@@ -1,0 +1,16 @@
+{
+  "name": "t1c-lib-js",
+  "version": "0.0.1",
+  "description": "The Trust1Connector library (T1C-Lib), is a javascript library to communicate with the Trust1Connector. The library simplify the execution to the connector and works asynchronous.",
+  "main": "dist/connector.js",
+  "scripts": {
+    "test": "mocha tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/Trust1T/t1c-lib-js.git"
+  },
+  "author": "Trust1Team",
+  "license": "SEE LICENSE IN license.txt",
+  "homepage": "https://bitbucket.org/Trust1T/t1c-lib-js#readme"
+}
