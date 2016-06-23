@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "sourceMap": true
+  },
+  "exclude": [
+    "node_modules"
+  ],
+  "files": [
+    "src/Trust1Connector.ts",
+    "src/Trust1Team.ts",
+    "src/Trust1Team/Config.ts",
+    "typings/index.d.ts"
+  ]
+}

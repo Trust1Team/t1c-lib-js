@@ -4,6 +4,12 @@ The Trust1Connector library (T1C-Lib), is a javascript library to communicate wi
 
 When the Trust1Connector isn’t installed the library will download the file automatically. This check returns a small object with some information.
 
+## Set up ##
+```bash
+$ git clone
+$ npm install
+```
+
 ### Usage ###
 Error message:
 ```json
