@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Simple</title>
+    <style media="screen">
+        pre {
+            background-color: #ddd;
+            border: 2px solid #333;
+            padding: .3em .5em;
+        }
+
+        pre#error {
+            border-color: #900;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div>
+        <button id="info">Info</button>
+        <button id="getTypes">Get Types</button>
+        <button id="beidRn">BeID Read</button>
+        <button id="beidAddress">BeID Address</button>
+        <button id="beidPhoto">BeID Photo</button>
+        <button id="beidRootCert">BeID Root Cert</button>
+        <button id="beidCitizenCert">BeID Citizen Cert</button>
+        <button id="beidAuthCert">BeID Authentication Cert</button>
+        <button id="beidNonRepCert">BeID Non Repudiation Cert</button>
+        <button id="beidVerifyPin">BeID Verify Pin</button>
+        <button id="beidSign">BeID Sign</button>
+        <button id="clear">Clear</button>
+    </div>
+    <pre id="information"></pre>
+    <pre id="error"></pre>
+</div>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js" charset="utf-8"></script>
+<script src="dist/bundle.js" charset="utf-8"></script>
+<script type="text/javascript">
+    (function ($) {
+
+        var connector = new Trust1Team.Trust1Connector({});
+        connector.checkForConnector(function(object) {
+            $("#error").empty();
+            $("#error").append(object.Info.version);
+        });
+
+
+
+
+//        T1Connector.init({}, function (object) {
+//            $("#error").empty();
+//            $("#error").append(object.message);
+//        });
+//
+//        function callback(data) {
+//            $("#information").append(JSON.stringify(data, null, '  '));
+//        }
+//
+//        $("#info").on('click', function () {
+//            $("#information").empty();
+//            T1Connector.info(callback, callback);
+//        });
+//        $("#getTypes").on('click', function () {
+//            $("#information").empty();
+//            T1Connector.card.getTypes(callback, callback);
+//        });
+//        $("#beidRn").on('click', function () {
+//            $("#information").empty();
+//            T1Connector.beid.rn(callback, callback);
+//        });
+//        $("#beidAddress").on('click', function () {
+//            $("#information").empty();
+//            T1Connector.beid.address(callback, callback);
+//        });
+//        $("#beidPhoto").on('click', function () {
+//            $("#information").empty();
+//            T1Connector.beid.photo(callback, callback);
+//        });
+//        $("#beidRootCert").on('click', function () {
+//            $("#information").empty();
+//            T1Connector.beid.rootCertificate(callback, callback);
+//        });
+//        $("#beidCitizenCert").on('click', function () {
+//            $("#information").empty();
+//            T1Connector.beid.citizenCertificate(callback, callback);
+//        });
+//        $("#beidAuthCert").on('click', function () {
+//            $("#information").empty();
+//            T1Connector.beid.authenticationCertificate(callback, callback);
+//        });
+//        $("#beidNonRepCert").on('click', function () {
+//            $("#information").empty();
+//            T1Connector.beid.nonRepudiationCertificate(callback, callback);
+//        });
+//        $("#beidVerifyPin").on('click', function () {
+//            $("#information").empty();
+//            var _body = "{\"VerifyPin\": {\"pin\": \"\",\"authenticationreference\": \"sha1\", \"privatekeyreference\": \"nonrepudiation\"}}";
+//            T1Connector.beid.verifyPin(callback, callback, _body);
+//        });
+//        $("#beidSign").on('click', function () {
+//            $("#information").empty();
+//            var _body = "{\"Sign\": {\"pin\": \"\",\"authenticationreference\": \"sha1\", \"privatekeyreference\": \"nonrepudiation\", \"data\": \"\"}}";
+//            T1Connector.beid.sign(callback, callback, _body);
+//        });
+//        $("#clear").on('click', function () {
+//            $("#information").empty();
+//        });
+    })(window.jQuery);
+</script>
+</body>
+</html>
