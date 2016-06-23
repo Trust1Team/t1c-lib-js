@@ -4,7 +4,7 @@
   "description": "The Trust1Connector library (T1C-Lib), is a javascript library to communicate with the Trust1Connector. The library simplify the execution to the connector and works asynchronous.",
   "main": "dist/connector.js",
   "scripts": {
-    "postinstall": "tsd reinstall --overwrite --save",
+    "postinstall": "typings install",
     "test": "karma start --single-run",
     "build": "browserify src/connector.js | uglifyjs -mc > dist/connector-min.js"
   },
@@ -31,7 +31,7 @@
     "ts-loader": "^0.8.2",
     "typescript": "^1.8.10",
     "uglify-js": "^2.6.2",
-    "webpack": "^1.13.1"
+    "webpack": "^1.13.1",
   },
   "dependencies": {
     "es6-promise": "^3.2.1",
