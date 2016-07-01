@@ -17,15 +17,15 @@ export class Config {
         this._performCheck = performCheck || true;
     }
 
-    get connectorUrl():string {
+    public connectorUrl():string {
         return this._connectorUrl;
     }
 
-    get distributionUrl():string {
+    public distributionUrl():string {
         return this._distributionUrl;
     }
 
-    get performCheck():boolean {
+    public performCheck():boolean {
         return this._performCheck;
     }
 }

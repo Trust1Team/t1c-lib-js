@@ -7,4 +7,5 @@ function __export(m) {
  */
 __export(require('./Trust1Team/Config'));
 __export(require('./Trust1Team/Connection'));
+__export(require('./Trust1Team/Cards'));
 //# sourceMappingURL=Trust1Team.js.map
