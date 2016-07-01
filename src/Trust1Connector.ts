@@ -3,15 +3,15 @@
  * @since 2016
  */
 
-import { Config, Connection } from './Trust1Team';
+import { Config, Connection, BeIDCard } from './Trust1Team';
 import { Promise } from 'es6-promise';
 
 export class Trust1Connector {
     private config:Config;
     private connection:Connection;
 
-    constructor(config?:Config) {
-        this.config = config;
+    constructor(config) {
+        this.config = new Config(config);
         this.connection = new Connection(this.config);
     }
 
@@ -25,4 +25,8 @@ export class Trust1Connector {
     // Card Types
 
     // Card Readers
+    public beid():BeIDCard {
+        var url:string = this.config.connectorUrl();
+        return new BeIDCard(url, this.connection);
+    }
 }

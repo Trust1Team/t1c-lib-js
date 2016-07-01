@@ -39,7 +39,7 @@
 <script type="text/javascript">
     (function ($) {
 
-        var connector = new Trust1Team.Trust1Connector({});
+        var connector = new Trust1Team.Trust1Connector();
         connector.checkForConnector(function(object) {
             $("#error").empty();
             $("#error").append(object.Info.version);
@@ -53,9 +53,9 @@
 //            $("#error").append(object.message);
 //        });
 //
-//        function callback(data) {
-//            $("#information").append(JSON.stringify(data, null, '  '));
-//        }
+        function callback(data) {
+            $("#information").append(JSON.stringify(data, null, '  '));
+        }
 //
 //        $("#info").on('click', function () {
 //            $("#information").empty();
@@ -65,10 +65,11 @@
 //            $("#information").empty();
 //            T1Connector.card.getTypes(callback, callback);
 //        });
-//        $("#beidRn").on('click', function () {
-//            $("#information").empty();
-//            T1Connector.beid.rn(callback, callback);
-//        });
+        $("#beidRn").on('click', function () {
+            $("#information").empty();
+            var beid = connector.beid();
+            beid.rn(callback);
+        });
 //        $("#beidAddress").on('click', function () {
 //            $("#information").empty();
 //            T1Connector.beid.address(callback, callback);

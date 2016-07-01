@@ -10,27 +10,15 @@ var Config = (function () {
         this._distributionUrl = distributionUrl || this.defDistributionUrl;
         this._performCheck = performCheck || true;
     }
-    Object.defineProperty(Config.prototype, "connectorUrl", {
-        get: function () {
-            return this._connectorUrl;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Config.prototype, "distributionUrl", {
-        get: function () {
-            return this._distributionUrl;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(Config.prototype, "performCheck", {
-        get: function () {
-            return this._performCheck;
-        },
-        enumerable: true,
-        configurable: true
-    });
+    Config.prototype.connectorUrl = function () {
+        return this._connectorUrl;
+    };
+    Config.prototype.distributionUrl = function () {
+        return this._distributionUrl;
+    };
+    Config.prototype.performCheck = function () {
+        return this._performCheck;
+    };
     return Config;
 })();
 exports.Config = Config;
