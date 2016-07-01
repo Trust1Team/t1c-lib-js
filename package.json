@@ -6,7 +6,7 @@
   "scripts": {
     "postinstall": "typings install",
     "test": "karma start --single-run",
-    "build": "browserify src/connector.js | uglifyjs -mc > dist/connector-min.js"
+    "build": "webpack --progress --colors"
   },
   "repository": {
     "type": "git",
@@ -16,7 +16,6 @@
   "license": "SEE LICENSE IN license.txt",
   "homepage": "https://bitbucket.org/Trust1T/t1c-lib-js#readme",
   "devDependencies": {
-    "browserify": "^13.0.1",
     "chai": "^3.5.0",
     "karma": "^0.13.22",
     "karma-chai": "^0.1.0",

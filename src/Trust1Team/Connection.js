@@ -21,9 +21,6 @@ var Connection = (function () {
                         }
                     }
                     else {
-                        //if (xmlHttp.hasOwnProperty('responseURL') && xmlHttp.getOwnProperty('').substr(0, this.config.distributionUrl.length) === this.config.distributionUrl) {
-                        //    reject(xmlHttp.responseText);
-                        //}
                         reject(JSON.parse(xmlHttp.responseText));
                     }
                 }

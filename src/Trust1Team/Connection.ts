@@ -15,8 +15,8 @@ export class Connection {
 
     private request (method:string, url:string, body:any):Promise<any> {
         return new Promise<any>((resolve, reject) => {
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.onreadystatechange = function () {
+            let xmlHttp:XMLHttpRequest = new XMLHttpRequest();
+            xmlHttp.onreadystatechange = () => {
                 if (xmlHttp.readyState === 4) {
                     if (xmlHttp.status === 200) {
                         if (xmlHttp.responseText && xmlHttp.responseText.length > 0) {
@@ -25,9 +25,6 @@ export class Connection {
                             resolve('');
                         }
                     } else {
-                        //if (xmlHttp.hasOwnProperty('responseURL') && xmlHttp.getOwnProperty('').substr(0, this.config.distributionUrl.length) === this.config.distributionUrl) {
-                        //    reject(xmlHttp.responseText);
-                        //}
                         reject(JSON.parse(xmlHttp.responseText));
                     }
                 }
