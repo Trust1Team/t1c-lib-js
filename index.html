@@ -78,10 +78,11 @@
 //            $("#information").empty();
 //            T1Connector.beid.photo(callback, callback);
 //        });
-//        $("#beidRootCert").on('click', function () {
-//            $("#information").empty();
-//            T1Connector.beid.rootCertificate(callback, callback);
-//        });
+        $("#beidRootCert").on('click', function () {
+            $("#information").empty();
+            var beid = connector.beid();
+            beid.rootCertificate(callback);
+        });
 //        $("#beidCitizenCert").on('click', function () {
 //            $("#information").empty();
 //            T1Connector.beid.citizenCertificate(callback, callback);

@@ -9,7 +9,7 @@ import { Promise } from 'es6-promise';
 
 describe('Connection', () => {
     let connection:Connection;
-    var server:Sinon.SinonFakeServer;
+    let server:Sinon.SinonFakeServer;
 
     beforeEach(() => {
         connection = new Connection(new Config());
@@ -19,7 +19,6 @@ describe('Connection', () => {
     afterEach(() => {
         server.restore();
     });
-
 
     describe('responding to a generic request', function () {
         beforeEach(function () {
@@ -36,13 +35,12 @@ describe('Connection', () => {
             var p:Promise<any> = connection.get('/hello');
             p.then(
                 (result) => {
-                    console.log(result);
-                    //expect(result).to.be.eq();
+                    expect(result.hello).to.be.eq("world");
+                    sinon.assertCalledWith('');
                     done();
                 }
             );
             server.respond();
-            //server.done();
         });
     });
 });
