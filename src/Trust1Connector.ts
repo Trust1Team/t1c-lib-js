@@ -13,7 +13,8 @@ export class Trust1Connector {
     private cards:Cards;
 
     constructor(config:Config) {
-        this.cards = new Cards(this.config.connectorUrl());
+        this.config = config || new Config();
+        this.cards = new Cards(this.config.connectorUrl);
     }
 
     public checkForConnector(callback) {
@@ -27,7 +28,6 @@ export class Trust1Connector {
 
     // Card Readers
     public beid():BeIDCard {
-        var url:string = this.config.connectorUrl();
         return this.cards.belgiumElectronicID;
     }
 }
