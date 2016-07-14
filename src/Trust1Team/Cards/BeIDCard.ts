@@ -8,9 +8,21 @@ import {connection} from "./../Connection";
 export class BeIDCard {
 
     private url:string;
+    private info_url:string;
 
     constructor(url:string) {
         this.url = url + '/beid';
+        this.info_url = url;
+    }
+
+    // GET  GCL Info
+    public info(resolve, reject) {
+        var p = connection.get(this.info_url + '/info');
+        p.then((result) => {
+            return resolve(result);
+        }, (error) => {
+            return reject(error);
+        })
     }
 
     // GET  Rn Data

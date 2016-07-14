@@ -57,10 +57,11 @@
             $("#information").append(JSON.stringify(data, null, '  '));
         }
 //
-//        $("#info").on('click', function () {
-//            $("#information").empty();
-//            T1Connector.info(callback, callback);
-//        });
+        $("#info").on('click', function () {
+            $("#information").empty();
+            var beid = connector.beid();
+            beid.info(callback);
+        });
 //        $("#getTypes").on('click', function () {
 //            $("#information").empty();
 //            T1Connector.card.getTypes(callback, callback);
