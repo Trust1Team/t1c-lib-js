@@ -18,7 +18,7 @@ export class Trust1Connector {
     }
 
     public checkForConnector(callback) {
-        var p = connection.get('http://localhost:12345/v1/info');
+        var p = connection.get('https://localhost:12345/v1/info');
         p.then((result) => {
             return callback(result);
         })
