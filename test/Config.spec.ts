@@ -2,8 +2,8 @@
  * @author Maarten Casteels
  * @since 2016
  */
-import { Config } from '../src/Trust1Team';
 import { expect } from 'chai';
+import {Config} from "../src/Trust1Team/Config";
 
 describe('Config', () => {
     let config:Config;

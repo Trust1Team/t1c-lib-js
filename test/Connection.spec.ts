@@ -2,17 +2,15 @@
  * @author Maarten Casteels
  * @since 2016
  */
-import { Config, Connection } from '../src/Trust1Team';
-import { expect } from 'chai';
-import * as sinon from  'sinon';
-import { Promise } from 'es6-promise';
+import {expect} from "chai";
+import * as sinon from "sinon";
+import {Promise} from "es6-promise";
+import {connection} from "../src/Trust1Team/Connection";
 
 describe('Connection', () => {
-    let connection:Connection;
     let server:Sinon.SinonFakeServer;
 
     beforeEach(() => {
-        connection = new Connection(new Config());
         server = sinon.fakeServer.create();
     });
 

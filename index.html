@@ -70,44 +70,50 @@
             var beid = connector.beid();
             beid.rn(callback);
         });
-//        $("#beidAddress").on('click', function () {
-//            $("#information").empty();
-//            T1Connector.beid.address(callback, callback);
-//        });
-//        $("#beidPhoto").on('click', function () {
-//            $("#information").empty();
-//            T1Connector.beid.photo(callback, callback);
-//        });
+        $("#beidAddress").on('click', function () {
+            $("#information").empty();
+            var beid = connector.beid();
+            beid.address(callback);
+        });
+        $("#beidPhoto").on('click', function () {
+            $("#information").empty();
+            var beid = connector.beid();
+            beid.photo(callback);
+        });
         $("#beidRootCert").on('click', function () {
             $("#information").empty();
             var beid = connector.beid();
             beid.rootCertificate(callback);
         });
-//        $("#beidCitizenCert").on('click', function () {
-//            $("#information").empty();
-//            T1Connector.beid.citizenCertificate(callback, callback);
-//        });
-//        $("#beidAuthCert").on('click', function () {
-//            $("#information").empty();
-//            T1Connector.beid.authenticationCertificate(callback, callback);
-//        });
-//        $("#beidNonRepCert").on('click', function () {
-//            $("#information").empty();
-//            T1Connector.beid.nonRepudiationCertificate(callback, callback);
-//        });
-//        $("#beidVerifyPin").on('click', function () {
-//            $("#information").empty();
-//            var _body = "{\"VerifyPin\": {\"pin\": \"\",\"authenticationreference\": \"sha1\", \"privatekeyreference\": \"nonrepudiation\"}}";
-//            T1Connector.beid.verifyPin(callback, callback, _body);
-//        });
+        $("#beidCitizenCert").on('click', function () {
+            $("#information").empty();
+            var beid = connector.beid();
+            beid.citizenCertificate(callback);
+        });
+        $("#beidAuthCert").on('click', function () {
+            $("#information").empty();
+            var beid = connector.beid();
+            beid.authenticationCertificate(callback);
+        });
+        $("#beidNonRepCert").on('click', function () {
+            $("#information").empty();
+            var beid = connector.beid();
+            beid.nonRepudiationCertificate(callback);
+        });
+        $("#beidVerifyPin").on('click', function () {
+            $("#information").empty();
+            var _body = "{\"VerifyPin\": {\"pin\": \"4331\",\"authenticationreference\": \"sha1\", \"privatekeyreference\": \"nonrepudiation\"}}";
+            var beid = connector.beid();
+            beid.verifyPin(_body, callback);
+        });
 //        $("#beidSign").on('click', function () {
 //            $("#information").empty();
 //            var _body = "{\"Sign\": {\"pin\": \"\",\"authenticationreference\": \"sha1\", \"privatekeyreference\": \"nonrepudiation\", \"data\": \"\"}}";
 //            T1Connector.beid.sign(callback, callback, _body);
 //        });
-//        $("#clear").on('click', function () {
-//            $("#information").empty();
-//        });
+        $("#clear").on('click', function () {
+            $("#information").empty();
+        });
     })(window.jQuery);
 </script>
 </body>
