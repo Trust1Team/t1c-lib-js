@@ -3,20 +3,21 @@
  * @since 2016
  */
 
-import { Config, Connection, BeIDCard } from './Trust1Team';
-import { Promise } from 'es6-promise';
+import {BeIDCard} from "./Trust1Team/Cards/BeIDCard";
+import {connection} from "./Trust1Team/Connection";
+import {Config} from "./Trust1Team/Config";
+import {Cards} from "./Trust1Team/Cards";
 
 export class Trust1Connector {
     private config:Config;
-    private connection:Connection;
+    private cards:Cards;
 
-    constructor(config) {
-        this.config = new Config(config);
-        this.connection = new Connection(this.config);
+    constructor(config:Config) {
+        this.cards = new Cards(this.config.connectorUrl());
     }
 
     public checkForConnector(callback) {
-        var p = this.connection.get('http://localhost:12345/v1/info');
+        var p = connection.get('http://localhost:12345/v1/info');
         p.then((result) => {
             return callback(result);
         })
@@ -27,6 +28,6 @@ export class Trust1Connector {
     // Card Readers
     public beid():BeIDCard {
         var url:string = this.config.connectorUrl();
-        return new BeIDCard(url, this.connection);
+        return this.cards.belgiumElectronicID;
     }
 }

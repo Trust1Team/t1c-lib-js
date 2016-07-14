@@ -2,4 +2,18 @@
  * @author Maarten Casteels
  * @since 2016
  */
-export * from './Cards/BeIDCard';
+import {BeIDCard} from "./Cards/BeIDCard";
+
+export class Cards {
+
+    private _belgiumElectronicID:BeIDCard;
+
+    constructor(url:string) {
+        this._belgiumElectronicID = new BeIDCard(url);
+    }
+
+
+    get belgiumElectronicID():BeIDCard {
+        return this._belgiumElectronicID;
+    }
+}

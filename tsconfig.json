@@ -9,8 +9,6 @@
   ],
   "files": [
     "src/Trust1Connector.ts",
-    "src/Trust1Team.ts",
-    "src/Trust1Team/Config.ts",
     "typings/index.d.ts"
   ]
 }

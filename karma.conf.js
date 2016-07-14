@@ -5,7 +5,7 @@ module.exports = function (config) {
         basePath: '',
         frameworks: ['mocha', 'chai', 'sinon'],
         files: [
-            'test/*.ts'
+            'test/**/*.ts'
         ],
         exclude: [
         ],

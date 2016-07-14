@@ -1,19 +1,22 @@
 /**
+ * TODO Add documentation!
+ *
  * @author Maarten Casteels
  * @since 2016
  */
-import { Promise } from 'es6-promise';
-import { Config } from './Config';
+import {Promise} from "es6-promise";
 
-export class Connection {
+interface Connection {
+    get(url:string, body?:any):Promise<any>;
+    post(url:string, body?:any):Promise<any>;
+}
 
-    private config:Config;
+class LocalConnection implements Connection {
 
-    constructor(config:Config) {
-        this.config = config;
+    constructor() {
     }
 
-    private request (method:string, url:string, body:any):Promise<any> {
+    private request(method:string, url:string, body:any):Promise<any> {
         return new Promise<any>((resolve, reject) => {
             let xmlHttp:XMLHttpRequest = new XMLHttpRequest();
             xmlHttp.onreadystatechange = () => {
@@ -38,14 +41,16 @@ export class Connection {
             }
             xmlHttp.send(body);
         });
-    };
+    }
 
 
     public get(url:string, body?:any):Promise<any> {
-      return this.request('GET', url, body || '');
-    };
+        return this.request('GET', url, body || '');
+    }
 
     public post(url:string, body?:any):Promise<any> {
         return this.request('POST', url, body || '');
-    };
+    }
 }
+
+export const connection = new LocalConnection();
