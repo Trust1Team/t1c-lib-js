@@ -15,7 +15,7 @@ describe('Config', () => {
     describe('#connectorUrl', () => {
         it('should return the default connector url', () => {
             var url:string = config.connectorUrl;
-            expect(url).to.be.eq('http://localhost:12345/v1');
+            expect(url).to.be.eq('https://localhost:12345/v1');
         });
 
         it('should return the custom connector url', () => {
@@ -29,7 +29,7 @@ describe('Config', () => {
             var test:string = '';
             var myConfig:Config = new Config(test);
             var url:string = myConfig.connectorUrl;
-            expect(url).to.be.eq('http://localhost:12345/v1');
+            expect(url).to.be.eq('https://localhost:12345/v1');
         });
     });
 
