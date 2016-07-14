@@ -9,7 +9,7 @@ var Trust1Connector = (function () {
         this.connection = new Trust1Team_1.Connection(this.config);
     }
     Trust1Connector.prototype.checkForConnector = function (callback) {
-        var p = this.connection.get('http://localhost:12345/v1/info');
+        var p = this.connection.get('https://localhost:12345/v1/info');
         p.then(function (result) {
             return callback(result);
         });
