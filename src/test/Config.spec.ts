@@ -3,7 +3,7 @@
  * @since 2016
  */
 import { expect } from 'chai';
-import {Config} from "../src/Trust1Team/Config";
+import {Config} from "../src/scripts/Trust1Team/Config";
 
 describe('Config', () => {
     let config:Config;
