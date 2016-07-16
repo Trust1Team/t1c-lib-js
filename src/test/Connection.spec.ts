@@ -5,7 +5,7 @@
 import {expect} from "chai";
 import * as sinon from "sinon";
 import {Promise} from "es6-promise";
-import {connection} from "../src/Trust1Team/Connection";
+import {connection} from "../src/scripts/Trust1Team/Connection";
 
 describe('Connection', () => {
     let server:Sinon.SinonFakeServer;

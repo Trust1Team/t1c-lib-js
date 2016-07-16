@@ -10,7 +10,7 @@
     "node_modules"
   ],
   "files": [
-    "src/Trust1Connector.ts",
+    "src/scripts/Trust1Connector.ts",
     "typings/index.d.ts"
   ]
 }
