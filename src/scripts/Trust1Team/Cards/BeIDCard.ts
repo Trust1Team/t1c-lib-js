@@ -55,7 +55,7 @@ export class BeIDCard {
         })
     }
 
-    // GET  Certificate Root
+    // get Certificate Root
     public rootCertificate(resolve, reject) {
         let p = connection.get(this.url + '/rootCertificate');
         p.then((result) => {
@@ -66,7 +66,7 @@ export class BeIDCard {
     }
 
 
-    // GET  Certificate Citizen
+    // get Certificate Citizen
     public citizenCertificate(resolve, reject) {
         let p = connection.get(this.url + '/citizenCertificate');
         p.then((result) => {
@@ -76,7 +76,7 @@ export class BeIDCard {
         })
     }
 
-    // GET  Certificate Non Repudiation
+    // get Certificate Non Repudiation
     public authenticationCertificate(resolve, reject) {
         let p = connection.get(this.url + '/authenticationCertificate');
         p.then((result) => {
@@ -86,7 +86,7 @@ export class BeIDCard {
         })
     }
 
-    // GET  Certificate Non Repudiation
+    // get Certificate Non Repudiation
     public nonRepudiationCertificate(resolve, reject) {
         let p = connection.get(this.url + '/nonRepudiationCertificate');
         p.then((result) => {
@@ -96,7 +96,7 @@ export class BeIDCard {
         })
     }
 
-    // POST Verify Pin
+    // post Verify Pin
     public verifyPin(body, resolve, reject) {
         let p = connection.post(this.url + '/verifyPin', body);
         p.then((result) => {
@@ -106,7 +106,7 @@ export class BeIDCard {
         })
     }
 
-    // POST Sign
+    // post Sign
     public sign(body, resolve, reject) {
         let p = connection.post(this.url + '/sign', body);
         p.then((result) => {
