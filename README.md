@@ -29,6 +29,11 @@ Use npm test to run the test suite of the project
 $ npm test
 ```
 
+To lint the code,
+```bash
+$ gulp tslint
+```
+
 To build the project to the right format,
 ```bash
 $ npm run build
