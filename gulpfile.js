@@ -25,7 +25,7 @@ gulp.task("tslint", function () {
 });
 
 gulp.task('webpack', function() {
-    return gulp.src('src/scripts/Trust1Connector.ts')
+    return gulp.src('src/scripts/gclClient.ts')
         .pipe(webpackstream( require('./webpack.config.js') ))
         .pipe(gulp.dest('dist/'));
 });

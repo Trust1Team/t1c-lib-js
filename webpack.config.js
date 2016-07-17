@@ -1,9 +1,9 @@
 var path = require("path");
 module.exports = {
-    entry: './src/scripts/Trust1Connector.ts',
+    entry: './src/scripts/gclClient.ts',
     output: {
         path: path.resolve(__dirname, "dist"),
-        filename: 'bundle.js',
+        filename: 'gclClient.js',
         library: ['gclClient']
     },
     devtool: 'source-map',

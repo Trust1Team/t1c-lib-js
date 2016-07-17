@@ -3,10 +3,10 @@
  * @since 2016
  */
 
-import {BeIDCard} from "./Trust1Team/Cards/BeIDCard";
-import {connection} from "./Trust1Team/Connection";
-import {Config} from "./Trust1Team/Config";
-import {Cards} from "./Trust1Team/Cards";
+import {BeIDCard} from "./Plugins/Cards/BeIDCard";
+import {connection} from "./Plugins/Connection";
+import {Config} from "./Plugins/Config";
+import {Cards} from "./Plugins/Cards";
 
 export class Trust1Connector {
     private config: Config;
