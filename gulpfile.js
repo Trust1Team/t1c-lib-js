@@ -1,4 +1,9 @@
 var gulp = require("gulp");
+var gutil = require( 'gulp-util' );
+var webpackstream = require('webpack-stream');
+var webpack = require('webpack');
+var WebpackDevServer = require("webpack-dev-server");
+var webpackConfig    = require('./webpack.config.js');
 var rename = require("gulp-rename");
 var del = require("del");
 var ts = require("gulp-typescript");
@@ -17,6 +22,22 @@ gulp.task("tslint", function () {
             formatter: "verbose"
         }))
         .pipe(tslint.report());
+});
+
+gulp.task('webpack', function() {
+    return gulp.src('src/scripts/Trust1Connector.ts')
+        .pipe(webpackstream( require('./webpack.config.js') ))
+        .pipe(gulp.dest('dist/'));
+});
+
+gulp.task('webpack-dev-server', function (callback) {
+    new WebpackDevServer(webpack(webpackConfig), {
+    }).listen(8080, 'localhost', function (err) {
+        if (err) {
+            throw new gutil.PluginError('webpack-dev-server', err);
+        }
+        gutil.log('[webpack-dev-server]', 'http://localhost:8080/index.html');
+    });
 });
 
 gulp.task("clean-css", function(cb) {
