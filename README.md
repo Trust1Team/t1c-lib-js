@@ -19,6 +19,11 @@ To use all the dependencies we also need the following commands on the environme
 $ npm install --global webpack
 ```
 
+You need to have typings installed for typing generation
+```bash
+$ npm install --global typings
+```
+
 To use all the dependencies we also need the following commands on the environment path
 ```bash
 $ npm install --global tslint
