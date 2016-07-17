@@ -39,6 +39,10 @@ To build the project to the right format,
 $ npm run build
 ```
 
+TODO - compiler options
+/*    "declaration": false,*/
+/*    "noImplicitAny": true,*/
+
 ### Usage ###
 Error message:
 ```json
