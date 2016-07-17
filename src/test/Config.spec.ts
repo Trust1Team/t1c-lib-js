@@ -2,8 +2,8 @@
  * @author Maarten Casteels
  * @since 2016
  */
-import { expect } from 'chai';
-import {Config} from "../src/scripts/Plugins/Config";
+import { expect } from "chai";
+import {Config} from "../scripts/Plugins/Config";
 
 describe('Config', () => {
     let config:Config;
