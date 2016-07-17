@@ -19,6 +19,11 @@ To use all the dependencies we also need the following commands on the environme
 $ npm install --global webpack
 ```
 
+To use all the dependencies we also need the following commands on the environment path
+```bash
+$ npm install --global tslint
+```
+
 Use npm install to download the necessary dependencies
 ```bash
 $ npm install
@@ -36,7 +41,7 @@ $ gulp tslint
 
 To build the project to the right format,
 ```bash
-$ npm run build
+$ gulp webpack
 ```
 
 TODO - compiler options
