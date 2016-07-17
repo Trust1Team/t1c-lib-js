@@ -27,6 +27,7 @@
     "gulp-util": "^3.0.7",
     "karma": "^0.13.22",
     "karma-chai": "^0.1.0",
+    "karma-mocha": "^1.1.1",
     "karma-phantomjs-launcher": "^1.0.0",
     "karma-sinon": "^1.0.5",
     "karma-typescript-preprocessor2": "^1.2.1",
