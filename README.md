@@ -50,8 +50,8 @@ $ gulp webpack
 ```
 
 TODO - compiler options
-/*    "declaration": false,*/
-/*    "noImplicitAny": true,*/
+"declaration": false,
+"noImplicitAny": true,
 
 ### Usage ###
 Error message:
