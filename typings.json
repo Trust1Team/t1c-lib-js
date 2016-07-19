@@ -1,0 +1,12 @@
+{
+  "name": "t1c-lib-js",
+  "globalDependencies": {
+    "assertion-error": "github:DefinitelyTyped/DefinitelyTyped/assertion-error/assertion-error.d.ts#830e4aaac859e4f648efaa16712f1d6e378e6902",
+    "chai": "github:DefinitelyTyped/DefinitelyTyped/chai/chai.d.ts#830e4aaac859e4f648efaa16712f1d6e378e6902",
+    "mocha": "github:DefinitelyTyped/DefinitelyTyped/mocha/mocha.d.ts#830e4aaac859e4f648efaa16712f1d6e378e6902",
+    "sinon": "github:DefinitelyTyped/DefinitelyTyped/sinon/sinon.d.ts#830e4aaac859e4f648efaa16712f1d6e378e6902"
+  },
+  "dependencies": {
+    "es6-promise": "registry:npm/es6-promise#3.0.0+20160211003958"
+  }
+}
