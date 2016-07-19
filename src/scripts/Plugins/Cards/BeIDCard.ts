@@ -3,7 +3,7 @@
  * @since 2016
  */
 
-import {connection} from "./../Connection";
+import {connection} from "../Connection";
 
 export class BeIDCard {
 
@@ -17,7 +17,7 @@ export class BeIDCard {
 
     // GET  GCL Info
     public info(resolve, reject) {
-        var p = connection.get(this.info_url + '/info');
+        let p = connection.get(this.info_url + '/info');
         p.then((result) => {
             return resolve(result);
         }, (error) => {
@@ -27,7 +27,7 @@ export class BeIDCard {
 
     // GET  Rn Data
     public rn(resolve, reject) {
-        var p = connection.get(this.url + '/rn');
+        let p = connection.get(this.url + '/rn');
         p.then((result) => {
             return resolve(result);
         }, (error) => {
@@ -37,7 +37,7 @@ export class BeIDCard {
 
     // GET  Address
     public address(resolve, reject) {
-        var p = connection.get(this.url + '/address');
+        let p = connection.get(this.url + '/address');
         p.then((result) => {
             return resolve(result);
         }, (error) => {
@@ -47,7 +47,7 @@ export class BeIDCard {
 
     // GET  Photo
     public photo(resolve, reject) {
-        var p = connection.get(this.url + '/photo');
+        let p = connection.get(this.url + '/photo');
         p.then((result) => {
             return resolve(result);
         }, (error) => {
@@ -55,9 +55,9 @@ export class BeIDCard {
         })
     }
 
-    // GET  Certificate Root
+    // get Certificate Root
     public rootCertificate(resolve, reject) {
-        var p = connection.get(this.url + '/rootCertificate');
+        let p = connection.get(this.url + '/rootCertificate');
         p.then((result) => {
             return resolve(result);
         }, (error) => {
@@ -66,9 +66,9 @@ export class BeIDCard {
     }
 
 
-    // GET  Certificate Citizen
+    // get Certificate Citizen
     public citizenCertificate(resolve, reject) {
-        var p = connection.get(this.url + '/citizenCertificate');
+        let p = connection.get(this.url + '/citizenCertificate');
         p.then((result) => {
             return resolve(result);
         }, (error) => {
@@ -76,9 +76,9 @@ export class BeIDCard {
         })
     }
 
-    // GET  Certificate Non Repudiation
+    // get Certificate Non Repudiation
     public authenticationCertificate(resolve, reject) {
-        var p = connection.get(this.url + '/authenticationCertificate');
+        let p = connection.get(this.url + '/authenticationCertificate');
         p.then((result) => {
             return resolve(result);
         }, (error) => {
@@ -86,9 +86,9 @@ export class BeIDCard {
         })
     }
 
-    // GET  Certificate Non Repudiation
+    // get Certificate Non Repudiation
     public nonRepudiationCertificate(resolve, reject) {
-        var p = connection.get(this.url + '/nonRepudiationCertificate');
+        let p = connection.get(this.url + '/nonRepudiationCertificate');
         p.then((result) => {
             return resolve(result);
         }, (error) => {
@@ -96,9 +96,9 @@ export class BeIDCard {
         })
     }
 
-    // POST Verify Pin
+    // post Verify Pin
     public verifyPin(body, resolve, reject) {
-        var p = connection.post(this.url + '/verifyPin', body);
+        let p = connection.post(this.url + '/verifyPin', body);
         p.then((result) => {
             return resolve(result);
         }, (error) => {
@@ -106,9 +106,9 @@ export class BeIDCard {
         })
     }
 
-    // POST Sign
+    // post Sign
     public sign(body, resolve, reject) {
-        var p = connection.post(this.url + '/sign', body);
+        let p = connection.post(this.url + '/sign', body);
         p.then((result) => {
             return resolve(result);
         }, (error) => {

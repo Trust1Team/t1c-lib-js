@@ -19,6 +19,16 @@ To use all the dependencies we also need the following commands on the environme
 $ npm install --global webpack
 ```
 
+You need to have typings installed for typing generation
+```bash
+$ npm install --global typings
+```
+
+To use all the dependencies we also need the following commands on the environment path
+```bash
+$ npm install --global tslint
+```
+
 Use npm install to download the necessary dependencies
 ```bash
 $ npm install
@@ -29,10 +39,19 @@ Use npm test to run the test suite of the project
 $ npm test
 ```
 
+To lint the code,
+```bash
+$ gulp tslint
+```
+
 To build the project to the right format,
 ```bash
-$ npm run build
+$ gulp webpack
 ```
+
+TODO - compiler options
+"declaration": false,
+"noImplicitAny": true,
 
 ### Usage ###
 Error message:
