@@ -1,8 +1,57 @@
 # Trust1Connector JavaScript Library
+[![Build Status](https://travis-ci.com/Trust1Team/t1c-lib-js.svg?token=Gnzr2xhdJbZMGJQ8i5nK&branch=develop)](https://travis-ci.com/Trust1Team/t1c-lib-js)
 
 The Trust1Connector library (T1C-Lib), is a javascript library to communicate with the Trust1Connector. The library simplify the execution to the connector and works asynchronous.
 
 When the Trust1Connector isn’t installed the library will download the file automatically. This check returns a small object with some information.
+
+## Installation - OSX Only
+Make sure you have brew installed on your machine
+```bash
+$ brew update
+$ brew upgrade # if you want this!
+$ brew install node
+```
+When node and npm are installed make sure to restart your terminal to make use of the fresh installed versions.
+
+To use all the dependencies we also need the following commands on the environment path
+```bash
+$ npm install --global webpack
+```
+
+You need to have typings installed for typing generation
+```bash
+$ npm install --global typings
+```
+
+To use all the dependencies we also need the following commands on the environment path
+```bash
+$ npm install --global tslint
+```
+
+Use npm install to download the necessary dependencies
+```bash
+$ npm install
+```
+
+Use npm test to run the test suite of the project
+```bash
+$ npm test
+```
+
+To lint the code,
+```bash
+$ gulp tslint
+```
+
+To build the project to the right format,
+```bash
+$ gulp webpack
+```
+
+TODO - compiler options
+"declaration": false,
+"noImplicitAny": true,
 
 ### Usage ###
 Error message:

@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "declaration": false,
+    "diagnostics": true,
+    "removeComments": true,
+    "sourceMap": true
+  },
+  "compileOnSave": false,
+  "exclude": [
+    "node_modules"
+  ],
+  "files": [
+    "src/scripts/gclClient.ts",
+    "typings/index.d.ts"
+  ]
+}
