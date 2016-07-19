@@ -5,12 +5,12 @@ module.exports = function (config) {
         basePath: '',
         frameworks: ['mocha', 'chai', 'sinon'],
         files: [
-            'test/**/*.ts'
+            'src/test/**/*.ts'
         ],
         exclude: [
         ],
         preprocessors: {
-            'test/**/*.ts': ['webpack']
+            'src/test/**/*.ts': ['webpack']
         },
         webpack: {
             module: webpackConfig.module,

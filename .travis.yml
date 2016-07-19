@@ -5,7 +5,3 @@ node_js:
 branches:
   only:
     - develop
-
-addons:
-    code_climate:
-        repo_token: 6766bf9760f833960fa1cf0c240c0b6260b1659c0be2725781dbc9a945a7631c
