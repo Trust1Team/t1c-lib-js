@@ -3,12 +3,12 @@
  * @since 2016
  */
 
-import {BeIDCard} from "./Plugins/Cards/BeIDCard";
-import {connection} from "./Plugins/Connection";
-import {Config} from "./Plugins/Config";
-import {Cards} from "./Plugins/Cards";
+import {BeIDCard} from "../Plugins/smartcards/eid/be/BeIDCard";
+import {connection} from "./comm/Connection";
+import {Config} from "./Config";
+import {Cards} from "../Plugins/Cards";
 
-export class Trust1Connector {
+export class GCLClient {
     private config: Config;
     private cards: Cards;
 

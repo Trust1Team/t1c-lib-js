@@ -2,6 +2,7 @@
  * TODO Add documentation!
  *
  * @author Maarten Casteels
+ * @autho Michallis Pashidis
  * @since 2016
  */
 import {Promise} from "es6-promise";
@@ -13,8 +14,7 @@ interface Connection {
 
 class LocalConnection implements Connection {
 
-    constructor() {
-    }
+    constructor() {}
 
     private request(method:string, url:string, body:any):Promise<any> {
         return new Promise<any>((resolve, reject) => {

@@ -2,9 +2,11 @@
  * @author Maarten Casteels
  * @since 2016
  */
-import {BeIDCard} from "./Cards/BeIDCard";
+import {BeIDCard} from "./smartcards/eid/be/BeIDCard";
 
 export class Cards {
+    // card factory
+
 
     private _belgiumElectronicID:BeIDCard;
 
