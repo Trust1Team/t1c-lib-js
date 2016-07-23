@@ -3,7 +3,7 @@
  * @since 2016
  */
 
-import {connection} from "../Connection";
+import {connection} from "../../../../core/comm/Connection";
 
 export class BeIDCard {
 
@@ -15,7 +15,7 @@ export class BeIDCard {
         this.info_url = url;
     }
 
-    // GET  GCL Info
+    // get  GCL Info
     public info(resolve, reject) {
         let p = connection.get(this.info_url + '/info');
         p.then((result) => {
@@ -25,7 +25,7 @@ export class BeIDCard {
         })
     }
 
-    // GET  Rn Data
+    // get  Rn Data
     public rn(resolve, reject) {
         let p = connection.get(this.url + '/rn');
         p.then((result) => {
@@ -35,7 +35,7 @@ export class BeIDCard {
         })
     }
 
-    // GET  Address
+    // get  Address
     public address(resolve, reject) {
         let p = connection.get(this.url + '/address');
         p.then((result) => {
@@ -45,7 +45,7 @@ export class BeIDCard {
         })
     }
 
-    // GET  Photo
+    // get  Photo
     public photo(resolve, reject) {
         let p = connection.get(this.url + '/photo');
         p.then((result) => {
