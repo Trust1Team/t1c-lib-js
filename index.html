@@ -2,7 +2,9 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Simple</title>
+    <title>GCL Javascript Test Page</title>
+    <!--Add bootstrap and dependencies-->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <style media="screen">
         pre {
             background-color: #ddd;
@@ -13,28 +15,63 @@
         pre#error {
             border-color: #900;
         }
+        .modal-header, h4, .close {
+            background-color: #5cb85c;
+            color:white !important;
+            text-align: center;
+            font-size: 30px;
+        }
+        .modal-footer {
+            background-color: #f9f9f9;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div>
-        <button id="info">Info</button>
-        <button id="getTypes">Get Types</button>
-        <button id="beidRn">BeID Read</button>
-        <button id="beidAddress">BeID Address</button>
-        <button id="beidPhoto">BeID Photo</button>
-        <button id="beidRootCert">BeID Root Cert</button>
-        <button id="beidCitizenCert">BeID Citizen Cert</button>
-        <button id="beidAuthCert">BeID Authentication Cert</button>
-        <button id="beidNonRepCert">BeID Non Repudiation Cert</button>
-        <button id="beidVerifyPin">BeID Verify Pin</button>
-        <button id="beidSign">BeID Sign</button>
-        <button id="clear">Clear</button>
+        <button id="info" type="button" class="btn btn-default btn-lg">Info</button>
+        <button id="getTypes" type="button" class="btn btn-default btn-lg">Get Types</button>
+        <button id="beidRn" type="button" class="btn btn-default btn-lg">BeID Read</button>
+        <button id="beidAddress" type="button" class="btn btn-default btn-lg">BeID Address</button>
+        <button id="beidPhoto" type="button" class="btn btn-default btn-lg">BeID Photo</button>
+        <button id="beidRootCert" type="button" class="btn btn-default btn-lg">BeID Root Cert</button>
+        <button id="beidCitizenCert" type="button" class="btn btn-default btn-lg">BeID Citizen Cert</button>
+        <button id="beidAuthCert" type="button" class="btn btn-default btn-lg">BeID Authentication Cert</button>
+        <button id="beidNonRepCert" type="button" class="btn btn-default btn-lg">BeID Non Repudiation Cert</button>
+        <button id="beidVerifyPin" type="button" class="btn btn-default btn-lg">BeID Verify Pin</button>
+        <button id="beidSign" type="button" class="btn btn-default btn-lg">BeID Sign</button>
+        <button id="clear" type="button" class="btn btn-default btn-lg">Clear</button>
     </div>
     <pre id="information"></pre>
     <pre id="error"></pre>
+    <!-- Modal -->
+    <div class="modal fade" id="pinModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Validate PIN</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <form role="form">
+                        <div class="form-group">
+                            <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                            <input type="password" class="form-control" id="psw" placeholder="Enter password">
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-off"></span> Validate</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button id="modalValidateSubmit" type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
-<script src="https://code.jquery.com/jquery-2.1.4.min.js" charset="utf-8"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script src="dist/gclClient.js" charset="utf-8"></script>
 <script type="text/javascript">
     (function ($) {
@@ -44,9 +81,6 @@
             $("#error").empty();
             $("#error").append(object.Info.version);
         });
-
-
-
 
 //        T1Connector.init({}, function (object) {
 //            $("#error").empty();
@@ -103,9 +137,13 @@
         });
         $("#beidVerifyPin").on('click', function () {
             $("#information").empty();
-            var _body = "{\"VerifyPin\": {\"pin\": \"4331\",\"authenticationreference\": \"sha1\", \"privatekeyreference\": \"nonrepudiation\"}}";
-            var beid = connector.beid();
-            beid.verifyPin(_body, callback);
+            $("#pinModal").modal();
+            //var _body = "{\"VerifyPin\": {\"pin\": \"4331\",\"authenticationreference\": \"sha1\", \"privatekeyreference\": \"nonrepudiation\"}}";
+            //var beid = connector.beid();
+            //beid.verifyPin(_body, callback);
+        });
+        $("#modalValidateSubmit").on('click', function () {
+            console.log("let's validate");
         });
 //        $("#beidSign").on('click', function () {
 //            $("#information").empty();
