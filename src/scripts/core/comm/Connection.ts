@@ -45,6 +45,9 @@ class LocalConnection implements Connection {
 
 
     public get(url:string, body?:any):Promise<any> {
+        $.getJSON( url, function( data ) {
+            console.log("jquery data: "+JSON.stringify(data));
+        });
         return this.request('GET', url, body || '');
     }
 
