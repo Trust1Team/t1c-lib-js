@@ -76,7 +76,7 @@
 <script type="text/javascript">
     (function ($) {
 
-        var connector = new gclClient.Trust1Connector();
+        var connector = new gclClient.GCLClient();
         connector.checkForConnector(function(object) {
             $("#error").empty();
             $("#error").append(object.Info.version);

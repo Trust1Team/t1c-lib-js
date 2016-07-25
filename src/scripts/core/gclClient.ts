@@ -4,7 +4,6 @@
  */
 
 import {BeIDCard} from "../Plugins/smartcards/eid/be/BeIDCard";
-import {connection} from "./comm/Connection";
 import {Config} from "./Config";
 import {Cards} from "../Plugins/Cards";
 
@@ -18,10 +17,13 @@ export class GCLClient {
     }
 
     public checkForConnector(callback) {
-        let p = connection.get(this.config.infoUrl);
-        p.then((result) => {
-            return callback(result);
+        //let p = connection.get(this.config.infoUrl);
+        $.getJSON( this.config.infoUrl, function( data ) {
+            return callback(data);
         });
+/*        p.then((result) => {
+            return callback(result);
+        });*/
     }
 
     // card Types

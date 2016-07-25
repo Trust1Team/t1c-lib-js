@@ -1,6 +1,6 @@
 var path = require("path");
 module.exports = {
-    entry: './src/scripts/gclClient.ts',
+    entry: './src/scripts/core/gclClient.ts',
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: 'gclClient.js',
