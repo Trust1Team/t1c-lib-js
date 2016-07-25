@@ -18,7 +18,7 @@ export class GCLClient {
     }
 
     public checkForConnector(callback) {
-        let p = connection.get("https://localhost:12345/v1/info");
+        let p = connection.get(this.config.infoUrl);
         p.then((result) => {
             return callback(result);
         });
