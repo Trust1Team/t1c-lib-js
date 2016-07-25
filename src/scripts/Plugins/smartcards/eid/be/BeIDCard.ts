@@ -17,6 +17,7 @@ export class BeIDCard {
 
     // get  GCL Info
     public info(resolve, reject) {
+
         let p = connection.get(this.info_url + '/info');
         p.then((result) => {
             return resolve(result);
