@@ -1,0 +1,2 @@
+interface Card {}
+export {Card};

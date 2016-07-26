@@ -4,8 +4,8 @@
  */
 export class Config {
 
-    private defConnectorUrl:string = 'https://localhost:12345/v1';
-    private defDistributionUrl:string = 'https://dist.t1t.be/gcl-ds/v1';
+    private defConnectorUrl= 'https://localhost:12345/v1';
+    private defDistributionUrl = 'https://dist.t1t.be/gcl-ds/v1';
 
     private _connectorUrl:string;
     private _distributionUrl:string;

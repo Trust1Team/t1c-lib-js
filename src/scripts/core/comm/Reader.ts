@@ -1,0 +1,2 @@
+interface Reader{}
+export {Reader};

@@ -3,9 +3,9 @@
  * @since 2016
  */
 
-import {BeIDCard} from "../Plugins/smartcards/eid/be/BeIDCard";
+import {EidBe} from "../Plugins/smartcards/eid/be/EidBe";
 import {Config} from "./Config";
-import {Cards} from "../Plugins/Cards";
+import {Cards} from "../Plugins/smartcards/CardFactory";
 
 export class GCLClient {
     private config: Config;
@@ -17,18 +17,14 @@ export class GCLClient {
     }
 
     public checkForConnector(callback) {
-        //let p = connection.get(this.config.infoUrl);
         $.getJSON( this.config.infoUrl, function( data ) {
             return callback(data);
         });
-/*        p.then((result) => {
-            return callback(result);
-        });*/
     }
 
     // card Types
     // card Readers
-    public beid(): BeIDCard {
+    public beid(): EidBe {
         return this.cards.belgiumElectronicID;
     }
 }
