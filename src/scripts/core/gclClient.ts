@@ -4,10 +4,11 @@
  * @since 2016
  */
 
-import {EidBe} from "../Plugins/smartcards/eid/be/EidBe";
 import {Config} from "./Config";
 import {Cards} from "../Plugins/smartcards/CardFactory";
+import {EidBe} from "../Plugins/smartcards/eid/be/EidBe";
 
+// must be a singleton instance
 class GCLClient {
     private config: Config;
     private cards: Cards;
@@ -23,11 +24,8 @@ class GCLClient {
         });
     }
 
-    // card Types
-    // card Readers
-    public beid(): EidBe {
-        return this.cards.belgiumElectronicID;
-    }
+    // get instance for belgian eID card
+    public beid = ():EidBe => {return this.cards.getEidBE();}
 }
 
 export {GCLClient}

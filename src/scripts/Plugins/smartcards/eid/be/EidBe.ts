@@ -9,6 +9,10 @@ interface AbstractEidBE{
     rnData(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     address(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     photo(callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    rootCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    citizenCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    authenticationCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    nonRepudiationCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
 }
 
 const PLUGIN_CONTEXT_BEID = "/beid";
