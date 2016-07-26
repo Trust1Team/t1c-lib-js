@@ -60,11 +60,11 @@
                             <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
                             <input type="password" class="form-control" id="psw" placeholder="Enter password">
                         </div>
-                        <button type="submit" class="btn btn-success btn-block"><span class="glyphicon glyphicon-off"></span> Validate</button>
+                        <button type="submit" id="modalValidate" class="btn btn-success btn-block"><span class="glyphicon glyphicon-off"></span> Validate</button>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button id="modalValidateSubmit" type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
+                    <button id="modalCancel" type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
                 </div>
             </div>
 
@@ -139,8 +139,9 @@
             //var beid = connector.beid();
             //beid.verifyPin(_body, callback);
         });
-        $("#modalValidateSubmit").on('click', function () {
+        $("#modalValidate").on('click', function () {
             console.log("let's validate");
+            console.log($("#psw").val());
         });
 //        $("#beidSign").on('click', function () {
 //            $("#information").empty();
@@ -149,6 +150,7 @@
 //        });
         $("#downloadgcl").on('click',function(){
             console.log("to be developed");
+
         });
         $("#clear").on('click', function () {
             $("#information").empty();
