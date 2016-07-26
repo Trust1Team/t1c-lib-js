@@ -8,6 +8,7 @@
     "sinon": "github:DefinitelyTyped/DefinitelyTyped/sinon/sinon.d.ts#830e4aaac859e4f648efaa16712f1d6e378e6902"
   },
   "dependencies": {
+    "debug": "registry:npm/debug#2.0.0+20160723033700",
     "es6-promise": "registry:npm/es6-promise#3.0.0+20160211003958"
   }
 }

@@ -1,5 +1,6 @@
 /**
  * @author Maarten Casteels
+ * @author Michallis Pashidis
  * @since 2016
  */
 
@@ -7,11 +8,11 @@ import {EidBe} from "../Plugins/smartcards/eid/be/EidBe";
 import {Config} from "./Config";
 import {Cards} from "../Plugins/smartcards/CardFactory";
 
-export class GCLClient {
+class GCLClient {
     private config: Config;
     private cards: Cards;
 
-    constructor(config: Config) {
+    constructor(config?: Config) {
         this.config = config || new Config();
         this.cards = new Cards(this.config.connectorUrl);
     }
@@ -28,3 +29,5 @@ export class GCLClient {
         return this.cards.belgiumElectronicID;
     }
 }
+
+export {GCLClient}
