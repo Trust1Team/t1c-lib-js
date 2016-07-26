@@ -1,3 +1,6 @@
+/**
+ * @author Michallis Pashidis
+ */
 interface RestException{
     description:string;
     status:number;

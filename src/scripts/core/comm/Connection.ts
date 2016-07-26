@@ -1,10 +1,9 @@
 /**
- * TODO Add documentation!
- *
  * @author Maarten Casteels
- * @autho Michallis Pashidis
+ * @author Michallis Pashidis
  * @since 2016
  */
+
 import {Promise} from "es6-promise";
 import * as CoreExceptions from "./CoreExceptions";
 

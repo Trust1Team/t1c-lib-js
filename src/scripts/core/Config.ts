@@ -1,5 +1,6 @@
 /**
  * @author Maarten Casteels
+ * @author Michallis Pashidis
  * @since 2016
  */
 export class Config {
