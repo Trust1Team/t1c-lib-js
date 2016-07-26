@@ -16,6 +16,9 @@ const BEID_RN_DATA = "/rn";
 const BEID_ADDRESS = "/address";
 const BEID_PHOTO = "/photo";
 const BEID_CERT_ROOT = "/rootCertificate";
+const BEID_CERT_CITIZEN = "/citizenCertificate";
+const BEID_CERT_AUTHENTICATION = "/authenticationCertificate";
+const BEID_CERT_NON_REPUDIATION = "/nonRepudiationCertificate";
 
 
 class EidBe implements AbstractEidBE{
@@ -28,37 +31,9 @@ class EidBe implements AbstractEidBE{
     public address(callback) {connection.get(this.url + BEID_ADDRESS, callback);}
     public photo(callback) {connection.get(this.url + BEID_PHOTO, callback);}
     public rootCertificate(callback) {connection.get(this.url + BEID_CERT_ROOT, callback);}
-
-
-    // get Certificate Citizen
-    public citizenCertificate(resolve, reject) {
-        let p = connection.getPromise(this.url + '/citizenCertificate');
-        p.then((result) => {
-            return resolve(result);
-        }, (error) => {
-            return reject(error);
-        })
-    }
-
-    // get Certificate Non Repudiation
-    public authenticationCertificate(resolve, reject) {
-        let p = connection.getPromise(this.url + '/authenticationCertificate');
-        p.then((result) => {
-            return resolve(result);
-        }, (error) => {
-            return reject(error);
-        })
-    }
-
-    // get Certificate Non Repudiation
-    public nonRepudiationCertificate(resolve, reject) {
-        let p = connection.getPromise(this.url + '/nonRepudiationCertificate');
-        p.then((result) => {
-            return resolve(result);
-        }, (error) => {
-            return reject(error);
-        })
-    }
+    public citizenCertificate(callback) {connection.get(this.url+ BEID_CERT_CITIZEN, callback);}
+    public authenticationCertificate(callback) {connection.get(this.url +  BEID_CERT_AUTHENTICATION, callback);}
+    public nonRepudiationCertificate(callback) {connection.get(this.url +  BEID_CERT_NON_REPUDIATION, callback);}
 
     // post Verify Pin
     public verifyPin(body, resolve, reject) {
