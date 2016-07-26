@@ -83,19 +83,11 @@
             $("#error").append(object.Info.version);
         });
 
-//        T1Connector.init({}, function (object) {
-//            $("#error").empty();
-//            $("#error").append(object.message);
-//        });
-//
         function callback(err,data) {
-            if(err){
-                $("#error").empty();
-                $("#error").append("ERROR:\n" + JSON.stringify(err, null, '  '));
-            }
+            if(err){$("#error").empty();$("#error").append("ERROR:\n" + JSON.stringify(err, null, '  '));}
             else $("#information").append(JSON.stringify(data, null, '  '));
         }
-//
+
         $("#info").on('click', function () {
             $("#information").empty();
             var beid = connector.beid();

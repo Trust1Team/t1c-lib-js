@@ -16,15 +16,10 @@ interface AbstractFactory {
 }
 
 export class Cards {
-    // card factory
-    private _belgiumElectronicID:EidBe;
+    constructor(private url:string) {}
 
-    constructor(url:string) {
-        this._belgiumElectronicID = new EidBe(url);
+    public getEidBE():EidBe {
+        return new EidBe(this.url);
     }
 
-
-    get belgiumElectronicID():EidBe {
-        return this._belgiumElectronicID;
-    }
 }
