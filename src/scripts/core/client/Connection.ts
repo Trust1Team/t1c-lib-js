@@ -5,13 +5,13 @@
  */
 
 import {Promise} from "es6-promise";
-import * as CoreExceptions from "./CoreExceptions";
+import * as CoreExceptions from "../exceptions/CoreExceptions";
 
 interface Connection {
     getPromise(url:string, body?:any):Promise<any>;
     postPromise(url:string, body?:any):Promise<any>;
     get(url:string, callback:(error:CoreExceptions.RestException, data:any) => void);
-    post(url:string, callback:(error:CoreExceptions.RestException, data:any) => void);
+    post(url:string, body:any, callback:(error:CoreExceptions.RestException, data:any) => void);
 }
 
 class LocalConnection implements Connection {
@@ -42,7 +42,7 @@ class LocalConnection implements Connection {
             if (method === 'POST') {
                 xmlHttp.setRequestHeader('Content-Type', 'application/json');
             }
-            xmlHttp.send(body);
+            xmlHttp.send(JSON.stringify(body));
         });
     }
 
@@ -77,21 +77,27 @@ class LocalConnection implements Connection {
         });
     }
 
-    public post(url:string, callback):void{
+    public post(url:string, body, callback):void{
         $.ajax({
             url: url,
             type: 'POST',
+            data: JSON.stringify(body),
+            contentType: 'application/json; charset=utf-8',
+            processData: false,
             dataType: 'json',
             success: function(data,status,jqXHR) {
                 data.capture_date = new Date();
                 return callback(null,data);
             },
             error: function(data,status,jqXHR) {
-                let error = {} as CoreExceptions.RestException;
+                console.log(JSON.stringify(data));
+                console.log(status);
+                console.log(JSON.stringify(jqXHR));
+/*                let error = {} as CoreExceptions.RestException;
                 error.status = data.status;
                 error.description = data.responseJSON.Error.description;
-                error.code = data.responseJSON.Error.code;
-                return callback(error);
+                error.code = data.responseJSON.Error.code;*/
+                return callback(data);
             }
         });
     }

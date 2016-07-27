@@ -5,7 +5,7 @@
 import {expect} from "chai";
 import * as Sinon from "sinon";
 import {Promise} from "es6-promise";
-import {connection} from "../scripts/core/comm/Connection";
+import {connection} from "../scripts/core/client/Connection";
 
 describe('Connection', () => {
 /*    var server:Sinon.SinonFakeServer;

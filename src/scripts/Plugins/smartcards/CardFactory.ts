@@ -2,8 +2,8 @@
  * @author Maarten Casteels
  * @since 2016
  */
-import {Reader} from "../../core/comm/Reader";
-import {Card} from "../../core/comm/Card";
+import {Reader} from "../../core/model/Reader";
+import {Card} from "./Card";
 import {EidBe} from "./eid/be/EidBe";
 import {AbstractEidBE} from "./eid/be/EidBe";
 import {AbstractEidEST} from "./eid/est/EidEst";
@@ -15,7 +15,7 @@ interface AbstractFactory {
     createEidLUX(reader_id?: Reader, card_id?: Card): AbstractEidLUX;
 }
 
-export class Cards {
+export class CardFactory {
     constructor(private url:string) {}
 
     public getEidBE():EidBe {

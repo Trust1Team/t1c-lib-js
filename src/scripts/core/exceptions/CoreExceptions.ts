@@ -8,4 +8,6 @@ interface RestException{
 }
 interface DataException{}
 
+interface ServiceException{}
+
 export {RestException,DataException}

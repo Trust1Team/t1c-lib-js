@@ -2,8 +2,8 @@
  * @author Maarten Casteels
  * @since 2016
  */
-import {connection} from "../../../../core/comm/Connection";
-import * as CoreExceptions from "../../../../core/comm/CoreExceptions";
+import {connection} from "../../../../core/client/Connection";
+import * as CoreExceptions from "../../../../core/exceptions/CoreExceptions";
 
 interface AbstractEidBE{
     rnData(callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -23,6 +23,7 @@ const BEID_CERT_ROOT = "/rootCertificate";
 const BEID_CERT_CITIZEN = "/citizenCertificate";
 const BEID_CERT_AUTHENTICATION = "/authenticationCertificate";
 const BEID_CERT_NON_REPUDIATION = "/nonRepudiationCertificate";
+const BEID_VERIFY_PIN = "/verifyPin";
 
 
 class EidBe implements AbstractEidBE{
@@ -40,13 +41,8 @@ class EidBe implements AbstractEidBE{
     public nonRepudiationCertificate(callback) {connection.get(this.url +  BEID_CERT_NON_REPUDIATION, callback);}
 
     // post Verify Pin
-    public verifyPin(body, resolve, reject) {
-        let p = connection.postPromise(this.url + '/verifyPin', body);
-        p.then((result) => {
-            return resolve(result);
-        }, (error) => {
-            return reject(error);
-        })
+    public verifyPin(body, callback) {
+        connection.post(this.url + BEID_VERIFY_PIN, body, callback);
     }
 
     // post Sign
