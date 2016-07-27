@@ -5,17 +5,20 @@
  */
 
 import {Config} from "./Config";
-import {Cards} from "../Plugins/smartcards/CardFactory";
+import {CardFactory} from "../Plugins/smartcards/CardFactory";
 import {EidBe} from "../Plugins/smartcards/eid/be/EidBe";
+import {CoreService} from "./services/CoreService";
 
 // must be a singleton instance
 class GCLClient {
     private config: Config;
-    private cards: Cards;
+    private cardFactory: CardFactory;
+    private coreService: CoreService;
 
     constructor(config?: Config) {
         this.config = config || new Config();
-        this.cards = new Cards(this.config.connectorUrl);
+        this.cardFactory = new CardFactory(this.config.connectorUrl);
+        this.coreService = new CoreService(this.config.connectorUrl);
     }
 
     public checkForConnector(callback) {
@@ -24,8 +27,11 @@ class GCLClient {
         });
     }
 
+    // get core services
+    public core = ():CoreService => {return this.coreService;};
+
     // get instance for belgian eID card
-    public beid = ():EidBe => {return this.cards.getEidBE();}
+    public beid = ():EidBe => {return this.cardFactory.getEidBE();}
 }
 
 export {GCLClient}

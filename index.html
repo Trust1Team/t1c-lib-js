@@ -85,18 +85,22 @@
 
         function callback(err,data) {
             if(err){$("#error").empty();$("#error").append("ERROR:\n" + JSON.stringify(err, null, '  '));}
-            else $("#information").append(JSON.stringify(data, null, '  '));
+            else {
+                console.log("callback success output:"+JSON.stringify(data,null,'  '));
+                $("#information").append(JSON.stringify(data, null, '  '));
+            }
         }
 
         $("#info").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid();
-            beid.info(callback);
+            var core = connector.core();
+            core.info(callback);
         });
-//        $("#getTypes").on('click', function () {
-//            $("#information").empty();
-//            T1Connector.card.getTypes(callback, callback);
-//        });
+        $("#getTypes").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.types(callback);
+        });
         $("#beidRn").on('click', function () {
             $("#information").empty();
             var beid = connector.beid();
@@ -135,14 +139,21 @@
         $("#beidVerifyPin").on('click', function () {
             $("#information").empty();
             $("#pinModal").modal();
-            //var _body = "{\"VerifyPin\": {\"pin\": \"4331\",\"authenticationreference\": \"sha1\", \"privatekeyreference\": \"nonrepudiation\"}}";
-            //var beid = connector.beid();
-            //beid.verifyPin(_body, callback);
         });
+
+
         $("#modalValidate").on('click', function () {
-            console.log("let's validate");
-            console.log($("#psw").val());
+            var _body={};
+            var props = {};
+            props.authenticationreference = "sha1";
+            props.privatekeyreference = "nonrepudiation";
+            props.pin = $("#psw").val();
+            _body.VerifyPin = props;
+            var beid = connector.beid();
+            beid.verifyPin(_body, callback);
         });
+
+
 //        $("#beidSign").on('click', function () {
 //            $("#information").empty();
 //            var _body = "{\"Sign\": {\"pin\": \"\",\"authenticationreference\": \"sha1\", \"privatekeyreference\": \"nonrepudiation\", \"data\": \"\"}}";
@@ -150,7 +161,6 @@
 //        });
         $("#downloadgcl").on('click',function(){
             console.log("to be developed");
-
         });
         $("#clear").on('click', function () {
             $("#information").empty();
