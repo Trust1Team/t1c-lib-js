@@ -48,7 +48,8 @@ class EidBe implements AbstractEidBE{
     public signData(body, callback) {connection.post(this.url + BEID_SIGN_DATA, body,callback);}
     public authenticate(body, callback) {connection.post(this.url + BEID_AUTHENTICATE, body,callback);}
     public dumpData(filters, callback) {
-        connection.get(this.url, callback,QUERY_PARAM_FILTER+filters.join(","));
+        if(filters.length>0){connection.get(this.url, callback,QUERY_PARAM_FILTER+filters.join(","));}
+        else{connection.get(this.url, callback);}
     }
 }
 
