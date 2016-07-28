@@ -58,11 +58,12 @@ class LocalConnection implements Connection {
     }
 
     // using Callback
-    public get(url:string, callback):void{
+    public get(url:string, callback, queryParams?:any):void{
         $.ajax({
             url: url,
             type: 'GET',
             dataType: 'json',
+            data: queryParams,
             success: function(data,status,jqXHR) {
                 data.capture_date = new Date();
                 return callback(null,data);

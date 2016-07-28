@@ -31,7 +31,8 @@
     <div>
         <button id="info" type="button" class="btn btn-default btn-lg">Info</button>
         <button id="getTypes" type="button" class="btn btn-default btn-lg">Get Types</button>
-        <button id="beidRn" type="button" class="btn btn-default btn-lg">BeID Read</button>
+        <button id="beidFiltered" type="button" class="btn btn-default btn-lg">BeID Read Filtered</button>
+        <button id="beidRn" type="button" class="btn btn-default btn-lg">BeID Rn Data</button>
         <button id="beidAddress" type="button" class="btn btn-default btn-lg">BeID Address</button>
         <button id="beidPhoto" type="button" class="btn btn-default btn-lg">BeID Photo</button>
         <button id="beidRootCert" type="button" class="btn btn-default btn-lg">BeID Root Cert</button>
@@ -120,6 +121,12 @@
             var core = connector.core();
             core.types(callback);
         });
+        $("#beidFiltered").on('click', function () {
+            $("#information").empty();
+            var beid = connector.beid();
+            var filter = ["rn","address"];
+            beid.dumpData(filter,callback);
+        });
         $("#beidRn").on('click', function () {
             $("#information").empty();
             var beid = connector.beid();
@@ -176,6 +183,10 @@
             beid.verifyPin(_body, validationCallback);
         });
 
+        $("#simplemodal").on('click',function(){
+            var beid = connector.beid();
+            beid.showModal();
+        });
 
 //        $("#beidSign").on('click', function () {
 //            $("#information").empty();
