@@ -31,7 +31,6 @@
     <div>
         <button id="info" type="button" class="btn btn-default btn-lg">Info</button>
         <button id="getTypes" type="button" class="btn btn-default btn-lg">Get Types</button>
-        <button id="beidFiltered" type="button" class="btn btn-default btn-lg">BeID Read Filtered</button>
         <button id="beidRn" type="button" class="btn btn-default btn-lg">BeID Rn Data</button>
         <button id="beidAddress" type="button" class="btn btn-default btn-lg">BeID Address</button>
         <button id="beidPhoto" type="button" class="btn btn-default btn-lg">BeID Photo</button>
@@ -44,6 +43,31 @@
         <button id="downloadgcl" type="button" class="btn btn-default btn-lg">Download GCL</button>
         <button id="clear" type="button" class="btn btn-default btn-lg">Clear</button>
     </div>
+    <hr />
+    <div>
+        <div class="form-group">
+            <input type="checkbox" name="type" value="rndata" id="rndata" />
+            <label for="rndata"><span class="glyphicon"></span> data</label>
+        </div>
+        <div class="form-group">
+            <input type="checkbox" name="type" value="address" id="address" />
+            <label for="address"><span class="glyphicon "></span> address</label>
+        </div>
+        <div class="form-group">
+            <input type="checkbox" name="type" value="photo" id="photo"/>
+            <label for="photo"><span class="glyphicon"></span> photo</label>
+        </div>
+        <div class="form-group">
+            <input type="checkbox" name="type" value="root-certificate" id="rootcert"/>
+            <label for="rootcert"><span class="glyphicon"></span> root certificate</label>
+        </div>
+        <div class="form-group">
+            <input type="checkbox" name="type" value="authentication-certificate" id="authcert"/>
+            <label for="authcert"><span class="glyphicon "></span> authentication certificate</label>
+        </div>
+        <button id="beidFiltered" type="button" class="btn btn-default btn-lg">BeID Read Filtered</button>
+    </div>
+    <hr />
     <pre id="information"></pre>
     <pre id="error"></pre>
     <!-- Modal -->
@@ -124,7 +148,13 @@
         $("#beidFiltered").on('click', function () {
             $("#information").empty();
             var beid = connector.beid();
-            var filter = ["rn","address"];
+            var filter = [];
+            console.log("checked",$("#rndata").val());
+            if($("#rndata").is(":checked"))filter.push($("#rndata").val());
+            if($("#address").is(":checked"))filter.push($("#address").val());
+            if($("#photo").is(":checked"))filter.push($("#photo").val());
+            if($("#rootcert").is(":checked"))filter.push($("#rootcert").val());
+            if($("#authcert").is(":checked"))filter.push($("#authcert").val());
             beid.dumpData(filter,callback);
         });
         $("#beidRn").on('click', function () {
@@ -181,11 +211,6 @@
             _body.VerifyPin = props;
             var beid = connector.beid();
             beid.verifyPin(_body, validationCallback);
-        });
-
-        $("#simplemodal").on('click',function(){
-            var beid = connector.beid();
-            beid.showModal();
         });
 
 //        $("#beidSign").on('click', function () {
