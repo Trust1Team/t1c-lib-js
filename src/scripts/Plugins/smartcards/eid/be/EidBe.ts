@@ -42,7 +42,7 @@ class EidBe implements AbstractEidBE{
 
     // post Verify Pin
     public verifyPin(body, callback) {
-        connection.post(this.url + BEID_VERIFY_PIN, body, callback);
+        connection.post(this.url + BEID_VERIFY_PIN, body,callback);
     }
 
     // post Sign

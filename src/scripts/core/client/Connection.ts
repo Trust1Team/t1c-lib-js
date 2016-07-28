@@ -85,19 +85,13 @@ class LocalConnection implements Connection {
             contentType: 'application/json; charset=utf-8',
             processData: false,
             dataType: 'json',
-            success: function(data,status,jqXHR) {
-                data.capture_date = new Date();
-                return callback(null,data);
+            mimeType: 'application/json',
+            success: function(response, status) {
+                response.capture_date = new Date();
+                return callback(null,response);
             },
-            error: function(data,status,jqXHR) {
-                console.log(JSON.stringify(data));
-                console.log(status);
-                console.log(JSON.stringify(jqXHR));
-/*                let error = {} as CoreExceptions.RestException;
-                error.status = data.status;
-                error.description = data.responseJSON.Error.description;
-                error.code = data.responseJSON.Error.code;*/
-                return callback(data);
+            error: function(response, status) {
+                return callback(response);
             }
         });
     }
