@@ -12,7 +12,7 @@
             padding: .3em .5em;
         }
 
-        pre#error {
+        pre#error,pre#validationError {
             border-color: #900;
         }
         .modal-header, h4, .close {
@@ -55,16 +55,18 @@
                     <h4><span class="glyphicon glyphicon-lock"></span> Validate PIN</h4>
                 </div>
                 <div class="modal-body" style="padding:40px 50px;">
-                    <form role="form">
-                        <div class="form-group">
-                            <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
-                            <input type="password" class="form-control" id="psw" placeholder="Enter password">
-                        </div>
-                        <button type="submit" id="modalValidate" class="btn btn-success btn-block"><span class="glyphicon glyphicon-off"></span> Validate</button>
-                    </form>
+                    <div class="form-group">
+                        <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="psw" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <pre id="validationInfo" hidden="true"></pre>
+                        <pre id="validationError" hidden="true"></pre>
+                    </div>
+                    <button id="buttonValidate" type="button" class="btn btn-default btn-lg">Validate</button>
                 </div>
                 <div class="modal-footer">
-                    <button id="modalCancel" type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Cancel</button>
+
                 </div>
             </div>
 
@@ -86,8 +88,25 @@
         function callback(err,data) {
             if(err){$("#error").empty();$("#error").append("ERROR:\n" + JSON.stringify(err, null, '  '));}
             else {
-                console.log("callback success output:"+JSON.stringify(data,null,'  '));
                 $("#information").append(JSON.stringify(data, null, '  '));
+            }
+        }
+
+        function validationCallback(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#validationError").empty();
+            $("#validationInfo").empty();
+            $("#validationError").hide();
+            $("#validationInfo").hide();
+
+            if(err){
+                $("#validationError").append(JSON.stringify(err, null, '  '));
+                $("#validationError").show();
+            }
+            else{
+                $("#validationInfo").append(JSON.stringify(data, null, '  '));
+                $("#validationInfo").show();
             }
         }
 
@@ -138,11 +157,15 @@
         });
         $("#beidVerifyPin").on('click', function () {
             $("#information").empty();
-            $("#pinModal").modal();
+            $("#error").empty();
+            $("#validationInformation").empty();
+            $("#validationInformation").hide();
+            $("#validationError").empty();
+            $("#validationError").hide();
+            $("#pinModal").modal('toggle');
         });
 
-
-        $("#modalValidate").on('click', function () {
+        $("#buttonValidate").on('click', function () {
             var _body={};
             var props = {};
             props.authenticationreference = "sha1";
@@ -150,7 +173,7 @@
             props.pin = $("#psw").val();
             _body.VerifyPin = props;
             var beid = connector.beid();
-            beid.verifyPin(_body, callback);
+            beid.verifyPin(_body, validationCallback);
         });
 
 
@@ -162,6 +185,7 @@
         $("#downloadgcl").on('click',function(){
             console.log("to be developed");
         });
+
         $("#clear").on('click', function () {
             $("#information").empty();
             connector.checkForConnector(function(object) {
