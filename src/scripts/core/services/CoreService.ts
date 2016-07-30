@@ -1,12 +1,13 @@
 /**
  * @author Michallis Pashidis
  */
-import {connection} from "../client/Connection";
+import {LocalConnection} from "../client/Connection";
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 
 interface AbstractCore{
     info(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     types(callback:(error:CoreExceptions.RestException, data:any) => void):void; // TODO will dissappear
+    readers(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
     plugins(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
 
 /*    verify(callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -25,15 +26,15 @@ interface AbstractCore{
 const CORE_INFO = "/info";
 const CORE_CARD_TYPES = "/card/gettypes"; // TODO should be on reader level
 const CORE_PLUGINS = "/plugins";
+const CORE_READERS = "/reader/info";
 
 class CoreService implements AbstractCore{
-    constructor(private url:string) {}
-    public info(callback) {connection.get(this.url + CORE_INFO,callback);}
-    public types(callback) {connection.get(this.url + CORE_CARD_TYPES,callback);}
+    constructor(private url:string,private connection:LocalConnection) {}
 
-    plugins(callback:(error:CoreExceptions.RestException, data:any)=>void):void {
-        connection.get(this.url + CORE_PLUGINS,callback);
-    }
+    public info(callback) {this.connection.get(this.url + CORE_INFO,callback);}
+    public types(callback) {this.connection.get(this.url + CORE_CARD_TYPES,callback);}
+    public readers(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS,callback);}
+    public plugins(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_PLUGINS,callback);}
 
     public browserInfo():any{
         return {

@@ -57,4 +57,4 @@ class LocalConnection implements Connection {
     }
 }
 
-export const connection = new LocalConnection();
+export {LocalConnection}
