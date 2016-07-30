@@ -32,6 +32,7 @@
         <button id="info" type="button" class="btn btn-default btn-lg">Info</button>
         <button id="getKey" type="button" class="btn btn-default btn-lg">Get API key</button>
         <button id="getTypes" type="button" class="btn btn-default btn-lg">Get Types</button>
+        <button id="getPlugins" type="button" class="btn btn-default btn-lg">Get Plugins</button>
         <button id="beidRn" type="button" class="btn btn-default btn-lg">BeID Rn Data</button>
         <button id="beidAddress" type="button" class="btn btn-default btn-lg">BeID Address</button>
         <button id="beidPhoto" type="button" class="btn btn-default btn-lg">BeID Photo</button>
@@ -95,12 +96,12 @@
 
                 </div>
             </div>
-
         </div>
     </div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/platform/1.3.1/platform.min.js"></script>
 <script src="dist/gclClient.js" charset="utf-8"></script>
 <script src="dist/gclConfig.js" charset="utf-8"></script>
 <script type="text/javascript">
@@ -151,6 +152,11 @@
             $("#information").empty();
             var core = connector.core();
             core.types(callback);
+        });
+        $("#getPlugins").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.plugins(callback);
         });
         $("#beidFiltered").on('click', function () {
             $("#information").empty();

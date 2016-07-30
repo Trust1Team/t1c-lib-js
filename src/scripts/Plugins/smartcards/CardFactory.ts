@@ -21,5 +21,4 @@ export class CardFactory {
     public getEidBE():EidBe {
         return new EidBe(this.url);
     }
-
 }
