@@ -38,7 +38,7 @@ const BEID_AUTHENTICATE = "/auth";
 
 class EidBe implements AbstractEidBE{
     // constructor
-    constructor(private url:string,private connection:LocalConnection) {this.url = url + PLUGIN_CONTEXT_BEID;}
+    constructor(private url:string,private connection:LocalConnection,private reader_id:string) {this.url = url + PLUGIN_CONTEXT_BEID;}
 
     public allData(filters, callback) {
         if(filters.length>0){this.connection.get(this.url + BEID_ALL_DATA, callback,QUERY_PARAM_FILTER+filters.join(","));}

@@ -14,8 +14,8 @@ const PLUGIN_CONTEXT_EMV = "/plugins/emv";
 const EMV_PAN = "/pan";
 
 class EMV implements AbstractEMV{
-    constructor(private url:string,private connection:LocalConnection) {this.url = url + PLUGIN_CONTEXT_EMV;}
+    constructor(private url:string,private connection:LocalConnection,private reader_id:string) {this.url = url + PLUGIN_CONTEXT_EMV;}
 
     pan(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + EMV_PAN,callback);}
 }
-export {EMV};
+export {AbstractEMV, EMV};
