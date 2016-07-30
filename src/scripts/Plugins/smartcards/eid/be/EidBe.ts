@@ -16,7 +16,8 @@ interface AbstractEidBE{
     verifyPin(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
     signData(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
     authenticate(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    dumpData(filters:string[],callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    allData(filters:string[],callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    allCeritficates(filters:string[],callback:(error:CoreExceptions.RestException, data:any) => void):void;
 }
 
 const QUERY_PARAM_FILTER = "filter=";
@@ -47,7 +48,7 @@ class EidBe implements AbstractEidBE{
     public verifyPin(body, callback) {connection.post(this.url + BEID_VERIFY_PIN, body,callback);}
     public signData(body, callback) {connection.post(this.url + BEID_SIGN_DATA, body,callback);}
     public authenticate(body, callback) {connection.post(this.url + BEID_AUTHENTICATE, body,callback);}
-    public dumpData(filters, callback) {
+    public allData(filters, callback) {
         if(filters.length>0){connection.get(this.url, callback,QUERY_PARAM_FILTER+filters.join(","));}
         else{connection.get(this.url, callback);}
     }
