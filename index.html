@@ -28,8 +28,10 @@
 </head>
 <body>
 <div class="container">
+    <h3>Belgian eID</h3>
     <div>
         <button id="info" type="button" class="btn btn-default btn-lg">Info</button>
+        <button id="getReaders" type="button" class="btn btn-default btn-lg">Readers</button>
         <button id="getKey" type="button" class="btn btn-default btn-lg">Get API key</button>
         <button id="getTypes" type="button" class="btn btn-default btn-lg">Get Types</button>
         <button id="getPlugins" type="button" class="btn btn-default btn-lg">Get Plugins</button>
@@ -44,11 +46,9 @@
         <button id="beidSign" type="button" class="btn btn-default btn-lg">BeID Sign</button>
         <button id="downloadgcl" type="button" class="btn btn-default btn-lg">Download GCL</button>
         <button id="clear" type="button" class="btn btn-default btn-lg">Clear</button>
-    </div>
-    <hr />
-    <div>
+        <button id="beidFiltered" type="button" class="btn btn-default btn-lg">BeID Read Filtered</button>
         <div class="form-group">
-            <input type="checkbox" name="type" value="rndata" id="rndata" />
+            <input type="checkbox" name="type" value="rn-data" id="rndata" />
             <label for="rndata"><span class="glyphicon"></span> data</label>
         </div>
         <div class="form-group">
@@ -67,12 +67,23 @@
             <input type="checkbox" name="type" value="authentication-certificate" id="authcert"/>
             <label for="authcert"><span class="glyphicon "></span> authentication certificate</label>
         </div>
-        <button id="beidFiltered" type="button" class="btn btn-default btn-lg">BeID Read Filtered</button>
+        <div class="form-group">
+            <input type="checkbox" name="type" value="citizen-certificate" id="citizencert"/>
+            <label for="authcert"><span class="glyphicon "></span> citizen certificate</label>
+        </div>
+        <div class="form-group">
+            <input type="checkbox" name="type" value="non-repudiation-certificate" id="nonrepcert"/>
+            <label for="authcert"><span class="glyphicon "></span> non-repudiation certificate</label>
+        </div>
     </div>
     <hr />
+    <h3>EMV Card</h3>
+    <div>
+        <button id="emvPan" type="button" class="btn btn-default btn-lg">EMV - Get PAN</button>
+    </div>
     <pre id="information"></pre>
     <pre id="error"></pre>
-    <!-- Modal -->
+    <!-- PIN verify Modal -->
     <div class="modal fade" id="pinModal" role="dialog">
         <div class="modal-dialog">
             <!-- Modal content-->
@@ -98,6 +109,28 @@
             </div>
         </div>
     </div>
+
+    <!-- Download Modal -->
+    <div class="modal fade" id="downloadModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Download Instructions</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="psw" placeholder="Enter pin code">
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
@@ -107,9 +140,10 @@
 <script type="text/javascript">
     (function ($) {
         var gclConfig = new gclClient.GCLConfig();
-        gclConfig.gclUrl = "http://localhost:10080";
+        gclConfig.gclUrl = "http://localhost:10080/v1";
         gclConfig.allowAutoUpdate = true;
         var connector = new gclClient.GCLClient(gclConfig);
+
         connector.checkForConnector(function(object) {
             $("#error").empty();
             $("#error").append(object.Info.version);
@@ -139,16 +173,20 @@
                 $("#validationInfo").show();
             }
         }
-
-        $("#getKey").on('click', function () {
-            $("#information").empty();
-            var core = connector.core();
-            core.readTextFile("file://t1c-ds.key");
-        });
         $("#info").on('click', function () {
             $("#information").empty();
             var core = connector.core();
             core.info(callback);
+        });
+        $("#getReaders").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.readers(callback);
+        });
+        $("#getKey").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.readTextFile("file://t1c-ds.key");
         });
         $("#getTypes").on('click', function () {
             $("#information").empty();
@@ -170,6 +208,8 @@
             if($("#photo").is(":checked"))filter.push($("#photo").val());
             if($("#rootcert").is(":checked"))filter.push($("#rootcert").val());
             if($("#authcert").is(":checked"))filter.push($("#authcert").val());
+            if($("#nonrepcert").is(":checked"))filter.push($("#nonrepcert").val());
+            if($("#citizencert").is(":checked"))filter.push($("#citizencert").val());
             beid.allData(filter,callback);
         });
         $("#beidRn").on('click', function () {
@@ -191,6 +231,14 @@
             $("#information").empty();
             var beid = connector.beid();
             beid.rootCertificate(callback);
+/*            var start = new Date().getTime();
+            for (i = 0; i < 10; ++i) {
+                beid.rootCertificate(function(err,data){
+                var end = new Date().getTime();
+                var time = end - start;
+                console.log('Execution time ('+i+'): ' + time);
+                });
+            }*/
         });
         $("#beidCitizenCert").on('click', function () {
             $("#information").empty();
@@ -228,11 +276,9 @@
             beid.verifyPin(_body, validationCallback);
         });
 
-//        $("#beidSign").on('click', function () {
-//            $("#information").empty();
-//            var _body = "{\"Sign\": {\"pin\": \"\",\"authenticationreference\": \"sha1\", \"privatekeyreference\": \"nonrepudiation\", \"data\": \"\"}}";
-//            T1Connector.beid.sign(callback, callback, _body);
-//        });
+        $("#beidSign").on('click', function () {
+            //TODO
+        });
         $("#downloadgcl").on('click',function(){
             console.log("to be developed");
         });
@@ -243,6 +289,14 @@
                 $("#error").empty();
                 $("#error").append(object.Info.version);
             });
+        });
+
+
+
+        $("#emvPan").on('click', function () {
+            $("#information").empty();
+            var emv = connector.emv();
+            emv.pan(callback);
         });
     })(window.jQuery);
 </script>
