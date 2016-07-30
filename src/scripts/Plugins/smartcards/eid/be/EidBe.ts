@@ -35,6 +35,8 @@ const BEID_AUTHENTICATE = "/auth";
 
 
 class EidBe implements AbstractEidBE{
+    allCeritficates(filters:string[], callback:(error:CoreExceptions.RestException, data:any)=>void):void {
+    }
     // constructor
     constructor(private url:string) {this.url = url + PLUGIN_CONTEXT_BEID;}
 
