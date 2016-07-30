@@ -15,16 +15,16 @@ class GCLClient {
     private cardFactory: CardFactory;
     private coreService: CoreService;
 
-    constructor(config?: Config) {
+    constructor(config: Config) {
         this.config = config || new Config();
-        this.cardFactory = new CardFactory(this.config.connectorUrl);
-        this.coreService = new CoreService(this.config.connectorUrl);
+        this.cardFactory = new CardFactory(this.config.gclUrl);
+        this.coreService = new CoreService(this.config.gclUrl);
+
+        console.log("platform",JSON.stringify(this.core().browserInfo()));
     }
 
     public checkForConnector(callback) {
-        $.getJSON( this.config.infoUrl, function( data ) {
-            return callback(data);
-        });
+        console.log("TBD");
     }
 
     // get core services
@@ -32,6 +32,8 @@ class GCLClient {
 
     // get instance for belgian eID card
     public beid = ():EidBe => {return this.cardFactory.getEidBE();}
+
+
 }
 
 export {GCLClient}

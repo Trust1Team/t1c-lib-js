@@ -3,40 +3,35 @@
  * @author Michallis Pashidis
  * @since 2016
  */
+const defaultGclUrl = "http://localhost:10080/v1";
+const defaultDSUrl = "https://dist.t1t.be/gcl-ds/v1";
+const defaultAllowAutoUpdate = true;
 export class Config {
+    private _gclUrl:string;
+    private _dsUrl:string;
+    private _apiKey:string;
+    private _allowAutoUpdate:boolean;
 
-    private defConnectorUrl= 'https://localhost:12345/v1';
-    private defDistributionUrl = 'https://dist.t1t.be/gcl-ds/v1';
-
-    private _connectorUrl:string;
-    private _distributionUrl:string;
-    private _performCheck:boolean;
-
-/*    constructor(connectorUrl?:string, distributionUrl?:string, performCheck?:boolean) {
-        this._connectorUrl = connectorUrl || this.defConnectorUrl;
-        this._distributionUrl = distributionUrl || this.defDistributionUrl;
-        this._performCheck = performCheck || true;
-    }*/
-    constructor()
-    constructor(config?:any){
-        this._connectorUrl = this.defConnectorUrl;
-        this._distributionUrl = this.defDistributionUrl;
-        this._performCheck = true;
+    constructor(gclUrl?:string, dsUrl?:string, apiKey?:string, allowAutoUpdate?:boolean){
+        this._gclUrl = gclUrl||defaultGclUrl;
+        this._dsUrl = dsUrl||defaultDSUrl;
+        this._apiKey = apiKey||'';
+        this._allowAutoUpdate = allowAutoUpdate||defaultAllowAutoUpdate;
     }
 
-    get connectorUrl():string {
-        return this._connectorUrl;
+    get gclUrl():string {
+        return this._gclUrl;
     }
 
-    get distributionUrl():string {
-        return this._distributionUrl;
+    get dsUrl():string {
+        return this._dsUrl;
     }
 
-    get performCheck():boolean {
-        return this._performCheck;
+    get apiKey():string {
+        return this._apiKey;
     }
 
-    get infoUrl():string {
-        return this._connectorUrl+"/info";
+    get allowAutoUpdate():boolean {
+        return this._allowAutoUpdate;
     }
 }
