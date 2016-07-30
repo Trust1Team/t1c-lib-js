@@ -106,8 +106,10 @@
 <script src="dist/gclConfig.js" charset="utf-8"></script>
 <script type="text/javascript">
     (function ($) {
-        console.log(JSON.stringify(gclConfig));
-        var connector = new gclClient.GCLClient();
+        var gclConfig = new gclClient.GCLConfig();
+        gclConfig.gclUrl = "http://localhost:10080";
+        gclConfig.allowAutoUpdate = true;
+        var connector = new gclClient.GCLClient(gclConfig);
         connector.checkForConnector(function(object) {
             $("#error").empty();
             $("#error").append(object.Info.version);

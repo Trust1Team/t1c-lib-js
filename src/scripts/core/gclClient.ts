@@ -4,19 +4,19 @@
  * @since 2016
  */
 
-import {Config} from "./Config";
+import {GCLConfig} from "./GCLConfig";
 import {CardFactory} from "../Plugins/smartcards/CardFactory";
 import {EidBe} from "../Plugins/smartcards/eid/be/EidBe";
 import {CoreService} from "./services/CoreService";
 
-// must be a singleton instance
 class GCLClient {
-    private config: Config;
+    private config: GCLConfig;
     private cardFactory: CardFactory;
     private coreService: CoreService;
 
-    constructor(config: Config) {
-        this.config = config || new Config();
+    constructor(config: GCLConfig) {
+        console.log("config:",JSON.stringify(config));
+        this.config = config || new GCLConfig();
         this.cardFactory = new CardFactory(this.config.gclUrl);
         this.coreService = new CoreService(this.config.gclUrl);
 
@@ -36,4 +36,4 @@ class GCLClient {
 
 }
 
-export {GCLClient}
+export {GCLClient,GCLConfig}
