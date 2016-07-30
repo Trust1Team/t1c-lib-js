@@ -135,18 +135,17 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/platform/1.3.1/platform.min.js"></script>
-<script src="dist/gclClient.js" charset="utf-8"></script>
-<script src="dist/gclConfig.js" charset="utf-8"></script>
+<script src="dist/GCLLib.js" charset="utf-8"></script>
 <script type="text/javascript">
     (function ($) {
-        var gclConfig = new gclClient.GCLConfig();
-        gclConfig.gclUrl = "http://localhost:10080/v1";
+        var gclConfig = new GCLLib.GCLConfig();
+        gclConfig.gclUrl = "http://localhost:10080/v1";//override config for local dev
         gclConfig.allowAutoUpdate = true;
-        var connector = new gclClient.GCLClient(gclConfig);
+        var connector = new GCLLib.GCLClient(gclConfig);
 
-        connector.checkForConnector(function(object) {
+        connector.core().info(function(err,data) {
             $("#error").empty();
-            $("#error").append(object.Info.version);
+            $("#error").append(data.Info.version);
         });
 
         function callback(err,data) {
@@ -202,7 +201,6 @@
             $("#information").empty();
             var beid = connector.beid();
             var filter = [];
-            console.log("checked",$("#rndata").val());
             if($("#rndata").is(":checked"))filter.push($("#rndata").val());
             if($("#address").is(":checked"))filter.push($("#address").val());
             if($("#photo").is(":checked"))filter.push($("#photo").val());
