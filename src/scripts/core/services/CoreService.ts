@@ -23,10 +23,12 @@ interface AbstractCore{
     browserInfo():any;
 }
 
-const CORE_INFO = "/info";
-const CORE_CARD_TYPES = "/card/gettypes"; // TODO should be on reader level
+const QUERY_PARAM_FILTER = "filter=";
+const CORE_INFO = "/";
 const CORE_PLUGINS = "/plugins";
-const CORE_READERS = "/reader/info";
+const CORE_READERS = "/readers";
+const CORE_READER_ID = "/readers/{id}";
+const CORE_DUMMY_JWT = "/manage";
 
 class CoreService implements AbstractCore{
     constructor(private url:string,private connection:LocalConnection) {}

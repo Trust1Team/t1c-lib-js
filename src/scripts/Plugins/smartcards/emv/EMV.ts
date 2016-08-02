@@ -11,7 +11,8 @@ interface AbstractEMV{
 }
 
 const PLUGIN_CONTEXT_EMV = "/plugins/emv";
-const EMV_PAN = "/pan";
+const EMV_PAN = (PLUGIN_CONTEXT_EMV+"/pan");
+const EMV_VERIFY = (PLUGIN_CONTEXT_EMV+"/verify-pin");
 
 class EMV implements AbstractEMV{
     constructor(private url:string,private connection:LocalConnection,private reader_id:string) {this.url = url + PLUGIN_CONTEXT_EMV;}

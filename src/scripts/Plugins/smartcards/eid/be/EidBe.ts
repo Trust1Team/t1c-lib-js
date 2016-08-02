@@ -24,16 +24,17 @@ const QUERY_PARAM_FILTER = "filter=";
 const PLUGIN_CONTEXT_BEID = "/plugins/beid";
 const BEID_ALL_DATA = "/";
 const BEID_ALL_CERTIFICATES = "/certificates";
-const BEID_RN_DATA = "/rn";
-const BEID_ADDRESS = "/address";
-const BEID_PHOTO = "/photo";
-const BEID_CERT_ROOT = (BEID_ALL_CERTIFICATES + "/root-certificate");
-const BEID_CERT_CITIZEN = BEID_ALL_CERTIFICATES + "/citizen-certificate";
-const BEID_CERT_AUTHENTICATION = BEID_ALL_CERTIFICATES + "/authentication-certificate";
-const BEID_CERT_NON_REPUDIATION = BEID_ALL_CERTIFICATES + "/non-repudiation-certificate";
-const BEID_VERIFY_PIN = "/verifyPin";
-const BEID_SIGN_DATA = "/sign";
-const BEID_AUTHENTICATE = "/auth";
+const BEID_RN_DATA = (PLUGIN_CONTEXT_BEID + "/rn");
+const BEID_ADDRESS = (PLUGIN_CONTEXT_BEID + "/address");
+const BEID_PHOTO = (PLUGIN_CONTEXT_BEID + "/picture");
+const BEID_CERT_ROOT = (BEID_ALL_CERTIFICATES + "/root");
+const BEID_CERT_CITIZEN = (BEID_ALL_CERTIFICATES + "/citizen");
+const BEID_CERT_AUTHENTICATION = (BEID_ALL_CERTIFICATES + "/authentication");
+const BEID_CERT_NON_REPUDIATION = (BEID_ALL_CERTIFICATES + "/non-repudiation");
+const BEID_CERT_RRN = (BEID_ALL_CERTIFICATES + "/rrn");
+const BEID_VERIFY_PIN = (BEID_ALL_CERTIFICATES +"/verify-pin");
+const BEID_SIGN_DATA = (BEID_ALL_CERTIFICATES +"/sign");
+const BEID_AUTHENTICATE = (BEID_ALL_CERTIFICATES +"/authenticate");
 
 
 class EidBe implements AbstractEidBE{
