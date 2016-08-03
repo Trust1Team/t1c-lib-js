@@ -6,7 +6,6 @@ import * as CoreExceptions from "../exceptions/CoreExceptions";
 
 interface AbstractCore{
     info(callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    types(callback:(error:CoreExceptions.RestException, data:any) => void):void; // TODO will dissappear
     readers(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
     plugins(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
 
@@ -34,7 +33,6 @@ class CoreService implements AbstractCore{
     constructor(private url:string,private connection:LocalConnection) {}
 
     public info(callback) {this.connection.get(this.url + CORE_INFO,callback);}
-    public types(callback) {this.connection.get(this.url + CORE_CARD_TYPES,callback);}
     public readers(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS,callback);}
     public plugins(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_PLUGINS,callback);}
 

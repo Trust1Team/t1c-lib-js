@@ -33,22 +33,23 @@
         <button id="info" type="button" class="btn btn-default btn-lg">Info</button>
         <button id="getReaders" type="button" class="btn btn-default btn-lg">Readers</button>
         <button id="getKey" type="button" class="btn btn-default btn-lg">Get API key</button>
-        <button id="getTypes" type="button" class="btn btn-default btn-lg">Get Types</button>
         <button id="getPlugins" type="button" class="btn btn-default btn-lg">Get Plugins</button>
         <button id="beidRn" type="button" class="btn btn-default btn-lg">BeID Rn Data</button>
         <button id="beidAddress" type="button" class="btn btn-default btn-lg">BeID Address</button>
-        <button id="beidPhoto" type="button" class="btn btn-default btn-lg">BeID Photo</button>
+        <button id="beidPic" type="button" class="btn btn-default btn-lg">BeID Picture</button>
+        <button id="beidAllCert" type="button" class="btn btn-default btn-lg">BeID All Cert</button>
         <button id="beidRootCert" type="button" class="btn btn-default btn-lg">BeID Root Cert</button>
         <button id="beidCitizenCert" type="button" class="btn btn-default btn-lg">BeID Citizen Cert</button>
         <button id="beidAuthCert" type="button" class="btn btn-default btn-lg">BeID Authentication Cert</button>
         <button id="beidNonRepCert" type="button" class="btn btn-default btn-lg">BeID Non Repudiation Cert</button>
+        <button id="beidRRNCert" type="button" class="btn btn-default btn-lg">BeID RRN Cert</button>
         <button id="beidVerifyPin" type="button" class="btn btn-default btn-lg">BeID Verify Pin</button>
         <button id="beidSign" type="button" class="btn btn-default btn-lg">BeID Sign</button>
         <button id="downloadgcl" type="button" class="btn btn-default btn-lg">Download GCL</button>
         <button id="clear" type="button" class="btn btn-default btn-lg">Clear</button>
         <button id="beidFiltered" type="button" class="btn btn-default btn-lg">BeID Read Filtered</button>
         <div class="form-group">
-            <input type="checkbox" name="type" value="rn-data" id="rndata" />
+            <input type="checkbox" name="type" value="rn" id="rndata" />
             <label for="rndata"><span class="glyphicon"></span> data</label>
         </div>
         <div class="form-group">
@@ -56,8 +57,8 @@
             <label for="address"><span class="glyphicon "></span> address</label>
         </div>
         <div class="form-group">
-            <input type="checkbox" name="type" value="photo" id="photo"/>
-            <label for="photo"><span class="glyphicon"></span> photo</label>
+            <input type="checkbox" name="type" value="picture" id="photo"/>
+            <label for="photo"><span class="glyphicon"></span> picture</label>
         </div>
         <div class="form-group">
             <input type="checkbox" name="type" value="root-certificate" id="rootcert"/>
@@ -74,6 +75,10 @@
         <div class="form-group">
             <input type="checkbox" name="type" value="non-repudiation-certificate" id="nonrepcert"/>
             <label for="authcert"><span class="glyphicon "></span> non-repudiation certificate</label>
+        </div>
+        <div class="form-group">
+            <input type="checkbox" name="type" value="rrn-certificate" id="rrncert"/>
+            <label for="authcert"><span class="glyphicon "></span> rrn certificate</label>
         </div>
     </div>
     <hr />
@@ -145,7 +150,7 @@
 
         connector.core().info(function(err,data) {
             $("#error").empty();
-            $("#error").append(data.Info.version);
+            $("#error").append(data.data.version);
         });
 
         function callback(err,data) {
@@ -187,11 +192,6 @@
             var core = connector.core();
             core.readTextFile("file://t1c-ds.key");
         });
-        $("#getTypes").on('click', function () {
-            $("#information").empty();
-            var core = connector.core();
-            core.types(callback);
-        });
         $("#getPlugins").on('click', function () {
             $("#information").empty();
             var core = connector.core();
@@ -208,6 +208,7 @@
             if($("#authcert").is(":checked"))filter.push($("#authcert").val());
             if($("#nonrepcert").is(":checked"))filter.push($("#nonrepcert").val());
             if($("#citizencert").is(":checked"))filter.push($("#citizencert").val());
+            if($("#rrncert").is(":checked"))filter.push($("#rrncert").val());
             beid.allData(filter,callback);
         });
         $("#beidRn").on('click', function () {
@@ -220,18 +221,23 @@
             var beid = connector.beid();
             beid.address(callback);
         });
-        $("#beidPhoto").on('click', function () {
+        $("#beidPic").on('click', function () {
             $("#information").empty();
             var beid = connector.beid();
-            beid.photo(callback);
+            beid.picture(callback);
+        });
+        $("#beidAllCert").on('click', function () {
+            $("#information").empty();
+            var beid = connector.beid();
+            beid.allCerts([],callback);
         });
         $("#beidRootCert").on('click', function () {
             $("#information").empty();
             var beid = connector.beid();
             beid.rootCertificate(callback);
 /*            var start = new Date().getTime();
-            for (i = 0; i < 10; ++i) {
-                beid.rootCertificate(function(err,data){
+            for (i = 0; i < 5; ++i) {
+                beid.allData([],function(err,data){
                 var end = new Date().getTime();
                 var time = end - start;
                 console.log('Execution time ('+i+'): ' + time);
@@ -242,6 +248,11 @@
             $("#information").empty();
             var beid = connector.beid();
             beid.citizenCertificate(callback);
+        });
+        $("#beidRRNCert").on('click', function () {
+            $("#information").empty();
+            var beid = connector.beid();
+            beid.rrnCertificate(callback);
         });
         $("#beidAuthCert").on('click', function () {
             $("#information").empty();
