@@ -32,6 +32,8 @@
     <div>
         <button id="info" type="button" class="btn btn-default btn-lg">Info</button>
         <button id="getReaders" type="button" class="btn btn-default btn-lg">Readers</button>
+        <button id="getReadersAvailable" type="button" class="btn btn-default btn-lg">Readers (card available)</button>
+        <button id="getReadersUnavailable" type="button" class="btn btn-default btn-lg">Readers (card unavailable)</button>
         <button id="getKey" type="button" class="btn btn-default btn-lg">Get API key</button>
         <button id="getPlugins" type="button" class="btn btn-default btn-lg">Get Plugins</button>
         <button id="beidRn" type="button" class="btn btn-default btn-lg">BeID Rn Data</button>
@@ -186,6 +188,16 @@
             $("#information").empty();
             var core = connector.core();
             core.readers(callback);
+        });
+        $("#getReadersAvailable").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.readersCardAvailable(callback);
+        });
+        $("#getReadersUnavailable").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.readersCardsUnavailable(callback);
         });
         $("#getKey").on('click', function () {
             $("#information").empty();
