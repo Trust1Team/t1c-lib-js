@@ -276,11 +276,9 @@
 
         $("#buttonValidate").on('click', function () {
             var _body={};
-            var props = {};
-            props.authenticationreference = "sha1";
-            props.privatekeyreference = "nonrepudiation";
-            props.pin = $("#psw").val();
-            _body.VerifyPin = props;
+            _body.algorithmReference = "sha1";
+            _body.privateKeyReference = "non-repudiation";
+            _body.pin = $("#psw").val();
             var beid = connector.beid();
             beid.verifyPin(_body, validationCallback);
         });
