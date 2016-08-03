@@ -58,7 +58,13 @@ class EidBe implements AbstractEidBE{
     public authenticationCertificate(callback) {this.connection.get(this.url +  BEID_CERT_AUTHENTICATION, callback);}
     public nonRepudiationCertificate(callback) {this.connection.get(this.url +  BEID_CERT_NON_REPUDIATION, callback);}
     public rrnCertificate(callback) {this.connection.get(this.url +  BEID_CERT_RRN, callback);}
-    public verifyPin(body, callback) {this.connection.post(this.url + BEID_VERIFY_PIN, body,callback);}
+    public verifyPin(body, callback) {
+        let _req:any = {};
+        _req.algorithm_reference = body.algorithReference;
+        _req.private_key_reference = body.privateKeyReference;
+        _req.pin = body.pin;
+        this.connection.post(this.url + BEID_VERIFY_PIN, _req, callback);
+    }
     public signData(body, callback) {this.connection.post(this.url + BEID_SIGN_DATA, body,callback);}
     public authenticate(body, callback) {this.connection.post(this.url + BEID_AUTHENTICATE, body,callback);}
 }
