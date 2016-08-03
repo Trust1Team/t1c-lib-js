@@ -43,7 +43,7 @@ class EidBe implements AbstractEidBE{
     constructor(private url:string,private connection:LocalConnection,private reader_id:string) {this.url = url + PLUGIN_CONTEXT_BEID;}
 
     public allData(filters, callback) {
-        if(filters && filters.length>0){this.connection.get(this.url + BEID_ALL_DATA, callback,QUERY_PARAM_FILTER + filters.join(","));}
+        if(filters && filters.length>0){this.connection.get(this.url + BEID_ALL_DATA, callback, QUERY_PARAM_FILTER + filters.join(","));}
         else{this.connection.get(this.url + BEID_ALL_DATA, callback);}
     }
     public allCerts(filters, callback) {

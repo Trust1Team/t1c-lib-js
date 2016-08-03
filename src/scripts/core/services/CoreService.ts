@@ -7,8 +7,10 @@ import * as CoreExceptions from "../exceptions/CoreExceptions";
 interface AbstractCore{
     info(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     readers(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
+    readersCardAvailable(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
+    readersCardsUnavailable(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
+    reader(reader_id:string,callback:(error:CoreExceptions.RestException,data:any)=>void):void;
     plugins(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
-
 /*    verify(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     download(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     activate(apikey:string, callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -22,18 +24,22 @@ interface AbstractCore{
     browserInfo():any;
 }
 
-const QUERY_PARAM_FILTER = "filter=";
+const FILTER_CARD_INSERTED = "card-inserted=";
 const CORE_INFO = "/";
 const CORE_PLUGINS = "/plugins";
-const CORE_READERS = "/readers";
+const CORE_READERS = "/card-readers";
 const CORE_READER_ID = "/readers/{id}";
 const CORE_DUMMY_JWT = "/manage";
 
 class CoreService implements AbstractCore{
+
     constructor(private url:string,private connection:LocalConnection) {}
 
     public info(callback) {this.connection.get(this.url + CORE_INFO,callback);}
     public readers(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS,callback);}
+    public readersCardAvailable(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS,callback,FILTER_CARD_INSERTED + 'true');}
+    public readersCardsUnavailable(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS,callback,FILTER_CARD_INSERTED + 'false');}
+    public reader(reader_id:string, callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS + "/" + reader_id, callback);}
     public plugins(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_PLUGINS,callback);}
 
     public browserInfo():any{
