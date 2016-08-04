@@ -13,29 +13,26 @@ import {LocalConnection} from "./client/Connection";
 import {AbstractDSClient,DSClient} from "./ds/DSClient";
 
 class GCLClient {
-    private config: GCLConfig;
+    private cfg: GCLConfig;
     private cardFactory: CardFactory;
     private coreService: CoreService;
     private connection: LocalConnection;
     private dsClient: DSClient;
 
-    constructor(config: GCLConfig) {
-        console.debug("config:",JSON.stringify(config));
-
-        this.config = config || new GCLConfig();
+    constructor(cfg: GCLConfig) {
+        this.cfg = cfg || new GCLConfig();
         this.connection = new LocalConnection();
-        this.cardFactory = new CardFactory(this.config.gclUrl,this.connection);
-        this.coreService = new CoreService(this.config.gclUrl,this.connection);
-        this.dsClient = new DSClient("http://localhost:8080/gcl-ds-web/v1",this.connection);
-
-        //console.debug("platform",JSON.stringify(this.core().browserInfo()));
-        this.dsClient.getJWT(function(err,data){
-            console.log(JSON.stringify(data));
-        })
+        this.cardFactory = new CardFactory(this.cfg.gclUrl,this.connection);
+        this.coreService = new CoreService(this.cfg.gclUrl,this.connection);
+        this.dsClient = new DSClient(this.cfg.dsUrl,this.connection);
     }
 
     // get core services
     public core = ():CoreService => {return this.coreService;};
+    // get core config
+    public config = ():GCLConfig => {return this.cfg};
+    // get ds client services
+    public ds = ():AbstractDSClient => {return this.dsClient;};
     // get instance for belgian eID card
     public beid = (reader_id?:string):AbstractEidBE => {return this.cardFactory.createEidBE(reader_id);};
     // get instance for EMV
