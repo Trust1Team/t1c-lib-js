@@ -10,6 +10,9 @@ class GCLConfig {
     private _gclUrl:string;
     private _dsUrl:string;
     private _apiKey:string;
+    private _client_id:string;
+    private _client_credential:string;
+    private _jwt:string;
     private _allowAutoUpdate:boolean;
 
     constructor(gclUrl?:string, dsUrl?:string, apiKey?:string, allowAutoUpdate?:boolean){
@@ -50,6 +53,30 @@ class GCLConfig {
 
     set allowAutoUpdate(value:boolean) {
         this._allowAutoUpdate = value;
+    }
+    
+    get client_id():string {
+        return this._client_id;
+    }
+
+    set client_id(value:string) {
+        this._client_id = value;
+    }
+
+    get client_credential():string {
+        return this._client_credential;
+    }
+
+    set client_credential(value:string) {
+        this._client_credential = value;
+    }
+
+    get jwt():string {
+        return this._jwt;
+    }
+
+    set jwt(value:string) {
+        this._jwt = value;
     }
 }
 

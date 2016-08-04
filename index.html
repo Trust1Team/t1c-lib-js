@@ -24,11 +24,45 @@
         .modal-footer {
             background-color: #f9f9f9;
         }
+        .dropdown-menu {
+            width: 400px !important;
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h3>Belgian eID</h3>
+    <nav class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Belgian eID</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+<!--                    <li class="active"><a href="#">Home</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#contact">Contact</a></li>-->
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">Select Reader <span class="caret"></span></a>
+                        <ul id="readerlist" class="dropdown-menu">
+<!--                            <li><a href="#">Action</a></li>
+                            <li><a href="#">Another action</a></li>
+                            <li><a href="#">Something else here</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">Nav header</li>
+                            <li><a href="#">Separated link</a></li>
+                            <li><a href="#">One more separated link</a></li>-->
+                        </ul>
+                    </li>
+                </ul>
+            </div><!--/.nav-collapse -->
+        </div>
+    </nav>
     <div>
         <button id="info" type="button" class="btn btn-default btn-lg">Info</button>
         <button id="getReaders" type="button" class="btn btn-default btn-lg">Readers</button>
@@ -149,6 +183,7 @@
         gclConfig.gclUrl = "http://localhost:10080/v1";//override config for local dev
         gclConfig.allowAutoUpdate = true;
         var connector = new GCLLib.GCLClient(gclConfig);
+        var selected_card_reader_id = "";
 
         connector.core().info(function(err,data) {
             $("#error").empty();
@@ -179,6 +214,28 @@
                 $("#validationInfo").show();
             }
         }
+
+        //check card readers upon refresh and provide the info
+        var core = connector.core();
+        core.readers(function(err,data){
+            if(data.data){
+                for(var i=0; i < data.data.length ; i ++){
+                    if(data.data[i].card){
+                        $("#readerlist").append( '<li class="list-group-item"><h5><span class="label label-success">Card inserted</span>' + ' '  + data.data[i].name + '</h5></li>' );
+                    }else{
+                        $("#readerlist").append( '<li class="list-group-item"><h5><span class="label label-warning">No Card</span>' + ' '  + data.data[i].name + '</h5></li>' );
+                    }
+
+                }
+
+            }else $("#readerlist").append( '<li> No readers connected </li>' );
+        });
+
+        $('.dropdown-menu a').on('click', function(){
+            $('.dropdown-toggle').html($(this).html() + '<span class="caret"></span>');
+        });
+
+        // Core Functionality
         $("#info").on('click', function () {
             $("#information").empty();
             var core = connector.core();
@@ -209,6 +266,9 @@
             var core = connector.core();
             core.plugins(callback);
         });
+
+
+        // belgian eid functionality
         $("#beidFiltered").on('click', function () {
             $("#information").empty();
             var beid = connector.beid();
@@ -311,7 +371,7 @@
         });
 
 
-
+        // EMV functionality
         $("#emvPan").on('click', function () {
             $("#information").empty();
             var emv = connector.emv();
