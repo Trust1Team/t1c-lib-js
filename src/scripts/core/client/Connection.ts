@@ -24,7 +24,7 @@ class LocalConnection implements Connection {
             dataType: 'json',
             data: queryParams,
             success: function(data,status,jqXHR) {
-                data.capture_date = new Date();
+                /*data.capture_date = new Date();*/
                 return callback(null,data);
             },
             error: function(data,status,jqXHR) {
