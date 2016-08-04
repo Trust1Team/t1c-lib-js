@@ -21,6 +21,7 @@ interface AbstractEidBE{
     authenticate(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
 }
 
+const SEPARATOR = "/";
 const QUERY_PARAM_FILTER = "filter=";
 const PLUGIN_CONTEXT_BEID = "/plugins/beid";
 const BEID_ALL_DATA = "/";
@@ -42,31 +43,37 @@ class EidBe implements AbstractEidBE{
     // constructor
     constructor(private url:string,private connection:LocalConnection,private reader_id:string) {this.url = url + PLUGIN_CONTEXT_BEID;}
 
+    // resolves the reader_id in the base URL
+    private resolvedReaderURI():string{
+        //return this.url + SEPARATOR + this.reader_id
+        return this.url;
+    }
+
     public allData(filters, callback) {
-        if(filters && filters.length>0){this.connection.get(this.url + BEID_ALL_DATA, callback, QUERY_PARAM_FILTER + filters.join(","));}
+        if(filters && filters.length>0){this.connection.get(this.resolvedReaderURI() + BEID_ALL_DATA, callback, QUERY_PARAM_FILTER + filters.join(","));}
         else{this.connection.get(this.url + BEID_ALL_DATA, callback);}
     }
     public allCerts(filters, callback) {
-        if(filters && filters.length>0){this.connection.get(this.url + BEID_ALL_CERTIFICATES, callback, QUERY_PARAM_FILTER + filters.join(","));}
+        if(filters && filters.length>0){this.connection.get(this.resolvedReaderURI + BEID_ALL_CERTIFICATES, callback, QUERY_PARAM_FILTER + filters.join(","));}
         else{this.connection.get(this.url + BEID_ALL_CERTIFICATES, callback);}
     }
-    public rnData(callback) {this.connection.get(this.url + BEID_RN_DATA,callback);}
-    public address(callback) {this.connection.get(this.url + BEID_ADDRESS, callback);}
-    public picture(callback) {this.connection.get(this.url + BEID_PHOTO, callback);}
-    public rootCertificate(callback) {this.connection.get(this.url + BEID_CERT_ROOT, callback);}
-    public citizenCertificate(callback) {this.connection.get(this.url+ BEID_CERT_CITIZEN, callback);}
-    public authenticationCertificate(callback) {this.connection.get(this.url +  BEID_CERT_AUTHENTICATION, callback);}
-    public nonRepudiationCertificate(callback) {this.connection.get(this.url +  BEID_CERT_NON_REPUDIATION, callback);}
-    public rrnCertificate(callback) {this.connection.get(this.url +  BEID_CERT_RRN, callback);}
+    public rnData(callback) {this.connection.get(this.resolvedReaderURI() + BEID_RN_DATA,callback);}
+    public address(callback) {this.connection.get(this.resolvedReaderURI + BEID_ADDRESS, callback);}
+    public picture(callback) {this.connection.get(this.resolvedReaderURI + BEID_PHOTO, callback);}
+    public rootCertificate(callback) {this.connection.get(this.resolvedReaderURI + BEID_CERT_ROOT, callback);}
+    public citizenCertificate(callback) {this.connection.get(this.resolvedReaderURI+ BEID_CERT_CITIZEN, callback);}
+    public authenticationCertificate(callback) {this.connection.get(this.resolvedReaderURI +  BEID_CERT_AUTHENTICATION, callback);}
+    public nonRepudiationCertificate(callback) {this.connection.get(this.resolvedReaderURI +  BEID_CERT_NON_REPUDIATION, callback);}
+    public rrnCertificate(callback) {this.connection.get(this.resolvedReaderURI +  BEID_CERT_RRN, callback);}
     public verifyPin(body, callback) {
         let _req:any = {};
         _req.algorithm_reference = body.algorithReference;
         _req.private_key_reference = body.privateKeyReference;
         _req.pin = body.pin;
-        this.connection.post(this.url + BEID_VERIFY_PIN, _req, callback);
+        this.connection.post(this.resolvedReaderURI + BEID_VERIFY_PIN, _req, callback);
     }
-    public signData(body, callback) {this.connection.post(this.url + BEID_SIGN_DATA, body,callback);}
-    public authenticate(body, callback) {this.connection.post(this.url + BEID_AUTHENTICATE, body,callback);}
+    public signData(body, callback) {this.connection.post(this.resolvedReaderURI + BEID_SIGN_DATA, body,callback);}
+    public authenticate(body, callback) {this.connection.post(this.resolvedReaderURI + BEID_AUTHENTICATE, body,callback);}
 }
 
 export {AbstractEidBE, EidBe}
