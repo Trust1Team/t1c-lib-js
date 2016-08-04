@@ -307,14 +307,6 @@
             $("#information").empty();
             var beid = connector.beid();
             beid.rootCertificate(callback);
-/*            var start = new Date().getTime();
-            for (i = 0; i < 5; ++i) {
-                beid.allData([],function(err,data){
-                var end = new Date().getTime();
-                var time = end - start;
-                console.log('Execution time ('+i+'): ' + time);
-                });
-            }*/
         });
         $("#beidCitizenCert").on('click', function () {
             $("#information").empty();
@@ -348,8 +340,6 @@
 
         $("#buttonValidate").on('click', function () {
             var _body={};
-            _body.algorithmReference = "sha1";
-            _body.privateKeyReference = "non-repudiation";
             _body.pin = $("#psw").val();
             var beid = connector.beid();
             beid.verifyPin(_body, validationCallback);
