@@ -180,7 +180,9 @@
 <script type="text/javascript">
     (function ($) {
         var gclConfig = new GCLLib.GCLConfig();
+        gclConfig.apiKey = "9026899d-4ca6-4bfb-af33-d61fa884ee5e";
         gclConfig.gclUrl = "http://localhost:10080/v1";//override config for local dev
+        gclConfig.dsUrl = "http://localhost:8080/gcl-ds-web/v1";
         gclConfig.allowAutoUpdate = true;
         var connector = new GCLLib.GCLClient(gclConfig);
         var selected_card_reader_id = "";
@@ -258,8 +260,9 @@
         });
         $("#getKey").on('click', function () {
             $("#information").empty();
-            var core = connector.core();
-            core.readTextFile("file://t1c-ds.key");
+            var apikey = connector.config().apiKey
+            if(apikey) $("#information").append(apikey);
+            else $("#information").append('no apikey set');
         });
         $("#getPlugins").on('click', function () {
             $("#information").empty();
