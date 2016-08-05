@@ -9,16 +9,18 @@ import {GCLConfig} from "../GCLConfig";
 interface AbstractDSClient{
     getJWT(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     refreshJWT(callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    downloadLink(infoBrowser, callback:(error:CoreExceptions.RestException) => void):void;
 }
 
 const SECURITY = "/security";
 const SECURITY_JWT_ISSUE = SECURITY + "/jwt/issue";
 const SECURITY_JWT_REFRESH = SECURITY + "/jwt/refresh";
+const DOWNLOAD = "/download/gcl";
 
 class DSClient implements AbstractDSClient{
     constructor(private url:string,private connection:RemoteConnection) {}
 
-    getJWT(callback:(error:CoreExceptions.RestException, data:any)=>void):void {
+    public getJWT(callback:(error:CoreExceptions.RestException, data:any)=>void):void {
         var consumerCb = callback;
         this.connection.get(this.url + SECURITY_JWT_ISSUE, function(error, data){
             if(error)return consumerCb(error,null);
@@ -26,7 +28,8 @@ class DSClient implements AbstractDSClient{
             return consumerCb(null,data);
         });
     }
-    refreshJWT(callback:(error:CoreExceptions.RestException, data:any)=>void):void {
+
+    public refreshJWT(callback:(error:CoreExceptions.RestException, data:any)=>void):void {
         var actualJWT = GCLConfig.Instance.jwt;
         if(actualJWT){
             let _body:any = {};
@@ -39,6 +42,10 @@ class DSClient implements AbstractDSClient{
             noJWT.status = 412; //precondition failed
             callback(noJWT,null);
         }
+    }
+
+    public downloadLink(infoBrowser, callback:(error:CoreExceptions.RestException, data:any)=>void):void {
+        this.connection.post(this.url + DOWNLOAD, infoBrowser, callback);
     }
 }
 

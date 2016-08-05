@@ -65,6 +65,8 @@
     </nav>
     <div>
         <button id="info" type="button" class="btn btn-default btn-lg">Info</button>
+        <button id="infoBrowser" type="button" class="btn btn-default btn-lg">Browser Info</button>
+        <button id="downloadgcl" type="button" class="btn btn-default btn-lg">Download GCL</button>
         <button id="getReaders" type="button" class="btn btn-default btn-lg">Readers</button>
         <button id="getReadersAvailable" type="button" class="btn btn-default btn-lg">Readers (card available)</button>
         <button id="getReadersUnavailable" type="button" class="btn btn-default btn-lg">Readers (card unavailable)</button>
@@ -84,7 +86,6 @@
         <button id="beidRRNCert" type="button" class="btn btn-default btn-lg">BeID RRN Cert</button>
         <button id="beidVerifyPin" type="button" class="btn btn-default btn-lg">BeID Verify Pin</button>
         <button id="beidSign" type="button" class="btn btn-default btn-lg">BeID Sign</button>
-        <button id="downloadgcl" type="button" class="btn btn-default btn-lg">Download GCL</button>
         <button id="clear" type="button" class="btn btn-default btn-lg">Clear</button>
         <button id="beidFiltered" type="button" class="btn btn-default btn-lg">BeID Read Filtered</button>
         <div class="form-group">
@@ -245,6 +246,11 @@
             var core = connector.core();
             core.info(callback);
         });
+        $("#infoBrowser").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.infoBrowser(callback);
+        });
         $("#getReaders").on('click', function () {
             $("#information").empty();
             var core = connector.core();
@@ -381,8 +387,19 @@
         $("#beidSign").on('click', function () {
             //TODO
         });
+
         $("#downloadgcl").on('click',function(){
-            console.log("to be developed");
+            var core = connector.core();
+            var self = this;
+            core.infoBrowser(function(error,data){
+               if(error){$("#error").append('Could not retrieve browser info');}
+               connector.ds().downloadLink(data,function(error,data){
+                   if(error)$("#error").append('Error retrieving download link');
+                   $("#error").empty();
+                   $("#information").empty();
+                   $("#information").append(JSON.stringify(data, null, '  '));
+               });
+            });
         });
 
         $("#clear").on('click', function () {
