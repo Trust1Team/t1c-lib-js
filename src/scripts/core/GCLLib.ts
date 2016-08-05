@@ -24,9 +24,9 @@ class GCLClient {
     constructor(cfg: GCLConfig) {
         // resolve config to singleton
         this.cfg = this.resolveConfig(cfg);
-        this.connection = new LocalConnection(this.cfg);
-        this.authConnection = new LocalAuthConnection(this.cfg);
-        this.remoteConnection = new RemoteConnection(this.cfg);
+        this.connection = new LocalConnection();
+        this.authConnection = new LocalAuthConnection();
+        this.remoteConnection = new RemoteConnection();
         this.cardFactory = new CardFactory(this.cfg.gclUrl,this.connection);
         this.coreService = new CoreService(this.cfg.gclUrl,this.connection);
         this.dsClient = new DSClient(this.cfg.dsUrl,this.remoteConnection);

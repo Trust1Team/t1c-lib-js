@@ -14,24 +14,16 @@ interface Connection {
 }
 
 class LocalAuthConnection implements Connection {
-    private jwt:string;
-
-    constructor(config:GCLConfig) {
-        this.jwt = config.jwt;
-    }
+    constructor() {}
 
     // using Callback
     public get(url:string, callback:(error:CoreExceptions.RestException, data:any)=>void, queryParams?:any):void{
-        $.ajaxSetup({
-            headers: { 'Authorization':('Bearer ' + this.jwt) }
-        });
-
         $.ajax({
             url: url,
             type: 'GET',
             dataType: 'json',
             data: queryParams,
-            headers: { 'Authorization':('Bearer ' + this.jwt) },
+            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt) },
             success: function(data,status,jqXHR) {
                 return callback(null,data);
             },
@@ -46,10 +38,6 @@ class LocalAuthConnection implements Connection {
     }
 
     public post(url:string, body:any, callback:(error:CoreExceptions.RestException, data:any) => void):void{
-        $.ajaxSetup({
-            headers: { 'Authorization':('Bearer ' + this.jwt) }
-        });
-
         $.ajax({
             url: url,
             type: 'POST',
@@ -58,7 +46,7 @@ class LocalAuthConnection implements Connection {
             processData: false,
             dataType: 'json',
             mimeType: 'application/json',
-            headers: { 'Authorization':('Bearer ' + this.jwt) },
+            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt) },
             success: function(response, status) {
                 return callback(null,response);
             },
@@ -74,7 +62,7 @@ class LocalAuthConnection implements Connection {
 }
 
 class LocalConnection implements Connection {
-    constructor(config:GCLConfig) {}
+    constructor() {}
 
     public get(url:string, callback:(error:CoreExceptions.RestException, data:any)=>void, queryParams?:any):void{
         $.ajax({
@@ -82,6 +70,7 @@ class LocalConnection implements Connection {
             type: 'GET',
             dataType: 'json',
             data: queryParams,
+            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt) },
             success: function(data,status,jqXHR) {
                 return callback(null,data);
             },
@@ -104,6 +93,7 @@ class LocalConnection implements Connection {
             processData: false,
             dataType: 'json',
             mimeType: 'application/json',
+            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt) },
             success: function(response, status) {
                 return callback(null,response);
             },
@@ -119,11 +109,7 @@ class LocalConnection implements Connection {
 }
 
 class RemoteConnection implements Connection {
-    private apikey:string;
-
-    constructor(config:GCLConfig) {
-        this.apikey = config.apiKey;
-    }
+    constructor() {}
 
     // using Callback
     public get(url:string, callback:(error:CoreExceptions.RestException, data:any)=>void, queryParams?:any):void{
@@ -132,7 +118,7 @@ class RemoteConnection implements Connection {
             type: 'GET',
             dataType: 'json',
             data: queryParams,
-            headers: { 'apikey': this.apikey },
+            headers: { 'apikey': GCLConfig.Instance.apiKey },
             success: function(data,status,jqXHR) {
                 return callback(null,data);
             },
@@ -147,10 +133,6 @@ class RemoteConnection implements Connection {
     }
 
     public post(url:string, body:any, callback:(error:CoreExceptions.RestException, data:any) => void):void{
-        $.ajaxSetup({
-            headers: { 'apikey': this.apikey }
-        });
-
         $.ajax({
             url: url,
             type: 'POST',
@@ -158,7 +140,7 @@ class RemoteConnection implements Connection {
             contentType: 'application/json; charset=utf-8',
             processData: false,
             dataType: 'json',
-            headers: { 'apikey': this.apikey },
+            headers: { 'apikey': GCLConfig.Instance.apiKey },
             mimeType: 'application/json',
             success: function(response, status) {
                 return callback(null,response);
