@@ -1,7 +1,7 @@
 /**
  * @author Michallis Pashidis
  */
-import {LocalConnection} from "../client/Connection";
+import {RemoteConnection} from "../client/Connection";
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 
 interface AbstractDSClient{
@@ -12,7 +12,7 @@ const SECURITY = "/security";
 const SECURITY_JWT_ISSUE = SECURITY + "/jwt/issue";
 
 class DSClient implements AbstractDSClient{
-    constructor(private url:string,private connection:LocalConnection) {}
+    constructor(private url:string,private connection:RemoteConnection) {}
 
     getJWT(callback:(error:CoreExceptions.RestException, data:any)=>void):void {
         this.connection.get(this.url + SECURITY_JWT_ISSUE, callback);
