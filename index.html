@@ -261,6 +261,8 @@
             core.readersCardsUnavailable(callback);
         });
         $("#getKey").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
             var apikey = connector.config().apiKey;
             if(apikey) $("#information").append(apikey);
             else $("#information").append('no apikey set');
