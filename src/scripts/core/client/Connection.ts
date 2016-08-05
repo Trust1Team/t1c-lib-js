@@ -31,6 +31,7 @@ class LocalAuthConnection implements Connection {
             type: 'GET',
             dataType: 'json',
             data: queryParams,
+            headers: { 'Authorization':('Bearer ' + this.jwt) },
             success: function(data,status,jqXHR) {
                 return callback(null,data);
             },
@@ -57,6 +58,7 @@ class LocalAuthConnection implements Connection {
             processData: false,
             dataType: 'json',
             mimeType: 'application/json',
+            headers: { 'Authorization':('Bearer ' + this.jwt) },
             success: function(response, status) {
                 return callback(null,response);
             },
@@ -72,15 +74,13 @@ class LocalAuthConnection implements Connection {
 }
 
 class LocalConnection implements Connection {
-    private jwt:string;
+    private apikey:string;
 
     constructor(config:GCLConfig) {
-        this.jwt = config.jwt;
+        this.apikey = config.apiKey;
     }
 
-    // using Callback
     public get(url:string, callback:(error:CoreExceptions.RestException, data:any)=>void, queryParams?:any):void{
-
         $.ajax({
             url: url,
             type: 'GET',
@@ -132,15 +132,12 @@ class RemoteConnection implements Connection {
 
     // using Callback
     public get(url:string, callback:(error:CoreExceptions.RestException, data:any)=>void, queryParams?:any):void{
-        $.ajaxSetup({
-            headers: { 'apikey': this.apikey }
-        });
-
         $.ajax({
             url: url,
             type: 'GET',
             dataType: 'json',
             data: queryParams,
+            headers: { 'apikey': this.apikey },
             success: function(data,status,jqXHR) {
                 return callback(null,data);
             },
@@ -166,6 +163,7 @@ class RemoteConnection implements Connection {
             contentType: 'application/json; charset=utf-8',
             processData: false,
             dataType: 'json',
+            headers: { 'apikey': this.apikey },
             mimeType: 'application/json',
             success: function(response, status) {
                 return callback(null,response);

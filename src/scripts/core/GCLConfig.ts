@@ -7,14 +7,18 @@ const defaultGclUrl = "https://localhost:10433/v1";
 const defaultDSUrl = "https://dist.t1t.be/gcl-ds/v1";
 const defaultAllowAutoUpdate = true;
 class GCLConfig {
+    //singleton pattern
+    private static instance:GCLConfig;
+
     private _gclUrl:string;
     private _dsUrl:string;
     private _apiKey:string;
     private _client_id:string;
-    private _client_credential:string;
+    private _client_secret:string;
     private _jwt:string;
     private _allowAutoUpdate:boolean;
 
+    // constructor for DTO
     constructor(gclUrl?:string, dsUrl?:string, apiKey?:string, allowAutoUpdate?:boolean){
         this._gclUrl = gclUrl||defaultGclUrl;
         this._dsUrl = dsUrl||defaultDSUrl;
@@ -22,6 +26,17 @@ class GCLConfig {
         this._allowAutoUpdate = allowAutoUpdate||defaultAllowAutoUpdate;
     }
 
+    // singleton pattern for use in T1C-JS
+    static get Instance() {
+        if (this.instance === null || this.instance === undefined) {
+            this.instance = new GCLConfig();
+            this.instance.gclUrl = defaultGclUrl;
+            this.instance.dsUrl = defaultDSUrl;
+            this.instance.apiKey = '';
+            this.instance.allowAutoUpdate = defaultAllowAutoUpdate;
+        }
+        return this.instance;
+    }
 
     get gclUrl():string {
         return this._gclUrl;
@@ -63,12 +78,12 @@ class GCLConfig {
         this._client_id = value;
     }
 
-    get client_credential():string {
-        return this._client_credential;
+    get client_secret():string {
+        return this._client_secret;
     }
 
-    set client_credential(value:string) {
-        this._client_credential = value;
+    set client_secret(value:string) {
+        this._client_secret = value;
     }
 
     get jwt():string {
