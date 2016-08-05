@@ -6,6 +6,7 @@ interface RestException{
     status:number;
     code:string;
 }
+
 interface DataException{}
 
 interface ServiceException{}
