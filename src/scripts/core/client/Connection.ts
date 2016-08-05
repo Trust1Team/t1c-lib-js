@@ -74,11 +74,7 @@ class LocalAuthConnection implements Connection {
 }
 
 class LocalConnection implements Connection {
-    private apikey:string;
-
-    constructor(config:GCLConfig) {
-        this.apikey = config.apiKey;
-    }
+    constructor(config:GCLConfig) {}
 
     public get(url:string, callback:(error:CoreExceptions.RestException, data:any)=>void, queryParams?:any):void{
         $.ajax({
@@ -100,7 +96,6 @@ class LocalConnection implements Connection {
     }
 
     public post(url:string, body:any, callback:(error:CoreExceptions.RestException, data:any) => void):void{
-
         $.ajax({
             url: url,
             type: 'POST',
