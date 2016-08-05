@@ -9,7 +9,8 @@ import * as CoreExceptions from "../exceptions/CoreExceptions";
 import {GCLConfig} from "../GCLConfig";
 
 interface Connection {
-    get(url:string, callback:(error:CoreExceptions.RestException, data:any, queryParams?:any) => void);
+    //get(url:string, callback:(error:CoreExceptions.RestException, data:any, queryParams?:any) => void);
+    get(url:string, callback:(error:any, data:any, queryParams?:any) => void);
     post(url:string, body:any, callback:(error:CoreExceptions.RestException, data:any) => void);
 }
 
@@ -17,7 +18,7 @@ class LocalAuthConnection implements Connection {
     constructor() {}
 
     // using Callback
-    public get(url:string, callback:(error:CoreExceptions.RestException, data:any)=>void, queryParams?:any):void{
+    public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
         $.ajax({
             url: url,
             type: 'GET',
@@ -28,16 +29,16 @@ class LocalAuthConnection implements Connection {
                 return callback(null,data);
             },
             error: function(data,status,jqXHR) {
-                let error = {} as CoreExceptions.RestException;
+/*                let error = {} as CoreExceptions.RestException;
                 error.status = data.status;
                 error.description = data.responseJSON.Error.description;
-                error.code = data.responseJSON.Error.code;
-                return callback(error,null);
+                error.code = data.responseJSON.Error.code;*/
+                return callback(data,null);
             }
         });
     }
 
-    public post(url:string, body:any, callback:(error:CoreExceptions.RestException, data:any) => void):void{
+    public post(url:string, body:any, callback:(error:any, data:any) => void):void{
         $.ajax({
             url: url,
             type: 'POST',
@@ -51,11 +52,11 @@ class LocalAuthConnection implements Connection {
                 return callback(null,response);
             },
             error: function(data, status, jqXHR) {
-                let error = {} as CoreExceptions.RestException;
+/*                let error = {} as CoreExceptions.RestException;
                 error.status = data.status;
                 error.description = data.responseJSON.Error.description;
-                error.code = data.responseJSON.Error.code;
-                return callback(error,null);
+                error.code = data.responseJSON.Error.code;*/
+                return callback(data,null);
             }
         });
     }
@@ -64,7 +65,7 @@ class LocalAuthConnection implements Connection {
 class LocalConnection implements Connection {
     constructor() {}
 
-    public get(url:string, callback:(error:CoreExceptions.RestException, data:any)=>void, queryParams?:any):void{
+    public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
         $.ajax({
             url: url,
             type: 'GET',
@@ -75,16 +76,16 @@ class LocalConnection implements Connection {
                 return callback(null,data);
             },
             error: function(data,status,jqXHR) {
-                let error = {} as CoreExceptions.RestException;
+/*                let error = {} as CoreExceptions.RestException;
                 error.status = data.status;
                 error.description = data.responseJSON.Error.description;
-                error.code = data.responseJSON.Error.code;
-                return callback(error,null);
+                error.code = data.responseJSON.Error.code;*/
+                return callback(data,null);
             }
         });
     }
 
-    public post(url:string, body:any, callback:(error:CoreExceptions.RestException, data:any) => void):void{
+    public post(url:string, body:any, callback:(error:any, data:any) => void):void{
         $.ajax({
             url: url,
             type: 'POST',
@@ -98,11 +99,8 @@ class LocalConnection implements Connection {
                 return callback(null,response);
             },
             error: function(data, status, jqXHR) {
-                let error = {} as CoreExceptions.RestException;
-                error.status = data.status;
-                error.description = data.responseJSON.Error.description;
-                error.code = data.responseJSON.Error.code;
-                return callback(error,null);
+                //let error = {} as CoreExceptions.RestException;
+                return callback(data,null);
             }
         });
     }
@@ -112,7 +110,7 @@ class RemoteConnection implements Connection {
     constructor() {}
 
     // using Callback
-    public get(url:string, callback:(error:CoreExceptions.RestException, data:any)=>void, queryParams?:any):void{
+    public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
         $.ajax({
             url: url,
             type: 'GET',
@@ -132,7 +130,7 @@ class RemoteConnection implements Connection {
         });
     }
 
-    public post(url:string, body:any, callback:(error:CoreExceptions.RestException, data:any) => void):void{
+    public post(url:string, body:any, callback:(error:any, data:any) => void):void{
         $.ajax({
             url: url,
             type: 'POST',
