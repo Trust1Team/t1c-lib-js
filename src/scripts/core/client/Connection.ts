@@ -142,8 +142,8 @@ class RemoteConnection implements Connection {
             dataType: 'json',
             headers: { 'apikey': GCLConfig.Instance.apiKey },
             mimeType: 'application/json',
-            success: function(response, status) {
-                return callback(null,response);
+            success: function(data, status,jqXHR) {
+                return callback(null,data);
             },
             error: function(data, status, jqXHR) {
                 let error = {} as CoreExceptions.RestException;
