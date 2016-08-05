@@ -46,7 +46,7 @@
                 <ul class="nav navbar-nav">
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">Select Reader <span class="caret"></span></a>
-                        <ul id="readerlist" class="dropdown-menu">
+                        <ul id="readerlist" class="dropdown-menu" role="menu">
                         </ul>
                     </li>
                 </ul>
@@ -75,7 +75,7 @@
         <button id="beidNonRepCert" type="button" class="btn btn-default btn-lg">BeID Non Repudiation Cert</button>
         <button id="beidRRNCert" type="button" class="btn btn-default btn-lg">BeID RRN Cert</button>
         <button id="beidVerifyPin" type="button" class="btn btn-default btn-lg">BeID Verify Pin</button>
-        <button id="beidSign" type="button" class="btn btn-default btn-lg">BeID Sign</button>
+        <!--<button id="beidSign" type="button" class="btn btn-default btn-lg">BeID Sign</button>-->
         <button id="clear" type="button" class="btn btn-default btn-lg">Clear</button>
         <button id="beidFiltered" type="button" class="btn btn-default btn-lg">BeID Read Filtered</button>
         <div class="form-group">
@@ -178,7 +178,6 @@
         gclConfig.dsUrl = "http://localhost:8080/gcl-ds-web/v1";
         gclConfig.allowAutoUpdate = true;
         var connector = new GCLLib.GCLClient(gclConfig);
-        var selected_card_reader_id = "";
 
         connector.core().info(function(err,data) {
             $("#error").empty();
@@ -216,13 +215,11 @@
             if(data.data){
                 for(var i=0; i < data.data.length ; i ++){
                     if(data.data[i].card){
-                        $("#readerlist").append( '<li class="list-group-item"><h5><span class="label label-success">Card inserted</span>' + ' '  + data.data[i].name + '</h5></li>' );
+                        $("#readerlist").append( '<li><a href="#"><h5><span class="label label-success">Card inserted - ' + data.data[i].name + ' (' + data.data[i].id + ')</span></h5></a></li>' );
                     }else{
-                        $("#readerlist").append( '<li class="list-group-item"><h5><span class="label label-warning">No Card</span>' + ' '  + data.data[i].name + '</h5></li>' );
+                        $("#readerlist").append( '<li><a href="#"><h5><span class="label label-warning">No Card - ' + data.data[i].name + ' (' + data.data[i].id + ')</span></h5></a></li>' );
                     }
-
                 }
-
             }else $("#readerlist").append( '<li> No readers connected </li>' );
         });
 
@@ -274,11 +271,11 @@
             $("#validationError").empty();
             connector.ds().refreshJWT(callback);
         });
-        $("#getJWTRefresh").on('click', function () {
+        $("#sendJWTDemo").on('click', function () {
             $("#information").empty();
             $("#error").empty();
             $("#validationError").empty();
-            //connector.ds().refreshJWT(callback);
+            connector.core().manage(callback);
         });
         $("#getPlugins").on('click', function () {
             $("#information").empty();
@@ -377,6 +374,11 @@
             //TODO
         });
 
+        $('.dropdown-menu').on('click', function(){
+            console.log("toggle readers:",$(this).text());
+            $('.dropdown-toggle').html($(this).html() + '<span class="caret"></span>');
+        });
+
         $("#downloadgcl").on('click',function(){
             var core = connector.core();
             var self = this;
@@ -393,10 +395,8 @@
 
         $("#clear").on('click', function () {
             $("#information").empty();
-            connector.checkForConnector(function(object) {
-                $("#error").empty();
-                $("#error").append(object.Info.version);
-            });
+            $("#error").empty();
+
         });
 
 
