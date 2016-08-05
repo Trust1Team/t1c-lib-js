@@ -22,7 +22,8 @@ class GCLClient {
     private dsClient: DSClient;
 
     constructor(cfg: GCLConfig) {
-        this.cfg = cfg || new GCLConfig();
+        // resolve config to singleton
+        this.cfg = this.resolveConfig(cfg);
         this.connection = new LocalConnection(this.cfg);
         this.authConnection = new LocalAuthConnection(this.cfg);
         this.remoteConnection = new RemoteConnection(this.cfg);
@@ -34,12 +35,20 @@ class GCLClient {
         this.initSecurityContext();
     }
 
+    private resolveConfig(cfg:GCLConfig) {
+        var resolvedCfg:GCLConfig = GCLConfig.Instance;
+        resolvedCfg.apiKey = cfg.apiKey;
+        resolvedCfg.allowAutoUpdate = cfg.allowAutoUpdate;
+        resolvedCfg.client_id = cfg.client_id;
+        resolvedCfg.client_secret = cfg.client_secret;
+        resolvedCfg.jwt = cfg.jwt;
+        resolvedCfg.dsUrl = cfg.dsUrl;
+        resolvedCfg.gclUrl = cfg.gclUrl;
+        return resolvedCfg;
+    }
+
     private initSecurityContext(){
-        if(this.cfg && this.cfg.apiKey){
-
-        }else if (this.cfg && this.cfg.jwt){
-
-        }
+        // TODO
     }
 
     // get core services
