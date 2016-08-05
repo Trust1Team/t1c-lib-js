@@ -9,7 +9,7 @@ import {CardFactory} from "../Plugins/smartcards/CardFactory";
 import {AbstractEidBE} from "../Plugins/smartcards/eid/be/EidBe";
 import {EMV} from "../Plugins/smartcards/emv/EMV";
 import {CoreService} from "./services/CoreService";
-import {LocalConnection, RemoteConnection} from "./client/Connection";
+import {LocalConnection, RemoteConnection, LocalAuthConnection} from "./client/Connection";
 import {AbstractDSClient,DSClient} from "./ds/DSClient";
 
 class GCLClient {
@@ -17,12 +17,14 @@ class GCLClient {
     private cardFactory: CardFactory;
     private coreService: CoreService;
     private connection: LocalConnection;
+    private authConnection: LocalAuthConnection;
     private remoteConnection: RemoteConnection;
     private dsClient: DSClient;
 
     constructor(cfg: GCLConfig) {
         this.cfg = cfg || new GCLConfig();
         this.connection = new LocalConnection(this.cfg);
+        this.authConnection = new LocalAuthConnection(this.cfg);
         this.remoteConnection = new RemoteConnection(this.cfg);
         this.cardFactory = new CardFactory(this.cfg.gclUrl,this.connection);
         this.coreService = new CoreService(this.cfg.gclUrl,this.connection);
