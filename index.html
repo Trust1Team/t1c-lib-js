@@ -296,7 +296,7 @@
         // belgian eid functionality
         $("#beidFiltered").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid($("#beidFiltered").value);
+            var beid = connector.beid($("#selected_reader").text());
             var filter = [];
             if($("#rndata").is(":checked"))filter.push($("#rndata").val());
             if($("#address").is(":checked"))filter.push($("#address").val());
@@ -310,7 +310,7 @@
         });
         $("#beidCertsFiltered").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid($("#beidFiltered").value);
+            var beid = connector.beid($("#selected_reader").text());
             var filter = [];
             if($("#rootcertx").is(":checked"))filter.push($("#rootcertx").val());
             if($("#authcertx").is(":checked"))filter.push($("#authcertx").val());
@@ -321,47 +321,47 @@
         });
         $("#beidRn").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid($("#beidFiltered").value);
+            var beid = connector.beid($("#selected_reader").text());
             beid.rnData(callback);
         });
         $("#beidAddress").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid($("#beidFiltered").value);
+            var beid = connector.beid($("#selected_reader").text());
             beid.address(callback);
         });
         $("#beidPic").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid($("#beidFiltered").value);
+            var beid = connector.beid($("#selected_reader").text());
             beid.picture(callback);
         });
         $("#beidAllCert").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid($("#beidFiltered").value);
+            var beid = connector.beid($("#selected_reader").text());
             beid.allCerts([],callback);
         });
         $("#beidRootCert").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid($("#beidFiltered").value);
+            var beid = connector.beid($("#selected_reader").text());
             beid.rootCertificate(callback);
         });
         $("#beidCitizenCert").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid($("#beidFiltered").value);
+            var beid = connector.beid($("#selected_reader").text());
             beid.citizenCertificate(callback);
         });
         $("#beidRRNCert").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid($("#beidFiltered").value);
+            var beid = connector.beid($("#selected_reader").text());
             beid.rrnCertificate(callback);
         });
         $("#beidAuthCert").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid($("#beidFiltered").value);
+            var beid = connector.beid($("#selected_reader").text());
             beid.authenticationCertificate(callback);
         });
         $("#beidNonRepCert").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid($("#beidFiltered").value);
+            var beid = connector.beid($("#selected_reader").text());
             beid.nonRepudiationCertificate(callback);
         });
         $("#beidVerifyPin").on('click', function () {
@@ -377,7 +377,7 @@
         $("#buttonValidate").on('click', function () {
             var _body={};
             _body.pin = $("#psw").val();
-            connector.beid($("#beidFiltered").value).verifyPin(_body, validationCallback);
+            connector.beid($("#selected_reader").text()).verifyPin(_body, validationCallback);
         });
 
         $("#beidSign").on('click', function () {
