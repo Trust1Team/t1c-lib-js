@@ -48,17 +48,18 @@ class EidBe implements AbstractEidBE{
 
     // resolves the reader_id in the base URL
     private resolvedReaderURI():string{
-        //return this.url + SEPARATOR + this.reader_id
-        return this.url;
+        //return this.url + SEPARATOR + this.reader_id;
+        return this.url + SEPARATOR + '8d1c8c29c9f928b5';
+        //return this.url;
     }
 
     public allData(filters, callback) {
         if(filters && filters.length>0){this.connection.get(this.resolvedReaderURI() + BEID_ALL_DATA, callback, QUERY_PARAM_FILTER + filters.join(","));}
-        else{this.connection.get(this.url + BEID_ALL_DATA, callback);}
+        else{this.connection.get(this.resolvedReaderURI() + BEID_ALL_DATA, callback);}
     }
     public allCerts(filters, callback) {
         if(filters && filters.length>0){this.connection.get(this.resolvedReaderURI() + BEID_ALL_CERTIFICATES, callback, QUERY_PARAM_FILTER + filters.join(","));}
-        else{this.connection.get(this.url + BEID_ALL_CERTIFICATES, callback);}
+        else{this.connection.get(this.resolvedReaderURI() + BEID_ALL_CERTIFICATES, callback);}
     }
     public rnData(callback) {this.connection.get(this.resolvedReaderURI() + BEID_RN_DATA,callback);}
     public address(callback) {this.connection.get(this.resolvedReaderURI() + BEID_ADDRESS, callback);}
