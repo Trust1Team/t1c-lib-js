@@ -13,7 +13,7 @@ interface Connection {
     post(url:string, body:any, callback:(error:CoreExceptions.RestException, data:any) => void);
 }
 
-class LocalConnection implements Connection {
+class LocalAuthConnection implements Connection {
     private jwt:string;
 
     constructor(config:GCLConfig) {
@@ -22,9 +22,9 @@ class LocalConnection implements Connection {
 
     // using Callback
     public get(url:string, callback:(error:CoreExceptions.RestException, data:any)=>void, queryParams?:any):void{
-/*        $.ajaxSetup({
+        $.ajaxSetup({
             headers: { 'Authorization':('Bearer ' + this.jwt) }
-        });*/
+        });
 
         $.ajax({
             url: url,
@@ -45,9 +45,61 @@ class LocalConnection implements Connection {
     }
 
     public post(url:string, body:any, callback:(error:CoreExceptions.RestException, data:any) => void):void{
-/*        $.ajaxSetup({
+        $.ajaxSetup({
             headers: { 'Authorization':('Bearer ' + this.jwt) }
-        });*/
+        });
+
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: JSON.stringify(body),
+            contentType: 'application/json; charset=utf-8',
+            processData: false,
+            dataType: 'json',
+            mimeType: 'application/json',
+            success: function(response, status) {
+                return callback(null,response);
+            },
+            error: function(data, status, jqXHR) {
+                let error = {} as CoreExceptions.RestException;
+                error.status = data.status;
+                error.description = data.responseJSON.Error.description;
+                error.code = data.responseJSON.Error.code;
+                return callback(error,null);
+            }
+        });
+    }
+}
+
+class LocalConnection implements Connection {
+    private jwt:string;
+
+    constructor(config:GCLConfig) {
+        this.jwt = config.jwt;
+    }
+
+    // using Callback
+    public get(url:string, callback:(error:CoreExceptions.RestException, data:any)=>void, queryParams?:any):void{
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            data: queryParams,
+            success: function(data,status,jqXHR) {
+                return callback(null,data);
+            },
+            error: function(data,status,jqXHR) {
+                let error = {} as CoreExceptions.RestException;
+                error.status = data.status;
+                error.description = data.responseJSON.Error.description;
+                error.code = data.responseJSON.Error.code;
+                return callback(error,null);
+            }
+        });
+    }
+
+    public post(url:string, body:any, callback:(error:CoreExceptions.RestException, data:any) => void):void{
 
         $.ajax({
             url: url,
@@ -129,4 +181,4 @@ class RemoteConnection implements Connection {
     }
 }
 
-export {LocalConnection,RemoteConnection}
+export {LocalConnection,LocalAuthConnection,RemoteConnection}
