@@ -40,7 +40,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Belgian eID</a>
+                <a class="navbar-brand" href="#">T1C-JS</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -50,9 +50,12 @@
                         </ul>
                     </li>
                 </ul>
-            </div><!--/.nav-collapse -->
+            </div>
         </div>
     </nav>
+    <hr />
+    <div><span id='selected_reader' class="label label-default">No card reader selected</span></div>
+    <hr />
     <div>
         <button id="info" type="button" class="btn btn-default btn-lg">Info</button>
         <button id="infoBrowser" type="button" class="btn btn-default btn-lg">Browser Info</button>
@@ -65,6 +68,7 @@
         <button id="getJWTRefresh" type="button" class="btn btn-default btn-lg">Refresh JWT</button>
         <button id="sendJWTDemo" type="button" class="btn btn-default btn-lg">Send JWT to GCL</button>
         <button id="getPlugins" type="button" class="btn btn-default btn-lg">Get Plugins</button>
+        <hr />
         <button id="beidRn" type="button" class="btn btn-default btn-lg">BeID Rn Data</button>
         <button id="beidAddress" type="button" class="btn btn-default btn-lg">BeID Address</button>
         <button id="beidPic" type="button" class="btn btn-default btn-lg">BeID Picture</button>
@@ -77,6 +81,7 @@
         <button id="beidVerifyPin" type="button" class="btn btn-default btn-lg">BeID Verify Pin</button>
         <!--<button id="beidSign" type="button" class="btn btn-default btn-lg">BeID Sign</button>-->
         <button id="clear" type="button" class="btn btn-default btn-lg">Clear</button>
+        <hr />
         <button id="beidFiltered" type="button" class="btn btn-default btn-lg">BeID Read Filtered</button>
         <div class="form-group">
             <input type="checkbox" name="type" value="rn" id="rndata" />
@@ -96,6 +101,7 @@
             <input type="checkbox" name="type" value="rrn-certificate" id="rrncert"/>
             <label for="rrncert"><span class="glyphicon "></span> rrn certificate</label>
         </div>
+        <hr />
         <button id="beidCertsFiltered" type="button" class="btn btn-default btn-lg">BeID Certs Filtered</button>
         <div class="form-group">
             <input type="checkbox" name="type" value="root-certificate" id="rootcertx"/>
@@ -215,15 +221,19 @@
             if(data.data){
                 for(var i=0; i < data.data.length ; i ++){
                     if(data.data[i].card){
-                        $("#readerlist").append( '<li><a href="#"><h5><span class="label label-success">Card inserted - ' + data.data[i].name + ' (' + data.data[i].id + ')</span></h5></a></li>' );
+                        $("#readerlist").append( '<li id="liid"><a href="#" ><h5><span class="label label-success" >' + data.data[i].id + '</span></h5></a></li>' );
                     }else{
-                        $("#readerlist").append( '<li><a href="#"><h5><span class="label label-warning">No Card - ' + data.data[i].name + ' (' + data.data[i].id + ')</span></h5></a></li>' );
+                        $("#readerlist").append( '<li><a href="#"><h5><span class="label label-warning">' + data.data[i].id + '</span></h5></a></li>' );
                     }
                 }
             }else $("#readerlist").append( '<li> No readers connected </li>' );
         });
 
-        $('.dropdown-menu a').on('click', function(){
+        //show selected reader in menu
+        $('.dropdown-menu').on('click', function(event){
+            console.log("Event:",event.target.innerHTML);
+            $('#selected_reader').empty();
+            $('#selected_reader').append(event.target.innerHTML);
             $('.dropdown-toggle').html($(this).html() + '<span class="caret"></span>');
         });
 
@@ -372,11 +382,6 @@
 
         $("#beidSign").on('click', function () {
             //TODO
-        });
-
-        $('.dropdown-menu').on('click', function(){
-            console.log("toggle readers:",$(this).text());
-            $('.dropdown-toggle').html($(this).html() + '<span class="caret"></span>');
         });
 
         $("#downloadgcl").on('click',function(){
