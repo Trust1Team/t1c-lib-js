@@ -1,5 +1,6 @@
 var gulp = require("gulp");
 var gutil = require( 'gulp-util' );
+var karma = require('karma');
 var webpackstream = require('webpack-stream');
 var webpack = require('webpack');
 var WebpackDevServer = require("webpack-dev-server");
@@ -38,6 +39,16 @@ gulp.task('webpack-dev-server', function (callback) {
         }
         gutil.log('[webpack-dev-server]', 'http://localhost:8080/index.html');
     });
+});
+
+gulp.task('test', function (done) {
+    var karmaServer = new karma.Server({
+        configFile: __dirname + '/karma.conf.js',
+        singleRun: true
+    }, function (exitCode) {
+        done();
+        process.exit(exitCode);
+    }).start();
 });
 
 gulp.task("clean-css", function(cb) {
