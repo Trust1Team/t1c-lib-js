@@ -1,0 +1,2 @@
+interface AbstractEidLUX{}
+export {AbstractEidLUX}

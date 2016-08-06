@@ -12,7 +12,7 @@
     "node_modules"
   ],
   "files": [
-    "src/scripts/gclClient.ts",
+    "src/scripts/core/GCLLib.ts",
     "typings/index.d.ts"
   ]
 }

@@ -21,12 +21,27 @@ $ npm install --global webpack
 
 You need to have typings installed for typing generation
 ```bash
-$ npm install --global typings
+$ npm i -g typings
+```
+
+In order to install a typing
+```bash
+$ typings install {framework} --save
+```
+
+For jQuery we need to install from dt source:
+```bash
+$ typings install dt~jquery --global --save
 ```
 
 To use all the dependencies we also need the following commands on the environment path
 ```bash
 $ npm install --global tslint
+```
+
+Debug is needed as well:
+```bash
+$ typings install debug --save
 ```
 
 Use npm install to download the necessary dependencies
