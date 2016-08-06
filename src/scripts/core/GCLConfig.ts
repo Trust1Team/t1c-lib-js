@@ -6,6 +6,8 @@
 const defaultGclUrl = "https://localhost:10433/v1";
 const defaultDSUrl = "https://dist.t1t.be/gcl-ds/v1";
 const defaultAllowAutoUpdate = true;
+const defaultImplicitDownload = false;
+
 class GCLConfig {
     //singleton pattern
     private static instance:GCLConfig;
@@ -17,13 +19,15 @@ class GCLConfig {
     private _client_secret:string;
     private _jwt:string;
     private _allowAutoUpdate:boolean;
+    private _implicitDownload:boolean;
 
     // constructor for DTO
-    constructor(gclUrl?:string, dsUrl?:string, apiKey?:string, allowAutoUpdate?:boolean){
+    constructor(gclUrl?:string, dsUrl?:string, apiKey?:string, allowAutoUpdate?:boolean, implicitDownload?:boolean){
         this._gclUrl = gclUrl||defaultGclUrl;
         this._dsUrl = dsUrl||defaultDSUrl;
         this._apiKey = apiKey||'';
         this._allowAutoUpdate = allowAutoUpdate||defaultAllowAutoUpdate;
+        this._implicitDownload = implicitDownload||defaultImplicitDownload;
     }
 
     // singleton pattern for use in T1C-JS
@@ -34,6 +38,7 @@ class GCLConfig {
             this.instance.dsUrl = defaultDSUrl;
             this.instance.apiKey = '';
             this.instance.allowAutoUpdate = defaultAllowAutoUpdate;
+            this.instance.implicitDownload = false;
         }
         return this.instance;
     }
@@ -92,6 +97,14 @@ class GCLConfig {
 
     set jwt(value:string) {
         this._jwt = value;
+    }
+
+    get implicitDownload():boolean {
+        return this._implicitDownload;
+    }
+
+    set implicitDownload(value:boolean) {
+        this._implicitDownload = value;
     }
 }
 

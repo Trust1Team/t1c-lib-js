@@ -9,7 +9,7 @@ import {GCLConfig} from "../GCLConfig";
 interface AbstractDSClient{
     getJWT(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     refreshJWT(callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    downloadLink(infoBrowser, callback:(error:CoreExceptions.RestException) => void):void;
+    downloadLink(infoBrowser, callback:(error:CoreExceptions.RestException, data:any) => void):void;
 }
 
 const SECURITY = "/security";

@@ -25,15 +25,11 @@ class LocalAuthConnection implements Connection {
             dataType: 'json',
             data: queryParams,
             headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt) },
-            success: function(data,status,jqXHR) {
-                return callback(null,data);
+            success: function(successResponse,status,jqXHR) {
+                return callback(null,successResponse);
             },
-            error: function(data,status,jqXHR) {
-/*                let error = {} as CoreExceptions.RestException;
-                error.status = data.status;
-                error.description = data.responseJSON.Error.description;
-                error.code = data.responseJSON.Error.code;*/
-                return callback(data,null);
+            error: function(errorResponse,status,jqXHR) {
+                return callback(errorResponse,null);
             }
         });
     }
@@ -48,15 +44,11 @@ class LocalAuthConnection implements Connection {
             dataType: 'json',
             mimeType: 'application/json',
             headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt) },
-            success: function(response, status) {
-                return callback(null,response);
+            success: function(successResponse, status) {
+                return callback(null,successResponse);
             },
-            error: function(data, status, jqXHR) {
-/*                let error = {} as CoreExceptions.RestException;
-                error.status = data.status;
-                error.description = data.responseJSON.Error.description;
-                error.code = data.responseJSON.Error.code;*/
-                return callback(data,null);
+            error: function(errorResponse, status, jqXHR) {
+                return callback(errorResponse,null);
             }
         });
     }
@@ -72,15 +64,11 @@ class LocalConnection implements Connection {
             dataType: 'json',
             data: queryParams,
             headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt) },
-            success: function(data,status,jqXHR) {
-                return callback(null,data);
+            success: function(successResponse,status,jqXHR) {
+                return callback(null,successResponse);
             },
-            error: function(data,status,jqXHR) {
-/*                let error = {} as CoreExceptions.RestException;
-                error.status = data.status;
-                error.description = data.responseJSON.Error.description;
-                error.code = data.responseJSON.Error.code;*/
-                return callback(data,null);
+            error: function(errorResponse,status,jqXHR) {
+                return callback(errorResponse,null);
             }
         });
     }
@@ -95,12 +83,11 @@ class LocalConnection implements Connection {
             dataType: 'json',
             mimeType: 'application/json',
             headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt) },
-            success: function(response, status) {
-                return callback(null,response);
+            success: function(successResponse, status) {
+                return callback(null,successResponse);
             },
-            error: function(data, status, jqXHR) {
-                //let error = {} as CoreExceptions.RestException;
-                return callback(data,null);
+            error: function(errorResponse, status, jqXHR) {
+                return callback(errorResponse,null);
             }
         });
     }
@@ -117,15 +104,11 @@ class RemoteConnection implements Connection {
             dataType: 'json',
             data: queryParams,
             headers: { 'apikey': GCLConfig.Instance.apiKey },
-            success: function(data,status,jqXHR) {
-                return callback(null,data);
+            success: function(successResponse,status,jqXHR) {
+                return callback(null,successResponse);
             },
-            error: function(data,status,jqXHR) {
-                let error = {} as CoreExceptions.RestException;
-                error.status = data.status;
-                error.description = data.responseJSON.Error.description;
-                error.code = data.responseJSON.Error.code;
-                return callback(error,null);
+            error: function(errorResponse,status,jqXHR) {
+                return callback(errorResponse,null);
             }
         });
     }
@@ -140,15 +123,11 @@ class RemoteConnection implements Connection {
             dataType: 'json',
             headers: { 'apikey': GCLConfig.Instance.apiKey },
             mimeType: 'application/json',
-            success: function(data, status,jqXHR) {
-                return callback(null,data);
+            success: function(successResponse, status,jqXHR) {
+                return callback(null,successResponse);
             },
-            error: function(data, status, jqXHR) {
-                let error = {} as CoreExceptions.RestException;
-                error.status = data.status;
-                error.description = data.responseJSON.Error.description;
-                error.code = data.responseJSON.Error.code;
-                return callback(error,null);
+            error: function(errorResponse, status, jqXHR) {
+                return callback(errorResponse,null);
             }
         });
     }
