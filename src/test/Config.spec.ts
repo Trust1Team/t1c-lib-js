@@ -3,7 +3,7 @@
  * @since 2016
  */
 import { expect } from "chai";
-import {Config} from "../scripts/Plugins/Config";
+import {Config} from "../scripts/core/GCLConfig";
 
 describe('Config', () => {
     let config:Config;

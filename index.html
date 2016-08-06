@@ -2,7 +2,9 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Simple</title>
+    <title>GCL Javascript Test Page</title>
+    <!--Add bootstrap and dependencies-->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <style media="screen">
         pre {
             background-color: #ddd;
@@ -10,110 +12,416 @@
             padding: .3em .5em;
         }
 
-        pre#error {
+        pre#error,pre#validationError {
             border-color: #900;
+        }
+        .modal-header, h4, .close {
+            background-color: #5cb85c;
+            color:white !important;
+            text-align: center;
+            font-size: 30px;
+        }
+        .modal-footer {
+            background-color: #f9f9f9;
+        }
+        .dropdown-menu {
+            width: 400px !important;
         }
     </style>
 </head>
 <body>
 <div class="container">
+    <nav class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">T1C-JS</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">Select Reader <span class="caret"></span></a>
+                        <ul id="readerlist" class="dropdown-menu" role="menu">
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <hr />
+    <div><span id='selected_reader' class="label label-default">No card reader selected</span></div>
+    <hr />
     <div>
-        <button id="info">Info</button>
-        <button id="getTypes">Get Types</button>
-        <button id="beidRn">BeID Read</button>
-        <button id="beidAddress">BeID Address</button>
-        <button id="beidPhoto">BeID Photo</button>
-        <button id="beidRootCert">BeID Root Cert</button>
-        <button id="beidCitizenCert">BeID Citizen Cert</button>
-        <button id="beidAuthCert">BeID Authentication Cert</button>
-        <button id="beidNonRepCert">BeID Non Repudiation Cert</button>
-        <button id="beidVerifyPin">BeID Verify Pin</button>
-        <button id="beidSign">BeID Sign</button>
-        <button id="clear">Clear</button>
+        <button id="info" type="button" class="btn btn-default btn-lg">Info</button>
+        <button id="infoBrowser" type="button" class="btn btn-default btn-lg">Browser Info</button>
+        <button id="downloadgcl" type="button" class="btn btn-default btn-lg">Download GCL</button>
+        <button id="getReaders" type="button" class="btn btn-default btn-lg">Readers</button>
+        <button id="pollReaders" type="button" class="btn btn-default btn-lg">Poll Readers</button>
+        <button id="getReadersAvailable" type="button" class="btn btn-default btn-lg">Readers (card available)</button>
+        <button id="getReadersUnavailable" type="button" class="btn btn-default btn-lg">Readers (card unavailable)</button>
+        <button id="getKey" type="button" class="btn btn-default btn-lg">Get API key</button>
+        <button id="getJWT" type="button" class="btn btn-default btn-lg">Get JWT</button>
+        <button id="getJWTRefresh" type="button" class="btn btn-default btn-lg">Refresh JWT</button>
+        <button id="sendJWTDemo" type="button" class="btn btn-default btn-lg">Send JWT to GCL</button>
+        <button id="getPlugins" type="button" class="btn btn-default btn-lg">Get Plugins</button>
+        <hr />
+        <button id="beidRn" type="button" class="btn btn-default btn-lg">BeID Rn Data</button>
+        <button id="beidAddress" type="button" class="btn btn-default btn-lg">BeID Address</button>
+        <button id="beidPic" type="button" class="btn btn-default btn-lg">BeID Picture</button>
+        <button id="beidAllCert" type="button" class="btn btn-default btn-lg">BeID All Cert</button>
+        <button id="beidRootCert" type="button" class="btn btn-default btn-lg">BeID Root Cert</button>
+        <button id="beidCitizenCert" type="button" class="btn btn-default btn-lg">BeID Citizen Cert</button>
+        <button id="beidAuthCert" type="button" class="btn btn-default btn-lg">BeID Authentication Cert</button>
+        <button id="beidNonRepCert" type="button" class="btn btn-default btn-lg">BeID Non Repudiation Cert</button>
+        <button id="beidRRNCert" type="button" class="btn btn-default btn-lg">BeID RRN Cert</button>
+        <button id="beidVerifyPin" type="button" class="btn btn-default btn-lg">BeID Verify Pin</button>
+        <button id="beidSign" type="button" class="btn btn-default btn-lg">BeID Sign</button>
+        <button id="beidAuthenticate" type="button" class="btn btn-default btn-lg">BeID Authenticate</button>
+        <button id="clear" type="button" class="btn btn-default btn-lg">Clear</button>
+        <hr />
+        <button id="beidFiltered" type="button" class="btn btn-default btn-lg">BeID Read Filtered</button>
+        <div class="form-group">
+            <input type="checkbox" name="type" value="rn" id="rndata" />
+            <label for="rndata"><span class="glyphicon"></span> data</label>
+            <input type="checkbox" name="type" value="address" id="address" />
+            <label for="address"><span class="glyphicon "></span> address</label>
+            <input type="checkbox" name="type" value="picture" id="photo"/>
+            <label for="photo"><span class="glyphicon"></span> picture</label>
+            <input type="checkbox" name="type" value="root-certificate" id="rootcert"/>
+            <label for="rootcert"><span class="glyphicon"></span> root certificate</label>
+            <input type="checkbox" name="type" value="authentication-certificate" id="authcert"/>
+            <label for="authcert"><span class="glyphicon "></span> authentication certificate</label>
+            <input type="checkbox" name="type" value="citizen-certificate" id="citizencert"/>
+            <label for="citizencert"><span class="glyphicon "></span> citizen certificate</label>
+            <input type="checkbox" name="type" value="non-repudiation-certificate" id="nonrepcert"/>
+            <label for="nonrepcert"><span class="glyphicon "></span> non-repudiation certificate</label>
+            <input type="checkbox" name="type" value="rrn-certificate" id="rrncert"/>
+            <label for="rrncert"><span class="glyphicon "></span> rrn certificate</label>
+        </div>
+        <hr />
+        <button id="beidCertsFiltered" type="button" class="btn btn-default btn-lg">BeID Certs Filtered</button>
+        <div class="form-group">
+            <input type="checkbox" name="type" value="root-certificate" id="rootcertx"/>
+            <label for="rootcertx"><span class="glyphicon"></span> root certificate</label>
+            <input type="checkbox" name="type" value="authentication-certificate" id="authcertx"/>
+            <label for="authcertx"><span class="glyphicon "></span> authentication certificate</label>
+            <input type="checkbox" name="type" value="citizen-certificate" id="citizencertx"/>
+            <label for="citizencertx"><span class="glyphicon "></span> citizen certificate</label>
+            <input type="checkbox" name="type" value="non-repudiation-certificate" id="nonrepcertx"/>
+            <label for="nonrepcertx"><span class="glyphicon "></span> non-repudiation certificate</label>
+            <input type="checkbox" name="type" value="rrn-certificate" id="rrncertx"/>
+            <label for="rrncertx"><span class="glyphicon "></span> rrn certificate</label>
+        </div>
+    </div>
+    <hr />
+    <h3>EMV Card</h3>
+    <div>
+        <button id="emvPan" type="button" class="btn btn-default btn-lg">EMV - Get PAN</button>
     </div>
     <pre id="information"></pre>
     <pre id="error"></pre>
+    <!-- PIN verify Modal -->
+    <div class="modal fade" id="pinModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Validate PIN</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="psw" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <pre id="validationInfo" hidden="true"></pre>
+                        <pre id="validationError" hidden="true"></pre>
+                    </div>
+                    <button id="buttonValidate" type="button" class="btn btn-default btn-lg">Validate</button>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Modal -->
+    <div class="modal fade" id="downloadModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Download Instructions</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div id="modalDownloadLink" class="form-group">
+                        <label for="psw">Click the download link to start downloading</label>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    Download provided by Trust1Team.
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<script src="https://code.jquery.com/jquery-2.1.4.min.js" charset="utf-8"></script>
-<script src="dist/gclClient.js" charset="utf-8"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/platform/1.3.1/platform.min.js"></script>
+<script src="dist/GCLLib.js" charset="utf-8"></script>
 <script type="text/javascript">
     (function ($) {
+        var gclConfig = new GCLLib.GCLConfig();
+        gclConfig.apiKey = "9026899d-4ca6-4bfb-af33-d61fa884ee5e";
+        gclConfig.gclUrl = "http://localhost:10080/v1";//override config for local dev
+        gclConfig.dsUrl = "http://localhost:8080/gcl-ds-web/v1";
+        gclConfig.allowAutoUpdate = true;
+        gclConfig.implicitDownload = true;
+        var connector = new GCLLib.GCLClient(gclConfig);
 
-        var connector = new gclClient.Trust1Connector();
-        connector.checkForConnector(function(object) {
+        connector.core().info(function(err,data) {
             $("#error").empty();
-            $("#error").append(object.Info.version);
+            $("#error").append(data.data.version);
         });
 
-
-
-
-//        T1Connector.init({}, function (object) {
-//            $("#error").empty();
-//            $("#error").append(object.message);
-//        });
-//
-        function callback(data) {
-            $("#information").append(JSON.stringify(data, null, '  '));
+        function callback(err,data) {
+            if(err){$("#error").empty();$("#error").append("ERROR:\n", JSON.stringify(err, null, '  '));}
+            else {
+                $("#information").append(JSON.stringify(data, null, '  '));
+            }
         }
-//
+
+        function validationCallback(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#validationError").empty();
+            $("#validationInfo").empty();
+            $("#validationError").hide();
+            $("#validationInfo").hide();
+
+            if(err){
+                $("#validationError").append(JSON.stringify(err, null, '  '));
+                $("#validationError").show();
+            }
+            else{
+                $("#validationInfo").append(JSON.stringify(data, null, '  '));
+                $("#validationInfo").show();
+            }
+        }
+
+        //check card readers upon refresh and provide the info
+        var core = connector.core();
+        core.readers(function(err,data){
+            if(data.data){
+                for(var i=0; i < data.data.length ; i ++){
+                    if(data.data[i].card){
+                        $("#readerlist").append( '<li id="liid"><a href="#" ><h5><span class="label label-success" >' + data.data[i].id + '</span></h5></a></li>' );
+                    }else{
+                        $("#readerlist").append( '<li><a href="#"><h5><span class="label label-warning">' + data.data[i].id + '</span></h5></a></li>' );
+                    }
+                }
+            }else $("#readerlist").append( '<li> No readers connected </li>' );
+        });
+
+        //show selected reader in menu
+        $('.dropdown-menu').on('click', function(event){
+            $('#selected_reader').empty();
+            $('#selected_reader').append(event.target.innerHTML);
+            $('.dropdown-toggle').html($(this).html() + '<span class="caret"></span>');
+        });
+
+        // Core Functionality
         $("#info").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid();
-            beid.info(callback);
+            var core = connector.core();
+            core.info(callback);
         });
-//        $("#getTypes").on('click', function () {
-//            $("#information").empty();
-//            T1Connector.card.getTypes(callback, callback);
-//        });
+        $("#infoBrowser").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.infoBrowser(callback);
+        });
+        $("#getReaders").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.readers(callback);
+        });
+        $("#pollReaders").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.pollReaders(15,callback);
+        });
+        $("#getReadersAvailable").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.readersCardAvailable(callback);
+        });
+        $("#getReadersUnavailable").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.readersCardsUnavailable(callback);
+        });
+        $("#getKey").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            var apikey = connector.config().apiKey;
+            if(apikey) $("#information").append(apikey);
+            else $("#information").append('no apikey set');
+        });
+        $("#getJWT").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            connector.ds().getJWT(callback);
+        });
+        $("#getJWTRefresh").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            $("#validationError").empty();
+            connector.ds().refreshJWT(callback);
+        });
+        $("#sendJWTDemo").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            $("#validationError").empty();
+            connector.core().manage(callback);
+        });
+        $("#getPlugins").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.plugins(callback);
+        });
+
+        // belgian eid functionality
+        $("#beidFiltered").on('click', function () {
+            $("#information").empty();
+            var beid = connector.beid($("#selected_reader").text());
+            var filter = [];
+            if($("#rndata").is(":checked"))filter.push($("#rndata").val());
+            if($("#address").is(":checked"))filter.push($("#address").val());
+            if($("#photo").is(":checked"))filter.push($("#photo").val());
+            if($("#rootcert").is(":checked"))filter.push($("#rootcert").val());
+            if($("#authcert").is(":checked"))filter.push($("#authcert").val());
+            if($("#nonrepcert").is(":checked"))filter.push($("#nonrepcert").val());
+            if($("#citizencert").is(":checked"))filter.push($("#citizencert").val());
+            if($("#rrncert").is(":checked"))filter.push($("#rrncert").val());
+            beid.allData(filter,callback);
+        });
+        $("#beidCertsFiltered").on('click', function () {
+            $("#information").empty();
+            var beid = connector.beid($("#selected_reader").text());
+            var filter = [];
+            if($("#rootcertx").is(":checked"))filter.push($("#rootcertx").val());
+            if($("#authcertx").is(":checked"))filter.push($("#authcertx").val());
+            if($("#nonrepcertx").is(":checked"))filter.push($("#nonrepcertx").val());
+            if($("#citizencertx").is(":checked"))filter.push($("#citizencertx").val());
+            if($("#rrncertx").is(":checked"))filter.push($("#rrncertx").val());
+            beid.allCerts(filter,callback);
+        });
         $("#beidRn").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid();
-            beid.rn(callback);
+            var beid = connector.beid($("#selected_reader").text());
+            beid.rnData(callback);
         });
         $("#beidAddress").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid();
+            var beid = connector.beid($("#selected_reader").text());
             beid.address(callback);
         });
-        $("#beidPhoto").on('click', function () {
+        $("#beidPic").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid();
-            beid.photo(callback);
+            var beid = connector.beid($("#selected_reader").text());
+            beid.picture(callback);
+        });
+        $("#beidAllCert").on('click', function () {
+            $("#information").empty();
+            var beid = connector.beid($("#selected_reader").text());
+            beid.allCerts([],callback);
         });
         $("#beidRootCert").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid();
+            var beid = connector.beid($("#selected_reader").text());
             beid.rootCertificate(callback);
         });
         $("#beidCitizenCert").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid();
+            var beid = connector.beid($("#selected_reader").text());
             beid.citizenCertificate(callback);
+        });
+        $("#beidRRNCert").on('click', function () {
+            $("#information").empty();
+            var beid = connector.beid($("#selected_reader").text());
+            beid.rrnCertificate(callback);
         });
         $("#beidAuthCert").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid();
+            var beid = connector.beid($("#selected_reader").text());
             beid.authenticationCertificate(callback);
         });
         $("#beidNonRepCert").on('click', function () {
             $("#information").empty();
-            var beid = connector.beid();
+            var beid = connector.beid($("#selected_reader").text());
             beid.nonRepudiationCertificate(callback);
         });
         $("#beidVerifyPin").on('click', function () {
             $("#information").empty();
-            var _body = "{\"VerifyPin\": {\"pin\": \"4331\",\"authenticationreference\": \"sha1\", \"privatekeyreference\": \"nonrepudiation\"}}";
-            var beid = connector.beid();
-            beid.verifyPin(_body, callback);
+            $("#error").empty();
+            $("#validationInformation").empty();
+            $("#validationInformation").hide();
+            $("#validationError").empty();
+            $("#validationError").hide();
+            $("#pinModal").modal('toggle');
         });
-//        $("#beidSign").on('click', function () {
-//            $("#information").empty();
-//            var _body = "{\"Sign\": {\"pin\": \"\",\"authenticationreference\": \"sha1\", \"privatekeyreference\": \"nonrepudiation\", \"data\": \"\"}}";
-//            T1Connector.beid.sign(callback, callback, _body);
-//        });
+
+        $("#buttonValidate").on('click', function () {
+            var _body={};
+            _body.pin = $("#psw").val();
+            connector.beid($("#selected_reader").text()).verifyPin(_body, validationCallback);
+        });
+
+        $("#beidSign").on('click', function () {
+            //TODO
+        });
+
+        $("#beidAuthenticate").on('click', function () {
+            //TODO
+        });
+
+        $("#downloadgcl").on('click',function(){
+            var core = connector.core();
+            var self = this;
+            core.infoBrowser(function(error,data){
+               if(error){$("#error").append('Could not retrieve browser info');}
+               connector.ds().downloadLink(data,function(error,data){
+                   if(error)$("#error").append('Error retrieving download link');
+                   $("#error").empty();
+                   $("#information").empty();
+                   $("#downloadModal").modal('toggle');
+                   $("a").remove('.downloadlinkref');
+                   $("#modalDownloadLink").append('<a class= "downloadlinkref" href="'+ data.url +'">Download link GCL</a>');
+               });
+            });
+        });
+
         $("#clear").on('click', function () {
             $("#information").empty();
+            $("#error").empty();
+
+        });
+
+
+        // EMV functionality
+        $("#emvPan").on('click', function () {
+            $("#information").empty();
+            var emv = connector.emv();
+            emv.pan(callback);
         });
     })(window.jQuery);
 </script>
