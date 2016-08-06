@@ -6,6 +6,7 @@
 
 import {GCLConfig} from "./GCLConfig";
 import {CardFactory} from "../Plugins/smartcards/CardFactory";
+import * as CoreExceptions from "./exceptions/CoreExceptions";
 import {AbstractEidBE} from "../Plugins/smartcards/eid/be/EidBe";
 import {EMV} from "../Plugins/smartcards/emv/EMV";
 import {CoreService} from "./services/CoreService";
@@ -33,6 +34,9 @@ class GCLClient {
 
         //setup security - fail safe
         this.initSecurityContext();
+
+        //check if implicit download has been set
+        if(this.cfg.implicitDownload && true){ this.implicitDownload();}
     }
 
     private resolveConfig(cfg:GCLConfig) {
@@ -44,6 +48,7 @@ class GCLClient {
         resolvedCfg.jwt = cfg.jwt;
         resolvedCfg.dsUrl = cfg.dsUrl;
         resolvedCfg.gclUrl = cfg.gclUrl;
+        resolvedCfg.implicitDownload = cfg.implicitDownload;
         return resolvedCfg;
     }
 
@@ -62,6 +67,24 @@ class GCLClient {
     // get instance for EMV
     public emv = (reader_id?:string):EMV => {return this.cardFactory.createEmv(reader_id);};
 
+    // facade implementation
+
+    // implicit download GCL instance when not found
+    private implicitDownload(){
+        var self = this;
+        this.core().info(function(error,data){
+            console.log("implicit error",JSON.stringify(error));
+            if(error){
+                // no gcl available - start download
+                let _info = self.core().infoBrowserSync();
+                console.log("implicit error",JSON.stringify(_info));
+                self.ds().downloadLink(_info,function(error:CoreExceptions.RestException, downloadResponse:any){
+                    if(error)console.error("could not download GCL package:",error.description);
+                    window.open(downloadResponse.url); return;
+                });
+            } else return;
+        })
+    }
 }
 
 export {GCLClient,GCLConfig}

@@ -5,6 +5,7 @@ import {LocalConnection} from "../client/Connection";
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 
 interface AbstractCore{
+    // async
     info(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     infoBrowser(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     readers(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
@@ -13,6 +14,9 @@ interface AbstractCore{
     reader(reader_id:string,callback:(error:CoreExceptions.RestException,data:any)=>void):void;
     plugins(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
     manage(callback:(error:CoreExceptions.RestException, data:any) => void):void;
+
+    // sync
+    infoBrowserSync():any;
 /*    verify(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     download(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     activate(apikey:string, callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -35,6 +39,7 @@ const CORE_DUMMY_JWT = "/admin/manage";
 class CoreService implements AbstractCore{
     constructor(private url:string,private connection:LocalConnection) {}
 
+    // async
     public info(callback:(error:CoreExceptions.RestException, data:any)=>void) {this.connection.get(this.url + CORE_INFO,callback);}
     public readers(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS,callback);}
     public readersCardAvailable(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS,callback,FILTER_CARD_INSERTED + 'true');}
@@ -47,6 +52,12 @@ class CoreService implements AbstractCore{
         callback(null,this.platformInfo());
     }
 
+    // sync
+    public infoBrowserSync(){
+        return this.platformInfo();
+    }
+
+    // private methods
     private platformInfo():any{
         return {
             manufacturer: platform.manufacturer || '',

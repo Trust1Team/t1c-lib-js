@@ -166,7 +166,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-
+                    Download provided by Trust1Team.
                 </div>
             </div>
         </div>
@@ -183,6 +183,7 @@
         gclConfig.gclUrl = "http://localhost:10080/v1";//override config for local dev
         gclConfig.dsUrl = "http://localhost:8080/gcl-ds-web/v1";
         gclConfig.allowAutoUpdate = true;
+        gclConfig.implicitDownload = true;
         var connector = new GCLLib.GCLClient(gclConfig);
 
         connector.core().info(function(err,data) {
@@ -396,7 +397,6 @@
                    if(error)$("#error").append('Error retrieving download link');
                    $("#error").empty();
                    $("#information").empty();
-                   $("#information").append(JSON.stringify(data, null, '  '));
                    $("#downloadModal").modal('toggle');
                    $("a").remove('.downloadlinkref');
                    $("#modalDownloadLink").append('<a class= "downloadlinkref" href="'+ data.url +'">Download link GCL</a>');
