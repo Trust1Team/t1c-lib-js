@@ -48,9 +48,7 @@ class EidBe implements AbstractEidBE{
 
     // resolves the reader_id in the base URL
     private resolvedReaderURI():string{
-        //return this.url + SEPARATOR + this.reader_id;
         return this.url + SEPARATOR + this.reader_id;
-        //return this.url;
     }
 
     public allData(filters, callback) {
