@@ -68,19 +68,5 @@ TODO - compiler options
 "declaration": false,
 "noImplicitAny": true,
 
-### Usage ###
-Error message:
-```json
-{
-    "error": false,
-    "installed": false,
-    "message": "",
-    "manual": ""
-}
-```
-| Key | Value |
-|-----------|---------------------------------------------------------------------|
-| error | When there was an error to perform the request |
-| installed | Indication, whether or not the Trust1Connector is already installed |
-| message | Message, can be error or installed message |
-| manual | Link for manual download |
+### Documentation ###
+[Gitbook](https://www.gitbook.com/book/t1t/t1c-js-guide/details) 
