@@ -51,7 +51,7 @@ $ npm install
 
 Use npm test to run the test suite of the project
 ```bash
-$ npm test
+$ gulp test
 ```
 
 To lint the code,
