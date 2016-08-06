@@ -4,7 +4,7 @@
  * @since 2016
  */
 const defaultGclUrl = "https://localhost:10433/v1";
-const defaultDSUrl = "https://dist.t1t.be/gcl-ds/v1";
+const defaultDSUrl = "https://accapim.t1t.be:443/trust1team/gclds/v1";
 const defaultAllowAutoUpdate = true;
 const defaultImplicitDownload = false;
 
