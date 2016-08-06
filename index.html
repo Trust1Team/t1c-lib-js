@@ -79,7 +79,8 @@
         <button id="beidNonRepCert" type="button" class="btn btn-default btn-lg">BeID Non Repudiation Cert</button>
         <button id="beidRRNCert" type="button" class="btn btn-default btn-lg">BeID RRN Cert</button>
         <button id="beidVerifyPin" type="button" class="btn btn-default btn-lg">BeID Verify Pin</button>
-        <!--<button id="beidSign" type="button" class="btn btn-default btn-lg">BeID Sign</button>-->
+        <button id="beidSign" type="button" class="btn btn-default btn-lg">BeID Sign</button>
+        <button id="beidAuthenticate" type="button" class="btn btn-default btn-lg">BeID Authenticate</button>
         <button id="clear" type="button" class="btn btn-default btn-lg">Clear</button>
         <hr />
         <button id="beidFiltered" type="button" class="btn btn-default btn-lg">BeID Read Filtered</button>
@@ -153,16 +154,15 @@
     <!-- Download Modal -->
     <div class="modal fade" id="downloadModal" role="dialog">
         <div class="modal-dialog">
-            <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header" style="padding:35px 50px;">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4><span class="glyphicon glyphicon-lock"></span> Download Instructions</h4>
                 </div>
                 <div class="modal-body" style="padding:40px 50px;">
-                    <div class="form-group">
-                        <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
-                        <input type="password" class="form-control" id="psw" placeholder="Enter pin code">
+                    <div id="modalDownloadLink" class="form-group">
+                        <label for="psw">Click the download link to start downloading</label>
+
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -231,7 +231,6 @@
 
         //show selected reader in menu
         $('.dropdown-menu').on('click', function(event){
-            console.log("Event:",event.target.innerHTML);
             $('#selected_reader').empty();
             $('#selected_reader').append(event.target.innerHTML);
             $('.dropdown-toggle').html($(this).html() + '<span class="caret"></span>');
@@ -384,6 +383,10 @@
             //TODO
         });
 
+        $("#beidAuthenticate").on('click', function () {
+            //TODO
+        });
+
         $("#downloadgcl").on('click',function(){
             var core = connector.core();
             var self = this;
@@ -394,6 +397,9 @@
                    $("#error").empty();
                    $("#information").empty();
                    $("#information").append(JSON.stringify(data, null, '  '));
+                   $("#downloadModal").modal('toggle');
+                   $("a").remove('.downloadlinkref');
+                   $("#modalDownloadLink").append('<a class= "downloadlinkref" href="'+ data.url +'">Download link GCL</a>');
                });
             });
         });
