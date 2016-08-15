@@ -1,0 +1,25 @@
+{
+  "name": "t1c",
+  "description": "The Trust1Connector library facilitates the integration of browser independent device communication using Javascript.",
+  "main": "dist/GCLLib.js",
+  "authors": [
+    "Trust1Team"
+  ],
+  "license": "SEE LICENSE IN license.txt",
+  "keywords": [
+    "eid",
+    "npapi-alternative",
+    "emv",
+    "calypso",
+    "smartcard",
+    "cardreader"
+  ],
+  "homepage": "http://trust1connector.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
