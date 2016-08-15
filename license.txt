@@ -1,5 +1,5 @@
 This file is part of the Trust1Team(R) sarl project.
- Copyright (c) 2014 Trust1Team sarl
+ Copyright (c) 2016 Trust1Team sarl
  Authors: Trust1Team development
 
  
