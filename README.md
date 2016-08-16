@@ -68,5 +68,8 @@ TODO - compiler options
 "declaration": false,
 "noImplicitAny": true,
 
+Registered bower:
+`bower register trust1connector git://github.com/Trust1Team/t1c-lib-js.git`
+
 ### Documentation ###
 [Gitbook](https://www.gitbook.com/book/t1t/t1c-js-guide/details) 

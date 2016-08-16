@@ -1,5 +1,5 @@
 {
-  "name": "t1c",
+  "name": "trust1connector",
   "description": "The Trust1Connector library facilitates the integration of browser independent device communication using Javascript.",
   "main": "dist/GCLLib.js",
   "authors": [
