@@ -152,6 +152,34 @@
         </div>
     </div>
 
+    <!-- Sign Modal -->
+    <div class="modal fade" id="signModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Sign example data</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <label for="psw">Base64-encoded data to be signed: E1uHACbPvhLew0gGmBH83lvtKIAKxU2/RezfBOsT6Vs=</label>
+                        <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="signpsw" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <pre id="signInfo" hidden="true"></pre>
+                        <pre id="signError" hidden="true"></pre>
+                    </div>
+                    <button id="buttonSign" type="button" class="btn btn-default btn-lg">Sign</button>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Download Modal -->
     <div class="modal fade" id="downloadModal" role="dialog">
         <div class="modal-dialog">
@@ -214,6 +242,24 @@
             else{
                 $("#validationInfo").append(JSON.stringify(data, null, '  '));
                 $("#validationInfo").show();
+            }
+        }
+
+        function signCallback(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#signError").empty();
+            $("#signInfo").empty();
+            $("#signError").hide();
+            $("#signInfo").hide();
+
+            if(err){
+                $("#signError").append(JSON.stringify(err, null, '  '));
+                $("#signError").show();
+            }
+            else{
+                $("#signInfo").append(JSON.stringify(data, null, '  '));
+                $("#signInfo").show();
             }
         }
 
@@ -387,7 +433,21 @@
         });
 
         $("#beidSign").on('click', function () {
-            //TODO
+            $("#information").empty();
+            $("#error").empty();
+            $("#validationInformation").empty();
+            $("#validationInformation").hide();
+            $("#validationError").empty();
+            $("#validationError").hide();
+            $("#signModal").modal('toggle');
+        });
+
+        $("#buttonSign").on('click', function () {
+            var _body={};
+            _body.pin = $("#signpsw").val();
+            _body.algorithm_reference = "sha256";
+            _body.data = "E1uHACbPvhLew0gGmBH83lvtKIAKxU2/RezfBOsT6Vs=";
+            connector.beid($("#selected_reader").text()).signData(_body, signCallback);
         });
 
         $("#beidAuthenticate").on('click', function () {
