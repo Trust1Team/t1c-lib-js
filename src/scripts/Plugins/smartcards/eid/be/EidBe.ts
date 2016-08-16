@@ -73,7 +73,15 @@ class EidBe implements AbstractEidBE{
         this.connection.post(this.resolvedReaderURI() + BEID_VERIFY_PIN, _req, callback);
     }
     public signData(body, callback) {this.connection.post(this.resolvedReaderURI() + BEID_SIGN_DATA, body,callback);}
-    public authenticate(body, callback) {this.connection.post(this.resolvedReaderURI() + BEID_AUTHENTICATE, body,callback);}
+    public authenticate(body, callback) {
+        let _req:any = {};
+        if(body){
+            _req.data = body.challenge;
+            _req.pin = body.pin;
+            _req.algorithm_reference = body.algorithm_reference;
+        }
+        this.connection.post(this.resolvedReaderURI() + BEID_AUTHENTICATE, _req,callback);
+    }
 }
 
 export {AbstractEidBE, EidBe}

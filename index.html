@@ -180,6 +180,34 @@
         </div>
     </div>
 
+    <!-- Authenticate Modal -->
+    <div class="modal fade" id="authModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Authentication</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <label for="psw">Base64-encoded challenge: I2e+u/sgy7fYgh+DWA0p2jzXQ7E=</label>
+                        <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="authpsw" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <pre id="authInfo" hidden="true"></pre>
+                        <pre id="authError" hidden="true"></pre>
+                    </div>
+                    <button id="buttonAuth" type="button" class="btn btn-default btn-lg">Authenticate</button>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Download Modal -->
     <div class="modal fade" id="downloadModal" role="dialog">
         <div class="modal-dialog">
@@ -260,6 +288,24 @@
             else{
                 $("#signInfo").append(JSON.stringify(data, null, '  '));
                 $("#signInfo").show();
+            }
+        }
+
+        function authCallback(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#authError").empty();
+            $("#authInfo").empty();
+            $("#authError").hide();
+            $("#authInfo").hide();
+
+            if(err){
+                $("#authError").append(JSON.stringify(err, null, '  '));
+                $("#authError").show();
+            }
+            else{
+                $("#authInfo").append(JSON.stringify(data, null, '  '));
+                $("#authInfo").show();
             }
         }
 
@@ -435,10 +481,10 @@
         $("#beidSign").on('click', function () {
             $("#information").empty();
             $("#error").empty();
-            $("#validationInformation").empty();
-            $("#validationInformation").hide();
-            $("#validationError").empty();
-            $("#validationError").hide();
+            $("#signInformation").empty();
+            $("#signInformation").hide();
+            $("#signError").empty();
+            $("#signError").hide();
             $("#signModal").modal('toggle');
         });
 
@@ -451,7 +497,21 @@
         });
 
         $("#beidAuthenticate").on('click', function () {
-            //TODO
+            $("#information").empty();
+            $("#error").empty();
+            $("#authInformation").empty();
+            $("#authInformation").hide();
+            $("#vauthError").empty();
+            $("#vauthError").hide();
+            $("#authModal").modal('toggle');
+        });
+
+        $("#buttonAuth").on('click', function () {
+            var _body={};
+            _body.challenge = "I2e+u/sgy7fYgh+DWA0p2jzXQ7E=";
+            _body.algorithm_reference = "sha1";
+            _body.pin = $("#authpsw").val();
+            connector.beid($("#selected_reader").text()).authenticate(_body, authCallback);
         });
 
         $("#downloadgcl").on('click',function(){
@@ -475,7 +535,6 @@
             $("#error").empty();
 
         });
-
 
         // EMV functionality
         $("#emvPan").on('click', function () {
