@@ -131,6 +131,25 @@ class RemoteConnection implements Connection {
             }
         });
     }
+
+    public put(url:string, body:any, callback:(error:any, data:any) => void):void{
+        $.ajax({
+            url: url,
+            type: 'PUT',
+            data: JSON.stringify(body),
+            contentType: 'application/json; charset=utf-8',
+            processData: false,
+            dataType: 'json',
+            headers: { 'apikey': GCLConfig.Instance.apiKey },
+            mimeType: 'application/json',
+            success: function(successResponse, status,jqXHR) {
+                return callback(null,successResponse);
+            },
+            error: function(errorResponse, status, jqXHR) {
+                return callback(errorResponse,null);
+            }
+        });
+    }
 }
 
 export {LocalConnection,LocalAuthConnection,RemoteConnection}

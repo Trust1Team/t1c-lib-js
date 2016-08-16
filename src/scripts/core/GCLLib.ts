@@ -25,6 +25,7 @@ class GCLClient {
     constructor(cfg: GCLConfig) {
         // resolve config to singleton
         this.cfg = this.resolveConfig(cfg);
+        // init communication
         this.connection = new LocalConnection();
         this.authConnection = new LocalAuthConnection();
         this.remoteConnection = new RemoteConnection();
@@ -37,6 +38,9 @@ class GCLClient {
 
         //check if implicit download has been set
         if(this.cfg.implicitDownload && true){ this.implicitDownload();}
+
+        //register and activate
+        this.registerAndActivate();
     }
 
     private resolveConfig(cfg:GCLConfig) {
@@ -54,6 +58,10 @@ class GCLClient {
 
     private initSecurityContext(){
         // TODO
+    }
+
+    private registerAndActivate(){
+        // TODO when activation flag set
     }
 
     // get core services
