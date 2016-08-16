@@ -14,32 +14,27 @@ $ brew install node
 ```
 When node and npm are installed make sure to restart your terminal to make use of the fresh installed versions.
 
-To use all the dependencies we also need the following commands on the environment path
+Webpack is need to build the Javascript library
 ```bash
 $ npm install --global webpack
 ```
 
-You need to have typings installed for typing generation
+Typings must be installed for typing generation
 ```bash
 $ npm i -g typings
 ```
 
-In order to install a typing
-```bash
-$ typings install {framework} --save
-```
-
-For jQuery we need to install from dt source:
+For jQuery we need to install from dt source
 ```bash
 $ typings install dt~jquery --global --save
 ```
 
-To use all the dependencies we also need the following commands on the environment path
+Linter:
 ```bash
 $ npm install --global tslint
 ```
 
-Debug is needed as well:
+Debug:
 ```bash
 $ typings install debug --save
 ```
@@ -49,7 +44,7 @@ Use npm install to download the necessary dependencies
 $ npm install
 ```
 
-Use npm test to run the test suite of the project
+Use gulp test to run the test suite of the project
 ```bash
 $ gulp test
 ```
@@ -59,7 +54,7 @@ To lint the code,
 $ gulp tslint
 ```
 
-To build the project to the right format,
+To build the Javascript library, compressed:
 ```bash
 $ gulp webpack
 ```
