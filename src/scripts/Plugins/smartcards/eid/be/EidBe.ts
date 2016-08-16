@@ -24,7 +24,6 @@ interface AbstractEidBE{
 const SEPARATOR = "/";
 const QUERY_PARAM_FILTER = "filter=";
 const PLUGIN_CONTEXT_BEID = "/plugins/beid";
-const BEID_ALL_DATA = "/";
 const BEID_ALL_CERTIFICATES = "/certificates";
 const BEID_RN_DATA = "/rn";
 const BEID_ADDRESS = "/address";
@@ -52,8 +51,8 @@ class EidBe implements AbstractEidBE{
     }
 
     public allData(filters, callback) {
-        if(filters && filters.length>0){this.connection.get(this.resolvedReaderURI() + BEID_ALL_DATA, callback, QUERY_PARAM_FILTER + filters.join(","));}
-        else{this.connection.get(this.resolvedReaderURI() + BEID_ALL_DATA, callback);}
+        if(filters && filters.length>0){this.connection.get(this.resolvedReaderURI(), callback, QUERY_PARAM_FILTER + filters.join(","));}
+        else{this.connection.get(this.resolvedReaderURI(), callback);}
     }
     public allCerts(filters, callback) {
         if(filters && filters.length>0){this.connection.get(this.resolvedReaderURI() + BEID_ALL_CERTIFICATES, callback, QUERY_PARAM_FILTER + filters.join(","));}
