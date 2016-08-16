@@ -10,12 +10,17 @@ interface AbstractDSClient{
     getJWT(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     refreshJWT(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     downloadLink(infoBrowser, callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    register(info, device_id, callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    activate(device_id, callback:(error:CoreExceptions.RestException, data:any) => void):void;
 }
 
+const SEPARATOR = "/";
 const SECURITY = "/security";
 const SECURITY_JWT_ISSUE = SECURITY + "/jwt/issue";
 const SECURITY_JWT_REFRESH = SECURITY + "/jwt/refresh";
 const DOWNLOAD = "/download/gcl";
+const DEVICE = "/device";
+
 
 class DSClient implements AbstractDSClient{
     constructor(private url:string,private connection:RemoteConnection) {}
@@ -47,6 +52,19 @@ class DSClient implements AbstractDSClient{
     public downloadLink(infoBrowser, callback:(error:CoreExceptions.RestException, data:any)=>void):void {
         this.connection.post(this.url + DOWNLOAD, infoBrowser, callback);
     }
+
+    public register(info, device_id, callback:(error:CoreExceptions.RestException, data:any)=>void):void {
+        let _req:any={};
+        _req.config = JSON.stringify(info);
+        this.connection.put(this.url + DEVICE + SEPARATOR + device_id, _req, callback);
+    }
+
+    public activate(device_id, callback:(error:CoreExceptions.RestException, data:any)=>void):void {
+        let _req:any={};
+        _req.config = {};
+        this.connection.post(this.url + DEVICE + SEPARATOR + device_id, _req, callback);
+    }
+
 }
 
 
