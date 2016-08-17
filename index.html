@@ -237,7 +237,7 @@
     (function ($) {
         var gclConfig = new GCLLib.GCLConfig();
         gclConfig.apiKey = "b644bdc6-74d8-4ee2-9ce5-347d5dc14cb5"; //test apikey rate limitted
-        gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
+        gclConfig.gclUrl = "http://localhost:10080/v1"; //override config for local dev
         gclConfig.dsUrl = "https://accapim.t1t.be:443/trust1team/gclds/v1";
         gclConfig.allowAutoUpdate = true;
         gclConfig.implicitDownload = true;
@@ -349,7 +349,7 @@
         $("#pollReaders").on('click', function () {
             $("#information").empty();
             var core = connector.core();
-            core.pollReaders(15,callback);
+            core.pollReaders(15,callback,function(){console.log('Stop waiting for readers, none found')},function(){console.log('Please connect a reader')});
         });
         $("#getReadersAvailable").on('click', function () {
             $("#information").empty();

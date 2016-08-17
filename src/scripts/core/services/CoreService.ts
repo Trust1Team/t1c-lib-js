@@ -9,7 +9,11 @@ interface AbstractCore{
     info(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     infoBrowser(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     readers(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
-    pollReaders(seconds:number,callback:(error:CoreExceptions.RestException,data:any)=>void):void;
+    pollReaders(seconds:number,
+                callback:(error:CoreExceptions.RestException,data:any)=>void,
+                readerTimeout:(error:CoreExceptions.RestException,data:any)=>void,
+                connectReader:(error:CoreExceptions.RestException,data:any)=>void
+    ):void;
     readersCardAvailable(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
     readersCardsUnavailable(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
     reader(reader_id:string,callback:(error:CoreExceptions.RestException,data:any)=>void):void;
@@ -54,33 +58,37 @@ class CoreService implements AbstractCore{
         callback(null,this.platformInfo());
     }
 
-    pollReaders(seconds:number, callback:(error:CoreExceptions.RestException, data:any)=>void):void {
+    pollReaders(seconds:number, callback, readerTimeoutCb, connectReaderCb):void {
         let maxSeconds = seconds;
         let self=this;
         console.debug("start poll readers");
-        readerTimeout(callback);
-        function readerTimeout(callback) {
+        readerTimeout(callback,readerTimeoutCb,connectReaderCb);
+        function readerTimeout(callback,rtcb,crcb) {
             setTimeout(function () {
                 console.debug("seconds left:",maxSeconds);
                 --maxSeconds;
                 self.readers(function(error, data){
                     if(error){
-                        console.log("Waiting...");
-                        readerTimeout(callback);
-                    };// todo
+                        console.debug("Waiting...");
+                        crcb(); //ask to connect reader
+                        readerTimeout(callback,rtcb,crcb); //no reader found and waiting - recursive call
+                    };
                     console.debug(JSON.stringify(data));
-                    if(maxSeconds==0){return callback(null,null)}
+                    // no error but stop
+                    if(maxSeconds==0){return rtcb();} //reader timeout
                     else if(data.data.length === 0) {
                         console.debug("Waiting...");
-                        readerTimeout(callback);
+                        crcb(); //ask to connect reader
+                        readerTimeout(callback,rtcb,crcb);
                     }
                     else {
                         console.debug("readerCount:",data.data.length);
-                        return callback(null,{reader_found:"yes"});
+                        return callback(null,data.data);
                     }
                 });
             }, 1000);
         };
+
     }
 
     // sync
