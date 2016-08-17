@@ -11,8 +11,8 @@ interface AbstractCore{
     readers(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
     pollReaders(seconds:number,
                 callback:(error:CoreExceptions.RestException,data:any)=>void,
-                readerTimeout:(error:CoreExceptions.RestException,data:any)=>void,
-                connectReader:(error:CoreExceptions.RestException,data:any)=>void
+                connectReader:(error:CoreExceptions.RestException,data:any)=>void,
+                readerTimeout:(error:CoreExceptions.RestException,data:any)=>void
     ):void;
     readersCardAvailable(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
     readersCardsUnavailable(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
@@ -58,7 +58,7 @@ class CoreService implements AbstractCore{
         callback(null,this.platformInfo());
     }
 
-    pollReaders(seconds:number, callback, readerTimeoutCb, connectReaderCb):void {
+    pollReaders(seconds:number, callback, connectReaderCb, readerTimeoutCb):void {
         let maxSeconds = seconds;
         let self=this;
         console.debug("start poll readers");
