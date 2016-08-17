@@ -9,10 +9,20 @@ interface AbstractCore{
     info(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     infoBrowser(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     readers(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
-    pollReaders(seconds:number,
+    pollReaders(secondsToPollReader:number,
                 callback:(error:CoreExceptions.RestException,data:any)=>void,
-                connectReader:(error:CoreExceptions.RestException,data:any)=>void,
-                readerTimeout:(error:CoreExceptions.RestException,data:any)=>void
+                connectReader:()=>void,
+                readerTimeout:()=>void
+    ):void;
+    pollCardInserted(secondsToPollReader:number,
+                     secondsToPollCard:number,
+                     callback:(error:CoreExceptions.RestException,data:any)=>void,
+                     connectReader:()=>void,
+                     readerTimeout:()=>void,
+                     readerConnected:()=>void,
+                     insertCard:()=>void,
+                     cardTimeout:()=>void
+
     ):void;
     readersCardAvailable(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
     readersCardsUnavailable(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
@@ -27,10 +37,6 @@ interface AbstractCore{
     activate(apikey:string, callback:(error:CoreExceptions.RestException, data:any) => void):void;
     init(apikey:string, callback:(error:CoreExceptions.RestException, data:any) => void):void; //TODO complete verify/download/register/verificationpoll
     update(apikey:string, callback:(error:CoreExceptions.RestException, data:any) => void):void; //triggered by config
-    readers(callback:(error:CoreExceptions.RestException, data:any) => void):void; //will contain card info if card inserted
-    pollReaders(config:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    pollCards(config:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    detectReader(error, success, connectReader, readerTimeout);
     detectCard(error, success, connectReader, readerConnected, readerTimeout, insertCard, cardInserted, cardTimeout);*/
 }
 
@@ -58,12 +64,70 @@ class CoreService implements AbstractCore{
         callback(null,this.platformInfo());
     }
 
-    pollReaders(seconds:number, callback, connectReaderCb, readerTimeoutCb):void {
-        let maxSeconds = seconds;
+    pollCardInserted(secondsToPollReade, secondsToPollCard, callback, connectReader, readerTimeout, readerConnected, insertCard, cardTimeout): void {
+        //start polling if no card found
+        let maxSeconds = secondsToPollCard;
+        var self = this;
+
+        this.pollReaders(secondsToPollCard,function(error, result){
+            if(error) return this.callback(error.message);
+            //reader found
+            readerConnected(); //callback consumer
+            console.debug("start poll for card inserted");
+            //verify if reader has card object - if this is the case we don't need to start polling
+            var readerWithCard = self.checkReadersForCardObject(result.data);
+            if(readerWithCard!=null){
+              return callback(null,readerWithCard);
+            };
+            //no card found - start polling
+            cardInsertedTimeout(callback,insertCard,cardTimeout);
+            function cardInsertedTimeout(cb,insertCb,cardTimeoutCb){
+                setTimeout(function(){
+                    console.debug("seconds left:",maxSeconds);
+                    --maxSeconds;
+                    self.readers(function(error,data){
+                       if(error){
+                           console.debug("Waiting...");
+                           insertCb();
+                           cardInsertedTimeout(cb,insertCb,cardTimeoutCb);
+                       };
+                       //no error but stop
+                        if(maxSeconds==0){return cardTimeoutCb();}
+                        else if(data.data.length === 0){
+                            connectReader();
+                            cardInsertedTimeout(cb,insertCb,cardTimeoutCb);
+                        }else{
+                            var readerWithCard = self.checkReadersForCardObject(data.data);
+                            if(readerWithCard!=null){
+                                return callback(null,readerWithCard);
+                            }else cardInsertedTimeout(cb,insertCb,cardTimeoutCb);
+                        }
+                    });
+                },1000);
+            };
+        },connectReader,readerTimeout);
+    }
+
+    /**
+     * Checks for card element in readers response
+     * @param readers
+     * @returns {any}
+     */
+    private checkReadersForCardObject(readers:any):any{
+        if(readers && readers.length>0){
+            for (var i in readers){
+                if(readers[i].card)return readers[i];
+            }
+        } else return null;
+    }
+
+    public pollReaders(secondsToPollReade:number, callback, connectReaderCb, readerTimeoutCb):void {
+        let maxSeconds = secondsToPollReade;
         let self=this;
         console.debug("start poll readers");
         readerTimeout(callback,readerTimeoutCb,connectReaderCb);
-        function readerTimeout(callback,rtcb,crcb) {
+        function readerTimeout(cb,rtcb,crcb) {
+            let selfTimeout = this;
             setTimeout(function () {
                 console.debug("seconds left:",maxSeconds);
                 --maxSeconds;
@@ -71,24 +135,22 @@ class CoreService implements AbstractCore{
                     if(error){
                         console.debug("Waiting...");
                         crcb(); //ask to connect reader
-                        readerTimeout(callback,rtcb,crcb); //no reader found and waiting - recursive call
+                        readerTimeout(cb,rtcb,crcb); //no reader found and waiting - recursive call
                     };
-                    console.debug(JSON.stringify(data));
                     // no error but stop
                     if(maxSeconds==0){return rtcb();} //reader timeout
                     else if(data.data.length === 0) {
                         console.debug("Waiting...");
                         crcb(); //ask to connect reader
-                        readerTimeout(callback,rtcb,crcb);
+                        readerTimeout(cb,rtcb,crcb);
                     }
                     else {
                         console.debug("readerCount:",data.data.length);
-                        return callback(null,data.data);
+                        return cb(null,data);
                     }
                 });
             }, 1000);
         };
-
     }
 
     // sync
