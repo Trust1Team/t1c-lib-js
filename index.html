@@ -355,8 +355,7 @@
         $("#pollCard").on('click', function () {
             $("#information").empty();
             var core = connector.core();
-            core.pollReaders(15,15,callback,function(){console.log('Please connect a reader')},function(){console.log('Stop waiting for readers, none found')},
-                    function(){console.log("Reader connected, continue")},
+            core.pollCardInserted(15,callback,function(){console.log('Please connect a reader')},
                     function(){console.log("Please insert card")},
                     function(){console.log("Stop waiting for card, none found")}
             );

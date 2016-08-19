@@ -14,12 +14,9 @@ interface AbstractCore{
                 connectReader:()=>void,
                 readerTimeout:()=>void
     ):void;
-    pollCardInserted(secondsToPollReader:number,
-                     secondsToPollCard:number,
+    pollCardInserted(secondsToPollCard:number,
                      callback:(error:CoreExceptions.RestException,data:any)=>void,
                      connectReader:()=>void,
-                     readerTimeout:()=>void,
-                     readerConnected:()=>void,
                      insertCard:()=>void,
                      cardTimeout:()=>void
 
@@ -64,48 +61,46 @@ class CoreService implements AbstractCore{
         callback(null,this.platformInfo());
     }
 
-    pollCardInserted(secondsToPollReade, secondsToPollCard, callback, connectReader, readerTimeout, readerConnected, insertCard, cardTimeout): void {
+    pollCardInserted(secondsToPollCard, callback, connectReaderCb, insertCardCb, cardTimeoutCb): void {
         //start polling if no card found
         let maxSeconds = secondsToPollCard;
-        var self = this;
-
-        this.pollReaders(secondsToPollCard,function(error, result){
-            if(error) return this.callback(error.message);
-            //reader found
-            readerConnected(); //callback consumer
-            console.debug("start poll for card inserted");
-            //verify if reader has card object - if this is the case we don't need to start polling
-            var readerWithCard = self.checkReadersForCardObject(result.data);
-            if(readerWithCard!=null){
-              return callback(null,readerWithCard);
-            };
-            //no card found - start polling
-            cardInsertedTimeout(callback,insertCard,cardTimeout);
-            function cardInsertedTimeout(cb,insertCb,cardTimeoutCb){
-                setTimeout(function(){
-                    console.debug("seconds left:",maxSeconds);
-                    --maxSeconds;
-                    self.readers(function(error,data){
-                       if(error){
-                           console.debug("Waiting...");
-                           insertCb();
-                           cardInsertedTimeout(cb,insertCb,cardTimeoutCb);
-                       };
-                       //no error but stop
-                        if(maxSeconds==0){return cardTimeoutCb();}
-                        else if(data.data.length === 0){
-                            connectReader();
-                            cardInsertedTimeout(cb,insertCb,cardTimeoutCb);
-                        }else{
-                            var readerWithCard = self.checkReadersForCardObject(data.data);
-                            if(readerWithCard!=null){
-                                return callback(null,readerWithCard);
-                            }else cardInsertedTimeout(cb,insertCb,cardTimeoutCb);
+        let self=this;
+        console.debug("start poll cards");
+        readerTimeout(callback, connectReaderCb, insertCardCb, cardTimeoutCb);
+        function readerTimeout(cb,crcb,iccb,ctcb) {
+            let selfTimeout = this;
+            setTimeout(function () {
+                console.debug("seconds left:",maxSeconds);
+                --maxSeconds;
+                self.readers(function(error, data){
+                    if(error){
+                        console.debug("Waiting...");
+                        crcb(); //ask to connect reader
+                        readerTimeout(cb,crcb,iccb,ctcb); //no reader found and waiting - recursive call
+                    };
+                    // no error but stop
+                    if(maxSeconds==0){return ctcb();} //reader timeout
+                    else if(data.data.length === 0) {
+                        console.debug("Waiting...");
+                        crcb(); //ask to connect reader
+                        readerTimeout(cb,crcb,iccb,ctcb);
+                    }
+                    else {
+                        console.debug("readerCount:",data.data.length);
+                        //detect card on any reader
+                        var reader = self.checkReadersForCardObject(data.data);
+                        if(reader) {
+                            var response:any = {}; response.data = reader; response.success=true;
+                            return cb(null, response);
+                        }else {
+                            console.debug("Insert card");
+                            iccb();
+                            readerTimeout(cb,crcb,iccb,ctcb);
                         }
-                    });
-                },1000);
-            };
-        },connectReader,readerTimeout);
+                    }
+                });
+            }, 1000);
+        };
     }
 
     /**
@@ -121,8 +116,8 @@ class CoreService implements AbstractCore{
         } else return null;
     }
 
-    public pollReaders(secondsToPollReade:number, callback, connectReaderCb, readerTimeoutCb):void {
-        let maxSeconds = secondsToPollReade;
+    public pollReaders(secondsToPollReader:number, callback, connectReaderCb, readerTimeoutCb):void {
+        let maxSeconds = secondsToPollReader;
         let self=this;
         console.debug("start poll readers");
         readerTimeout(callback,readerTimeoutCb,connectReaderCb);
