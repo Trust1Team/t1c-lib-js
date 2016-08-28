@@ -24,7 +24,7 @@ class LocalAuthConnection implements Connection {
             type: 'GET',
             dataType: 'json',
             data: queryParams,
-            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt) },
+            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt), 'Accept-Language':'en-US' },
             success: function(successResponse,status,jqXHR) {
                 return callback(null,successResponse);
             },
@@ -43,7 +43,7 @@ class LocalAuthConnection implements Connection {
             processData: false,
             dataType: 'json',
             mimeType: 'application/json',
-            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt) },
+            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt), 'Accept-Language':'en-US' },
             success: function(successResponse, status) {
                 return callback(null,successResponse);
             },
@@ -63,7 +63,7 @@ class LocalConnection implements Connection {
             type: 'GET',
             dataType: 'json',
             data: queryParams,
-            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt) },
+            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt), 'Accept-Language':'en-US' },
             success: function(successResponse,status,jqXHR) {
                 return callback(null,successResponse);
             },
@@ -82,7 +82,7 @@ class LocalConnection implements Connection {
             processData: false,
             dataType: 'json',
             mimeType: 'application/json',
-            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt) },
+            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt), 'Accept-Language':'en-US' },
             success: function(successResponse, status) {
                 return callback(null,successResponse);
             },
@@ -103,7 +103,7 @@ class RemoteConnection implements Connection {
             type: 'GET',
             dataType: 'json',
             data: queryParams,
-            headers: { 'apikey': GCLConfig.Instance.apiKey },
+            headers: { 'apikey': GCLConfig.Instance.apiKey, 'Accept-Language':'en-US' },
             success: function(successResponse,status,jqXHR) {
                 return callback(null,successResponse);
             },
@@ -121,7 +121,7 @@ class RemoteConnection implements Connection {
             contentType: 'application/json; charset=utf-8',
             processData: false,
             dataType: 'json',
-            headers: { 'apikey': GCLConfig.Instance.apiKey },
+            headers: { 'apikey': GCLConfig.Instance.apiKey, 'Accept-Language':'en-US' },
             mimeType: 'application/json',
             success: function(successResponse, status,jqXHR) {
                 return callback(null,successResponse);
@@ -140,7 +140,7 @@ class RemoteConnection implements Connection {
             contentType: 'application/json; charset=utf-8',
             processData: false,
             dataType: 'json',
-            headers: { 'apikey': GCLConfig.Instance.apiKey },
+            headers: { 'apikey': GCLConfig.Instance.apiKey, 'Accept-Language':'en-US' },
             mimeType: 'application/json',
             success: function(successResponse, status,jqXHR) {
                 return callback(null,successResponse);
