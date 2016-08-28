@@ -240,7 +240,7 @@
         gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
         gclConfig.dsUrl = "https://accapim.t1t.be:443/trust1team/gclds/v1";
         gclConfig.allowAutoUpdate = true;
-        gclConfig.implicitDownload = true;
+        gclConfig.implicitDownload = false;
         var connector = new GCLLib.GCLClient(gclConfig);
 
         connector.core().info(function(err,data) {
@@ -383,7 +383,7 @@
             $("#information").empty();
             $("#error").empty();
             $("#validationError").empty();
-            connector.core().manage(callback);
+            connector.core().activate(callback);
         });
         $("#getPlugins").on('click', function () {
             $("#information").empty();
