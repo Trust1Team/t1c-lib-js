@@ -52,6 +52,25 @@ class LocalAuthConnection implements Connection {
             }
         });
     }
+
+    public put(url:string, body:any, callback:(error:any, data:any) => void):void{
+        $.ajax({
+            url: url,
+            type: 'PUT',
+            data: JSON.stringify(body),
+            contentType: 'application/json; charset=utf-8',
+            processData: false,
+            dataType: 'json',
+            mimeType: 'application/json',
+            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt), 'Accept-Language':'en-US' },
+            success: function(successResponse, status) {
+                return callback(null,successResponse);
+            },
+            error: function(errorResponse, status, jqXHR) {
+                return callback(errorResponse,null);
+            }
+        });
+    }
 }
 
 class LocalConnection implements Connection {
@@ -77,6 +96,25 @@ class LocalConnection implements Connection {
         $.ajax({
             url: url,
             type: 'POST',
+            data: JSON.stringify(body),
+            contentType: 'application/json; charset=utf-8',
+            processData: false,
+            dataType: 'json',
+            mimeType: 'application/json',
+            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt), 'Accept-Language':'en-US' },
+            success: function(successResponse, status) {
+                return callback(null,successResponse);
+            },
+            error: function(errorResponse, status, jqXHR) {
+                return callback(errorResponse,null);
+            }
+        });
+    }
+
+    public put(url:string, body:any, callback:(error:any, data:any) => void):void{
+        $.ajax({
+            url: url,
+            type: 'PUT',
             data: JSON.stringify(body),
             contentType: 'application/json; charset=utf-8',
             processData: false,
