@@ -23,6 +23,7 @@ class GCLClient {
     private dsClient: DSClient;
 
     constructor(cfg: GCLConfig) {
+        let self = this;
         // resolve config to singleton
         this.cfg = this.resolveConfig(cfg);
         // init communication
@@ -30,17 +31,18 @@ class GCLClient {
         this.authConnection = new LocalAuthConnection();
         this.remoteConnection = new RemoteConnection();
         this.cardFactory = new CardFactory(this.cfg.gclUrl,this.connection);
-        this.coreService = new CoreService(this.cfg.gclUrl,this.connection);
+        this.coreService = new CoreService(this.cfg.gclUrl,this.authConnection);
         this.dsClient = new DSClient(this.cfg.dsUrl,this.remoteConnection);
-
-        //setup security - fail safe
-        this.initSecurityContext();
 
         //check if implicit download has been set
         if(this.cfg.implicitDownload && true){ this.implicitDownload();}
 
-        //register and activate
-        this.registerAndActivate();
+        //setup security - fail safe
+        this.initSecurityContext(function(err,data){
+            if(err) console.log(JSON.stringify(err));
+            //register and activate
+            self.registerAndActivate();
+        });
     }
 
     private resolveConfig(cfg:GCLConfig) {
@@ -56,12 +58,62 @@ class GCLClient {
         return resolvedCfg;
     }
 
-    private initSecurityContext(){
-        // TODO
+    /**
+     * Init security context
+     */
+    private initSecurityContext(cb){
+        let self = this;
+        let clientCb = cb;
+        this.core().getPubKey(function(err:any,gclResponse){
+            if(err && err.responseJSON && !err.responseJSON.success){
+                //no certificate set - retrieve cert from DS
+                self.dsClient.getPubKey(function(err,dsResponse){
+                    if(err) return clientCb(err,null);
+                    let innerCb = clientCb;
+                    self.core().setPubKey(dsResponse.pubkey,function(err,response){
+                        if(err) return innerCb(err,null);
+                        return innerCb(null,{});
+                    })
+                })
+            }
+            // certificate loaded
+            return cb(null,{});
+        })
     }
 
     private registerAndActivate(){
-        // TODO when activation flag set
+        let self = this;
+        //get GCL info
+        self.core().info(function(err,infoResponse:any){
+            if(err) {console.log(JSON.stringify(err));return;}
+            let activated = infoResponse.data.activated;
+            let uuid = infoResponse.data.uid;
+            if(activated && activated==false){
+                self.dsClient.register({},uuid,function(err,activationResponse){
+                    if(err) return;
+                    console.log(activationResponse);
+                    GCLConfig.Instance.jwt = activationResponse.token;
+                    self.core().activate(function(err,data){console.log(JSON.stringify(data)); return;})
+                });
+            }else {
+                console.log("GCL activated");
+                return;
+            }
+/*            if(activated) self.syncDevice(uuid);
+            else self.registerDevice(uuid);*/
+        });
+    }
+
+    private syncDevice(uuid){
+        //get device from DS
+        //this.dsClient.getDevice()
+        //if activated && uuid registered => sync
+        //if activated && uuid unregistered => put
+    }
+
+    private registerDevice(uuid){
+        //if not activated && uuid unregistered => put
+        //if not activated && uuid registered => sync
     }
 
     // get core services
