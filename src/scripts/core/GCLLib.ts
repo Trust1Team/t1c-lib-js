@@ -88,14 +88,17 @@ class GCLClient {
             if(err) {console.log(JSON.stringify(err));return;}
             let activated = infoResponse.data.activated;
             let uuid = infoResponse.data.uid;
-            if(!activated){
+            if(activated && activated==false){
                 self.dsClient.register({},uuid,function(err,activationResponse){
                     if(err) return;
                     console.log(activationResponse);
                     GCLConfig.Instance.jwt = activationResponse.token;
                     self.core().activate(function(err,data){console.log(JSON.stringify(data)); return;})
                 });
-            }else return;
+            }else {
+                console.log("GCL activated");
+                return;
+            }
 /*            if(activated) self.syncDevice(uuid);
             else self.registerDevice(uuid);*/
         });

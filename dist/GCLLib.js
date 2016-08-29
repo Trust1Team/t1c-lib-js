@@ -117,7 +117,7 @@ var GCLLib =
 	            }
 	            var activated = infoResponse.data.activated;
 	            var uuid = infoResponse.data.uid;
-	            if (!activated) {
+	            if (activated && activated == false) {
 	                self.dsClient.register({}, uuid, function (err, activationResponse) {
 	                    if (err)
 	                        return;
@@ -126,8 +126,10 @@ var GCLLib =
 	                    self.core().activate(function (err, data) { console.log(JSON.stringify(data)); return; });
 	                });
 	            }
-	            else
+	            else {
+	                console.log("GCL activated");
 	                return;
+	            }
 	        });
 	    };
 	    GCLClient.prototype.syncDevice = function (uuid) {
