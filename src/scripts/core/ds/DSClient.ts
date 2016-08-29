@@ -21,7 +21,7 @@ const SECURITY_JWT_ISSUE = SECURITY + "/jwt/issue";
 const SECURITY_JWT_REFRESH = SECURITY + "/jwt/refresh";
 const DOWNLOAD = "/download/gcl";
 const PUB_KEY = SECURITY + "/keys/public";
-const DEVICE = "/device";
+const DEVICE = "/devices";
 
 
 class DSClient implements AbstractDSClient{
