@@ -65,7 +65,8 @@
         <button id="getReadersAvailable" type="button" class="btn btn-default btn-lg">Readers (card available)</button>
         <button id="getReadersUnavailable" type="button" class="btn btn-default btn-lg">Readers (card unavailable)</button>
         <button id="getKey" type="button" class="btn btn-default btn-lg">Get API key</button>
-        <button id="getPubKey" type="button" class="btn btn-default btn-lg">Get Public Key (JWT vaidation)</button>
+        <button id="getPubKeyDS" type="button" class="btn btn-default btn-lg">Get Public Key (DS)</button>
+        <button id="getPubKeyGCL" type="button" class="btn btn-default btn-lg">Get Public Key (GCL)</button>
         <button id="getJWT" type="button" class="btn btn-default btn-lg">Get JWT</button>
         <button id="getJWTRefresh" type="button" class="btn btn-default btn-lg">Refresh JWT</button>
         <button id="sendJWTDemo" type="button" class="btn btn-default btn-lg">Send JWT to GCL</button>
@@ -370,10 +371,15 @@
             if(apikey) $("#information").append(apikey);
             else $("#information").append('no apikey set');
         });
-        $("#getPubKey").on('click', function () {
+        $("#getPubKeyDS").on('click', function () {
             $("#information").empty();
             $("#error").empty();
             connector.ds().getPubKey(callback);
+        });
+        $("#getPubKeyGCL").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            connector.core().getPubKey(callback);
         });
         $("#getJWT").on('click', function () {
             $("#information").empty();
