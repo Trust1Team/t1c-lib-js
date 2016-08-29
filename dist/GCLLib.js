@@ -86,6 +86,23 @@ var GCLLib =
 	        return resolvedCfg;
 	    };
 	    GCLClient.prototype.initSecurityContext = function () {
+	        console.log("set security context");
+	        var self = this;
+	        this.core().getPubKey(function (err, gclResponse) {
+	            if (err && err.responseJSON && !err.responseJSON.success) {
+	                self.dsClient.getPubKey(function (err, dsResponse) {
+	                    if (err)
+	                        console.log(JSON.stringify(err));
+	                    console.log("Pub key:" + dsResponse.pubkey);
+	                    self.core().setPubKey(dsResponse.pubkey, function (err, response) {
+	                        if (err)
+	                            console.log(JSON.stringify(err));
+	                    });
+	                });
+	            }
+	            console.log("end security context");
+	            return;
+	        });
 	    };
 	    GCLClient.prototype.registerAndActivate = function () {
 	    };
@@ -367,7 +384,8 @@ var GCLLib =
 	var CORE_PLUGINS = "/plugins";
 	var CORE_READERS = "/card-readers";
 	var CORE_READER_ID = "/readers/{id}";
-	var CORE_DUMMY_JWT = "/admin/manage";
+	var CORE_ACTIVATE = "/admin/activate";
+	var CORE_PUB_KEY = "/admin/certificate";
 	var CoreService = (function () {
 	    function CoreService(url, connection) {
 	        this.url = url;
@@ -379,7 +397,13 @@ var GCLLib =
 	    CoreService.prototype.readersCardsUnavailable = function (callback) { this.connection.get(this.url + CORE_READERS, callback, FILTER_CARD_INSERTED + 'false'); };
 	    CoreService.prototype.reader = function (reader_id, callback) { this.connection.get(this.url + CORE_READERS + "/" + reader_id, callback); };
 	    CoreService.prototype.plugins = function (callback) { this.connection.get(this.url + CORE_PLUGINS, callback); };
-	    CoreService.prototype.manage = function (callback) { this.connection.post(this.url + CORE_DUMMY_JWT, {}, callback); };
+	    CoreService.prototype.activate = function (callback) { this.connection.post(this.url + CORE_ACTIVATE, {}, callback); };
+	    CoreService.prototype.getPubKey = function (callback) { this.connection.get(this.url + CORE_PUB_KEY, callback); };
+	    CoreService.prototype.setPubKey = function (pubkey, callback) {
+	        var req = {};
+	        req.certificate = pubkey;
+	        this.connection.put(this.url + CORE_PUB_KEY, req, callback);
+	    };
 	    CoreService.prototype.infoBrowser = function (callback) {
 	        callback(null, this.platformInfo());
 	    };
@@ -478,6 +502,24 @@ var GCLLib =
 	            }
 	        });
 	    };
+	    LocalAuthConnection.prototype.put = function (url, body, callback) {
+	        $.ajax({
+	            url: url,
+	            type: 'PUT',
+	            data: JSON.stringify(body),
+	            contentType: 'application/json; charset=utf-8',
+	            processData: false,
+	            dataType: 'json',
+	            mimeType: 'application/json',
+	            headers: { 'Authorization': ('Bearer ' + GCLConfig_1.GCLConfig.Instance.jwt), 'Accept-Language': 'en-US' },
+	            success: function (successResponse, status) {
+	                return callback(null, successResponse);
+	            },
+	            error: function (errorResponse, status, jqXHR) {
+	                return callback(errorResponse, null);
+	            }
+	        });
+	    };
 	    return LocalAuthConnection;
 	}());
 	exports.LocalAuthConnection = LocalAuthConnection;
@@ -503,6 +545,24 @@ var GCLLib =
 	        $.ajax({
 	            url: url,
 	            type: 'POST',
+	            data: JSON.stringify(body),
+	            contentType: 'application/json; charset=utf-8',
+	            processData: false,
+	            dataType: 'json',
+	            mimeType: 'application/json',
+	            headers: { 'Authorization': ('Bearer ' + GCLConfig_1.GCLConfig.Instance.jwt), 'Accept-Language': 'en-US' },
+	            success: function (successResponse, status) {
+	                return callback(null, successResponse);
+	            },
+	            error: function (errorResponse, status, jqXHR) {
+	                return callback(errorResponse, null);
+	            }
+	        });
+	    };
+	    LocalConnection.prototype.put = function (url, body, callback) {
+	        $.ajax({
+	            url: url,
+	            type: 'PUT',
 	            data: JSON.stringify(body),
 	            contentType: 'application/json; charset=utf-8',
 	            processData: false,
@@ -590,12 +650,23 @@ var GCLLib =
 	var SECURITY_JWT_ISSUE = SECURITY + "/jwt/issue";
 	var SECURITY_JWT_REFRESH = SECURITY + "/jwt/refresh";
 	var DOWNLOAD = "/download/gcl";
-	var DEVICE = "/device";
+	var PUB_KEY = SECURITY + "/keys/public";
+	var DEVICE = "/devices";
 	var DSClient = (function () {
 	    function DSClient(url, connection) {
 	        this.url = url;
 	        this.connection = connection;
 	    }
+	    DSClient.prototype.getDevice = function (uuid, callback) {
+	        var consumerCb = callback;
+	        this.connection.get(this.url + DEVICE + SEPARATOR + uuid, function (error, data) {
+	            if (error)
+	                return consumerCb(error, null);
+	            if (data)
+	                return consumerCb(null, data);
+	            return consumerCb(null, data);
+	        });
+	    };
 	    DSClient.prototype.getJWT = function (callback) {
 	        var consumerCb = callback;
 	        this.connection.get(this.url + SECURITY_JWT_ISSUE, function (error, data) {
@@ -620,6 +691,9 @@ var GCLLib =
 	            noJWT.status = 412;
 	            callback(noJWT, null);
 	        }
+	    };
+	    DSClient.prototype.getPubKey = function (callback) {
+	        this.connection.get(this.url + PUB_KEY, callback);
 	    };
 	    DSClient.prototype.downloadLink = function (infoBrowser, callback) {
 	        this.connection.post(this.url + DOWNLOAD, infoBrowser, callback);
