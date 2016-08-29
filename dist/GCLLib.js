@@ -60,6 +60,7 @@ var GCLLib =
 	        this.ds = function () { return _this.dsClient; };
 	        this.beid = function (reader_id) { return _this.cardFactory.createEidBE(reader_id); };
 	        this.emv = function (reader_id) { return _this.cardFactory.createEmv(reader_id); };
+	        var self = this;
 	        this.cfg = this.resolveConfig(cfg);
 	        this.connection = new Connection_1.LocalConnection();
 	        this.authConnection = new Connection_1.LocalAuthConnection();
@@ -67,11 +68,14 @@ var GCLLib =
 	        this.cardFactory = new CardFactory_1.CardFactory(this.cfg.gclUrl, this.connection);
 	        this.coreService = new CoreService_1.CoreService(this.cfg.gclUrl, this.connection);
 	        this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.remoteConnection);
-	        this.initSecurityContext();
 	        if (this.cfg.implicitDownload && true) {
 	            this.implicitDownload();
 	        }
-	        this.registerAndActivate();
+	        this.initSecurityContext(function (err, data) {
+	            if (err)
+	                console.log(JSON.stringify(err));
+	            self.registerAndActivate();
+	        });
 	    }
 	    GCLClient.prototype.resolveConfig = function (cfg) {
 	        var resolvedCfg = GCLConfig_1.GCLConfig.Instance;
@@ -85,26 +89,38 @@ var GCLLib =
 	        resolvedCfg.implicitDownload = cfg.implicitDownload;
 	        return resolvedCfg;
 	    };
-	    GCLClient.prototype.initSecurityContext = function () {
-	        console.log("set security context");
+	    GCLClient.prototype.initSecurityContext = function (cb) {
 	        var self = this;
+	        var clientCb = cb;
 	        this.core().getPubKey(function (err, gclResponse) {
 	            if (err && err.responseJSON && !err.responseJSON.success) {
 	                self.dsClient.getPubKey(function (err, dsResponse) {
 	                    if (err)
-	                        console.log(JSON.stringify(err));
-	                    console.log("Pub key:" + dsResponse.pubkey);
+	                        return clientCb(err, null);
+	                    var innerCb = clientCb;
 	                    self.core().setPubKey(dsResponse.pubkey, function (err, response) {
 	                        if (err)
-	                            console.log(JSON.stringify(err));
+	                            return innerCb(err, null);
+	                        return innerCb(null, {});
 	                    });
 	                });
 	            }
-	            console.log("end security context");
-	            return;
+	            return cb(null, {});
 	        });
 	    };
 	    GCLClient.prototype.registerAndActivate = function () {
+	        var self = this;
+	        self.core().info(function (err, infoResponse) {
+	            if (err) {
+	                console.log(JSON.stringify(err));
+	                return;
+	            }
+	            console.log(JSON.stringify(infoResponse));
+	        });
+	    };
+	    GCLClient.prototype.syncDevice = function () {
+	    };
+	    GCLClient.prototype.registerDevice = function () {
 	    };
 	    GCLClient.prototype.implicitDownload = function () {
 	        var self = this;
