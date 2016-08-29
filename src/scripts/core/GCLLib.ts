@@ -23,6 +23,7 @@ class GCLClient {
     private dsClient: DSClient;
 
     constructor(cfg: GCLConfig) {
+        let self = this;
         // resolve config to singleton
         this.cfg = this.resolveConfig(cfg);
         // init communication
@@ -33,14 +34,15 @@ class GCLClient {
         this.coreService = new CoreService(this.cfg.gclUrl,this.connection);
         this.dsClient = new DSClient(this.cfg.dsUrl,this.remoteConnection);
 
-        //setup security - fail safe
-        this.initSecurityContext();
-
         //check if implicit download has been set
         if(this.cfg.implicitDownload && true){ this.implicitDownload();}
 
-        //register and activate
-        this.registerAndActivate();
+        //setup security - fail safe
+        this.initSecurityContext(function(err,data){
+            if(err) console.log(JSON.stringify(err));
+            //register and activate
+            self.registerAndActivate();
+        });
     }
 
     private resolveConfig(cfg:GCLConfig) {
@@ -59,21 +61,23 @@ class GCLClient {
     /**
      * Init security context
      */
-    private initSecurityContext(){
+    private initSecurityContext(cb){
         let self = this;
+        let clientCb = cb;
         this.core().getPubKey(function(err:any,gclResponse){
             if(err && err.responseJSON && !err.responseJSON.success){
                 //no certificate set - retrieve cert from DS
                 self.dsClient.getPubKey(function(err,dsResponse){
-                    if(err) console.log(JSON.stringify(err));
-                    console.log("Pub key:"+ dsResponse.pubkey);
+                    if(err) return clientCb(err,null);
+                    let innerCb = clientCb;
                     self.core().setPubKey(dsResponse.pubkey,function(err,response){
-                        if(err) console.log(JSON.stringify(err));
+                        if(err) return innerCb(err,null);
+                        return innerCb(null,{});
                     })
                 })
             }
             // certificate loaded
-            return;
+            return cb(null,{});
         })
     }
 
@@ -81,7 +85,8 @@ class GCLClient {
         let self = this;
         //get info
         self.core().info(function(err,infoResponse){
-
+            if(err) {console.log(JSON.stringify(err));return;}
+            console.log(JSON.stringify(infoResponse));
         });
         //get uuid (check if exists)
 
