@@ -39,8 +39,10 @@ class GCLClient {
 
         //setup security - fail safe
         this.initSecurityContext(function(err,data){
-            if(err) console.log(JSON.stringify(err));
-            //register and activate
+            if(err) {
+                console.log(JSON.stringify(err));
+                return;
+            }
             self.registerAndActivate();
         });
     }
@@ -88,10 +90,12 @@ class GCLClient {
             if(err) {console.log(JSON.stringify(err));return;}
             let activated = infoResponse.data.activated;
             let uuid = infoResponse.data.uid;
-            if(activated && activated==false){
+            console.log("GCL activated?:" + activated);
+            if(!activated){
+                console.log("GCL perform activation");
                 self.dsClient.register({},uuid,function(err,activationResponse){
                     if(err) return;
-                    console.log(activationResponse);
+                    console.log(JSON.stringify(activationResponse));
                     GCLConfig.Instance.jwt = activationResponse.token;
                     self.core().activate(function(err,data){console.log(JSON.stringify(data)); return;})
                 });
