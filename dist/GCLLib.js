@@ -117,13 +117,17 @@ var GCLLib =
 	            }
 	            var activated = infoResponse.data.activated;
 	            var uuid = infoResponse.data.uid;
-	            self.dsClient.register({}, uuid, function (err, activationResponse) {
-	                if (err)
-	                    return;
-	                console.log(activationResponse);
-	                GCLConfig_1.GCLConfig.Instance.jwt = activationResponse.token;
-	                self.core().activate(function (err, data) { return; });
-	            });
+	            if (!activated) {
+	                self.dsClient.register({}, uuid, function (err, activationResponse) {
+	                    if (err)
+	                        return;
+	                    console.log(activationResponse);
+	                    GCLConfig_1.GCLConfig.Instance.jwt = activationResponse.token;
+	                    self.core().activate(function (err, data) { console.log(JSON.stringify(data)); return; });
+	                });
+	            }
+	            else
+	                return;
 	        });
 	    };
 	    GCLClient.prototype.syncDevice = function (uuid) {
