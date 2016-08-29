@@ -36,6 +36,7 @@ const CORE_PLUGINS = "/plugins";
 const CORE_READERS = "/card-readers";
 const CORE_READER_ID = "/readers/{id}";
 const CORE_ACTIVATE = "/admin/activate";
+const CORE_PUB_KEY = "/admin/certificate";
 
 class CoreService implements AbstractCore{
     // constructor
