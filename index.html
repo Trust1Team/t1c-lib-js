@@ -65,6 +65,7 @@
         <button id="getReadersAvailable" type="button" class="btn btn-default btn-lg">Readers (card available)</button>
         <button id="getReadersUnavailable" type="button" class="btn btn-default btn-lg">Readers (card unavailable)</button>
         <button id="getKey" type="button" class="btn btn-default btn-lg">Get API key</button>
+        <button id="getPubKey" type="button" class="btn btn-default btn-lg">Get Public Key (JWT vaidation)</button>
         <button id="getJWT" type="button" class="btn btn-default btn-lg">Get JWT</button>
         <button id="getJWTRefresh" type="button" class="btn btn-default btn-lg">Refresh JWT</button>
         <button id="sendJWTDemo" type="button" class="btn btn-default btn-lg">Send JWT to GCL</button>
@@ -238,7 +239,8 @@
         var gclConfig = new GCLLib.GCLConfig();
         gclConfig.apiKey = "b644bdc6-74d8-4ee2-9ce5-347d5dc14cb5"; //test apikey rate limitted
         gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
-        gclConfig.dsUrl = "https://accapim.t1t.be:443/trust1team/gclds/v1";
+        //gclConfig.dsUrl = "https://accapim.t1t.be:443/trust1team/gclds/v1";
+        gclConfig.dsUrl = "http://localhost:8080/gcl-ds-web/v1";
         gclConfig.allowAutoUpdate = true;
         gclConfig.implicitDownload = false;
         var connector = new GCLLib.GCLClient(gclConfig);
@@ -367,6 +369,11 @@
             var apikey = connector.config().apiKey;
             if(apikey) $("#information").append(apikey);
             else $("#information").append('no apikey set');
+        });
+        $("#getPubKey").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            connector.ds().getPubKey(callback);
         });
         $("#getJWT").on('click', function () {
             $("#information").empty();
