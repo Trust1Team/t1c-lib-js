@@ -8,6 +8,7 @@ import {GCLConfig} from "../GCLConfig";
 
 interface AbstractDSClient{
     getJWT(callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    getDevice(uuid,callback:(error:CoreExceptions.RestException, data:any) => void):void;
     refreshJWT(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     getPubKey(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     downloadLink(infoBrowser, callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -26,6 +27,15 @@ const DEVICE = "/devices";
 
 class DSClient implements AbstractDSClient{
     constructor(private url:string,private connection:RemoteConnection) {}
+
+    public getDevice(uuid,callback:(error:CoreExceptions.RestException, data:any)=>void):void {
+        var consumerCb = callback;
+        this.connection.get(this.url + DEVICE + SEPARATOR + uuid, function(error, data){
+            if(error)return consumerCb(error,null);
+            if(data) return consumerCb(null,data); //TODO
+            return consumerCb(null,data);
+        });
+    }
 
     public getJWT(callback:(error:CoreExceptions.RestException, data:any)=>void):void {
         var consumerCb = callback;

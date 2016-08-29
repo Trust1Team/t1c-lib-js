@@ -56,12 +56,48 @@ class GCLClient {
         return resolvedCfg;
     }
 
+    /**
+     * Init security context
+     */
     private initSecurityContext(){
-        // TODO
+        let self = this;
+        this.core().getPubKey(function(err:any,gclResponse){
+            if(err && err.responseJSON && !err.responseJSON.success){
+                //no certificate set - retrieve cert from DS
+                self.dsClient.getPubKey(function(err,dsResponse){
+                    if(err) console.log(JSON.stringify(err));
+                    console.log("Pub key:"+ dsResponse.pubkey);
+                    self.core().setPubKey(dsResponse.pubkey,function(err,response){
+                        if(err) console.log(JSON.stringify(err));
+                    })
+                })
+            }
+            // certificate loaded
+            return;
+        })
     }
 
     private registerAndActivate(){
-        // TODO when activation flag set
+        let self = this;
+        //get info
+        self.core().info(function(err,infoResponse){
+
+        });
+        //get uuid (check if exists)
+
+        //if activated && uuid registered => sync
+        //if activated && uuid unregistered => put
+
+        //if not activated && uuid unregistered => put
+        //if not activated && uuid registered => sync
+    }
+
+    private syncDevice(){
+        
+    }
+
+    private registerDevice(){
+
     }
 
     // get core services

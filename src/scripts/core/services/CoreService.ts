@@ -14,6 +14,8 @@ interface AbstractCore{
     readersCardsUnavailable(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
     reader(reader_id:string,callback:(error:CoreExceptions.RestException,data:any)=>void):void;
     plugins(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
+    getPubKey(callback:(error:CoreExceptions.RestException,data:any)=>void):void;
+    setPubKey(pubkey:any,callback:(error:CoreExceptions.RestException,data:any)=>void):void;
     activate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
 
     // sync
@@ -50,6 +52,12 @@ class CoreService implements AbstractCore{
     public reader(reader_id:string, callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS + "/" + reader_id, callback);}
     public plugins(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_PLUGINS,callback);}
     public activate(callback:(error:CoreExceptions.RestException, data:any)=>void) {this.connection.post(this.url + CORE_ACTIVATE,{},callback);}
+    public getPubKey(callback:(error:CoreExceptions.RestException, data:any)=>void) {this.connection.get(this.url + CORE_PUB_KEY,callback);}
+    public setPubKey(pubkey:any,callback:(error:CoreExceptions.RestException, data:any)=>void) {
+        var req:any = {};
+        req.certificate = pubkey;
+        this.connection.put(this.url + CORE_PUB_KEY,req,callback);
+    }
 
     public infoBrowser(callback:(error:CoreExceptions.RestException, data:any)=>void):void{
         callback(null,this.platformInfo());
