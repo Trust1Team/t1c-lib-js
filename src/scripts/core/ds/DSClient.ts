@@ -9,6 +9,7 @@ import {GCLConfig} from "../GCLConfig";
 interface AbstractDSClient{
     getJWT(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     refreshJWT(callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    getPubKey(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     downloadLink(infoBrowser, callback:(error:CoreExceptions.RestException, data:any) => void):void;
     register(info, device_id, callback:(error:CoreExceptions.RestException, data:any) => void):void;
     activate(device_id, callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -19,6 +20,7 @@ const SECURITY = "/security";
 const SECURITY_JWT_ISSUE = SECURITY + "/jwt/issue";
 const SECURITY_JWT_REFRESH = SECURITY + "/jwt/refresh";
 const DOWNLOAD = "/download/gcl";
+const PUB_KEY = SECURITY + "/keys/public";
 const DEVICE = "/device";
 
 
@@ -47,6 +49,10 @@ class DSClient implements AbstractDSClient{
             noJWT.status = 412; //precondition failed
             callback(noJWT,null);
         }
+    }
+
+    public getPubKey(callback:(error:CoreExceptions.RestException, data:any)=>void):void {
+        this.connection.get(this.url + PUB_KEY, callback);
     }
 
     public downloadLink(infoBrowser, callback:(error:CoreExceptions.RestException, data:any)=>void):void {

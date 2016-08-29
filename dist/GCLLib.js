@@ -367,7 +367,7 @@ var GCLLib =
 	var CORE_PLUGINS = "/plugins";
 	var CORE_READERS = "/card-readers";
 	var CORE_READER_ID = "/readers/{id}";
-	var CORE_DUMMY_JWT = "/admin/manage";
+	var CORE_ACTIVATE = "/admin/activate";
 	var CoreService = (function () {
 	    function CoreService(url, connection) {
 	        this.url = url;
@@ -379,7 +379,7 @@ var GCLLib =
 	    CoreService.prototype.readersCardsUnavailable = function (callback) { this.connection.get(this.url + CORE_READERS, callback, FILTER_CARD_INSERTED + 'false'); };
 	    CoreService.prototype.reader = function (reader_id, callback) { this.connection.get(this.url + CORE_READERS + "/" + reader_id, callback); };
 	    CoreService.prototype.plugins = function (callback) { this.connection.get(this.url + CORE_PLUGINS, callback); };
-	    CoreService.prototype.manage = function (callback) { this.connection.post(this.url + CORE_DUMMY_JWT, {}, callback); };
+	    CoreService.prototype.activate = function (callback) { this.connection.post(this.url + CORE_ACTIVATE, {}, callback); };
 	    CoreService.prototype.infoBrowser = function (callback) {
 	        callback(null, this.platformInfo());
 	    };
@@ -590,6 +590,7 @@ var GCLLib =
 	var SECURITY_JWT_ISSUE = SECURITY + "/jwt/issue";
 	var SECURITY_JWT_REFRESH = SECURITY + "/jwt/refresh";
 	var DOWNLOAD = "/download/gcl";
+	var PUB_KEY = SECURITY + "/keys/public";
 	var DEVICE = "/device";
 	var DSClient = (function () {
 	    function DSClient(url, connection) {
@@ -620,6 +621,9 @@ var GCLLib =
 	            noJWT.status = 412;
 	            callback(noJWT, null);
 	        }
+	    };
+	    DSClient.prototype.getPubKey = function (callback) {
+	        this.connection.get(this.url + PUB_KEY, callback);
 	    };
 	    DSClient.prototype.downloadLink = function (infoBrowser, callback) {
 	        this.connection.post(this.url + DOWNLOAD, infoBrowser, callback);
