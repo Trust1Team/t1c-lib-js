@@ -72,8 +72,10 @@ var GCLLib =
 	            this.implicitDownload();
 	        }
 	        this.initSecurityContext(function (err, data) {
-	            if (err)
+	            if (err) {
 	                console.log(JSON.stringify(err));
+	                return;
+	            }
 	            self.registerAndActivate();
 	        });
 	    }
@@ -117,11 +119,13 @@ var GCLLib =
 	            }
 	            var activated = infoResponse.data.activated;
 	            var uuid = infoResponse.data.uid;
-	            if (activated && activated == false) {
+	            console.log("GCL activated?:" + activated);
+	            if (!activated) {
+	                console.log("GCL perform activation");
 	                self.dsClient.register({}, uuid, function (err, activationResponse) {
 	                    if (err)
 	                        return;
-	                    console.log(activationResponse);
+	                    console.log(JSON.stringify(activationResponse));
 	                    GCLConfig_1.GCLConfig.Instance.jwt = activationResponse.token;
 	                    self.core().activate(function (err, data) { console.log(JSON.stringify(data)); return; });
 	                });
@@ -437,32 +441,89 @@ var GCLLib =
 	    CoreService.prototype.infoBrowser = function (callback) {
 	        callback(null, this.platformInfo());
 	    };
-	    CoreService.prototype.pollReaders = function (seconds, callback) {
-	        var maxSeconds = seconds;
+	    CoreService.prototype.pollCardInserted = function (secondsToPollCard, callback, connectReaderCb, insertCardCb, cardTimeoutCb) {
+	        var maxSeconds = secondsToPollCard;
 	        var self = this;
-	        console.debug("start poll readers");
-	        readerTimeout(callback);
-	        function readerTimeout(callback) {
+	        console.debug("start poll cards");
+	        readerTimeout(callback, connectReaderCb, insertCardCb, cardTimeoutCb);
+	        function readerTimeout(cb, crcb, iccb, ctcb) {
+	            var selfTimeout = this;
 	            setTimeout(function () {
 	                console.debug("seconds left:", maxSeconds);
 	                --maxSeconds;
 	                self.readers(function (error, data) {
 	                    if (error) {
-	                        console.log("Waiting...");
-	                        readerTimeout(callback);
+	                        console.debug("Waiting...");
+	                        crcb();
+	                        readerTimeout(cb, crcb, iccb, ctcb);
 	                    }
 	                    ;
-	                    console.debug(JSON.stringify(data));
 	                    if (maxSeconds == 0) {
-	                        return callback(null, null);
+	                        return ctcb();
 	                    }
 	                    else if (data.data.length === 0) {
 	                        console.debug("Waiting...");
-	                        readerTimeout(callback);
+	                        crcb();
+	                        readerTimeout(cb, crcb, iccb, ctcb);
 	                    }
 	                    else {
 	                        console.debug("readerCount:", data.data.length);
-	                        return callback(null, { reader_found: "yes" });
+	                        var reader = self.checkReadersForCardObject(data.data);
+	                        if (reader) {
+	                            var response = {};
+	                            response.data = reader;
+	                            response.success = true;
+	                            return cb(null, response);
+	                        }
+	                        else {
+	                            console.debug("Insert card");
+	                            iccb();
+	                            readerTimeout(cb, crcb, iccb, ctcb);
+	                        }
+	                    }
+	                });
+	            }, 1000);
+	        }
+	        ;
+	    };
+	    CoreService.prototype.checkReadersForCardObject = function (readers) {
+	        if (readers && readers.length > 0) {
+	            for (var i in readers) {
+	                if (readers[i].card)
+	                    return readers[i];
+	            }
+	        }
+	        else
+	            return null;
+	    };
+	    CoreService.prototype.pollReaders = function (secondsToPollReader, callback, connectReaderCb, readerTimeoutCb) {
+	        var maxSeconds = secondsToPollReader;
+	        var self = this;
+	        console.debug("start poll readers");
+	        readerTimeout(callback, readerTimeoutCb, connectReaderCb);
+	        function readerTimeout(cb, rtcb, crcb) {
+	            var selfTimeout = this;
+	            setTimeout(function () {
+	                console.debug("seconds left:", maxSeconds);
+	                --maxSeconds;
+	                self.readers(function (error, data) {
+	                    if (error) {
+	                        console.debug("Waiting...");
+	                        crcb();
+	                        readerTimeout(cb, rtcb, crcb);
+	                    }
+	                    ;
+	                    if (maxSeconds == 0) {
+	                        return rtcb();
+	                    }
+	                    else if (data.data.length === 0) {
+	                        console.debug("Waiting...");
+	                        crcb();
+	                        readerTimeout(cb, rtcb, crcb);
+	                    }
+	                    else {
+	                        console.debug("readerCount:", data.data.length);
+	                        return cb(null, data);
 	                    }
 	                });
 	            }, 1000);
