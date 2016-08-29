@@ -88,12 +88,14 @@ class GCLClient {
             if(err) {console.log(JSON.stringify(err));return;}
             let activated = infoResponse.data.activated;
             let uuid = infoResponse.data.uid;
-            self.dsClient.register({},uuid,function(err,activationResponse){
-               if(err) return;
-                console.log(activationResponse);
-                GCLConfig.Instance.jwt = activationResponse.token;
-                self.core().activate(function(err,data){return;})
-            });
+            if(!activated){
+                self.dsClient.register({},uuid,function(err,activationResponse){
+                    if(err) return;
+                    console.log(activationResponse);
+                    GCLConfig.Instance.jwt = activationResponse.token;
+                    self.core().activate(function(err,data){console.log(JSON.stringify(data)); return;})
+                });
+            }else return;
 /*            if(activated) self.syncDevice(uuid);
             else self.registerDevice(uuid);*/
         });
