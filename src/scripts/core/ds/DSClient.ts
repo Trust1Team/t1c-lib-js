@@ -71,7 +71,7 @@ class DSClient implements AbstractDSClient{
 
     public register(info, device_id, callback:(error:CoreExceptions.RestException, data:any)=>void):void {
         let _req:any={};
-        _req.config = JSON.stringify(info);
+        console.log("Device id:"+device_id);
         this.connection.put(this.url + DEVICE + SEPARATOR + device_id, _req, callback);
     }
 

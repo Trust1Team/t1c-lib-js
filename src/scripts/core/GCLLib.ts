@@ -31,7 +31,7 @@ class GCLClient {
         this.authConnection = new LocalAuthConnection();
         this.remoteConnection = new RemoteConnection();
         this.cardFactory = new CardFactory(this.cfg.gclUrl,this.connection);
-        this.coreService = new CoreService(this.cfg.gclUrl,this.connection);
+        this.coreService = new CoreService(this.cfg.gclUrl,this.authConnection);
         this.dsClient = new DSClient(this.cfg.dsUrl,this.remoteConnection);
 
         //check if implicit download has been set
@@ -83,26 +83,32 @@ class GCLClient {
 
     private registerAndActivate(){
         let self = this;
-        //get info
-        self.core().info(function(err,infoResponse){
+        //get GCL info
+        self.core().info(function(err,infoResponse:any){
             if(err) {console.log(JSON.stringify(err));return;}
-            console.log(JSON.stringify(infoResponse));
+            let activated = infoResponse.data.activated;
+            let uuid = infoResponse.data.uid;
+            self.dsClient.register({},uuid,function(err,activationResponse){
+               if(err) return;
+                console.log(activationResponse);
+                GCLConfig.Instance.jwt = activationResponse.token;
+                self.core().activate(function(err,data){return;})
+            });
+/*            if(activated) self.syncDevice(uuid);
+            else self.registerDevice(uuid);*/
         });
-        //get uuid (check if exists)
+    }
 
+    private syncDevice(uuid){
+        //get device from DS
+        //this.dsClient.getDevice()
         //if activated && uuid registered => sync
         //if activated && uuid unregistered => put
+    }
 
+    private registerDevice(uuid){
         //if not activated && uuid unregistered => put
         //if not activated && uuid registered => sync
-    }
-
-    private syncDevice(){
-        
-    }
-
-    private registerDevice(){
-
     }
 
     // get core services
