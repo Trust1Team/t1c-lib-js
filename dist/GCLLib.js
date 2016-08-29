@@ -66,7 +66,7 @@ var GCLLib =
 	        this.authConnection = new Connection_1.LocalAuthConnection();
 	        this.remoteConnection = new Connection_1.RemoteConnection();
 	        this.cardFactory = new CardFactory_1.CardFactory(this.cfg.gclUrl, this.connection);
-	        this.coreService = new CoreService_1.CoreService(this.cfg.gclUrl, this.connection);
+	        this.coreService = new CoreService_1.CoreService(this.cfg.gclUrl, this.authConnection);
 	        this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.remoteConnection);
 	        if (this.cfg.implicitDownload && true) {
 	            this.implicitDownload();
@@ -115,12 +115,20 @@ var GCLLib =
 	                console.log(JSON.stringify(err));
 	                return;
 	            }
-	            console.log(JSON.stringify(infoResponse));
+	            var activated = infoResponse.data.activated;
+	            var uuid = infoResponse.data.uid;
+	            self.dsClient.register({}, uuid, function (err, activationResponse) {
+	                if (err)
+	                    return;
+	                console.log(activationResponse);
+	                GCLConfig_1.GCLConfig.Instance.jwt = activationResponse.token;
+	                self.core().activate(function (err, data) { return; });
+	            });
 	        });
 	    };
-	    GCLClient.prototype.syncDevice = function () {
+	    GCLClient.prototype.syncDevice = function (uuid) {
 	    };
-	    GCLClient.prototype.registerDevice = function () {
+	    GCLClient.prototype.registerDevice = function (uuid) {
 	    };
 	    GCLClient.prototype.implicitDownload = function () {
 	        var self = this;
@@ -716,7 +724,7 @@ var GCLLib =
 	    };
 	    DSClient.prototype.register = function (info, device_id, callback) {
 	        var _req = {};
-	        _req.config = JSON.stringify(info);
+	        console.log("Device id:" + device_id);
 	        this.connection.put(this.url + DEVICE + SEPARATOR + device_id, _req, callback);
 	    };
 	    DSClient.prototype.activate = function (device_id, callback) {
