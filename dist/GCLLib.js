@@ -441,89 +441,32 @@ var GCLLib =
 	    CoreService.prototype.infoBrowser = function (callback) {
 	        callback(null, this.platformInfo());
 	    };
-	    CoreService.prototype.pollCardInserted = function (secondsToPollCard, callback, connectReaderCb, insertCardCb, cardTimeoutCb) {
-	        var maxSeconds = secondsToPollCard;
-	        var self = this;
-	        console.debug("start poll cards");
-	        readerTimeout(callback, connectReaderCb, insertCardCb, cardTimeoutCb);
-	        function readerTimeout(cb, crcb, iccb, ctcb) {
-	            var selfTimeout = this;
-	            setTimeout(function () {
-	                console.debug("seconds left:", maxSeconds);
-	                --maxSeconds;
-	                self.readers(function (error, data) {
-	                    if (error) {
-	                        console.debug("Waiting...");
-	                        crcb();
-	                        readerTimeout(cb, crcb, iccb, ctcb);
-	                    }
-	                    ;
-	                    if (maxSeconds == 0) {
-	                        return ctcb();
-	                    }
-	                    else if (data.data.length === 0) {
-	                        console.debug("Waiting...");
-	                        crcb();
-	                        readerTimeout(cb, crcb, iccb, ctcb);
-	                    }
-	                    else {
-	                        console.debug("readerCount:", data.data.length);
-	                        var reader = self.checkReadersForCardObject(data.data);
-	                        if (reader) {
-	                            var response = {};
-	                            response.data = reader;
-	                            response.success = true;
-	                            return cb(null, response);
-	                        }
-	                        else {
-	                            console.debug("Insert card");
-	                            iccb();
-	                            readerTimeout(cb, crcb, iccb, ctcb);
-	                        }
-	                    }
-	                });
-	            }, 1000);
-	        }
-	        ;
-	    };
-	    CoreService.prototype.checkReadersForCardObject = function (readers) {
-	        if (readers && readers.length > 0) {
-	            for (var i in readers) {
-	                if (readers[i].card)
-	                    return readers[i];
-	            }
-	        }
-	        else
-	            return null;
-	    };
-	    CoreService.prototype.pollReaders = function (secondsToPollReader, callback, connectReaderCb, readerTimeoutCb) {
-	        var maxSeconds = secondsToPollReader;
+	    CoreService.prototype.pollReaders = function (seconds, callback) {
+	        var maxSeconds = seconds;
 	        var self = this;
 	        console.debug("start poll readers");
-	        readerTimeout(callback, readerTimeoutCb, connectReaderCb);
-	        function readerTimeout(cb, rtcb, crcb) {
-	            var selfTimeout = this;
+	        readerTimeout(callback);
+	        function readerTimeout(callback) {
 	            setTimeout(function () {
 	                console.debug("seconds left:", maxSeconds);
 	                --maxSeconds;
 	                self.readers(function (error, data) {
 	                    if (error) {
-	                        console.debug("Waiting...");
-	                        crcb();
-	                        readerTimeout(cb, rtcb, crcb);
+	                        console.log("Waiting...");
+	                        readerTimeout(callback);
 	                    }
 	                    ;
+	                    console.debug(JSON.stringify(data));
 	                    if (maxSeconds == 0) {
-	                        return rtcb();
+	                        return callback(null, null);
 	                    }
 	                    else if (data.data.length === 0) {
 	                        console.debug("Waiting...");
-	                        crcb();
-	                        readerTimeout(cb, rtcb, crcb);
+	                        readerTimeout(callback);
 	                    }
 	                    else {
 	                        console.debug("readerCount:", data.data.length);
-	                        return cb(null, data);
+	                        return callback(null, { reader_found: "yes" });
 	                    }
 	                });
 	            }, 1000);
