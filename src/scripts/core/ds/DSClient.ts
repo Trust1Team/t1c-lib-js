@@ -72,6 +72,14 @@ class DSClient implements AbstractDSClient{
     public register(info, device_id, callback:(error:CoreExceptions.RestException, data:any)=>void):void {
         let _req:any={};
         console.log("Device id:"+device_id);
+        _req.uuid = device_id;
+        _req.browser = info.browser;
+        _req.os = info.os;
+        _req.manufacturer = info.manufacturer;
+        _req.ua = info.ua;
+        _req.activated = info.activated;
+        _req.managed = info.managed;
+        _req.version = info.core_version;
         this.connection.put(this.url + DEVICE + SEPARATOR + device_id, _req, callback);
     }
 

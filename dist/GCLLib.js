@@ -118,11 +118,18 @@ var GCLLib =
 	                return;
 	            }
 	            var activated = infoResponse.data.activated;
+	            var managed = infoResponse.data.managed;
+	            var core_version = infoResponse.data.version;
 	            var uuid = infoResponse.data.uid;
 	            console.log("GCL activated?:" + activated);
+	            console.log("GCL managed?:" + managed);
 	            if (!activated) {
 	                console.log("GCL perform activation");
-	                self.dsClient.register({}, uuid, function (err, activationResponse) {
+	                var info = self.core().infoBrowserSync();
+	                info.managed = managed;
+	                info.core_version = core_version;
+	                info.activated = activated;
+	                self.dsClient.register(info, uuid, function (err, activationResponse) {
 	                    if (err)
 	                        return;
 	                    console.log(JSON.stringify(activationResponse));
@@ -735,6 +742,14 @@ var GCLLib =
 	    DSClient.prototype.register = function (info, device_id, callback) {
 	        var _req = {};
 	        console.log("Device id:" + device_id);
+	        _req.uuid = device_id;
+	        _req.browser = info.browser;
+	        _req.os = info.os;
+	        _req.manufacturer = info.manufacturer;
+	        _req.ua = info.ua;
+	        _req.activated = info.activated;
+	        _req.managed = info.managed;
+	        _req.version = info.core_version;
 	        this.connection.put(this.url + DEVICE + SEPARATOR + device_id, _req, callback);
 	    };
 	    DSClient.prototype.activate = function (device_id, callback) {
