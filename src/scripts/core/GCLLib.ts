@@ -89,11 +89,18 @@ class GCLClient {
         self.core().info(function(err,infoResponse:any){
             if(err) {console.log(JSON.stringify(err));return;}
             let activated = infoResponse.data.activated;
+            let managed = infoResponse.data.managed;
+            let core_version = infoResponse.data.version;
             let uuid = infoResponse.data.uid;
             console.log("GCL activated?:" + activated);
+            console.log("GCL managed?:" + managed);
             if(!activated){
                 console.log("GCL perform activation");
-                self.dsClient.register({},uuid,function(err,activationResponse){
+                let info = self.core().infoBrowserSync();
+                info.managed = managed;
+                info.core_version = core_version;
+                info.activated = activated;
+                self.dsClient.register(info,uuid,function(err,activationResponse){
                     if(err) return;
                     console.log(JSON.stringify(activationResponse));
                     GCLConfig.Instance.jwt = activationResponse.token;
