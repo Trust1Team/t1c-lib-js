@@ -19,7 +19,7 @@ describe('Config', () => {
         });
 
         it('should return the custom connector url', () => {
-            let test = "https://localhost:10080/v2";
+            let test = "http://localhost:10080/v2";
             let myConfig:GCLConfig = new GCLConfig();
             myConfig.gclUrl = test;
             var url:string = myConfig.gclUrl;
@@ -27,7 +27,7 @@ describe('Config', () => {
         });
 
         it('should return the custom ds url', () => {
-            let test = "https://dist.t1t.be/v1";
+            let test = "https://accapim.t1t.be:443/trust1team/gclds/v1";
             let myConfig:GCLConfig = new GCLConfig();
             myConfig.dsUrl = test;
             var dsUrl:string = myConfig.dsUrl;
