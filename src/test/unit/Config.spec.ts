@@ -3,7 +3,7 @@
  * @since 2016
  */
 import { expect } from "chai";
-import {GCLConfig} from "../scripts/core/GCLConfig";
+import {GCLConfig} from "../../scripts/core/GCLConfig";
 
 describe('Config', () => {
     let config:GCLConfig;
@@ -12,7 +12,7 @@ describe('Config', () => {
         config = new GCLConfig();
     });
 
-    describe('#gcl-config', () => {
+    describe('gcl-config', () => {
         it('should return the default connector url', () => {
             var url:string = config.gclUrl;
             expect(url).to.be.eq('https://localhost:10433/v1');
