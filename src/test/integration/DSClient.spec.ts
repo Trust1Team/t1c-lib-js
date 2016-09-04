@@ -1,6 +1,7 @@
 import {expect} from "chai";
 import {AbstractDSClient,DSClient} from "../../scripts/core/ds/DSClient";
 import {RemoteConnection} from "../../scripts/core/client/Connection";
+var jwtDecode = require('jwt-decode');
 
 describe('DSClient', () => {
     let dsUnderTest = "http://localhost:8080/gcl-ds-web/v1";
@@ -16,6 +17,15 @@ describe('DSClient', () => {
 
         it('should verify that a ds client has been instantiated', () => {
             expect(dsClient).not.undefined;
+        });
+
+        it('should verify that jwt decoder has been instantiated', () => {
+            expect(jwtDecode).not.undefined;
+        });
+
+
+        it('should verify that jwt decoder has been instantiated', () => {
+            expect(jwtDecode).not.undefined;
         });
 
         it('should return the url for DS under test', () => {
