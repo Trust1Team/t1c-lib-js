@@ -1,6 +1,8 @@
 import {expect} from "chai";
 import {AbstractDSClient,DSClient} from "../../scripts/core/ds/DSClient";
 import {RemoteConnection} from "../../scripts/core/client/Connection";
+//workaround in order to use require for non available module in DefinitlyTyped
+declare var require: any;
 var jwtDecode = require('jwt-decode');
 
 describe('DSClient', () => {
@@ -18,11 +20,6 @@ describe('DSClient', () => {
         it('should verify that a ds client has been instantiated', () => {
             expect(dsClient).not.undefined;
         });
-
-        it('should verify that jwt decoder has been instantiated', () => {
-            expect(jwtDecode).not.undefined;
-        });
-
 
         it('should verify that jwt decoder has been instantiated', () => {
             expect(jwtDecode).not.undefined;
@@ -54,6 +51,23 @@ describe('DSClient', () => {
                 expect(data).to.exist;
                 expect(data.token).to.exist;
                done();
+            });
+        });
+
+        it('should get verify JWT claims', (done) => {
+            dsClient.getJWT(function(err,data){
+                expect(err).to.be.null;
+                expect(data).to.exist;
+                expect(data.token).to.exist;
+                let token = jwtDecode(data.token);
+                expect(token.iss).not.empty;
+                expect(token.aud).not.empty;
+                expect(token.jti).not.empty;
+                expect(token.iat).not.empty;
+                expect(token.nbf).not.empty;
+                expect(token.sub).not.empty;
+                expect(token.activation).not.empty;
+                done();
             });
         });
 
