@@ -7,6 +7,7 @@ import {RestException} from "../exceptions/CoreExceptions";
 import {GCLConfig} from "../GCLConfig";
 
 interface AbstractDSClient{
+    getUrl():String;
     getInfo(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     getJWT(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     getDevice(uuid,callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -29,6 +30,8 @@ const DEVICE = "/devices";
 
 class DSClient implements AbstractDSClient{
     constructor(private url:string,private connection:RemoteConnection) {}
+
+    public getUrl(){return this.url;}
 
     public getInfo(callback:(error:CoreExceptions.RestException, data:any)=>void):void {
         var consumerCb = callback;

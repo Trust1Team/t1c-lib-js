@@ -1,17 +1,34 @@
 import {expect} from "chai";
-import {GCLConfig} from "../../scripts/core/ds/DSClient";
+import {AbstractDSClient,DSClient} from "../../scripts/core/ds/DSClient";
+import {RemoteConnection} from "../../scripts/core/client/Connection";
 
 describe('DSClient', () => {
-    let config:GCLConfig;
+    let dsUnderTest = "http://localhost:8080/gcl-ds-web/v1";
+    let remoteConnection:RemoteConnection;
+    let dsClient:DSClient;
 
     beforeEach(() => {
-        config = new GCLConfig();
+        remoteConnection = new RemoteConnection();
+        dsClient = new DSClient(dsUnderTest,remoteConnection);
     });
 
     describe('DSClient Service Expectations', () => {
 
-        it('should return information for the distribution service', () => {
-            expect('').to.be.eq('');
+        it('should verify that a ds client has been instantiated', () => {
+            expect(dsClient).not.undefined;
+        });
+
+        it('should return the url for DS under test', () => {
+            expect(dsClient.getUrl()).to.equals(dsUnderTest);
+        });
+
+        it('should return information for the distribution service', (done) => {
+            dsClient.getInfo(function(err,data){
+                console.log(JSON.stringify(err));
+                console.log(JSON.stringify(data));
+                done();
+            });
+            done();
         });
 
         it('should  get device information when UUID is given', () => {

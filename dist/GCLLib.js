@@ -688,6 +688,7 @@ var GCLLib =
 	var GCLConfig_1 = __webpack_require__(1);
 	var SEPARATOR = "/";
 	var SECURITY = "/security";
+	var SYS_INFO = "/system/status";
 	var SECURITY_JWT_ISSUE = SECURITY + "/jwt/issue";
 	var SECURITY_JWT_REFRESH = SECURITY + "/jwt/refresh";
 	var DOWNLOAD = "/download/gcl";
@@ -698,6 +699,15 @@ var GCLLib =
 	        this.url = url;
 	        this.connection = connection;
 	    }
+	    DSClient.prototype.getUrl = function () { return this.url; };
+	    DSClient.prototype.getInfo = function (callback) {
+	        var consumerCb = callback;
+	        this.connection.get(this.url + SYS_INFO, function (error, data) {
+	            if (error)
+	                return consumerCb(error, null);
+	            return consumerCb(null, data);
+	        });
+	    };
 	    DSClient.prototype.getDevice = function (uuid, callback) {
 	        var consumerCb = callback;
 	        this.connection.get(this.url + DEVICE + SEPARATOR + uuid, function (error, data) {
