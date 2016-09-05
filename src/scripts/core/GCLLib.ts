@@ -92,26 +92,28 @@ class GCLClient {
             let managed = infoResponse.data.managed;
             let core_version = infoResponse.data.version;
             let uuid = infoResponse.data.uid;
-            console.log("GCL activated?:" + activated);
-            console.log("GCL managed?:" + managed);
+            //compose info
+            let info = self.core().infoBrowserSync();
+            info.managed = managed;
+            info.core_version = core_version;
+            info.activated = activated;
             if(!activated){
-                console.log("GCL perform activation");
-                let info = self.core().infoBrowserSync();
-                info.managed = managed;
-                info.core_version = core_version;
-                info.activated = activated;
+                //we need to register the device
+                console.log("Register device:"+uuid);
                 self.dsClient.register(info,uuid,function(err,activationResponse){
                     if(err) return;
-                    console.log(JSON.stringify(activationResponse));
                     GCLConfig.Instance.jwt = activationResponse.token;
                     self.core().activate(function(err,data){console.log(JSON.stringify(data)); return;})
                 });
             }else {
-                console.log("GCL activated");
-                return;
+                //we need to synchronize the device
+                console.log("Sync device:"+uuid);
+                self.dsClient.sync(info,uuid,function(err,activationResponse){
+                    if(err) return;
+                    GCLConfig.Instance.jwt = activationResponse.token;
+                    return;
+                });
             }
-/*            if(activated) self.syncDevice(uuid);
-            else self.registerDevice(uuid);*/
         });
     }
 
