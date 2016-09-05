@@ -26,6 +26,7 @@ class GCLConfig {
         this._gclUrl = gclUrl||defaultGclUrl;
         this._dsUrl = dsUrl||defaultDSUrl;
         this._apiKey = apiKey||'';
+        this._jwt = 'none';
         this._allowAutoUpdate = allowAutoUpdate||defaultAllowAutoUpdate;
         this._implicitDownload = implicitDownload||defaultImplicitDownload;
     }
