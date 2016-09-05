@@ -7,6 +7,8 @@ import {RestException} from "../exceptions/CoreExceptions";
 import {GCLConfig} from "../GCLConfig";
 
 interface AbstractDSClient{
+    getUrl():String;
+    getInfo(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     getJWT(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     getDevice(uuid,callback:(error:CoreExceptions.RestException, data:any) => void):void;
     refreshJWT(callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -18,6 +20,7 @@ interface AbstractDSClient{
 
 const SEPARATOR = "/";
 const SECURITY = "/security";
+const SYS_INFO = "/system/status";
 const SECURITY_JWT_ISSUE = SECURITY + "/jwt/issue";
 const SECURITY_JWT_REFRESH = SECURITY + "/jwt/refresh";
 const DOWNLOAD = "/download/gcl";
@@ -27,6 +30,16 @@ const DEVICE = "/devices";
 
 class DSClient implements AbstractDSClient{
     constructor(private url:string,private connection:RemoteConnection) {}
+
+    public getUrl(){return this.url;}
+
+    public getInfo(callback:(error:CoreExceptions.RestException, data:any)=>void):void {
+        var consumerCb = callback;
+        this.connection.get(this.url + SYS_INFO, function(error, data){
+            if(error)return consumerCb(error,null);
+            return consumerCb(null,data);
+        });
+    }
 
     public getDevice(uuid,callback:(error:CoreExceptions.RestException, data:any)=>void):void {
         var consumerCb = callback;
@@ -72,6 +85,14 @@ class DSClient implements AbstractDSClient{
     public register(info, device_id, callback:(error:CoreExceptions.RestException, data:any)=>void):void {
         let _req:any={};
         console.log("Device id:"+device_id);
+        _req.uuid = device_id;
+        _req.browser = info.browser;
+        _req.os = info.os;
+        _req.manufacturer = info.manufacturer;
+        _req.ua = info.ua;
+        _req.activated = info.activated;
+        _req.managed = info.managed;
+        _req.version = info.core_version;
         this.connection.put(this.url + DEVICE + SEPARATOR + device_id, _req, callback);
     }
 

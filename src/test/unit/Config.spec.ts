@@ -3,7 +3,7 @@
  * @since 2016
  */
 import { expect } from "chai";
-import {GCLConfig} from "../scripts/core/GCLConfig";
+import {GCLConfig} from "../../scripts/core/GCLConfig";
 
 describe('Config', () => {
     let config:GCLConfig;
@@ -12,14 +12,14 @@ describe('Config', () => {
         config = new GCLConfig();
     });
 
-    describe('#gcl-config', () => {
+    describe('gcl-config', () => {
         it('should return the default connector url', () => {
             var url:string = config.gclUrl;
             expect(url).to.be.eq('https://localhost:10433/v1');
         });
 
         it('should return the custom connector url', () => {
-            let test = "https://localhost:10080/v2";
+            let test = "http://localhost:10080/v2";
             let myConfig:GCLConfig = new GCLConfig();
             myConfig.gclUrl = test;
             var url:string = myConfig.gclUrl;
@@ -27,7 +27,7 @@ describe('Config', () => {
         });
 
         it('should return the custom ds url', () => {
-            let test = "https://dist.t1t.be/v1";
+            let test = "https://accapim.t1t.be:443/trust1team/gclds/v1";
             let myConfig:GCLConfig = new GCLConfig();
             myConfig.dsUrl = test;
             var dsUrl:string = myConfig.dsUrl;
