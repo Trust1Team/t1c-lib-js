@@ -358,7 +358,15 @@
         $("#pollReaders").on('click', function () {
             $("#information").empty();
             var core = connector.core();
-            core.pollReaders(15,callback);
+            core.pollReaders(15,callback,function(){console.log('Please connect a reader')},function(){console.log('Stop waiting for readers, none found')});
+        });
+        $("#pollCard").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.pollCardInserted(15,callback,function(){console.log('Please connect a reader')},
+                    function(){console.log("Please insert card")},
+                    function(){console.log("Stop waiting for card, none found")}
+            );
         });
         $("#getReadersAvailable").on('click', function () {
             $("#information").empty();
