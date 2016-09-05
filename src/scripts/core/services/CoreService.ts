@@ -76,41 +76,7 @@ class CoreService implements AbstractCore{
         let maxSeconds = secondsToPollCard;
         let self=this;
         console.debug("start poll cards");
-        readerTimeout(callback, connectReaderCb, insertCardCb, cardTimeoutCb);
-        function readerTimeout(cb,crcb,iccb,ctcb) {
-            let selfTimeout = this;
-            setTimeout(function () {
-                console.debug("seconds left:",maxSeconds);
-                --maxSeconds;
-                self.readers(function(error, data){
-                    if(error){
-                        console.debug("Waiting...");
-                        crcb(); //ask to connect reader
-                        readerTimeout(cb,crcb,iccb,ctcb); //no reader found and waiting - recursive call
-                    };
-                    // no error but stop
-                    if(maxSeconds==0){return ctcb();} //reader timeout
-                    else if(data.data.length === 0) {
-                        console.debug("Waiting...");
-                        crcb(); //ask to connect reader
-                        readerTimeout(cb,crcb,iccb,ctcb);
-                    }
-                    else {
-                        console.debug("readerCount:",data.data.length);
-                        //detect card on any reader
-                        var reader = self.checkReadersForCardObject(data.data);
-                        if(reader) {
-                            var response:any = {}; response.data = reader; response.success=true;
-                            return cb(null, response);
-                        }else {
-                            console.debug("Insert card");
-                            iccb();
-                            readerTimeout(cb,crcb,iccb,ctcb);
-                        }
-                    }
-                });
-            }, 1000);
-        };
+        //self.pollReaders(secondsToPollCard,callback,connectReaderCb,);
     }
 
     /**
