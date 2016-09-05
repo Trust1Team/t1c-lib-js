@@ -152,10 +152,6 @@ var GCLLib =
 	            }
 	        });
 	    };
-	    GCLClient.prototype.syncDevice = function (uuid) {
-	    };
-	    GCLClient.prototype.registerDevice = function (uuid) {
-	    };
 	    GCLClient.prototype.implicitDownload = function () {
 	        var self = this;
 	        this.core().info(function (error, data) {
