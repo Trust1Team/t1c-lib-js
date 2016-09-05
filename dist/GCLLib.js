@@ -184,6 +184,7 @@ var GCLLib =
 	        this._gclUrl = gclUrl || defaultGclUrl;
 	        this._dsUrl = dsUrl || defaultDSUrl;
 	        this._apiKey = apiKey || '';
+	        this._jwt = 'none';
 	        this._allowAutoUpdate = allowAutoUpdate || defaultAllowAutoUpdate;
 	        this._implicitDownload = implicitDownload || defaultImplicitDownload;
 	    }
@@ -481,6 +482,7 @@ var GCLLib =
 	        ;
 	    };
 	    CoreService.prototype.infoBrowserSync = function () { return this.platformInfo(); };
+	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.platformInfo = function () {
 	        return {
 	            manufacturer: platform.manufacturer || '',
@@ -518,6 +520,7 @@ var GCLLib =
 	            data: queryParams,
 	            headers: { 'Authorization': ('Bearer ' + GCLConfig_1.GCLConfig.Instance.jwt), 'Accept-Language': 'en-US' },
 	            success: function (successResponse, status, jqXHR) {
+	                console.log(JSON.stringify(jqXHR));
 	                return callback(null, successResponse);
 	            },
 	            error: function (errorResponse, status, jqXHR) {

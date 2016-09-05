@@ -26,6 +26,7 @@ class LocalAuthConnection implements Connection {
             data: queryParams,
             headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt), 'Accept-Language':'en-US' },
             success: function(successResponse,status,jqXHR) {
+                console.log(JSON.stringify(jqXHR));
                 return callback(null,successResponse);
             },
             error: function(errorResponse,status,jqXHR) {

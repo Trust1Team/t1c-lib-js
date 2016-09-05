@@ -1,7 +1,7 @@
 /**
  * @author Michallis Pashidis
  */
-import {LocalConnection} from "../client/Connection";
+import {LocalConnection, LocalAuthConnection} from "../client/Connection";
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 
 interface AbstractCore{
@@ -19,6 +19,7 @@ interface AbstractCore{
     activate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
 
     // sync
+    getUrl():String;
     infoBrowserSync():any;
 /*    verify(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     download(callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -42,7 +43,7 @@ const CORE_PUB_KEY = "/admin/certificate";
 
 class CoreService implements AbstractCore{
     // constructor
-    constructor(private url:string,private connection:LocalConnection) {}
+    constructor(private url:string,private connection:LocalAuthConnection) {}
 
     // async
     public info(callback:(error:CoreExceptions.RestException, data:any)=>void) {this.connection.get(this.url + CORE_INFO,callback);}
@@ -94,6 +95,7 @@ class CoreService implements AbstractCore{
 
     // sync
     public infoBrowserSync(){return this.platformInfo();}
+    public getUrl(){return this.url;}
 
     // private methods
     private platformInfo():any{
