@@ -103,7 +103,14 @@ class GCLClient {
                 self.dsClient.register(info,uuid,function(err,activationResponse){
                     if(err) return;
                     GCLConfig.Instance.jwt = activationResponse.token;
-                    self.core().activate(function(err,data){console.log(JSON.stringify(data)); return;})
+                    self.core().activate(function(err,data){
+                        if(err)return;//will try again upon next sync
+                        //sync
+                        info.activated = true;
+                        self.dsClient.sync(info,uuid,function(err,syncResponse){
+                           return; //ignore response
+                        });
+                    })
                 });
             }else {
                 //we need to synchronize the device
@@ -115,18 +122,6 @@ class GCLClient {
                 });
             }
         });
-    }
-
-    private syncDevice(uuid){
-        //get device from DS
-        //this.dsClient.getDevice()
-        //if activated && uuid registered => sync
-        //if activated && uuid unregistered => put
-    }
-
-    private registerDevice(uuid){
-        //if not activated && uuid unregistered => put
-        //if not activated && uuid registered => sync
     }
 
     // get core services

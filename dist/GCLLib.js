@@ -131,7 +131,14 @@ var GCLLib =
 	                    if (err)
 	                        return;
 	                    GCLConfig_1.GCLConfig.Instance.jwt = activationResponse.token;
-	                    self.core().activate(function (err, data) { console.log(JSON.stringify(data)); return; });
+	                    self.core().activate(function (err, data) {
+	                        if (err)
+	                            return;
+	                        info.activated = true;
+	                        self.dsClient.sync(info, uuid, function (err, syncResponse) {
+	                            return;
+	                        });
+	                    });
 	                });
 	            }
 	            else {
