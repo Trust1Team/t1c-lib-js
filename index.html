@@ -241,8 +241,8 @@
         gclConfig.apiKey = "b644bdc6-74d8-4ee2-9ce5-347d5dc14cb5"; //test apikey rate limited
         gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
         //gclConfig.gclUrl = "http://localhost:10080/v1"; //override config for local dev
-        gclConfig.dsUrl = "https://accapim.t1t.be:443/trust1team/gclds/v1";
-        //gclConfig.dsUrl = "http://localhost:8080/gcl-ds-web/v1";
+        //gclConfig.dsUrl = "https://accapim.t1t.be:443/trust1team/gclds/v1";
+        gclConfig.dsUrl = "http://localhost:8080/gcl-ds-web/v1";
         gclConfig.allowAutoUpdate = true;
         gclConfig.implicitDownload = false;
         var connector = new GCLLib.GCLClient(gclConfig);
