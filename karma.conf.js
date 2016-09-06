@@ -6,7 +6,6 @@ module.exports = function (config) {
         frameworks: ['mocha', 'chai', 'sinon'],
         files: [
             'node_modules/jquery/dist/jquery.js',
-            'node_modules/jquery/dist/jquery.js',
             'src/test/**/*.ts'
         ],
         exclude: [
@@ -23,7 +22,7 @@ module.exports = function (config) {
         colors: true,
         logLevel: config.LOG_INFO,
         autoWatch: true,
-        browsers: ['PhantomJS'],
+        browsers: ['Chrome','Opera','IE','Safari'],
         singleRun: false,
         concurrency: Infinity
     })
