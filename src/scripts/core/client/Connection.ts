@@ -9,9 +9,9 @@ import * as CoreExceptions from "../exceptions/CoreExceptions";
 import {GCLConfig} from "../GCLConfig";
 
 interface Connection {
-    //get(url:string, callback:(error:CoreExceptions.RestException, data:any, queryParams?:any) => void);
-    get(url:string, callback:(error:any, data:any, queryParams?:any) => void);
-    post(url:string, body:any, callback:(error:CoreExceptions.RestException, data:any) => void);
+    get(url:string, callback:(error:any, data:any) => void, queryParams?:any);
+    post(url:string, body:any, callback:(error:any, data:any) => void);
+    put(url:string, body:any, callback:(error:any, data:any) => void);
 }
 
 class LocalAuthConnection implements Connection {
@@ -26,11 +26,10 @@ class LocalAuthConnection implements Connection {
             data: queryParams,
             headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt), 'Accept-Language':'en-US' },
             success: function(successResponse,status,jqXHR) {
-                console.log(JSON.stringify(jqXHR));
                 return callback(null,successResponse);
             },
-            error: function(errorResponse,status,jqXHR) {
-                return callback(errorResponse,null);
+            error: function(jqXHR,textStatus,errorThrown) {
+                return callback(jqXHR,null);
             }
         });
     }
@@ -191,4 +190,4 @@ class RemoteConnection implements Connection {
     }
 }
 
-export {LocalConnection,LocalAuthConnection,RemoteConnection}
+export {LocalConnection,LocalAuthConnection,RemoteConnection,Connection}

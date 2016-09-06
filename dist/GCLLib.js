@@ -438,7 +438,12 @@ var GCLLib =
 	        this.url = url;
 	        this.connection = connection;
 	    }
-	    CoreService.prototype.info = function (callback) { this.connection.get(this.url + CORE_INFO, callback); };
+	    CoreService.prototype.info = function (callback) {
+	        console.log("test data:" + this.url);
+	        console.log("test data:" + CORE_INFO);
+	        console.log("test data:" + JSON.stringify(this.connection));
+	        this.connection.get(this.url + CORE_INFO, callback);
+	    };
 	    CoreService.prototype.readers = function (callback) { this.connection.get(this.url + CORE_READERS, callback); };
 	    CoreService.prototype.readersCardAvailable = function (callback) { this.connection.get(this.url + CORE_READERS, callback, FILTER_CARD_INSERTED + 'true'); };
 	    CoreService.prototype.readersCardsUnavailable = function (callback) { this.connection.get(this.url + CORE_READERS, callback, FILTER_CARD_INSERTED + 'false'); };
@@ -458,46 +463,6 @@ var GCLLib =
 	        var maxSeconds = secondsToPollCard;
 	        var self = this;
 	        console.debug("start poll cards");
-	        readerTimeout(callback, connectReaderCb, insertCardCb, cardTimeoutCb);
-	        function readerTimeout(cb, crcb, iccb, ctcb) {
-	            var selfTimeout = this;
-	            setTimeout(function () {
-	                console.debug("seconds left:", maxSeconds);
-	                --maxSeconds;
-	                self.readers(function (error, data) {
-	                    if (error) {
-	                        console.debug("Waiting...");
-	                        crcb();
-	                        readerTimeout(cb, crcb, iccb, ctcb);
-	                    }
-	                    ;
-	                    if (maxSeconds == 0) {
-	                        return ctcb();
-	                    }
-	                    else if (data.data.length === 0) {
-	                        console.debug("Waiting...");
-	                        crcb();
-	                        readerTimeout(cb, crcb, iccb, ctcb);
-	                    }
-	                    else {
-	                        console.debug("readerCount:", data.data.length);
-	                        var reader = self.checkReadersForCardObject(data.data);
-	                        if (reader) {
-	                            var response = {};
-	                            response.data = reader;
-	                            response.success = true;
-	                            return cb(null, response);
-	                        }
-	                        else {
-	                            console.debug("Insert card");
-	                            iccb();
-	                            readerTimeout(cb, crcb, iccb, ctcb);
-	                        }
-	                    }
-	                });
-	            }, 1000);
-	        }
-	        ;
 	    };
 	    CoreService.prototype.checkReadersForCardObject = function (readers) {
 	        if (readers && readers.length > 0) {
