@@ -10828,6 +10828,7 @@ var GCLLib =
 	"use strict";
 	var GCLConfig_1 = __webpack_require__(1);
 	var SEPARATOR = "/";
+	var QP_APIKEY = "?apikey=";
 	var SECURITY = "/security";
 	var SYS_INFO = "/system/status";
 	var SECURITY_JWT_ISSUE = SECURITY + "/jwt/issue";
@@ -10892,8 +10893,7 @@ var GCLLib =
 	            if (err)
 	                return callback(err, null);
 	            var _res = {};
-	            console.log(JSON.stringify(data));
-	            _res.url = GCLConfig_1.GCLConfig.Instance.dsUrl + data.path;
+	            _res.url = GCLConfig_1.GCLConfig.Instance.dsUrl + data.path + QP_APIKEY + GCLConfig_1.GCLConfig.Instance.apiKey;
 	            return callback(null, _res);
 	        });
 	    };

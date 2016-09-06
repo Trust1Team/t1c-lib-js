@@ -19,6 +19,7 @@ interface AbstractDSClient{
 }
 
 const SEPARATOR = "/";
+const QP_APIKEY = "?apikey=";
 const SECURITY = "/security";
 const SYS_INFO = "/system/status";
 const SECURITY_JWT_ISSUE = SECURITY + "/jwt/issue";
@@ -82,7 +83,7 @@ class DSClient implements AbstractDSClient{
         this.connection.post(this.url + DOWNLOAD, infoBrowser, function(err,data){
             if(err)return callback(err,null);
             let _res:any = {};
-            _res.url = GCLConfig.Instance.dsUrl+data.path;
+            _res.url = GCLConfig.Instance.dsUrl+data.path+QP_APIKEY+GCLConfig.Instance.apiKey;
             return callback(null,_res);
         });
     }
