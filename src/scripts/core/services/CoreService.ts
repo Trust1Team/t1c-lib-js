@@ -1,7 +1,7 @@
 /**
  * @author Michallis Pashidis
  */
-import {LocalConnection, LocalAuthConnection} from "../client/Connection";
+import {LocalConnection, LocalAuthConnection,Connection} from "../client/Connection";
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 
 interface AbstractCore{
@@ -50,13 +50,13 @@ const CORE_PUB_KEY = "/admin/certificate";
 
 class CoreService implements AbstractCore{
     // constructor
-    constructor(private url:string,private connection:LocalAuthConnection) {}
+    constructor(private url:string,private connection:Connection) {}
 
     // async
     public info(callback:(error:CoreExceptions.RestException, data:any)=>void) {this.connection.get(this.url + CORE_INFO,callback);}
-    public readers(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS,callback);}
-    public readersCardAvailable(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS,callback,FILTER_CARD_INSERTED + 'true');}
-    public readersCardsUnavailable(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS,callback,FILTER_CARD_INSERTED + 'false');}
+    public readers(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS, callback);}
+    public readersCardAvailable(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS, callback, FILTER_CARD_INSERTED + 'true');}
+    public readersCardsUnavailable(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS, callback, FILTER_CARD_INSERTED + 'false');}
     public reader(reader_id:string, callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS + "/" + reader_id, callback);}
     public plugins(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_PLUGINS,callback);}
     public activate(callback:(error:CoreExceptions.RestException, data:any)=>void) {this.connection.post(this.url + CORE_ACTIVATE,{},callback);}
