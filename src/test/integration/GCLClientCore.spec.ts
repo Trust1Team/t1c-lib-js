@@ -12,7 +12,7 @@ describe('GCLClient', () => {
         core = new CoreService(gclUnderTest,localAuthConnection);
     });
 
-    describe('GCL Core Service Expectations', () => {
+    describe('GCL Core Service', () => {
 
         it('should verify that a connection has been instantiated', () => {
             expect(localAuthConnection).not.undefined;
@@ -27,13 +27,11 @@ describe('GCLClient', () => {
         });
 
         it('should return information about the GCL client', (done) => {
-            //core.infoBrowserSync();
-            done();
-/*            core.readers(function(err,data){
-                console.log(JSON.stringify(err));
-                console.log(JSON.stringify(data));
+            core.info(function(err,data){
+                expect(err).to.be.null;
+                expect(data).exist;
                 done();
-            })*/
+            })
         });
     });
 });

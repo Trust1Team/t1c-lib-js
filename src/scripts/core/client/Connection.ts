@@ -4,9 +4,8 @@
  * @since 2016
  */
 
-import {Promise} from "es6-promise";
-import * as CoreExceptions from "../exceptions/CoreExceptions";
 import {GCLConfig} from "../GCLConfig";
+import * as $ from "jquery";
 
 interface Connection {
     get(url:string, callback:(error:any, data:any) => void, queryParams?:any);

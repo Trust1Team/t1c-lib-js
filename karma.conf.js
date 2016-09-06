@@ -20,9 +20,9 @@ module.exports = function (config) {
         reporters: ['progress'],
         port: 9876,
         colors: true,
-        logLevel: config.LOG_ERROR,
+        logLevel: config.LOG_INFO,
         autoWatch: true,
-        browsers: ['PhantomJS'],
+        browsers: ['Chrome','Opera','IE','Safari'],
         singleRun: false,
         concurrency: Infinity
     })
