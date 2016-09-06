@@ -10888,7 +10888,14 @@ var GCLLib =
 	        this.connection.get(this.url + PUB_KEY, callback);
 	    };
 	    DSClient.prototype.downloadLink = function (infoBrowser, callback) {
-	        this.connection.post(this.url + DOWNLOAD, infoBrowser, callback);
+	        this.connection.post(this.url + DOWNLOAD, infoBrowser, function (err, data) {
+	            if (err)
+	                return callback(err, null);
+	            var _res = {};
+	            console.log(JSON.stringify(data));
+	            _res.url = GCLConfig_1.GCLConfig.Instance.dsUrl + data.path;
+	            return callback(null, _res);
+	        });
 	    };
 	    DSClient.prototype.register = function (info, device_id, callback) {
 	        var _req = {};
