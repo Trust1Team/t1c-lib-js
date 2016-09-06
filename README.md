@@ -1,5 +1,5 @@
 # Trust1Connector JavaScript Library
-[![][t1t-logo]][Trust1Team-url]
+[![][t1c-logo]][Trust1Connector-url]
 
 The Trust1Connector library (T1C-Lib), is a javascript library to communicate with the Trust1Connector. The library simplify the execution to the connector and works asynchronous.
 
@@ -125,5 +125,7 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 
 
 [Trust1Team-url]: http://trust1team.com
+[Trust1Connector-url]: http://www.trust1connector.com
 [t1t-logo]: http://imgur.com/lukAaxx.png
+[t1c-logo]: http://i.imgur.com/We0DIvj.png
 [jwt-up-doc]: https://trust1t.atlassian.net/wiki/pages/viewpage.action?pageId=74547210
