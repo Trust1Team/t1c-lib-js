@@ -363,8 +363,7 @@
         });
         $("#pollCard").on('click', function () {
             $("#information").empty();
-            var core = connector.core();
-            core.pollCardInserted(15,callback,function(){console.log('Please connect a reader')},
+            connector.core().pollCardInserted(20,callback,function(){console.log('Please connect a reader')},
                     function(){console.log("Please insert card")},
                     function(){console.log("Stop waiting for card, none found")}
             );
