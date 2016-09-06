@@ -62,6 +62,7 @@
         <button id="downloadgcl" type="button" class="btn btn-default btn-lg">Download GCL</button>
         <button id="getReaders" type="button" class="btn btn-default btn-lg">Readers</button>
         <button id="pollReaders" type="button" class="btn btn-default btn-lg">Poll Readers</button>
+        <button id="pollCard" type="button" class="btn btn-default btn-lg">Poll Cards</button>
         <button id="getReadersAvailable" type="button" class="btn btn-default btn-lg">Readers (card available)</button>
         <button id="getReadersUnavailable" type="button" class="btn btn-default btn-lg">Readers (card unavailable)</button>
         <button id="getKey" type="button" class="btn btn-default btn-lg">Get API key</button>
@@ -69,7 +70,6 @@
         <button id="getPubKeyGCL" type="button" class="btn btn-default btn-lg">Get Public Key (GCL)</button>
         <button id="getJWT" type="button" class="btn btn-default btn-lg">Get JWT</button>
         <button id="getJWTRefresh" type="button" class="btn btn-default btn-lg">Refresh JWT</button>
-        <button id="sendJWT" type="button" class="btn btn-default btn-lg">Send JWT to GCL</button>
         <button id="getPlugins" type="button" class="btn btn-default btn-lg">Get Plugins</button>
         <hr />
         <button id="beidRn" type="button" class="btn btn-default btn-lg">BeID Rn Data</button>
@@ -238,7 +238,7 @@
 <script type="text/javascript">
     (function ($) {
         var gclConfig = new GCLLib.GCLConfig();
-        gclConfig.apiKey = "b644bdc6-74d8-4ee2-9ce5-347d5dc14cb5"; //test apikey rate limited
+        gclConfig.apiKey = "2cc27598-2af7-48af-a2df-c7352e5368ff"; //test apikey rate limited
         gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
         //gclConfig.gclUrl = "http://localhost:10080/v1"; //override config for local dev
         gclConfig.dsUrl = "https://accapim.t1t.be:443/trust1team/gclds/v1";
@@ -358,7 +358,14 @@
         $("#pollReaders").on('click', function () {
             $("#information").empty();
             var core = connector.core();
-            core.pollReaders(15,callback);
+            core.pollReaders(15,callback,function(){console.log('Please connect a reader')},function(){console.log('Stop waiting for readers, none found')});
+        });
+        $("#pollCard").on('click', function () {
+            $("#information").empty();
+            connector.core().pollCardInserted(20,callback,function(){console.log('Please connect a reader')},
+                    function(){console.log("Please insert card")},
+                    function(){console.log("Stop waiting for card, none found")}
+            );
         });
         $("#getReadersAvailable").on('click', function () {
             $("#information").empty();
@@ -397,12 +404,6 @@
             $("#error").empty();
             $("#validationError").empty();
             connector.ds().refreshJWT(callback);
-        });
-        $("#sendJWT").on('click', function () {
-            $("#information").empty();
-            $("#error").empty();
-            $("#validationError").empty();
-            connector.core().activate(callback);
         });
         $("#getPlugins").on('click', function () {
             $("#information").empty();

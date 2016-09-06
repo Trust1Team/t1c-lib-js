@@ -1,5 +1,5 @@
 /**
- * @author Maarten Casteels
+ * @author Michallis
  * @since 2016
  */
 import {EidBe} from "./eid/be/EidBe";
