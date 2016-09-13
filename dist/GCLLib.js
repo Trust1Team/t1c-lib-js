@@ -402,9 +402,10 @@ var GCLLib =
 
 	"use strict";
 	var SEPARATOR = "/";
+	var QUERY_PARAM_FILTER = "filter=";
 	var PLUGIN_CONTEXT_EMV = "/plugins/emv";
 	var EMV_PAN = "/pan";
-	var EMV_VERIFY = "/verify-pin";
+	var EMV_VERIFY_PIN = "/verify-pin";
 	var EMV = (function () {
 	    function EMV(url, connection, reader_id) {
 	        this.url = url;
@@ -412,8 +413,21 @@ var GCLLib =
 	        this.reader_id = reader_id;
 	        this.url = url + PLUGIN_CONTEXT_EMV;
 	    }
-	    EMV.prototype.resolvedReaderURI = function () {
-	        return this.url + SEPARATOR + this.reader_id;
+	    EMV.prototype.resolvedReaderURI = function () { return this.url + SEPARATOR + this.reader_id; };
+	    EMV.prototype.allData = function (filters, callback) {
+	        if (filters && filters.length > 0) {
+	            this.connection.get(this.resolvedReaderURI(), callback, QUERY_PARAM_FILTER + filters.join(","));
+	        }
+	        else {
+	            this.connection.get(this.resolvedReaderURI(), callback);
+	        }
+	    };
+	    EMV.prototype.verifyPin = function (body, callback) {
+	        var _req = {};
+	        if (body.pin) {
+	            _req.pin = body.pin;
+	        }
+	        this.connection.post(this.resolvedReaderURI() + EMV_VERIFY_PIN, _req, callback);
 	    };
 	    EMV.prototype.pan = function (callback) { this.connection.get(this.resolvedReaderURI() + EMV_PAN, callback); };
 	    return EMV;

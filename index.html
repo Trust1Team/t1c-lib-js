@@ -124,6 +124,13 @@
     <h3>EMV Card</h3>
     <div>
         <button id="emvPan" type="button" class="btn btn-default btn-lg">EMV - Get PAN</button>
+        <button id="emvVerifyPin" type="button" class="btn btn-default btn-lg">EMV - Verify PIN</button>
+        <button id="emvAllData" type="button" class="btn btn-default btn-lg">EMV - Get All Data</button>
+        <div class="form-group">
+            <input type="checkbox" name="type" value="rn" id="emvPanCheck" />
+            <label for="emvPanCheck"><span class="glyphicon"></span> PAN</label>
+        </div>
+        <hr />
     </div>
     <pre id="information"></pre>
     <pre id="error"></pre>
@@ -146,6 +153,32 @@
                         <pre id="validationError" hidden="true"></pre>
                     </div>
                     <button id="buttonValidate" type="button" class="btn btn-default btn-lg">Validate</button>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="pinModalEMV" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Validate PIN</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="pswEMV" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <pre id="validationInfoEMV" hidden="true"></pre>
+                        <pre id="validationErrorEMV" hidden="true"></pre>
+                    </div>
+                    <button id="buttonValidateEMV" type="button" class="btn btn-default btn-lg">Validate</button>
                 </div>
                 <div class="modal-footer">
 
@@ -293,6 +326,24 @@
             else{
                 $("#validationInfo").append(JSON.stringify(data, null, '  '));
                 $("#validationInfo").show();
+            }
+        }
+
+        function validationCallbackEMV(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#validationErrorEMV").empty();
+            $("#validationInfoEMV").empty();
+            $("#validationErrorEMV").hide();
+            $("#validationInfoEMV").hide();
+
+            if(err){
+                $("#validationErrorEMV").append(JSON.stringify(err, null, '  '));
+                $("#validationErrorEMV").show();
+            }
+            else{
+                $("#validationInfoEMV").append(JSON.stringify(data, null, '  '));
+                $("#validationInfoEMV").show();
             }
         }
 
@@ -561,6 +612,29 @@
             $("#information").empty();
             var emv = connector.emv($("#selected_reader").text());
             emv.pan(callback);
+        });
+        $("#emvVerifyPin").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            $("#validationInformation").empty();
+            $("#validationInformation").hide();
+            $("#validationError").empty();
+            $("#validationError").hide();
+            $("#pinModalEMV").modal('toggle');
+        });
+
+        $("#buttonValidateEMV").on('click', function () {
+            var _body={};
+            _body.pin = $("#pswEMV").val();
+            connector.emv($("#selected_reader").text()).verifyPin(_body, validationCallbackEMV);
+        });
+
+        $("#emvAllData").on('click', function () {
+            $("#information").empty();
+            var emv = connector.emv($("#selected_reader").text());
+            var filter = [];
+            if($("#emvPanCheck").is(":checked"))filter.push($("#emvPanCheck").val());
+            emv.allData(filter,callback);
         });
     })(window.jQuery);
 </script>
