@@ -3,6 +3,8 @@
  */
 import {LocalConnection, LocalAuthConnection,Connection} from "../client/Connection";
 import * as CoreExceptions from "../exceptions/CoreExceptions";
+declare var require: any;
+var platform = require('platform');
 
 interface AbstractCore{
     // async
