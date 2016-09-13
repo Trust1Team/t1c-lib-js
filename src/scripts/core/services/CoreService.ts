@@ -102,7 +102,7 @@ class CoreService implements AbstractCore{
                         }
                     }
                 });
-            }, 500);
+            }, 1000);
         };
     }
 
@@ -149,7 +149,7 @@ class CoreService implements AbstractCore{
                         return cb(null,data);
                     }
                 });
-            }, 500);
+            }, 1000);
         };
     }
 
