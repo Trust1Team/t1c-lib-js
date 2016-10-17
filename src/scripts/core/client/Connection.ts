@@ -37,6 +37,7 @@ class LocalAuthConnection implements Connection {
         $.ajax({
             url: url,
             type: 'POST',
+            crossDomain: true,
             data: JSON.stringify(body),
             contentType: 'application/json; charset=utf-8',
             processData: false,
@@ -56,6 +57,7 @@ class LocalAuthConnection implements Connection {
         $.ajax({
             url: url,
             type: 'PUT',
+            crossDomain: true,
             data: JSON.stringify(body),
             contentType: 'application/json; charset=utf-8',
             processData: false,
@@ -95,6 +97,7 @@ class LocalConnection implements Connection {
         $.ajax({
             url: url,
             type: 'POST',
+            crossDomain: true,
             data: JSON.stringify(body),
             contentType: 'application/json; charset=utf-8',
             processData: false,
@@ -114,6 +117,7 @@ class LocalConnection implements Connection {
         $.ajax({
             url: url,
             type: 'PUT',
+            crossDomain: true,
             data: JSON.stringify(body),
             contentType: 'application/json; charset=utf-8',
             processData: false,
@@ -154,6 +158,7 @@ class RemoteConnection implements Connection {
         $.ajax({
             url: url,
             type: 'POST',
+            crossDomain: true,
             data: JSON.stringify(body),
             contentType: 'application/json; charset=utf-8',
             processData: false,
@@ -173,6 +178,7 @@ class RemoteConnection implements Connection {
         $.ajax({
             url: url,
             type: 'PUT',
+            crossDomain: true,
             data: JSON.stringify(body),
             contentType: 'application/json; charset=utf-8',
             processData: false,
