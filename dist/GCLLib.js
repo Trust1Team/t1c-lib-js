@@ -1763,6 +1763,7 @@ var GCLLib =
 	        $.ajax({
 	            url: url,
 	            type: 'POST',
+	            crossDomain: true,
 	            data: JSON.stringify(body),
 	            contentType: 'application/json; charset=utf-8',
 	            processData: false,
@@ -1781,6 +1782,7 @@ var GCLLib =
 	        $.ajax({
 	            url: url,
 	            type: 'PUT',
+	            crossDomain: true,
 	            data: JSON.stringify(body),
 	            contentType: 'application/json; charset=utf-8',
 	            processData: false,
@@ -1820,6 +1822,7 @@ var GCLLib =
 	        $.ajax({
 	            url: url,
 	            type: 'POST',
+	            crossDomain: true,
 	            data: JSON.stringify(body),
 	            contentType: 'application/json; charset=utf-8',
 	            processData: false,
@@ -1838,6 +1841,7 @@ var GCLLib =
 	        $.ajax({
 	            url: url,
 	            type: 'PUT',
+	            crossDomain: true,
 	            data: JSON.stringify(body),
 	            contentType: 'application/json; charset=utf-8',
 	            processData: false,
@@ -1877,6 +1881,7 @@ var GCLLib =
 	        $.ajax({
 	            url: url,
 	            type: 'POST',
+	            crossDomain: true,
 	            data: JSON.stringify(body),
 	            contentType: 'application/json; charset=utf-8',
 	            processData: false,
@@ -1895,6 +1900,7 @@ var GCLLib =
 	        $.ajax({
 	            url: url,
 	            type: 'PUT',
+	            crossDomain: true,
 	            data: JSON.stringify(body),
 	            contentType: 'application/json; charset=utf-8',
 	            processData: false,
