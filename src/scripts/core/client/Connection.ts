@@ -18,6 +18,7 @@ class LocalAuthConnection implements Connection {
 
     // using Callback
     public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'GET',
@@ -34,10 +35,10 @@ class LocalAuthConnection implements Connection {
     }
 
     public post(url:string, body:any, callback:(error:any, data:any) => void):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'POST',
-            crossDomain: true,
             data: JSON.stringify(body),
             contentType: 'application/json; charset=utf-8',
             processData: false,
@@ -54,10 +55,10 @@ class LocalAuthConnection implements Connection {
     }
 
     public put(url:string, body:any, callback:(error:any, data:any) => void):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'PUT',
-            crossDomain: true,
             data: JSON.stringify(body),
             contentType: 'application/json; charset=utf-8',
             processData: false,
@@ -78,6 +79,7 @@ class LocalConnection implements Connection {
     constructor() {}
 
     public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'GET',
@@ -94,10 +96,10 @@ class LocalConnection implements Connection {
     }
 
     public post(url:string, body:any, callback:(error:any, data:any) => void):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'POST',
-            crossDomain: true,
             data: JSON.stringify(body),
             contentType: 'application/json; charset=utf-8',
             processData: false,
@@ -114,10 +116,10 @@ class LocalConnection implements Connection {
     }
 
     public put(url:string, body:any, callback:(error:any, data:any) => void):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'PUT',
-            crossDomain: true,
             data: JSON.stringify(body),
             contentType: 'application/json; charset=utf-8',
             processData: false,
@@ -139,6 +141,7 @@ class RemoteConnection implements Connection {
 
     // using Callback
     public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'GET',
@@ -155,10 +158,10 @@ class RemoteConnection implements Connection {
     }
 
     public post(url:string, body:any, callback:(error:any, data:any) => void):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'POST',
-            crossDomain: true,
             data: JSON.stringify(body),
             contentType: 'application/json; charset=utf-8',
             processData: false,
@@ -175,10 +178,10 @@ class RemoteConnection implements Connection {
     }
 
     public put(url:string, body:any, callback:(error:any, data:any) => void):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'PUT',
-            crossDomain: true,
             data: JSON.stringify(body),
             contentType: 'application/json; charset=utf-8',
             processData: false,
