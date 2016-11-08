@@ -7,8 +7,8 @@ import * as $ from "jquery";
 
 const defaultGclUrl = "https://localhost:10433/v1";
 const defaultDSUrl = "https://accapim.t1t.be:443";
-//const defaultDSContextPath = "/trust1team/gclds/v1";
-const defaultDSContextPath = "/gcl-ds-web/v1"; //<==== for dev
+const defaultDSContextPath = "/trust1team/gclds/v1";
+//const defaultDSContextPath = "/gcl-ds-web/v1"; //<==== for local dev
 const fileDownloadUrlPostfix = "/trust1team/signbox-file/v1";
 const defaultAllowAutoUpdate = true;
 const defaultImplicitDownload = false;
