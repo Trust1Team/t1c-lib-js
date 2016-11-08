@@ -87,6 +87,7 @@ var GCLLib =
 	        resolvedCfg.client_secret = cfg.client_secret;
 	        resolvedCfg.jwt = cfg.jwt;
 	        resolvedCfg.dsUrl = cfg.dsUrl;
+	        resolvedCfg.dsFilDownloadUrl = cfg.dsUrl;
 	        resolvedCfg.gclUrl = cfg.gclUrl;
 	        resolvedCfg.implicitDownload = cfg.implicitDownload;
 	        return resolvedCfg;
@@ -182,7 +183,7 @@ var GCLLib =
 	"use strict";
 	var defaultGclUrl = "https://localhost:10433/v1";
 	var defaultDSUrl = "https://accapim.t1t.be:443";
-	var defaultDSContextPath = "/gcl-ds-web";
+	var defaultDSContextPath = "/gcl-ds-web/v1";
 	var fileDownloadUrlPostfix = "/trust1team/signbox-file/v1";
 	var defaultAllowAutoUpdate = true;
 	var defaultImplicitDownload = false;
@@ -191,6 +192,7 @@ var GCLLib =
 	        this._gclUrl = gclUrl || defaultGclUrl;
 	        this._dsFilDownloadUrl = (dsUrl || defaultDSUrl);
 	        this._dsUrl = (dsUrl || defaultDSUrl);
+	        this._dsUrlBase = (dsUrl || defaultDSUrl);
 	        this._apiKey = apiKey || '';
 	        this._jwt = 'none';
 	        this._allowAutoUpdate = allowAutoUpdate || defaultAllowAutoUpdate;
@@ -202,6 +204,7 @@ var GCLLib =
 	                this.instance = new GCLConfig();
 	                this.instance.gclUrl = defaultGclUrl;
 	                this.instance.dsUrl = defaultDSUrl + defaultDSContextPath;
+	                this.instance.dsUrlBase = defaultDSUrl;
 	                this.instance.dsFilDownloadUrl = defaultDSUrl + fileDownloadUrlPostfix;
 	                this.instance.apiKey = '';
 	                this.instance.allowAutoUpdate = defaultAllowAutoUpdate;
@@ -232,6 +235,7 @@ var GCLLib =
 	            }
 	            else {
 	                this._dsUrl = value + defaultDSContextPath;
+	                this.dsUrlBase = value;
 	            }
 	        },
 	        enumerable: true,
@@ -302,12 +306,22 @@ var GCLLib =
 	            return this._dsFilDownloadUrl;
 	        },
 	        set: function (value) {
-	            if (strEndsWith(value, defaultDSContextPath)) {
+	            if (strEndsWith(value, fileDownloadUrlPostfix)) {
 	                this._dsFilDownloadUrl = value;
 	            }
 	            else {
 	                this._dsFilDownloadUrl = value + fileDownloadUrlPostfix;
 	            }
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "dsUrlBase", {
+	        get: function () {
+	            return this._dsUrlBase;
+	        },
+	        set: function (value) {
+	            this._dsUrlBase = value;
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -12102,7 +12116,7 @@ var GCLLib =
 	            if (err)
 	                return callback(err, null);
 	            var _res = {};
-	            _res.url = GCLConfig_1.GCLConfig.Instance.dsUrl + data.path + QP_APIKEY + GCLConfig_1.GCLConfig.Instance.apiKey;
+	            _res.url = GCLConfig_1.GCLConfig.Instance.dsUrlBase + data.path + QP_APIKEY + GCLConfig_1.GCLConfig.Instance.apiKey;
 	            return callback(null, _res);
 	        });
 	    };

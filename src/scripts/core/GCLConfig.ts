@@ -9,7 +9,7 @@ const defaultGclUrl = "https://localhost:10433/v1";
 const defaultDSUrl = "https://accapim.t1t.be:443";
 //const defaultDSContextPath = "/trust1team/gclds/v1";
 ///gcl-ds-web/
-const defaultDSContextPath = "/gcl-ds-web";
+const defaultDSContextPath = "/gcl-ds-web/v1";
 const fileDownloadUrlPostfix = "/trust1team/signbox-file/v1";
 const defaultAllowAutoUpdate = true;
 const defaultImplicitDownload = false;
@@ -17,7 +17,7 @@ const defaultImplicitDownload = false;
 class GCLConfig {
     //singleton pattern
     private static instance:GCLConfig;
-
+    private _dsUrlBase;
     private _gclUrl:string;
     private _dsFilDownloadUrl:string;
     private _dsUrl:string;
@@ -33,6 +33,7 @@ class GCLConfig {
         this._gclUrl = gclUrl||defaultGclUrl;
         this._dsFilDownloadUrl = (dsUrl||defaultDSUrl);
         this._dsUrl = (dsUrl||defaultDSUrl);
+        this._dsUrlBase = (dsUrl||defaultDSUrl);
         this._apiKey = apiKey||'';
         this._jwt = 'none';
         this._allowAutoUpdate = allowAutoUpdate||defaultAllowAutoUpdate;
@@ -45,6 +46,7 @@ class GCLConfig {
             this.instance = new GCLConfig();
             this.instance.gclUrl = defaultGclUrl;
             this.instance.dsUrl = defaultDSUrl + defaultDSContextPath;
+            this.instance.dsUrlBase = defaultDSUrl;
             this.instance.dsFilDownloadUrl = defaultDSUrl + fileDownloadUrlPostfix;
             this.instance.apiKey = '';
             this.instance.allowAutoUpdate = defaultAllowAutoUpdate;
@@ -70,6 +72,7 @@ class GCLConfig {
             this._dsUrl = value;
         }else {
             this._dsUrl = value + defaultDSContextPath;
+            this.dsUrlBase = value;
         }
     }
 
@@ -127,11 +130,19 @@ class GCLConfig {
     }
 
     set dsFilDownloadUrl(value:string) {
-        if(strEndsWith(value,defaultDSContextPath)){
+        if(strEndsWith(value,fileDownloadUrlPostfix)){
             this._dsFilDownloadUrl = value;
         }else{
             this._dsFilDownloadUrl = value + fileDownloadUrlPostfix;
         }
+    }
+
+    get dsUrlBase() {
+        return this._dsUrlBase;
+    }
+
+    set dsUrlBase(value) {
+        this._dsUrlBase = value;
     }
 }
 
