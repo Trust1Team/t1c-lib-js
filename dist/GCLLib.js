@@ -183,7 +183,7 @@ var GCLLib =
 	"use strict";
 	var defaultGclUrl = "https://localhost:10433/v1";
 	var defaultDSUrl = "https://accapim.t1t.be:443";
-	var defaultDSContextPath = "/trust1team/gclds/v1";
+	var defaultDSContextPath = "/gcl-ds-web/v1";
 	var fileDownloadUrlPostfix = "/trust1team/signbox-file/v1";
 	var defaultAllowAutoUpdate = true;
 	var defaultImplicitDownload = false;
@@ -191,7 +191,8 @@ var GCLLib =
 	    function GCLConfig(gclUrl, dsUrl, apiKey, allowAutoUpdate, implicitDownload) {
 	        this._gclUrl = gclUrl || defaultGclUrl;
 	        this._dsFilDownloadUrl = (dsUrl || defaultDSUrl);
-	        this._dsUrl = (dsUrl || defaultDSUrl);
+	        this._dsUrl = (dsUrl || defaultDSUrl) + defaultDSContextPath;
+	        this._dsFilDownloadUrl = (dsUrl || defaultDSUrl) + fileDownloadUrlPostfix;
 	        this._dsUrlBase = (dsUrl || defaultDSUrl);
 	        this._apiKey = apiKey || '';
 	        this._jwt = 'none';
