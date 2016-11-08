@@ -18,6 +18,7 @@ class LocalAuthConnection implements Connection {
 
     // using Callback
     public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'GET',
@@ -34,6 +35,7 @@ class LocalAuthConnection implements Connection {
     }
 
     public post(url:string, body:any, callback:(error:any, data:any) => void):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'POST',
@@ -53,6 +55,7 @@ class LocalAuthConnection implements Connection {
     }
 
     public put(url:string, body:any, callback:(error:any, data:any) => void):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'PUT',
@@ -76,6 +79,7 @@ class LocalConnection implements Connection {
     constructor() {}
 
     public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'GET',
@@ -92,6 +96,7 @@ class LocalConnection implements Connection {
     }
 
     public post(url:string, body:any, callback:(error:any, data:any) => void):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'POST',
@@ -111,6 +116,7 @@ class LocalConnection implements Connection {
     }
 
     public put(url:string, body:any, callback:(error:any, data:any) => void):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'PUT',
@@ -135,6 +141,7 @@ class RemoteConnection implements Connection {
 
     // using Callback
     public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'GET',
@@ -151,6 +158,7 @@ class RemoteConnection implements Connection {
     }
 
     public post(url:string, body:any, callback:(error:any, data:any) => void):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'POST',
@@ -170,6 +178,7 @@ class RemoteConnection implements Connection {
     }
 
     public put(url:string, body:any, callback:(error:any, data:any) => void):void{
+    	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'PUT',

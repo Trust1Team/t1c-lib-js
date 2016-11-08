@@ -55,6 +55,7 @@ class GCLClient {
         resolvedCfg.client_secret = cfg.client_secret;
         resolvedCfg.jwt = cfg.jwt;
         resolvedCfg.dsUrl = cfg.dsUrl;
+        resolvedCfg.dsFilDownloadUrl = cfg.dsUrl;
         resolvedCfg.gclUrl = cfg.gclUrl;
         resolvedCfg.implicitDownload = cfg.implicitDownload;
         return resolvedCfg;
