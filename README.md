@@ -68,10 +68,7 @@ Setup Typescript compiler options
 
 ## Distribution ##
 Registered bower:
-`bower register trust1connector git://github.com/Trust1Team/t1c-lib-js.git`
-
-## Documentation ##
-[T1C-JS Online Documentation](https://www.gitbook.com/book/t1t/t1c-js-guide/details) 
+`bower register trust1connector git://github.com/Trust1Team/t1c-lib-js.git
 
 ## License
 

@@ -3,8 +3,14 @@
  * @author Michallis Pashidis
  * @since 2016
  */
+import * as $ from "jquery";
+
 const defaultGclUrl = "https://localhost:10433/v1";
-const defaultDSUrl = "https://accapim.t1t.be:443/trust1team/gclds/v1";
+const defaultDSUrl = "https://accapim.t1t.be:443";
+//const defaultDSContextPath = "/trust1team/gclds/v1";
+///gcl-ds-web/
+const defaultDSContextPath = "/gcl-ds-web";
+const fileDownloadUrlPostfix = "/trust1team/signbox-file/v1";
 const defaultAllowAutoUpdate = true;
 const defaultImplicitDownload = false;
 
@@ -13,6 +19,7 @@ class GCLConfig {
     private static instance:GCLConfig;
 
     private _gclUrl:string;
+    private _dsFilDownloadUrl:string;
     private _dsUrl:string;
     private _apiKey:string;
     private _client_id:string;
@@ -24,7 +31,8 @@ class GCLConfig {
     // constructor for DTO
     constructor(gclUrl?:string, dsUrl?:string, apiKey?:string, allowAutoUpdate?:boolean, implicitDownload?:boolean){
         this._gclUrl = gclUrl||defaultGclUrl;
-        this._dsUrl = dsUrl||defaultDSUrl;
+        this._dsFilDownloadUrl = (dsUrl||defaultDSUrl);
+        this._dsUrl = (dsUrl||defaultDSUrl);
         this._apiKey = apiKey||'';
         this._jwt = 'none';
         this._allowAutoUpdate = allowAutoUpdate||defaultAllowAutoUpdate;
@@ -36,7 +44,8 @@ class GCLConfig {
         if (this.instance === null || this.instance === undefined) {
             this.instance = new GCLConfig();
             this.instance.gclUrl = defaultGclUrl;
-            this.instance.dsUrl = defaultDSUrl;
+            this.instance.dsUrl = defaultDSUrl + defaultDSContextPath;
+            this.instance.dsFilDownloadUrl = defaultDSUrl + fileDownloadUrlPostfix;
             this.instance.apiKey = '';
             this.instance.allowAutoUpdate = defaultAllowAutoUpdate;
             this.instance.implicitDownload = false;
@@ -57,7 +66,11 @@ class GCLConfig {
     }
 
     set dsUrl(value:string) {
-        this._dsUrl = value;
+        if(strEndsWith(value,defaultDSContextPath)){
+            this._dsUrl = value;
+        }else {
+            this._dsUrl = value + defaultDSContextPath;
+        }
     }
 
     get apiKey():string {
@@ -107,6 +120,23 @@ class GCLConfig {
     set implicitDownload(value:boolean) {
         this._implicitDownload = value;
     }
+
+
+    get dsFilDownloadUrl():string {
+        return this._dsFilDownloadUrl;
+    }
+
+    set dsFilDownloadUrl(value:string) {
+        if(strEndsWith(value,defaultDSContextPath)){
+            this._dsFilDownloadUrl = value;
+        }else{
+            this._dsFilDownloadUrl = value + fileDownloadUrlPostfix;
+        }
+    }
+}
+
+function strEndsWith(str, suffix) {
+    return str.match(suffix+"$")==suffix;
 }
 
 export {GCLConfig}
