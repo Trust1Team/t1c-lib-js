@@ -12113,11 +12113,12 @@ var GCLLib =
 	        this.connection.get(this.url + PUB_KEY, callback);
 	    };
 	    DSClient.prototype.downloadLink = function (infoBrowser, callback) {
+	        var _dsuri = this.url;
 	        this.connection.post(this.url + DOWNLOAD, infoBrowser, function (err, data) {
 	            if (err)
 	                return callback(err, null);
 	            var _res = {};
-	            _res.url = GCLConfig_1.GCLConfig.Instance.dsUrlBase + data.path + QP_APIKEY + GCLConfig_1.GCLConfig.Instance.apiKey;
+	            _res.url = _dsuri + data.path + QP_APIKEY + GCLConfig_1.GCLConfig.Instance.apiKey;
 	            return callback(null, _res);
 	        });
 	    };
