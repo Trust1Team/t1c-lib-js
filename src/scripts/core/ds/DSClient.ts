@@ -80,10 +80,12 @@ class DSClient implements AbstractDSClient{
     }
 
     public downloadLink(infoBrowser, callback:(error:CoreExceptions.RestException, data:any)=>void):void {
+        let _dsuri = this.url;
         this.connection.post(this.url + DOWNLOAD, infoBrowser, function(err,data){
             if(err)return callback(err,null);
             let _res:any = {};
-            _res.url = GCLConfig.Instance.dsUrlBase+data.path+QP_APIKEY+GCLConfig.Instance.apiKey;
+            _res.url = _dsuri+data.path+QP_APIKEY+GCLConfig.Instance.apiKey;
+            //_res.url = GCLConfig.Instance.dsUrlBase+data.path+QP_APIKEY+GCLConfig.Instance.apiKey;
             return callback(null,_res);
         });
     }
