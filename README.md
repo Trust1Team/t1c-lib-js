@@ -108,9 +108,17 @@ You can be released from the requirements of the Affero General Public License
  source product...
 Irrespective of your choice of license, the T1T logo as depicted below may not be removed from this file, or from any software or other product or service to which it is applied, without the express prior written permission of Trust1Team sarl. The T1T logo is an EU Registered Trademark (n° 12943131).
 ```
+### Release Notes - Trust1Connector - Version js-0.9.7 ###
+## Story
 
-### Release Notes v0.9.3 ###
+*   [[T1C-423](https://trust1t.atlassian.net/browse/T1C-423)] - T1C-DS: Download of GCL artifacts through reverse proxy
+*   [[T1C-424](https://trust1t.atlassian.net/browse/T1C-424)] - Add support to download artifacts based on the API-key
+*   [[T1C-438](https://trust1t.atlassian.net/browse/T1C-438)] - Proxy URI not well resolved when executed in JS lib
 
+### Release Notes - Trust1Connector - Version js-0.9.6 ###
+## Story
+
+*   [[T1C-431](https://trust1t.atlassian.net/browse/T1C-431)] - Update JS lib to support reverse proxy for google bucket downloads
 
 ### Release Notes v0.9.2 ###
 ## Bug
