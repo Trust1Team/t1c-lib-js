@@ -62,12 +62,15 @@ var GCLLib =
 	        this.emv = function (reader_id) { return _this.cardFactory.createEmv(reader_id); };
 	        var self = this;
 	        this.cfg = this.resolveConfig(cfg);
-	        this.connection = new Connection_1.LocalConnection();
-	        this.authConnection = new Connection_1.LocalAuthConnection();
-	        this.remoteConnection = new Connection_1.RemoteConnection();
-	        this.cardFactory = new CardFactory_1.CardFactory(this.cfg.gclUrl, this.connection);
-	        this.coreService = new CoreService_1.CoreService(this.cfg.gclUrl, this.authConnection);
-	        this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.remoteConnection);
+	        this.connection = new Connection_1.LocalConnection(this.cfg);
+	        this.authConnection = new Connection_1.LocalAuthConnection(this.cfg);
+	        this.remoteConnection = new Connection_1.RemoteConnection(this.cfg);
+	        this.cardFactory = new CardFactory_1.CardFactory(this.cfg.gclUrl, this.connection, this.cfg);
+	        this.coreService = new CoreService_1.CoreService(this.cfg.gclUrl, this.authConnection, this.cfg);
+	        console.log("dsurl:" + this.cfg.dsUrl);
+	        console.log("dsurl base:" + this.cfg.dsUrlBase);
+	        console.log("dsurl file:" + this.cfg.dsFilDownloadUrl);
+	        this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg);
 	        if (this.cfg.implicitDownload && true) {
 	            this.implicitDownload();
 	        }
@@ -80,14 +83,11 @@ var GCLLib =
 	        });
 	    }
 	    GCLClient.prototype.resolveConfig = function (cfg) {
-	        var resolvedCfg = GCLConfig_1.GCLConfig.Instance;
-	        resolvedCfg.apiKey = cfg.apiKey;
+	        var resolvedCfg = new GCLConfig_1.GCLConfig(cfg.dsUrlBase, cfg.apiKey);
 	        resolvedCfg.allowAutoUpdate = cfg.allowAutoUpdate;
 	        resolvedCfg.client_id = cfg.client_id;
 	        resolvedCfg.client_secret = cfg.client_secret;
 	        resolvedCfg.jwt = cfg.jwt;
-	        resolvedCfg.dsUrl = cfg.dsUrl;
-	        resolvedCfg.dsFilDownloadUrl = cfg.dsUrl;
 	        resolvedCfg.gclUrl = cfg.gclUrl;
 	        resolvedCfg.implicitDownload = cfg.implicitDownload;
 	        return resolvedCfg;
@@ -113,6 +113,7 @@ var GCLLib =
 	    };
 	    GCLClient.prototype.registerAndActivate = function () {
 	        var self = this;
+	        var self_cfg = this.cfg;
 	        self.core().info(function (err, infoResponse) {
 	            if (err) {
 	                console.log(JSON.stringify(err));
@@ -131,7 +132,7 @@ var GCLLib =
 	                self.dsClient.register(info, uuid, function (err, activationResponse) {
 	                    if (err)
 	                        return;
-	                    GCLConfig_1.GCLConfig.Instance.jwt = activationResponse.token;
+	                    self_cfg.jwt = activationResponse.token;
 	                    self.core().activate(function (err, data) {
 	                        if (err)
 	                            return;
@@ -147,7 +148,7 @@ var GCLLib =
 	                self.dsClient.sync(info, uuid, function (err, activationResponse) {
 	                    if (err)
 	                        return;
-	                    GCLConfig_1.GCLConfig.Instance.jwt = activationResponse.token;
+	                    self_cfg.jwt = activationResponse.token;
 	                    return;
 	                });
 	            }
@@ -184,44 +185,27 @@ var GCLLib =
 	var defaultGclUrl = "https://localhost:10433/v1";
 	var defaultDSUrl = "https://accapim.t1t.be:443";
 	var defaultDSContextPath = "/trust1team/gclds/v1";
-	var fileDownloadUrlPostfix = "/trust1team/signbox-file/v1";
+	var fileDownloadUrlPostfix = "/trust1team/gclds-file/v1";
 	var defaultAllowAutoUpdate = true;
 	var defaultImplicitDownload = false;
 	var GCLConfig = (function () {
-	    function GCLConfig(gclUrl, dsUrl, apiKey, allowAutoUpdate, implicitDownload) {
-	        this._gclUrl = gclUrl || defaultGclUrl;
-	        this._dsFilDownloadUrl = (dsUrl || defaultDSUrl);
-	        this._dsUrl = (dsUrl || defaultDSUrl) + defaultDSContextPath;
-	        this._dsFilDownloadUrl = (dsUrl || defaultDSUrl) + fileDownloadUrlPostfix;
-	        this._dsUrlBase = (dsUrl || defaultDSUrl);
-	        this._apiKey = apiKey || '';
+	    function GCLConfig(dsUriValue, apiKey) {
+	        console.log("Set ds uri constructor value: " + dsUriValue);
+	        this._gclUrl = defaultGclUrl;
+	        this._dsUrl = dsUriValue + defaultDSContextPath;
+	        this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
+	        this._dsUrlBase = dsUriValue;
+	        this._apiKey = apiKey;
 	        this._jwt = 'none';
-	        this._allowAutoUpdate = allowAutoUpdate || defaultAllowAutoUpdate;
-	        this._implicitDownload = implicitDownload || defaultImplicitDownload;
+	        this._allowAutoUpdate = defaultAllowAutoUpdate;
+	        this._implicitDownload = defaultImplicitDownload;
 	    }
-	    Object.defineProperty(GCLConfig, "Instance", {
-	        get: function () {
-	            if (this.instance === null || this.instance === undefined) {
-	                this.instance = new GCLConfig();
-	                this.instance.gclUrl = defaultGclUrl;
-	                this.instance.dsUrl = defaultDSUrl + defaultDSContextPath;
-	                this.instance.dsUrlBase = defaultDSUrl;
-	                this.instance.dsFilDownloadUrl = defaultDSUrl + fileDownloadUrlPostfix;
-	                this.instance.apiKey = '';
-	                this.instance.allowAutoUpdate = defaultAllowAutoUpdate;
-	                this.instance.implicitDownload = false;
-	            }
-	            return this.instance;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
 	    Object.defineProperty(GCLConfig.prototype, "gclUrl", {
 	        get: function () {
 	            return this._gclUrl;
 	        },
 	        set: function (value) {
-	            this._gclUrl = value;
+	            this._gclUrl = value || defaultGclUrl;
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -230,13 +214,16 @@ var GCLLib =
 	        get: function () {
 	            return this._dsUrl;
 	        },
-	        set: function (value) {
-	            if (strEndsWith(value, defaultDSContextPath)) {
-	                this._dsUrl = value;
+	        set: function (dsUriValue) {
+	            if (strEndsWith(dsUriValue, defaultDSContextPath)) {
+	                this._dsUrlBase = dsUriValue.replace(defaultDSContextPath, '');
+	                this._dsUrl = dsUriValue;
+	                this._dsFileDownloadUrl = this._dsUrlBase + fileDownloadUrlPostfix;
 	            }
 	            else {
-	                this._dsUrl = value + defaultDSContextPath;
-	                this.dsUrlBase = value;
+	                this._dsUrl = dsUriValue + defaultDSContextPath;
+	                this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
+	                this._dsUrlBase = dsUriValue;
 	            }
 	        },
 	        enumerable: true,
@@ -304,15 +291,7 @@ var GCLLib =
 	    });
 	    Object.defineProperty(GCLConfig.prototype, "dsFilDownloadUrl", {
 	        get: function () {
-	            return this._dsFilDownloadUrl;
-	        },
-	        set: function (value) {
-	            if (strEndsWith(value, fileDownloadUrlPostfix)) {
-	                this._dsFilDownloadUrl = value;
-	            }
-	            else {
-	                this._dsFilDownloadUrl = value + fileDownloadUrlPostfix;
-	            }
+	            return this._dsFileDownloadUrl;
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -320,9 +299,6 @@ var GCLLib =
 	    Object.defineProperty(GCLConfig.prototype, "dsUrlBase", {
 	        get: function () {
 	            return this._dsUrlBase;
-	        },
-	        set: function (value) {
-	            this._dsUrlBase = value;
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -343,9 +319,10 @@ var GCLLib =
 	var EidBe_1 = __webpack_require__(3);
 	var EMV_1 = __webpack_require__(4);
 	var CardFactory = (function () {
-	    function CardFactory(url, connection) {
+	    function CardFactory(url, connection, cfg) {
 	        this.url = url;
 	        this.connection = connection;
+	        this.cfg = cfg;
 	    }
 	    CardFactory.prototype.createEidEST = function (reader_id) {
 	        return undefined;
@@ -491,9 +468,10 @@ var GCLLib =
 	var CORE_ACTIVATE = "/admin/activate";
 	var CORE_PUB_KEY = "/admin/certificate";
 	var CoreService = (function () {
-	    function CoreService(url, connection) {
+	    function CoreService(url, connection, cfg) {
 	        this.url = url;
 	        this.connection = connection;
+	        this.cfg = cfg;
 	    }
 	    CoreService.prototype.info = function (callback) { this.connection.get(this.url + CORE_INFO, callback); };
 	    CoreService.prototype.readers = function (callback) { this.connection.get(this.url + CORE_READERS, callback); };
@@ -1781,19 +1759,20 @@ var GCLLib =
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var GCLConfig_1 = __webpack_require__(1);
 	var $ = __webpack_require__(9);
 	var LocalAuthConnection = (function () {
-	    function LocalAuthConnection() {
+	    function LocalAuthConnection(cfg) {
+	        this.cfg = cfg;
 	    }
 	    LocalAuthConnection.prototype.get = function (url, callback, queryParams) {
+	        var self_cfg = this.cfg;
 	        $.support.cors = true;
 	        $.ajax({
 	            url: url,
 	            type: 'GET',
 	            dataType: 'json',
 	            data: queryParams,
-	            headers: { 'Authorization': ('Bearer ' + GCLConfig_1.GCLConfig.Instance.jwt), 'Accept-Language': 'en-US' },
+	            headers: { 'Authorization': ('Bearer ' + self_cfg.jwt), 'Accept-Language': 'en-US' },
 	            success: function (successResponse, status, jqXHR) {
 	                return callback(null, successResponse);
 	            },
@@ -1803,6 +1782,7 @@ var GCLLib =
 	        });
 	    };
 	    LocalAuthConnection.prototype.post = function (url, body, callback) {
+	        var self_cfg = this.cfg;
 	        $.support.cors = true;
 	        $.ajax({
 	            url: url,
@@ -1812,7 +1792,7 @@ var GCLLib =
 	            processData: false,
 	            dataType: 'json',
 	            mimeType: 'application/json',
-	            headers: { 'Authorization': ('Bearer ' + GCLConfig_1.GCLConfig.Instance.jwt), 'Accept-Language': 'en-US' },
+	            headers: { 'Authorization': ('Bearer ' + self_cfg.jwt), 'Accept-Language': 'en-US' },
 	            success: function (successResponse, status) {
 	                return callback(null, successResponse);
 	            },
@@ -1822,6 +1802,7 @@ var GCLLib =
 	        });
 	    };
 	    LocalAuthConnection.prototype.put = function (url, body, callback) {
+	        var self_cfg = this.cfg;
 	        $.support.cors = true;
 	        $.ajax({
 	            url: url,
@@ -1831,7 +1812,7 @@ var GCLLib =
 	            processData: false,
 	            dataType: 'json',
 	            mimeType: 'application/json',
-	            headers: { 'Authorization': ('Bearer ' + GCLConfig_1.GCLConfig.Instance.jwt), 'Accept-Language': 'en-US' },
+	            headers: { 'Authorization': ('Bearer ' + self_cfg.jwt), 'Accept-Language': 'en-US' },
 	            success: function (successResponse, status) {
 	                return callback(null, successResponse);
 	            },
@@ -1844,16 +1825,18 @@ var GCLLib =
 	}());
 	exports.LocalAuthConnection = LocalAuthConnection;
 	var LocalConnection = (function () {
-	    function LocalConnection() {
+	    function LocalConnection(cfg) {
+	        this.cfg = cfg;
 	    }
 	    LocalConnection.prototype.get = function (url, callback, queryParams) {
+	        var self_cfg = this.cfg;
 	        $.support.cors = true;
 	        $.ajax({
 	            url: url,
 	            type: 'GET',
 	            dataType: 'json',
 	            data: queryParams,
-	            headers: { 'Authorization': ('Bearer ' + GCLConfig_1.GCLConfig.Instance.jwt), 'Accept-Language': 'en-US' },
+	            headers: { 'Authorization': ('Bearer ' + self_cfg.jwt), 'Accept-Language': 'en-US' },
 	            success: function (successResponse, status, jqXHR) {
 	                return callback(null, successResponse);
 	            },
@@ -1863,6 +1846,7 @@ var GCLLib =
 	        });
 	    };
 	    LocalConnection.prototype.post = function (url, body, callback) {
+	        var self_cfg = this.cfg;
 	        $.support.cors = true;
 	        $.ajax({
 	            url: url,
@@ -1872,7 +1856,7 @@ var GCLLib =
 	            processData: false,
 	            dataType: 'json',
 	            mimeType: 'application/json',
-	            headers: { 'Authorization': ('Bearer ' + GCLConfig_1.GCLConfig.Instance.jwt), 'Accept-Language': 'en-US' },
+	            headers: { 'Authorization': ('Bearer ' + self_cfg.jwt), 'Accept-Language': 'en-US' },
 	            success: function (successResponse, status) {
 	                return callback(null, successResponse);
 	            },
@@ -1882,6 +1866,7 @@ var GCLLib =
 	        });
 	    };
 	    LocalConnection.prototype.put = function (url, body, callback) {
+	        var self_cfg = this.cfg;
 	        $.support.cors = true;
 	        $.ajax({
 	            url: url,
@@ -1891,7 +1876,7 @@ var GCLLib =
 	            processData: false,
 	            dataType: 'json',
 	            mimeType: 'application/json',
-	            headers: { 'Authorization': ('Bearer ' + GCLConfig_1.GCLConfig.Instance.jwt), 'Accept-Language': 'en-US' },
+	            headers: { 'Authorization': ('Bearer ' + self_cfg.jwt), 'Accept-Language': 'en-US' },
 	            success: function (successResponse, status) {
 	                return callback(null, successResponse);
 	            },
@@ -1904,16 +1889,18 @@ var GCLLib =
 	}());
 	exports.LocalConnection = LocalConnection;
 	var RemoteConnection = (function () {
-	    function RemoteConnection() {
+	    function RemoteConnection(cfg) {
+	        this.cfg = cfg;
 	    }
 	    RemoteConnection.prototype.get = function (url, callback, queryParams) {
+	        var self_cfg = this.cfg;
 	        $.support.cors = true;
 	        $.ajax({
 	            url: url,
 	            type: 'GET',
 	            dataType: 'json',
 	            data: queryParams,
-	            headers: { 'apikey': GCLConfig_1.GCLConfig.Instance.apiKey, 'Accept-Language': 'en-US' },
+	            headers: { 'apikey': self_cfg.apiKey, 'Accept-Language': 'en-US' },
 	            success: function (successResponse, status, jqXHR) {
 	                return callback(null, successResponse);
 	            },
@@ -1923,6 +1910,7 @@ var GCLLib =
 	        });
 	    };
 	    RemoteConnection.prototype.post = function (url, body, callback) {
+	        var self_cfg = this.cfg;
 	        $.support.cors = true;
 	        $.ajax({
 	            url: url,
@@ -1931,7 +1919,7 @@ var GCLLib =
 	            contentType: 'application/json; charset=utf-8',
 	            processData: false,
 	            dataType: 'json',
-	            headers: { 'apikey': GCLConfig_1.GCLConfig.Instance.apiKey, 'Accept-Language': 'en-US' },
+	            headers: { 'apikey': self_cfg.apiKey, 'Accept-Language': 'en-US' },
 	            mimeType: 'application/json',
 	            success: function (successResponse, status, jqXHR) {
 	                return callback(null, successResponse);
@@ -1942,6 +1930,7 @@ var GCLLib =
 	        });
 	    };
 	    RemoteConnection.prototype.put = function (url, body, callback) {
+	        var self_cfg = this.cfg;
 	        $.support.cors = true;
 	        $.ajax({
 	            url: url,
@@ -1950,7 +1939,7 @@ var GCLLib =
 	            contentType: 'application/json; charset=utf-8',
 	            processData: false,
 	            dataType: 'json',
-	            headers: { 'apikey': GCLConfig_1.GCLConfig.Instance.apiKey, 'Accept-Language': 'en-US' },
+	            headers: { 'apikey': self_cfg.apiKey, 'Accept-Language': 'en-US' },
 	            mimeType: 'application/json',
 	            success: function (successResponse, status, jqXHR) {
 	                return callback(null, successResponse);
@@ -12047,10 +12036,9 @@ var GCLLib =
 
 /***/ },
 /* 10 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	"use strict";
-	var GCLConfig_1 = __webpack_require__(1);
 	var SEPARATOR = "/";
 	var QP_APIKEY = "?apikey=";
 	var SECURITY = "/security";
@@ -12061,9 +12049,10 @@ var GCLLib =
 	var PUB_KEY = SECURITY + "/keys/public";
 	var DEVICE = "/devices";
 	var DSClient = (function () {
-	    function DSClient(url, connection) {
+	    function DSClient(url, connection, cfg) {
 	        this.url = url;
 	        this.connection = connection;
+	        this.cfg = cfg;
 	    }
 	    DSClient.prototype.getUrl = function () { return this.url; };
 	    DSClient.prototype.getInfo = function (callback) {
@@ -12086,16 +12075,17 @@ var GCLLib =
 	    };
 	    DSClient.prototype.getJWT = function (callback) {
 	        var consumerCb = callback;
+	        var self_cfg = this.cfg;
 	        this.connection.get(this.url + SECURITY_JWT_ISSUE, function (error, data) {
 	            if (error)
 	                return consumerCb(error, null);
 	            if (data && data.token)
-	                GCLConfig_1.GCLConfig.Instance.jwt = data.token;
+	                self_cfg.jwt = data.token;
 	            return consumerCb(null, data);
 	        });
 	    };
 	    DSClient.prototype.refreshJWT = function (callback) {
-	        var actualJWT = GCLConfig_1.GCLConfig.Instance.jwt;
+	        var actualJWT = this.cfg.jwt;
 	        if (actualJWT) {
 	            var _body = {};
 	            _body.originalJWT = actualJWT;
@@ -12113,12 +12103,14 @@ var GCLLib =
 	        this.connection.get(this.url + PUB_KEY, callback);
 	    };
 	    DSClient.prototype.downloadLink = function (infoBrowser, callback) {
-	        var _dsuri = this.url;
+	        var _dsBase = this.cfg.dsUrlBase;
+	        var _apikey = this.cfg.apiKey;
 	        this.connection.post(this.url + DOWNLOAD, infoBrowser, function (err, data) {
 	            if (err)
 	                return callback(err, null);
 	            var _res = {};
-	            _res.url = _dsuri + data.path + QP_APIKEY + GCLConfig_1.GCLConfig.Instance.apiKey;
+	            _res.url = _dsBase + data.path + QP_APIKEY + _apikey;
+	            console.log("Res url:" + _res.url);
 	            return callback(null, _res);
 	        });
 	    };

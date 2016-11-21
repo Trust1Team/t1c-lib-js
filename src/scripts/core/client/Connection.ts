@@ -14,17 +14,18 @@ interface Connection {
 }
 
 class LocalAuthConnection implements Connection {
-    constructor() {}
+    constructor(private cfg:GCLConfig) {}
 
     // using Callback
     public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
+        let self_cfg = this.cfg;
     	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'GET',
             dataType: 'json',
             data: queryParams,
-            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt), 'Accept-Language':'en-US' },
+            headers: { 'Authorization':('Bearer ' + self_cfg.jwt), 'Accept-Language':'en-US' },
             success: function(successResponse,status,jqXHR) {
                 return callback(null,successResponse);
             },
@@ -35,6 +36,7 @@ class LocalAuthConnection implements Connection {
     }
 
     public post(url:string, body:any, callback:(error:any, data:any) => void):void{
+        let self_cfg = this.cfg;
     	$.support.cors = true;
         $.ajax({
             url: url,
@@ -44,7 +46,7 @@ class LocalAuthConnection implements Connection {
             processData: false,
             dataType: 'json',
             mimeType: 'application/json',
-            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt), 'Accept-Language':'en-US' },
+            headers: { 'Authorization':('Bearer ' + self_cfg.jwt), 'Accept-Language':'en-US' },
             success: function(successResponse, status) {
                 return callback(null,successResponse);
             },
@@ -55,6 +57,7 @@ class LocalAuthConnection implements Connection {
     }
 
     public put(url:string, body:any, callback:(error:any, data:any) => void):void{
+        let self_cfg = this.cfg;
     	$.support.cors = true;
         $.ajax({
             url: url,
@@ -64,7 +67,7 @@ class LocalAuthConnection implements Connection {
             processData: false,
             dataType: 'json',
             mimeType: 'application/json',
-            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt), 'Accept-Language':'en-US' },
+            headers: { 'Authorization':('Bearer ' + self_cfg.jwt), 'Accept-Language':'en-US' },
             success: function(successResponse, status) {
                 return callback(null,successResponse);
             },
@@ -76,16 +79,17 @@ class LocalAuthConnection implements Connection {
 }
 
 class LocalConnection implements Connection {
-    constructor() {}
+    constructor(private cfg:GCLConfig) {}
 
     public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
+        let self_cfg = this.cfg;
     	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'GET',
             dataType: 'json',
             data: queryParams,
-            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt), 'Accept-Language':'en-US' },
+            headers: { 'Authorization':('Bearer ' + self_cfg.jwt), 'Accept-Language':'en-US' },
             success: function(successResponse,status,jqXHR) {
                 return callback(null,successResponse);
             },
@@ -96,6 +100,7 @@ class LocalConnection implements Connection {
     }
 
     public post(url:string, body:any, callback:(error:any, data:any) => void):void{
+        let self_cfg = this.cfg;
     	$.support.cors = true;
         $.ajax({
             url: url,
@@ -105,7 +110,7 @@ class LocalConnection implements Connection {
             processData: false,
             dataType: 'json',
             mimeType: 'application/json',
-            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt), 'Accept-Language':'en-US' },
+            headers: { 'Authorization':('Bearer ' + self_cfg.jwt), 'Accept-Language':'en-US' },
             success: function(successResponse, status) {
                 return callback(null,successResponse);
             },
@@ -116,6 +121,7 @@ class LocalConnection implements Connection {
     }
 
     public put(url:string, body:any, callback:(error:any, data:any) => void):void{
+        let self_cfg = this.cfg;
     	$.support.cors = true;
         $.ajax({
             url: url,
@@ -125,7 +131,7 @@ class LocalConnection implements Connection {
             processData: false,
             dataType: 'json',
             mimeType: 'application/json',
-            headers: { 'Authorization':('Bearer ' + GCLConfig.Instance.jwt), 'Accept-Language':'en-US' },
+            headers: { 'Authorization':('Bearer ' + self_cfg.jwt), 'Accept-Language':'en-US' },
             success: function(successResponse, status) {
                 return callback(null,successResponse);
             },
@@ -137,17 +143,18 @@ class LocalConnection implements Connection {
 }
 
 class RemoteConnection implements Connection {
-    constructor() {}
+    constructor(private cfg:GCLConfig) {}
 
     // using Callback
     public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
+        let self_cfg = this.cfg;
     	$.support.cors = true;
         $.ajax({
             url: url,
             type: 'GET',
             dataType: 'json',
             data: queryParams,
-            headers: { 'apikey': GCLConfig.Instance.apiKey, 'Accept-Language':'en-US' },
+            headers: { 'apikey': self_cfg.apiKey, 'Accept-Language':'en-US' },
             success: function(successResponse,status,jqXHR) {
                 return callback(null,successResponse);
             },
@@ -158,6 +165,7 @@ class RemoteConnection implements Connection {
     }
 
     public post(url:string, body:any, callback:(error:any, data:any) => void):void{
+        let self_cfg = this.cfg;
     	$.support.cors = true;
         $.ajax({
             url: url,
@@ -166,7 +174,7 @@ class RemoteConnection implements Connection {
             contentType: 'application/json; charset=utf-8',
             processData: false,
             dataType: 'json',
-            headers: { 'apikey': GCLConfig.Instance.apiKey, 'Accept-Language':'en-US' },
+            headers: { 'apikey': self_cfg.apiKey, 'Accept-Language':'en-US' },
             mimeType: 'application/json',
             success: function(successResponse, status,jqXHR) {
                 return callback(null,successResponse);
@@ -178,6 +186,7 @@ class RemoteConnection implements Connection {
     }
 
     public put(url:string, body:any, callback:(error:any, data:any) => void):void{
+        let self_cfg = this.cfg;
     	$.support.cors = true;
         $.ajax({
             url: url,
@@ -186,7 +195,7 @@ class RemoteConnection implements Connection {
             contentType: 'application/json; charset=utf-8',
             processData: false,
             dataType: 'json',
-            headers: { 'apikey': GCLConfig.Instance.apiKey, 'Accept-Language':'en-US' },
+            headers: { 'apikey': self_cfg.apiKey, 'Accept-Language':'en-US' },
             mimeType: 'application/json',
             success: function(successResponse, status,jqXHR) {
                 return callback(null,successResponse);
