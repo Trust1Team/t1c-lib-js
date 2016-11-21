@@ -32,9 +32,6 @@ class GCLClient {
         this.remoteConnection = new RemoteConnection(this.cfg);
         this.cardFactory = new CardFactory(this.cfg.gclUrl,this.connection,this.cfg);
         this.coreService = new CoreService(this.cfg.gclUrl,this.authConnection,this.cfg);
-        console.log("dsurl:"+this.cfg.dsUrl);
-        console.log("dsurl base:"+this.cfg.dsUrlBase);
-        console.log("dsurl file:"+this.cfg.dsFilDownloadUrl);
         this.dsClient = new DSClient(this.cfg.dsUrl,this.remoteConnection,this.cfg);
 
         //check if implicit download has been set
@@ -101,7 +98,7 @@ class GCLClient {
             info.activated = activated;
             if(!activated){
                 //we need to register the device
-                console.log("Register device:"+uuid);
+                //console.log("Register device:"+uuid);
                 self.dsClient.register(info,uuid,function(err,activationResponse){
                     if(err) return;
                     self_cfg.jwt = activationResponse.token;
@@ -116,7 +113,7 @@ class GCLClient {
                 });
             }else {
                 //we need to synchronize the device
-                console.log("Sync device:"+uuid);
+                //console.log("Sync device:"+uuid);
                 self.dsClient.sync(info,uuid,function(err,activationResponse){
                     if(err) return;
                     self_cfg.jwt = activationResponse.token;
