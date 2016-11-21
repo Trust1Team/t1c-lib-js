@@ -87,7 +87,7 @@ class DSClient implements AbstractDSClient{
             if(err)return callback(err,null);
             let _res:any = {};
             _res.url = _dsBase+data.path+QP_APIKEY+_apikey;
-            console.log("Res url:"+_res.url);
+            //console.log("Res url:"+_res.url);
             return callback(null,_res);
         });
     }

@@ -29,7 +29,6 @@ class GCLConfig {
 
     // constructor for DTO
     constructor(dsUriValue?:string, apiKey?:string){
-        console.log("Set ds uri constructor value: "+dsUriValue);
         this._gclUrl = defaultGclUrl;
         this._dsUrl = dsUriValue + defaultDSContextPath;
         this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
