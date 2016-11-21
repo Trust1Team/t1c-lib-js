@@ -27,12 +27,15 @@ class GCLClient {
         // resolve config to singleton
         this.cfg = this.resolveConfig(cfg);
         // init communication
-        this.connection = new LocalConnection();
-        this.authConnection = new LocalAuthConnection();
-        this.remoteConnection = new RemoteConnection();
-        this.cardFactory = new CardFactory(this.cfg.gclUrl,this.connection);
-        this.coreService = new CoreService(this.cfg.gclUrl,this.authConnection);
-        this.dsClient = new DSClient(this.cfg.dsUrl,this.remoteConnection);
+        this.connection = new LocalConnection(this.cfg);
+        this.authConnection = new LocalAuthConnection(this.cfg);
+        this.remoteConnection = new RemoteConnection(this.cfg);
+        this.cardFactory = new CardFactory(this.cfg.gclUrl,this.connection,this.cfg);
+        this.coreService = new CoreService(this.cfg.gclUrl,this.authConnection,this.cfg);
+        console.log("dsurl:"+this.cfg.dsUrl);
+        console.log("dsurl base:"+this.cfg.dsUrlBase);
+        console.log("dsurl file:"+this.cfg.dsFilDownloadUrl);
+        this.dsClient = new DSClient(this.cfg.dsUrl,this.remoteConnection,this.cfg);
 
         //check if implicit download has been set
         if(this.cfg.implicitDownload && true){ this.implicitDownload();}
@@ -48,14 +51,11 @@ class GCLClient {
     }
 
     private resolveConfig(cfg:GCLConfig) {
-        var resolvedCfg:GCLConfig = GCLConfig.Instance;
-        resolvedCfg.apiKey = cfg.apiKey;
+        var resolvedCfg:GCLConfig = new GCLConfig(cfg.dsUrlBase,cfg.apiKey); //must be the base url because the GCLConfig object adds the context path and keeps the base url intact
         resolvedCfg.allowAutoUpdate = cfg.allowAutoUpdate;
         resolvedCfg.client_id = cfg.client_id;
         resolvedCfg.client_secret = cfg.client_secret;
         resolvedCfg.jwt = cfg.jwt;
-        resolvedCfg.dsUrl = cfg.dsUrl;
-        resolvedCfg.dsFilDownloadUrl = cfg.dsUrl;
         resolvedCfg.gclUrl = cfg.gclUrl;
         resolvedCfg.implicitDownload = cfg.implicitDownload;
         return resolvedCfg;
@@ -86,6 +86,7 @@ class GCLClient {
 
     private registerAndActivate(){
         let self = this;
+        let self_cfg = this.cfg;
         //get GCL info
         self.core().info(function(err,infoResponse:any){
             if(err) {console.log(JSON.stringify(err));return;}
@@ -103,7 +104,7 @@ class GCLClient {
                 console.log("Register device:"+uuid);
                 self.dsClient.register(info,uuid,function(err,activationResponse){
                     if(err) return;
-                    GCLConfig.Instance.jwt = activationResponse.token;
+                    self_cfg.jwt = activationResponse.token;
                     self.core().activate(function(err,data){
                         if(err)return;//will try again upon next sync
                         //sync
@@ -118,7 +119,7 @@ class GCLClient {
                 console.log("Sync device:"+uuid);
                 self.dsClient.sync(info,uuid,function(err,activationResponse){
                     if(err) return;
-                    GCLConfig.Instance.jwt = activationResponse.token;
+                    self_cfg.jwt = activationResponse.token;
                     return;
                 });
             }

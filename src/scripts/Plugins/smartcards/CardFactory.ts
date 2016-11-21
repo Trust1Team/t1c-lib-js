@@ -8,6 +8,7 @@ import {AbstractEidBE} from "./eid/be/EidBe";
 import {AbstractEidEST} from "./eid/est/EidEst";
 import {AbstractEidLUX} from "./eid/lux/EidLux";
 import {LocalConnection} from "../../core/client/Connection";
+import {GCLConfig} from "../../core/GCLConfig";
 
 interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
@@ -25,7 +26,7 @@ export class CardFactory implements AbstractFactory{
         return undefined;
     }
 
-    constructor(private url:string,private connection:LocalConnection) {}
+    constructor(private url:string,private connection:LocalConnection,private cfg:GCLConfig) {}
 
     public createEidBE(reader_id?:string):AbstractEidBE {return new EidBe(this.url,this.connection,reader_id);}
 

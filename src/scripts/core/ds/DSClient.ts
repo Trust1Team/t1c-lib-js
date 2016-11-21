@@ -30,7 +30,7 @@ const DEVICE = "/devices";
 
 
 class DSClient implements AbstractDSClient{
-    constructor(private url:string,private connection:RemoteConnection) {}
+    constructor(private url:string,private connection:RemoteConnection,private cfg:GCLConfig) {}
 
     public getUrl(){return this.url;}
 
@@ -53,15 +53,16 @@ class DSClient implements AbstractDSClient{
 
     public getJWT(callback:(error:CoreExceptions.RestException, data:any)=>void):void {
         var consumerCb = callback;
+        let self_cfg = this.cfg;
         this.connection.get(this.url + SECURITY_JWT_ISSUE, function(error, data){
             if(error)return consumerCb(error,null);
-            if(data && data.token) GCLConfig.Instance.jwt = data.token;
+            if(data && data.token) self_cfg.jwt = data.token;
             return consumerCb(null,data);
         });
     }
 
     public refreshJWT(callback:(error:CoreExceptions.RestException, data:any)=>void):void {
-        var actualJWT = GCLConfig.Instance.jwt;
+        var actualJWT = this.cfg.jwt;
         if(actualJWT){
             let _body:any = {};
             _body.originalJWT = actualJWT;
@@ -80,12 +81,13 @@ class DSClient implements AbstractDSClient{
     }
 
     public downloadLink(infoBrowser, callback:(error:CoreExceptions.RestException, data:any)=>void):void {
-        let _dsuri = this.url;
+        let _dsBase = this.cfg.dsUrlBase;
+        let _apikey = this.cfg.apiKey;
         this.connection.post(this.url + DOWNLOAD, infoBrowser, function(err,data){
             if(err)return callback(err,null);
             let _res:any = {};
-            _res.url = _dsuri+data.path+QP_APIKEY+GCLConfig.Instance.apiKey;
-            //_res.url = GCLConfig.Instance.dsUrlBase+data.path+QP_APIKEY+GCLConfig.Instance.apiKey;
+            _res.url = _dsBase+data.path+QP_APIKEY+_apikey;
+            console.log("Res url:"+_res.url);
             return callback(null,_res);
         });
     }

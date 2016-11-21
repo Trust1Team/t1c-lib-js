@@ -3,6 +3,7 @@
  */
 import {LocalConnection, LocalAuthConnection,Connection} from "../client/Connection";
 import * as CoreExceptions from "../exceptions/CoreExceptions";
+import {GCLConfig} from "../GCLConfig";
 declare var require: any;
 var platform = require('platform');
 
@@ -46,7 +47,7 @@ const CORE_PUB_KEY = "/admin/certificate";
 
 class CoreService implements AbstractCore{
     // constructor
-    constructor(private url:string,private connection:Connection) {}
+    constructor(private url:string,private connection:Connection,private cfg:GCLConfig) {}
 
     // async
     public info(callback:(error:CoreExceptions.RestException, data:any)=>void) {this.connection.get(this.url + CORE_INFO,callback);}
