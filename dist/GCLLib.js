@@ -67,9 +67,6 @@ var GCLLib =
 	        this.remoteConnection = new Connection_1.RemoteConnection(this.cfg);
 	        this.cardFactory = new CardFactory_1.CardFactory(this.cfg.gclUrl, this.connection, this.cfg);
 	        this.coreService = new CoreService_1.CoreService(this.cfg.gclUrl, this.authConnection, this.cfg);
-	        console.log("dsurl:" + this.cfg.dsUrl);
-	        console.log("dsurl base:" + this.cfg.dsUrlBase);
-	        console.log("dsurl file:" + this.cfg.dsFilDownloadUrl);
 	        this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg);
 	        if (this.cfg.implicitDownload && true) {
 	            this.implicitDownload();
@@ -128,7 +125,6 @@ var GCLLib =
 	            info.core_version = core_version;
 	            info.activated = activated;
 	            if (!activated) {
-	                console.log("Register device:" + uuid);
 	                self.dsClient.register(info, uuid, function (err, activationResponse) {
 	                    if (err)
 	                        return;
@@ -144,7 +140,6 @@ var GCLLib =
 	                });
 	            }
 	            else {
-	                console.log("Sync device:" + uuid);
 	                self.dsClient.sync(info, uuid, function (err, activationResponse) {
 	                    if (err)
 	                        return;
@@ -190,7 +185,6 @@ var GCLLib =
 	var defaultImplicitDownload = false;
 	var GCLConfig = (function () {
 	    function GCLConfig(dsUriValue, apiKey) {
-	        console.log("Set ds uri constructor value: " + dsUriValue);
 	        this._gclUrl = defaultGclUrl;
 	        this._dsUrl = dsUriValue + defaultDSContextPath;
 	        this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
@@ -12122,7 +12116,6 @@ var GCLLib =
 	                return callback(err, null);
 	            var _res = {};
 	            _res.url = _dsBase + data.path + QP_APIKEY + _apikey;
-	            console.log("Res url:" + _res.url);
 	            return callback(null, _res);
 	        });
 	    };
