@@ -400,13 +400,25 @@ var GCLLib =
 	        }
 	        this.connection.post(this.resolvedReaderURI() + BEID_VERIFY_PIN, _req, callback);
 	    };
-	    EidBe.prototype.signData = function (body, callback) { this.connection.post(this.resolvedReaderURI() + BEID_SIGN_DATA, body, callback); };
+	    EidBe.prototype.signData = function (body, callback) {
+	        var _req = {};
+	        if (body) {
+	            _req.algorithm_reference = body.algorithm_reference;
+	            _req.data = body.data;
+	            if (body.pin) {
+	                _req.pin = body.pin;
+	            }
+	        }
+	        this.connection.post(this.resolvedReaderURI() + BEID_SIGN_DATA, _req, callback);
+	    };
 	    EidBe.prototype.authenticate = function (body, callback) {
 	        var _req = {};
 	        if (body) {
 	            _req.data = body.challenge;
-	            _req.pin = body.pin;
 	            _req.algorithm_reference = body.algorithm_reference;
+	            if (body.pin) {
+	                _req.pin = body.pin;
+	            }
 	        }
 	        this.connection.post(this.resolvedReaderURI() + BEID_AUTHENTICATE, _req, callback);
 	    };
