@@ -108,6 +108,12 @@ You can be released from the requirements of the Affero General Public License
  source product...
 Irrespective of your choice of license, the T1T logo as depicted below may not be removed from this file, or from any software or other product or service to which it is applied, without the express prior written permission of Trust1Team sarl. The T1T logo is an EU Registered Trademark (n° 12943131).
 ```
+
+### Release Notes - Trust1Connector - Version js-0.9.8 ###
+## Bug
+
+*   [[T1C-470](https://trust1t.atlassian.net/browse/T1C-470)] - T1C-JS: The download functionality no longer works
+
 ### Release Notes - Trust1Connector - Version js-0.9.7 ###
 ## Story
 
