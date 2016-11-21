@@ -71,14 +71,23 @@ class EidBe implements AbstractEidBE{
         _req.private_key_reference = VERIFY_PRIV_KEY_REF;
         if(body.pin) {_req.pin = body.pin;}
         this.connection.post(this.resolvedReaderURI() + BEID_VERIFY_PIN, _req, callback);
+    }    
+    public signData(body, callback) {
+    	let _req:any = {};
+    	if (body) {
+			_req.algorithm_reference = body.algorithm_reference;
+			_req.data = body.data;
+			if(body.pin) {_req.pin = body.pin;}  		
+		}
+    
+    	this.connection.post(this.resolvedReaderURI() + BEID_SIGN_DATA, _req, callback);
     }
-    public signData(body, callback) {this.connection.post(this.resolvedReaderURI() + BEID_SIGN_DATA, body,callback);}
     public authenticate(body, callback) {
         let _req:any = {};
         if(body){
             _req.data = body.challenge;
-            _req.pin = body.pin;
             _req.algorithm_reference = body.algorithm_reference;
+            if(body.pin) {_req.pin = body.pin;}
         }
         this.connection.post(this.resolvedReaderURI() + BEID_AUTHENTICATE, _req,callback);
     }
