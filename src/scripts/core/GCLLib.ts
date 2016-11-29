@@ -12,6 +12,7 @@ import {EMV} from "../Plugins/smartcards/emv/EMV";
 import {CoreService} from "./services/CoreService";
 import {LocalConnection, RemoteConnection, LocalAuthConnection} from "./client/Connection";
 import {AbstractDSClient,DSClient} from "./ds/DSClient";
+import {AbstractOCVClient,OCVClient} from "./ocv/OCVClient";
 
 class GCLClient {
     private cfg: GCLConfig;
@@ -21,6 +22,7 @@ class GCLClient {
     private authConnection: LocalAuthConnection;
     private remoteConnection: RemoteConnection;
     private dsClient: DSClient;
+    private ocvClient: OCVClient;
 
     constructor(cfg: GCLConfig) {
         let self = this;
@@ -33,6 +35,7 @@ class GCLClient {
         this.cardFactory = new CardFactory(this.cfg.gclUrl,this.connection,this.cfg);
         this.coreService = new CoreService(this.cfg.gclUrl,this.authConnection,this.cfg);
         this.dsClient = new DSClient(this.cfg.dsUrl,this.remoteConnection,this.cfg);
+        this.ocvClient = new OCVClient(this.cfg.ocvUrl,this.remoteConnection,this.cfg);
 
         //check if implicit download has been set
         if(this.cfg.implicitDownload && true){ this.implicitDownload();}
@@ -129,6 +132,8 @@ class GCLClient {
     public config = ():GCLConfig => {return this.cfg};
     // get ds client services
     public ds = ():AbstractDSClient => {return this.dsClient;};
+    // get ocv client services
+    public ocv = ():AbstractOCVClient => {return this.ocvClient;};
     // get instance for belgian eID card
     public beid = (reader_id?:string):AbstractEidBE => {return this.cardFactory.createEidBE(reader_id);};
     // get instance for EMV
