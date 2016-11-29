@@ -743,22 +743,24 @@
             $("#information").empty();
             $("#error").empty();
 
-            connector.beid($("#selected_reader").text()).allCerts([],function(err,data){
+            connector.beid($("#selected_reader").text()).allCerts([],function(err,certdata){
                 //print output
-                callback(err,data);
+                callback(err,certdata);
                 var authCert = {};
                 authCert.order=0;
-                authCert.certificate = data.authentication_certificate;
+                authCert.certificate = certdata.data.authentication_certificate;
                 var intermediateCert = {};
                 intermediateCert.order=1;
-                intermediateCert.certificate = data.citizen_certificate;
+                intermediateCert.certificate = certdata.data.citizen_certificate;
                 var rootCert = {};
                 rootCert.order=2;
-                rootCert.certificate = data.root_certificate;
-                var _body = [];
-                _body.push(authCert);
-                _body.push(intermediateCert);
-                _body.push(rootCert);
+                rootCert.certificate = certdata.data.root_certificate;
+                var _body = {};
+                var certificates = [];
+                certificates.push(authCert);
+                certificates.push(intermediateCert);
+                certificates.push(rootCert);
+                _body.certificateChain = certificates;
                 connector.ocv().validateCertificateChain(_body,callback);
             });
 
