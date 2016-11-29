@@ -8,6 +8,7 @@ import * as $ from "jquery";
 const defaultGclUrl = "https://localhost:10433/v1";
 const defaultDSUrl = "https://accapim.t1t.be:443";
 const defaultDSContextPath = "/trust1team/gclds/v1";
+const defaultOCVContextPath = "/trust1team/ocv-api/v1";
 //const defaultDSContextPath = "/gcl-ds-web/v1"; //<==== for local dev
 const fileDownloadUrlPostfix = "/trust1team/gclds-file/v1";
 const defaultAllowAutoUpdate = true;
@@ -17,6 +18,7 @@ class GCLConfig {
     //singleton pattern
     private static instance:GCLConfig;
     private _dsUrlBase:string;
+    private _ocvUrl:string;
     private _gclUrl:string;
     private _dsFileDownloadUrl:string;
     private _dsUrl:string;
@@ -31,12 +33,21 @@ class GCLConfig {
     constructor(dsUriValue?:string, apiKey?:string){
         this._gclUrl = defaultGclUrl;
         this._dsUrl = dsUriValue + defaultDSContextPath;
+        this._ocvUrl = dsUriValue + defaultOCVContextPath;
         this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
         this._dsUrlBase = dsUriValue;
         this._apiKey = apiKey;
         this._jwt = 'none';
         this._allowAutoUpdate = defaultAllowAutoUpdate;
         this._implicitDownload = defaultImplicitDownload;
+    }
+
+    get ocvUrl(): string {
+        return this._ocvUrl;
+    }
+
+    set ocvUrl(value: string) {
+        this._ocvUrl = value;
     }
 
     get gclUrl():string {
