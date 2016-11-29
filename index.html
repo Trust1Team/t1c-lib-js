@@ -121,7 +121,6 @@
         </div>
     </div>
     <hr />
-    <h3>EMV Card</h3>
     <div>
         <button id="emvPan" type="button" class="btn btn-default btn-lg">EMV - Get PAN</button>
         <button id="emvVerifyPin" type="button" class="btn btn-default btn-lg">EMV - Verify PIN</button>
@@ -130,6 +129,13 @@
             <input type="checkbox" name="type" value="rn" id="emvPanCheck" />
             <label for="emvPanCheck"><span class="glyphicon"></span> PAN</label>
         </div>
+        <hr />
+    </div>
+    <hr />
+    <h3>EMV Card</h3>
+    <div>
+        <div><button id="ocvGetChallenge" type="button" class="btn btn-default btn-lg">OCV - Get Challenge</button></div>
+        <div><button id="ocvBeIDAuthenticate" type="button" class="btn btn-default btn-lg">OCV - Authenticate Server Challenge</button></div>
         <hr />
     </div>
     <pre id="information"></pre>
@@ -243,6 +249,33 @@
         </div>
     </div>
 
+    <!-- OCV Authenticate Modal -->
+    <div class="modal fade" id="ocvAuthModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Authentication</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <input class="form-control" id="ocvtempvalue" placeholder="Challenge should appear here">
+                        <input type="password" class="form-control" id="ocvAuthpsw" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <pre id="ocvAuthInfo" hidden="true"></pre>
+                        <pre id="ocvAuthError" hidden="true"></pre>
+                    </div>
+                    <button id="ocvButtonAuth" type="button" class="btn btn-default btn-lg">OCV Authenticate</button>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Download Modal -->
     <div class="modal fade" id="downloadModal" role="dialog">
         <div class="modal-dialog">
@@ -275,10 +308,12 @@
         gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
         //gclConfig.gclUrl = "http://localhost:10080/v1"; //override config for local dev
         gclConfig.dsUrl = "https://accapim.t1t.be:443";
+        gclConfig.ocvUrl = "https://accapim.t1t.be:443/trust1team/ocv-api/v1";
         //gclConfig.dsUrl = "http://localhost:8080";
         gclConfig.allowAutoUpdate = true;
         gclConfig.implicitDownload = false;
         var connector = new GCLLib.GCLClient(gclConfig);
+
 
         connector.core().info(function(err,data) {
             $("#error").empty();
@@ -380,6 +415,24 @@
             else{
                 $("#authInfo").append(JSON.stringify(data, null, '  '));
                 $("#authInfo").show();
+            }
+        }
+
+        function ocvAuthCallback(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#ocvAuthError").empty();
+            $("#ocvAuthInfo").empty();
+            $("#ocvAuthError").hide();
+            $("#ocvAuthInfo").hide();
+
+            if(err){
+                $("#ocvAuthError").append(JSON.stringify(err, null, '  '));
+                $("#ocvAuthError").show();
+            }
+            else{
+                $("#ocvAuthInfo").append(JSON.stringify(data, null, '  '));
+                $("#ocvAuthInfo").show();
             }
         }
 
@@ -579,10 +632,18 @@
 
         $("#buttonAuth").on('click', function () {
             var _body={};
-            _body.challenge = "I2e+u/sgy7fYgh+DWA0p2jzXQ7E=";
+            _body.data = "I2e+u/sgy7fYgh+DWA0p2jzXQ7E=";
             _body.algorithm_reference = "sha1";
             _body.pin = $("#authpsw").val();
             connector.beid($("#selected_reader").text()).authenticate(_body, authCallback);
+        });
+
+        $("#ocvButtonAuth").on('click', function () {
+            var _body={};
+            _body.data = $("#ocvtempvalue").val();
+            _body.algorithm_reference = "sha256";
+            _body.pin = $("#ocvAuthpsw").val();
+            connector.beid($("#selected_reader").text()).authenticate(_body, ocvAuthCallback);
         });
 
         $("#downloadgcl").on('click',function(){
@@ -636,6 +697,30 @@
             if($("#emvPanCheck").is(":checked"))filter.push($("#emvPanCheck").val());
             emv.allData(filter,callback);
         });
+
+        $("#ocvGetChallenge").on('click',function(){
+            $("#information").empty();
+            var ocv = connector.ocv();
+            ocv.getChallenge('SHA256',callback);
+        });
+
+        $("#ocvBeIDAuthenticate").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            var ocv = connector.ocv();
+            ocv.getChallenge('SHA256',function(err,data){
+                if(err){$("#error").empty();$("#error").append("ERROR:\n", JSON.stringify(err, null, '  '));}
+                else {
+                    $("#ocvtempvalue").val(data.hash);
+                }
+            });
+            $("#authInformation").empty();
+            $("#authInformation").hide();
+            $("#vauthError").empty();
+            $("#vauthError").hide();
+            $("#ocvAuthModal").modal('toggle');
+        });
+
     })(window.jQuery);
 </script>
 </body>

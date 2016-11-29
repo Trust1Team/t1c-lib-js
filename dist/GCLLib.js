@@ -52,12 +52,14 @@ var GCLLib =
 	var CoreService_1 = __webpack_require__(5);
 	var Connection_1 = __webpack_require__(8);
 	var DSClient_1 = __webpack_require__(10);
+	var OCVClient_1 = __webpack_require__(11);
 	var GCLClient = (function () {
 	    function GCLClient(cfg) {
 	        var _this = this;
 	        this.core = function () { return _this.coreService; };
 	        this.config = function () { return _this.cfg; };
 	        this.ds = function () { return _this.dsClient; };
+	        this.ocv = function () { return _this.ocvClient; };
 	        this.beid = function (reader_id) { return _this.cardFactory.createEidBE(reader_id); };
 	        this.emv = function (reader_id) { return _this.cardFactory.createEmv(reader_id); };
 	        var self = this;
@@ -68,6 +70,7 @@ var GCLLib =
 	        this.cardFactory = new CardFactory_1.CardFactory(this.cfg.gclUrl, this.connection, this.cfg);
 	        this.coreService = new CoreService_1.CoreService(this.cfg.gclUrl, this.authConnection, this.cfg);
 	        this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg);
+	        this.ocvClient = new OCVClient_1.OCVClient(this.cfg.ocvUrl, this.remoteConnection, this.cfg);
 	        if (this.cfg.implicitDownload && true) {
 	            this.implicitDownload();
 	        }
@@ -180,6 +183,7 @@ var GCLLib =
 	var defaultGclUrl = "https://localhost:10433/v1";
 	var defaultDSUrl = "https://accapim.t1t.be:443";
 	var defaultDSContextPath = "/trust1team/gclds/v1";
+	var defaultOCVContextPath = "/trust1team/ocv-api/v1";
 	var fileDownloadUrlPostfix = "/trust1team/gclds-file/v1";
 	var defaultAllowAutoUpdate = true;
 	var defaultImplicitDownload = false;
@@ -187,6 +191,7 @@ var GCLLib =
 	    function GCLConfig(dsUriValue, apiKey) {
 	        this._gclUrl = defaultGclUrl;
 	        this._dsUrl = dsUriValue + defaultDSContextPath;
+	        this._ocvUrl = dsUriValue + defaultOCVContextPath;
 	        this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
 	        this._dsUrlBase = dsUriValue;
 	        this._apiKey = apiKey;
@@ -194,6 +199,16 @@ var GCLLib =
 	        this._allowAutoUpdate = defaultAllowAutoUpdate;
 	        this._implicitDownload = defaultImplicitDownload;
 	    }
+	    Object.defineProperty(GCLConfig.prototype, "ocvUrl", {
+	        get: function () {
+	            return this._ocvUrl;
+	        },
+	        set: function (value) {
+	            this._ocvUrl = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
 	    Object.defineProperty(GCLConfig.prototype, "gclUrl", {
 	        get: function () {
 	            return this._gclUrl;
@@ -408,7 +423,7 @@ var GCLLib =
 	    EidBe.prototype.authenticate = function (body, callback) {
 	        var _req = {};
 	        if (body) {
-	            _req.data = body.challenge;
+	            _req.data = body.data;
 	            _req.algorithm_reference = body.algorithm_reference;
 	            if (body.pin) {
 	                _req.pin = body.pin;
@@ -12146,6 +12161,47 @@ var GCLLib =
 	    return DSClient;
 	}());
 	exports.DSClient = DSClient;
+
+
+/***/ },
+/* 11 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var DIGEST = "?digest=";
+	var CHALLENGE = "/challenge";
+	var CERTIFICATE = "/certs/validate-chain";
+	var OCVClient = (function () {
+	    function OCVClient(url, connection, cfg) {
+	        this.url = url;
+	        this.connection = connection;
+	        this.cfg = cfg;
+	    }
+	    OCVClient.prototype.getUrl = function () { return this.url; };
+	    OCVClient.prototype.getChallenge = function (digestAlgorithm, callback) {
+	        var consumerCb = callback;
+	        this.connection.get(this.url + CHALLENGE + DIGEST + digestAlgorithm, function (error, data) {
+	            if (error)
+	                return consumerCb(error, null);
+	            return consumerCb(null, data);
+	        });
+	    };
+	    OCVClient.prototype.validateChallengeSignedHash = function (data, callback) {
+	        var _req = {};
+	        _req.base64Signature = data.base64Signature;
+	        _req.base64Certificate = data.base64Certificate;
+	        _req.hash = data.hash;
+	        _req.digestAlgorithm = data.digestAlgorithm;
+	        this.connection.post(this.url + CHALLENGE, _req, callback);
+	    };
+	    OCVClient.prototype.validateCertificateChain = function (data, callback) {
+	        var _req = {};
+	        _req.certificateChain = data.certificateChain;
+	        this.connection.post(this.url + CERTIFICATE, _req, callback);
+	    };
+	    return OCVClient;
+	}());
+	exports.OCVClient = OCVClient;
 
 
 /***/ }

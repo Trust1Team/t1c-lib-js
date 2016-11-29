@@ -85,7 +85,7 @@ class EidBe implements AbstractEidBE{
     public authenticate(body, callback) {
         let _req:any = {};
         if(body){
-            _req.data = body.challenge;
+            _req.data = body.data;
             _req.algorithm_reference = body.algorithm_reference;
             if(body.pin) {_req.pin = body.pin;}
         }
