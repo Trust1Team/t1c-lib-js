@@ -136,6 +136,7 @@
     <div>
         <div><button id="ocvGetChallenge" type="button" class="btn btn-default btn-lg">OCV - Get Challenge</button></div>
         <div><button id="ocvBeIDAuthenticate" type="button" class="btn btn-default btn-lg">OCV - Authenticate Server Challenge</button></div>
+        <div><button id="ocvValidateCertChain" type="button" class="btn btn-default btn-lg">OCV - Validate Certificate Chain</button></div>
         <hr />
     </div>
     <pre id="information"></pre>
@@ -308,7 +309,8 @@
         gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
         //gclConfig.gclUrl = "http://localhost:10080/v1"; //override config for local dev
         gclConfig.dsUrl = "https://accapim.t1t.be:443";
-        gclConfig.ocvUrl = "https://accapim.t1t.be:443/trust1team/ocv-api/v1";
+        //gclConfig.ocvUrl = "https://accapim.t1t.be:443/trust1team/ocv-api/v1";
+        gclConfig.ocvUrl = "http://localhost:8080/ocv-api-web/v1";
         //gclConfig.dsUrl = "http://localhost:8080";
         gclConfig.allowAutoUpdate = true;
         gclConfig.implicitDownload = false;
@@ -735,6 +737,43 @@
             $("#vauthError").empty();
             $("#vauthError").hide();
             $("#ocvAuthModal").modal('toggle');
+        });
+
+        $("#ocvValidateCertChain").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+
+            connector.beid($("#selected_reader").text()).allCerts([],function(err,data){
+                //print output
+                callback(err,data);
+                var authCert = {};
+                authCert.order=0;
+                authCert.certificate = data.authentication_certificate;
+                var intermediateCert = {};
+                intermediateCert.order=1;
+                intermediateCert.certificate = data.citizen_certificate;
+                var rootCert = {};
+                rootCert.order=2;
+                rootCert.certificate = data.root_certificate;
+                var _body = [];
+                _body.push(authCert);
+                _body.push(intermediateCert);
+                _body.push(rootCert);
+                connector.ocv().validateCertificateChain(_body,callback);
+            });
+
+/*            var ocv = connector.ocv();
+            ocv.getChallenge('SHA256',function(err,data){
+                if(err){$("#error").empty();$("#error").append("ERROR:\n", JSON.stringify(err, null, '  '));}
+                else {
+                    $("#ocvtempvalue").val(data.hash);
+                }
+            });
+            $("#authInformation").empty();
+            $("#authInformation").hide();
+            $("#vauthError").empty();
+            $("#vauthError").hide();
+            $("#ocvAuthModal").modal('toggle');*/
         });
 
     })(window.jQuery);
