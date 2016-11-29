@@ -434,6 +434,21 @@
                 $("#ocvAuthInfo").append(JSON.stringify(data, null, '  '));
                 $("#ocvAuthInfo").show();
             }
+            var signature = data.data;
+            // verify challenge against backend
+            connector.beid($("#selected_reader").text()).authenticationCertificate(function(err,data){
+                var _req = {};
+                _req.hash = $("#ocvtempvalue").val();
+                _req.digestAlgorithm = "SHA256";
+                _req.base64Signature = signature;
+                _req.base64Certificate = data.data;
+                connector.ocv().validateChallengeSignedHash(_req,function(err,data){
+                    if(err){$("#error").empty();$("#error").append("ERROR:\n", JSON.stringify(err, null, '  '));}
+                    else {
+                        $("#ocvAuthInfo").append(JSON.stringify(data, null, '  '));
+                    }
+                });
+            });
         }
 
         //show selected reader in menu
@@ -638,6 +653,7 @@
             connector.beid($("#selected_reader").text()).authenticate(_body, authCallback);
         });
 
+        //call to gcl in order to sign the server generated hash
         $("#ocvButtonAuth").on('click', function () {
             var _body={};
             _body.data = $("#ocvtempvalue").val();
