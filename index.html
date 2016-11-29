@@ -132,7 +132,7 @@
         <hr />
     </div>
     <hr />
-    <h3>EMV Card</h3>
+    <h3>Open Certificate Validation API</h3>
     <div>
         <div><button id="ocvGetChallenge" type="button" class="btn btn-default btn-lg">OCV - Get Challenge</button></div>
         <div><button id="ocvBeIDAuthenticate" type="button" class="btn btn-default btn-lg">OCV - Authenticate Server Challenge</button></div>
@@ -742,8 +742,12 @@
         $("#ocvValidateCertChain").on('click', function () {
             $("#information").empty();
             $("#error").empty();
-
-            connector.beid($("#selected_reader").text()).allCerts([],function(err,certdata){
+            //create certificate filter
+            var certFilter = [];
+            certFilter.push("root-certificate");
+            certFilter.push("authentication-certificate");
+            certFilter.push("citizen-certificate");
+            connector.beid($("#selected_reader").text()).allCerts(certFilter,function(err,certdata){
                 //print output
                 callback(err,certdata);
                 var authCert = {};
@@ -763,19 +767,6 @@
                 _body.certificateChain = certificates;
                 connector.ocv().validateCertificateChain(_body,callback);
             });
-
-/*            var ocv = connector.ocv();
-            ocv.getChallenge('SHA256',function(err,data){
-                if(err){$("#error").empty();$("#error").append("ERROR:\n", JSON.stringify(err, null, '  '));}
-                else {
-                    $("#ocvtempvalue").val(data.hash);
-                }
-            });
-            $("#authInformation").empty();
-            $("#authInformation").hide();
-            $("#vauthError").empty();
-            $("#vauthError").hide();
-            $("#ocvAuthModal").modal('toggle');*/
         });
 
     })(window.jQuery);
