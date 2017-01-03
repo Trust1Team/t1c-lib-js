@@ -159,4 +159,9 @@ class GCLClient {
     }
 }
 
-export {GCLClient,GCLConfig}
+// get Lib version
+function version() {
+    return '%%GULP_INJECT_VERSION%%';
+}
+
+export {GCLClient,GCLConfig,version}

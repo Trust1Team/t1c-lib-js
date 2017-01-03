@@ -1,15 +1,20 @@
+///<reference path="../../../typings/index.d.ts"/>
 import {expect} from "chai";
 import {LocalAuthConnection} from "../../scripts/core/client/Connection";
 import {CoreService} from "../../scripts/core/services/CoreService";
+import {GCLConfig} from "../../scripts/core/GCLConfig";
 
 describe('GCLClient', () => {
     let gclUnderTest = "https://localhost:10443/v1";
     let localAuthConnection:LocalAuthConnection;
     let core:CoreService;
+    let config = new GCLConfig("https://dist.t1t.be/v1","someapikey");
+
 
     beforeEach(() => {
-        localAuthConnection = new LocalAuthConnection();
-        core = new CoreService(gclUnderTest,localAuthConnection);
+
+        localAuthConnection = new LocalAuthConnection(config);
+        core = new CoreService(gclUnderTest,localAuthConnection, config);
     });
 
     describe('GCL Core Service', () => {
