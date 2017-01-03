@@ -31,8 +31,8 @@ describe('GCLClient', () => {
             expect(core.getUrl()).to.equals(gclUnderTest);
         });
 
-        it('should return information about the GCL client', (done) => {
-            core.info(function(err,data){
+        it('should return information about the client browser', (done) => {
+            core.infoBrowser(function(err,data){
                 expect(err).to.be.null;
                 expect(data).exist;
                 done();
