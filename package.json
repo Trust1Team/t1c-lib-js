@@ -5,7 +5,7 @@
   "main": "dist/connector.js",
   "scripts": {
     "postinstall": "typings install",
-    "test": "karma start --single-run",
+    "test": "./node_modules/karma-cli/bin/karma start --reporters teamcity --single-run --colors false",
     "build": "gulp webpack"
   },
   "repository": {
@@ -29,15 +29,17 @@
     "karma": "^0.13.22",
     "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "^2.0.0",
+    "karma-cli": "^1.0.1",
     "karma-firefox-launcher": "^1.0.0",
     "karma-ie-launcher": "^1.0.0",
     "karma-jquery": "^0.1.0",
     "karma-mocha": "^1.1.1",
     "karma-opera-launcher": "^1.0.0",
-    "karma-phantomjs-launcher": "^1.0.0",
+    "karma-phantomjs-launcher": "^1.0.1",
     "karma-safari-launcher": "^1.0.0",
     "karma-sinon": "^1.0.5",
     "karma-sinon-chai": "^1.2.3",
+    "karma-teamcity-reporter": "^1.0.0",
     "karma-typescript-preprocessor2": "^1.2.1",
     "karma-webpack": "^1.7.0",
     "phantomjs-prebuilt": "^2.1.7",
