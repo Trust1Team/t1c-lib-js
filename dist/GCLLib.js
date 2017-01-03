@@ -173,6 +173,10 @@ var GCLLib =
 	    return GCLClient;
 	}());
 	exports.GCLClient = GCLClient;
+	function version() {
+	    return 'v0.9.12';
+	}
+	exports.version = version;
 
 
 /***/ },
@@ -622,33 +626,33 @@ var GCLLib =
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*!
-	 * Platform.js v1.3.1 <http://mths.be/platform>
-	 * Copyright 2014-2016 Benjamin Tan <https://d10.github.io/>
+	 * Platform.js <https://mths.be/platform>
+	 * Copyright 2014-2016 Benjamin Tan <https://demoneaux.github.io/>
 	 * Copyright 2011-2013 John-David Dalton <http://allyoucanleet.com/>
-	 * Available under MIT license <http://mths.be/mit>
+	 * Available under MIT license <https://mths.be/mit>
 	 */
 	;(function() {
 	  'use strict';
 	
-	  /** Used to determine if values are of the language type `Object` */
+	  /** Used to determine if values are of the language type `Object`. */
 	  var objectTypes = {
 	    'function': true,
 	    'object': true
 	  };
 	
-	  /** Used as a reference to the global object */
+	  /** Used as a reference to the global object. */
 	  var root = (objectTypes[typeof window] && window) || this;
 	
-	  /** Backup possible global object */
+	  /** Backup possible global object. */
 	  var oldRoot = root;
 	
-	  /** Detect free variable `exports` */
+	  /** Detect free variable `exports`. */
 	  var freeExports = objectTypes[typeof exports] && exports;
 	
-	  /** Detect free variable `module` */
+	  /** Detect free variable `module`. */
 	  var freeModule = objectTypes[typeof module] && module && !module.nodeType && module;
 	
-	  /** Detect free variable `global` from Node.js or Browserified code and use it as `root` */
+	  /** Detect free variable `global` from Node.js or Browserified code and use it as `root`. */
 	  var freeGlobal = freeExports && freeModule && typeof global == 'object' && global;
 	  if (freeGlobal && (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal || freeGlobal.self === freeGlobal)) {
 	    root = freeGlobal;
@@ -661,19 +665,19 @@ var GCLLib =
 	   */
 	  var maxSafeInteger = Math.pow(2, 53) - 1;
 	
-	  /** Opera regexp */
+	  /** Regular expression to detect Opera. */
 	  var reOpera = /\bOpera/;
 	
-	  /** Possible global object */
+	  /** Possible global object. */
 	  var thisBinding = this;
 	
-	  /** Used for native method references */
+	  /** Used for native method references. */
 	  var objectProto = Object.prototype;
 	
-	  /** Used to check for own properties of an object */
+	  /** Used to check for own properties of an object. */
 	  var hasOwnProperty = objectProto.hasOwnProperty;
 	
-	  /** Used to resolve the internal `[[Class]]` of values */
+	  /** Used to resolve the internal `[[Class]]` of values. */
 	  var toString = objectProto.toString;
 	
 	  /*--------------------------------------------------------------------------*/
@@ -699,11 +703,12 @@ var GCLLib =
 	   * @param {string} [label] A label for the OS.
 	   */
 	  function cleanupOS(os, pattern, label) {
-	    // platform tokens defined at
+	    // Platform tokens are defined at:
 	    // http://msdn.microsoft.com/en-us/library/ms537503(VS.85).aspx
 	    // http://web.archive.org/web/20081122053950/http://msdn.microsoft.com/en-us/library/ms537503(VS.85).aspx
 	    var data = {
-	      '6.4':  '10',
+	      '10.0': '10',
+	      '6.4':  '10 Technical Preview',
 	      '6.3':  '8.1',
 	      '6.2':  '8',
 	      '6.1':  'Server 2008 R2 / 7',
@@ -715,12 +720,12 @@ var GCLLib =
 	      '4.0':  'NT',
 	      '4.90': 'ME'
 	    };
-	    // detect Windows version from platform tokens
-	    if (pattern && label && /^Win/i.test(os) &&
-	        (data = data[0/*Opera 9.25 fix*/, /[\d.]+$/.exec(os)])) {
+	    // Detect Windows version from platform tokens.
+	    if (pattern && label && /^Win/i.test(os) && !/^Windows Phone /i.test(os) &&
+	        (data = data[/[\d.]+$/.exec(os)])) {
 	      os = 'Windows ' + data;
 	    }
-	    // correct character case and cleanup
+	    // Correct character case and cleanup string.
 	    os = String(os);
 	
 	    if (pattern && label) {
@@ -739,6 +744,7 @@ var GCLLib =
 	        .replace(/(?: BePC|[ .]*fc[ \d.]+)$/i, '')
 	        .replace(/\bx86\.64\b/gi, 'x86_64')
 	        .replace(/\b(Windows Phone) OS\b/, '$1')
+	        .replace(/\b(Chrome OS \w+) [\d.]+\b/, '$1')
 	        .split(' on ')[0]
 	    );
 	
@@ -873,93 +879,94 @@ var GCLLib =
 	   */
 	  function parse(ua) {
 	
-	    /** The environment context object */
+	    /** The environment context object. */
 	    var context = root;
 	
-	    /** Used to flag when a custom context is provided */
+	    /** Used to flag when a custom context is provided. */
 	    var isCustomContext = ua && typeof ua == 'object' && getClassOf(ua) != 'String';
 	
-	    // juggle arguments
+	    // Juggle arguments.
 	    if (isCustomContext) {
 	      context = ua;
 	      ua = null;
 	    }
 	
-	    /** Browser navigator object */
+	    /** Browser navigator object. */
 	    var nav = context.navigator || {};
 	
-	    /** Browser user agent string */
+	    /** Browser user agent string. */
 	    var userAgent = nav.userAgent || '';
 	
 	    ua || (ua = userAgent);
 	
-	    /** Used to flag when `thisBinding` is the [ModuleScope] */
+	    /** Used to flag when `thisBinding` is the [ModuleScope]. */
 	    var isModuleScope = isCustomContext || thisBinding == oldRoot;
 	
-	    /** Used to detect if browser is like Chrome */
+	    /** Used to detect if browser is like Chrome. */
 	    var likeChrome = isCustomContext
 	      ? !!nav.likeChrome
 	      : /\bChrome\b/.test(ua) && !/internal|\n/i.test(toString.toString());
 	
-	    /** Internal `[[Class]]` value shortcuts */
+	    /** Internal `[[Class]]` value shortcuts. */
 	    var objectClass = 'Object',
 	        airRuntimeClass = isCustomContext ? objectClass : 'ScriptBridgingProxyObject',
 	        enviroClass = isCustomContext ? objectClass : 'Environment',
 	        javaClass = (isCustomContext && context.java) ? 'JavaPackage' : getClassOf(context.java),
 	        phantomClass = isCustomContext ? objectClass : 'RuntimeObject';
 	
-	    /** Detect Java environment */
+	    /** Detect Java environments. */
 	    var java = /\bJava/.test(javaClass) && context.java;
 	
-	    /** Detect Rhino */
+	    /** Detect Rhino. */
 	    var rhino = java && getClassOf(context.environment) == enviroClass;
 	
-	    /** A character to represent alpha */
+	    /** A character to represent alpha. */
 	    var alpha = java ? 'a' : '\u03b1';
 	
-	    /** A character to represent beta */
+	    /** A character to represent beta. */
 	    var beta = java ? 'b' : '\u03b2';
 	
-	    /** Browser document object */
+	    /** Browser document object. */
 	    var doc = context.document || {};
 	
 	    /**
-	     * Detect Opera browser (Presto-based)
+	     * Detect Opera browser (Presto-based).
 	     * http://www.howtocreate.co.uk/operaStuff/operaObject.html
 	     * http://dev.opera.com/articles/view/opera-mini-web-content-authoring-guidelines/#operamini
 	     */
 	    var opera = context.operamini || context.opera;
 	
-	    /** Opera `[[Class]]` */
+	    /** Opera `[[Class]]`. */
 	    var operaClass = reOpera.test(operaClass = (isCustomContext && opera) ? opera['[[Class]]'] : getClassOf(opera))
 	      ? operaClass
 	      : (opera = null);
 	
 	    /*------------------------------------------------------------------------*/
 	
-	    /** Temporary variable used over the script's lifetime */
+	    /** Temporary variable used over the script's lifetime. */
 	    var data;
 	
-	    /** The CPU architecture */
+	    /** The CPU architecture. */
 	    var arch = ua;
 	
-	    /** Platform description array */
+	    /** Platform description array. */
 	    var description = [];
 	
-	    /** Platform alpha/beta indicator */
+	    /** Platform alpha/beta indicator. */
 	    var prerelease = null;
 	
-	    /** A flag to indicate that environment features should be used to resolve the platform */
+	    /** A flag to indicate that environment features should be used to resolve the platform. */
 	    var useFeatures = ua == userAgent;
 	
-	    /** The browser/environment version */
+	    /** The browser/environment version. */
 	    var version = useFeatures && opera && typeof opera.version == 'function' && opera.version();
 	
 	    /** A flag to indicate if the OS ends with "/ Version" */
 	    var isSpecialCasedOS;
 	
-	    /* Detectable layout engines (order is important) */
+	    /* Detectable layout engines (order is important). */
 	    var layout = getLayout([
+	      { 'label': 'EdgeHTML', 'pattern': 'Edge' },
 	      'Trident',
 	      { 'label': 'WebKit', 'pattern': 'AppleWebKit' },
 	      'iCab',
@@ -970,7 +977,7 @@ var GCLLib =
 	      'Gecko'
 	    ]);
 	
-	    /* Detectable browser names (order is important) */
+	    /* Detectable browser names (order is important). */
 	    var name = getName([
 	      'Adobe AIR',
 	      'Arora',
@@ -984,13 +991,14 @@ var GCLLib =
 	      'GreenBrowser',
 	      'iCab',
 	      'Iceweasel',
-	      { 'label': 'SRWare Iron', 'pattern': 'Iron' },
 	      'K-Meleon',
 	      'Konqueror',
 	      'Lunascape',
 	      'Maxthon',
+	      { 'label': 'Microsoft Edge', 'pattern': 'Edge' },
 	      'Midori',
 	      'Nook Browser',
+	      'PaleMoon',
 	      'PhantomJS',
 	      'Raven',
 	      'Rekonq',
@@ -999,6 +1007,7 @@ var GCLLib =
 	      { 'label': 'Silk', 'pattern': '(?:Cloud9|Silk-Accelerated)' },
 	      'Sleipnir',
 	      'SlimBrowser',
+	      { 'label': 'SRWare Iron', 'pattern': 'Iron' },
 	      'Sunrise',
 	      'Swiftfox',
 	      'WebPositive',
@@ -1009,12 +1018,13 @@ var GCLLib =
 	      'Chrome',
 	      { 'label': 'Chrome Mobile', 'pattern': '(?:CriOS|CrMo)' },
 	      { 'label': 'Firefox', 'pattern': '(?:Firefox|Minefield)' },
+	      { 'label': 'Firefox for iOS', 'pattern': 'FxiOS' },
 	      { 'label': 'IE', 'pattern': 'IEMobile' },
 	      { 'label': 'IE', 'pattern': 'MSIE' },
 	      'Safari'
 	    ]);
 	
-	    /* Detectable products (order is important) */
+	    /* Detectable products (order is important). */
 	    var product = getProduct([
 	      { 'label': 'BlackBerry', 'pattern': 'BB10' },
 	      'BlackBerry',
@@ -1029,10 +1039,11 @@ var GCLLib =
 	      'iPhone',
 	      'Kindle',
 	      { 'label': 'Kindle Fire', 'pattern': '(?:Cloud9|Silk-Accelerated)' },
+	      'Nexus',
 	      'Nook',
 	      'PlayBook',
-	      'PlayStation 4',
 	      'PlayStation 3',
+	      'PlayStation 4',
 	      'PlayStation Vita',
 	      'TouchPad',
 	      'Transformer',
@@ -1043,14 +1054,15 @@ var GCLLib =
 	      'Xoom'
 	    ]);
 	
-	    /* Detectable manufacturers */
+	    /* Detectable manufacturers. */
 	    var manufacturer = getManufacturer({
 	      'Apple': { 'iPad': 1, 'iPhone': 1, 'iPod': 1 },
+	      'Archos': {},
 	      'Amazon': { 'Kindle': 1, 'Kindle Fire': 1 },
 	      'Asus': { 'Transformer': 1 },
 	      'Barnes & Noble': { 'Nook': 1 },
 	      'BlackBerry': { 'PlayBook': 1 },
-	      'Google': { 'Google TV': 1 },
+	      'Google': { 'Google TV': 1, 'Nexus': 1 },
 	      'HP': { 'TouchPad': 1 },
 	      'HTC': {},
 	      'LG': {},
@@ -1062,11 +1074,12 @@ var GCLLib =
 	      'Sony': { 'PlayStation 4': 1, 'PlayStation 3': 1, 'PlayStation Vita': 1 }
 	    });
 	
-	    /* Detectable OSes (order is important) */
+	    /* Detectable operating systems (order is important). */
 	    var os = getOS([
-	      'Windows Phone ',
+	      'Windows Phone',
 	      'Android',
 	      'CentOS',
+	      { 'label': 'Chrome OS', 'pattern': 'CrOS' },
 	      'Debian',
 	      'Fedora',
 	      'FreeBSD',
@@ -1074,6 +1087,7 @@ var GCLLib =
 	      'Haiku',
 	      'Kubuntu',
 	      'Linux Mint',
+	      'OpenBSD',
 	      'Red Hat',
 	      'SuSE',
 	      'Ubuntu',
@@ -1118,10 +1132,10 @@ var GCLLib =
 	     */
 	    function getManufacturer(guesses) {
 	      return reduce(guesses, function(result, value, key) {
-	        // lookup the manufacturer by product or scan the UA for the manufacturer
+	        // Lookup the manufacturer by product or scan the UA for the manufacturer.
 	        return result || (
 	          value[product] ||
-	          value[0/*Opera 9.25 fix*/, /^[a-z]+(?: +[a-z]+\b)*/i.exec(product)] ||
+	          value[/^[a-z]+(?: +[a-z]+\b)*/i.exec(product)] ||
 	          RegExp('\\b' + qualify(key) + '(?:\\b|\\w*\\d)', 'i').exec(ua)
 	        ) && key;
 	      });
@@ -1175,11 +1189,11 @@ var GCLLib =
 	              RegExp('\\b' + pattern + ' *\\d+[.\\w_]*', 'i').exec(ua) ||
 	              RegExp('\\b' + pattern + '(?:; *(?:[a-z]+[_-])?[a-z]+\\d+|[^ ();-]*)', 'i').exec(ua)
 	            )) {
-	          // split by forward slash and append product version if needed
+	          // Split by forward slash and append product version if needed.
 	          if ((result = String((guess.label && !RegExp(pattern, 'i').test(guess.label)) ? guess.label : result).split('/'))[1] && !/[\d.]+/.test(result[0])) {
 	            result[0] += ' ' + result[1];
 	          }
-	          // correct character case and cleanup
+	          // Correct character case and cleanup string.
 	          guess = guess.label || guess;
 	          result = format(result[0]
 	            .replace(RegExp(pattern, 'i'), guess)
@@ -1217,121 +1231,125 @@ var GCLLib =
 	
 	    /*------------------------------------------------------------------------*/
 	
-	    // convert layout to an array so we can add extra details
+	    // Convert layout to an array so we can add extra details.
 	    layout && (layout = [layout]);
 	
-	    // detect product names that contain their manufacturer's name
+	    // Detect product names that contain their manufacturer's name.
 	    if (manufacturer && !product) {
 	      product = getProduct([manufacturer]);
 	    }
-	    // clean up Google TV
+	    // Clean up Google TV.
 	    if ((data = /\bGoogle TV\b/.exec(product))) {
 	      product = data[0];
 	    }
-	    // detect simulators
+	    // Detect simulators.
 	    if (/\bSimulator\b/i.test(ua)) {
 	      product = (product ? product + ' ' : '') + 'Simulator';
 	    }
-	    // detect Opera Mini 8+ running in Turbo/Uncompressed mode on iOS
+	    // Detect Opera Mini 8+ running in Turbo/Uncompressed mode on iOS.
 	    if (name == 'Opera Mini' && /\bOPiOS\b/.test(ua)) {
 	      description.push('running in Turbo/Uncompressed mode');
 	    }
-	    // detect iOS
-	    if (/^iP/.test(product)) {
+	    // Detect IE Mobile 11.
+	    if (name == 'IE' && /\blike iPhone OS\b/.test(ua)) {
+	      data = parse(ua.replace(/like iPhone OS/, ''));
+	      manufacturer = data.manufacturer;
+	      product = data.product;
+	    }
+	    // Detect iOS.
+	    else if (/^iP/.test(product)) {
 	      name || (name = 'Safari');
 	      os = 'iOS' + ((data = / OS ([\d_]+)/i.exec(ua))
 	        ? ' ' + data[1].replace(/_/g, '.')
 	        : '');
 	    }
-	    // detect Kubuntu
+	    // Detect Kubuntu.
 	    else if (name == 'Konqueror' && !/buntu/i.test(os)) {
 	      os = 'Kubuntu';
 	    }
-	    // detect Android browsers
-	    else if (manufacturer && manufacturer != 'Google' &&
-	        ((/Chrome/.test(name) && !/\bMobile Safari\b/i.test(ua)) || /\bVita\b/.test(product))) {
+	    // Detect Android browsers.
+	    else if ((manufacturer && manufacturer != 'Google' &&
+	        ((/Chrome/.test(name) && !/\bMobile Safari\b/i.test(ua)) || /\bVita\b/.test(product))) ||
+	        (/\bAndroid\b/.test(os) && /^Chrome/.test(name) && /\bVersion\//i.test(ua))) {
 	      name = 'Android Browser';
 	      os = /\bAndroid\b/.test(os) ? os : 'Android';
 	    }
-	    // detect false positives for Firefox/Safari
-	    else if (!name || (data = !/\bMinefield\b|\(Android;/i.test(ua) && /\b(?:Firefox|Safari)\b/.exec(name))) {
-	      // escape the `/` for Firefox 1
+	    // Detect Silk desktop/accelerated modes.
+	    else if (name == 'Silk') {
+	      if (!/\bMobi/i.test(ua)) {
+	        os = 'Android';
+	        description.unshift('desktop mode');
+	      }
+	      if (/Accelerated *= *true/i.test(ua)) {
+	        description.unshift('accelerated');
+	      }
+	    }
+	    // Detect PaleMoon identifying as Firefox.
+	    else if (name == 'PaleMoon' && (data = /\bFirefox\/([\d.]+)\b/.exec(ua))) {
+	      description.push('identifying as Firefox ' + data[1]);
+	    }
+	    // Detect Firefox OS and products running Firefox.
+	    else if (name == 'Firefox' && (data = /\b(Mobile|Tablet|TV)\b/i.exec(ua))) {
+	      os || (os = 'Firefox OS');
+	      product || (product = data[1]);
+	    }
+	    // Detect false positives for Firefox/Safari.
+	    else if (!name || (data = !/\bMinefield\b/i.test(ua) && /\b(?:Firefox|Safari)\b/.exec(name))) {
+	      // Escape the `/` for Firefox 1.
 	      if (name && !product && /[\/,]|^[^(]+?\)/.test(ua.slice(ua.indexOf(data + '/') + 8))) {
-	        // clear name of false positives
+	        // Clear name of false positives.
 	        name = null;
 	      }
-	      // reassign a generic name
+	      // Reassign a generic name.
 	      if ((data = product || manufacturer || os) &&
 	          (product || manufacturer || /\b(?:Android|Symbian OS|Tablet OS|webOS)\b/.test(os))) {
 	        name = /[a-z]+(?: Hat)?/i.exec(/\bAndroid\b/.test(os) ? os : data) + ' Browser';
 	      }
 	    }
-	    // detect Firefox OS
-	    if ((data = /\((Mobile|Tablet).*?Firefox\b/i.exec(ua)) && data[1]) {
-	      os = 'Firefox OS';
-	      if (!product) {
-	        product = data[1];
-	      }
-	    }
-	    // detect non-Opera versions (order is important)
+	    // Detect non-Opera (Presto-based) versions (order is important).
 	    if (!version) {
 	      version = getVersion([
-	        '(?:Cloud9|CriOS|CrMo|IEMobile|Iron|Opera ?Mini|OPiOS|OPR|Raven|Silk(?!/[\\d.]+$))',
+	        '(?:Cloud9|CriOS|CrMo|Edge|FxiOS|IEMobile|Iron|Opera ?Mini|OPiOS|OPR|Raven|Silk(?!/[\\d.]+$))',
 	        'Version',
 	        qualify(name),
 	        '(?:Firefox|Minefield|NetFront)'
 	      ]);
 	    }
-	    // detect stubborn layout engines
-	    if (layout == 'iCab' && parseFloat(version) > 3) {
-	      layout = ['WebKit'];
-	    } else if (
-	        layout != 'Trident' &&
-	        (data =
+	    // Detect stubborn layout engines.
+	    if ((data =
+	          layout == 'iCab' && parseFloat(version) > 3 && 'WebKit' ||
 	          /\bOpera\b/.test(name) && (/\bOPR\b/.test(ua) ? 'Blink' : 'Presto') ||
-	          /\b(?:Midori|Nook|Safari)\b/i.test(ua) && 'WebKit' ||
-	          !layout && /\bMSIE\b/i.test(ua) && (os == 'Mac OS' ? 'Tasman' : 'Trident')
-	        )
-	    ) {
+	          /\b(?:Midori|Nook|Safari)\b/i.test(ua) && !/^(?:Trident|EdgeHTML)$/.test(layout) && 'WebKit' ||
+	          !layout && /\bMSIE\b/i.test(ua) && (os == 'Mac OS' ? 'Tasman' : 'Trident') ||
+	          layout == 'WebKit' && /\bPlayStation\b(?! Vita\b)/i.test(name) && 'NetFront'
+	        )) {
 	      layout = [data];
 	    }
-	    // detect NetFront on PlayStation
-	    else if (/\bPlayStation\b(?! Vita\b)/i.test(name) && layout == 'WebKit') {
-	      layout = ['NetFront'];
-	    }
-	    // detect Windows Phone 7 desktop mode
+	    // Detect Windows Phone 7 desktop mode.
 	    if (name == 'IE' && (data = (/; *(?:XBLWP|ZuneWP)(\d+)/i.exec(ua) || 0)[1])) {
 	      name += ' Mobile';
 	      os = 'Windows Phone ' + (/\+$/.test(data) ? data : data + '.x');
 	      description.unshift('desktop mode');
 	    }
-	    // detect Windows Phone 8+ desktop mode
+	    // Detect Windows Phone 8.x desktop mode.
 	    else if (/\bWPDesktop\b/i.test(ua)) {
 	      name = 'IE Mobile';
-	      os = 'Windows Phone 8+';
+	      os = 'Windows Phone 8.x';
 	      description.unshift('desktop mode');
 	      version || (version = (/\brv:([\d.]+)/.exec(ua) || 0)[1]);
 	    }
-	    // detect IE 11 and above
+	    // Detect IE 11.
 	    else if (name != 'IE' && layout == 'Trident' && (data = /\brv:([\d.]+)/.exec(ua))) {
-	      if (!/\bWPDesktop\b/i.test(ua)) {
-	        if (name) {
-	          description.push('identifying as ' + name + (version ? ' ' + version : ''));
-	        }
-	        name = 'IE';
+	      if (name) {
+	        description.push('identifying as ' + name + (version ? ' ' + version : ''));
 	      }
+	      name = 'IE';
 	      version = data[1];
 	    }
-	    // detect Microsoft Edge
-	    else if ((name == 'Chrome' || name != 'IE') && (data = /\bEdge\/([\d.]+)/.exec(ua))) {
-	      name = 'Microsoft Edge';
-	      version = data[1];
-	      layout = ['Trident'];
-	    }
-	    // leverage environment features
+	    // Leverage environment features.
 	    if (useFeatures) {
-	      // detect server-side environments
-	      // Rhino has a global function while others have a global object
+	      // Detect server-side environments.
+	      // Rhino has a global function while others have a global object.
 	      if (isHostType(context, 'global')) {
 	        if (java) {
 	          data = java.lang.System;
@@ -1350,7 +1368,10 @@ var GCLLib =
 	            }
 	          }
 	        }
-	        else if (typeof context.process == 'object' && (data = context.process)) {
+	        else if (
+	          typeof context.process == 'object' && !context.process.browser &&
+	          (data = context.process)
+	        ) {
 	          name = 'Node.js';
 	          arch = data.arch;
 	          os = data.platform;
@@ -1360,20 +1381,20 @@ var GCLLib =
 	          name = 'Rhino';
 	        }
 	      }
-	      // detect Adobe AIR
+	      // Detect Adobe AIR.
 	      else if (getClassOf((data = context.runtime)) == airRuntimeClass) {
 	        name = 'Adobe AIR';
 	        os = data.flash.system.Capabilities.os;
 	      }
-	      // detect PhantomJS
+	      // Detect PhantomJS.
 	      else if (getClassOf((data = context.phantom)) == phantomClass) {
 	        name = 'PhantomJS';
 	        version = (data = data.version || null) && (data.major + '.' + data.minor + '.' + data.patch);
 	      }
-	      // detect IE compatibility modes
+	      // Detect IE compatibility modes.
 	      else if (typeof doc.documentMode == 'number' && (data = /\bTrident\/(\d+)/i.exec(ua))) {
-	        // we're in compatibility mode when the Trident version + 4 doesn't
-	        // equal the document mode
+	        // We're in compatibility mode when the Trident version + 4 doesn't
+	        // equal the document mode.
 	        version = [version, doc.documentMode];
 	        if ((data = +data[1] + 4) != version[1]) {
 	          description.push('IE ' + version[1] + ' mode');
@@ -1384,7 +1405,7 @@ var GCLLib =
 	      }
 	      os = os && format(os);
 	    }
-	    // detect prerelease phases
+	    // Detect prerelease phases.
 	    if (version && (data =
 	          /(?:[ab]|dp|pre|[ab]\d+pre)(?:\d+\+?)?$/i.exec(version) ||
 	          /(?:alpha|beta)(?: ?\d)?/i.exec(ua + ';' + (useFeatures && nav.appMinorVersion)) ||
@@ -1394,41 +1415,31 @@ var GCLLib =
 	      version = version.replace(RegExp(data + '\\+?$'), '') +
 	        (prerelease == 'beta' ? beta : alpha) + (/\d+\+?/.exec(data) || '');
 	    }
-	    // detect Firefox Mobile
+	    // Detect Firefox Mobile.
 	    if (name == 'Fennec' || name == 'Firefox' && /\b(?:Android|Firefox OS)\b/.test(os)) {
 	      name = 'Firefox Mobile';
 	    }
-	    // obscure Maxthon's unreliable version
+	    // Obscure Maxthon's unreliable version.
 	    else if (name == 'Maxthon' && version) {
 	      version = version.replace(/\.[\d.]+/, '.x');
 	    }
-	    // detect Silk desktop/accelerated modes
-	    else if (name == 'Silk') {
-	      if (!/\bMobi/i.test(ua)) {
-	        os = 'Android';
-	        description.unshift('desktop mode');
-	      }
-	      if (/Accelerated *= *true/i.test(ua)) {
-	        description.unshift('accelerated');
-	      }
-	    }
-	    // detect Xbox 360 and Xbox One
+	    // Detect Xbox 360 and Xbox One.
 	    else if (/\bXbox\b/i.test(product)) {
 	      os = null;
 	      if (product == 'Xbox 360' && /\bIEMobile\b/.test(ua)) {
 	        description.unshift('mobile mode');
 	      }
 	    }
-	    // add mobile postfix
+	    // Add mobile postfix.
 	    else if ((/^(?:Chrome|IE|Opera)$/.test(name) || name && !product && !/Browser|Mobi/.test(name)) &&
 	        (os == 'Windows CE' || /Mobi/i.test(ua))) {
 	      name += ' Mobile';
 	    }
-	    // detect IE platform preview
+	    // Detect IE platform preview.
 	    else if (name == 'IE' && useFeatures && context.external === null) {
 	      description.unshift('platform preview');
 	    }
-	    // detect BlackBerry OS version
+	    // Detect BlackBerry OS version.
 	    // http://docs.blackberry.com/en/developers/deliverables/18169/HTTP_headers_sent_by_BB_Browser_1234911_11.jsp
 	    else if ((/\bBlackBerry\b/.test(product) || /\bBB10\b/.test(ua)) && (data =
 	          (RegExp(product.replace(/ +/g, ' *') + '/([.\\d]+)', 'i').exec(ua) || 0)[1] ||
@@ -1438,22 +1449,19 @@ var GCLLib =
 	      os = (data[1] ? (product = null, manufacturer = 'BlackBerry') : 'Device Software') + ' ' + data[0];
 	      version = null;
 	    }
-	    // detect Opera identifying/masking itself as another browser
+	    // Detect Opera identifying/masking itself as another browser.
 	    // http://www.opera.com/support/kb/view/843/
-	    else if (this != forOwn && (
-	          product != 'Wii' && (
-	            (useFeatures && opera) ||
-	            (/Opera/.test(name) && /\b(?:MSIE|Firefox)\b/i.test(ua)) ||
-	            (name == 'Firefox' && /\bOS X (?:\d+\.){2,}/.test(os)) ||
-	            (name == 'IE' && (
-	              (os && !/^Win/.test(os) && version > 5.5) ||
-	              /\bWindows XP\b/.test(os) && version > 8 ||
-	              version == 8 && !/\bTrident\b/.test(ua)
-	            ))
-	          )
+	    else if (this != forOwn && product != 'Wii' && (
+	          (useFeatures && opera) ||
+	          (/Opera/.test(name) && /\b(?:MSIE|Firefox)\b/i.test(ua)) ||
+	          (name == 'Firefox' && /\bOS X (?:\d+\.){2,}/.test(os)) ||
+	          (name == 'IE' && (
+	            (os && !/^Win/.test(os) && version > 5.5) ||
+	            /\bWindows XP\b/.test(os) && version > 8 ||
+	            version == 8 && !/\bTrident\b/.test(ua)
+	          ))
 	        ) && !reOpera.test((data = parse.call(forOwn, ua.replace(reOpera, '') + ';'))) && data.name) {
-	
-	      // when "indentifying", the UA contains both Opera and the other browser's name
+	      // When "identifying", the UA contains both Opera and the other browser's name.
 	      data = 'ing as ' + data.name + ((data = data.version) ? ' ' + data : '');
 	      if (reOpera.test(name)) {
 	        if (/\bIE\b/.test(data) && os == 'Mac OS') {
@@ -1461,7 +1469,7 @@ var GCLLib =
 	        }
 	        data = 'identify' + data;
 	      }
-	      // when "masking", the UA contains only the other browser's name
+	      // When "masking", the UA contains only the other browser's name.
 	      else {
 	        data = 'mask' + data;
 	        if (operaClass) {
@@ -1479,29 +1487,29 @@ var GCLLib =
 	      layout = ['Presto'];
 	      description.push(data);
 	    }
-	    // detect WebKit Nightly and approximate Chrome/Safari versions
+	    // Detect WebKit Nightly and approximate Chrome/Safari versions.
 	    if ((data = (/\bAppleWebKit\/([\d.]+\+?)/i.exec(ua) || 0)[1])) {
-	      // correct build for numeric comparison
+	      // Correct build number for numeric comparison.
 	      // (e.g. "532.5" becomes "532.05")
 	      data = [parseFloat(data.replace(/\.(\d)$/, '.0$1')), data];
-	      // nightly builds are postfixed with a `+`
+	      // Nightly builds are postfixed with a "+".
 	      if (name == 'Safari' && data[1].slice(-1) == '+') {
 	        name = 'WebKit Nightly';
 	        prerelease = 'alpha';
 	        version = data[1].slice(0, -1);
 	      }
-	      // clear incorrect browser versions
+	      // Clear incorrect browser versions.
 	      else if (version == data[1] ||
 	          version == (data[2] = (/\bSafari\/([\d.]+\+?)/i.exec(ua) || 0)[1])) {
 	        version = null;
 	      }
-	      // use the full Chrome version when available
+	      // Use the full Chrome version when available.
 	      data[1] = (/\bChrome\/([\d.]+)/i.exec(ua) || 0)[1];
-	      // detect Blink layout engine
-	      if (data[0] == 537.36 && data[2] == 537.36 && parseFloat(data[1]) >= 28 && name != 'IE' && name != 'Microsoft Edge') {
+	      // Detect Blink layout engine.
+	      if (data[0] == 537.36 && data[2] == 537.36 && parseFloat(data[1]) >= 28 && layout == 'WebKit') {
 	        layout = ['Blink'];
 	      }
-	      // detect JavaScriptCore
+	      // Detect JavaScriptCore.
 	      // http://stackoverflow.com/questions/6768474/how-can-i-detect-which-javascript-engine-v8-or-jsc-is-used-at-runtime-in-androi
 	      if (!useFeatures || (!likeChrome && !data[1])) {
 	        layout && (layout[1] = 'like Safari');
@@ -1510,14 +1518,14 @@ var GCLLib =
 	        layout && (layout[1] = 'like Chrome');
 	        data = data[1] || (data = data[0], data < 530 ? 1 : data < 532 ? 2 : data < 532.05 ? 3 : data < 533 ? 4 : data < 534.03 ? 5 : data < 534.07 ? 6 : data < 534.10 ? 7 : data < 534.13 ? 8 : data < 534.16 ? 9 : data < 534.24 ? 10 : data < 534.30 ? 11 : data < 535.01 ? 12 : data < 535.02 ? '13+' : data < 535.07 ? 15 : data < 535.11 ? 16 : data < 535.19 ? 17 : data < 536.05 ? 18 : data < 536.10 ? 19 : data < 537.01 ? 20 : data < 537.11 ? '21+' : data < 537.13 ? 23 : data < 537.18 ? 24 : data < 537.24 ? 25 : data < 537.36 ? 26 : layout != 'Blink' ? '27' : '28');
 	      }
-	      // add the postfix of ".x" or "+" for approximate versions
+	      // Add the postfix of ".x" or "+" for approximate versions.
 	      layout && (layout[1] += ' ' + (data += typeof data == 'number' ? '.x' : /[.+]/.test(data) ? '' : '+'));
-	      // obscure version for some Safari 1-2 releases
+	      // Obscure version for some Safari 1-2 releases.
 	      if (name == 'Safari' && (!version || parseInt(version) > 45)) {
 	        version = data;
 	      }
 	    }
-	    // detect Opera desktop modes
+	    // Detect Opera desktop modes.
 	    if (name == 'Opera' &&  (data = /\bzbov|zvav$/.exec(os))) {
 	      name += ' ';
 	      description.unshift('desktop mode');
@@ -1529,7 +1537,7 @@ var GCLLib =
 	      }
 	      os = os.replace(RegExp(' *' + data + '$'), '');
 	    }
-	    // detect Chrome desktop mode
+	    // Detect Chrome desktop mode.
 	    else if (name == 'Safari' && /\bChrome\b/.exec(layout && layout[1])) {
 	      description.unshift('desktop mode');
 	      name = 'Chrome Mobile';
@@ -1542,31 +1550,32 @@ var GCLLib =
 	        os = null;
 	      }
 	    }
-	    // strip incorrect OS versions
+	    // Strip incorrect OS versions.
 	    if (version && version.indexOf((data = /[\d.]+$/.exec(os))) == 0 &&
 	        ua.indexOf('/' + data + '-') > -1) {
 	      os = trim(os.replace(data, ''));
 	    }
-	    // add layout engine
+	    // Add layout engine.
 	    if (layout && !/\b(?:Avant|Nook)\b/.test(name) && (
 	        /Browser|Lunascape|Maxthon/.test(name) ||
+	        name != 'Safari' && /^iOS/.test(os) && /\bSafari\b/.test(layout[1]) ||
 	        /^(?:Adobe|Arora|Breach|Midori|Opera|Phantom|Rekonq|Rock|Sleipnir|Web)/.test(name) && layout[1])) {
-	      // don't add layout details to description if they are falsey
+	      // Don't add layout details to description if they are falsey.
 	      (data = layout[layout.length - 1]) && description.push(data);
 	    }
-	    // combine contextual information
+	    // Combine contextual information.
 	    if (description.length) {
 	      description = ['(' + description.join('; ') + ')'];
 	    }
-	    // append manufacturer
+	    // Append manufacturer to description.
 	    if (manufacturer && product && product.indexOf(manufacturer) < 0) {
 	      description.push('on ' + manufacturer);
 	    }
-	    // append product
+	    // Append product to description.
 	    if (product) {
-	      description.push((/^on /.test(description[description.length -1]) ? '' : 'on ') + product);
+	      description.push((/^on /.test(description[description.length - 1]) ? '' : 'on ') + product);
 	    }
-	    // parse OS into an object
+	    // Parse the OS into an object.
 	    if (os) {
 	      data = / ([\d.+]+)$/.exec(os);
 	      isSpecialCasedOS = data && os.charAt(os.length - data[0].length - 1) == '/';
@@ -1580,7 +1589,7 @@ var GCLLib =
 	        }
 	      };
 	    }
-	    // add browser/OS architecture
+	    // Add browser/OS architecture.
 	    if ((data = /\b(?:AMD|IA|Win|WOW|x86_|x)64\b/i.exec(arch)) && !/\bi686\b/i.test(arch)) {
 	      if (os) {
 	        os.architecture = 64;
@@ -1592,6 +1601,13 @@ var GCLLib =
 	      ) {
 	        description.unshift('32-bit');
 	      }
+	    }
+	    // Chrome 39 and above on OS X is always 64-bit.
+	    else if (
+	        os && /^OS X/.test(os.family) &&
+	        name == 'Chrome' && parseFloat(version) >= 39
+	    ) {
+	      os.architecture = 64;
 	    }
 	
 	    ua || (ua = null);
@@ -1736,24 +1752,31 @@ var GCLLib =
 	
 	  /*--------------------------------------------------------------------------*/
 	
-	  // export platform
-	  // some AMD build optimizers, like r.js, check for condition patterns like the following:
+	  // Export platform.
+	  var platform = parse();
+	
+	  // Some AMD build optimizers, like r.js, check for condition patterns like the following:
 	  if (true) {
-	    // define as an anonymous module so, through path mapping, it can be aliased
+	    // Expose platform on the global object to prevent errors when platform is
+	    // loaded by a script tag in the presence of an AMD loader.
+	    // See http://requirejs.org/docs/errors.html#mismatch for more details.
+	    root.platform = platform;
+	
+	    // Define as an anonymous module so platform can be aliased through path mapping.
 	    !(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
-	      return parse();
+	      return platform;
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	  }
-	  // check for `exports` after `define` in case a build optimizer adds an `exports` object
+	  // Check for `exports` after `define` in case a build optimizer adds an `exports` object.
 	  else if (freeExports && freeModule) {
-	    // in Narwhal, Node.js, Rhino -require, or RingoJS
-	    forOwn(parse(), function(value, key) {
+	    // Export for CommonJS support.
+	    forOwn(platform, function(value, key) {
 	      freeExports[key] = value;
 	    });
 	  }
-	  // in a browser or Rhino
 	  else {
-	    root.platform = parse();
+	    // Export to the global object.
+	    root.platform = platform;
 	  }
 	}.call(this));
 	
@@ -1979,9 +2002,8 @@ var GCLLib =
 /* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*eslint-disable no-unused-vars*/
-	/*!
-	 * jQuery JavaScript Library v3.1.0
+	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+	 * jQuery JavaScript Library v3.1.1
 	 * https://jquery.com/
 	 *
 	 * Includes Sizzle.js
@@ -1991,7 +2013,7 @@ var GCLLib =
 	 * Released under the MIT license
 	 * https://jquery.org/license
 	 *
-	 * Date: 2016-07-07T21:44Z
+	 * Date: 2016-09-22T22:30Z
 	 */
 	( function( global, factory ) {
 	
@@ -2064,13 +2086,13 @@ var GCLLib =
 			doc.head.appendChild( script ).parentNode.removeChild( script );
 		}
 	/* global Symbol */
-	// Defining this global in .eslintrc would create a danger of using the global
+	// Defining this global in .eslintrc.json would create a danger of using the global
 	// unguarded in another place, it seems safer to define global only for this module
 	
 	
 	
 	var
-		version = "3.1.0",
+		version = "3.1.1",
 	
 		// Define a local copy of jQuery
 		jQuery = function( selector, context ) {
@@ -2110,13 +2132,14 @@ var GCLLib =
 		// Get the Nth element in the matched element set OR
 		// Get the whole matched element set as a clean array
 		get: function( num ) {
-			return num != null ?
 	
-				// Return just the one element from the set
-				( num < 0 ? this[ num + this.length ] : this[ num ] ) :
+			// Return all the elements in a clean array
+			if ( num == null ) {
+				return slice.call( this );
+			}
 	
-				// Return all the elements in a clean array
-				slice.call( this );
+			// Return just the one element from the set
+			return num < 0 ? this[ num + this.length ] : this[ num ];
 		},
 	
 		// Take an array of elements and push it onto the stack
@@ -2524,14 +2547,14 @@ var GCLLib =
 	}
 	var Sizzle =
 	/*!
-	 * Sizzle CSS Selector Engine v2.3.0
+	 * Sizzle CSS Selector Engine v2.3.3
 	 * https://sizzlejs.com/
 	 *
 	 * Copyright jQuery Foundation and other contributors
 	 * Released under the MIT license
 	 * http://jquery.org/license
 	 *
-	 * Date: 2016-01-04
+	 * Date: 2016-08-08
 	 */
 	(function( window ) {
 	
@@ -2677,7 +2700,7 @@ var GCLLib =
 	
 		// CSS string/identifier serialization
 		// https://drafts.csswg.org/cssom/#common-serializing-idioms
-		rcssescape = /([\0-\x1f\x7f]|^-?\d)|^-$|[^\x80-\uFFFF\w-]/g,
+		rcssescape = /([\0-\x1f\x7f]|^-?\d)|^-$|[^\0-\x1f\x7f-\uFFFF\w-]/g,
 		fcssescape = function( ch, asCodePoint ) {
 			if ( asCodePoint ) {
 	
@@ -2704,7 +2727,7 @@ var GCLLib =
 	
 		disabledAncestor = addCombinator(
 			function( elem ) {
-				return elem.disabled === true;
+				return elem.disabled === true && ("form" in elem || "label" in elem);
 			},
 			{ dir: "parentNode", next: "legend" }
 		);
@@ -2990,26 +3013,54 @@ var GCLLib =
 	 * @param {Boolean} disabled true for :disabled; false for :enabled
 	 */
 	function createDisabledPseudo( disabled ) {
-		// Known :disabled false positives:
-		// IE: *[disabled]:not(button, input, select, textarea, optgroup, option, menuitem, fieldset)
-		// not IE: fieldset[disabled] > legend:nth-of-type(n+2) :can-disable
+	
+		// Known :disabled false positives: fieldset[disabled] > legend:nth-of-type(n+2) :can-disable
 		return function( elem ) {
 	
-			// Check form elements and option elements for explicit disabling
-			return "label" in elem && elem.disabled === disabled ||
-				"form" in elem && elem.disabled === disabled ||
+			// Only certain elements can match :enabled or :disabled
+			// https://html.spec.whatwg.org/multipage/scripting.html#selector-enabled
+			// https://html.spec.whatwg.org/multipage/scripting.html#selector-disabled
+			if ( "form" in elem ) {
 	
-				// Check non-disabled form elements for fieldset[disabled] ancestors
-				"form" in elem && elem.disabled === false && (
-					// Support: IE6-11+
-					// Ancestry is covered for us
-					elem.isDisabled === disabled ||
+				// Check for inherited disabledness on relevant non-disabled elements:
+				// * listed form-associated elements in a disabled fieldset
+				//   https://html.spec.whatwg.org/multipage/forms.html#category-listed
+				//   https://html.spec.whatwg.org/multipage/forms.html#concept-fe-disabled
+				// * option elements in a disabled optgroup
+				//   https://html.spec.whatwg.org/multipage/forms.html#concept-option-disabled
+				// All such elements have a "form" property.
+				if ( elem.parentNode && elem.disabled === false ) {
 	
-					// Otherwise, assume any non-<option> under fieldset[disabled] is disabled
-					/* jshint -W018 */
-					elem.isDisabled !== !disabled &&
-						("label" in elem || !disabledAncestor( elem )) !== disabled
-				);
+					// Option elements defer to a parent optgroup if present
+					if ( "label" in elem ) {
+						if ( "label" in elem.parentNode ) {
+							return elem.parentNode.disabled === disabled;
+						} else {
+							return elem.disabled === disabled;
+						}
+					}
+	
+					// Support: IE 6 - 11
+					// Use the isDisabled shortcut property to check for disabled fieldset ancestors
+					return elem.isDisabled === disabled ||
+	
+						// Where there is no isDisabled, check manually
+						/* jshint -W018 */
+						elem.isDisabled !== !disabled &&
+							disabledAncestor( elem ) === disabled;
+				}
+	
+				return elem.disabled === disabled;
+	
+			// Try to winnow out elements that can't be disabled before trusting the disabled property.
+			// Some victims get caught in our net (label, legend, menu, track), but it shouldn't
+			// even exist on them, let alone have a boolean value.
+			} else if ( "label" in elem ) {
+				return elem.disabled === disabled;
+			}
+	
+			// Remaining elements are neither :enabled nor :disabled
+			return false;
 		};
 	}
 	
@@ -3125,25 +3176,21 @@ var GCLLib =
 			return !document.getElementsByName || !document.getElementsByName( expando ).length;
 		});
 	
-		// ID find and filter
+		// ID filter and find
 		if ( support.getById ) {
-			Expr.find["ID"] = function( id, context ) {
-				if ( typeof context.getElementById !== "undefined" && documentIsHTML ) {
-					var m = context.getElementById( id );
-					return m ? [ m ] : [];
-				}
-			};
 			Expr.filter["ID"] = function( id ) {
 				var attrId = id.replace( runescape, funescape );
 				return function( elem ) {
 					return elem.getAttribute("id") === attrId;
 				};
 			};
+			Expr.find["ID"] = function( id, context ) {
+				if ( typeof context.getElementById !== "undefined" && documentIsHTML ) {
+					var elem = context.getElementById( id );
+					return elem ? [ elem ] : [];
+				}
+			};
 		} else {
-			// Support: IE6/7
-			// getElementById is not reliable as a find shortcut
-			delete Expr.find["ID"];
-	
 			Expr.filter["ID"] =  function( id ) {
 				var attrId = id.replace( runescape, funescape );
 				return function( elem ) {
@@ -3151,6 +3198,36 @@ var GCLLib =
 						elem.getAttributeNode("id");
 					return node && node.value === attrId;
 				};
+			};
+	
+			// Support: IE 6 - 7 only
+			// getElementById is not reliable as a find shortcut
+			Expr.find["ID"] = function( id, context ) {
+				if ( typeof context.getElementById !== "undefined" && documentIsHTML ) {
+					var node, i, elems,
+						elem = context.getElementById( id );
+	
+					if ( elem ) {
+	
+						// Verify the id attribute
+						node = elem.getAttributeNode("id");
+						if ( node && node.value === id ) {
+							return [ elem ];
+						}
+	
+						// Fall back on getElementsByName
+						elems = context.getElementsByName( id );
+						i = 0;
+						while ( (elem = elems[i++]) ) {
+							node = elem.getAttributeNode("id");
+							if ( node && node.value === id ) {
+								return [ elem ];
+							}
+						}
+					}
+	
+					return [];
+				}
 			};
 		}
 	
@@ -4192,6 +4269,7 @@ var GCLLib =
 						return matcher( elem, context, xml );
 					}
 				}
+				return false;
 			} :
 	
 			// Check against all ancestor/preceding elements
@@ -4236,6 +4314,7 @@ var GCLLib =
 						}
 					}
 				}
+				return false;
 			};
 	}
 	
@@ -4598,8 +4677,7 @@ var GCLLib =
 			// Reduce context if the leading compound selector is an ID
 			tokens = match[0] = match[0].slice( 0 );
 			if ( tokens.length > 2 && (token = tokens[0]).type === "ID" &&
-					support.getById && context.nodeType === 9 && documentIsHTML &&
-					Expr.relative[ tokens[1].type ] ) {
+					context.nodeType === 9 && documentIsHTML && Expr.relative[ tokens[1].type ] ) {
 	
 				context = ( Expr.find["ID"]( token.matches[0].replace(runescape, funescape), context ) || [] )[0];
 				if ( !context ) {
@@ -4781,24 +4859,29 @@ var GCLLib =
 			return jQuery.grep( elements, function( elem, i ) {
 				return !!qualifier.call( elem, i, elem ) !== not;
 			} );
-	
 		}
 	
+		// Single element
 		if ( qualifier.nodeType ) {
 			return jQuery.grep( elements, function( elem ) {
 				return ( elem === qualifier ) !== not;
 			} );
-	
 		}
 	
-		if ( typeof qualifier === "string" ) {
-			if ( risSimple.test( qualifier ) ) {
-				return jQuery.filter( qualifier, elements, not );
-			}
-	
-			qualifier = jQuery.filter( qualifier, elements );
+		// Arraylike of elements (jQuery, arguments, Array)
+		if ( typeof qualifier !== "string" ) {
+			return jQuery.grep( elements, function( elem ) {
+				return ( indexOf.call( qualifier, elem ) > -1 ) !== not;
+			} );
 		}
 	
+		// Simple selector that can be filtered directly, removing non-Elements
+		if ( risSimple.test( qualifier ) ) {
+			return jQuery.filter( qualifier, elements, not );
+		}
+	
+		// Complex selector, compare the two sets, removing non-Elements
+		qualifier = jQuery.filter( qualifier, elements );
 		return jQuery.grep( elements, function( elem ) {
 			return ( indexOf.call( qualifier, elem ) > -1 ) !== not && elem.nodeType === 1;
 		} );
@@ -4811,11 +4894,13 @@ var GCLLib =
 			expr = ":not(" + expr + ")";
 		}
 	
-		return elems.length === 1 && elem.nodeType === 1 ?
-			jQuery.find.matchesSelector( elem, expr ) ? [ elem ] : [] :
-			jQuery.find.matches( expr, jQuery.grep( elems, function( elem ) {
-				return elem.nodeType === 1;
-			} ) );
+		if ( elems.length === 1 && elem.nodeType === 1 ) {
+			return jQuery.find.matchesSelector( elem, expr ) ? [ elem ] : [];
+		}
+	
+		return jQuery.find.matches( expr, jQuery.grep( elems, function( elem ) {
+			return elem.nodeType === 1;
+		} ) );
 	};
 	
 	jQuery.fn.extend( {
@@ -5143,14 +5228,14 @@ var GCLLib =
 			return this.pushStack( matched );
 		};
 	} );
-	var rnotwhite = ( /\S+/g );
+	var rnothtmlwhite = ( /[^\x20\t\r\n\f]+/g );
 	
 	
 	
 	// Convert String-formatted options into Object-formatted ones
 	function createOptions( options ) {
 		var object = {};
-		jQuery.each( options.match( rnotwhite ) || [], function( _, flag ) {
+		jQuery.each( options.match( rnothtmlwhite ) || [], function( _, flag ) {
 			object[ flag ] = true;
 		} );
 		return object;
@@ -5915,13 +6000,16 @@ var GCLLib =
 			}
 		}
 	
-		return chainable ?
-			elems :
+		if ( chainable ) {
+			return elems;
+		}
 	
-			// Gets
-			bulk ?
-				fn.call( elems ) :
-				len ? fn( elems[ 0 ], key ) : emptyGet;
+		// Gets
+		if ( bulk ) {
+			return fn.call( elems );
+		}
+	
+		return len ? fn( elems[ 0 ], key ) : emptyGet;
 	};
 	var acceptData = function( owner ) {
 	
@@ -6058,7 +6146,7 @@ var GCLLib =
 					// Otherwise, create an array by matching non-whitespace
 					key = key in cache ?
 						[ key ] :
-						( key.match( rnotwhite ) || [] );
+						( key.match( rnothtmlwhite ) || [] );
 				}
 	
 				i = key.length;
@@ -6106,6 +6194,31 @@ var GCLLib =
 	var rbrace = /^(?:\{[\w\W]*\}|\[[\w\W]*\])$/,
 		rmultiDash = /[A-Z]/g;
 	
+	function getData( data ) {
+		if ( data === "true" ) {
+			return true;
+		}
+	
+		if ( data === "false" ) {
+			return false;
+		}
+	
+		if ( data === "null" ) {
+			return null;
+		}
+	
+		// Only convert to a number if it doesn't change the string
+		if ( data === +data + "" ) {
+			return +data;
+		}
+	
+		if ( rbrace.test( data ) ) {
+			return JSON.parse( data );
+		}
+	
+		return data;
+	}
+	
 	function dataAttr( elem, key, data ) {
 		var name;
 	
@@ -6117,14 +6230,7 @@ var GCLLib =
 	
 			if ( typeof data === "string" ) {
 				try {
-					data = data === "true" ? true :
-						data === "false" ? false :
-						data === "null" ? null :
-	
-						// Only convert to a number if it doesn't change the string
-						+data + "" === data ? +data :
-						rbrace.test( data ) ? JSON.parse( data ) :
-						data;
+					data = getData( data );
 				} catch ( e ) {}
 	
 				// Make sure we set the data so it isn't changed later
@@ -6501,7 +6607,7 @@ var GCLLib =
 			return display;
 		}
 	
-		temp = doc.body.appendChild( doc.createElement( nodeName ) ),
+		temp = doc.body.appendChild( doc.createElement( nodeName ) );
 		display = jQuery.css( temp, "display" );
 	
 		temp.parentNode.removeChild( temp );
@@ -6619,15 +6725,23 @@ var GCLLib =
 	
 		// Support: IE <=9 - 11 only
 		// Use typeof to avoid zero-argument method invocation on host objects (#15151)
-		var ret = typeof context.getElementsByTagName !== "undefined" ?
-				context.getElementsByTagName( tag || "*" ) :
-				typeof context.querySelectorAll !== "undefined" ?
-					context.querySelectorAll( tag || "*" ) :
-				[];
+		var ret;
 	
-		return tag === undefined || tag && jQuery.nodeName( context, tag ) ?
-			jQuery.merge( [ context ], ret ) :
-			ret;
+		if ( typeof context.getElementsByTagName !== "undefined" ) {
+			ret = context.getElementsByTagName( tag || "*" );
+	
+		} else if ( typeof context.querySelectorAll !== "undefined" ) {
+			ret = context.querySelectorAll( tag || "*" );
+	
+		} else {
+			ret = [];
+		}
+	
+		if ( tag === undefined || tag && jQuery.nodeName( context, tag ) ) {
+			return jQuery.merge( [ context ], ret );
+		}
+	
+		return ret;
 	}
 	
 	
@@ -6901,7 +7015,7 @@ var GCLLib =
 			}
 	
 			// Handle multiple events separated by a space
-			types = ( types || "" ).match( rnotwhite ) || [ "" ];
+			types = ( types || "" ).match( rnothtmlwhite ) || [ "" ];
 			t = types.length;
 			while ( t-- ) {
 				tmp = rtypenamespace.exec( types[ t ] ) || [];
@@ -6983,7 +7097,7 @@ var GCLLib =
 			}
 	
 			// Once for each type.namespace in types; type may be omitted
-			types = ( types || "" ).match( rnotwhite ) || [ "" ];
+			types = ( types || "" ).match( rnothtmlwhite ) || [ "" ];
 			t = types.length;
 			while ( t-- ) {
 				tmp = rtypenamespace.exec( types[ t ] ) || [];
@@ -7109,51 +7223,58 @@ var GCLLib =
 		},
 	
 		handlers: function( event, handlers ) {
-			var i, matches, sel, handleObj,
+			var i, handleObj, sel, matchedHandlers, matchedSelectors,
 				handlerQueue = [],
 				delegateCount = handlers.delegateCount,
 				cur = event.target;
 	
-			// Support: IE <=9
 			// Find delegate handlers
-			// Black-hole SVG <use> instance trees (#13180)
-			//
-			// Support: Firefox <=42
-			// Avoid non-left-click in FF but don't block IE radio events (#3861, gh-2343)
-			if ( delegateCount && cur.nodeType &&
-				( event.type !== "click" || isNaN( event.button ) || event.button < 1 ) ) {
+			if ( delegateCount &&
+	
+				// Support: IE <=9
+				// Black-hole SVG <use> instance trees (trac-13180)
+				cur.nodeType &&
+	
+				// Support: Firefox <=42
+				// Suppress spec-violating clicks indicating a non-primary pointer button (trac-3861)
+				// https://www.w3.org/TR/DOM-Level-3-Events/#event-type-click
+				// Support: IE 11 only
+				// ...but not arrow key "clicks" of radio inputs, which can have `button` -1 (gh-2343)
+				!( event.type === "click" && event.button >= 1 ) ) {
 	
 				for ( ; cur !== this; cur = cur.parentNode || this ) {
 	
 					// Don't check non-elements (#13208)
 					// Don't process clicks on disabled elements (#6911, #8165, #11382, #11764)
-					if ( cur.nodeType === 1 && ( cur.disabled !== true || event.type !== "click" ) ) {
-						matches = [];
+					if ( cur.nodeType === 1 && !( event.type === "click" && cur.disabled === true ) ) {
+						matchedHandlers = [];
+						matchedSelectors = {};
 						for ( i = 0; i < delegateCount; i++ ) {
 							handleObj = handlers[ i ];
 	
 							// Don't conflict with Object.prototype properties (#13203)
 							sel = handleObj.selector + " ";
 	
-							if ( matches[ sel ] === undefined ) {
-								matches[ sel ] = handleObj.needsContext ?
+							if ( matchedSelectors[ sel ] === undefined ) {
+								matchedSelectors[ sel ] = handleObj.needsContext ?
 									jQuery( sel, this ).index( cur ) > -1 :
 									jQuery.find( sel, this, null, [ cur ] ).length;
 							}
-							if ( matches[ sel ] ) {
-								matches.push( handleObj );
+							if ( matchedSelectors[ sel ] ) {
+								matchedHandlers.push( handleObj );
 							}
 						}
-						if ( matches.length ) {
-							handlerQueue.push( { elem: cur, handlers: matches } );
+						if ( matchedHandlers.length ) {
+							handlerQueue.push( { elem: cur, handlers: matchedHandlers } );
 						}
 					}
 				}
 			}
 	
 			// Add the remaining (directly-bound) handlers
+			cur = this;
 			if ( delegateCount < handlers.length ) {
-				handlerQueue.push( { elem: this, handlers: handlers.slice( delegateCount ) } );
+				handlerQueue.push( { elem: cur, handlers: handlers.slice( delegateCount ) } );
 			}
 	
 			return handlerQueue;
@@ -7387,7 +7508,19 @@ var GCLLib =
 	
 			// Add which for click: 1 === left; 2 === middle; 3 === right
 			if ( !event.which && button !== undefined && rmouseEvent.test( event.type ) ) {
-				return ( button & 1 ? 1 : ( button & 2 ? 3 : ( button & 4 ? 2 : 0 ) ) );
+				if ( button & 1 ) {
+					return 1;
+				}
+	
+				if ( button & 2 ) {
+					return 3;
+				}
+	
+				if ( button & 4 ) {
+					return 2;
+				}
+	
+				return 0;
 			}
 	
 			return event.which;
@@ -8143,15 +8276,17 @@ var GCLLib =
 	}
 	
 	function augmentWidthOrHeight( elem, name, extra, isBorderBox, styles ) {
-		var i = extra === ( isBorderBox ? "border" : "content" ) ?
-	
-			// If we already have the right measurement, avoid augmentation
-			4 :
-	
-			// Otherwise initialize for horizontal or vertical properties
-			name === "width" ? 1 : 0,
-	
+		var i,
 			val = 0;
+	
+		// If we already have the right measurement, avoid augmentation
+		if ( extra === ( isBorderBox ? "border" : "content" ) ) {
+			i = 4;
+	
+		// Otherwise initialize for horizontal or vertical properties
+		} else {
+			i = name === "width" ? 1 : 0;
+		}
 	
 		for ( ; i < 4; i += 2 ) {
 	
@@ -9005,7 +9140,7 @@ var GCLLib =
 				callback = props;
 				props = [ "*" ];
 			} else {
-				props = props.match( rnotwhite );
+				props = props.match( rnothtmlwhite );
 			}
 	
 			var prop,
@@ -9043,9 +9178,14 @@ var GCLLib =
 			opt.duration = 0;
 	
 		} else {
-			opt.duration = typeof opt.duration === "number" ?
-				opt.duration : opt.duration in jQuery.fx.speeds ?
-					jQuery.fx.speeds[ opt.duration ] : jQuery.fx.speeds._default;
+			if ( typeof opt.duration !== "number" ) {
+				if ( opt.duration in jQuery.fx.speeds ) {
+					opt.duration = jQuery.fx.speeds[ opt.duration ];
+	
+				} else {
+					opt.duration = jQuery.fx.speeds._default;
+				}
+			}
 		}
 	
 		// Normalize opt.queue - true/undefined/null -> "fx"
@@ -9395,7 +9535,10 @@ var GCLLib =
 		removeAttr: function( elem, value ) {
 			var name,
 				i = 0,
-				attrNames = value && value.match( rnotwhite );
+	
+				// Attribute names can contain non-HTML whitespace characters
+				// https://html.spec.whatwg.org/multipage/syntax.html#attributes-2
+				attrNames = value && value.match( rnothtmlwhite );
 	
 			if ( attrNames && elem.nodeType === 1 ) {
 				while ( ( name = attrNames[ i++ ] ) ) {
@@ -9502,12 +9645,19 @@ var GCLLib =
 					// Use proper attribute retrieval(#12072)
 					var tabindex = jQuery.find.attr( elem, "tabindex" );
 	
-					return tabindex ?
-						parseInt( tabindex, 10 ) :
+					if ( tabindex ) {
+						return parseInt( tabindex, 10 );
+					}
+	
+					if (
 						rfocusable.test( elem.nodeName ) ||
-							rclickable.test( elem.nodeName ) && elem.href ?
-								0 :
-								-1;
+						rclickable.test( elem.nodeName ) &&
+						elem.href
+					) {
+						return 0;
+					}
+	
+					return -1;
 				}
 			}
 		},
@@ -9524,9 +9674,14 @@ var GCLLib =
 	// on the option
 	// The getter ensures a default option is selected
 	// when in an optgroup
+	// eslint rule "no-unused-expressions" is disabled for this code
+	// since it considers such accessions noop
 	if ( !support.optSelected ) {
 		jQuery.propHooks.selected = {
 			get: function( elem ) {
+	
+				/* eslint no-unused-expressions: "off" */
+	
 				var parent = elem.parentNode;
 				if ( parent && parent.parentNode ) {
 					parent.parentNode.selectedIndex;
@@ -9534,6 +9689,9 @@ var GCLLib =
 				return null;
 			},
 			set: function( elem ) {
+	
+				/* eslint no-unused-expressions: "off" */
+	
 				var parent = elem.parentNode;
 				if ( parent ) {
 					parent.selectedIndex;
@@ -9564,7 +9722,13 @@ var GCLLib =
 	
 	
 	
-	var rclass = /[\t\r\n\f]/g;
+		// Strip and collapse whitespace according to HTML spec
+		// https://html.spec.whatwg.org/multipage/infrastructure.html#strip-and-collapse-whitespace
+		function stripAndCollapse( value ) {
+			var tokens = value.match( rnothtmlwhite ) || [];
+			return tokens.join( " " );
+		}
+	
 	
 	function getClass( elem ) {
 		return elem.getAttribute && elem.getAttribute( "class" ) || "";
@@ -9582,12 +9746,11 @@ var GCLLib =
 			}
 	
 			if ( typeof value === "string" && value ) {
-				classes = value.match( rnotwhite ) || [];
+				classes = value.match( rnothtmlwhite ) || [];
 	
 				while ( ( elem = this[ i++ ] ) ) {
 					curValue = getClass( elem );
-					cur = elem.nodeType === 1 &&
-						( " " + curValue + " " ).replace( rclass, " " );
+					cur = elem.nodeType === 1 && ( " " + stripAndCollapse( curValue ) + " " );
 	
 					if ( cur ) {
 						j = 0;
@@ -9598,7 +9761,7 @@ var GCLLib =
 						}
 	
 						// Only assign if different to avoid unneeded rendering.
-						finalValue = jQuery.trim( cur );
+						finalValue = stripAndCollapse( cur );
 						if ( curValue !== finalValue ) {
 							elem.setAttribute( "class", finalValue );
 						}
@@ -9624,14 +9787,13 @@ var GCLLib =
 			}
 	
 			if ( typeof value === "string" && value ) {
-				classes = value.match( rnotwhite ) || [];
+				classes = value.match( rnothtmlwhite ) || [];
 	
 				while ( ( elem = this[ i++ ] ) ) {
 					curValue = getClass( elem );
 	
 					// This expression is here for better compressibility (see addClass)
-					cur = elem.nodeType === 1 &&
-						( " " + curValue + " " ).replace( rclass, " " );
+					cur = elem.nodeType === 1 && ( " " + stripAndCollapse( curValue ) + " " );
 	
 					if ( cur ) {
 						j = 0;
@@ -9644,7 +9806,7 @@ var GCLLib =
 						}
 	
 						// Only assign if different to avoid unneeded rendering.
-						finalValue = jQuery.trim( cur );
+						finalValue = stripAndCollapse( cur );
 						if ( curValue !== finalValue ) {
 							elem.setAttribute( "class", finalValue );
 						}
@@ -9679,7 +9841,7 @@ var GCLLib =
 					// Toggle individual class names
 					i = 0;
 					self = jQuery( this );
-					classNames = value.match( rnotwhite ) || [];
+					classNames = value.match( rnothtmlwhite ) || [];
 	
 					while ( ( className = classNames[ i++ ] ) ) {
 	
@@ -9722,10 +9884,8 @@ var GCLLib =
 			className = " " + selector + " ";
 			while ( ( elem = this[ i++ ] ) ) {
 				if ( elem.nodeType === 1 &&
-					( " " + getClass( elem ) + " " ).replace( rclass, " " )
-						.indexOf( className ) > -1
-				) {
-					return true;
+					( " " + stripAndCollapse( getClass( elem ) ) + " " ).indexOf( className ) > -1 ) {
+						return true;
 				}
 			}
 	
@@ -9736,8 +9896,7 @@ var GCLLib =
 	
 	
 	
-	var rreturn = /\r/g,
-		rspaces = /[\x20\t\r\n\f]+/g;
+	var rreturn = /\r/g;
 	
 	jQuery.fn.extend( {
 		val: function( value ) {
@@ -9758,13 +9917,13 @@ var GCLLib =
 	
 					ret = elem.value;
 	
-					return typeof ret === "string" ?
+					// Handle most common string cases
+					if ( typeof ret === "string" ) {
+						return ret.replace( rreturn, "" );
+					}
 	
-						// Handle most common string cases
-						ret.replace( rreturn, "" ) :
-	
-						// Handle cases where value is null/undef or number
-						ret == null ? "" : ret;
+					// Handle cases where value is null/undef or number
+					return ret == null ? "" : ret;
 				}
 	
 				return;
@@ -9821,20 +9980,24 @@ var GCLLib =
 						// option.text throws exceptions (#14686, #14858)
 						// Strip and collapse whitespace
 						// https://html.spec.whatwg.org/#strip-and-collapse-whitespace
-						jQuery.trim( jQuery.text( elem ) ).replace( rspaces, " " );
+						stripAndCollapse( jQuery.text( elem ) );
 				}
 			},
 			select: {
 				get: function( elem ) {
-					var value, option,
+					var value, option, i,
 						options = elem.options,
 						index = elem.selectedIndex,
 						one = elem.type === "select-one",
 						values = one ? null : [],
-						max = one ? index + 1 : options.length,
-						i = index < 0 ?
-							max :
-							one ? index : 0;
+						max = one ? index + 1 : options.length;
+	
+					if ( index < 0 ) {
+						i = max;
+	
+					} else {
+						i = one ? index : 0;
+					}
 	
 					// Loop through all the selected options
 					for ( ; i < max; i++ ) {
@@ -10288,13 +10451,17 @@ var GCLLib =
 			.map( function( i, elem ) {
 				var val = jQuery( this ).val();
 	
-				return val == null ?
-					null :
-					jQuery.isArray( val ) ?
-						jQuery.map( val, function( val ) {
-							return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
-						} ) :
-						{ name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+				if ( val == null ) {
+					return null;
+				}
+	
+				if ( jQuery.isArray( val ) ) {
+					return jQuery.map( val, function( val ) {
+						return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
+					} );
+				}
+	
+				return { name: elem.name, value: val.replace( rCRLF, "\r\n" ) };
 			} ).get();
 		}
 	} );
@@ -10303,7 +10470,7 @@ var GCLLib =
 	var
 		r20 = /%20/g,
 		rhash = /#.*$/,
-		rts = /([?&])_=[^&]*/,
+		rantiCache = /([?&])_=[^&]*/,
 		rheaders = /^(.*?):[ \t]*([^\r\n]*)$/mg,
 	
 		// #7653, #8125, #8152: local protocol detection
@@ -10349,7 +10516,7 @@ var GCLLib =
 	
 			var dataType,
 				i = 0,
-				dataTypes = dataTypeExpression.toLowerCase().match( rnotwhite ) || [];
+				dataTypes = dataTypeExpression.toLowerCase().match( rnothtmlwhite ) || [];
 	
 			if ( jQuery.isFunction( func ) ) {
 	
@@ -10817,7 +10984,7 @@ var GCLLib =
 			s.type = options.method || options.type || s.method || s.type;
 	
 			// Extract dataTypes list
-			s.dataTypes = ( s.dataType || "*" ).toLowerCase().match( rnotwhite ) || [ "" ];
+			s.dataTypes = ( s.dataType || "*" ).toLowerCase().match( rnothtmlwhite ) || [ "" ];
 	
 			// A cross-domain request is in order when the origin doesn't match the current origin.
 			if ( s.crossDomain == null ) {
@@ -10889,9 +11056,9 @@ var GCLLib =
 					delete s.data;
 				}
 	
-				// Add anti-cache in uncached url if needed
+				// Add or update anti-cache param if needed
 				if ( s.cache === false ) {
-					cacheURL = cacheURL.replace( rts, "" );
+					cacheURL = cacheURL.replace( rantiCache, "$1" );
 					uncached = ( rquery.test( cacheURL ) ? "&" : "?" ) + "_=" + ( nonce++ ) + uncached;
 				}
 	
@@ -11630,7 +11797,7 @@ var GCLLib =
 			off = url.indexOf( " " );
 	
 		if ( off > -1 ) {
-			selector = jQuery.trim( url.slice( off ) );
+			selector = stripAndCollapse( url.slice( off ) );
 			url = url.slice( 0, off );
 		}
 	
@@ -12022,7 +12189,6 @@ var GCLLib =
 	
 	
 	
-	
 	var
 	
 		// Map over jQuery in case of overwrite
@@ -12049,6 +12215,9 @@ var GCLLib =
 	if ( !noGlobal ) {
 		window.jQuery = window.$ = jQuery;
 	}
+	
+	
+	
 	
 	
 	return jQuery;

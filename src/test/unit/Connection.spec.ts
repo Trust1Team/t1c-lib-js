@@ -2,6 +2,8 @@
  * @author Maarten Casteels
  * @since 2016
  */
+///<reference path="../../../typings/index.d.ts"/>
+
 import {expect} from "chai";
 import * as Sinon from "sinon";
 import {Promise} from "es6-promise";

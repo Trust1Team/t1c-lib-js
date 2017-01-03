@@ -1,6 +1,6 @@
 {
   "name": "t1c-lib-js",
-  "version": "0.0.1",
+  "version": "0.9.12",
   "description": "The Trust1Connector library (T1C-Lib), is a javascript library to communicate with the Trust1Connector. The library simplify the execution to the connector and works asynchronous.",
   "main": "dist/connector.js",
   "scripts": {
@@ -20,6 +20,7 @@
     "del": "^2.2.1",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
+    "gulp-inject-version": "^1.0.1",
     "gulp-minify-css": "^1.2.4",
     "gulp-rename": "^1.2.2",
     "gulp-tslint": "^6.0.1",

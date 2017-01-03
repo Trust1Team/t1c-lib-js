@@ -2,6 +2,7 @@
  * @author Maarten Casteels
  * @since 2016
  */
+///<reference path="../../../typings/index.d.ts"/>
 import { expect } from "chai";
 import {GCLConfig} from "../../scripts/core/GCLConfig";
 
@@ -47,16 +48,10 @@ describe('Config', () => {
     describe('#gcl-config-constructor', () => {
         it('should set the config as constructed', () => {
             var dsUrl = "https://dist.t1t.be/v1";
-            var gclUrl = "https://localhost:10443/v1";
             var apikey = "someapikey";
-            var allowAutoUpdate = true;
-            var implicitDownload = false;
-            let myConfig = new GCLConfig(gclUrl,dsUrl,apikey,allowAutoUpdate,implicitDownload);
-            expect(myConfig.dsUrl).to.be.eq(dsUrl);
-            expect(myConfig.gclUrl).to.be.eq(gclUrl);
+            let myConfig = new GCLConfig(dsUrl,apikey);
+            expect(myConfig.dsUrl).to.be.eq(dsUrl + '/trust1team/gclds/v1');
             expect(myConfig.apiKey).to.be.eq(apikey);
-            expect(myConfig.allowAutoUpdate).to.be.eq(allowAutoUpdate);
-            expect(myConfig.implicitDownload).to.be.eq(implicitDownload);
         });
     });
 });

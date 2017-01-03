@@ -1,7 +1,10 @@
+///<reference path="../../../../typings/index.d.ts"/>
+
 import {expect} from "chai";
 import {LocalConnection, LocalAuthConnection,Connection} from "../../../scripts/core/client/Connection";
 import {CoreService} from "../../../scripts/core/services/CoreService";
 import {CardFactory} from "../../../scripts/Plugins/smartcards/CardFactory";
+import {GCLConfig} from "../../../scripts/core/GCLConfig";
 
 describe('Plugin-Belgian eID', () => {
     let gclUnderTest = "https://localhost:10443/v1";
@@ -9,11 +12,13 @@ describe('Plugin-Belgian eID', () => {
     let coreService;
     let cardFactory;
     let beidPlugin;
+    let config = new GCLConfig("https://dist.t1t.be/v1","someapikey");
+
 
     beforeEach(()=>{
-        localAuthConnection = new LocalAuthConnection();
-        coreService = new CoreService(gclUnderTest,localAuthConnection);
-        cardFactory = new CardFactory(gclUnderTest,localAuthConnection);
+        localAuthConnection = new LocalAuthConnection(config);
+        coreService = new CoreService(gclUnderTest,localAuthConnection, config);
+        cardFactory = new CardFactory(gclUnderTest,new LocalConnection(config), config);
         beidPlugin = cardFactory.createEidBE();
     });
 
