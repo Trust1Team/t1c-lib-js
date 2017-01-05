@@ -24,10 +24,6 @@ describe('Plugin-Belgian eID', () => {
 
     describe('Belgian eID Test Cases', () => {
 
-/*        it('should verify an existing local connection instance', ()=>{
-           expect(localConnection).not.undefined;
-        });*/
-
         it('should verify an existing local authentication connection instance', ()=>{
             expect(localAuthConnection).not.undefined;
         });

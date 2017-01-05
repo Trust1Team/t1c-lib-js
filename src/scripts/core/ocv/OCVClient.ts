@@ -12,7 +12,6 @@ interface AbstractOCVClient{
     validateCertificateChain(data:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
 }
 
-const DIGEST = "?digest=";
 const CHALLENGE = "/challenge";
 const CERTIFICATE = "/certs/validate-chain";
 
@@ -23,10 +22,10 @@ class OCVClient implements AbstractOCVClient{
 
     public getChallenge(digestAlgorithm, callback: (error: RestException, data: any)=>void): void {
         var consumerCb = callback;
-        this.connection.get(this.url + CHALLENGE + DIGEST + digestAlgorithm, function(error, data){
+        this.connection.get(this.url + CHALLENGE, function(error, data){
             if(error)return consumerCb(error,null);
             return consumerCb(null,data);
-        });
+        }, { digest: digestAlgorithm });
     }
 
     public validateChallengeSignedHash(data: any, callback: (error: RestException, data: any)=>void): void {

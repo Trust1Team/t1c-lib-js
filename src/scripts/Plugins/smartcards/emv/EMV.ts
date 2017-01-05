@@ -12,10 +12,13 @@ interface AbstractEMV{
 }
 
 const SEPARATOR = "/";
-const QUERY_PARAM_FILTER = "filter=";
 const PLUGIN_CONTEXT_EMV = "/plugins/emv";
 const EMV_PAN = "/pan";
 const EMV_VERIFY_PIN = "/verify-pin";
+
+function createFilter(filters:string[]):any {
+    return { filter: filters.join(',') };
+}
 
 class EMV implements AbstractEMV{
     constructor(private url:string,private connection:LocalConnection,private reader_id:string) {this.url = url + PLUGIN_CONTEXT_EMV;}
@@ -23,7 +26,7 @@ class EMV implements AbstractEMV{
     private resolvedReaderURI():string{return this.url + SEPARATOR + this.reader_id;}
 
     allData(filters,callback):void {
-        if(filters && filters.length>0){this.connection.get(this.resolvedReaderURI(), callback, QUERY_PARAM_FILTER + filters.join(","));}
+        if(filters && filters.length>0){this.connection.get(this.resolvedReaderURI(), callback, createFilter(filters));}
         else{this.connection.get(this.resolvedReaderURI(), callback);}
     }
 
