@@ -15,7 +15,7 @@ describe('Config', () => {
 
     describe('gcl-config', () => {
         it('should return the default connector url', () => {
-            var url:string = config.gclUrl;
+            let url:string = config.gclUrl;
             expect(url).to.be.eq('https://localhost:10433/v1');
         });
 
@@ -23,7 +23,7 @@ describe('Config', () => {
             let test = "http://localhost:10080/v2";
             let myConfig:GCLConfig = new GCLConfig();
             myConfig.gclUrl = test;
-            var url:string = myConfig.gclUrl;
+            let url:string = myConfig.gclUrl;
             expect(url).to.be.eq(test);
         });
 
@@ -31,7 +31,7 @@ describe('Config', () => {
             let test = "https://accapim.t1t.be:443/trust1team/gclds/v1";
             let myConfig:GCLConfig = new GCLConfig();
             myConfig.dsUrl = test;
-            var dsUrl:string = myConfig.dsUrl;
+            let dsUrl:string = myConfig.dsUrl;
             expect(dsUrl).to.be.eq(test);
         });
 
@@ -39,7 +39,7 @@ describe('Config', () => {
             let test = "somekey";
             let myConfig:GCLConfig = new GCLConfig();
             myConfig.apiKey = test;
-            var apikey:string = myConfig.apiKey;
+            let apikey:string = myConfig.apiKey;
             expect(apikey).to.be.eq(test);
         });
 
@@ -47,8 +47,8 @@ describe('Config', () => {
 
     describe('#gcl-config-constructor', () => {
         it('should set the config as constructed', () => {
-            var dsUrl = "https://dist.t1t.be/v1";
-            var apikey = "someapikey";
+            let dsUrl = "https://dist.t1t.be/v1";
+            let apikey = "someapikey";
             let myConfig = new GCLConfig(dsUrl,apikey);
             expect(myConfig.dsUrl).to.be.eq(dsUrl + '/trust1team/gclds/v1');
             expect(myConfig.apiKey).to.be.eq(apikey);

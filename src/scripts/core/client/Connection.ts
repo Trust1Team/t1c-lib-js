@@ -3,9 +3,10 @@
  * @author Michallis Pashidis
  * @since 2016
  */
+///<reference path="../../../../typings/index.d.ts"/>
 
 import {GCLConfig} from "../GCLConfig";
-import * as $ from "jquery";
+import axios from "axios";
 
 interface Connection {
     get(url:string, callback:(error:any, data:any) => void, queryParams?:any);
@@ -17,64 +18,16 @@ class LocalAuthConnection implements Connection {
     constructor(private cfg:GCLConfig) {}
 
     // using Callback
-    public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
-        let self_cfg = this.cfg;
-    	$.support.cors = true;
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: 'json',
-            data: queryParams,
-            headers: { 'Authorization':('Bearer ' + self_cfg.jwt), 'Accept-Language':'en-US' },
-            success: function(successResponse,status,jqXHR) {
-                return callback(null,successResponse);
-            },
-            error: function(jqXHR,textStatus,errorThrown) {
-                return callback(jqXHR,null);
-            }
-        });
+    public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void {
+        return handleRequest(url, 'GET', callback, undefined, queryParams, undefined, this.cfg.jwt);
     }
 
     public post(url:string, body:any, callback:(error:any, data:any) => void):void{
-        let self_cfg = this.cfg;
-    	$.support.cors = true;
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: JSON.stringify(body),
-            contentType: 'application/json; charset=utf-8',
-            processData: false,
-            dataType: 'json',
-            mimeType: 'application/json',
-            headers: { 'Authorization':('Bearer ' + self_cfg.jwt), 'Accept-Language':'en-US' },
-            success: function(successResponse, status) {
-                return callback(null,successResponse);
-            },
-            error: function(errorResponse, status, jqXHR) {
-                return callback(errorResponse,null);
-            }
-        });
+        return handleRequest(url, 'POST', callback, body, undefined, undefined, this.cfg.jwt);
     }
 
     public put(url:string, body:any, callback:(error:any, data:any) => void):void{
-        let self_cfg = this.cfg;
-    	$.support.cors = true;
-        $.ajax({
-            url: url,
-            type: 'PUT',
-            data: JSON.stringify(body),
-            contentType: 'application/json; charset=utf-8',
-            processData: false,
-            dataType: 'json',
-            mimeType: 'application/json',
-            headers: { 'Authorization':('Bearer ' + self_cfg.jwt), 'Accept-Language':'en-US' },
-            success: function(successResponse, status) {
-                return callback(null,successResponse);
-            },
-            error: function(errorResponse, status, jqXHR) {
-                return callback(errorResponse,null);
-            }
-        });
+        return handleRequest(url, 'PUT', callback, body, undefined, undefined, this.cfg.jwt);
     }
 }
 
@@ -82,63 +35,15 @@ class LocalConnection implements Connection {
     constructor(private cfg:GCLConfig) {}
 
     public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
-        let self_cfg = this.cfg;
-    	$.support.cors = true;
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: 'json',
-            data: queryParams,
-            headers: { 'Authorization':('Bearer ' + self_cfg.jwt), 'Accept-Language':'en-US' },
-            success: function(successResponse,status,jqXHR) {
-                return callback(null,successResponse);
-            },
-            error: function(errorResponse,status,jqXHR) {
-                return callback(errorResponse,null);
-            }
-        });
+        return handleRequest(url, 'GET', callback, undefined, queryParams, undefined, this.cfg.jwt);
     }
 
     public post(url:string, body:any, callback:(error:any, data:any) => void):void{
-        let self_cfg = this.cfg;
-    	$.support.cors = true;
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: JSON.stringify(body),
-            contentType: 'application/json; charset=utf-8',
-            processData: false,
-            dataType: 'json',
-            mimeType: 'application/json',
-            headers: { 'Authorization':('Bearer ' + self_cfg.jwt), 'Accept-Language':'en-US' },
-            success: function(successResponse, status) {
-                return callback(null,successResponse);
-            },
-            error: function(errorResponse, status, jqXHR) {
-                return callback(errorResponse,null);
-            }
-        });
+        return handleRequest(url, 'POST', callback, body, undefined, undefined, this.cfg.jwt);
     }
 
     public put(url:string, body:any, callback:(error:any, data:any) => void):void{
-        let self_cfg = this.cfg;
-    	$.support.cors = true;
-        $.ajax({
-            url: url,
-            type: 'PUT',
-            data: JSON.stringify(body),
-            contentType: 'application/json; charset=utf-8',
-            processData: false,
-            dataType: 'json',
-            mimeType: 'application/json',
-            headers: { 'Authorization':('Bearer ' + self_cfg.jwt), 'Accept-Language':'en-US' },
-            success: function(successResponse, status) {
-                return callback(null,successResponse);
-            },
-            error: function(errorResponse, status, jqXHR) {
-                return callback(errorResponse,null);
-            }
-        });
+        return handleRequest(url, 'PUT', callback, body, undefined, undefined, this.cfg.jwt);
     }
 }
 
@@ -147,64 +52,40 @@ class RemoteConnection implements Connection {
 
     // using Callback
     public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
-        let self_cfg = this.cfg;
-    	$.support.cors = true;
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: 'json',
-            data: queryParams,
-            headers: { 'apikey': self_cfg.apiKey, 'Accept-Language':'en-US' },
-            success: function(successResponse,status,jqXHR) {
-                return callback(null,successResponse);
-            },
-            error: function(errorResponse,status,jqXHR) {
-                return callback(errorResponse,null);
-            }
-        });
+        return handleRequest(url, 'GET', callback, undefined, queryParams, this.cfg.apiKey, undefined);
     }
 
     public post(url:string, body:any, callback:(error:any, data:any) => void):void{
-        let self_cfg = this.cfg;
-    	$.support.cors = true;
-        $.ajax({
-            url: url,
-            type: 'POST',
-            data: JSON.stringify(body),
-            contentType: 'application/json; charset=utf-8',
-            processData: false,
-            dataType: 'json',
-            headers: { 'apikey': self_cfg.apiKey, 'Accept-Language':'en-US' },
-            mimeType: 'application/json',
-            success: function(successResponse, status,jqXHR) {
-                return callback(null,successResponse);
-            },
-            error: function(errorResponse, status, jqXHR) {
-                return callback(errorResponse,null);
-            }
-        });
+        return handleRequest(url, 'POST', callback, body, undefined, this.cfg.apiKey, undefined);
     }
 
     public put(url:string, body:any, callback:(error:any, data:any) => void):void{
-        let self_cfg = this.cfg;
-    	$.support.cors = true;
-        $.ajax({
-            url: url,
-            type: 'PUT',
-            data: JSON.stringify(body),
-            contentType: 'application/json; charset=utf-8',
-            processData: false,
-            dataType: 'json',
-            headers: { 'apikey': self_cfg.apiKey, 'Accept-Language':'en-US' },
-            mimeType: 'application/json',
-            success: function(successResponse, status,jqXHR) {
-                return callback(null,successResponse);
-            },
-            error: function(errorResponse, status, jqXHR) {
-                return callback(errorResponse,null);
-            }
-        });
+        return handleRequest(url, 'PUT', callback, body, undefined, this.cfg.apiKey, undefined);
     }
 }
+
+function handleRequest(url:string, method:string, callback:(error:any, data:any) => void, body?:any, params?:any, apikey?:string, jwt?:string):void {
+    let request = {
+        url: url,
+        method: method,
+        headers: {
+            'Accept-Language': 'en-US'
+        },
+        responseType: 'json'
+    };
+    if (body) request['data'] = body;
+    if (params) {
+        request['params'] = params;
+    }
+    if (apikey) request.headers['apikey'] = apikey;
+    if (jwt) request.headers['Authorization'] = 'Bearer ' + jwt;
+
+    axios.request(request).then(function (response) {
+        return callback(null, response.data);
+    }).catch(function (error) {
+        return callback(error, null);
+    })
+}
+
 
 export {LocalConnection,LocalAuthConnection,RemoteConnection,Connection}

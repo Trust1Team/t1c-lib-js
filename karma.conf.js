@@ -5,7 +5,7 @@ module.exports = function (config) {
         basePath: '',
         frameworks: ['mocha', 'chai', 'sinon'],
         files: [
-            'node_modules/jquery/dist/jquery.js',
+            'node_modules/es6-promise/dist/es6-promise.js',
             'src/test/**/*.ts'
         ],
         exclude: [
