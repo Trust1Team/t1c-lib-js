@@ -12,7 +12,6 @@ describe('GCLClient', () => {
 
 
     beforeEach(() => {
-
         localAuthConnection = new LocalAuthConnection(config);
         core = new CoreService(gclUnderTest,localAuthConnection, config);
     });
@@ -32,11 +31,56 @@ describe('GCLClient', () => {
         });
 
         it('should return information about the client browser', (done) => {
-            core.infoBrowser(function(err,data){
+            core.infoBrowser((err,data) => {
+                expect(err).to.be.null;
+                expect(data).exist;
+                done();
+            });
+        });
+
+        it('should return info about the GCL installation', (done) => {
+            core.info((err, data) => {
+                expect(err).to.be.null;
+                expect(data).exist;
+                done()
+            });
+        });
+
+        it('should return available card readers', (done) => {
+            core.readers((err,data) => {
+                expect(err).to.be.null;
+                expect(data).exist;
+                done();
+            });
+        });
+
+        it('should return readers with available cards', (done) => {
+            core.readersCardAvailable((err,data) => {
+                expect(err).to.be.null;
+                expect(data).exist;
+                done();
+            });
+        });
+
+        it('should return readers without available cards', (done) => {
+            core.readersCardsUnavailable((err,data) => {
+                expect(err).to.be.null;
+                expect(data).exist;
+                done();
+            });
+        });
+
+        it('should return a list of available plugins', (done) => {
+            core.plugins((err, data) => {
                 expect(err).to.be.null;
                 expect(data).exist;
                 done();
             })
+        });
+
+        it('should return the T1C-Lib version', () => {
+            expect(core.version()).to.be.a('string');
+            expect(core.version()).to.equal('%%GULP_INJECT_VERSION%%');
         });
     });
 });
