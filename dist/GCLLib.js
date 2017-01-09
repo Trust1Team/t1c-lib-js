@@ -173,10 +173,6 @@ var GCLLib =
 	    return GCLClient;
 	}());
 	exports.GCLClient = GCLClient;
-	function version() {
-	    return 'v0.9.12';
-	}
-	exports.version = version;
 
 
 /***/ },
@@ -621,6 +617,9 @@ var GCLLib =
 	            },
 	            ua: platform.ua
 	        };
+	    };
+	    CoreService.prototype.version = function () {
+	        return 'v1.0.0';
 	    };
 	    return CoreService;
 	}());
@@ -1879,7 +1878,10 @@ var GCLLib =
 	    axios_1.default.request(request).then(function (response) {
 	        return callback(null, response.data);
 	    }).catch(function (error) {
-	        return callback(error, null);
+	        if (error.response)
+	            return callback(error.response, null);
+	        else
+	            return callback(error, null);
 	    });
 	}
 
