@@ -22,7 +22,7 @@ module.exports = function (config) {
         colors: true,
         logLevel: config.LOG_DEBUG,
         autoWatch: true,
-        browsers: ['Safari'],
+        browsers: ['PhantomJS'],
         singleRun: false,
         concurrency: Infinity
     })
