@@ -35,6 +35,9 @@ interface AbstractCore{
     // sync
     getUrl():String;
     infoBrowserSync():any;
+
+    // t1c-lib-info
+    version():String;
 }
 
 const CORE_INFO = "/";
@@ -176,6 +179,11 @@ class CoreService implements AbstractCore{
             },
             ua: platform.ua
         };
+    }
+
+    // get Lib version
+    public version() {
+        return '%%GULP_INJECT_VERSION%%';
     }
 }
 
