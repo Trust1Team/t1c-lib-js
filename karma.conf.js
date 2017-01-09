@@ -21,9 +21,8 @@ module.exports = function (config) {
         port: 9876,
         colors: true,
         logLevel: config.LOG_DEBUG,
-        autoWatch: true,
-        browsers: ['Safari'],
-        singleRun: false,
+        browsers: ['PhantomJS'],
+        singleRun: true,
         concurrency: Infinity,
 
         // Increase timeouts to prevent the issue with disconnected tests (https://goo.gl/nstA69)
