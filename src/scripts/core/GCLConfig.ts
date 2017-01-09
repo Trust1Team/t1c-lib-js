@@ -3,7 +3,6 @@
  * @author Michallis Pashidis
  * @since 2016
  */
-import * as $ from "jquery";
 
 const defaultGclUrl = "https://localhost:10433/v1";
 const defaultDSUrl = "https://accapim.t1t.be:443";

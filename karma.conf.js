@@ -5,7 +5,7 @@ module.exports = function (config) {
         basePath: '',
         frameworks: ['mocha', 'chai', 'sinon'],
         files: [
-            'node_modules/jquery/dist/jquery.js',
+            'node_modules/es6-promise/dist/es6-promise.js',
             'src/test/**/*.ts'
         ],
         exclude: [
@@ -20,10 +20,22 @@ module.exports = function (config) {
         reporters: ['progress'],
         port: 9876,
         colors: true,
-        logLevel: config.LOG_INFO,
-        autoWatch: true,
-        browsers: ['Chrome','Opera','IE','Safari'],
-        singleRun: false,
-        concurrency: Infinity
+        logLevel: config.LOG_DEBUG,
+        browsers: ['PhantomJS'],
+        singleRun: true,
+        concurrency: Infinity,
+
+        // Increase timeouts to prevent the issue with disconnected tests (https://goo.gl/nstA69)
+        captureTimeout: 4 * 60 * 1000,
+        browserDisconnectTimeout: 10000,
+        browserDisconnectTolerance: 1,
+        browserNoActivityTimeout: 4 * 60 * 1000,
+
+        // increase mocha timeout
+        client: {
+            mocha: {
+                timeout: 20000 // 20 seconds
+            }
+        }
     })
 };

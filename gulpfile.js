@@ -1,6 +1,7 @@
 var gulp = require("gulp");
 var gutil = require( 'gulp-util' );
 var karma = require('karma');
+var injectVersion = require('gulp-inject-version');
 var webpackstream = require('webpack-stream');
 var webpack = require('webpack');
 var WebpackDevServer = require("webpack-dev-server");
@@ -28,6 +29,7 @@ gulp.task("tslint", function () {
 gulp.task('webpack', function() {
     return gulp.src('src/scripts/GCLLib.ts')
         .pipe(webpackstream( require('./webpack.config.js') ))
+        .pipe(injectVersion())
         .pipe(gulp.dest('dist/'));
 });
 

@@ -35,15 +35,21 @@ interface AbstractCore{
     // sync
     getUrl():String;
     infoBrowserSync():any;
+
+    // t1c-lib-info
+    version():String;
 }
 
-const FILTER_CARD_INSERTED = "card-inserted=";
 const CORE_INFO = "/";
 const CORE_PLUGINS = "/plugins";
 const CORE_READERS = "/card-readers";
 const CORE_READER_ID = "/readers/{id}";
 const CORE_ACTIVATE = "/admin/activate";
 const CORE_PUB_KEY = "/admin/certificate";
+
+function cardInsertedFilter(inserted:boolean):any {
+    return { 'card-inserted': inserted };
+}
 
 class CoreService implements AbstractCore{
     // constructor
@@ -52,8 +58,8 @@ class CoreService implements AbstractCore{
     // async
     public info(callback:(error:CoreExceptions.RestException, data:any)=>void) {this.connection.get(this.url + CORE_INFO,callback);}
     public readers(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS, callback);}
-    public readersCardAvailable(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS, callback, FILTER_CARD_INSERTED + 'true');}
-    public readersCardsUnavailable(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS, callback, FILTER_CARD_INSERTED + 'false');}
+    public readersCardAvailable(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS, callback, cardInsertedFilter(true));}
+    public readersCardsUnavailable(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS, callback, cardInsertedFilter(false));}
     public reader(reader_id:string, callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_READERS + "/" + reader_id, callback);}
     public plugins(callback:(error:CoreExceptions.RestException, data:any)=>void):void {this.connection.get(this.url + CORE_PLUGINS,callback);}
     public activate(callback:(error:CoreExceptions.RestException, data:any)=>void) {this.connection.post(this.url + CORE_ACTIVATE,{},callback);}
@@ -173,6 +179,11 @@ class CoreService implements AbstractCore{
             },
             ua: platform.ua
         };
+    }
+
+    // get Lib version
+    public version() {
+        return '%%GULP_INJECT_VERSION%%';
     }
 }
 

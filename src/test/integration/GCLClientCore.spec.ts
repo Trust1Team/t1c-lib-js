@@ -1,15 +1,19 @@
+///<reference path="../../../typings/index.d.ts"/>
 import {expect} from "chai";
 import {LocalAuthConnection} from "../../scripts/core/client/Connection";
 import {CoreService} from "../../scripts/core/services/CoreService";
+import {GCLConfig} from "../../scripts/core/GCLConfig";
+import {TestUtil} from "../../test-util/TestUtils"
 
 describe('GCLClient', () => {
     let gclUnderTest = "https://localhost:10443/v1";
     let localAuthConnection:LocalAuthConnection;
     let core:CoreService;
+    let config = new GCLConfig("https://dist.t1t.be/v1","someapikey");
 
     beforeEach(() => {
-        localAuthConnection = new LocalAuthConnection();
-        core = new CoreService(gclUnderTest,localAuthConnection);
+        localAuthConnection = new LocalAuthConnection(config);
+        core = new CoreService(gclUnderTest,localAuthConnection, config);
     });
 
     describe('GCL Core Service', () => {
@@ -26,12 +30,62 @@ describe('GCLClient', () => {
             expect(core.getUrl()).to.equals(gclUnderTest);
         });
 
-        it('should return information about the GCL client', (done) => {
-            core.info(function(err,data){
+        it('should return information about the client browser', (done) => {
+            core.infoBrowser((err,data) => {
                 expect(err).to.be.null;
                 expect(data).exist;
                 done();
-            })
+            });
+        });
+
+        // it('should return info about the GCL installation', (done) => {
+        //     core.info((err, data) => {
+        //         TestUtil.asyncCheck(done, () => {
+        //             expect(err).to.be.null;
+        //             expect(data).exist;
+        //         });
+        //     });
+        // });
+
+        // it('should return available card readers', (done) => {
+        //     core.readers((err,data) => {
+        //         TestUtil.asyncCheck(done, () => {
+        //             expect(err).to.be.null;
+        //             expect(data).exist;
+        //         });
+        //     });
+        // });
+
+        // it('should return readers with available cards', (done) => {
+        //     core.readersCardAvailable((err,data) => {
+        //         TestUtil.asyncCheck(done, () => {
+        //             expect(err).to.be.null;
+        //             expect(data).exist;
+        //         });
+        //     });
+        // });
+
+        // it('should return readers without available cards', (done) => {
+        //     core.readersCardsUnavailable((err,data) => {
+        //         TestUtil.asyncCheck(done, () => {
+        //             expect(err).to.be.null;
+        //             expect(data).exist;
+        //         });
+        //     });
+        // });
+
+        // it('should return a list of available plugins', (done) => {
+        //     core.plugins((err, data) => {
+        //         TestUtil.asyncCheck(done, () => {
+        //             expect(err).to.be.null;
+        //             expect(data).exist;
+        //         });
+        //     });
+        // });
+
+        it('should return the T1C-Lib version', () => {
+            expect(core.version()).to.be.a('string');
+            expect(core.version()).to.equal('%%GULP_INJECT_VERSION%%');
         });
     });
 });

@@ -3,7 +3,6 @@
  */
 import {RemoteConnection} from "../client/Connection";
 import * as CoreExceptions from "../exceptions/CoreExceptions";
-import {RestException} from "../exceptions/CoreExceptions";
 import {GCLConfig} from "../GCLConfig";
 
 interface AbstractDSClient{
