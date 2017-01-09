@@ -24,6 +24,19 @@ module.exports = function (config) {
         autoWatch: true,
         browsers: ['PhantomJS'],
         singleRun: false,
-        concurrency: Infinity
+        concurrency: Infinity,
+
+        // Increase timeouts to prevent the issue with disconnected tests (https://goo.gl/nstA69)
+        captureTimeout: 4 * 60 * 1000,
+        browserDisconnectTimeout: 10000,
+        browserDisconnectTolerance: 1,
+        browserNoActivityTimeout: 4 * 60 * 1000,
+
+        // increase mocha timeout
+        client: {
+            mocha: {
+                timeout: 20000 // 20 seconds
+            }
+        }
     })
 };
