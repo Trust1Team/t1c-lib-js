@@ -34,7 +34,7 @@ describe('DSClient', () => {
         });
 
         it('should return information for the distribution service', (done) => {
-            // requires GCL, cannot be reliably tested
+            // needs access to the distribution server, cannot be tests
             done();
 
             // dsClient.getInfo(function(err,data){
@@ -53,7 +53,7 @@ describe('DSClient', () => {
         });
 
         it('should get a JWT token', (done) => {
-            // requires GCL, cannot be reliably tested
+            // JWT functionality not yet implemented, cannot be tested
             done();
 
             // dsClient.getJWT(function(err,data){
@@ -65,7 +65,7 @@ describe('DSClient', () => {
         });
 
         it('should get verify JWT claims', (done) => {
-            // requires GCL, cannot be reliably tested
+            // JWT functionality not yet implemented, cannot be reliably tested
             done();
 
             // dsClient.getJWT(function(err,data){

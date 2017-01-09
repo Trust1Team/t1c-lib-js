@@ -40,14 +40,6 @@ describe('Plugin-Belgian eID', () => {
             expect(beidPlugin).not.undefined;
         });
 
-        it('should return available card readers', (done)=>{
-            coreService.readers(function(err,data){
-                console.log("Error: "+JSON.stringify(err));
-                console.log("data: "+data);
-                done();
-            });
-        });
-
     });
 });
 
