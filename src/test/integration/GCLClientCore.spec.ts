@@ -38,41 +38,41 @@ describe('GCLClient', () => {
             });
         });
 
-        it('should return info about the GCL installation', (done) => {
-            core.info((err, data) => {
-                TestUtil.asyncCheck(done, () => {
-                    expect(err).to.be.null;
-                    expect(data).exist;
-                });
-            });
-        });
+        // it('should return info about the GCL installation', (done) => {
+        //     core.info((err, data) => {
+        //         TestUtil.asyncCheck(done, () => {
+        //             expect(err).to.be.null;
+        //             expect(data).exist;
+        //         });
+        //     });
+        // });
 
-        it('should return available card readers', (done) => {
-            core.readers((err,data) => {
-                TestUtil.asyncCheck(done, () => {
-                    expect(err).to.be.null;
-                    expect(data).exist;
-                });
-            });
-        });
+        // it('should return available card readers', (done) => {
+        //     core.readers((err,data) => {
+        //         TestUtil.asyncCheck(done, () => {
+        //             expect(err).to.be.null;
+        //             expect(data).exist;
+        //         });
+        //     });
+        // });
 
-        it('should return readers with available cards', (done) => {
-            core.readersCardAvailable((err,data) => {
-                TestUtil.asyncCheck(done, () => {
-                    expect(err).to.be.null;
-                    expect(data).exist;
-                });
-            });
-        });
+        // it('should return readers with available cards', (done) => {
+        //     core.readersCardAvailable((err,data) => {
+        //         TestUtil.asyncCheck(done, () => {
+        //             expect(err).to.be.null;
+        //             expect(data).exist;
+        //         });
+        //     });
+        // });
 
-        it('should return readers without available cards', (done) => {
-            core.readersCardsUnavailable((err,data) => {
-                TestUtil.asyncCheck(done, () => {
-                    expect(err).to.be.null;
-                    expect(data).exist;
-                });
-            });
-        });
+        // it('should return readers without available cards', (done) => {
+        //     core.readersCardsUnavailable((err,data) => {
+        //         TestUtil.asyncCheck(done, () => {
+        //             expect(err).to.be.null;
+        //             expect(data).exist;
+        //         });
+        //     });
+        // });
 
         it('should return a list of available plugins', (done) => {
             core.plugins((err, data) => {
