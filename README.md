@@ -108,6 +108,16 @@ You can be released from the requirements of the Affero General Public License
  source product...
 Irrespective of your choice of license, the T1T logo as depicted below may not be removed from this file, or from any software or other product or service to which it is applied, without the express prior written permission of Trust1Team sarl. The T1T logo is an EU Registered Trademark (n° 12943131).
 ```
+### Release Notes - Trust1Connector - Version js-1.0.0 ###
+## Task
+
+*   [[T1C-408](https://trust1t.atlassian.net/browse/T1C-408)] - Add support to get the version of the T1C-JS
+
+## Other
+
+*   jQuery dependency was only used for making HTTP requests. Replaced with Axios HTTP library to reduce footprint. Some code incompatibilities may occur.
+
+
 ### Release Notes - Trust1Connector - Version js-0.9.11 ###
 ## Task
 
