@@ -83,8 +83,8 @@ function handleRequest(url:string, method:string, callback:(error:any, data:any)
     axios.request(request).then(function (response) {
         return callback(null, response.data);
     }).catch(function (error) {
-        return callback(error, null);
-    })
+        return callback(error.response, null);
+    });
 }
 
 
