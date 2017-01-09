@@ -74,14 +74,14 @@ describe('GCLClient', () => {
         //     });
         // });
 
-        it('should return a list of available plugins', (done) => {
-            core.plugins((err, data) => {
-                TestUtil.asyncCheck(done, () => {
-                    expect(err).to.be.null;
-                    expect(data).exist;
-                });
-            });
-        });
+        // it('should return a list of available plugins', (done) => {
+        //     core.plugins((err, data) => {
+        //         TestUtil.asyncCheck(done, () => {
+        //             expect(err).to.be.null;
+        //             expect(data).exist;
+        //         });
+        //     });
+        // });
 
         it('should return the T1C-Lib version', () => {
             expect(core.version()).to.be.a('string');
