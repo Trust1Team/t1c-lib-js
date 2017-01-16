@@ -620,7 +620,7 @@ var GCLLib =
 	        };
 	    };
 	    CoreService.prototype.version = function () {
-	        return 'v1.0.0';
+	        return 'v1.0.1';
 	    };
 	    return CoreService;
 	}());
