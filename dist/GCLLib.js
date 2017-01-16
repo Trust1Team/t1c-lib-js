@@ -96,8 +96,9 @@ var GCLLib =
 	        var self = this;
 	        var clientCb = cb;
 	        this.core().getPubKey(function (err, gclResponse) {
-	            if (err && err.responseJSON && !err.responseJSON.success) {
+	            if (err && err.data && !err.data.success) {
 	                self.dsClient.getPubKey(function (err, dsResponse) {
+	                    console.log(dsResponse);
 	                    if (err)
 	                        return clientCb(err, null);
 	                    var innerCb = clientCb;

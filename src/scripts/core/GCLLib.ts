@@ -68,9 +68,10 @@ class GCLClient {
         let self = this;
         let clientCb = cb;
         this.core().getPubKey(function(err:any,gclResponse){
-            if(err && err.responseJSON && !err.responseJSON.success){
-                //no certificate set - retrieve cert from DS
+            if(err && err.data && !err.data.success){
+                // console.log('no certificate set - retrieve cert from DS');
                 self.dsClient.getPubKey(function(err,dsResponse){
+                    console.log(dsResponse);
                     if(err) return clientCb(err,null);
                     let innerCb = clientCb;
                     self.core().setPubKey(dsResponse.pubkey,function(err,response){
