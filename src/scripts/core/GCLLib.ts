@@ -48,6 +48,13 @@ class GCLClient {
             }
             self.registerAndActivate();
         });
+
+        //verify OCV accessibility
+        this.initOCVContext(function(err,data){
+            if(err){
+                console.warn("OCV not available for apikey, contact support@trust1team.com to add this capability");
+            }else console.log("OCV available for apikey");
+        });
     }
 
     private resolveConfig(cfg:GCLConfig) {
@@ -59,6 +66,13 @@ class GCLClient {
         resolvedCfg.gclUrl = cfg.gclUrl;
         resolvedCfg.implicitDownload = cfg.implicitDownload;
         return resolvedCfg;
+    }
+
+    /**
+     * Init OCV - verify if OCV is available
+     */
+    private initOCVContext(cb){
+        return this.ocvClient.getInfo(cb);
     }
 
     /**
