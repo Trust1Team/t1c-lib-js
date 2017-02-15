@@ -720,14 +720,43 @@
 
         $("#ocvGetChallenge").on('click',function(){
             $("#information").empty();
+            $("#error").empty();
             var ocv = connector.ocv();
             ocv.getChallenge('SHA256',callback);
         });
 
         $("#ocvGetInfo").on('click',function(){
             $("#information").empty();
+            $("#error").empty();
             var ocv = connector.ocv();
             ocv.getInfo(callback);
+        });
+
+        $("#ocvValidateSignature").on('click',function(){
+            $("#information").empty();
+            $("#error").empty();
+            if($("#selected_reader").text()=="No card reader selected"){
+                console.log("Please select a card reader and provide a card");
+                return $("#error").append("Please select a card reader and provide a card");
+            }
+            var beid = connector.beid($("#selected_reader").text());
+            var conn = connector;
+            beid.rnData(function(err,rndata){
+                if(err) return callback(err,rndata);
+                var beid_conn = beid;
+                var connector = conn;
+                //get RRN certificate
+                beid_conn.rrnCertificate(function(err,rrncertdata){
+                    var req = {};
+                    req.rawData = rndata.data.raw_data;
+                    req.signedData = rndata.data.signature;
+                    req.signingCert = rrncertdata.data;
+                    var ocv = connector.ocv();
+                    ocv.validateSignature(req,function(err,ocvResponse){
+                       callback(err,ocvResponse);
+                    });
+                });
+            });
         });
 
         $("#ocvBeIDAuthenticate").on('click', function () {
