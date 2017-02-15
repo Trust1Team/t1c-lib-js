@@ -134,9 +134,11 @@
     <hr />
     <h3>Open Certificate Validation API</h3>
     <div>
+        <div><button id="ocvGetInfo" type="button" class="btn btn-default btn-lg">OCV - Get Service Info</button></div>
         <div><button id="ocvGetChallenge" type="button" class="btn btn-default btn-lg">OCV - Get Challenge</button></div>
         <div><button id="ocvBeIDAuthenticate" type="button" class="btn btn-default btn-lg">OCV - Authenticate Server Challenge</button></div>
         <div><button id="ocvValidateCertChain" type="button" class="btn btn-default btn-lg">OCV - Validate Certificate Chain</button></div>
+        <div><button id="ocvValidateSignature" type="button" class="btn btn-default btn-lg">OCV - Validate Signature</button></div>
         <hr />
     </div>
     <pre id="information"></pre>
@@ -720,6 +722,12 @@
             $("#information").empty();
             var ocv = connector.ocv();
             ocv.getChallenge('SHA256',callback);
+        });
+
+        $("#ocvGetInfo").on('click',function(){
+            $("#information").empty();
+            var ocv = connector.ocv();
+            ocv.getInfo(callback);
         });
 
         $("#ocvBeIDAuthenticate").on('click', function () {
