@@ -3618,10 +3618,10 @@ var GCLLib =
 	    OCVClient.prototype.getUrl = function () { return this.url; };
 	    OCVClient.prototype.validateSignature = function (data, callback) {
 	        var _req = {};
-	        _req.rawData = data.data;
+	        _req.rawData = data.rawData;
 	        _req.signature = data.signedData;
 	        _req.certificate = data.signingCert;
-	        this.connection.post(this.url + CHALLENGE, _req, callback);
+	        this.connection.post(this.url + SIGNATURE, _req, callback);
 	    };
 	    OCVClient.prototype.getInfo = function (callback) {
 	        var cb = callback;

@@ -26,10 +26,10 @@ class OCVClient implements AbstractOCVClient{
 
     public validateSignature(data: any, callback: (error: RestException, data: any) => void): void {
         let _req:any={};
-        _req.rawData = data.data;
+        _req.rawData = data.rawData;
         _req.signature = data.signedData;
         _req.certificate = data.signingCert;
-        this.connection.post(this.url + CHALLENGE, _req, callback);
+        this.connection.post(this.url + SIGNATURE, _req, callback);
     }
 
     public getInfo(callback: (error: RestException, data: any) => void): void {
