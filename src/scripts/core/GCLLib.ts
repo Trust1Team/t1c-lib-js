@@ -8,6 +8,7 @@ import {GCLConfig} from "./GCLConfig";
 import {CardFactory} from "../Plugins/smartcards/CardFactory";
 import * as CoreExceptions from "./exceptions/CoreExceptions";
 import {AbstractEidBE} from "../Plugins/smartcards/eid/be/EidBe";
+import {AbstractEidLUX} from "../Plugins/smartcards/eid/lux/EidLux";
 import {EMV} from "../Plugins/smartcards/emv/EMV";
 import {CoreService} from "./services/CoreService";
 import {LocalConnection, RemoteConnection, LocalAuthConnection} from "./client/Connection";
@@ -151,6 +152,8 @@ class GCLClient {
     public ocv = ():AbstractOCVClient => {return this.ocvClient;};
     // get instance for belgian eID card
     public beid = (reader_id?:string):AbstractEidBE => {return this.cardFactory.createEidBE(reader_id);};
+    // get instance for luxemburg eID card
+    public luxeid = (reader_id?:string, pin?:string):AbstractEidLUX => {return this.cardFactory.createEidLUX(reader_id, pin);};
     // get instance for EMV
     public emv = (reader_id?:string):EMV => {return this.cardFactory.createEmv(reader_id);};
 

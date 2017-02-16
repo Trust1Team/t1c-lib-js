@@ -75,7 +75,7 @@ function handleRequest(url:string, method:string, callback:(error:any, data:any)
     };
     if (body) request['data'] = body;
     if (params) {
-        request['params'] = params;
+        request['params'] = params; //?filter=a,b,c&pin=123456
     }
     if (apikey) request.headers['apikey'] = apikey;
     if (jwt) request.headers['Authorization'] = 'Bearer ' + jwt;

@@ -68,7 +68,7 @@ function handleRequest(url, method, callback, body, params, apikey, jwt) {
     if (body)
         request['data'] = body;
     if (params) {
-        request['params'] = params;
+        request['params'] = params; //?filter=a,b,c&pin=123456
     }
     if (apikey)
         request.headers['apikey'] = apikey;
