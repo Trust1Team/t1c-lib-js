@@ -15,6 +15,7 @@ import {LocalConnection, RemoteConnection, LocalAuthConnection} from "./client/C
 import {AbstractDSClient,DSClient} from "./ds/DSClient";
 import {AbstractOCVClient,OCVClient} from "./ocv/OCVClient";
 import {Mobib} from "../Plugins/smartcards/mobib/mobib";
+import {AbstractLuxTrust} from "../Plugins/smartcards/luxtrust/LuxTrust";
 
 class GCLClient {
     private cfg: GCLConfig;
@@ -155,6 +156,8 @@ class GCLClient {
     public beid = (reader_id?:string):AbstractEidBE => {return this.cardFactory.createEidBE(reader_id);};
     // get instance for luxemburg eID card
     public luxeid = (reader_id?:string, pin?:string):AbstractEidLUX => {return this.cardFactory.createEidLUX(reader_id, pin);};
+    // get instance for luxtrust card
+    public luxtrust = (reader_id?:string, pin?:string):AbstractLuxTrust => {return this.cardFactory.createLuxTrust(reader_id);};
     // get instance for EMV
     public emv = (reader_id?:string):EMV => {return this.cardFactory.createEmv(reader_id);};
     // get instance for MOBIB

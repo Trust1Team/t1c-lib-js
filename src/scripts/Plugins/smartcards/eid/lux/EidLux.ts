@@ -19,6 +19,7 @@ interface AbstractEidLUX{
     verifyPin(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
     signData(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
     authenticate(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    signatureImage(callback:(error:CoreExceptions.RestException, data:any) => void):void;
 }
 
 function createFilterQueryParam(filters:string[],pin:string):any {
@@ -40,9 +41,8 @@ const LUX_CERT_NON_REPUDIATION = LUX_ALL_CERTIFICATES + "/non-repudiation";
 const LUX_VERIFY_PIN = "/verify-pin";
 const LUX_SIGN_DATA = "/sign";
 const LUX_AUTHENTICATE = "/authenticate";
+const LUX_SIGNATURE_IMAGE = "/signature-image";
 
-// property constants
-const VERIFY_PRIV_KEY_REF = "non-repudiation";
 
 class EidLux implements AbstractEidLUX{
     // constructor
@@ -84,7 +84,6 @@ class EidLux implements AbstractEidLUX{
 
     verifyPin(body, callback) {
         let _req:any = {};
-        _req.private_key_reference = VERIFY_PRIV_KEY_REF;
         if (body.pin) {_req.pin = body.pin;}
         this.connection.post(this.resolvedReaderURI() + LUX_VERIFY_PIN, _req, callback, createPinQueryParam(this.pin));
     }
@@ -107,6 +106,10 @@ class EidLux implements AbstractEidLUX{
             if(body.pin) {_req.pin = body.pin;}
         }
         this.connection.post(this.resolvedReaderURI() + LUX_AUTHENTICATE, _req, callback, createPinQueryParam(this.pin));
+    }
+
+    signatureImage(callback) {
+        this.connection.get(this.resolvedReaderURI() + LUX_SIGNATURE_IMAGE, callback, createPinQueryParam(this.pin));
     }
 }
 
