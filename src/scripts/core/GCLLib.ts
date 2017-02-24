@@ -14,6 +14,7 @@ import {CoreService} from "./services/CoreService";
 import {LocalConnection, RemoteConnection, LocalAuthConnection} from "./client/Connection";
 import {AbstractDSClient,DSClient} from "./ds/DSClient";
 import {AbstractOCVClient,OCVClient} from "./ocv/OCVClient";
+import {Mobib} from "../Plugins/smartcards/mobib/mobib";
 
 class GCLClient {
     private cfg: GCLConfig;
@@ -156,6 +157,8 @@ class GCLClient {
     public luxeid = (reader_id?:string, pin?:string):AbstractEidLUX => {return this.cardFactory.createEidLUX(reader_id, pin);};
     // get instance for EMV
     public emv = (reader_id?:string):EMV => {return this.cardFactory.createEmv(reader_id);};
+    // get instance for MOBIB
+    public mobib = (reader_id?:string):Mobib => { return this.cardFactory.createMobib(reader_id); };
 
     // facade implementation
 

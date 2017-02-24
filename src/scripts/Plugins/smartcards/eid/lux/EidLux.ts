@@ -41,6 +41,9 @@ const LUX_VERIFY_PIN = "/verify-pin";
 const LUX_SIGN_DATA = "/sign";
 const LUX_AUTHENTICATE = "/authenticate";
 
+// property constants
+const VERIFY_PRIV_KEY_REF = "non-repudiation";
+
 class EidLux implements AbstractEidLUX{
     // constructor
     constructor(private url:string, private connection:LocalConnection, private reader_id:string, private pin:string) {
@@ -78,25 +81,32 @@ class EidLux implements AbstractEidLUX{
     rootCertificate(callback) {this.connection.get(this.resolvedReaderURI() + LUX_CERT_ROOT, callback, createPinQueryParam(this.pin));}
     authenticationCertificate(callback) {this.connection.get(this.resolvedReaderURI() + LUX_CERT_AUTHENTICATION, callback,createPinQueryParam(this.pin));}
     nonRepudiationCertificate(callback) {this.connection.get(this.resolvedReaderURI() + LUX_CERT_NON_REPUDIATION, callback,createPinQueryParam(this.pin));}
-    verifyPin(body: any, callback) {
-        let _res:any = {};
-        _res.result=false;
-        _res.info="TBD";
-        callback(_res,null);
+
+    verifyPin(body, callback) {
+        let _req:any = {};
+        _req.private_key_reference = VERIFY_PRIV_KEY_REF;
+        if (body.pin) {_req.pin = body.pin;}
+        this.connection.post(this.resolvedReaderURI() + LUX_VERIFY_PIN, _req, callback, createPinQueryParam(this.pin));
     }
 
-    signData(body: any, callback) {
-        let _res:any = {};
-        _res.result=false;
-        _res.info="TBD";
-        callback(_res,null);
+    signData(body, callback) {
+        let _req:any = {};
+        if (body) {
+            _req.algorithm_reference = body.algorithm_reference;
+            _req.data = body.data;
+            if(body.pin) {_req.pin = body.pin;}
+        }
+        this.connection.post(this.resolvedReaderURI() + LUX_SIGN_DATA, _req, callback, createPinQueryParam(this.pin));
     }
 
-    authenticate(body: any, callback) {
-        let _res:any = {};
-        _res.result=false;
-        _res.info="TBD";
-        callback(_res,null);
+    authenticate(body, callback) {
+        let _req:any = {};
+        if(body){
+            _req.data = body.data;
+            _req.algorithm_reference = body.algorithm_reference;
+            if(body.pin) {_req.pin = body.pin;}
+        }
+        this.connection.post(this.resolvedReaderURI() + LUX_AUTHENTICATE, _req, callback, createPinQueryParam(this.pin));
     }
 }
 
