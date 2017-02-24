@@ -7,11 +7,13 @@ import {AbstractEidBE, EidBe} from "./eid/be/EidBe";
 import {AbstractEidLUX, EidLux} from "./eid/lux/EidLux";
 import {LocalConnection} from "../../core/client/Connection";
 import {GCLConfig} from "../../core/GCLConfig";
+import {AbstractMobib, Mobib} from "./mobib/mobib";
 
 interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
     createEidLUX(reader_id?: string): AbstractEidLUX;
     createEmv(reader_id?: string): AbstractEMV;
+    createMobib(reader_id?:string): AbstractMobib;
 }
 
 export class CardFactory implements AbstractFactory{
@@ -23,4 +25,7 @@ export class CardFactory implements AbstractFactory{
 
     public createEmv(reader_id?:string): EMV {return new EMV(this.url,this.connection,reader_id);}
 
+    public createMobib(reader_id?:string): Mobib {
+        return new Mobib(this.url, this.connection, reader_id);
+    }
 }
