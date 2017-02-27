@@ -575,7 +575,11 @@ var GCLLib =
 	                _req.pin = body.pin;
 	            }
 	        }
-	        this.connection.post(this.resolvedReaderURI() + LUX_SIGN_DATA, _req, callback, createPinQueryParam(this.pin));
+	        var params;
+	        if (body.pin) {
+	            params = createPinQueryParam(body.pin);
+	        }
+	        this.connection.post(this.resolvedReaderURI() + LUX_SIGN_DATA, _req, callback, params);
 	    };
 	    EidLux.prototype.authenticate = function (body, callback) {
 	        var _req = {};
@@ -2089,7 +2093,7 @@ var GCLLib =
 	        return handleRequest(url, 'GET', callback, undefined, queryParams, undefined, this.cfg.jwt);
 	    };
 	    LocalConnection.prototype.post = function (url, body, callback, queryParams) {
-	        return handleRequest(url, 'POST', callback, body, undefined, undefined, this.cfg.jwt);
+	        return handleRequest(url, 'POST', callback, body, queryParams, undefined, this.cfg.jwt);
 	    };
 	    LocalConnection.prototype.put = function (url, body, callback) {
 	        return handleRequest(url, 'PUT', callback, body, undefined, undefined, this.cfg.jwt);

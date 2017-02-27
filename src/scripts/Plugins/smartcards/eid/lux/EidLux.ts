@@ -95,7 +95,11 @@ class EidLux implements AbstractEidLUX{
             _req.data = body.data;
             if(body.pin) {_req.pin = body.pin;}
         }
-        this.connection.post(this.resolvedReaderURI() + LUX_SIGN_DATA, _req, callback, createPinQueryParam(this.pin));
+        let params;
+        if (body.pin) {
+            params = createPinQueryParam(body.pin);
+        }
+        this.connection.post(this.resolvedReaderURI() + LUX_SIGN_DATA, _req, callback, params);
     }
 
     authenticate(body, callback) {
