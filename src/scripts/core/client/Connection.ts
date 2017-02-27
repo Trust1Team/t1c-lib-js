@@ -39,7 +39,7 @@ class LocalConnection implements Connection {
     }
 
     public post(url:string, body:any, callback:(error:any, data:any) => void, queryParams?:any):void{
-        return handleRequest(url, 'POST', callback, body, undefined, undefined, this.cfg.jwt);
+        return handleRequest(url, 'POST', callback, body, queryParams, undefined, this.cfg.jwt);
     }
 
     public put(url:string, body:any, callback:(error:any, data:any) => void):void{
