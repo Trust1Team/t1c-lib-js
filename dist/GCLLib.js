@@ -662,6 +662,7 @@ var GCLLib =
 	var LUX_VERIFY_PIN = "/verify-pin";
 	var LUX_SIGN_DATA = "/sign";
 	var LUX_AUTHENTICATE = "/authenticate";
+	var LUX_OTP_CHALLENGE = '/ocra/challenge';
 	var LuxTrust = (function () {
 	    function LuxTrust(url, connection, reader_id) {
 	        this.url = url;
@@ -719,6 +720,15 @@ var GCLLib =
 	            }
 	        }
 	        this.connection.post(this.resolvedReaderURI() + LUX_AUTHENTICATE, _req, callback);
+	    };
+	    LuxTrust.prototype.challenge = function (body, callback) {
+	        var _req = {};
+	        if (body) {
+	            if (body.pin) {
+	                _req.pin = body.pin;
+	            }
+	        }
+	        this.connection.post(this.resolvedReaderURI() + LUX_OTP_CHALLENGE, _req, callback);
 	    };
 	    return LuxTrust;
 	}());
