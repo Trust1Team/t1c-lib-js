@@ -118,14 +118,23 @@ class GCLClient {
                 //we need to register the device
                 //console.log("Register device:"+uuid);
                 self.dsClient.register(info,uuid,function(err,activationResponse){
-                    if(err) return;
+                    if (err) {
+                        console.log("Error while registering the device: " + JSON.stringify(err));
+                        return;
+                    }
                     self_cfg.jwt = activationResponse.token;
                     self.core().activate(function(err,data){
-                        if(err)return;//will try again upon next sync
+                        if (err) {
+                            console.log(JSON.stringify(err));
+                            return;
+                        }
                         //sync
                         info.activated = true;
                         self.dsClient.sync(info,uuid,function(err,syncResponse){
-                           return; //ignore response
+                            if (err) {
+                                console.log("Error while syncing the device: " + JSON.stringify(err));
+                                return;
+                            }
                         });
                     })
                 });
@@ -133,7 +142,10 @@ class GCLClient {
                 //we need to synchronize the device
                 //console.log("Sync device:"+uuid);
                 self.dsClient.sync(info,uuid,function(err,activationResponse){
-                    if(err) return;
+                    if (err) {
+                        console.log("Error while syncing the device: " + JSON.stringify(err));
+                        return;
+                    }
                     self_cfg.jwt = activationResponse.token;
                     return;
                 });
