@@ -308,12 +308,23 @@
     (function ($) {
         var gclConfig = new GCLLib.GCLConfig();
         gclConfig.apiKey = "2cc27598-2af7-48af-a2df-c7352e5368ff"; //test apikey rate limited
+        
+        //gclConfig.apiKey = "3f73ccaa-bdb4-4535-af53-351c58de0b83"; // Alpha Credit PROD
+        //gclConfig.apiKey = "77c5e498-dca0-4a69-a04f-3b3732d506b9"; // ING Lease PROD
+        //gclConfig.apiKey = "877c05a2-3959-4c54-88fd-3a399e838919"; // Record Bank PROD
+        
         gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
         //gclConfig.gclUrl = "http://localhost:10080/v1"; //override config for local dev
-        gclConfig.dsUrl = "https://accapim.t1t.be:443";
-        gclConfig.ocvUrl = "https://accapim.t1t.be:443/trust1team/ocv-api/v1";
+        
+        gclConfig.dsUrl = "http://localhost:8080";
+        //gclConfig.dsUrl = "https://accapim.t1t.be:443";
+        //gclConfig.dsUrl = "https://prodapim.t1t.be:443";
+        //gclConfig.dsUrl = "https://t1c.t1t.be:443";
+        
         //gclConfig.ocvUrl = "http://localhost:8080/ocv-api-web/v1";
-        //gclConfig.dsUrl = "http://localhost:8080";
+        gclConfig.ocvUrl = "https://accapim.t1t.be:443/trust1team/ocv-api/v1";
+        //gclConfig.ocvUrl = "https://prodapim.t1t.be:443/trust1team/ocv-api/v1";
+        
         gclConfig.allowAutoUpdate = true;
         gclConfig.implicitDownload = false;
         var connector = new GCLLib.GCLClient(gclConfig);
