@@ -11,7 +11,6 @@ interface AbstractEidLUX{
     allData(filters:string[],callback:(error:CoreExceptions.RestException, data:any) => void):void;
     allCerts(filters:string[], callback:(error:CoreExceptions.RestException, data:any) => void):void;
     biometric(callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    address(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     picture(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     rootCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     authenticationCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -76,7 +75,8 @@ class EidLux implements AbstractEidLUX{
     }
 
     biometric(callback){this.connection.get(this.resolvedReaderURI() + LUX_BIOMETRIC,callback, createPinQueryParam(this.pin));}
-    address(callback) {this.connection.get(this.resolvedReaderURI() + LUX_ADDRESS, callback, createPinQueryParam(this.pin));}
+    //In order to access the address information, we need different keys, and on Lux gov level this is protected
+    /*address(callback) {this.connection.get(this.resolvedReaderURI() + LUX_ADDRESS, callback, createPinQueryParam(this.pin));}*/
     picture(callback) {this.connection.get(this.resolvedReaderURI() + LUX_PHOTO, callback, createPinQueryParam(this.pin));}
     rootCertificate(callback) {this.connection.get(this.resolvedReaderURI() + LUX_CERT_ROOT, callback, createPinQueryParam(this.pin));}
     authenticationCertificate(callback) {this.connection.get(this.resolvedReaderURI() + LUX_CERT_AUTHENTICATION, callback,createPinQueryParam(this.pin));}
