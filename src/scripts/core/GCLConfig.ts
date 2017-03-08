@@ -8,10 +8,11 @@ const defaultGclUrl = "https://localhost:10433/v1";
 const defaultDSUrl = "https://accapim.t1t.be:443";
 const defaultDSContextPath = "/trust1team/gclds/v1";
 const defaultOCVContextPath = "/trust1team/ocv-api/v1";
-//const defaultDSContextPath = "/gcl-ds-web/v1"; //<==== for local dev
+const defaultDSContextPathTestMode = "/gcl-ds-web/v1";
 const fileDownloadUrlPostfix = "/trust1team/gclds-file/v1";
 const defaultAllowAutoUpdate = true;
 const defaultImplicitDownload = false;
+const defaultLocalTestMode = false;
 
 class GCLConfig {
     //singleton pattern
@@ -27,6 +28,7 @@ class GCLConfig {
     private _jwt:string;
     private _allowAutoUpdate:boolean;
     private _implicitDownload:boolean;
+    private _localTestMode:boolean;
 
     // constructor for DTO
     constructor(dsUriValue?:string, apiKey?:string){
@@ -39,6 +41,7 @@ class GCLConfig {
         this._jwt = 'none';
         this._allowAutoUpdate = defaultAllowAutoUpdate;
         this._implicitDownload = defaultImplicitDownload;
+        this._localTestMode = defaultLocalTestMode;
     }
 
     get ocvUrl(): string {
@@ -128,6 +131,16 @@ class GCLConfig {
 
     get dsUrlBase() {
         return this._dsUrlBase;
+    }
+
+
+    get localTestMode(): boolean {
+        return this._localTestMode;
+    }
+
+    set localTestMode(value: boolean) {
+        this._localTestMode = value;
+        if (this._localTestMode)this._dsUrl = this._dsUrlBase + defaultDSContextPathTestMode;
     }
 }
 

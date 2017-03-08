@@ -227,12 +227,16 @@
         gclConfig.apiKey = "2cc27598-2af7-48af-a2df-c7352e5368ff"; //test apikey rate limited
         gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
         //gclConfig.gclUrl = "http://localhost:10080/v1"; //override config for local dev
-        gclConfig.dsUrl = "https://accapim.t1t.be:443";
         gclConfig.ocvUrl = "https://accapim.t1t.be:443/trust1team/ocv-api/v1";
         //gclConfig.ocvUrl = "http://localhost:8080/ocv-api-web/v1";
-        //gclConfig.dsUrl = "http://localhost:8080";
+        gclConfig.localTestMode=false;
         gclConfig.allowAutoUpdate = true;
         gclConfig.implicitDownload = false;
+
+        if(gclConfig.localTestMode){
+            gclConfig.dsUrl = "http://localhost:8080";
+        }else gclConfig.dsUrl = "https://accapim.t1t.be:443";
+
         var connector = new GCLLib.GCLClient(gclConfig);
 
         // TEST PIN ENTRY
