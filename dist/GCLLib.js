@@ -49,10 +49,10 @@ var GCLLib =
 	var GCLConfig_1 = __webpack_require__(1);
 	exports.GCLConfig = GCLConfig_1.GCLConfig;
 	var CardFactory_1 = __webpack_require__(2);
-	var CoreService_1 = __webpack_require__(5);
-	var Connection_1 = __webpack_require__(8);
-	var DSClient_1 = __webpack_require__(35);
-	var OCVClient_1 = __webpack_require__(36);
+	var CoreService_1 = __webpack_require__(8);
+	var Connection_1 = __webpack_require__(11);
+	var DSClient_1 = __webpack_require__(38);
+	var OCVClient_1 = __webpack_require__(39);
 	var GCLClient = (function () {
 	    function GCLClient(cfg) {
 	        var _this = this;
@@ -61,15 +61,22 @@ var GCLLib =
 	        this.ds = function () { return _this.dsClient; };
 	        this.ocv = function () { return _this.ocvClient; };
 	        this.beid = function (reader_id) { return _this.cardFactory.createEidBE(reader_id); };
+	        this.luxeid = function (reader_id, pin) { return _this.cardFactory.createEidLUX(reader_id, pin); };
+	        this.luxtrust = function (reader_id, pin) { return _this.cardFactory.createLuxTrust(reader_id); };
 	        this.emv = function (reader_id) { return _this.cardFactory.createEmv(reader_id); };
+	        this.mobib = function (reader_id) { return _this.cardFactory.createMobib(reader_id); };
 	        var self = this;
 	        this.cfg = this.resolveConfig(cfg);
 	        this.connection = new Connection_1.LocalConnection(this.cfg);
 	        this.authConnection = new Connection_1.LocalAuthConnection(this.cfg);
 	        this.remoteConnection = new Connection_1.RemoteConnection(this.cfg);
+	        this.localTestConnection = new Connection_1.LocalTestConnection(this.cfg);
 	        this.cardFactory = new CardFactory_1.CardFactory(this.cfg.gclUrl, this.connection, this.cfg);
 	        this.coreService = new CoreService_1.CoreService(this.cfg.gclUrl, this.authConnection, this.cfg);
-	        this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg);
+	        if (this.cfg.localTestMode)
+	            this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg);
+	        else
+	            this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg);
 	        this.ocvClient = new OCVClient_1.OCVClient(this.cfg.ocvUrl, this.remoteConnection, this.cfg);
 	        if (this.cfg.implicitDownload && true) {
 	            this.implicitDownload();
@@ -97,6 +104,7 @@ var GCLLib =
 	        resolvedCfg.jwt = cfg.jwt;
 	        resolvedCfg.gclUrl = cfg.gclUrl;
 	        resolvedCfg.implicitDownload = cfg.implicitDownload;
+	        resolvedCfg.localTestMode = cfg.localTestMode;
 	        return resolvedCfg;
 	    };
 	    GCLClient.prototype.initOCVContext = function (cb) {
@@ -195,9 +203,11 @@ var GCLLib =
 	var defaultDSUrl = "https://accapim.t1t.be:443";
 	var defaultDSContextPath = "/trust1team/gclds/v1";
 	var defaultOCVContextPath = "/trust1team/ocv-api/v1";
+	var defaultDSContextPathTestMode = "/gcl-ds-web/v1";
 	var fileDownloadUrlPostfix = "/trust1team/gclds-file/v1";
 	var defaultAllowAutoUpdate = true;
 	var defaultImplicitDownload = false;
+	var defaultLocalTestMode = false;
 	var GCLConfig = (function () {
 	    function GCLConfig(dsUriValue, apiKey) {
 	        this._gclUrl = defaultGclUrl;
@@ -209,6 +219,7 @@ var GCLLib =
 	        this._jwt = 'none';
 	        this._allowAutoUpdate = defaultAllowAutoUpdate;
 	        this._implicitDownload = defaultImplicitDownload;
+	        this._localTestMode = defaultLocalTestMode;
 	    }
 	    Object.defineProperty(GCLConfig.prototype, "ocvUrl", {
 	        get: function () {
@@ -323,6 +334,18 @@ var GCLLib =
 	        enumerable: true,
 	        configurable: true
 	    });
+	    Object.defineProperty(GCLConfig.prototype, "localTestMode", {
+	        get: function () {
+	            return this._localTestMode;
+	        },
+	        set: function (value) {
+	            this._localTestMode = value;
+	            if (this._localTestMode)
+	                this._dsUrl = this._dsUrlBase + defaultDSContextPathTestMode;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
 	    return GCLConfig;
 	}());
 	exports.GCLConfig = GCLConfig;
@@ -336,22 +359,24 @@ var GCLLib =
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var EidBe_1 = __webpack_require__(3);
-	var EMV_1 = __webpack_require__(4);
+	var EMV_1 = __webpack_require__(3);
+	var EidBe_1 = __webpack_require__(4);
+	var EidLux_1 = __webpack_require__(5);
+	var mobib_1 = __webpack_require__(6);
+	var LuxTrust_1 = __webpack_require__(7);
 	var CardFactory = (function () {
 	    function CardFactory(url, connection, cfg) {
 	        this.url = url;
 	        this.connection = connection;
 	        this.cfg = cfg;
 	    }
-	    CardFactory.prototype.createEidEST = function (reader_id) {
-	        return undefined;
-	    };
-	    CardFactory.prototype.createEidLUX = function (reader_id) {
-	        return undefined;
-	    };
 	    CardFactory.prototype.createEidBE = function (reader_id) { return new EidBe_1.EidBe(this.url, this.connection, reader_id); };
+	    CardFactory.prototype.createEidLUX = function (reader_id, pin) { return new EidLux_1.EidLux(this.url, this.connection, reader_id, pin); };
 	    CardFactory.prototype.createEmv = function (reader_id) { return new EMV_1.EMV(this.url, this.connection, reader_id); };
+	    CardFactory.prototype.createLuxTrust = function (reader_id) { return new LuxTrust_1.LuxTrust(this.url, this.connection, reader_id); };
+	    CardFactory.prototype.createMobib = function (reader_id) {
+	        return new mobib_1.Mobib(this.url, this.connection, reader_id);
+	    };
 	    return CardFactory;
 	}());
 	exports.CardFactory = CardFactory;
@@ -359,6 +384,47 @@ var GCLLib =
 
 /***/ },
 /* 3 */
+/***/ function(module, exports) {
+
+	"use strict";
+	var SEPARATOR = "/";
+	var PLUGIN_CONTEXT_EMV = "/plugins/emv";
+	var EMV_PAN = "/pan";
+	var EMV_VERIFY_PIN = "/verify-pin";
+	function createFilter(filters) {
+	    return { filter: filters.join(',') };
+	}
+	var EMV = (function () {
+	    function EMV(url, connection, reader_id) {
+	        this.url = url;
+	        this.connection = connection;
+	        this.reader_id = reader_id;
+	        this.url = url + PLUGIN_CONTEXT_EMV;
+	    }
+	    EMV.prototype.resolvedReaderURI = function () { return this.url + SEPARATOR + this.reader_id; };
+	    EMV.prototype.allData = function (filters, callback) {
+	        if (filters && filters.length > 0) {
+	            this.connection.get(this.resolvedReaderURI(), callback, createFilter(filters));
+	        }
+	        else {
+	            this.connection.get(this.resolvedReaderURI(), callback);
+	        }
+	    };
+	    EMV.prototype.verifyPin = function (body, callback) {
+	        var _req = {};
+	        if (body.pin) {
+	            _req.pin = body.pin;
+	        }
+	        this.connection.post(this.resolvedReaderURI() + EMV_VERIFY_PIN, _req, callback);
+	    };
+	    EMV.prototype.pan = function (callback) { this.connection.get(this.resolvedReaderURI() + EMV_PAN, callback); };
+	    return EMV;
+	}());
+	exports.EMV = EMV;
+
+
+/***/ },
+/* 4 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -450,26 +516,134 @@ var GCLLib =
 
 
 /***/ },
-/* 4 */
+/* 5 */
+/***/ function(module, exports) {
+
+	"use strict";
+	function createFilterQueryParam(filters, pin) {
+	    return { filter: filters.join(','), pin: pin };
+	}
+	function createPinQueryParam(pin) {
+	    return { pin: pin };
+	}
+	var SEPARATOR = "/";
+	var PLUGIN_CONTEXT_LUXEID = "/plugins/luxeid";
+	var LUX_ALL_CERTIFICATES = "/certificates";
+	var LUX_BIOMETRIC = "/biometric";
+	var LUX_ADDRESS = "/address";
+	var LUX_PHOTO = "/picture";
+	var LUX_CERT_ROOT = LUX_ALL_CERTIFICATES + "/root";
+	var LUX_CERT_AUTHENTICATION = LUX_ALL_CERTIFICATES + "/authentication";
+	var LUX_CERT_NON_REPUDIATION = LUX_ALL_CERTIFICATES + "/non-repudiation";
+	var LUX_VERIFY_PIN = "/verify-pin";
+	var LUX_SIGN_DATA = "/sign";
+	var LUX_AUTHENTICATE = "/authenticate";
+	var LUX_SIGNATURE_IMAGE = "/signature-image";
+	var EidLux = (function () {
+	    function EidLux(url, connection, reader_id, pin) {
+	        this.url = url;
+	        this.connection = connection;
+	        this.reader_id = reader_id;
+	        this.pin = pin;
+	        this.url = url + PLUGIN_CONTEXT_LUXEID;
+	        this.pin = pin;
+	    }
+	    EidLux.prototype.allDataFilters = function () {
+	        return ["authentication-certificate", "biometric", "non-repudiation-certificate", "picture", "root-certificates"];
+	    };
+	    EidLux.prototype.allCertFilters = function () {
+	        return ["authentication-certificate", "non-repudiation-certificate", "root-certificates"];
+	    };
+	    EidLux.prototype.resolvedReaderURI = function () {
+	        return this.url + SEPARATOR + this.reader_id;
+	    };
+	    EidLux.prototype.allData = function (filters, callback) {
+	        if (filters && filters.length > 0) {
+	            this.connection.get(this.resolvedReaderURI(), callback, createFilterQueryParam(filters, this.pin));
+	        }
+	        else {
+	            this.connection.get(this.resolvedReaderURI(), callback, createPinQueryParam(this.pin));
+	        }
+	    };
+	    EidLux.prototype.allCerts = function (filters, callback) {
+	        if (filters && filters.length > 0) {
+	            this.connection.get(this.resolvedReaderURI() + LUX_ALL_CERTIFICATES, callback, createFilterQueryParam(filters, this.pin));
+	        }
+	        else {
+	            this.connection.get(this.resolvedReaderURI() + LUX_ALL_CERTIFICATES, callback, createPinQueryParam(this.pin));
+	        }
+	    };
+	    EidLux.prototype.biometric = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_BIOMETRIC, callback, createPinQueryParam(this.pin)); };
+	    EidLux.prototype.picture = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_PHOTO, callback, createPinQueryParam(this.pin)); };
+	    EidLux.prototype.rootCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_CERT_ROOT, callback, createPinQueryParam(this.pin)); };
+	    EidLux.prototype.authenticationCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_CERT_AUTHENTICATION, callback, createPinQueryParam(this.pin)); };
+	    EidLux.prototype.nonRepudiationCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_CERT_NON_REPUDIATION, callback, createPinQueryParam(this.pin)); };
+	    EidLux.prototype.verifyPin = function (body, callback) {
+	        var _req = {};
+	        if (body.pin) {
+	            _req.pin = body.pin;
+	        }
+	        this.connection.post(this.resolvedReaderURI() + LUX_VERIFY_PIN, _req, callback, createPinQueryParam(this.pin));
+	    };
+	    EidLux.prototype.signData = function (body, callback) {
+	        var _req = {};
+	        if (body) {
+	            _req.algorithm_reference = body.algorithm_reference;
+	            _req.data = body.data;
+	            if (body.pin) {
+	                _req.pin = body.pin;
+	            }
+	        }
+	        var params;
+	        if (body.pin) {
+	            params = createPinQueryParam(body.pin);
+	        }
+	        this.connection.post(this.resolvedReaderURI() + LUX_SIGN_DATA, _req, callback, params);
+	    };
+	    EidLux.prototype.authenticate = function (body, callback) {
+	        var _req = {};
+	        if (body) {
+	            _req.data = body.data;
+	            _req.algorithm_reference = body.algorithm_reference;
+	            if (body.pin) {
+	                _req.pin = body.pin;
+	            }
+	        }
+	        this.connection.post(this.resolvedReaderURI() + LUX_AUTHENTICATE, _req, callback, createPinQueryParam(this.pin));
+	    };
+	    EidLux.prototype.signatureImage = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + LUX_SIGNATURE_IMAGE, callback, createPinQueryParam(this.pin));
+	    };
+	    return EidLux;
+	}());
+	exports.EidLux = EidLux;
+
+
+/***/ },
+/* 6 */
 /***/ function(module, exports) {
 
 	"use strict";
 	var SEPARATOR = "/";
-	var PLUGIN_CONTEXT_EMV = "/plugins/emv";
-	var EMV_PAN = "/pan";
-	var EMV_VERIFY_PIN = "/verify-pin";
+	var PLUGIN_CONTEXT_MOBIB = "/plugins/mobib";
+	var MOBIB_CARD_ISSUING = "/card-issuing";
+	var MOBIB_CONTRACTS = "/contracts";
+	var MOBIB_PHOTO = "/picture";
+	var MOBIB_STATUS = "/status";
 	function createFilter(filters) {
 	    return { filter: filters.join(',') };
 	}
-	var EMV = (function () {
-	    function EMV(url, connection, reader_id) {
+	var Mobib = (function () {
+	    function Mobib(url, connection, reader_id) {
 	        this.url = url;
 	        this.connection = connection;
 	        this.reader_id = reader_id;
-	        this.url = url + PLUGIN_CONTEXT_EMV;
+	        this.url = url + PLUGIN_CONTEXT_MOBIB;
 	    }
-	    EMV.prototype.resolvedReaderURI = function () { return this.url + SEPARATOR + this.reader_id; };
-	    EMV.prototype.allData = function (filters, callback) {
+	    Mobib.prototype.resolvedReaderURI = function () {
+	        return this.url + SEPARATOR + this.reader_id;
+	    };
+	    Mobib.prototype.allData = function (filters, callback) {
 	        if (filters && filters.length > 0) {
 	            this.connection.get(this.resolvedReaderURI(), callback, createFilter(filters));
 	        }
@@ -477,25 +651,119 @@ var GCLLib =
 	            this.connection.get(this.resolvedReaderURI(), callback);
 	        }
 	    };
-	    EMV.prototype.verifyPin = function (body, callback) {
+	    Mobib.prototype.cardIssuing = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + MOBIB_CARD_ISSUING, callback);
+	    };
+	    Mobib.prototype.contracts = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + MOBIB_CONTRACTS, callback);
+	    };
+	    Mobib.prototype.picture = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + MOBIB_PHOTO, callback);
+	    };
+	    Mobib.prototype.status = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + MOBIB_STATUS, callback);
+	    };
+	    return Mobib;
+	}());
+	exports.Mobib = Mobib;
+
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	"use strict";
+	function createFilterQueryParam(filters) {
+	    return { filter: filters.join(',') };
+	}
+	var SEPARATOR = "/";
+	var PLUGIN_CONTEXT_LUXTRUST = "/plugins/luxtrust";
+	var LUX_ALL_CERTIFICATES = "/certificates";
+	var LUX_CERT_ROOT = LUX_ALL_CERTIFICATES + "/root";
+	var LUX_CERT_AUTHENTICATION = LUX_ALL_CERTIFICATES + "/authentication";
+	var LUX_CERT_SIGNING = LUX_ALL_CERTIFICATES + "/signing";
+	var LUX_VERIFY_PIN = "/verify-pin";
+	var LUX_SIGN_DATA = "/sign";
+	var LUX_AUTHENTICATE = "/authenticate";
+	var LUX_OTP_CHALLENGE = '/ocra/challenge';
+	var LuxTrust = (function () {
+	    function LuxTrust(url, connection, reader_id) {
+	        this.url = url;
+	        this.connection = connection;
+	        this.reader_id = reader_id;
+	        this.url = url + PLUGIN_CONTEXT_LUXTRUST;
+	    }
+	    LuxTrust.prototype.resolvedReaderURI = function () {
+	        return this.url + SEPARATOR + this.reader_id;
+	    };
+	    LuxTrust.prototype.allData = function (filters, callback) {
+	        if (filters && filters.length > 0) {
+	            this.connection.get(this.resolvedReaderURI(), callback, createFilterQueryParam(filters));
+	        }
+	        else {
+	            this.connection.get(this.resolvedReaderURI(), callback);
+	        }
+	    };
+	    LuxTrust.prototype.allCerts = function (filters, callback) {
+	        if (filters && filters.length > 0) {
+	            this.connection.get(this.resolvedReaderURI() + LUX_ALL_CERTIFICATES, callback, createFilterQueryParam(filters));
+	        }
+	        else {
+	            this.connection.get(this.resolvedReaderURI() + LUX_ALL_CERTIFICATES, callback);
+	        }
+	    };
+	    LuxTrust.prototype.rootCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_CERT_ROOT, callback); };
+	    LuxTrust.prototype.authenticationCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_CERT_AUTHENTICATION, callback); };
+	    LuxTrust.prototype.signingCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_CERT_SIGNING, callback); };
+	    LuxTrust.prototype.verifyPin = function (body, callback) {
 	        var _req = {};
 	        if (body.pin) {
 	            _req.pin = body.pin;
 	        }
-	        this.connection.post(this.resolvedReaderURI() + EMV_VERIFY_PIN, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + LUX_VERIFY_PIN, _req, callback);
 	    };
-	    EMV.prototype.pan = function (callback) { this.connection.get(this.resolvedReaderURI() + EMV_PAN, callback); };
-	    return EMV;
+	    LuxTrust.prototype.signData = function (body, callback) {
+	        var _req = {};
+	        if (body) {
+	            _req.algorithm_reference = body.algorithm_reference;
+	            _req.data = body.data;
+	            if (body.pin) {
+	                _req.pin = body.pin;
+	            }
+	        }
+	        this.connection.post(this.resolvedReaderURI() + LUX_SIGN_DATA, _req, callback);
+	    };
+	    LuxTrust.prototype.authenticate = function (body, callback) {
+	        var _req = {};
+	        if (body) {
+	            _req.data = body.data;
+	            _req.algorithm_reference = body.algorithm_reference;
+	            if (body.pin) {
+	                _req.pin = body.pin;
+	            }
+	        }
+	        this.connection.post(this.resolvedReaderURI() + LUX_AUTHENTICATE, _req, callback);
+	    };
+	    LuxTrust.prototype.challenge = function (body, callback) {
+	        var _req = {};
+	        if (body) {
+	            if (body.pin) {
+	                _req.pin = body.pin;
+	            }
+	        }
+	        this.connection.post(this.resolvedReaderURI() + LUX_OTP_CHALLENGE, _req, callback);
+	    };
+	    return LuxTrust;
 	}());
-	exports.EMV = EMV;
+	exports.LuxTrust = LuxTrust;
 
 
 /***/ },
-/* 5 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var platform = __webpack_require__(6);
+	var platform = __webpack_require__(9);
 	var CORE_INFO = "/";
 	var CORE_PLUGINS = "/plugins";
 	var CORE_READERS = "/card-readers";
@@ -638,7 +906,7 @@ var GCLLib =
 
 
 /***/ },
-/* 6 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*!
@@ -1777,10 +2045,10 @@ var GCLLib =
 	  }
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(10)(module), (function() { return this; }())))
 
 /***/ },
-/* 7 */
+/* 10 */
 /***/ function(module, exports) {
 
 	module.exports = function(module) {
@@ -1796,11 +2064,11 @@ var GCLLib =
 
 
 /***/ },
-/* 8 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var axios_1 = __webpack_require__(9);
+	var axios_1 = __webpack_require__(12);
 	var LocalAuthConnection = (function () {
 	    function LocalAuthConnection(cfg) {
 	        this.cfg = cfg;
@@ -1824,8 +2092,8 @@ var GCLLib =
 	    LocalConnection.prototype.get = function (url, callback, queryParams) {
 	        return handleRequest(url, 'GET', callback, undefined, queryParams, undefined, this.cfg.jwt);
 	    };
-	    LocalConnection.prototype.post = function (url, body, callback) {
-	        return handleRequest(url, 'POST', callback, body, undefined, undefined, this.cfg.jwt);
+	    LocalConnection.prototype.post = function (url, body, callback, queryParams) {
+	        return handleRequest(url, 'POST', callback, body, queryParams, undefined, this.cfg.jwt);
 	    };
 	    LocalConnection.prototype.put = function (url, body, callback) {
 	        return handleRequest(url, 'PUT', callback, body, undefined, undefined, this.cfg.jwt);
@@ -1849,6 +2117,22 @@ var GCLLib =
 	    return RemoteConnection;
 	}());
 	exports.RemoteConnection = RemoteConnection;
+	var LocalTestConnection = (function () {
+	    function LocalTestConnection(cfg) {
+	        this.cfg = cfg;
+	    }
+	    LocalTestConnection.prototype.get = function (url, callback, queryParams) {
+	        return handleTestRequest(url, 'GET', callback, undefined, queryParams, undefined);
+	    };
+	    LocalTestConnection.prototype.post = function (url, body, callback) {
+	        return handleTestRequest(url, 'POST', callback, body, undefined, undefined);
+	    };
+	    LocalTestConnection.prototype.put = function (url, body, callback) {
+	        return handleTestRequest(url, 'PUT', callback, body, undefined, undefined);
+	    };
+	    return LocalTestConnection;
+	}());
+	exports.LocalTestConnection = LocalTestConnection;
 	function handleRequest(url, method, callback, body, params, apikey, jwt) {
 	    var request = {
 	        url: url,
@@ -1876,24 +2160,50 @@ var GCLLib =
 	            return callback(error, null);
 	    });
 	}
+	function handleTestRequest(url, method, callback, body, params, jwt) {
+	    var request = {
+	        url: url,
+	        method: method,
+	        headers: {
+	            'Accept-Language': 'en-US'
+	        },
+	        responseType: 'json'
+	    };
+	    if (body)
+	        request['data'] = body;
+	    if (params) {
+	        request['params'] = params;
+	    }
+	    request.headers['X-Consumer-Username'] = "testorg.testapp.v1";
+	    if (jwt)
+	        request.headers['Authorization'] = 'Bearer ' + jwt;
+	    axios_1.default.request(request).then(function (response) {
+	        return callback(null, response.data);
+	    }).catch(function (error) {
+	        if (error.response)
+	            return callback(error.response, null);
+	        else
+	            return callback(error, null);
+	    });
+	}
 
 
 /***/ },
-/* 9 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(10);
+	module.exports = __webpack_require__(13);
 
 /***/ },
-/* 10 */
+/* 13 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(11);
-	var bind = __webpack_require__(12);
-	var Axios = __webpack_require__(13);
-	var defaults = __webpack_require__(14);
+	var utils = __webpack_require__(14);
+	var bind = __webpack_require__(15);
+	var Axios = __webpack_require__(16);
+	var defaults = __webpack_require__(17);
 	
 	/**
 	 * Create an instance of Axios
@@ -1926,15 +2236,15 @@ var GCLLib =
 	};
 	
 	// Expose Cancel & CancelToken
-	axios.Cancel = __webpack_require__(32);
-	axios.CancelToken = __webpack_require__(33);
-	axios.isCancel = __webpack_require__(29);
+	axios.Cancel = __webpack_require__(35);
+	axios.CancelToken = __webpack_require__(36);
+	axios.isCancel = __webpack_require__(32);
 	
 	// Expose all/spread
 	axios.all = function all(promises) {
 	  return Promise.all(promises);
 	};
-	axios.spread = __webpack_require__(34);
+	axios.spread = __webpack_require__(37);
 	
 	module.exports = axios;
 	
@@ -1943,12 +2253,12 @@ var GCLLib =
 
 
 /***/ },
-/* 11 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var bind = __webpack_require__(12);
+	var bind = __webpack_require__(15);
 	
 	/*global toString:true*/
 	
@@ -2248,7 +2558,7 @@ var GCLLib =
 
 
 /***/ },
-/* 12 */
+/* 15 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2265,17 +2575,17 @@ var GCLLib =
 
 
 /***/ },
-/* 13 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var defaults = __webpack_require__(14);
-	var utils = __webpack_require__(11);
-	var InterceptorManager = __webpack_require__(26);
-	var dispatchRequest = __webpack_require__(27);
-	var isAbsoluteURL = __webpack_require__(30);
-	var combineURLs = __webpack_require__(31);
+	var defaults = __webpack_require__(17);
+	var utils = __webpack_require__(14);
+	var InterceptorManager = __webpack_require__(29);
+	var dispatchRequest = __webpack_require__(30);
+	var isAbsoluteURL = __webpack_require__(33);
+	var combineURLs = __webpack_require__(34);
 	
 	/**
 	 * Create a new instance of Axios
@@ -2356,13 +2666,13 @@ var GCLLib =
 
 
 /***/ },
-/* 14 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(11);
-	var normalizeHeaderName = __webpack_require__(16);
+	var utils = __webpack_require__(14);
+	var normalizeHeaderName = __webpack_require__(19);
 	
 	var PROTECTION_PREFIX = /^\)\]\}',?\n/;
 	var DEFAULT_CONTENT_TYPE = {
@@ -2379,10 +2689,10 @@ var GCLLib =
 	  var adapter;
 	  if (typeof XMLHttpRequest !== 'undefined') {
 	    // For browsers use XHR adapter
-	    adapter = __webpack_require__(17);
+	    adapter = __webpack_require__(20);
 	  } else if (typeof process !== 'undefined') {
 	    // For node use HTTP adapter
-	    adapter = __webpack_require__(17);
+	    adapter = __webpack_require__(20);
 	  }
 	  return adapter;
 	}
@@ -2453,10 +2763,10 @@ var GCLLib =
 	
 	module.exports = defaults;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18)))
 
 /***/ },
-/* 15 */
+/* 18 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -2581,12 +2891,12 @@ var GCLLib =
 
 
 /***/ },
-/* 16 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(11);
+	var utils = __webpack_require__(14);
 	
 	module.exports = function normalizeHeaderName(headers, normalizedName) {
 	  utils.forEach(headers, function processHeader(value, name) {
@@ -2599,18 +2909,18 @@ var GCLLib =
 
 
 /***/ },
-/* 17 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(11);
-	var settle = __webpack_require__(18);
-	var buildURL = __webpack_require__(21);
-	var parseHeaders = __webpack_require__(22);
-	var isURLSameOrigin = __webpack_require__(23);
-	var createError = __webpack_require__(19);
-	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(24);
+	var utils = __webpack_require__(14);
+	var settle = __webpack_require__(21);
+	var buildURL = __webpack_require__(24);
+	var parseHeaders = __webpack_require__(25);
+	var isURLSameOrigin = __webpack_require__(26);
+	var createError = __webpack_require__(22);
+	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(27);
 	
 	module.exports = function xhrAdapter(config) {
 	  return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -2706,7 +3016,7 @@ var GCLLib =
 	    // This is only done if running in a standard browser environment.
 	    // Specifically not if we're in a web worker, or react-native.
 	    if (utils.isStandardBrowserEnv()) {
-	      var cookies = __webpack_require__(25);
+	      var cookies = __webpack_require__(28);
 	
 	      // Add xsrf header
 	      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -2780,15 +3090,15 @@ var GCLLib =
 	  });
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18)))
 
 /***/ },
-/* 18 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var createError = __webpack_require__(19);
+	var createError = __webpack_require__(22);
 	
 	/**
 	 * Resolve or reject a Promise based on response status.
@@ -2814,12 +3124,12 @@ var GCLLib =
 
 
 /***/ },
-/* 19 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var enhanceError = __webpack_require__(20);
+	var enhanceError = __webpack_require__(23);
 	
 	/**
 	 * Create an Error with the specified message, config, error code, and response.
@@ -2837,7 +3147,7 @@ var GCLLib =
 
 
 /***/ },
-/* 20 */
+/* 23 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -2862,12 +3172,12 @@ var GCLLib =
 
 
 /***/ },
-/* 21 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(11);
+	var utils = __webpack_require__(14);
 	
 	function encode(val) {
 	  return encodeURIComponent(val).
@@ -2936,12 +3246,12 @@ var GCLLib =
 
 
 /***/ },
-/* 22 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(11);
+	var utils = __webpack_require__(14);
 	
 	/**
 	 * Parse headers into an object
@@ -2979,12 +3289,12 @@ var GCLLib =
 
 
 /***/ },
-/* 23 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(11);
+	var utils = __webpack_require__(14);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -3053,7 +3363,7 @@ var GCLLib =
 
 
 /***/ },
-/* 24 */
+/* 27 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3095,12 +3405,12 @@ var GCLLib =
 
 
 /***/ },
-/* 25 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(11);
+	var utils = __webpack_require__(14);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -3154,12 +3464,12 @@ var GCLLib =
 
 
 /***/ },
-/* 26 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(11);
+	var utils = __webpack_require__(14);
 	
 	function InterceptorManager() {
 	  this.handlers = [];
@@ -3212,15 +3522,15 @@ var GCLLib =
 
 
 /***/ },
-/* 27 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(11);
-	var transformData = __webpack_require__(28);
-	var isCancel = __webpack_require__(29);
-	var defaults = __webpack_require__(14);
+	var utils = __webpack_require__(14);
+	var transformData = __webpack_require__(31);
+	var isCancel = __webpack_require__(32);
+	var defaults = __webpack_require__(17);
 	
 	/**
 	 * Throws a `Cancel` if cancellation has been requested.
@@ -3297,12 +3607,12 @@ var GCLLib =
 
 
 /***/ },
-/* 28 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(11);
+	var utils = __webpack_require__(14);
 	
 	/**
 	 * Transform the data for a request or a response
@@ -3323,7 +3633,7 @@ var GCLLib =
 
 
 /***/ },
-/* 29 */
+/* 32 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3334,7 +3644,7 @@ var GCLLib =
 
 
 /***/ },
-/* 30 */
+/* 33 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3354,7 +3664,7 @@ var GCLLib =
 
 
 /***/ },
-/* 31 */
+/* 34 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3372,7 +3682,7 @@ var GCLLib =
 
 
 /***/ },
-/* 32 */
+/* 35 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3397,12 +3707,12 @@ var GCLLib =
 
 
 /***/ },
-/* 33 */
+/* 36 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var Cancel = __webpack_require__(32);
+	var Cancel = __webpack_require__(35);
 	
 	/**
 	 * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -3460,7 +3770,7 @@ var GCLLib =
 
 
 /***/ },
-/* 34 */
+/* 37 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3493,7 +3803,7 @@ var GCLLib =
 
 
 /***/ },
-/* 35 */
+/* 38 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -3601,7 +3911,7 @@ var GCLLib =
 
 
 /***/ },
-/* 36 */
+/* 39 */
 /***/ function(module, exports) {
 
 	"use strict";
