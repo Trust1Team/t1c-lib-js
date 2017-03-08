@@ -8,11 +8,14 @@ import {GCLConfig} from "./GCLConfig";
 import {CardFactory} from "../Plugins/smartcards/CardFactory";
 import * as CoreExceptions from "./exceptions/CoreExceptions";
 import {AbstractEidBE} from "../Plugins/smartcards/eid/be/EidBe";
+import {AbstractEidLUX} from "../Plugins/smartcards/eid/lux/EidLux";
 import {EMV} from "../Plugins/smartcards/emv/EMV";
 import {CoreService} from "./services/CoreService";
-import {LocalConnection, RemoteConnection, LocalAuthConnection} from "./client/Connection";
+import {LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection} from "./client/Connection";
 import {AbstractDSClient,DSClient} from "./ds/DSClient";
 import {AbstractOCVClient,OCVClient} from "./ocv/OCVClient";
+import {Mobib} from "../Plugins/smartcards/mobib/mobib";
+import {AbstractLuxTrust} from "../Plugins/smartcards/luxtrust/LuxTrust";
 
 class GCLClient {
     private cfg: GCLConfig;
@@ -21,6 +24,7 @@ class GCLClient {
     private connection: LocalConnection;
     private authConnection: LocalAuthConnection;
     private remoteConnection: RemoteConnection;
+    private localTestConnection: LocalTestConnection;
     private dsClient: DSClient;
     private ocvClient: OCVClient;
 
@@ -32,9 +36,11 @@ class GCLClient {
         this.connection = new LocalConnection(this.cfg);
         this.authConnection = new LocalAuthConnection(this.cfg);
         this.remoteConnection = new RemoteConnection(this.cfg);
+        this.localTestConnection = new LocalTestConnection(this.cfg);
         this.cardFactory = new CardFactory(this.cfg.gclUrl,this.connection,this.cfg);
         this.coreService = new CoreService(this.cfg.gclUrl,this.authConnection,this.cfg);
-        this.dsClient = new DSClient(this.cfg.dsUrl,this.remoteConnection,this.cfg);
+        if(this.cfg.localTestMode) this.dsClient = new DSClient(this.cfg.dsUrl,this.localTestConnection,this.cfg);
+        else this.dsClient = new DSClient(this.cfg.dsUrl,this.remoteConnection,this.cfg);
         this.ocvClient = new OCVClient(this.cfg.ocvUrl,this.remoteConnection,this.cfg);
 
         //check if implicit download has been set
@@ -65,6 +71,7 @@ class GCLClient {
         resolvedCfg.jwt = cfg.jwt;
         resolvedCfg.gclUrl = cfg.gclUrl;
         resolvedCfg.implicitDownload = cfg.implicitDownload;
+        resolvedCfg.localTestMode = cfg.localTestMode;
         return resolvedCfg;
     }
 
@@ -163,8 +170,14 @@ class GCLClient {
     public ocv = ():AbstractOCVClient => {return this.ocvClient;};
     // get instance for belgian eID card
     public beid = (reader_id?:string):AbstractEidBE => {return this.cardFactory.createEidBE(reader_id);};
+    // get instance for luxemburg eID card
+    public luxeid = (reader_id?:string, pin?:string):AbstractEidLUX => {return this.cardFactory.createEidLUX(reader_id, pin);};
+    // get instance for luxtrust card
+    public luxtrust = (reader_id?:string, pin?:string):AbstractLuxTrust => {return this.cardFactory.createLuxTrust(reader_id);};
     // get instance for EMV
     public emv = (reader_id?:string):EMV => {return this.cardFactory.createEmv(reader_id);};
+    // get instance for MOBIB
+    public mobib = (reader_id?:string):Mobib => { return this.cardFactory.createMobib(reader_id); };
 
     // facade implementation
 

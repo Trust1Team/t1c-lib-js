@@ -1,7 +1,7 @@
 /**
  * @author Michallis Pashidis
  */
-import {RemoteConnection} from "../client/Connection";
+import {RemoteConnection, Connection} from "../client/Connection";
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 import {GCLConfig} from "../GCLConfig";
 
@@ -29,7 +29,7 @@ const DEVICE = "/devices";
 
 
 class DSClient implements AbstractDSClient{
-    constructor(private url:string,private connection:RemoteConnection,private cfg:GCLConfig) {}
+    constructor(private url:string,private connection:Connection,private cfg:GCLConfig) {}
 
     public getUrl(){return this.url;}
 
