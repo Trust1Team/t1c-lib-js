@@ -11,7 +11,7 @@ import {AbstractEidBE} from "../Plugins/smartcards/eid/be/EidBe";
 import {AbstractEidLUX} from "../Plugins/smartcards/eid/lux/EidLux";
 import {EMV} from "../Plugins/smartcards/emv/EMV";
 import {CoreService} from "./services/CoreService";
-import {LocalConnection, RemoteConnection, LocalAuthConnection} from "./client/Connection";
+import {LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection} from "./client/Connection";
 import {AbstractDSClient,DSClient} from "./ds/DSClient";
 import {AbstractOCVClient,OCVClient} from "./ocv/OCVClient";
 import {Mobib} from "../Plugins/smartcards/mobib/mobib";
@@ -24,6 +24,7 @@ class GCLClient {
     private connection: LocalConnection;
     private authConnection: LocalAuthConnection;
     private remoteConnection: RemoteConnection;
+    private localTestConnection: LocalTestConnection;
     private dsClient: DSClient;
     private ocvClient: OCVClient;
 
@@ -35,9 +36,11 @@ class GCLClient {
         this.connection = new LocalConnection(this.cfg);
         this.authConnection = new LocalAuthConnection(this.cfg);
         this.remoteConnection = new RemoteConnection(this.cfg);
+        this.localTestConnection = new LocalTestConnection(this.cfg);
         this.cardFactory = new CardFactory(this.cfg.gclUrl,this.connection,this.cfg);
         this.coreService = new CoreService(this.cfg.gclUrl,this.authConnection,this.cfg);
-        this.dsClient = new DSClient(this.cfg.dsUrl,this.remoteConnection,this.cfg);
+        if(this.cfg.localTestMode) this.dsClient = new DSClient(this.cfg.dsUrl,this.localTestConnection,this.cfg);
+        else this.dsClient = new DSClient(this.cfg.dsUrl,this.remoteConnection,this.cfg);
         this.ocvClient = new OCVClient(this.cfg.ocvUrl,this.remoteConnection,this.cfg);
 
         //check if implicit download has been set
@@ -68,6 +71,7 @@ class GCLClient {
         resolvedCfg.jwt = cfg.jwt;
         resolvedCfg.gclUrl = cfg.gclUrl;
         resolvedCfg.implicitDownload = cfg.implicitDownload;
+        resolvedCfg.localTestMode = cfg.localTestMode;
         return resolvedCfg;
     }
 

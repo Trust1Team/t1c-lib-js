@@ -64,6 +64,24 @@ class RemoteConnection implements Connection {
     }
 }
 
+class LocalTestConnection implements Connection {
+    constructor(private cfg:GCLConfig) {}
+
+    // using Callback
+    public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
+        return handleTestRequest(url, 'GET', callback, undefined, queryParams, undefined);
+    }
+
+    public post(url:string, body:any, callback:(error:any, data:any) => void):void{
+        return handleTestRequest(url, 'POST', callback, body, undefined, undefined);
+    }
+
+    public put(url:string, body:any, callback:(error:any, data:any) => void):void{
+        return handleTestRequest(url, 'PUT', callback, body, undefined, undefined);
+    }
+}
+
+
 function handleRequest(url:string, method:string, callback:(error:any, data:any) => void, body?:any, params?:any, apikey?:string, jwt?:string):void {
     let request = {
         url: url,
@@ -88,5 +106,30 @@ function handleRequest(url:string, method:string, callback:(error:any, data:any)
     });
 }
 
+function handleTestRequest(url:string, method:string, callback:(error:any, data:any) => void, body?:any, params?:any, jwt?:string):void {
+    let request = {
+        url: url,
+        method: method,
+        headers: {
+            'Accept-Language': 'en-US'
+        },
+        responseType: 'json'
+    };
+    if (body) request['data'] = body;
+    if (params) {
+        request['params'] = params; //?filter=a,b,c&pin=123456
+    }
+    //resovled apikey - no gateway for local test
+    request.headers['X-Consumer-Username'] = "testorg.testapp.v1";
+    if (jwt) request.headers['Authorization'] = 'Bearer ' + jwt;
 
-export {LocalConnection,LocalAuthConnection,RemoteConnection,Connection}
+    axios.request(request).then(function (response) {
+        return callback(null, response.data);
+    }).catch(function (error) {
+        if (error.response) return callback(error.response, null);
+        else return callback(error, null);
+    });
+}
+
+
+export {LocalConnection,LocalAuthConnection,RemoteConnection,Connection,LocalTestConnection}
