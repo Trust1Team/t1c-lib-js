@@ -9,6 +9,7 @@ import {LocalConnection} from "../../core/client/Connection";
 import {GCLConfig} from "../../core/GCLConfig";
 import {AbstractMobib, Mobib} from "./mobib/mobib";
 import {LuxTrust, AbstractLuxTrust} from "./luxtrust/LuxTrust";
+import {Ocra, AbstractOcra} from "./ocra/ocra";
 
 interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
@@ -16,6 +17,7 @@ interface AbstractFactory {
     createEmv(reader_id?: string): AbstractEMV;
     createLuxTrust(reader_id?: string): AbstractLuxTrust;
     createMobib(reader_id?:string): AbstractMobib;
+    createOcra(reader_id?:string): AbstractOcra;
 }
 
 export class CardFactory implements AbstractFactory{
@@ -29,7 +31,7 @@ export class CardFactory implements AbstractFactory{
 
     public createLuxTrust(reader_id?:string): LuxTrust { return new LuxTrust(this.url, this.connection, reader_id); }
 
-    public createMobib(reader_id?:string): Mobib {
-        return new Mobib(this.url, this.connection, reader_id);
-    }
+    public createMobib(reader_id?:string): Mobib { return new Mobib(this.url, this.connection, reader_id); }
+
+    public createOcra(reader_id?:string): Ocra { return new Ocra(this.url, this.connection, reader_id); }
 }
