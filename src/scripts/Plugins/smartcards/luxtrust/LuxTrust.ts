@@ -14,9 +14,6 @@ interface AbstractLuxTrust{
     verifyPin(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
     signData(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
     authenticate(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
-
-    // TODO remove once this is moved to separate plugin
-    challenge(body:any, callback:(error:CoreExceptions.RestException, data:any) => void):void;
 }
 
 function createFilterQueryParam(filters:string[]):any {
@@ -32,8 +29,6 @@ const LUX_CERT_SIGNING = LUX_ALL_CERTIFICATES + "/signing";
 const LUX_VERIFY_PIN = "/verify-pin";
 const LUX_SIGN_DATA = "/sign";
 const LUX_AUTHENTICATE = "/authenticate";
-// TODO remove once this is moved to separate plugin
-const LUX_OTP_CHALLENGE = '/ocra/challenge';
 
 
 class LuxTrust implements AbstractLuxTrust {
@@ -85,15 +80,6 @@ class LuxTrust implements AbstractLuxTrust {
             if(body.pin) {_req.pin = body.pin;}
         }
         this.connection.post(this.resolvedReaderURI() + LUX_AUTHENTICATE, _req, callback);
-    }
-
-    // TODO remove once OTP gets moved to separate plugin
-    challenge(body, callback) {
-        let _req:any = {};
-        if (body) {
-            if(body.pin) {_req.pin = body.pin;}
-        }
-        this.connection.post(this.resolvedReaderURI() + LUX_OTP_CHALLENGE, _req, callback);
     }
 }
 
