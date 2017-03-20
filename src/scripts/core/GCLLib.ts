@@ -9,13 +9,14 @@ import {CardFactory} from "../Plugins/smartcards/CardFactory";
 import * as CoreExceptions from "./exceptions/CoreExceptions";
 import {AbstractEidBE} from "../Plugins/smartcards/eid/be/EidBe";
 import {AbstractEidLUX} from "../Plugins/smartcards/eid/lux/EidLux";
-import {EMV} from "../Plugins/smartcards/emv/EMV";
+import {EMV, AbstractEMV} from "../Plugins/smartcards/emv/EMV";
 import {CoreService} from "./services/CoreService";
 import {LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection} from "./client/Connection";
 import {AbstractDSClient,DSClient} from "./ds/DSClient";
 import {AbstractOCVClient,OCVClient} from "./ocv/OCVClient";
-import {Mobib} from "../Plugins/smartcards/mobib/mobib";
+import {Mobib, AbstractMobib} from "../Plugins/smartcards/mobib/mobib";
 import {AbstractLuxTrust} from "../Plugins/smartcards/luxtrust/LuxTrust";
+import {AbstractOcra} from "../Plugins/smartcards/ocra/ocra";
 
 class GCLClient {
     private cfg: GCLConfig;
@@ -175,9 +176,12 @@ class GCLClient {
     // get instance for luxtrust card
     public luxtrust = (reader_id?:string, pin?:string):AbstractLuxTrust => {return this.cardFactory.createLuxTrust(reader_id);};
     // get instance for EMV
-    public emv = (reader_id?:string):EMV => {return this.cardFactory.createEmv(reader_id);};
+    public emv = (reader_id?:string):AbstractEMV => {return this.cardFactory.createEmv(reader_id);};
     // get instance for MOBIB
-    public mobib = (reader_id?:string):Mobib => { return this.cardFactory.createMobib(reader_id); };
+    public mobib = (reader_id?:string):AbstractMobib => { return this.cardFactory.createMobib(reader_id); };
+    // get instance for OCRA
+    public ocra = (reader_id?:string):AbstractOcra => { return this.cardFactory.createOcra(reader_id); };
+
 
     // facade implementation
 
