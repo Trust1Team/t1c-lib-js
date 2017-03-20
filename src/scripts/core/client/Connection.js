@@ -30,8 +30,8 @@ var LocalConnection = (function () {
     LocalConnection.prototype.get = function (url, callback, queryParams) {
         return handleRequest(url, 'GET', callback, undefined, queryParams, undefined, this.cfg.jwt);
     };
-    LocalConnection.prototype.post = function (url, body, callback) {
-        return handleRequest(url, 'POST', callback, body, undefined, undefined, this.cfg.jwt);
+    LocalConnection.prototype.post = function (url, body, callback, queryParams) {
+        return handleRequest(url, 'POST', callback, body, queryParams, undefined, this.cfg.jwt);
     };
     LocalConnection.prototype.put = function (url, body, callback) {
         return handleRequest(url, 'PUT', callback, body, undefined, undefined, this.cfg.jwt);
@@ -56,6 +56,23 @@ var RemoteConnection = (function () {
     return RemoteConnection;
 }());
 exports.RemoteConnection = RemoteConnection;
+var LocalTestConnection = (function () {
+    function LocalTestConnection(cfg) {
+        this.cfg = cfg;
+    }
+    // using Callback
+    LocalTestConnection.prototype.get = function (url, callback, queryParams) {
+        return handleTestRequest(url, 'GET', callback, undefined, queryParams, undefined);
+    };
+    LocalTestConnection.prototype.post = function (url, body, callback) {
+        return handleTestRequest(url, 'POST', callback, body, undefined, undefined);
+    };
+    LocalTestConnection.prototype.put = function (url, body, callback) {
+        return handleTestRequest(url, 'PUT', callback, body, undefined, undefined);
+    };
+    return LocalTestConnection;
+}());
+exports.LocalTestConnection = LocalTestConnection;
 function handleRequest(url, method, callback, body, params, apikey, jwt) {
     var request = {
         url: url,
@@ -72,6 +89,33 @@ function handleRequest(url, method, callback, body, params, apikey, jwt) {
     }
     if (apikey)
         request.headers['apikey'] = apikey;
+    if (jwt)
+        request.headers['Authorization'] = 'Bearer ' + jwt;
+    axios_1.default.request(request).then(function (response) {
+        return callback(null, response.data);
+    }).catch(function (error) {
+        if (error.response)
+            return callback(error.response, null);
+        else
+            return callback(error, null);
+    });
+}
+function handleTestRequest(url, method, callback, body, params, jwt) {
+    var request = {
+        url: url,
+        method: method,
+        headers: {
+            'Accept-Language': 'en-US'
+        },
+        responseType: 'json'
+    };
+    if (body)
+        request['data'] = body;
+    if (params) {
+        request['params'] = params; //?filter=a,b,c&pin=123456
+    }
+    //resovled apikey - no gateway for local test
+    request.headers['X-Consumer-Username'] = "testorg.testapp.v1";
     if (jwt)
         request.headers['Authorization'] = 'Bearer ' + jwt;
     axios_1.default.request(request).then(function (response) {
