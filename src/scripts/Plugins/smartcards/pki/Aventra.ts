@@ -6,6 +6,7 @@ import {LocalConnection} from "../../../core/client/Connection";
 import * as CoreExceptions from "../../../core/exceptions/CoreExceptions";
 
 interface AbstractAventra{
+    allCerts(filters:string[], callback:(error:CoreExceptions.RestException, data:any) => void):void;
     rootCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     issuerCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     authenticationCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -41,6 +42,10 @@ class Aventra implements AbstractAventra{
     private resolvedReaderURI():string{
         return this.url + SEPARATOR + this.reader_id;
     }
+
+    allCerts(filters, callback): void {
+    }
+
     rootCertificate(callback): void {
     }
 

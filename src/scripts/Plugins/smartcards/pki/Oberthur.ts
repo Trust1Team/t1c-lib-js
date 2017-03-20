@@ -6,6 +6,7 @@ import {LocalConnection} from "../../../core/client/Connection";
 import * as CoreExceptions from "../../../core/exceptions/CoreExceptions";
 
 interface AbstractOberthur{
+    allCerts(filters:string[], callback:(error:CoreExceptions.RestException, data:any) => void):void;
     rootCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     issuerCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     authenticationCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -34,6 +35,7 @@ function createFilter(filters:string[]):any {
 
 
 class Oberthur implements AbstractOberthur{
+
     // constructor
     constructor(private url:string,private connection:LocalConnection,private reader_id:string) {this.url = url + PLUGIN_CONTEXT_BEID;}
 
@@ -41,6 +43,10 @@ class Oberthur implements AbstractOberthur{
     private resolvedReaderURI():string{
         return this.url + SEPARATOR + this.reader_id;
     }
+
+    allCerts(filters, callback): void {
+    }
+
     rootCertificate(callback): void {
     }
 

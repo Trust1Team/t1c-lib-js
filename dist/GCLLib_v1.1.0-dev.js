@@ -854,8 +854,6 @@ var GCLLib =
 	    Aventra.prototype.resolvedReaderURI = function () {
 	        return this.url + SEPARATOR + this.reader_id;
 	    };
-	    Aventra.prototype.allCerts = function (filters, callback) {
-	    };
 	    Aventra.prototype.rootCertificate = function (callback) {
 	    };
 	    Aventra.prototype.issuerCertificate = function (callback) {
@@ -905,8 +903,6 @@ var GCLLib =
 	    }
 	    Oberthur.prototype.resolvedReaderURI = function () {
 	        return this.url + SEPARATOR + this.reader_id;
-	    };
-	    Oberthur.prototype.allCerts = function (filters, callback) {
 	    };
 	    Oberthur.prototype.rootCertificate = function (callback) {
 	    };
