@@ -377,8 +377,8 @@ var GCLLib =
 	var mobib_1 = __webpack_require__(6);
 	var LuxTrust_1 = __webpack_require__(7);
 	var ocra_1 = __webpack_require__(8);
-	var AventraNo_1 = __webpack_require__(9);
-	var OberthurNo_1 = __webpack_require__(10);
+	var Aventra_1 = __webpack_require__(9);
+	var Oberthur_1 = __webpack_require__(10);
 	var CardFactory = (function () {
 	    function CardFactory(url, connection, cfg) {
 	        this.url = url;
@@ -391,8 +391,8 @@ var GCLLib =
 	    CardFactory.prototype.createLuxTrust = function (reader_id) { return new LuxTrust_1.LuxTrust(this.url, this.connection, reader_id); };
 	    CardFactory.prototype.createMobib = function (reader_id) { return new mobib_1.Mobib(this.url, this.connection, reader_id); };
 	    CardFactory.prototype.createOcra = function (reader_id) { return new ocra_1.Ocra(this.url, this.connection, reader_id); };
-	    CardFactory.prototype.createAventraNO = function (reader_id) { return new AventraNo_1.AventraNo(this.url, this.connection, reader_id); };
-	    CardFactory.prototype.createOberthurNO = function (reader_id) { return new OberthurNo_1.OberthurNo(this.url, this.connection, reader_id); };
+	    CardFactory.prototype.createAventraNO = function (reader_id) { return new Aventra_1.Aventra(this.url, this.connection, reader_id); };
+	    CardFactory.prototype.createOberthurNO = function (reader_id) { return new Oberthur_1.Oberthur(this.url, this.connection, reader_id); };
 	    return CardFactory;
 	}());
 	exports.CardFactory = CardFactory;
@@ -832,47 +832,47 @@ var GCLLib =
 	"use strict";
 	var SEPARATOR = "/";
 	var PLUGIN_CONTEXT_BEID = "/plugins/aventra";
-	var NOAVENTRA_ALL_CERTIFICATES = "/certificates";
-	var NOAVENTRA_CERT_ROOT = NOAVENTRA_ALL_CERTIFICATES + "/root";
-	var NOAVENTRA_CERT_ISSUER = NOAVENTRA_ALL_CERTIFICATES + "/issuer";
-	var NOAVENTRA_CERT_AUTHENTICATION = NOAVENTRA_ALL_CERTIFICATES + "/authentication";
-	var NOAVENTRA_CERT_SIGNING = NOAVENTRA_ALL_CERTIFICATES + "/signing";
-	var NOAVENTRA_CERT_ENCRYPTION = NOAVENTRA_ALL_CERTIFICATES + "/encryption";
-	var NOAVENTRA_VERIFY_PIN = "/verify-pin";
-	var NOAVENTRA_SIGN_DATA = "/sign";
-	var NOAVENTRA_AUTHENTICATE = "/authenticate";
+	var AVENTRA_ALL_CERTIFICATES = "/certificates";
+	var AVENTRA_CERT_ROOT = AVENTRA_ALL_CERTIFICATES + "/root";
+	var AVENTRA_CERT_ISSUER = AVENTRA_ALL_CERTIFICATES + "/issuer";
+	var AVENTRA_CERT_AUTHENTICATION = AVENTRA_ALL_CERTIFICATES + "/authentication";
+	var AVENTRA_CERT_SIGNING = AVENTRA_ALL_CERTIFICATES + "/signing";
+	var AVENTRA_CERT_ENCRYPTION = AVENTRA_ALL_CERTIFICATES + "/encryption";
+	var AVENTRA_VERIFY_PIN = "/verify-pin";
+	var AVENTRA_SIGN_DATA = "/sign";
+	var AVENTRA_AUTHENTICATE = "/authenticate";
 	function createFilter(filters) {
 	    return { filter: filters.join(',') };
 	}
-	var AventraNo = (function () {
-	    function AventraNo(url, connection, reader_id) {
+	var Aventra = (function () {
+	    function Aventra(url, connection, reader_id) {
 	        this.url = url;
 	        this.connection = connection;
 	        this.reader_id = reader_id;
 	        this.url = url + PLUGIN_CONTEXT_BEID;
 	    }
-	    AventraNo.prototype.resolvedReaderURI = function () {
+	    Aventra.prototype.resolvedReaderURI = function () {
 	        return this.url + SEPARATOR + this.reader_id;
 	    };
-	    AventraNo.prototype.rootCertificate = function (callback) {
+	    Aventra.prototype.rootCertificate = function (callback) {
 	    };
-	    AventraNo.prototype.issuerCertificate = function (callback) {
+	    Aventra.prototype.issuerCertificate = function (callback) {
 	    };
-	    AventraNo.prototype.authenticationCertificate = function (callback) {
+	    Aventra.prototype.authenticationCertificate = function (callback) {
 	    };
-	    AventraNo.prototype.signingCertificate = function (callback) {
+	    Aventra.prototype.signingCertificate = function (callback) {
 	    };
-	    AventraNo.prototype.encryptionCertificate = function (callback) {
+	    Aventra.prototype.encryptionCertificate = function (callback) {
 	    };
-	    AventraNo.prototype.verifyPin = function (body, callback) {
+	    Aventra.prototype.verifyPin = function (body, callback) {
 	    };
-	    AventraNo.prototype.signData = function (body, callback) {
+	    Aventra.prototype.signData = function (body, callback) {
 	    };
-	    AventraNo.prototype.authenticate = function (body, callback) {
+	    Aventra.prototype.authenticate = function (body, callback) {
 	    };
-	    return AventraNo;
+	    return Aventra;
 	}());
-	exports.AventraNo = AventraNo;
+	exports.Aventra = Aventra;
 
 
 /***/ },
@@ -882,47 +882,47 @@ var GCLLib =
 	"use strict";
 	var SEPARATOR = "/";
 	var PLUGIN_CONTEXT_BEID = "/plugins/oberthur";
-	var NOOBERTHUR_ALL_CERTIFICATES = "/certificates";
-	var NOOBERTHUR_CERT_ROOT = NOOBERTHUR_ALL_CERTIFICATES + "/root";
-	var NOOBERTUR_CERT_ISSUER = NOOBERTHUR_ALL_CERTIFICATES + "/issuer";
-	var NOOBERTUR_CERT_AUTHENTICATION = NOOBERTHUR_ALL_CERTIFICATES + "/authentication";
-	var NOOBERTUR_CERT_SIGNING = NOOBERTHUR_ALL_CERTIFICATES + "/signing";
-	var NOOBERTUR_CERT_ENCRYPTION = NOOBERTHUR_ALL_CERTIFICATES + "/encryption";
-	var NOOBERTUR_VERIFY_PIN = "/verify-pin";
-	var NOOBERTUR_SIGN_DATA = "/sign";
-	var NOOBERTUR_AUTHENTICATE = "/authenticate";
+	var OBERTHUR_ALL_CERTIFICATES = "/certificates";
+	var OBERTHUR_CERT_ROOT = OBERTHUR_ALL_CERTIFICATES + "/root";
+	var OBERTUR_CERT_ISSUER = OBERTHUR_ALL_CERTIFICATES + "/issuer";
+	var OBERTUR_CERT_AUTHENTICATION = OBERTHUR_ALL_CERTIFICATES + "/authentication";
+	var OBERTUR_CERT_SIGNING = OBERTHUR_ALL_CERTIFICATES + "/signing";
+	var OBERTUR_CERT_ENCRYPTION = OBERTHUR_ALL_CERTIFICATES + "/encryption";
+	var OBERTUR_VERIFY_PIN = "/verify-pin";
+	var OBERTUR_SIGN_DATA = "/sign";
+	var OBERTUR_AUTHENTICATE = "/authenticate";
 	function createFilter(filters) {
 	    return { filter: filters.join(',') };
 	}
-	var OberthurNo = (function () {
-	    function OberthurNo(url, connection, reader_id) {
+	var Oberthur = (function () {
+	    function Oberthur(url, connection, reader_id) {
 	        this.url = url;
 	        this.connection = connection;
 	        this.reader_id = reader_id;
 	        this.url = url + PLUGIN_CONTEXT_BEID;
 	    }
-	    OberthurNo.prototype.resolvedReaderURI = function () {
+	    Oberthur.prototype.resolvedReaderURI = function () {
 	        return this.url + SEPARATOR + this.reader_id;
 	    };
-	    OberthurNo.prototype.rootCertificate = function (callback) {
+	    Oberthur.prototype.rootCertificate = function (callback) {
 	    };
-	    OberthurNo.prototype.issuerCertificate = function (callback) {
+	    Oberthur.prototype.issuerCertificate = function (callback) {
 	    };
-	    OberthurNo.prototype.authenticationCertificate = function (callback) {
+	    Oberthur.prototype.authenticationCertificate = function (callback) {
 	    };
-	    OberthurNo.prototype.signingCertificate = function (callback) {
+	    Oberthur.prototype.signingCertificate = function (callback) {
 	    };
-	    OberthurNo.prototype.encryptionCertificate = function (callback) {
+	    Oberthur.prototype.encryptionCertificate = function (callback) {
 	    };
-	    OberthurNo.prototype.verifyPin = function (body, callback) {
+	    Oberthur.prototype.verifyPin = function (body, callback) {
 	    };
-	    OberthurNo.prototype.signData = function (body, callback) {
+	    Oberthur.prototype.signData = function (body, callback) {
 	    };
-	    OberthurNo.prototype.authenticate = function (body, callback) {
+	    Oberthur.prototype.authenticate = function (body, callback) {
 	    };
-	    return OberthurNo;
+	    return Oberthur;
 	}());
-	exports.OberthurNo = OberthurNo;
+	exports.Oberthur = Oberthur;
 
 
 /***/ },

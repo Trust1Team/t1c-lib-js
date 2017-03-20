@@ -5,7 +5,7 @@
 import {LocalConnection} from "../../../core/client/Connection";
 import * as CoreExceptions from "../../../core/exceptions/CoreExceptions";
 
-interface AbstractOberthurNo{
+interface AbstractOberthur{
     rootCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     issuerCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     authenticationCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -18,22 +18,22 @@ interface AbstractOberthurNo{
 
 const SEPARATOR = "/";
 const PLUGIN_CONTEXT_BEID = "/plugins/oberthur";
-const NOOBERTHUR_ALL_CERTIFICATES = "/certificates";
-const NOOBERTHUR_CERT_ROOT = NOOBERTHUR_ALL_CERTIFICATES + "/root";
-const NOOBERTUR_CERT_ISSUER = NOOBERTHUR_ALL_CERTIFICATES + "/issuer";
-const NOOBERTUR_CERT_AUTHENTICATION = NOOBERTHUR_ALL_CERTIFICATES + "/authentication";
-const NOOBERTUR_CERT_SIGNING = NOOBERTHUR_ALL_CERTIFICATES + "/signing";
-const NOOBERTUR_CERT_ENCRYPTION = NOOBERTHUR_ALL_CERTIFICATES + "/encryption";
-const NOOBERTUR_VERIFY_PIN = "/verify-pin";
-const NOOBERTUR_SIGN_DATA = "/sign";
-const NOOBERTUR_AUTHENTICATE = "/authenticate";
+const OBERTHUR_ALL_CERTIFICATES = "/certificates";
+const OBERTHUR_CERT_ROOT = OBERTHUR_ALL_CERTIFICATES + "/root";
+const OBERTUR_CERT_ISSUER = OBERTHUR_ALL_CERTIFICATES + "/issuer";
+const OBERTUR_CERT_AUTHENTICATION = OBERTHUR_ALL_CERTIFICATES + "/authentication";
+const OBERTUR_CERT_SIGNING = OBERTHUR_ALL_CERTIFICATES + "/signing";
+const OBERTUR_CERT_ENCRYPTION = OBERTHUR_ALL_CERTIFICATES + "/encryption";
+const OBERTUR_VERIFY_PIN = "/verify-pin";
+const OBERTUR_SIGN_DATA = "/sign";
+const OBERTUR_AUTHENTICATE = "/authenticate";
 
 function createFilter(filters:string[]):any {
     return { filter: filters.join(',') };
 }
 
 
-class OberthurNo implements AbstractOberthurNo{
+class Oberthur implements AbstractOberthur{
     // constructor
     constructor(private url:string,private connection:LocalConnection,private reader_id:string) {this.url = url + PLUGIN_CONTEXT_BEID;}
 
@@ -66,4 +66,4 @@ class OberthurNo implements AbstractOberthurNo{
     }
 }
 
-export {AbstractOberthurNo, OberthurNo}
+export {AbstractOberthur, Oberthur}

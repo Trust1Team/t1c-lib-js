@@ -5,7 +5,7 @@
 import {LocalConnection} from "../../../core/client/Connection";
 import * as CoreExceptions from "../../../core/exceptions/CoreExceptions";
 
-interface AbstractAventraNo{
+interface AbstractAventra{
     rootCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     issuerCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     authenticationCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -18,22 +18,22 @@ interface AbstractAventraNo{
 
 const SEPARATOR = "/";
 const PLUGIN_CONTEXT_BEID = "/plugins/aventra";
-const NOAVENTRA_ALL_CERTIFICATES = "/certificates";
-const NOAVENTRA_CERT_ROOT = NOAVENTRA_ALL_CERTIFICATES + "/root";
-const NOAVENTRA_CERT_ISSUER = NOAVENTRA_ALL_CERTIFICATES + "/issuer";
-const NOAVENTRA_CERT_AUTHENTICATION = NOAVENTRA_ALL_CERTIFICATES + "/authentication";
-const NOAVENTRA_CERT_SIGNING = NOAVENTRA_ALL_CERTIFICATES + "/signing";
-const NOAVENTRA_CERT_ENCRYPTION = NOAVENTRA_ALL_CERTIFICATES + "/encryption";
-const NOAVENTRA_VERIFY_PIN = "/verify-pin";
-const NOAVENTRA_SIGN_DATA = "/sign";
-const NOAVENTRA_AUTHENTICATE = "/authenticate";
+const AVENTRA_ALL_CERTIFICATES = "/certificates";
+const AVENTRA_CERT_ROOT = AVENTRA_ALL_CERTIFICATES + "/root";
+const AVENTRA_CERT_ISSUER = AVENTRA_ALL_CERTIFICATES + "/issuer";
+const AVENTRA_CERT_AUTHENTICATION = AVENTRA_ALL_CERTIFICATES + "/authentication";
+const AVENTRA_CERT_SIGNING = AVENTRA_ALL_CERTIFICATES + "/signing";
+const AVENTRA_CERT_ENCRYPTION = AVENTRA_ALL_CERTIFICATES + "/encryption";
+const AVENTRA_VERIFY_PIN = "/verify-pin";
+const AVENTRA_SIGN_DATA = "/sign";
+const AVENTRA_AUTHENTICATE = "/authenticate";
 
 function createFilter(filters:string[]):any {
     return { filter: filters.join(',') };
 }
 
 
-class AventraNo implements AbstractAventraNo{
+class Aventra implements AbstractAventra{
     // constructor
     constructor(private url:string,private connection:LocalConnection,private reader_id:string) {this.url = url + PLUGIN_CONTEXT_BEID;}
 
@@ -66,4 +66,4 @@ class AventraNo implements AbstractAventraNo{
     }
 }
 
-export {AbstractAventraNo, AventraNo}
+export {AbstractAventra, Aventra}
