@@ -2,10 +2,10 @@
  * @author Michallis Pashidis
  * @since 2016
  */
-import {LocalConnection} from "../../../../core/client/Connection";
-import * as CoreExceptions from "../../../../core/exceptions/CoreExceptions";
+import {LocalConnection} from "../../../core/client/Connection";
+import * as CoreExceptions from "../../../core/exceptions/CoreExceptions";
 
-interface AbstractAventraNo{
+interface AbstractOberthurNo{
     rootCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     issuerCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     authenticationCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -17,23 +17,23 @@ interface AbstractAventraNo{
 }
 
 const SEPARATOR = "/";
-const PLUGIN_CONTEXT_BEID = "/plugins/beid";
-const NOAVENTRA_ALL_CERTIFICATES = "/certificates";
-const NOAVENTRA_CERT_ROOT = NOAVENTRA_ALL_CERTIFICATES + "/root";
-const NOAVENTRA_CERT_ISSUER = NOAVENTRA_ALL_CERTIFICATES + "/issuer";
-const NOAVENTRA_CERT_AUTHENTICATION = NOAVENTRA_ALL_CERTIFICATES + "/authentication";
-const NOAVENTRA_CERT_SIGNING = NOAVENTRA_ALL_CERTIFICATES + "/signing";
-const NOAVENTRA_CERT_ENCRYPTION = NOAVENTRA_ALL_CERTIFICATES + "/encryption";
-const NOAVENTRA_VERIFY_PIN = "/verify-pin";
-const NOAVENTRA_SIGN_DATA = "/sign";
-const NOAVENTRA_AUTHENTICATE = "/authenticate";
+const PLUGIN_CONTEXT_BEID = "/plugins/oberthur";
+const NOOBERTHUR_ALL_CERTIFICATES = "/certificates";
+const NOOBERTHUR_CERT_ROOT = NOOBERTHUR_ALL_CERTIFICATES + "/root";
+const NOOBERTUR_CERT_ISSUER = NOOBERTHUR_ALL_CERTIFICATES + "/issuer";
+const NOOBERTUR_CERT_AUTHENTICATION = NOOBERTHUR_ALL_CERTIFICATES + "/authentication";
+const NOOBERTUR_CERT_SIGNING = NOOBERTHUR_ALL_CERTIFICATES + "/signing";
+const NOOBERTUR_CERT_ENCRYPTION = NOOBERTHUR_ALL_CERTIFICATES + "/encryption";
+const NOOBERTUR_VERIFY_PIN = "/verify-pin";
+const NOOBERTUR_SIGN_DATA = "/sign";
+const NOOBERTUR_AUTHENTICATE = "/authenticate";
 
 function createFilter(filters:string[]):any {
     return { filter: filters.join(',') };
 }
 
 
-class AventraNo implements AbstractAventraNo{
+class OberthurNo implements AbstractOberthurNo{
     // constructor
     constructor(private url:string,private connection:LocalConnection,private reader_id:string) {this.url = url + PLUGIN_CONTEXT_BEID;}
 
@@ -66,4 +66,4 @@ class AventraNo implements AbstractAventraNo{
     }
 }
 
-export {AbstractAventraNo, AventraNo}
+export {AbstractOberthurNo, OberthurNo}

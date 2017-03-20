@@ -17,6 +17,8 @@ import {AbstractOCVClient,OCVClient} from "./ocv/OCVClient";
 import {Mobib, AbstractMobib} from "../Plugins/smartcards/mobib/mobib";
 import {AbstractLuxTrust} from "../Plugins/smartcards/luxtrust/LuxTrust";
 import {AbstractOcra} from "../Plugins/smartcards/ocra/ocra";
+import {AbstractAventraNo} from "../Plugins/smartcards/pki/AventraNo";
+import {AbstractOberthurNo} from "../Plugins/smartcards/pki/OberthurNo";
 
 class GCLClient {
     private cfg: GCLConfig;
@@ -181,7 +183,10 @@ class GCLClient {
     public mobib = (reader_id?:string):AbstractMobib => { return this.cardFactory.createMobib(reader_id); };
     // get instance for OCRA
     public ocra = (reader_id?:string):AbstractOcra => { return this.cardFactory.createOcra(reader_id); };
-
+    // get instance for Aventra
+    public aventra = (reader_id?:string):AbstractAventraNo => { return this.cardFactory.createAventraNO(reader_id); };
+    // get instance for Oberthur
+    public oberthur = (reader_id?:string):AbstractOberthurNo => { return this.cardFactory.createOberthurNO(reader_id); };
 
     // facade implementation
 

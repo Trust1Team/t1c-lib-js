@@ -1,6 +1,6 @@
 "use strict";
 var SEPARATOR = "/";
-var PLUGIN_CONTEXT_BEID = "/plugins/beid";
+var PLUGIN_CONTEXT_BEID = "/plugins/aventra";
 var NOAVENTRA_ALL_CERTIFICATES = "/certificates";
 var NOAVENTRA_CERT_ROOT = NOAVENTRA_ALL_CERTIFICATES + "/root";
 var NOAVENTRA_CERT_ISSUER = NOAVENTRA_ALL_CERTIFICATES + "/issuer";
