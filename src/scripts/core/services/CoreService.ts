@@ -84,7 +84,7 @@ class CoreService implements AbstractCore{
         function cardTimeout(cb,rtcb,crcb,iccb) {
             let selfTimeout = this;
             setTimeout(function () {
-                console.debug("seconds left:",maxSeconds);
+                // console.debug("seconds left:",maxSeconds);
                 --maxSeconds;
                 self.readers(function(error, data){
                     if(error){
