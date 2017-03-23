@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>GCL Javascript Lux eID Test Page</title>
+    <title>GCL Javascript Aventra Test Page</title>
     <!--Add bootstrap and dependencies-->
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <style media="screen">
@@ -58,57 +58,19 @@
     <hr />
     <div>
         <button id="info" type="button" class="btn btn-default btn-lg">Info</button>
-        <button id="infoBrowser" type="button" class="btn btn-default btn-lg">Browser Info</button>
         <button id="downloadgcl" type="button" class="btn btn-default btn-lg">Download GCL</button>
         <button id="getReaders" type="button" class="btn btn-default btn-lg">Readers</button>
-        <button id="pollReaders" type="button" class="btn btn-default btn-lg">Poll Readers</button>
-        <button id="pollCard" type="button" class="btn btn-default btn-lg">Poll Cards</button>
-        <button id="getReadersAvailable" type="button" class="btn btn-default btn-lg">Readers (card available)</button>
-        <button id="getReadersUnavailable" type="button" class="btn btn-default btn-lg">Readers (card unavailable)</button>
-        <button id="getKey" type="button" class="btn btn-default btn-lg">Get API key</button>
-        <button id="getPubKeyDS" type="button" class="btn btn-default btn-lg">Get Public Key (DS)</button>
-        <button id="getPubKeyGCL" type="button" class="btn btn-default btn-lg">Get Public Key (GCL)</button>
-        <button id="getJWT" type="button" class="btn btn-default btn-lg">Get JWT</button>
-        <button id="getJWTRefresh" type="button" class="btn btn-default btn-lg">Refresh JWT</button>
-        <button id="getPlugins" type="button" class="btn btn-default btn-lg">Get Plugins</button>
         <hr />
-        <button id="luxidBiometric" type="button" class="btn btn-default btn-lg">LuxID Biometric</button>
-        <button id="luxidAddress" type="button" class="btn btn-default btn-lg">LuxID Address</button>
-        <button id="luxidPic" type="button" class="btn btn-default btn-lg">LuxID Picture</button>
-        <button id="luxidAllCert" type="button" class="btn btn-default btn-lg">LuxID All Cert</button>
-        <button id="luxidRootCert" type="button" class="btn btn-default btn-lg">LuxID Root Cert</button>
-        <button id="luxidAuthCert" type="button" class="btn btn-default btn-lg">LuxID Authentication Cert</button>
-        <button id="luxidNonRepCert" type="button" class="btn btn-default btn-lg">LuxID Non Repudiation Cert</button>
-        <button id="luxidVerifyPin" type="button" class="btn btn-default btn-lg">LuxID Verify Pin</button>
-        <button id="luxidSign" type="button" class="btn btn-default btn-lg">LuxID Sign</button>
-        <button id="luxidAuthenticate" type="button" class="btn btn-default btn-lg">LuxID Authenticate</button>
+        <button id="aventraAllData" type="button" class="btn btn-default btn-lg">Aventra allData</button>
+        <button id="aventraAllCert" type="button" class="btn btn-default btn-lg">Aventra All Cert</button>
+        <button id="aventraRootCert" type="button" class="btn btn-default btn-lg">Aventra Root Cert</button>
+        <button id="aventraAuthCert" type="button" class="btn btn-default btn-lg">Aventra Authentication Cert</button>
+        <button id="aventraNonRepCert" type="button" class="btn btn-default btn-lg">Aventra Non Repudiation Cert</button>
+        <button id="aventraVerifyPin" type="button" class="btn btn-default btn-lg">Aventra Verify Pin</button>
+        <button id="aventraSign" type="button" class="btn btn-default btn-lg">Aventra Sign</button>
+        <button id="aventraAuthenticate" type="button" class="btn btn-default btn-lg">Aventra Authenticate</button>
         <button id="clear" type="button" class="btn btn-default btn-lg">Clear</button>
         <hr />
-        <button id="luxidFiltered" type="button" class="btn btn-default btn-lg">LuxID Read Filtered</button>
-        <div class="form-group">
-            <input type="checkbox" name="type" value="biometric" id="biometric" />
-            <label for="biometric"><span class="glyphicon"></span> biometric</label>
-            <input type="checkbox" name="type" value="address" id="address" />
-            <label for="address"><span class="glyphicon "></span> address</label>
-            <input type="checkbox" name="type" value="picture" id="photo"/>
-            <label for="photo"><span class="glyphicon"></span> picture</label>
-            <input type="checkbox" name="type" value="root-certificate" id="rootcert"/>
-            <label for="rootcert"><span class="glyphicon"></span> root certificate</label>
-            <input type="checkbox" name="type" value="authentication-certificate" id="authcert"/>
-            <label for="authcert"><span class="glyphicon "></span> authentication certificate</label>
-            <input type="checkbox" name="type" value="non-repudiation-certificate" id="nonrepcert"/>
-            <label for="nonrepcert"><span class="glyphicon "></span> non-repudiation certificate</label>
-        </div>
-        <hr />
-        <button id="luxidCertsFiltered" type="button" class="btn btn-default btn-lg">Lux eID Certs Filtered</button>
-        <div class="form-group">
-            <input type="checkbox" name="type" value="root-certificate" id="rootcertx"/>
-            <label for="rootcertx"><span class="glyphicon"></span> root certificate</label>
-            <input type="checkbox" name="type" value="authentication-certificate" id="authcertx"/>
-            <label for="authcertx"><span class="glyphicon "></span> authentication certificate</label>
-            <input type="checkbox" name="type" value="non-repudiation-certificate" id="nonrepcertx"/>
-            <label for="nonrepcertx"><span class="glyphicon "></span> non-repudiation certificate</label>
-        </div>
     </div>
     <hr />
     <pre id="information"></pre>
@@ -229,8 +191,8 @@
         //gclConfig.gclUrl = "http://localhost:10080/v1"; //override config for local dev
         gclConfig.ocvUrl = "https://accapim.t1t.be:443/trust1team/ocv-api/v1";
         //gclConfig.ocvUrl = "http://localhost:8080/ocv-api-web/v1";
-        gclConfig.localTestMode=false;
-        gclConfig.allowAutoUpdate = true;
+        gclConfig.localTestMode=true;
+        gclConfig.allowAutoUpdate = false;
         gclConfig.implicitDownload = false;
 
         if(gclConfig.localTestMode){
@@ -240,7 +202,7 @@
         var connector = new GCLLib.GCLClient(gclConfig);
 
         // TEST PIN ENTRY
-        var pin ="123456";
+        var pin ="1234";
 
 
         connector.core().info(function(err,data) {
@@ -341,16 +303,13 @@
             var core = connector.core();
             core.info(callback);
         });
-        $("#infoBrowser").on('click', function () {
-            $("#information").empty();
-            var core = connector.core();
-            core.infoBrowser(callback);
-        });
+
         $("#getReaders").on('click', function () {
             $("#information").empty();
             var core = connector.core();
             core.readers(callback);
         });
+
         $("#pollReaders").on('click', function () {
             $("#information").empty();
             var core = connector.core();
@@ -363,110 +322,50 @@
                     function(){console.log("Stop waiting for card, none found")}
             );
         });
+
         $("#getReadersAvailable").on('click', function () {
             $("#information").empty();
             var core = connector.core();
             core.readersCardAvailable(callback);
         });
+
         $("#getReadersUnavailable").on('click', function () {
             $("#information").empty();
             var core = connector.core();
             core.readersCardsUnavailable(callback);
         });
-        $("#getKey").on('click', function () {
+
+        // aventra eid functionality
+        $("#aventraAllData").on('click', function () {
             $("#information").empty();
-            $("#error").empty();
-            var apikey = connector.config().apiKey;
-            if(apikey) $("#information").append(apikey);
-            else $("#information").append('no apikey set');
-        });
-        $("#getPubKeyDS").on('click', function () {
-            $("#information").empty();
-            $("#error").empty();
-            connector.ds().getPubKey(callback);
-        });
-        $("#getPubKeyGCL").on('click', function () {
-            $("#information").empty();
-            $("#error").empty();
-            connector.core().getPubKey(callback);
-        });
-        $("#getJWT").on('click', function () {
-            $("#information").empty();
-            $("#error").empty();
-            connector.ds().getJWT(callback);
-        });
-        $("#getJWTRefresh").on('click', function () {
-            $("#information").empty();
-            $("#error").empty();
-            $("#validationError").empty();
-            connector.ds().refreshJWT(callback);
-        });
-        $("#getPlugins").on('click', function () {
-            $("#information").empty();
-            var core = connector.core();
-            core.plugins(callback);
+            var aventra = connector.aventra($("#selected_reader").text(),pin);
+            aventra.allData(callback);
         });
 
-        // luxemburg eid functionality
-        $("#luxidFiltered").on('click', function () {
+        $("#aventraAllCert").on('click', function () {
             $("#information").empty();
-            var luxeid = connector.luxeid($("#selected_reader").text(),pin);
-            var filter = [];
-            if($("#biometric").is(":checked"))filter.push($("#biometric").val());
-            if($("#address").is(":checked"))filter.push($("#address").val());
-            if($("#photo").is(":checked"))filter.push($("#photo").val());
-            if($("#rootcert").is(":checked"))filter.push($("#rootcert").val());
-            if($("#authcert").is(":checked"))filter.push($("#authcert").val());
-            if($("#nonrepcert").is(":checked"))filter.push($("#nonrepcert").val());
-            luxeid.allData(filter,callback);
+            var aventra = connector.aventra($("#selected_reader").text(),pin);
+            aventra.allCerts([],callback);
         });
-        $("#luxidCertsFiltered").on('click', function () {
+        $("#aventraRootCert").on('click', function () {
             $("#information").empty();
-            var luxeid = connector.luxeid($("#selected_reader").text(),pin);
-            var filter = [];
-            if($("#rootcertx").is(":checked"))filter.push($("#rootcertx").val());
-            if($("#authcertx").is(":checked"))filter.push($("#authcertx").val());
-            if($("#nonrepcertx").is(":checked"))filter.push($("#nonrepcertx").val());
-            if($("#citizencertx").is(":checked"))filter.push($("#citizencertx").val());
-            if($("#rrncertx").is(":checked"))filter.push($("#rrncertx").val());
-            luxeid.allCerts(filter,callback);
+            var aventra = connector.aventra($("#selected_reader").text(),pin);
+            aventra.rootCertificate(callback);
         });
-        $("#luxidBiometric").on('click', function () {
+
+        $("#aventraAuthCert").on('click', function () {
             $("#information").empty();
-            var luxeid = connector.luxeid($("#selected_reader").text(),pin);
-            luxeid.biometric(callback);
+            var aventra = connector.aventra($("#selected_reader").text(),pin);
+            aventra.authenticationCertificate(callback);
         });
-        $("#luxidAddress").on('click', function () {
+
+        $("#aventraNonRepCert").on('click', function () {
             $("#information").empty();
-            var luxeid = connector.luxeid($("#selected_reader").text(),pin);
-            luxeid.address(callback);
+            var aventra = connector.aventra($("#selected_reader").text(),pin);
+            aventra.nonRepudiationCertificate(callback);
         });
-        $("#luxidPic").on('click', function () {
-            $("#information").empty();
-            var luxeid = connector.luxeid($("#selected_reader").text(),pin);
-            luxeid.picture(callback);
-        });
-        $("#luxidAllCert").on('click', function () {
-            $("#information").empty();
-            var luxeid = connector.luxeid($("#selected_reader").text(),pin);
-            luxeid.allCerts([],callback);
-        });
-        $("#luxidRootCert").on('click', function () {
-            $("#information").empty();
-            var luxeid = connector.luxeid($("#selected_reader").text(),pin);
-            luxeid.rootCertificate(callback);
-        });
-        $("#luxidAuthCert").on('click', function () {
-            $("#information").empty();
-            var luxeid = connector.luxeid($("#selected_reader").text(),pin);
-            luxeid.authenticationCertificate(callback);
-        });
-        $("#luxidNonRepCert").on('click', function () {
-            $("#information").empty();
-            var luxeid = connector.luxeid($("#selected_reader").text(),pin);
-            luxeid.nonRepudiationCertificate(callback);
-        });
-        $("#luxidVerifyPin").on('click', function () {
+
+        $("#aventraVerifyPin").on('click', function () {
             $("#information").empty();
             $("#error").empty();
             $("#validationInformation").empty();
@@ -479,10 +378,10 @@
         $("#buttonValidate").on('click', function () {
             var _body={};
             _body.pin = $("#psw").val();
-            connector.beid($("#selected_reader").text()).verifyPin(_body, validationCallback);
+            connector.aventra($("#selected_reader").text()).verifyPin(_body, validationCallback);
         });
 
-        $("#luxidSign").on('click', function () {
+        $("#aventraSign").on('click', function () {
             $("#information").empty();
             $("#error").empty();
             $("#signInformation").empty();
@@ -495,12 +394,12 @@
         $("#buttonSign").on('click', function () {
             var _body={};
             _body.pin = $("#signpsw").val();
-            _body.algorithm_reference = "sha256";
-            _body.data = "E1uHACbPvhLew0gGmBH83lvtKIAKxU2/RezfBOsT6Vs=";
-            connector.beid($("#selected_reader").text()).signData(_body, signCallback);
+            _body.algorithm_reference = "sha1";
+            _body.data = "K4d2IAU03FedJ74fV7n/QfXkk/o=";
+            connector.aventra($("#selected_reader").text()).signData(_body, signCallback);
         });
 
-        $("#luxidAuthenticate").on('click', function () {
+        $("#aventraAuthenticate").on('click', function () {
             $("#information").empty();
             $("#error").empty();
             $("#authInformation").empty();
@@ -512,10 +411,10 @@
 
         $("#buttonAuth").on('click', function () {
             var _body={};
-            _body.data = "I2e+u/sgy7fYgh+DWA0p2jzXQ7E=";
+            _body.data = "K4d2IAU03FedJ74fV7n/QfXkk/o=";
             _body.algorithm_reference = "sha1";
             _body.pin = $("#authpsw").val();
-            connector.beid($("#selected_reader").text()).authenticate(_body, authCallback);
+            connector.aventra($("#selected_reader").text()).authenticate(_body, authCallback);
         });
 
         $("#downloadgcl").on('click',function(){
