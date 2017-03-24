@@ -15,7 +15,7 @@ import {LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnect
 import {AbstractDSClient,DSClient} from "./ds/DSClient";
 import {AbstractOCVClient,OCVClient} from "./ocv/OCVClient";
 import {Mobib, AbstractMobib} from "../Plugins/smartcards/mobib/mobib";
-import {AbstractLuxTrust} from "../Plugins/smartcards/luxtrust/LuxTrust";
+import {AbstractLuxTrust} from "../Plugins/smartcards/pki/LuxTrust";
 import {AbstractOcra} from "../Plugins/smartcards/ocra/ocra";
 import {AbstractAventra} from "../Plugins/smartcards/pki/Aventra";
 import {AbstractOberthur} from "../Plugins/smartcards/pki/Oberthur";

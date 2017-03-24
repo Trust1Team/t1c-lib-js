@@ -8,7 +8,7 @@ import {AbstractEidLUX, EidLux} from "./eid/lux/EidLux";
 import {LocalConnection} from "../../core/client/Connection";
 import {GCLConfig} from "../../core/GCLConfig";
 import {AbstractMobib, Mobib} from "./mobib/mobib";
-import {LuxTrust, AbstractLuxTrust} from "./luxtrust/LuxTrust";
+import {LuxTrust, AbstractLuxTrust} from "./pki/LuxTrust";
 import {Ocra, AbstractOcra} from "./ocra/ocra";
 import {AbstractAventra, Aventra} from "./pki/Aventra";
 import {AbstractOberthur, Oberthur} from "./pki/Oberthur";
