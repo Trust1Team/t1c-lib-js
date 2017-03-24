@@ -64,8 +64,10 @@
         <button id="aventraAllData" type="button" class="btn btn-default btn-lg">Aventra allData</button>
         <button id="aventraAllCert" type="button" class="btn btn-default btn-lg">Aventra All Cert</button>
         <button id="aventraRootCert" type="button" class="btn btn-default btn-lg">Aventra Root Cert</button>
-        <button id="aventraAuthCert" type="button" class="btn btn-default btn-lg">Aventra Authentication Cert</button>
-        <button id="aventraNonRepCert" type="button" class="btn btn-default btn-lg">Aventra Non Repudiation Cert</button>
+        <button id="aventraAuthenticationCert" type="button" class="btn btn-default btn-lg">Aventra Authentication Cert</button>
+        <button id="aventraIssuerCert" type="button" class="btn btn-default btn-lg">Aventra Issuer Cert</button>
+        <button id="aventraSigningCert" type="button" class="btn btn-default btn-lg">Aventra Signing Cert</button>
+        <button id="aventraEncryptionCert" type="button" class="btn btn-default btn-lg">Aventra Encryption Cert</button>
         <button id="aventraVerifyPin" type="button" class="btn btn-default btn-lg">Aventra Verify Pin</button>
         <button id="aventraSign" type="button" class="btn btn-default btn-lg">Aventra Sign</button>
         <button id="aventraAuthenticate" type="button" class="btn btn-default btn-lg">Aventra Authenticate</button>
@@ -339,7 +341,7 @@
         $("#aventraAllData").on('click', function () {
             $("#information").empty();
             var aventra = connector.aventra($("#selected_reader").text(),pin);
-            aventra.allData(callback);
+            aventra.allData([],callback);
         });
 
         $("#aventraAllCert").on('click', function () {
@@ -353,16 +355,28 @@
             aventra.rootCertificate(callback);
         });
 
-        $("#aventraAuthCert").on('click', function () {
+        $("#aventraAuthenticationCert").on('click', function () {
             $("#information").empty();
             var aventra = connector.aventra($("#selected_reader").text(),pin);
             aventra.authenticationCertificate(callback);
         });
 
-        $("#aventraNonRepCert").on('click', function () {
+        $("#aventraSigningCert").on('click', function () {
             $("#information").empty();
             var aventra = connector.aventra($("#selected_reader").text(),pin);
-            aventra.nonRepudiationCertificate(callback);
+            aventra.signingCertificate(callback);
+        });
+
+        $("#aventraIssuerCert").on('click', function () {
+            $("#information").empty();
+            var aventra = connector.aventra($("#selected_reader").text(),pin);
+            aventra.issuerCertificate(callback);
+        });
+
+        $("#aventraEncryptionCert").on('click', function () {
+            $("#information").empty();
+            var aventra = connector.aventra($("#selected_reader").text(),pin);
+            aventra.encryptionCertificate(callback);
         });
 
         $("#aventraVerifyPin").on('click', function () {
