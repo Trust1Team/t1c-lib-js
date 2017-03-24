@@ -8,10 +8,11 @@ var defaultGclUrl = "https://localhost:10433/v1";
 var defaultDSUrl = "https://accapim.t1t.be:443";
 var defaultDSContextPath = "/trust1team/gclds/v1";
 var defaultOCVContextPath = "/trust1team/ocv-api/v1";
-//const defaultDSContextPath = "/gcl-ds-web/v1"; //<==== for local dev
+var defaultDSContextPathTestMode = "/gcl-ds-web/v1";
 var fileDownloadUrlPostfix = "/trust1team/gclds-file/v1";
 var defaultAllowAutoUpdate = true;
 var defaultImplicitDownload = false;
+var defaultLocalTestMode = false;
 var GCLConfig = (function () {
     // constructor for DTO
     function GCLConfig(dsUriValue, apiKey) {
@@ -24,6 +25,7 @@ var GCLConfig = (function () {
         this._jwt = 'none';
         this._allowAutoUpdate = defaultAllowAutoUpdate;
         this._implicitDownload = defaultImplicitDownload;
+        this._localTestMode = defaultLocalTestMode;
     }
     Object.defineProperty(GCLConfig.prototype, "ocvUrl", {
         get: function () {
@@ -134,6 +136,18 @@ var GCLConfig = (function () {
     Object.defineProperty(GCLConfig.prototype, "dsUrlBase", {
         get: function () {
             return this._dsUrlBase;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(GCLConfig.prototype, "localTestMode", {
+        get: function () {
+            return this._localTestMode;
+        },
+        set: function (value) {
+            this._localTestMode = value;
+            if (this._localTestMode)
+                this._dsUrl = this._dsUrlBase + defaultDSContextPathTestMode;
         },
         enumerable: true,
         configurable: true

@@ -10,6 +10,8 @@ import {GCLConfig} from "../../core/GCLConfig";
 import {AbstractMobib, Mobib} from "./mobib/mobib";
 import {LuxTrust, AbstractLuxTrust} from "./luxtrust/LuxTrust";
 import {Ocra, AbstractOcra} from "./ocra/ocra";
+import {AbstractAventra, Aventra} from "./pki/Aventra";
+import {AbstractOberthur, Oberthur} from "./pki/Oberthur";
 
 interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
@@ -18,6 +20,8 @@ interface AbstractFactory {
     createLuxTrust(reader_id?: string): AbstractLuxTrust;
     createMobib(reader_id?:string): AbstractMobib;
     createOcra(reader_id?:string): AbstractOcra;
+    createAventraNO(reader_id?:string): AbstractAventra;
+    createOberthurNO(reader_id?:string): AbstractOberthur;
 }
 
 export class CardFactory implements AbstractFactory{
@@ -34,4 +38,8 @@ export class CardFactory implements AbstractFactory{
     public createMobib(reader_id?:string): Mobib { return new Mobib(this.url, this.connection, reader_id); }
 
     public createOcra(reader_id?:string): Ocra { return new Ocra(this.url, this.connection, reader_id); }
+
+    public createAventraNO(reader_id?:string): Aventra { return new Aventra(this.url, this.connection, reader_id); }
+
+    public createOberthurNO(reader_id?:string): Oberthur { return new Oberthur(this.url, this.connection, reader_id); }
 }
