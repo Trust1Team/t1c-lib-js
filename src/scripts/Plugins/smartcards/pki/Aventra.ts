@@ -17,6 +17,7 @@ interface AbstractAventra{
     signingCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     encryptionCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     verifyPin(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    resetPin(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
     signData(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
     authenticate(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
 }
@@ -93,6 +94,15 @@ class Aventra implements AbstractAventra{
     verifyPin(body, callback): void {
         let _req:any = {};
         if (body.pin) {_req.pin = body.pin;}
+        if (body.private_key_reference) {_req.private_key_reference = body.private_key_reference;}
+        this.connection.post(this.resolvedReaderURI() + AVENTRA_VERIFY_PIN, _req, callback);
+    }
+
+    resetPin(body, callback): void {
+        let _req:any = {};
+        if (body.new_pin) {_req.pin = body.new_pin;}
+        if (body.puk) {_req.puk = body.puk;}
+        if (body.private_key_reference) {_req.private_key_reference = body.private_key_reference;}
         this.connection.post(this.resolvedReaderURI() + AVENTRA_VERIFY_PIN, _req, callback);
     }
 
