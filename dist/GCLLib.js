@@ -852,10 +852,13 @@ var GCLLib =
 	        this.url = url + PLUGIN_CONTEXT_BEID;
 	    }
 	    Aventra.prototype.allDataFilters = function () {
-	        return ["authentication-certificate", "biometric", "non-repudiation-certificate", "picture", "root-certificates"];
+	        return ["serial", "root_certificate", "authentication-certificate", "encryption_certificate", "issuer_certificate", "signing_certificate"];
 	    };
 	    Aventra.prototype.allCertFilters = function () {
-	        return ["authentication-certificate", "non-repudiation-certificate", "root-certificates"];
+	        return ["root_certificate", "authentication-certificate", "encryption_certificate", "issuer_certificate", "signing_certificate"];
+	    };
+	    Aventra.prototype.allKeyRefs = function () {
+	        return ["authenticate", "sign", "encrypt"];
 	    };
 	    Aventra.prototype.resolvedReaderURI = function () {
 	        return this.url + SEPARATOR + this.reader_id;
@@ -895,6 +898,22 @@ var GCLLib =
 	        var _req = {};
 	        if (body.pin) {
 	            _req.pin = body.pin;
+	        }
+	        if (body.private_key_reference) {
+	            _req.private_key_reference = body.private_key_reference;
+	        }
+	        this.connection.post(this.resolvedReaderURI() + AVENTRA_VERIFY_PIN, _req, callback);
+	    };
+	    Aventra.prototype.resetPin = function (body, callback) {
+	        var _req = {};
+	        if (body.new_pin) {
+	            _req.pin = body.new_pin;
+	        }
+	        if (body.puk) {
+	            _req.puk = body.puk;
+	        }
+	        if (body.private_key_reference) {
+	            _req.private_key_reference = body.private_key_reference;
 	        }
 	        this.connection.post(this.resolvedReaderURI() + AVENTRA_VERIFY_PIN, _req, callback);
 	    };
