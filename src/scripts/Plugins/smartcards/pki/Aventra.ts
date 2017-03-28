@@ -31,6 +31,7 @@ const AVENTRA_CERT_AUTHENTICATION = AVENTRA_ALL_CERTIFICATES + "/authentication"
 const AVENTRA_CERT_SIGNING = AVENTRA_ALL_CERTIFICATES + "/signing";
 const AVENTRA_CERT_ENCRYPTION = AVENTRA_ALL_CERTIFICATES + "/encryption";
 const AVENTRA_VERIFY_PIN = "/verify-pin";
+const AVENTRA_RESET_PIN = "/reset-pin";
 const AVENTRA_SIGN_DATA = "/sign";
 const AVENTRA_AUTHENTICATE = "/authenticate";
 
@@ -100,10 +101,10 @@ class Aventra implements AbstractAventra{
 
     resetPin(body, callback): void {
         let _req:any = {};
-        if (body.new_pin) {_req.pin = body.new_pin;}
+        if (body.new_pin) {_req.new_pin = body.new_pin;}
         if (body.puk) {_req.puk = body.puk;}
         if (body.private_key_reference) {_req.private_key_reference = body.private_key_reference;}
-        this.connection.post(this.resolvedReaderURI() + AVENTRA_VERIFY_PIN, _req, callback);
+        this.connection.post(this.resolvedReaderURI() + AVENTRA_RESET_PIN, _req, callback);
     }
 
     signData(body, callback): void {
