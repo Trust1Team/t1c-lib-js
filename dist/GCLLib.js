@@ -839,6 +839,7 @@ var GCLLib =
 	var AVENTRA_CERT_SIGNING = AVENTRA_ALL_CERTIFICATES + "/signing";
 	var AVENTRA_CERT_ENCRYPTION = AVENTRA_ALL_CERTIFICATES + "/encryption";
 	var AVENTRA_VERIFY_PIN = "/verify-pin";
+	var AVENTRA_RESET_PIN = "/reset-pin";
 	var AVENTRA_SIGN_DATA = "/sign";
 	var AVENTRA_AUTHENTICATE = "/authenticate";
 	function createFilter(filters) {
@@ -907,7 +908,7 @@ var GCLLib =
 	    Aventra.prototype.resetPin = function (body, callback) {
 	        var _req = {};
 	        if (body.new_pin) {
-	            _req.pin = body.new_pin;
+	            _req.new_pin = body.new_pin;
 	        }
 	        if (body.puk) {
 	            _req.puk = body.puk;
@@ -915,7 +916,7 @@ var GCLLib =
 	        if (body.private_key_reference) {
 	            _req.private_key_reference = body.private_key_reference;
 	        }
-	        this.connection.post(this.resolvedReaderURI() + AVENTRA_VERIFY_PIN, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + AVENTRA_RESET_PIN, _req, callback);
 	    };
 	    Aventra.prototype.signData = function (body, callback) {
 	        var _req = {};
