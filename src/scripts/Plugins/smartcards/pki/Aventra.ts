@@ -8,6 +8,7 @@ import * as CoreExceptions from "../../../core/exceptions/CoreExceptions";
 interface AbstractAventra{
     allDataFilters():Array<string>;
     allCertFilters():Array<string>;
+    allKeyRefs():Array<string>;
     allData(filters:string[],callback:(error:CoreExceptions.RestException, data:any) => void):void;
     allCerts(filters:string[], callback:(error:CoreExceptions.RestException, data:any) => void):void;
     rootCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -43,11 +44,15 @@ class Aventra implements AbstractAventra{
 
     // filters
     public allDataFilters(){
-        return ["authentication-certificate","biometric","non-repudiation-certificate","picture","root-certificates"];
+        return ["serial","root_certificate","authentication-certificate","encryption_certificate","issuer_certificate","signing_certificate"];
     }
 
     public allCertFilters(){
-        return ["authentication-certificate","non-repudiation-certificate","root-certificates"];
+        return ["root_certificate","authentication-certificate","encryption_certificate","issuer_certificate","signing_certificate"];
+    }
+
+    public allKeyRefs(){
+        return ["authenticate","sign","encrypt"];
     }
 
     // resolves the reader_id in the base URL
