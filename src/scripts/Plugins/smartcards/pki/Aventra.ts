@@ -121,7 +121,7 @@ class Aventra implements AbstractAventra{
         //only sha1 possible
         let _req:any = {};
         if (body) {
-            _req.algorithm_reference = body.algorithm_reference;
+            _req.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
             _req.data = body.data;
             if(body.pin) {_req.pin = body.pin;}
         }
@@ -132,7 +132,7 @@ class Aventra implements AbstractAventra{
         let _req:any = {};
         if(body){
             _req.data = body.data;
-            _req.algorithm_reference = body.algorithm_reference;
+            _req.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
             if(body.pin) {_req.pin = body.pin;}
         }
         this.connection.post(this.resolvedReaderURI() + AVENTRA_AUTHENTICATE, _req,callback);
