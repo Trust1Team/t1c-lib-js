@@ -70,6 +70,8 @@
         <button id="aventraEncryptionCert" type="button" class="btn btn-default btn-lg">Aventra Encryption Cert</button>
         <button id="aventraVerifyPin" type="button" class="btn btn-default btn-lg">Aventra Verify Auth Pin</button>
         <button id="aventraVerifySignPin" type="button" class="btn btn-default btn-lg">Aventra Verify Sign Pin</button>
+        <button id="aventraSignAlgo" type="button" class="btn btn-default btn-lg">Available sign algorithm refs</button>
+        <button id="aventraAuthAlgo" type="button" class="btn btn-default btn-lg">Available authentication algorithm refs</button>
         <button id="aventraSign" type="button" class="btn btn-default btn-lg">Aventra Sign</button>
         <button id="aventraAuthenticate" type="button" class="btn btn-default btn-lg">Aventra Authenticate</button>
         <button id="aventraResetAuthenticationCert" type="button" class="btn btn-default btn-lg">Aventra Reset Auth Cert</button>
@@ -592,6 +594,16 @@
             _body.puk = $("#pswResetSignPUK").val();
             _body.private_key_reference = "sign";
             connector.aventra($("#selected_reader").text()).resetPin(_body, resetSignPINCallback);
+        });
+
+        $("#aventraSignAlgo").on('click', function () {
+            $("#information").empty();
+            connector.aventra($("#selected_reader").text()).allAlgoRefsForSigning(callback);
+        });
+
+        $("#aventraAuthAlgo").on('click', function () {
+            $("#information").empty();
+            connector.aventra($("#selected_reader").text()).allAlgoRefsForAuthentication(callback);
         });
 
         $("#aventraSign").on('click', function () {

@@ -9,6 +9,8 @@ interface AbstractAventra{
     allDataFilters():Array<string>;
     allCertFilters():Array<string>;
     allKeyRefs():Array<string>;
+    allAlgoRefsForAuthentication(callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    allAlgoRefsForSigning(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     allData(filters:string[],callback:(error:CoreExceptions.RestException, data:any) => void):void;
     allCerts(filters:string[], callback:(error:CoreExceptions.RestException, data:any) => void):void;
     rootCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -46,7 +48,7 @@ class Aventra implements AbstractAventra{
 
     // filters
     public allDataFilters(){
-        return ["serial","root_certificate","authentication-certificate","encryption_certificate","issuer_certificate","signing_certificate"];
+        return ["applet-info","root_certificate","authentication-certificate","encryption_certificate","issuer_certificate","signing_certificate"];
     }
 
     public allCertFilters(){
@@ -55,6 +57,14 @@ class Aventra implements AbstractAventra{
 
     public allKeyRefs(){
         return ["authenticate","sign","encrypt"];
+    }
+
+    allAlgoRefsForAuthentication(callback): void {
+        this.connection.get(this.resolvedReaderURI() + AVENTRA_AUTHENTICATE, callback);
+    }
+
+    allAlgoRefsForSigning(callback): void {
+        this.connection.get(this.resolvedReaderURI() + AVENTRA_SIGN_DATA, callback);
     }
 
     // resolves the reader_id in the base URL
