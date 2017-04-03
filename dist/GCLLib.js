@@ -927,7 +927,7 @@ var GCLLib =
 	    Aventra.prototype.signData = function (body, callback) {
 	        var _req = {};
 	        if (body) {
-	            _req.algorithm_reference = body.algorithm_reference;
+	            _req.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
 	            _req.data = body.data;
 	            if (body.pin) {
 	                _req.pin = body.pin;
@@ -939,7 +939,7 @@ var GCLLib =
 	        var _req = {};
 	        if (body) {
 	            _req.data = body.data;
-	            _req.algorithm_reference = body.algorithm_reference;
+	            _req.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
 	            if (body.pin) {
 	                _req.pin = body.pin;
 	            }
