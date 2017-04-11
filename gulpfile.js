@@ -1,5 +1,6 @@
 var gulp = require("gulp");
 var gutil = require( 'gulp-util' );
+var stripDebug = require('gulp-strip-debug');
 var karma = require('karma');
 var injectVersion = require('gulp-inject-version');
 var webpackstream = require('webpack-stream');
@@ -26,10 +27,16 @@ gulp.task("tslint", function () {
         .pipe(tslint.report());
 });
 
-gulp.task('webpack', function() {
+gulp.task('webpack-debug', function() {
     return gulp.src('src/scripts/GCLLib.ts')
         .pipe(webpackstream( require('./webpack.config.js') ))
         .pipe(injectVersion())
+        .pipe(gulp.dest('dist/'));
+});
+
+gulp.task('webpack', ['webpack-debug'], function () {
+    return gulp.src('dist/GCLLib.js')
+        .pipe(stripDebug())
         .pipe(gulp.dest('dist/'));
 });
 
