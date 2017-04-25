@@ -2,7 +2,7 @@
   "name": "t1c-lib-js",
   "version": "1.0.2",
   "description": "The Trust1Connector library (T1C-Lib), is a javascript library to communicate with the Trust1Connector. The library simplify the execution to the connector and works asynchronous.",
-  "main": "dist/connector.js",
+  "main": "dist/GCLLib.js",
   "scripts": {
     "postinstall": "typings install",
     "test": "./node_modules/karma-cli/bin/karma start --reporters teamcity --single-run --colors false",
