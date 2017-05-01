@@ -11,7 +11,7 @@ interface AbstractPiv{
     allKeyRefs(callback:(error:CoreExceptions.RestException, data:Array<string>) => void):void;
     allAlgoRefsForAuthentication(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     allAlgoRefsForSigning(callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    printedInformation(callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    printedInformation(body:any, callback:(error:CoreExceptions.RestException, data:any) => void):void;
     facialImage(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     allData(filters:string[], callback:(error:CoreExceptions.RestException, data:any) => void):void;
     allCerts(filters:string[], callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -38,9 +38,9 @@ const PIV_FACIAL_IMAGE = '/facial-image';
 const PIV_ALL_CERTIFICATES = "/certificates";
 const PIV_CERT_AUTHENTICATION = PIV_ALL_CERTIFICATES + "/authentication";
 const PIV_CERT_SIGNING = PIV_ALL_CERTIFICATES + "/signing";
-const LUX_VERIFY_PIN = "/verify-pin";
-const LUX_SIGN_DATA = "/sign";
-const LUX_AUTHENTICATE = "/authenticate";
+const PIV_VERIFY_PIN = "/verify-pin";
+const PIV_SIGN_DATA = "/sign";
+const PIV_AUTHENTICATE = "/authenticate";
 
 
 class PIV implements AbstractPiv {
@@ -74,8 +74,10 @@ class PIV implements AbstractPiv {
         this.connection.get(this.resolvedReaderURI() + PIV_ALL_SIGN_ALGOS, callback);
     }
 
-    public printedInformation(callback) {
-        this.connection.get(this.resolvedReaderURI() + PIV_PRINTED_INFORMATION, callback);
+    public printedInformation(body, callback) {
+        let _req:any = {};
+        if (body.pin) {_req.pin = body.pin;}
+        this.connection.post(this.resolvedReaderURI() + PIV_PRINTED_INFORMATION, _req, callback);
     }
 
     public facialImage(callback) {
@@ -98,7 +100,7 @@ class PIV implements AbstractPiv {
     verifyPin(body, callback) {
         let _req:any = {};
         if (body.pin) {_req.pin = body.pin;}
-        this.connection.post(this.resolvedReaderURI() + LUX_VERIFY_PIN, _req, callback);
+        this.connection.post(this.resolvedReaderURI() + PIV_VERIFY_PIN, _req, callback);
     }
 
     signData(body, callback) {
@@ -108,7 +110,7 @@ class PIV implements AbstractPiv {
             _req.data = body.data;
             if(body.pin) {_req.pin = body.pin;}
         }
-        this.connection.post(this.resolvedReaderURI() + LUX_SIGN_DATA, _req, callback);
+        this.connection.post(this.resolvedReaderURI() + PIV_SIGN_DATA, _req, callback);
     }
 
     authenticate(body, callback) {
@@ -118,7 +120,7 @@ class PIV implements AbstractPiv {
             _req.algorithm_reference = body.algorithm_reference;
             if(body.pin) {_req.pin = body.pin;}
         }
-        this.connection.post(this.resolvedReaderURI() + LUX_AUTHENTICATE, _req, callback);
+        this.connection.post(this.resolvedReaderURI() + PIV_AUTHENTICATE, _req, callback);
     }
 }
 
