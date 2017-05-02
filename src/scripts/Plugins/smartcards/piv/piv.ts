@@ -12,7 +12,7 @@ interface AbstractPiv{
     allAlgoRefsForAuthentication(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     allAlgoRefsForSigning(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     printedInformation(body:any, callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    facialImage(callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    facialImage(body:any, callback:(error:CoreExceptions.RestException, data:any) => void):void;
     allData(filters:string[], callback:(error:CoreExceptions.RestException, data:any) => void):void;
     allCerts(filters:string[], callback:(error:CoreExceptions.RestException, data:any) => void):void;
     authenticationCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -80,8 +80,10 @@ class PIV implements AbstractPiv {
         this.connection.post(this.resolvedReaderURI() + PIV_PRINTED_INFORMATION, _req, callback);
     }
 
-    public facialImage(callback) {
-        this.connection.get(this.resolvedReaderURI() + PIV_FACIAL_IMAGE, callback);
+    public facialImage(body, callback) {
+        let _req:any = {};
+        if (body.pin) {_req.pin = body.pin;}
+        this.connection.post(this.resolvedReaderURI() + PIV_FACIAL_IMAGE, _req, callback);
     }
 
     public allData(filters, callback) {
