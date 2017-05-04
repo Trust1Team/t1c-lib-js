@@ -989,7 +989,7 @@ var GCLLib =
 	    return { filter: filters.join(',') };
 	}
 	var SEPARATOR = "/";
-	var PLUGIN_CONTEXT_PIV = "/containers/piv";
+	var PLUGIN_CONTEXT_PIV = "/plugins/piv";
 	var PIV_ALL_DATA_FILTERS = '/all-data-filters';
 	var PIV_ALL_CERT_FILTERS = '/all-cert-filters';
 	var PIV_ALL_KEY_REFS = '/all-key-refs';

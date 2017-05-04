@@ -27,7 +27,7 @@ function createFilterQueryParam(filters:string[]):any {
 }
 
 const SEPARATOR = "/";
-const PLUGIN_CONTEXT_PIV = "/containers/piv";
+const PLUGIN_CONTEXT_PIV = "/plugins/piv";
 const PIV_ALL_DATA_FILTERS = '/all-data-filters';
 const PIV_ALL_CERT_FILTERS = '/all-cert-filters';
 const PIV_ALL_KEY_REFS = '/all-key-refs';
