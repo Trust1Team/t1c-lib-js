@@ -842,6 +842,7 @@ var GCLLib =
 	var AVENTRA_CERT_SIGNING = AVENTRA_ALL_CERTIFICATES + "/signing";
 	var AVENTRA_CERT_ENCRYPTION = AVENTRA_ALL_CERTIFICATES + "/encryption";
 	var AVENTRA_VERIFY_PIN = "/verify-pin";
+	var AVENTRA_RESET_PIN = "/reset-pin";
 	var AVENTRA_SIGN_DATA = "/sign";
 	var AVENTRA_AUTHENTICATE = "/authenticate";
 	function createFilter(filters) {
@@ -855,10 +856,19 @@ var GCLLib =
 	        this.url = url + PLUGIN_CONTEXT_BEID;
 	    }
 	    Aventra.prototype.allDataFilters = function () {
-	        return ["authentication-certificate", "biometric", "non-repudiation-certificate", "picture", "root-certificates"];
+	        return ["applet-info", "root_certificate", "authentication-certificate", "encryption_certificate", "issuer_certificate", "signing_certificate"];
 	    };
 	    Aventra.prototype.allCertFilters = function () {
-	        return ["authentication-certificate", "non-repudiation-certificate", "root-certificates"];
+	        return ["root_certificate", "authentication-certificate", "encryption_certificate", "issuer_certificate", "signing_certificate"];
+	    };
+	    Aventra.prototype.allKeyRefs = function () {
+	        return ["authenticate", "sign", "encrypt"];
+	    };
+	    Aventra.prototype.allAlgoRefsForAuthentication = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + AVENTRA_AUTHENTICATE, callback);
+	    };
+	    Aventra.prototype.allAlgoRefsForSigning = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + AVENTRA_SIGN_DATA, callback);
 	    };
 	    Aventra.prototype.resolvedReaderURI = function () {
 	        return this.url + SEPARATOR + this.reader_id;
@@ -899,12 +909,28 @@ var GCLLib =
 	        if (body.pin) {
 	            _req.pin = body.pin;
 	        }
+	        if (body.private_key_reference) {
+	            _req.private_key_reference = body.private_key_reference;
+	        }
 	        this.connection.post(this.resolvedReaderURI() + AVENTRA_VERIFY_PIN, _req, callback);
+	    };
+	    Aventra.prototype.resetPin = function (body, callback) {
+	        var _req = {};
+	        if (body.new_pin) {
+	            _req.new_pin = body.new_pin;
+	        }
+	        if (body.puk) {
+	            _req.puk = body.puk;
+	        }
+	        if (body.private_key_reference) {
+	            _req.private_key_reference = body.private_key_reference;
+	        }
+	        this.connection.post(this.resolvedReaderURI() + AVENTRA_RESET_PIN, _req, callback);
 	    };
 	    Aventra.prototype.signData = function (body, callback) {
 	        var _req = {};
 	        if (body) {
-	            _req.algorithm_reference = body.algorithm_reference;
+	            _req.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
 	            _req.data = body.data;
 	            if (body.pin) {
 	                _req.pin = body.pin;
@@ -916,7 +942,7 @@ var GCLLib =
 	        var _req = {};
 	        if (body) {
 	            _req.data = body.data;
-	            _req.algorithm_reference = body.algorithm_reference;
+	            _req.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
 	            if (body.pin) {
 	                _req.pin = body.pin;
 	            }
@@ -956,6 +982,21 @@ var GCLLib =
 	    }
 	    Oberthur.prototype.resolvedReaderURI = function () {
 	        return this.url + SEPARATOR + this.reader_id;
+	    };
+	    Oberthur.prototype.allDataFilters = function () {
+	        return ["applet-info", "root_certificate", "authentication-certificate", "encryption_certificate", "issuer_certificate", "signing_certificate"];
+	    };
+	    Oberthur.prototype.allCertFilters = function () {
+	        return ["root_certificate", "authentication-certificate", "encryption_certificate", "issuer_certificate", "signing_certificate"];
+	    };
+	    Oberthur.prototype.allKeyRefs = function () {
+	        return ["authenticate", "sign", "encrypt"];
+	    };
+	    Oberthur.prototype.allAlgoRefsForAuthentication = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + OBERTUR_AUTHENTICATE, callback);
+	    };
+	    Oberthur.prototype.allAlgoRefsForSigning = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + OBERTUR_SIGN_DATA, callback);
 	    };
 	    Oberthur.prototype.allCerts = function (filters, callback) {
 	    };
