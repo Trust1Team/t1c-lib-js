@@ -6,6 +6,11 @@ import {LocalConnection} from "../../../core/client/Connection";
 import * as CoreExceptions from "../../../core/exceptions/CoreExceptions";
 
 interface AbstractOberthur{
+    allDataFilters():Array<string>;
+    allCertFilters():Array<string>;
+    allKeyRefs():Array<string>;
+    allAlgoRefsForAuthentication(callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    allAlgoRefsForSigning(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     allCerts(filters:string[], callback:(error:CoreExceptions.RestException, data:any) => void):void;
     rootCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     issuerCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -44,6 +49,26 @@ class Oberthur implements AbstractOberthur{
         return this.url + SEPARATOR + this.reader_id;
     }
 
+    // filters
+    public allDataFilters(){
+        return ["applet-info","root_certificate","authentication-certificate","encryption_certificate","issuer_certificate","signing_certificate"];
+    }
+
+    public allCertFilters(){
+        return ["root_certificate","authentication-certificate","encryption_certificate","issuer_certificate","signing_certificate"];
+    }
+
+    public allKeyRefs(){
+        return ["authenticate","sign","encrypt"];
+    }
+
+    public allAlgoRefsForAuthentication(callback): void {
+        this.connection.get(this.resolvedReaderURI() + OBERTUR_AUTHENTICATE, callback);
+    }
+
+    public allAlgoRefsForSigning(callback): void {
+        this.connection.get(this.resolvedReaderURI() + OBERTUR_SIGN_DATA, callback);
+    }
     allCerts(filters, callback): void {
     }
 

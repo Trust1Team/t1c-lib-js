@@ -8,6 +8,9 @@ import * as CoreExceptions from "../../../core/exceptions/CoreExceptions";
 interface AbstractAventra{
     allDataFilters():Array<string>;
     allCertFilters():Array<string>;
+    allKeyRefs():Array<string>;
+    allAlgoRefsForAuthentication(callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    allAlgoRefsForSigning(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     allData(filters:string[],callback:(error:CoreExceptions.RestException, data:any) => void):void;
     allCerts(filters:string[], callback:(error:CoreExceptions.RestException, data:any) => void):void;
     rootCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
@@ -16,6 +19,7 @@ interface AbstractAventra{
     signingCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     encryptionCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
     verifyPin(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
+    resetPin(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
     signData(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
     authenticate(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
 }
@@ -29,6 +33,7 @@ const AVENTRA_CERT_AUTHENTICATION = AVENTRA_ALL_CERTIFICATES + "/authentication"
 const AVENTRA_CERT_SIGNING = AVENTRA_ALL_CERTIFICATES + "/signing";
 const AVENTRA_CERT_ENCRYPTION = AVENTRA_ALL_CERTIFICATES + "/encryption";
 const AVENTRA_VERIFY_PIN = "/verify-pin";
+const AVENTRA_RESET_PIN = "/reset-pin";
 const AVENTRA_SIGN_DATA = "/sign";
 const AVENTRA_AUTHENTICATE = "/authenticate";
 
@@ -43,11 +48,23 @@ class Aventra implements AbstractAventra{
 
     // filters
     public allDataFilters(){
-        return ["authentication-certificate","biometric","non-repudiation-certificate","picture","root-certificates"];
+        return ["applet-info","root_certificate","authentication-certificate","encryption_certificate","issuer_certificate","signing_certificate"];
     }
 
     public allCertFilters(){
-        return ["authentication-certificate","non-repudiation-certificate","root-certificates"];
+        return ["root_certificate","authentication-certificate","encryption_certificate","issuer_certificate","signing_certificate"];
+    }
+
+    public allKeyRefs(){
+        return ["authenticate","sign","encrypt"];
+    }
+
+    allAlgoRefsForAuthentication(callback): void {
+        this.connection.get(this.resolvedReaderURI() + AVENTRA_AUTHENTICATE, callback);
+    }
+
+    allAlgoRefsForSigning(callback): void {
+        this.connection.get(this.resolvedReaderURI() + AVENTRA_SIGN_DATA, callback);
     }
 
     // resolves the reader_id in the base URL
@@ -88,14 +105,23 @@ class Aventra implements AbstractAventra{
     verifyPin(body, callback): void {
         let _req:any = {};
         if (body.pin) {_req.pin = body.pin;}
+        if (body.private_key_reference) {_req.private_key_reference = body.private_key_reference;}
         this.connection.post(this.resolvedReaderURI() + AVENTRA_VERIFY_PIN, _req, callback);
+    }
+
+    resetPin(body, callback): void {
+        let _req:any = {};
+        if (body.new_pin) {_req.new_pin = body.new_pin;}
+        if (body.puk) {_req.puk = body.puk;}
+        if (body.private_key_reference) {_req.private_key_reference = body.private_key_reference;}
+        this.connection.post(this.resolvedReaderURI() + AVENTRA_RESET_PIN, _req, callback);
     }
 
     signData(body, callback): void {
         //only sha1 possible
         let _req:any = {};
         if (body) {
-            _req.algorithm_reference = body.algorithm_reference;
+            _req.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
             _req.data = body.data;
             if(body.pin) {_req.pin = body.pin;}
         }
@@ -106,7 +132,7 @@ class Aventra implements AbstractAventra{
         let _req:any = {};
         if(body){
             _req.data = body.data;
-            _req.algorithm_reference = body.algorithm_reference;
+            _req.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
             if(body.pin) {_req.pin = body.pin;}
         }
         this.connection.post(this.resolvedReaderURI() + AVENTRA_AUTHENTICATE, _req,callback);
