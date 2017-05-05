@@ -3,7 +3,6 @@
     "align": [
       true,
       "parameters",
-      "arguments",
       "statements"
     ],
     "ban": false,
@@ -11,7 +10,8 @@
     "comment-format": [
       true,
       "check-space",
-      "check-lowercase"
+      "check-lowercase",
+      {"ignore-words": ["TODO", "HACK"]}
     ],
     "curly": true,
     "eofline": true,
@@ -23,15 +23,14 @@
     "label-undefined": true,
     "max-line-length": [ true, 140 ],
     "member-ordering": [
-      true,
-      "public-before-private",
-      "static-before-instance",
-      "variables-before-functions"
+      true, {
+        "order": "fields-first"
+      }
     ],
     "no-any": false,
     "no-arg": true,
     "no-bitwise": true,
-    "no-consecutive-blank-lines": true,
+    "no-consecutive-blank-lines": [ true, 2 ],
     "no-console": [
       true,
       "debug",
@@ -48,6 +47,7 @@
     "no-duplicate-variable": true,
     "no-empty": true,
     "no-eval": true,
+    "no-inferrable-types": true,
     "no-internal-module": true,
     "no-require-imports": false,
     "no-string-literal": true,
@@ -59,15 +59,19 @@
     "no-use-before-declare": true,
     "no-var-keyword": true,
     "no-var-requires": true,
+    "object-literal-key-quotes": [ true, "as-needed" ],
+    "object-literal-shorthand": true,
     "one-line": [
       true,
       "check-open-brace",
       "check-catch",
       "check-whitespace"
     ],
+    "promise-function-async": true,
     "quotemark": [ true, "double" ],
     "radix": true,
-    "semicolon": true,
+    "semicolon": [ true, "always", "ignore-interfaces" ],
+    "strict-type-predicates": true,
     "switch-default": true,
     "trailing-comma": [true, {
       "singleline": "never",
@@ -75,8 +79,7 @@
     }],
     "triple-equals": [ true, "allow-null-check" ],
     "typedef": [
-      false,
-      "call-signature",
+      true,
       "parameter",
       "property-declaration",
       "member-variable-declaration"
