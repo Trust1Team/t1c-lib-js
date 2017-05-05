@@ -1,6 +1,7 @@
 /**
  * @author Maarten Casteels
  * @author Michallis Pashidis
+ * @author Maarten Somers
  * @since 2016
  */
 
@@ -31,7 +32,7 @@ class GCLConfig {
     private _localTestMode:boolean;
 
     // constructor for DTO
-    constructor(dsUriValue?:string, apiKey?:string){
+    constructor (dsUriValue? :string, apiKey? :string) {
         this._gclUrl = defaultGclUrl;
         this._dsUrl = dsUriValue + defaultDSContextPath;
         this._ocvUrl = dsUriValue + defaultOCVContextPath;
@@ -44,20 +45,20 @@ class GCLConfig {
         this._localTestMode = defaultLocalTestMode;
     }
 
-    get ocvUrl(): string {
+    get ocvUrl() :string {
         return this._ocvUrl;
     }
 
-    set ocvUrl(value: string) {
+    set ocvUrl(value :string) {
         this._ocvUrl = value;
     }
 
-    get gclUrl():string {
+    get gclUrl() :string {
         return this._gclUrl;
     }
 
-    set gclUrl(value:string) {
-        this._gclUrl = value||defaultGclUrl;
+    set gclUrl(value :string) {
+        this._gclUrl = value || defaultGclUrl;
     }
 
     get dsUrl():string {
@@ -124,7 +125,6 @@ class GCLConfig {
         this._implicitDownload = value;
     }
 
-
     get dsFilDownloadUrl():string {
         return this._dsFileDownloadUrl;
     }
@@ -132,7 +132,6 @@ class GCLConfig {
     get dsUrlBase() {
         return this._dsUrlBase;
     }
-
 
     get localTestMode(): boolean {
         return this._localTestMode;
