@@ -6,7 +6,7 @@ import { Connection } from "../client/Connection";
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 import * as _ from "lodash";
 import * as platform from "platform";
-import * as CoreModel from "../model/CoreModel";
+import * as CoreModel from "./CoreModel";
 
 const CORE_INFO = "/";
 const CORE_PLUGINS = "/plugins";
@@ -20,22 +20,6 @@ class CoreService implements CoreModel.AbstractCore {
 
     private static cardInsertedFilter(inserted: boolean): {} {
         return { "card-inserted": inserted };
-    }
-
-    /**
-     * Checks for card element in readers response
-     * @param readers
-     * @returns {any}
-     */
-    // TODO remove and use card-inserted query param
-    private static checkReadersForCardObject(readers: CoreModel.CardReader[]): CoreModel.CardReader {
-        if (!_.isEmpty(readers)) {
-            _.forEach(readers, (reader: CoreModel.CardReader) => {
-                if (reader.card) { return reader; }
-            });
-        } else {
-            return null;
-        }
     }
 
     private static platformInfo(): CoreModel.BrowserInfoResponse {
@@ -87,35 +71,37 @@ class CoreService implements CoreModel.AbstractCore {
         let self = this;
 
         // recursive function
-        cardTimeout(callback, cardTimeoutCb, connectReaderCb, insertCardCb);
-        function cardTimeout(cb: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
-                             rtcb: () => void,
-                             crcb: () => void,
-                             iccb: () => void) {
-            setTimeout(function () {
-                // console.debug("seconds left:",maxSeconds);
+        poll();
+
+        function poll() {
+            _.delay(function () {
                 --maxSeconds;
-                self.readers(function(error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) {
+                self.readers(function (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) {
                     if (error) {
-                        crcb(); // ask to connect reader
-                        cardTimeout(cb, rtcb, crcb, iccb); // no reader found and waiting - recursive call
+                        connectReaderCb();
+                        poll();
                     }
-                    // no error but stop
-                    if (maxSeconds === 0) { return rtcb(); } // reader timeout
-                    else if (data.data.length === 0) {
-                        crcb(); // ask to connect reader
-                        cardTimeout(cb, rtcb, crcb, iccb);
-                    } else {
-                        let readerWithCard = CoreService.checkReadersForCardObject(data.data);
-                        if (readerWithCard != null) {
-                            return cb(null, { data: [readerWithCard], success: true });
+                    if (maxSeconds === 0) { return cardTimeoutCb(); } // reader timeout
+                    else if (!_.isEmpty(data.data)) {
+                        // there are some readers, check if one of them has a card
+                        let readersWithCards = _.filter(data.data, function (reader: CoreModel.CardReader) {
+                            return _.has(reader, "card");
+                        });
+                        if (readersWithCards.length) {
+                            // reader with card found (at least one), return data
+                            return callback(null, { data: readersWithCards, success: true });
                         } else {
-                            iccb();
-                            cardTimeout(cb, rtcb, crcb, iccb);
+                            // no readers with card found, continue polling
+                            insertCardCb();
+                            poll();
                         }
+                    } else {
+                        // length is zero, no readers connected
+                        connectReaderCb();
+                        poll();
                     }
                 });
-            },         1000);
+            }, 1000);
         }
     }
 
@@ -127,25 +113,24 @@ class CoreService implements CoreModel.AbstractCore {
         let self = this;
 
         // recursive function
-        readerTimeout(callback, readerTimeoutCb, connectReaderCb);
-        function readerTimeout(cb: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
-                               rtcb: () => void,
-                               crcb: () => void) {
-            setTimeout(function () {
+        poll();
+
+        function poll() {
+            _.delay(function () {
                 --maxSeconds;
                 self.readers(function(error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse): void {
                     if (error) {
-                        crcb(); // ask to connect reader
-                        readerTimeout(cb, rtcb, crcb); // no reader found and waiting - recursive call
+                        connectReaderCb(); // ask to connect reader
+                        poll(); // no reader found and waiting - recursive call
                     }
                     // no error but stop
-                    if (maxSeconds === 0) { return rtcb(); } // reader timeout
-                    else if (data.data.length === 0) {
-                        crcb(); // ask to connect reader
-                        readerTimeout(cb, rtcb, crcb);
+                    if (maxSeconds === 0) { return readerTimeoutCb(); } // reader timeout
+                    else if (_.isEmpty(data.data)) {
+                        connectReaderCb(); // ask to connect reader
+                        poll();
                     }
                     else {
-                        return cb(null, data);
+                        return callback(null, data);
                     }
                 });
             }, 1000);

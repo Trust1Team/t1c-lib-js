@@ -40,6 +40,7 @@ interface AbstractCore {
 }
 
 interface T1CResponse {
+    data?: {}
     success: boolean
 }
 
@@ -64,7 +65,7 @@ interface BrowserInfoResponse extends T1CResponse {
         os: {
             name: string
             version: string
-            architecture: string
+            architecture: number
         }
         ua: string
     }
@@ -103,4 +104,4 @@ interface PubKeyResponse extends T1CResponse {
 }
 
 export { AbstractCore, T1CResponse, InfoResponse, BrowserInfoResponse, Card, CardReader,
-    CardReadersResponse, SingleReaderResponse, PluginsResponse, PubKeyResponse }
+    CardReadersResponse, SingleReaderResponse, PluginsResponse, PubKeyResponse };

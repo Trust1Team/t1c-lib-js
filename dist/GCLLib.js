@@ -85,7 +85,7 @@ var GCLLib =
 	        else {
 	            this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg);
 	        }
-	        this.ocvClient = new OCVClient_1.OCVClient(this.cfg.ocvUrl, this.remoteConnection, this.cfg);
+	        this.ocvClient = new OCVClient_1.OCVClient(this.cfg.ocvUrl, this.remoteConnection);
 	        if (this.cfg.implicitDownload && true) {
 	            this.implicitDownload();
 	        }
@@ -125,7 +125,6 @@ var GCLLib =
 	        this.core().getPubKey(function (err) {
 	            if (err && err.data && !err.data.success) {
 	                self.dsClient.getPubKey(function (error, dsResponse) {
-	                    void 0;
 	                    if (err) {
 	                        return clientCb(err, null);
 	                    }
@@ -168,7 +167,7 @@ var GCLLib =
 	                            return;
 	                        }
 	                        mergedInfo.activated = true;
-	                        self.dsClient.sync(info, uuid, function (syncError) {
+	                        self.dsClient.sync(mergedInfo, uuid, function (syncError) {
 	                            if (syncError) {
 	                                void 0;
 	                                return;
@@ -17323,10 +17322,11 @@ var GCLLib =
 
 /***/ },
 /* 3 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
+	var _ = __webpack_require__(1);
 	var defaultGclUrl = "https://localhost:10443/v1";
 	var defaultDSUrl = "https://accapim.t1t.be:443";
 	var defaultDSContextPath = "/trust1team/gclds/v1";
@@ -17344,7 +17344,7 @@ var GCLLib =
 	        this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
 	        this._dsUrlBase = dsUriValue;
 	        this._apiKey = apiKey;
-	        this._jwt = 'none';
+	        this._jwt = "none";
 	        this._allowAutoUpdate = defaultAllowAutoUpdate;
 	        this._implicitDownload = defaultImplicitDownload;
 	        this._localTestMode = defaultLocalTestMode;
@@ -17374,8 +17374,8 @@ var GCLLib =
 	            return this._dsUrl;
 	        },
 	        set: function (dsUriValue) {
-	            if (strEndsWith(dsUriValue, defaultDSContextPath)) {
-	                this._dsUrlBase = dsUriValue.replace(defaultDSContextPath, '');
+	            if (_.endsWith(dsUriValue, defaultDSContextPath)) {
+	                this._dsUrlBase = _.replace(dsUriValue, defaultDSContextPath, "");
 	                this._dsUrl = dsUriValue;
 	                this._dsFileDownloadUrl = this._dsUrlBase + fileDownloadUrlPostfix;
 	            }
@@ -17468,8 +17468,9 @@ var GCLLib =
 	        },
 	        set: function (value) {
 	            this._localTestMode = value;
-	            if (this._localTestMode)
+	            if (this._localTestMode) {
 	                this._dsUrl = this._dsUrlBase + defaultDSContextPathTestMode;
+	            }
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -17477,9 +17478,6 @@ var GCLLib =
 	    return GCLConfig;
 	}());
 	exports.GCLConfig = GCLConfig;
-	function strEndsWith(str, suffix) {
-	    return str.match(suffix + "$") == suffix;
-	}
 
 
 /***/ },
@@ -18281,18 +18279,6 @@ var GCLLib =
 	    CoreService.cardInsertedFilter = function (inserted) {
 	        return { "card-inserted": inserted };
 	    };
-	    CoreService.checkReadersForCardObject = function (readers) {
-	        if (!_.isEmpty(readers)) {
-	            _.forEach(readers, function (reader) {
-	                if (reader.card) {
-	                    return reader;
-	                }
-	            });
-	        }
-	        else {
-	            return null;
-	        }
-	    };
 	    CoreService.platformInfo = function () {
 	        return {
 	            data: {
@@ -18329,31 +18315,33 @@ var GCLLib =
 	    CoreService.prototype.pollCardInserted = function (secondsToPollCard, callback, connectReaderCb, insertCardCb, cardTimeoutCb) {
 	        var maxSeconds = secondsToPollCard;
 	        var self = this;
-	        cardTimeout(callback, cardTimeoutCb, connectReaderCb, insertCardCb);
-	        function cardTimeout(cb, rtcb, crcb, iccb) {
-	            setTimeout(function () {
+	        poll();
+	        function poll() {
+	            _.delay(function () {
 	                --maxSeconds;
 	                self.readers(function (error, data) {
 	                    if (error) {
-	                        crcb();
-	                        cardTimeout(cb, rtcb, crcb, iccb);
+	                        connectReaderCb();
+	                        poll();
 	                    }
 	                    if (maxSeconds === 0) {
-	                        return rtcb();
+	                        return cardTimeoutCb();
 	                    }
-	                    else if (data.data.length === 0) {
-	                        crcb();
-	                        cardTimeout(cb, rtcb, crcb, iccb);
-	                    }
-	                    else {
-	                        var readerWithCard = CoreService.checkReadersForCardObject(data.data);
-	                        if (readerWithCard != null) {
-	                            return cb(null, { data: [readerWithCard], success: true });
+	                    else if (!_.isEmpty(data.data)) {
+	                        var readersWithCards = _.filter(data.data, function (reader) {
+	                            return _.has(reader, "card");
+	                        });
+	                        if (readersWithCards.length) {
+	                            return callback(null, { data: readersWithCards, success: true });
 	                        }
 	                        else {
-	                            iccb();
-	                            cardTimeout(cb, rtcb, crcb, iccb);
+	                            insertCardCb();
+	                            poll();
 	                        }
+	                    }
+	                    else {
+	                        connectReaderCb();
+	                        poll();
 	                    }
 	                });
 	            }, 1000);
@@ -18362,24 +18350,24 @@ var GCLLib =
 	    CoreService.prototype.pollReaders = function (secondsToPollReader, callback, connectReaderCb, readerTimeoutCb) {
 	        var maxSeconds = secondsToPollReader;
 	        var self = this;
-	        readerTimeout(callback, readerTimeoutCb, connectReaderCb);
-	        function readerTimeout(cb, rtcb, crcb) {
-	            setTimeout(function () {
+	        poll();
+	        function poll() {
+	            _.delay(function () {
 	                --maxSeconds;
 	                self.readers(function (error, data) {
 	                    if (error) {
-	                        crcb();
-	                        readerTimeout(cb, rtcb, crcb);
+	                        connectReaderCb();
+	                        poll();
 	                    }
 	                    if (maxSeconds === 0) {
-	                        return rtcb();
+	                        return readerTimeoutCb();
 	                    }
-	                    else if (data.data.length === 0) {
-	                        crcb();
-	                        readerTimeout(cb, rtcb, crcb);
+	                    else if (_.isEmpty(data.data)) {
+	                        connectReaderCb();
+	                        poll();
 	                    }
 	                    else {
-	                        return cb(null, data);
+	                        return callback(null, data);
 	                    }
 	                });
 	            }, 1000);
@@ -19583,13 +19571,13 @@ var GCLLib =
 	        this.cfg = cfg;
 	    }
 	    LocalAuthConnection.prototype.get = function (url, callback, queryParams) {
-	        return handleRequest(url, 'GET', callback, undefined, queryParams, undefined, this.cfg.jwt);
+	        return handleRequest(url, "GET", callback, undefined, queryParams, undefined, this.cfg.jwt);
 	    };
-	    LocalAuthConnection.prototype.post = function (url, body, callback) {
-	        return handleRequest(url, 'POST', callback, body, undefined, undefined, this.cfg.jwt);
+	    LocalAuthConnection.prototype.post = function (url, body, callback, queryParams) {
+	        return handleRequest(url, "POST", callback, body, undefined, undefined, this.cfg.jwt);
 	    };
-	    LocalAuthConnection.prototype.put = function (url, body, callback) {
-	        return handleRequest(url, 'PUT', callback, body, undefined, undefined, this.cfg.jwt);
+	    LocalAuthConnection.prototype.put = function (url, body, callback, queryParams) {
+	        return handleRequest(url, "PUT", callback, body, undefined, undefined, this.cfg.jwt);
 	    };
 	    return LocalAuthConnection;
 	}());
@@ -19599,13 +19587,13 @@ var GCLLib =
 	        this.cfg = cfg;
 	    }
 	    LocalConnection.prototype.get = function (url, callback, queryParams) {
-	        return handleRequest(url, 'GET', callback, undefined, queryParams, undefined, this.cfg.jwt);
+	        return handleRequest(url, "GET", callback, undefined, queryParams, undefined, this.cfg.jwt);
 	    };
 	    LocalConnection.prototype.post = function (url, body, callback, queryParams) {
-	        return handleRequest(url, 'POST', callback, body, queryParams, undefined, this.cfg.jwt);
+	        return handleRequest(url, "POST", callback, body, queryParams, undefined, this.cfg.jwt);
 	    };
-	    LocalConnection.prototype.put = function (url, body, callback) {
-	        return handleRequest(url, 'PUT', callback, body, undefined, undefined, this.cfg.jwt);
+	    LocalConnection.prototype.put = function (url, body, callback, queryParams) {
+	        return handleRequest(url, "PUT", callback, body, undefined, undefined, this.cfg.jwt);
 	    };
 	    return LocalConnection;
 	}());
@@ -19615,13 +19603,13 @@ var GCLLib =
 	        this.cfg = cfg;
 	    }
 	    RemoteConnection.prototype.get = function (url, callback, queryParams) {
-	        return handleRequest(url, 'GET', callback, undefined, queryParams, this.cfg.apiKey, undefined);
+	        return handleRequest(url, "GET", callback, undefined, queryParams, this.cfg.apiKey, undefined);
 	    };
-	    RemoteConnection.prototype.post = function (url, body, callback) {
-	        return handleRequest(url, 'POST', callback, body, undefined, this.cfg.apiKey, undefined);
+	    RemoteConnection.prototype.post = function (url, body, callback, queryParams) {
+	        return handleRequest(url, "POST", callback, body, undefined, this.cfg.apiKey, undefined);
 	    };
-	    RemoteConnection.prototype.put = function (url, body, callback) {
-	        return handleRequest(url, 'PUT', callback, body, undefined, this.cfg.apiKey, undefined);
+	    RemoteConnection.prototype.put = function (url, body, callback, queryParams) {
+	        return handleRequest(url, "PUT", callback, body, undefined, this.cfg.apiKey, undefined);
 	    };
 	    return RemoteConnection;
 	}());
@@ -19631,13 +19619,13 @@ var GCLLib =
 	        this.cfg = cfg;
 	    }
 	    LocalTestConnection.prototype.get = function (url, callback, queryParams) {
-	        return handleTestRequest(url, 'GET', callback, undefined, queryParams, undefined);
+	        return handleTestRequest(url, "GET", callback, undefined, queryParams, undefined);
 	    };
-	    LocalTestConnection.prototype.post = function (url, body, callback) {
-	        return handleTestRequest(url, 'POST', callback, body, undefined, undefined);
+	    LocalTestConnection.prototype.post = function (url, body, callback, queryParams) {
+	        return handleTestRequest(url, "POST", callback, body, undefined, undefined);
 	    };
-	    LocalTestConnection.prototype.put = function (url, body, callback) {
-	        return handleTestRequest(url, 'PUT', callback, body, undefined, undefined);
+	    LocalTestConnection.prototype.put = function (url, body, callback, queryParams) {
+	        return handleTestRequest(url, "PUT", callback, body, undefined, undefined);
 	    };
 	    return LocalTestConnection;
 	}());
@@ -19647,26 +19635,31 @@ var GCLLib =
 	        url: url,
 	        method: method,
 	        headers: {
-	            'Accept-Language': 'en-US'
+	            "Accept-Language": "en-US"
 	        },
-	        responseType: 'json'
+	        responseType: "json"
 	    };
-	    if (body)
-	        request['data'] = body;
-	    if (params) {
-	        request['params'] = params;
+	    if (body) {
+	        request.data = body;
 	    }
-	    if (apikey)
-	        request.headers['apikey'] = apikey;
-	    if (jwt)
-	        request.headers['Authorization'] = 'Bearer ' + jwt;
+	    if (params) {
+	        request.params = params;
+	    }
+	    if (apikey) {
+	        request.headers.apikey = apikey;
+	    }
+	    if (jwt) {
+	        request.headers.Authorization = "Bearer " + jwt;
+	    }
 	    axios_1.default.request(request).then(function (response) {
 	        return callback(null, response.data);
 	    }).catch(function (error) {
-	        if (error.response)
+	        if (error.response) {
 	            return callback(error.response, null);
-	        else
+	        }
+	        else {
 	            return callback(error, null);
+	        }
 	    });
 	}
 	function handleTestRequest(url, method, callback, body, params, jwt) {
@@ -19674,25 +19667,29 @@ var GCLLib =
 	        url: url,
 	        method: method,
 	        headers: {
-	            'Accept-Language': 'en-US'
+	            "Accept-Language": "en-US",
+	            "X-Consumer-Username": "testorg.testapp.v1"
 	        },
-	        responseType: 'json'
+	        responseType: "json"
 	    };
-	    if (body)
-	        request['data'] = body;
-	    if (params) {
-	        request['params'] = params;
+	    if (body) {
+	        request.data = body;
 	    }
-	    request.headers['X-Consumer-Username'] = "testorg.testapp.v1";
-	    if (jwt)
-	        request.headers['Authorization'] = 'Bearer ' + jwt;
+	    if (params) {
+	        request.params = params;
+	    }
+	    if (jwt) {
+	        request.headers.Authorization = "Bearer " + jwt;
+	    }
 	    axios_1.default.request(request).then(function (response) {
 	        return callback(null, response.data);
 	    }).catch(function (error) {
-	        if (error.response)
+	        if (error.response) {
 	            return callback(error.response, null);
-	        else
+	        }
+	        else {
 	            return callback(error, null);
+	        }
 	    });
 	}
 
@@ -21374,10 +21371,11 @@ var GCLLib =
 
 /***/ },
 /* 43 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
+	var _ = __webpack_require__(1);
 	var SEPARATOR = "/";
 	var QP_APIKEY = "?apikey=";
 	var SECURITY = "/security";
@@ -21397,18 +21395,21 @@ var GCLLib =
 	    DSClient.prototype.getInfo = function (callback) {
 	        var consumerCb = callback;
 	        this.connection.get(this.url + SYS_INFO, function (error, data) {
-	            if (error)
+	            if (error) {
 	                return consumerCb(error, null);
+	            }
 	            return consumerCb(null, data);
 	        });
 	    };
 	    DSClient.prototype.getDevice = function (uuid, callback) {
 	        var consumerCb = callback;
 	        this.connection.get(this.url + DEVICE + SEPARATOR + uuid, function (error, data) {
-	            if (error)
+	            if (error) {
 	                return consumerCb(error, null);
-	            if (data)
+	            }
+	            if (data) {
 	                return consumerCb(null, data);
+	            }
 	            return consumerCb(null, data);
 	        });
 	    };
@@ -21416,65 +21417,42 @@ var GCLLib =
 	        var consumerCb = callback;
 	        var self_cfg = this.cfg;
 	        this.connection.get(this.url + SECURITY_JWT_ISSUE, function (error, data) {
-	            if (error)
+	            if (error) {
 	                return consumerCb(error, null);
-	            if (data && data.token)
+	            }
+	            if (data && data.token) {
 	                self_cfg.jwt = data.token;
+	            }
 	            return consumerCb(null, data);
 	        });
 	    };
 	    DSClient.prototype.refreshJWT = function (callback) {
 	        var actualJWT = this.cfg.jwt;
 	        if (actualJWT) {
-	            var _body = {};
-	            _body.originalJWT = actualJWT;
-	            this.connection.post(this.url + SECURITY_JWT_REFRESH, _body, callback);
+	            this.connection.post(this.url + SECURITY_JWT_REFRESH, { originalJWT: actualJWT }, callback);
 	        }
 	        else {
-	            var noJWT = {};
-	            noJWT.code = '500';
-	            noJWT.description = 'No JWT available';
-	            noJWT.status = 412;
-	            callback(noJWT, null);
+	            callback({ code: "500", description: "No JWT available", status: 412 }, null);
 	        }
 	    };
 	    DSClient.prototype.getPubKey = function (callback) {
 	        this.connection.get(this.url + PUB_KEY, callback);
 	    };
 	    DSClient.prototype.downloadLink = function (infoBrowser, callback) {
-	        var _dsBase = this.cfg.dsUrlBase;
-	        var _apikey = this.cfg.apiKey;
 	        this.connection.post(this.url + DOWNLOAD, infoBrowser, function (err, data) {
-	            if (err)
+	            if (err) {
 	                return callback(err, null);
-	            var _res = {};
-	            _res.url = _dsBase + data.path + QP_APIKEY + _apikey;
-	            return callback(null, _res);
+	            }
+	            return callback(null, { url: this.cfg.dsUrlBase + data.path + QP_APIKEY + this.cfg.apiKey });
 	        });
 	    };
 	    DSClient.prototype.register = function (info, device_id, callback) {
-	        var _req = {};
-	        _req.uuid = device_id;
-	        _req.browser = info.browser;
-	        _req.os = info.os;
-	        _req.manufacturer = info.manufacturer;
-	        _req.ua = info.ua;
-	        _req.activated = info.activated;
-	        _req.managed = info.managed;
-	        _req.version = info.core_version;
-	        this.connection.put(this.url + DEVICE + SEPARATOR + device_id, _req, callback);
+	        var req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, "core_version"));
+	        this.connection.put(this.url + DEVICE + SEPARATOR + device_id, req, callback);
 	    };
 	    DSClient.prototype.sync = function (info, device_id, callback) {
-	        var _req = {};
-	        _req.uuid = device_id;
-	        _req.browser = info.browser;
-	        _req.os = info.os;
-	        _req.manufacturer = info.manufacturer;
-	        _req.ua = info.ua;
-	        _req.activated = info.activated;
-	        _req.managed = info.managed;
-	        _req.version = info.core_version;
-	        this.connection.post(this.url + DEVICE + SEPARATOR + device_id, _req, callback);
+	        var req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, "core_version"));
+	        this.connection.post(this.url + DEVICE + SEPARATOR + device_id, req, callback);
 	    };
 	    return DSClient;
 	}());
@@ -21492,47 +21470,37 @@ var GCLLib =
 	var SYSTEM_STATUS = "/system/status";
 	var SIGNATURE = "/signature/validate";
 	var OCVClient = (function () {
-	    function OCVClient(url, connection, cfg) {
+	    function OCVClient(url, connection) {
 	        this.url = url;
 	        this.connection = connection;
-	        this.cfg = cfg;
 	    }
 	    OCVClient.prototype.getUrl = function () { return this.url; };
 	    OCVClient.prototype.validateSignature = function (data, callback) {
-	        var _req = {};
-	        _req.rawData = data.rawData;
-	        _req.signature = data.signedData;
-	        _req.certificate = data.signingCert;
-	        this.connection.post(this.url + SIGNATURE, _req, callback);
+	        this.connection.post(this.url + SIGNATURE, data, callback);
 	    };
 	    OCVClient.prototype.getInfo = function (callback) {
 	        var cb = callback;
 	        this.connection.get(this.url + SYSTEM_STATUS, function (error, data) {
-	            if (error)
+	            if (error) {
 	                return cb(error, null);
+	            }
 	            return cb(null, data);
 	        });
 	    };
 	    OCVClient.prototype.getChallenge = function (digestAlgorithm, callback) {
 	        var consumerCb = callback;
 	        this.connection.get(this.url + CHALLENGE, function (error, data) {
-	            if (error)
+	            if (error) {
 	                return consumerCb(error, null);
+	            }
 	            return consumerCb(null, data);
 	        }, { digest: digestAlgorithm });
 	    };
 	    OCVClient.prototype.validateChallengeSignedHash = function (data, callback) {
-	        var _req = {};
-	        _req.base64Signature = data.base64Signature;
-	        _req.base64Certificate = data.base64Certificate;
-	        _req.hash = data.hash;
-	        _req.digestAlgorithm = data.digestAlgorithm;
-	        this.connection.post(this.url + CHALLENGE, _req, callback);
+	        this.connection.post(this.url + CHALLENGE, data, callback);
 	    };
 	    OCVClient.prototype.validateCertificateChain = function (data, callback) {
-	        var _req = {};
-	        _req.certificateChain = data.certificateChain;
-	        this.connection.post(this.url + CERTIFICATE, _req, callback);
+	        this.connection.post(this.url + CERTIFICATE, data, callback);
 	    };
 	    return OCVClient;
 	}());

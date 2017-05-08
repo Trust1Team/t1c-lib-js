@@ -12,9 +12,10 @@ import { CardFactory } from "../Plugins/smartcards/CardFactory";
 import { AbstractEidBE } from "../Plugins/smartcards/eid/be/EidBe";
 import { AbstractEidLUX } from "../Plugins/smartcards/eid/lux/EidLux";
 import { AbstractEMV } from "../Plugins/smartcards/emv/EMV";
-import { CoreService } from "./services/CoreService";
+import { CoreService } from "./service/CoreService";
 import { LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection } from "./client/Connection";
-import { AbstractDSClient, DSClient } from "./ds/DSClient";
+import { AbstractDSClient, DownloadLinkResponse, JWTResponse } from "./ds/DSClientModel";
+import { DSClient } from "./ds/DSClient";
 import { AbstractOCVClient, OCVClient } from "./ocv/OCVClient";
 import { AbstractMobib } from "../Plugins/smartcards/mobib/mobib";
 import { AbstractLuxTrust } from "../Plugins/smartcards/pki/LuxTrust";
@@ -22,7 +23,7 @@ import { AbstractOcra } from "../Plugins/smartcards/ocra/ocra";
 import { AbstractAventra } from "../Plugins/smartcards/pki/Aventra";
 import { AbstractOberthur } from "../Plugins/smartcards/pki/Oberthur";
 import { AbstractPiv } from "../Plugins/smartcards/piv/piv";
-import { InfoResponse } from "./model/CoreModel";
+import { InfoResponse } from "./service/CoreModel";
 
 
 class GCLClient {
@@ -49,7 +50,7 @@ class GCLClient {
         this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
         if (this.cfg.localTestMode) { this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg); }
         else { this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg); }
-        this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteConnection, this.cfg);
+        this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteConnection);
 
         // check if implicit download has been set
         if (this.cfg.implicitDownload && true) { this.implicitDownload(); }
@@ -121,14 +122,14 @@ class GCLClient {
     /**
      * Init security context
      */
-    private initSecurityContext(cb) {
+    // TODO rework
+    private initSecurityContext(cb: (error: CoreExceptions.RestException, data: {}) => void) {
         let self = this;
         let clientCb = cb;
         this.core().getPubKey(function(err: any) {
             if (err && err.data && !err.data.success) {
                 // console.log('no certificate set - retrieve cert from DS');
                 self.dsClient.getPubKey(function(error: any, dsResponse: any) {
-                    console.log(dsResponse);
                     if (err) { return clientCb(err, null); }
                     let innerCb = clientCb;
 
@@ -147,7 +148,7 @@ class GCLClient {
         let self = this;
         let self_cfg = this.cfg;
         // get GCL info
-        self.core().info(function(err, infoResponse: InfoResponse) {
+        self.core().info(function(err: CoreExceptions.RestException, infoResponse: InfoResponse) {
             if (err) {
                 console.log(JSON.stringify(err));
                 return;
@@ -162,7 +163,7 @@ class GCLClient {
             if (!activated) {
                 // we need to register the device
                 // console.log("Register device:"+uuid);
-                self.dsClient.register(mergedInfo, uuid, function(error, activationResponse) {
+                self.dsClient.register(mergedInfo, uuid, function(error: CoreExceptions.RestException, activationResponse: JWTResponse) {
                     if (err) {
                         console.log("Error while registering the device: " + JSON.stringify(err));
                         return;
@@ -175,7 +176,7 @@ class GCLClient {
                         }
                         // sync
                         mergedInfo.activated = true;
-                        self.dsClient.sync(info, uuid, function(syncError) {
+                        self.dsClient.sync(mergedInfo, uuid, function(syncError: CoreExceptions.RestException) {
                             if (syncError) {
                                 console.log("Error while syncing the device: " + JSON.stringify(syncError));
                                 return;
@@ -186,7 +187,7 @@ class GCLClient {
             } else {
                 // we need to synchronize the device
                 // console.log("Sync device:"+uuid);
-                self.dsClient.sync(mergedInfo, uuid, function(syncError, activationResponse) {
+                self.dsClient.sync(mergedInfo, uuid, function(syncError: CoreExceptions.RestException, activationResponse: JWTResponse) {
                     if (syncError) {
                         console.log("Error while syncing the device: " + JSON.stringify(syncError));
                         return;
@@ -207,7 +208,7 @@ class GCLClient {
                 // no gcl available - start download
                 let _info = self.core().infoBrowserSync();
                 console.log("implicit error", JSON.stringify(_info));
-                self.ds().downloadLink(_info, function(linkError: CoreExceptions.RestException, downloadResponse) {
+                self.ds().downloadLink(_info, function(linkError: CoreExceptions.RestException, downloadResponse: DownloadLinkResponse) {
                     if (linkError) { console.error("could not download GCL package:", linkError.description); }
                     window.open(downloadResponse.url); return;
                 });
