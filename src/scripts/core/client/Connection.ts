@@ -1,135 +1,146 @@
 /**
  * @author Maarten Casteels
  * @author Michallis Pashidis
+ * @author Maarten Somers
  * @since 2016
  */
 ///<reference path="../../../../typings/index.d.ts"/>
 
 import {GCLConfig} from "../GCLConfig";
-import axios from "axios";
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
+import { RestException } from "../exceptions/CoreExceptions";
 
 interface Connection {
-    get(url:string, callback:(error:any, data:any) => void, queryParams?:any);
-    post(url:string, body:any, callback:(error:any, data:any) => void);
-    put(url:string, body:any, callback:(error:any, data:any) => void);
+    get(url: string, callback: (error: any, data: any) => void, queryParams?: any);
+    post(url: string, body: any, callback: (error: any, data: any) => void);
+    put(url: string, body: any, callback: (error: any, data: any) => void);
 }
 
 class LocalAuthConnection implements Connection {
-    constructor(private cfg:GCLConfig) {}
+    constructor(private cfg:  GCLConfig) {}
 
     // using Callback
-    public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void {
-        return handleRequest(url, 'GET', callback, undefined, queryParams, undefined, this.cfg.jwt);
+    public get(url: string, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
+        return handleRequest(url, "GET", callback, undefined, queryParams, undefined, this.cfg.jwt);
     }
 
-    public post(url:string, body:any, callback:(error:any, data:any) => void):void{
-        return handleRequest(url, 'POST', callback, body, undefined, undefined, this.cfg.jwt);
+    public post(url: string, body: any, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
+        return handleRequest(url, "POST", callback, body, undefined, undefined, this.cfg.jwt);
     }
 
-    public put(url:string, body:any, callback:(error:any, data:any) => void):void{
-        return handleRequest(url, 'PUT', callback, body, undefined, undefined, this.cfg.jwt);
+    public put(url: string, body: any, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
+        return handleRequest(url, "PUT", callback, body, undefined, undefined, this.cfg.jwt);
     }
 }
 
 class LocalConnection implements Connection {
-    constructor(private cfg:GCLConfig) {}
+    constructor(private cfg: GCLConfig) {}
 
-    public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
-        return handleRequest(url, 'GET', callback, undefined, queryParams, undefined, this.cfg.jwt);
+    public get(url: string, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
+        return handleRequest(url, "GET", callback, undefined, queryParams, undefined, this.cfg.jwt);
     }
 
-    public post(url:string, body:any, callback:(error:any, data:any) => void, queryParams?:any):void{
-        return handleRequest(url, 'POST', callback, body, queryParams, undefined, this.cfg.jwt);
+    public post(url: string, body: any, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
+        return handleRequest(url, "POST", callback, body, queryParams, undefined, this.cfg.jwt);
     }
 
-    public put(url:string, body:any, callback:(error:any, data:any) => void):void{
-        return handleRequest(url, 'PUT', callback, body, undefined, undefined, this.cfg.jwt);
+    public put(url: string, body: any, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
+        return handleRequest(url, "PUT", callback, body, undefined, undefined, this.cfg.jwt);
     }
 }
 
 class RemoteConnection implements Connection {
-    constructor(private cfg:GCLConfig) {}
+    constructor(private cfg: GCLConfig) {}
 
     // using Callback
-    public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
-        return handleRequest(url, 'GET', callback, undefined, queryParams, this.cfg.apiKey, undefined);
+    public get(url: string, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string} ): void {
+        return handleRequest(url, "GET", callback, undefined, queryParams, this.cfg.apiKey, undefined);
     }
 
-    public post(url:string, body:any, callback:(error:any, data:any) => void):void{
-        return handleRequest(url, 'POST', callback, body, undefined, this.cfg.apiKey, undefined);
+    public post(url: string, body: any, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
+        return handleRequest(url, "POST", callback, body, undefined, this.cfg.apiKey, undefined);
     }
 
-    public put(url:string, body:any, callback:(error:any, data:any) => void):void{
-        return handleRequest(url, 'PUT', callback, body, undefined, this.cfg.apiKey, undefined);
+    public put(url: string, body: any, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
+        return handleRequest(url, "PUT", callback, body, undefined, this.cfg.apiKey, undefined);
     }
 }
 
 class LocalTestConnection implements Connection {
-    constructor(private cfg:GCLConfig) {}
+    constructor(private cfg: GCLConfig) {}
 
     // using Callback
-    public get(url:string, callback:(error:any, data:any)=>void, queryParams?:any):void{
-        return handleTestRequest(url, 'GET', callback, undefined, queryParams, undefined);
+    public get(url: string, callback: (error: RestException, data: any) => void, queryParams?: { [key: string]: string }): void {
+        return handleTestRequest(url, "GET", callback, undefined, queryParams, undefined);
     }
 
-    public post(url:string, body:any, callback:(error:any, data:any) => void):void{
-        return handleTestRequest(url, 'POST', callback, body, undefined, undefined);
+    public post(url: string,
+                body: any,
+                callback: (error: RestException, data: any) => void, queryParams?: { [key: string]: string }): void {
+        return handleTestRequest(url, "POST", callback, body, undefined, undefined);
     }
 
-    public put(url:string, body:any, callback:(error:any, data:any) => void):void{
-        return handleTestRequest(url, 'PUT', callback, body, undefined, undefined);
+    public put(url: string, body: any, callback: (error: RestException, data: any) => void, queryParams?: { [key: string]: string }): void {
+        return handleTestRequest(url, "PUT", callback, body, undefined, undefined);
     }
 }
 
 
-function handleRequest(url:string, method:string, callback:(error:any, data:any) => void, body?:any, params?:any, apikey?:string, jwt?:string):void {
-    let request = {
-        url: url,
-        method: method,
-        headers: {
-            'Accept-Language': 'en-US'
+function handleRequest(url: string,
+                       method: string,
+                       callback: (error: any, data: any) => void,
+                       body?: any,
+                       params?: any,
+                       apikey?: string,
+                       jwt?: string): void {
+    let request: AxiosRequestConfig = {
+        url,
+        method,
+        headers:  {
+            "Accept-Language":  "en-US"
         },
-        responseType: 'json'
+        responseType:  "json"
     };
-    if (body) request['data'] = body;
-    if (params) {
-        request['params'] = params; //?filter=a,b,c&pin=123456
-    }
-    if (apikey) request.headers['apikey'] = apikey;
-    if (jwt) request.headers['Authorization'] = 'Bearer ' + jwt;
+    if (body) { request.data = body; }
+    if (params) { request.params = params; }
+    if (apikey) { request.headers.apikey = apikey; }
+    if (jwt) { request.headers.Authorization = "Bearer " + jwt; }
 
-    axios.request(request).then(function (response) {
+    axios.request(request).then(function (response: AxiosResponse) {
         return callback(null, response.data);
-    }).catch(function (error) {
-        if (error.response) return callback(error.response, null);
-        else return callback(error, null);
+    }).catch(function (error: AxiosError) {
+        if (error.response) { return callback(error.response, null); }
+        else { return callback(error, null); }
     });
 }
 
-function handleTestRequest(url:string, method:string, callback:(error:any, data:any) => void, body?:any, params?:any, jwt?:string):void {
-    let request = {
-        url: url,
-        method: method,
-        headers: {
-            'Accept-Language': 'en-US'
+function handleTestRequest(url: string,
+                           method: string,
+                           callback: (error: any, data: any) => void,
+                           body?: any,
+                           params?: any,
+                           jwt?: string): void {
+    let request: AxiosRequestConfig = {
+        url,
+        method,
+        headers:  {
+            "Accept-Language":  "en-US",
+            "X-Consumer-Username": "testorg.testapp.v1"
         },
-        responseType: 'json'
+        responseType:  "json"
     };
-    if (body) request['data'] = body;
-    if (params) {
-        request['params'] = params; //?filter=a,b,c&pin=123456
-    }
-    //resovled apikey - no gateway for local test
-    request.headers['X-Consumer-Username'] = "testorg.testapp.v1";
-    if (jwt) request.headers['Authorization'] = 'Bearer ' + jwt;
+    if (body) { request.data = body; }
+    if (params) { request.params = params; }
+    if (jwt) { request.headers.Authorization = "Bearer " + jwt; }
 
-    axios.request(request).then(function (response) {
+    axios.request(request).then(function (response: AxiosResponse) {
         return callback(null, response.data);
-    }).catch(function (error) {
-        if (error.response) return callback(error.response, null);
-        else return callback(error, null);
+    }).catch(function (error: AxiosError) {
+        if (error.response) { return callback(error.response, null); }
+        else { return callback(error, null); }
     });
 }
 
 
-export {LocalConnection,LocalAuthConnection,RemoteConnection,Connection,LocalTestConnection}
+export { LocalConnection, LocalAuthConnection, RemoteConnection, Connection, LocalTestConnection };
+
