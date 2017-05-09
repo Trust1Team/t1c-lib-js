@@ -29,4 +29,10 @@ interface VerifyPinData extends OptionalPin {
     private_key_reference: string
 }
 
-export { Card, CertCard, PinCard, AuthenticateOrSignData, VerifyPinData, OptionalPin };
+interface ResetPinData {
+    puk: string,
+    new_pin: string
+    private_key_reference: string
+}
+
+export { Card, CertCard, PinCard, AuthenticateOrSignData, ResetPinData, VerifyPinData, OptionalPin };

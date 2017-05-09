@@ -48,6 +48,10 @@ interface DataResponse extends T1CResponse {
     data: string
 }
 
+interface DataArrayResponse extends T1CResponse {
+    data: string[]
+}
+
 interface InfoResponse extends T1CResponse {
     data: {
         activated: boolean
@@ -107,5 +111,5 @@ interface PubKeyResponse extends T1CResponse {
     data: string
 }
 
-export { AbstractCore, T1CResponse, DataResponse, InfoResponse, BrowserInfoResponse, Card, CardReader,
+export { AbstractCore, T1CResponse, DataResponse, DataArrayResponse, InfoResponse, BrowserInfoResponse, Card, CardReader,
     CardReadersResponse, SingleReaderResponse, PluginsResponse, PubKeyResponse };
