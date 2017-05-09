@@ -2,9 +2,9 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from "../../../core/exceptions/CoreExceptions";
-import { DataArrayResponse, DataResponse, T1CResponse } from "../../../core/service/CoreModel";
-import { AuthenticateOrSignData, ResetPinData, VerifyPinData } from "../Card";
+import { RestException } from "../../../../core/exceptions/CoreExceptions";
+import { DataArrayResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import { AuthenticateOrSignData, ResetPinData, VerifyPinData } from "../../Card";
 
 interface AbstractAventra {
     allDataFilters(): string[];
