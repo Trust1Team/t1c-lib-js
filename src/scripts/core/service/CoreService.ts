@@ -82,7 +82,7 @@ class CoreService implements CoreModel.AbstractCore {
                         poll();
                     }
                     if (maxSeconds === 0) { return cardTimeoutCb(); } // reader timeout
-                    else if (!_.isEmpty(data.data)) {
+                    else if (!_.isEmpty(data) && !_.isEmpty(data.data)) {
                         // there are some readers, check if one of them has a card
                         let readersWithCards = _.filter(data.data, function (reader: CoreModel.CardReader) {
                             return _.has(reader, "card");
@@ -125,7 +125,7 @@ class CoreService implements CoreModel.AbstractCore {
                     }
                     // no error but stop
                     if (maxSeconds === 0) { return readerTimeoutCb(); } // reader timeout
-                    else if (_.isEmpty(data.data)) {
+                    else if (_.isEmpty(data) || _.isEmpty(data.data)) {
                         connectReaderCb(); // ask to connect reader
                         poll();
                     }

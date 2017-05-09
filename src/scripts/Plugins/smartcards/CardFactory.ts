@@ -2,17 +2,19 @@
  * @author Michallis
  * @since 2016
  */
-import {EMV, AbstractEMV} from "./emv/EMV";
-import {AbstractEidBE, EidBe} from "./eid/be/EidBe";
-import {AbstractEidLUX, EidLux} from "./eid/lux/EidLux";
-import {LocalConnection} from "../../core/client/Connection";
-import {GCLConfig} from "../../core/GCLConfig";
-import {AbstractMobib, Mobib} from "./mobib/mobib";
-import {LuxTrust, AbstractLuxTrust} from "./pki/LuxTrust";
-import {Ocra, AbstractOcra} from "./ocra/ocra";
-import {AbstractAventra, Aventra} from "./pki/Aventra";
-import {AbstractOberthur, Oberthur} from "./pki/Oberthur";
-import {AbstractPiv, PIV} from "./piv/piv";
+import { EMV } from "./emv/EMV";
+import { EidBe } from "./eid/be/EidBe";
+import { AbstractEidLUX, EidLux } from "./eid/lux/EidLux";
+import { LocalConnection } from "../../core/client/Connection";
+import { GCLConfig } from "../../core/GCLConfig";
+import { AbstractMobib, Mobib } from "./mobib/mobib";
+import { LuxTrust, AbstractLuxTrust } from "./pki/LuxTrust";
+import { Ocra, AbstractOcra } from "./ocra/ocra";
+import { AbstractAventra, Aventra } from "./pki/Aventra";
+import { AbstractOberthur, Oberthur } from "./pki/Oberthur";
+import { AbstractPiv, PIV } from "./piv/piv";
+import { AbstractEidBE } from "./eid/be/EidBeModel";
+import { AbstractEMV } from "./emv/EMVModel";
 
 interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;

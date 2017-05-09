@@ -17526,7 +17526,7 @@ var GCLLib =
 	var EMV_PAN = "/pan";
 	var EMV_VERIFY_PIN = "/verify-pin";
 	function createFilter(filters) {
-	    return { filter: filters.join(',') };
+	    return { filter: filters.join(",") };
 	}
 	var EMV = (function () {
 	    function EMV(url, connection, reader_id) {
@@ -17535,9 +17535,8 @@ var GCLLib =
 	        this.reader_id = reader_id;
 	        this.url = url + PLUGIN_CONTEXT_EMV;
 	    }
-	    EMV.prototype.resolvedReaderURI = function () { return this.url + SEPARATOR + this.reader_id; };
 	    EMV.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length > 0) {
+	        if (filters && filters.length) {
 	            this.connection.get(this.resolvedReaderURI(), callback, createFilter(filters));
 	        }
 	        else {
@@ -17551,7 +17550,10 @@ var GCLLib =
 	        }
 	        this.connection.post(this.resolvedReaderURI() + EMV_VERIFY_PIN, _req, callback);
 	    };
-	    EMV.prototype.pan = function (callback) { this.connection.get(this.resolvedReaderURI() + EMV_PAN, callback); };
+	    EMV.prototype.pan = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + EMV_PAN, callback);
+	    };
+	    EMV.prototype.resolvedReaderURI = function () { return this.url + SEPARATOR + this.reader_id; };
 	    return EMV;
 	}());
 	exports.EMV = EMV;
@@ -18326,7 +18328,7 @@ var GCLLib =
 	                    if (maxSeconds === 0) {
 	                        return cardTimeoutCb();
 	                    }
-	                    else if (!_.isEmpty(data.data)) {
+	                    else if (!_.isEmpty(data) && !_.isEmpty(data.data)) {
 	                        var readersWithCards = _.filter(data.data, function (reader) {
 	                            return _.has(reader, "card");
 	                        });
@@ -18361,7 +18363,7 @@ var GCLLib =
 	                    if (maxSeconds === 0) {
 	                        return readerTimeoutCb();
 	                    }
-	                    else if (_.isEmpty(data.data)) {
+	                    else if (_.isEmpty(data) || _.isEmpty(data.data)) {
 	                        connectReaderCb();
 	                        poll();
 	                    }
