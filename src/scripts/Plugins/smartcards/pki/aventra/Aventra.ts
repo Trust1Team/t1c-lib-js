@@ -3,10 +3,10 @@
  * @author Maarten Somers
  * @since 2017
  */
-import {LocalConnection} from "../../../core/client/Connection";
-import { RestException } from "../../../core/exceptions/CoreExceptions";
-import { DataArrayResponse, DataResponse, T1CResponse } from "../../../core/service/CoreModel";
-import { AuthenticateOrSignData, ResetPinData, VerifyPinData } from "../Card";
+import {LocalConnection} from "../../../../core/client/Connection";
+import { RestException } from "../../../../core/exceptions/CoreExceptions";
+import { DataArrayResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import { AuthenticateOrSignData, ResetPinData, VerifyPinData } from "../../Card";
 import { AbstractAventra, AllCertsResponse, AllDataResponse } from "./AventraModel";
 
 const SEPARATOR = "/";
