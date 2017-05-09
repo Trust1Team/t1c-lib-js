@@ -17579,7 +17579,7 @@ var GCLLib =
 	var BEID_AUTHENTICATE = "/authenticate";
 	var VERIFY_PRIV_KEY_REF = "non-repudiation";
 	function createFilter(filters) {
-	    return { filter: filters.join(',') };
+	    return { filter: filters.join(",") };
 	}
 	var EidBe = (function () {
 	    function EidBe(url, connection, reader_id) {
@@ -17588,11 +17588,8 @@ var GCLLib =
 	        this.reader_id = reader_id;
 	        this.url = url + PLUGIN_CONTEXT_BEID;
 	    }
-	    EidBe.prototype.resolvedReaderURI = function () {
-	        return this.url + SEPARATOR + this.reader_id;
-	    };
 	    EidBe.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length > 0) {
+	        if (filters && filters.length) {
 	            this.connection.get(this.resolvedReaderURI(), callback, createFilter(filters));
 	        }
 	        else {
@@ -17600,50 +17597,52 @@ var GCLLib =
 	        }
 	    };
 	    EidBe.prototype.allCerts = function (filters, callback) {
-	        if (filters && filters.length > 0) {
+	        if (filters && filters.length) {
 	            this.connection.get(this.resolvedReaderURI() + BEID_ALL_CERTIFICATES, callback, createFilter(filters));
 	        }
 	        else {
 	            this.connection.get(this.resolvedReaderURI() + BEID_ALL_CERTIFICATES, callback);
 	        }
 	    };
-	    EidBe.prototype.rnData = function (callback) { this.connection.get(this.resolvedReaderURI() + BEID_RN_DATA, callback); };
-	    EidBe.prototype.address = function (callback) { this.connection.get(this.resolvedReaderURI() + BEID_ADDRESS, callback); };
-	    EidBe.prototype.picture = function (callback) { this.connection.get(this.resolvedReaderURI() + BEID_PHOTO, callback); };
-	    EidBe.prototype.rootCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + BEID_CERT_ROOT, callback); };
-	    EidBe.prototype.citizenCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + BEID_CERT_CITIZEN, callback); };
-	    EidBe.prototype.authenticationCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + BEID_CERT_AUTHENTICATION, callback); };
-	    EidBe.prototype.nonRepudiationCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + BEID_CERT_NON_REPUDIATION, callback); };
-	    EidBe.prototype.rrnCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + BEID_CERT_RRN, callback); };
+	    EidBe.prototype.rnData = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + BEID_RN_DATA, callback);
+	    };
+	    EidBe.prototype.address = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + BEID_ADDRESS, callback);
+	    };
+	    EidBe.prototype.picture = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + BEID_PHOTO, callback);
+	    };
+	    EidBe.prototype.rootCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + BEID_CERT_ROOT, callback);
+	    };
+	    EidBe.prototype.citizenCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + BEID_CERT_CITIZEN, callback);
+	    };
+	    EidBe.prototype.authenticationCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + BEID_CERT_AUTHENTICATION, callback);
+	    };
+	    EidBe.prototype.nonRepudiationCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + BEID_CERT_NON_REPUDIATION, callback);
+	    };
+	    EidBe.prototype.rrnCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + BEID_CERT_RRN, callback);
+	    };
 	    EidBe.prototype.verifyPin = function (body, callback) {
-	        var _req = {};
-	        _req.private_key_reference = VERIFY_PRIV_KEY_REF;
+	        var _req = { private_key_reference: VERIFY_PRIV_KEY_REF };
 	        if (body.pin) {
 	            _req.pin = body.pin;
 	        }
 	        this.connection.post(this.resolvedReaderURI() + BEID_VERIFY_PIN, _req, callback);
 	    };
 	    EidBe.prototype.signData = function (body, callback) {
-	        var _req = {};
-	        if (body) {
-	            _req.algorithm_reference = body.algorithm_reference;
-	            _req.data = body.data;
-	            if (body.pin) {
-	                _req.pin = body.pin;
-	            }
-	        }
-	        this.connection.post(this.resolvedReaderURI() + BEID_SIGN_DATA, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + BEID_SIGN_DATA, body, callback);
 	    };
 	    EidBe.prototype.authenticate = function (body, callback) {
-	        var _req = {};
-	        if (body) {
-	            _req.data = body.data;
-	            _req.algorithm_reference = body.algorithm_reference;
-	            if (body.pin) {
-	                _req.pin = body.pin;
-	            }
-	        }
-	        this.connection.post(this.resolvedReaderURI() + BEID_AUTHENTICATE, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + BEID_AUTHENTICATE, body, callback);
+	    };
+	    EidBe.prototype.resolvedReaderURI = function () {
+	        return this.url + SEPARATOR + this.reader_id;
 	    };
 	    return EidBe;
 	}());
