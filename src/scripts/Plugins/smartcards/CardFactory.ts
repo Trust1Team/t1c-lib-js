@@ -11,13 +11,14 @@ import { AbstractMobib, Mobib } from "./mobib/mobib";
 import { LuxTrust } from "./pki/luxtrust/LuxTrust";
 import { Ocra } from "./ocra/ocra";
 import { Aventra } from "./pki/aventra/Aventra";
-import { AbstractOberthur, Oberthur } from "./pki/oberthur/Oberthur";
+import { Oberthur } from "./pki/oberthur/Oberthur";
 import { AbstractPiv, PIV } from "./piv/piv";
 import { AbstractEidBE } from "./eid/be/EidBeModel";
 import { AbstractEMV } from "./emv/EMVModel";
 import { AbstractOcra } from "./ocra/ocraModel";
 import { AbstractAventra } from "./pki/aventra/AventraModel";
 import { AbstractLuxTrust } from "./pki/luxtrust/LuxTrustModel";
+import { AbstractOberthur } from "./pki/oberthur/OberthurModel";
 
 interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
