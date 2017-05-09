@@ -25,15 +25,29 @@ interface AbstractOberthur {
 }
 
 interface AllDataResponse extends AllCertsResponse {
-
+    data: {
+        applet_info: {
+            change_counter: number
+            name: string
+            serial: string
+            version: string
+        }
+        root_certificate: string
+        issuer_certificate: string
+        authentication_certificate: string
+        signing_certificate: string
+        encryption_certificate: string
+    }
 }
 
 interface AllCertsResponse {
-    root_certificate: string
-    issuer_certificate: string
-    authentication_certificate: string
-    signing_certificate: string
-    encryption_certificate: string
+    data: {
+        root_certificate: string
+        issuer_certificate: string
+        authentication_certificate: string
+        signing_certificate: string
+        encryption_certificate: string
+    }
 }
 
 export { AbstractOberthur, AllCertsResponse, AllDataResponse };
