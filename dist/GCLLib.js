@@ -18116,17 +18116,12 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	function createFilterQueryParam(filters) {
-	    return { filter: filters.join(',') };
+	    return { filter: filters.join(",") };
 	}
 	var SEPARATOR = "/";
 	var PLUGIN_CONTEXT_PIV = "/plugins/piv";
-	var PIV_ALL_DATA_FILTERS = '/all-data-filters';
-	var PIV_ALL_CERT_FILTERS = '/all-cert-filters';
-	var PIV_ALL_KEY_REFS = '/all-key-refs';
-	var PIV_ALL_AUTH_ALGOS = '/all-algo-refs-for-authentication';
-	var PIV_ALL_SIGN_ALGOS = '/all-algo-refs-for-signing';
-	var PIV_PRINTED_INFORMATION = '/printed-information';
-	var PIV_FACIAL_IMAGE = '/facial-image';
+	var PIV_PRINTED_INFORMATION = "/printed-information";
+	var PIV_FACIAL_IMAGE = "/facial-image";
 	var PIV_ALL_CERTIFICATES = "/certificates";
 	var PIV_CERT_AUTHENTICATION = PIV_ALL_CERTIFICATES + "/authentication";
 	var PIV_CERT_SIGNING = PIV_ALL_CERTIFICATES + "/signing";
@@ -18140,84 +18135,61 @@ var GCLLib =
 	        this.reader_id = reader_id;
 	        this.url = url + PLUGIN_CONTEXT_PIV;
 	    }
-	    PIV.prototype.resolvedReaderURI = function () {
-	        return this.url + SEPARATOR + this.reader_id;
+	    PIV.prototype.allDataFilters = function () {
+	        return ["applet-info", "root_certificate", "authentication-certificate",
+	            "encryption_certificate", "issuer_certificate", "signing_certificate"];
 	    };
-	    PIV.prototype.allDataFilters = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + PIV_ALL_DATA_FILTERS, callback);
+	    PIV.prototype.allCertFilters = function () {
+	        return ["authentication-certificate", "signing_certificate"];
 	    };
-	    PIV.prototype.allCertFilters = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + PIV_ALL_CERT_FILTERS, callback);
-	    };
-	    PIV.prototype.allKeyRefs = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + PIV_ALL_KEY_REFS, callback);
+	    PIV.prototype.allKeyRefs = function () {
+	        return ["authenticate", "sign", "encrypt"];
 	    };
 	    PIV.prototype.allAlgoRefsForAuthentication = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + PIV_ALL_AUTH_ALGOS, callback);
+	        this.connection.get(this.resolvedReaderURI() + PIV_AUTHENTICATE, callback);
 	    };
 	    PIV.prototype.allAlgoRefsForSigning = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + PIV_ALL_SIGN_ALGOS, callback);
+	        this.connection.get(this.resolvedReaderURI() + PIV_SIGN_DATA, callback);
 	    };
 	    PIV.prototype.printedInformation = function (body, callback) {
-	        var _req = {};
-	        if (body.pin) {
-	            _req.pin = body.pin;
-	        }
-	        this.connection.post(this.resolvedReaderURI() + PIV_PRINTED_INFORMATION, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + PIV_PRINTED_INFORMATION, body, callback);
 	    };
 	    PIV.prototype.facialImage = function (body, callback) {
-	        var _req = {};
-	        if (body.pin) {
-	            _req.pin = body.pin;
-	        }
-	        this.connection.post(this.resolvedReaderURI() + PIV_FACIAL_IMAGE, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + PIV_FACIAL_IMAGE, body, callback);
 	    };
-	    PIV.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length > 0) {
-	            this.connection.get(this.resolvedReaderURI(), callback, createFilterQueryParam(filters));
+	    PIV.prototype.allData = function (filters, body, callback) {
+	        if (filters && filters.length) {
+	            this.connection.post(this.resolvedReaderURI(), body, callback, createFilterQueryParam(filters));
 	        }
 	        else {
-	            this.connection.get(this.resolvedReaderURI(), callback);
+	            this.connection.post(this.resolvedReaderURI(), body, callback);
 	        }
 	    };
-	    PIV.prototype.allCerts = function (filters, callback) {
-	        if (filters && filters.length > 0) {
-	            this.connection.get(this.resolvedReaderURI() + PIV_ALL_CERTIFICATES, callback, createFilterQueryParam(filters));
+	    PIV.prototype.allCerts = function (filters, body, callback) {
+	        if (filters && filters.length) {
+	            this.connection.post(this.resolvedReaderURI() + PIV_ALL_CERTIFICATES, body, callback, createFilterQueryParam(filters));
 	        }
 	        else {
-	            this.connection.get(this.resolvedReaderURI() + PIV_ALL_CERTIFICATES, callback);
+	            this.connection.post(this.resolvedReaderURI() + PIV_ALL_CERTIFICATES, body, callback);
 	        }
 	    };
-	    PIV.prototype.authenticationCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + PIV_CERT_AUTHENTICATION, callback); };
-	    PIV.prototype.signingCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + PIV_CERT_SIGNING, callback); };
+	    PIV.prototype.authenticationCertificate = function (body, callback) {
+	        this.connection.post(this.resolvedReaderURI() + PIV_CERT_AUTHENTICATION, body, callback);
+	    };
+	    PIV.prototype.signingCertificate = function (body, callback) {
+	        this.connection.post(this.resolvedReaderURI() + PIV_CERT_SIGNING, body, callback);
+	    };
 	    PIV.prototype.verifyPin = function (body, callback) {
-	        var _req = {};
-	        if (body.pin) {
-	            _req.pin = body.pin;
-	        }
-	        this.connection.post(this.resolvedReaderURI() + PIV_VERIFY_PIN, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + PIV_VERIFY_PIN, body, callback);
 	    };
 	    PIV.prototype.signData = function (body, callback) {
-	        var _req = {};
-	        if (body) {
-	            _req.algorithm_reference = body.algorithm_reference;
-	            _req.data = body.data;
-	            if (body.pin) {
-	                _req.pin = body.pin;
-	            }
-	        }
-	        this.connection.post(this.resolvedReaderURI() + PIV_SIGN_DATA, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + PIV_SIGN_DATA, body, callback);
 	    };
 	    PIV.prototype.authenticate = function (body, callback) {
-	        var _req = {};
-	        if (body) {
-	            _req.data = body.data;
-	            _req.algorithm_reference = body.algorithm_reference;
-	            if (body.pin) {
-	                _req.pin = body.pin;
-	            }
-	        }
-	        this.connection.post(this.resolvedReaderURI() + PIV_AUTHENTICATE, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + PIV_AUTHENTICATE, body, callback);
+	    };
+	    PIV.prototype.resolvedReaderURI = function () {
+	        return this.url + SEPARATOR + this.reader_id;
 	    };
 	    return PIV;
 	}());
