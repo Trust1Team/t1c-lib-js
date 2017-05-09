@@ -9,12 +9,13 @@ import { LocalConnection } from "../../core/client/Connection";
 import { GCLConfig } from "../../core/GCLConfig";
 import { AbstractMobib, Mobib } from "./mobib/mobib";
 import { LuxTrust, AbstractLuxTrust } from "./pki/LuxTrust";
-import { Ocra, AbstractOcra } from "./ocra/ocra";
+import { Ocra } from "./ocra/ocra";
 import { AbstractAventra, Aventra } from "./pki/Aventra";
 import { AbstractOberthur, Oberthur } from "./pki/Oberthur";
 import { AbstractPiv, PIV } from "./piv/piv";
 import { AbstractEidBE } from "./eid/be/EidBeModel";
 import { AbstractEMV } from "./emv/EMVModel";
+import { AbstractOcra } from "./ocra/ocraModel";
 
 interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;

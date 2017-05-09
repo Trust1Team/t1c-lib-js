@@ -17894,13 +17894,13 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	function createFilterQueryParam(filters) {
-	    return { filter: filters.join(',') };
+	    return { filter: filters.join(",") };
 	}
 	var SEPARATOR = "/";
 	var PLUGIN_CONTEXT_OCRA = "/plugins/ocra";
-	var OCRA_CHALLENGE = '/challenge';
-	var OCRA_READ_COUNTER = '/read-counter';
-	var OCRA_VERIFY_PIN = '/verify-pin';
+	var OCRA_CHALLENGE = "/challenge";
+	var OCRA_READ_COUNTER = "/read-counter";
+	var OCRA_VERIFY_PIN = "/verify-pin";
 	var Ocra = (function () {
 	    function Ocra(url, connection, reader_id) {
 	        this.url = url;
@@ -17908,11 +17908,8 @@ var GCLLib =
 	        this.reader_id = reader_id;
 	        this.url = url + PLUGIN_CONTEXT_OCRA;
 	    }
-	    Ocra.prototype.resolvedReaderURI = function () {
-	        return this.url + SEPARATOR + this.reader_id;
-	    };
 	    Ocra.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length > 0) {
+	        if (filters && filters.length) {
 	            this.connection.get(this.resolvedReaderURI(), callback, createFilterQueryParam(filters));
 	        }
 	        else {
@@ -17920,29 +17917,16 @@ var GCLLib =
 	        }
 	    };
 	    Ocra.prototype.challenge = function (body, callback) {
-	        var _req = {};
-	        if (body) {
-	            if (body.pin) {
-	                _req.pin = body.pin;
-	            }
-	        }
-	        this.connection.post(this.resolvedReaderURI() + OCRA_CHALLENGE, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + OCRA_CHALLENGE, body, callback);
 	    };
 	    Ocra.prototype.readCounter = function (body, callback) {
-	        var _req = {};
-	        if (body) {
-	            if (body.pin) {
-	                _req.pin = body.pin;
-	            }
-	        }
-	        this.connection.post(this.resolvedReaderURI() + OCRA_READ_COUNTER, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + OCRA_READ_COUNTER, body, callback);
 	    };
 	    Ocra.prototype.verifyPin = function (body, callback) {
-	        var _req = {};
-	        if (body.pin) {
-	            _req.pin = body.pin;
-	        }
-	        this.connection.post(this.resolvedReaderURI() + OCRA_VERIFY_PIN, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + OCRA_VERIFY_PIN, body, callback);
+	    };
+	    Ocra.prototype.resolvedReaderURI = function () {
+	        return this.url + SEPARATOR + this.reader_id;
 	    };
 	    return Ocra;
 	}());
