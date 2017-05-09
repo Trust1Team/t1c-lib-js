@@ -102,4 +102,4 @@ class EidBe implements AbstractEidBE {
     }
 }
 
-export { AbstractEidBE, EidBe };
+export { EidBe };

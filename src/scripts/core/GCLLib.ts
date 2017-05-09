@@ -9,9 +9,7 @@ import * as _ from "lodash";
 
 import { GCLConfig } from "./GCLConfig";
 import { CardFactory } from "../Plugins/smartcards/CardFactory";
-import { AbstractEidBE } from "../Plugins/smartcards/eid/be/EidBe";
 import { AbstractEidLUX } from "../Plugins/smartcards/eid/lux/EidLux";
-import { AbstractEMV } from "../Plugins/smartcards/emv/EMV";
 import { CoreService } from "./service/CoreService";
 import { LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection } from "./client/Connection";
 import { AbstractDSClient, DownloadLinkResponse, JWTResponse } from "./ds/DSClientModel";
@@ -24,6 +22,8 @@ import { AbstractAventra } from "../Plugins/smartcards/pki/Aventra";
 import { AbstractOberthur } from "../Plugins/smartcards/pki/Oberthur";
 import { AbstractPiv } from "../Plugins/smartcards/piv/piv";
 import { InfoResponse } from "./service/CoreModel";
+import { AbstractEidBE } from "../Plugins/smartcards/eid/be/EidBeModel";
+import { AbstractEMV } from "../Plugins/smartcards/emv/EMVModel";
 
 
 class GCLClient {
