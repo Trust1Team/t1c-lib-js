@@ -18034,7 +18034,7 @@ var GCLLib =
 	var OBERTUR_SIGN_DATA = "/sign";
 	var OBERTUR_AUTHENTICATE = "/authenticate";
 	function createFilter(filters) {
-	    return { filter: filters.join(',') };
+	    return { filter: filters.join(",") };
 	}
 	var Oberthur = (function () {
 	    function Oberthur(url, connection, reader_id) {
@@ -18043,11 +18043,9 @@ var GCLLib =
 	        this.reader_id = reader_id;
 	        this.url = url + PLUGIN_CONTEXT_BEID;
 	    }
-	    Oberthur.prototype.resolvedReaderURI = function () {
-	        return this.url + SEPARATOR + this.reader_id;
-	    };
 	    Oberthur.prototype.allDataFilters = function () {
-	        return ["applet-info", "root_certificate", "authentication-certificate", "encryption_certificate", "issuer_certificate", "signing_certificate"];
+	        return ["applet-info", "root_certificate", "authentication-certificate",
+	            "encryption_certificate", "issuer_certificate", "signing_certificate"];
 	    };
 	    Oberthur.prototype.allCertFilters = function () {
 	        return ["root_certificate", "authentication-certificate", "encryption_certificate", "issuer_certificate", "signing_certificate"];
@@ -18061,23 +18059,50 @@ var GCLLib =
 	    Oberthur.prototype.allAlgoRefsForSigning = function (callback) {
 	        this.connection.get(this.resolvedReaderURI() + OBERTUR_SIGN_DATA, callback);
 	    };
+	    Oberthur.prototype.allData = function (filters, callback) {
+	        if (filters && filters.length) {
+	            this.connection.get(this.resolvedReaderURI(), callback, createFilter(filters));
+	        }
+	        else {
+	            this.connection.get(this.resolvedReaderURI(), callback);
+	        }
+	    };
 	    Oberthur.prototype.allCerts = function (filters, callback) {
+	        if (filters && filters.length) {
+	            this.connection.get(this.resolvedReaderURI() + OBERTHUR_ALL_CERTIFICATES, callback, createFilter(filters));
+	        }
+	        else {
+	            this.connection.get(this.resolvedReaderURI() + OBERTHUR_ALL_CERTIFICATES, callback);
+	        }
 	    };
 	    Oberthur.prototype.rootCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + OBERTHUR_CERT_ROOT, callback);
 	    };
 	    Oberthur.prototype.issuerCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + OBERTUR_CERT_ISSUER, callback);
 	    };
 	    Oberthur.prototype.authenticationCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + OBERTUR_CERT_AUTHENTICATION, callback);
 	    };
 	    Oberthur.prototype.signingCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + OBERTUR_CERT_SIGNING, callback);
 	    };
 	    Oberthur.prototype.encryptionCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + OBERTUR_CERT_ENCRYPTION, callback);
 	    };
 	    Oberthur.prototype.verifyPin = function (body, callback) {
+	        this.connection.post(this.resolvedReaderURI() + OBERTUR_VERIFY_PIN, body, callback);
 	    };
 	    Oberthur.prototype.signData = function (body, callback) {
+	        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
+	        this.connection.post(this.resolvedReaderURI() + OBERTUR_SIGN_DATA, body, callback);
 	    };
 	    Oberthur.prototype.authenticate = function (body, callback) {
+	        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
+	        this.connection.post(this.resolvedReaderURI() + OBERTUR_AUTHENTICATE, body, callback);
+	    };
+	    Oberthur.prototype.resolvedReaderURI = function () {
+	        return this.url + SEPARATOR + this.reader_id;
 	    };
 	    return Oberthur;
 	}());
