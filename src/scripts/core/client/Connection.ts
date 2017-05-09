@@ -11,9 +11,9 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { RestException } from "../exceptions/CoreExceptions";
 
 interface Connection {
-    get(url: string, callback: (error: any, data: any) => void, queryParams?: any);
-    post(url: string, body: any, callback: (error: any, data: any) => void);
-    put(url: string, body: any, callback: (error: any, data: any) => void);
+    get(url: string, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string });
+    post(url: string, body: { [key: string]: any }, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string });
+    put(url: string, body: { [key: string]: any }, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string });
 }
 
 class LocalAuthConnection implements Connection {
