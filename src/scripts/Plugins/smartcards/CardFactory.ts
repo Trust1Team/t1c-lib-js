@@ -8,15 +8,16 @@ import { AbstractEidLUX, EidLux } from "./eid/lux/EidLux";
 import { LocalConnection } from "../../core/client/Connection";
 import { GCLConfig } from "../../core/GCLConfig";
 import { AbstractMobib, Mobib } from "./mobib/mobib";
-import { LuxTrust, AbstractLuxTrust } from "./pki/LuxTrust";
+import { LuxTrust } from "./pki/luxtrust/LuxTrust";
 import { Ocra } from "./ocra/ocra";
-import { Aventra } from "./pki/Aventra";
-import { AbstractOberthur, Oberthur } from "./pki/Oberthur";
+import { Aventra } from "./pki/aventra/Aventra";
+import { AbstractOberthur, Oberthur } from "./pki/oberthur/Oberthur";
 import { AbstractPiv, PIV } from "./piv/piv";
 import { AbstractEidBE } from "./eid/be/EidBeModel";
 import { AbstractEMV } from "./emv/EMVModel";
 import { AbstractOcra } from "./ocra/ocraModel";
-import { AbstractAventra } from "./pki/AventraModel";
+import { AbstractAventra } from "./pki/aventra/AventraModel";
+import { AbstractLuxTrust } from "./pki/luxtrust/LuxTrustModel";
 
 interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;

@@ -2,8 +2,8 @@
  * @author Michallis Pashidis
  * @since 2016
  */
-import {LocalConnection} from "../../../core/client/Connection";
-import * as CoreExceptions from "../../../core/exceptions/CoreExceptions";
+import {LocalConnection} from "../../../../core/client/Connection";
+import * as CoreExceptions from "../../../../core/exceptions/CoreExceptions";
 
 interface AbstractOberthur{
     allDataFilters():Array<string>;

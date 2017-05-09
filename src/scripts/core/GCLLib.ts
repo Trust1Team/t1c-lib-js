@@ -16,14 +16,14 @@ import { AbstractDSClient, DownloadLinkResponse, JWTResponse } from "./ds/DSClie
 import { DSClient } from "./ds/DSClient";
 import { AbstractOCVClient, OCVClient } from "./ocv/OCVClient";
 import { AbstractMobib } from "../Plugins/smartcards/mobib/mobib";
-import { AbstractLuxTrust } from "../Plugins/smartcards/pki/LuxTrust";
-import { AbstractOberthur } from "../Plugins/smartcards/pki/Oberthur";
+import { AbstractOberthur } from "../Plugins/smartcards/pki/oberthur/Oberthur";
 import { AbstractPiv } from "../Plugins/smartcards/piv/piv";
 import { InfoResponse } from "./service/CoreModel";
 import { AbstractEidBE } from "../Plugins/smartcards/eid/be/EidBeModel";
 import { AbstractEMV } from "../Plugins/smartcards/emv/EMVModel";
 import { AbstractOcra } from "../Plugins/smartcards/ocra/ocraModel";
-import { AbstractAventra } from "../Plugins/smartcards/pki/AventraModel";
+import { AbstractAventra } from "../Plugins/smartcards/pki/aventra/AventraModel";
+import { AbstractLuxTrust } from "../Plugins/smartcards/pki/luxtrust/LuxTrustModel";
 
 
 class GCLClient {

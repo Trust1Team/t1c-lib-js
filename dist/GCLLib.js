@@ -17813,7 +17813,7 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	function createFilterQueryParam(filters) {
-	    return { filter: filters.join(',') };
+	    return { filter: filters.join(",") };
 	}
 	var SEPARATOR = "/";
 	var PLUGIN_CONTEXT_LUXTRUST = "/plugins/luxtrust";
@@ -17831,11 +17831,8 @@ var GCLLib =
 	        this.reader_id = reader_id;
 	        this.url = url + PLUGIN_CONTEXT_LUXTRUST;
 	    }
-	    LuxTrust.prototype.resolvedReaderURI = function () {
-	        return this.url + SEPARATOR + this.reader_id;
-	    };
 	    LuxTrust.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length > 0) {
+	        if (filters && filters.length) {
 	            this.connection.get(this.resolvedReaderURI(), callback, createFilterQueryParam(filters));
 	        }
 	        else {
@@ -17843,44 +17840,33 @@ var GCLLib =
 	        }
 	    };
 	    LuxTrust.prototype.allCerts = function (filters, callback) {
-	        if (filters && filters.length > 0) {
+	        if (filters && filters.length) {
 	            this.connection.get(this.resolvedReaderURI() + LUX_ALL_CERTIFICATES, callback, createFilterQueryParam(filters));
 	        }
 	        else {
 	            this.connection.get(this.resolvedReaderURI() + LUX_ALL_CERTIFICATES, callback);
 	        }
 	    };
-	    LuxTrust.prototype.rootCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_CERT_ROOT, callback); };
-	    LuxTrust.prototype.authenticationCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_CERT_AUTHENTICATION, callback); };
-	    LuxTrust.prototype.signingCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_CERT_SIGNING, callback); };
+	    LuxTrust.prototype.rootCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + LUX_CERT_ROOT, callback);
+	    };
+	    LuxTrust.prototype.authenticationCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + LUX_CERT_AUTHENTICATION, callback);
+	    };
+	    LuxTrust.prototype.signingCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + LUX_CERT_SIGNING, callback);
+	    };
 	    LuxTrust.prototype.verifyPin = function (body, callback) {
-	        var _req = {};
-	        if (body.pin) {
-	            _req.pin = body.pin;
-	        }
-	        this.connection.post(this.resolvedReaderURI() + LUX_VERIFY_PIN, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + LUX_VERIFY_PIN, body, callback);
 	    };
 	    LuxTrust.prototype.signData = function (body, callback) {
-	        var _req = {};
-	        if (body) {
-	            _req.algorithm_reference = body.algorithm_reference;
-	            _req.data = body.data;
-	            if (body.pin) {
-	                _req.pin = body.pin;
-	            }
-	        }
-	        this.connection.post(this.resolvedReaderURI() + LUX_SIGN_DATA, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + LUX_SIGN_DATA, body, callback);
 	    };
 	    LuxTrust.prototype.authenticate = function (body, callback) {
-	        var _req = {};
-	        if (body) {
-	            _req.data = body.data;
-	            _req.algorithm_reference = body.algorithm_reference;
-	            if (body.pin) {
-	                _req.pin = body.pin;
-	            }
-	        }
-	        this.connection.post(this.resolvedReaderURI() + LUX_AUTHENTICATE, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + LUX_AUTHENTICATE, body, callback);
+	    };
+	    LuxTrust.prototype.resolvedReaderURI = function () {
+	        return this.url + SEPARATOR + this.reader_id;
 	    };
 	    return LuxTrust;
 	}());
