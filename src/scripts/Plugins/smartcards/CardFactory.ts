@@ -10,12 +10,13 @@ import { GCLConfig } from "../../core/GCLConfig";
 import { AbstractMobib, Mobib } from "./mobib/mobib";
 import { LuxTrust, AbstractLuxTrust } from "./pki/LuxTrust";
 import { Ocra } from "./ocra/ocra";
-import { AbstractAventra, Aventra } from "./pki/Aventra";
+import { Aventra } from "./pki/Aventra";
 import { AbstractOberthur, Oberthur } from "./pki/Oberthur";
 import { AbstractPiv, PIV } from "./piv/piv";
 import { AbstractEidBE } from "./eid/be/EidBeModel";
 import { AbstractEMV } from "./emv/EMVModel";
 import { AbstractOcra } from "./ocra/ocraModel";
+import { AbstractAventra } from "./pki/AventraModel";
 
 interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;

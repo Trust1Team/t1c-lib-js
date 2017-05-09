@@ -17952,7 +17952,7 @@ var GCLLib =
 	var AVENTRA_SIGN_DATA = "/sign";
 	var AVENTRA_AUTHENTICATE = "/authenticate";
 	function createFilter(filters) {
-	    return { filter: filters.join(',') };
+	    return { filter: filters.join(",") };
 	}
 	var Aventra = (function () {
 	    function Aventra(url, connection, reader_id) {
@@ -17962,7 +17962,8 @@ var GCLLib =
 	        this.url = url + PLUGIN_CONTEXT_BEID;
 	    }
 	    Aventra.prototype.allDataFilters = function () {
-	        return ["applet-info", "root_certificate", "authentication-certificate", "encryption_certificate", "issuer_certificate", "signing_certificate"];
+	        return ["applet-info", "root_certificate", "authentication-certificate",
+	            "encryption_certificate", "issuer_certificate", "signing_certificate"];
 	    };
 	    Aventra.prototype.allCertFilters = function () {
 	        return ["root_certificate", "authentication-certificate", "encryption_certificate", "issuer_certificate", "signing_certificate"];
@@ -17976,11 +17977,8 @@ var GCLLib =
 	    Aventra.prototype.allAlgoRefsForSigning = function (callback) {
 	        this.connection.get(this.resolvedReaderURI() + AVENTRA_SIGN_DATA, callback);
 	    };
-	    Aventra.prototype.resolvedReaderURI = function () {
-	        return this.url + SEPARATOR + this.reader_id;
-	    };
 	    Aventra.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length > 0) {
+	        if (filters && filters.length) {
 	            this.connection.get(this.resolvedReaderURI(), callback, createFilter(filters));
 	        }
 	        else {
@@ -17988,7 +17986,7 @@ var GCLLib =
 	        }
 	    };
 	    Aventra.prototype.allCerts = function (filters, callback) {
-	        if (filters && filters.length > 0) {
+	        if (filters && filters.length) {
 	            this.connection.get(this.resolvedReaderURI() + AVENTRA_ALL_CERTIFICATES, callback, createFilter(filters));
 	        }
 	        else {
@@ -18011,49 +18009,21 @@ var GCLLib =
 	        this.connection.get(this.resolvedReaderURI() + AVENTRA_CERT_ENCRYPTION, callback);
 	    };
 	    Aventra.prototype.verifyPin = function (body, callback) {
-	        var _req = {};
-	        if (body.pin) {
-	            _req.pin = body.pin;
-	        }
-	        if (body.private_key_reference) {
-	            _req.private_key_reference = body.private_key_reference;
-	        }
-	        this.connection.post(this.resolvedReaderURI() + AVENTRA_VERIFY_PIN, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + AVENTRA_VERIFY_PIN, body, callback);
 	    };
 	    Aventra.prototype.resetPin = function (body, callback) {
-	        var _req = {};
-	        if (body.new_pin) {
-	            _req.new_pin = body.new_pin;
-	        }
-	        if (body.puk) {
-	            _req.puk = body.puk;
-	        }
-	        if (body.private_key_reference) {
-	            _req.private_key_reference = body.private_key_reference;
-	        }
-	        this.connection.post(this.resolvedReaderURI() + AVENTRA_RESET_PIN, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + AVENTRA_RESET_PIN, body, callback);
 	    };
 	    Aventra.prototype.signData = function (body, callback) {
-	        var _req = {};
-	        if (body) {
-	            _req.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
-	            _req.data = body.data;
-	            if (body.pin) {
-	                _req.pin = body.pin;
-	            }
-	        }
-	        this.connection.post(this.resolvedReaderURI() + AVENTRA_SIGN_DATA, _req, callback);
+	        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
+	        this.connection.post(this.resolvedReaderURI() + AVENTRA_SIGN_DATA, body, callback);
 	    };
 	    Aventra.prototype.authenticate = function (body, callback) {
-	        var _req = {};
-	        if (body) {
-	            _req.data = body.data;
-	            _req.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
-	            if (body.pin) {
-	                _req.pin = body.pin;
-	            }
-	        }
-	        this.connection.post(this.resolvedReaderURI() + AVENTRA_AUTHENTICATE, _req, callback);
+	        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
+	        this.connection.post(this.resolvedReaderURI() + AVENTRA_AUTHENTICATE, body, callback);
+	    };
+	    Aventra.prototype.resolvedReaderURI = function () {
+	        return this.url + SEPARATOR + this.reader_id;
 	    };
 	    return Aventra;
 	}());
