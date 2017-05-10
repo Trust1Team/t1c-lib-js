@@ -81,8 +81,7 @@
     "typedef": [
       true,
       "parameter",
-      "property-declaration",
-      "member-variable-declaration"
+      "property-declaration"
     ],
     "typedef-whitespace": [
       true,

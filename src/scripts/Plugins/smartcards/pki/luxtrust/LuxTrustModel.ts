@@ -4,18 +4,15 @@
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
-import { AuthenticateOrSignData, OptionalPin } from "../../Card";
+import { AuthenticateOrSignData, CertCard, OptionalPin } from "../../Card";
 
-interface AbstractLuxTrust {
+interface AbstractLuxTrust extends CertCard {
     // callback-based
     allData(filters: string[], callback: (error: RestException, data: AllDataResponse) => void): void;
     allCerts(filters: string[], callback: (error: RestException, data: AllCertsResponse) => void): void;
     rootCertificate(callback: (error: RestException, data: DataResponse) => void): void;
     authenticationCertificate(callback: (error: RestException, data: DataResponse) => void): void;
     signingCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void): void;
-    signData(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
-    authenticate(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
 
     // promise-based
     // allData(filters: string[]): Promise<AllDataResponse>;
@@ -23,9 +20,6 @@ interface AbstractLuxTrust {
     // rootCertificate(): Promise<DataResponse>;
     // authenticationCertificate(): Promise<DataResponse>;
     // signingCertificate(): Promise<DataResponse>;
-    // verifyPin(body: OptionalPin): Promise<T1CResponse>;
-    // signData(body: AuthenticateOrSignData): Promise<DataResponse>;
-    // authenticate(body: AuthenticateOrSignData): Promise<DataResponse>;
 }
 
 interface AllDataResponse extends T1CResponse {

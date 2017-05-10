@@ -19,7 +19,6 @@ function createPinQueryParam(pin: string): { pin: string } {
 }
 
 const SEPARATOR = "/";
-const PLUGIN_CONTEXT_LUXEID = "/plugins/luxeid";
 const LUX_ALL_CERTIFICATES = "/certificates";
 const LUX_BIOMETRIC = "/biometric";
 const LUX_ADDRESS = "/address";
@@ -35,10 +34,7 @@ const LUX_SIGNATURE_IMAGE = "/signature-image";
 
 class EidLux implements AbstractEidLUX {
     // constructor
-    constructor(private url: string, private connection: LocalConnection, private reader_id: string, private pin: string) {
-        this.url = url + PLUGIN_CONTEXT_LUXEID;
-        this.pin = pin;
-    }
+    constructor(private url: string, private connection: LocalConnection, private reader_id: string, private pin: string) {}
 
     // filters
     public allDataFilters() {

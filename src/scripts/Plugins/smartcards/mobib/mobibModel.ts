@@ -4,8 +4,9 @@
  */
 import { RestException } from "../../../core/exceptions/CoreExceptions";
 import { DataResponse, T1CResponse } from "../../../core/service/CoreModel";
+import { Card } from "../Card";
 
-interface AbstractMobib {
+interface AbstractMobib extends Card {
     // callback-based
     allData(filters: string[], callback: (error: RestException, data: AllDataResponse) => void): void;
     cardIssuing(callback: (error: RestException, data: CardIssuingResponse) => void): void;

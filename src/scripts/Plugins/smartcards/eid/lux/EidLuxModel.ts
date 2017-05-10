@@ -3,10 +3,10 @@
  * @since 2017
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { AuthenticateOrSignData, OptionalPin } from "../../Card";
+import { AuthenticateOrSignData, CertCard, OptionalPin } from "../../Card";
 import { DataArrayResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
 
-interface AbstractEidLUX {
+interface AbstractEidLUX extends CertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allData(filters: string[], callback: (error: RestException, data: AllDataResponse) => void): void;
