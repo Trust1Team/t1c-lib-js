@@ -15,7 +15,6 @@ import { LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnec
 import { AbstractDSClient, DownloadLinkResponse, JWTResponse } from "./ds/DSClientModel";
 import { DSClient } from "./ds/DSClient";
 import { AbstractOCVClient, OCVClient } from "./ocv/OCVClient";
-import { AbstractMobib } from "../Plugins/smartcards/mobib/mobib";
 import { InfoResponse } from "./service/CoreModel";
 import { AbstractEidBE } from "../Plugins/smartcards/eid/be/EidBeModel";
 import { AbstractEMV } from "../Plugins/smartcards/emv/EMVModel";
@@ -24,6 +23,7 @@ import { AbstractAventra } from "../Plugins/smartcards/pki/aventra/AventraModel"
 import { AbstractLuxTrust } from "../Plugins/smartcards/pki/luxtrust/LuxTrustModel";
 import { AbstractOberthur } from "../Plugins/smartcards/pki/oberthur/OberthurModel";
 import { AbstractPiv } from "../Plugins/smartcards/piv/pivModel";
+import { AbstractMobib } from "../Plugins/smartcards/mobib/mobibModel";
 
 
 class GCLClient {

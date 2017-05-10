@@ -4,40 +4,8 @@
  */
 import { LocalConnection } from "../../../core/client/Connection";
 import { RestException } from "../../../core/exceptions/CoreExceptions";
-import { DataResponse, T1CResponse } from "../../../core/service/CoreModel";
-
-interface AbstractMobib {
-    allData(filters: string[], callback: (error: RestException, data: any) => void): void;
-    cardIssuing(callback: (error: RestException, data: any) => void): void;
-    contracts(callback: (error: RestException, data: any) => void): void;
-    picture(callback: (error: RestException, data: DataResponse) => void): void;
-    status(callback: (error: RestException, data: StatusResponse) => void): void;
-}
-
-interface StatusResponse extends T1CResponse {
-    data: {
-        active: boolean
-    }
-}
-
-interface CardIssuing {
-    card_expiration_date: string
-    card_holder_birth_date: string
-    card_holder_end_date: string
-    card_holder_id: string
-    card_holder_name: string
-    card_holder_start_date:  string
-    card_revalidation_date: string
-    card_type: number
-    company_id: number
-    gender: number
-    language: number
-    version: number
-}
-
-interface CardIssuingResponse extends T1CResponse {
-    data: CardIssuing
-}
+import { DataResponse } from "../../../core/service/CoreModel";
+import { AbstractMobib, AllDataResponse, CardIssuingResponse, ContractsResponse, StatusResponse } from "./mobibModel";
 
 const SEPARATOR = "/";
 const PLUGIN_CONTEXT_MOBIB = "/plugins/mobib";
@@ -58,31 +26,31 @@ class Mobib implements AbstractMobib {
     }
 
 
-    public allData(filters: string[], callback) {
-        if (filters && filters.length > 0) { this.connection.get(this.resolvedReaderURI(), callback, createFilter(filters)); }
+    public allData(filters: string[], callback: (error: RestException, data: AllDataResponse) => void) {
+        if (filters && filters.length) { this.connection.get(this.resolvedReaderURI(), callback, createFilter(filters)); }
         else { this.connection.get(this.resolvedReaderURI(), callback); }
     }
 
-    public cardIssuing(callback) {
+    public cardIssuing(callback: (error: RestException, data: CardIssuingResponse) => void) {
         this.connection.get(this.resolvedReaderURI() + MOBIB_CARD_ISSUING, callback);
     }
 
-    public contracts(callback) {
+    public contracts(callback: (error: RestException, data: ContractsResponse) => void) {
         this.connection.get(this.resolvedReaderURI() + MOBIB_CONTRACTS, callback);
     }
 
-    public picture(callback) {
+    public picture(callback: (error: RestException, data: DataResponse) => void) {
         this.connection.get(this.resolvedReaderURI() + MOBIB_PHOTO, callback);
     }
 
 
-    public status(callback) {
+    public status(callback: (error: RestException, data: StatusResponse) => void) {
         this.connection.get(this.resolvedReaderURI() + MOBIB_STATUS, callback);
     }
 
 
     // resolves the reader_id in the base URL
-    private resolvedReaderURI():string{
+    private resolvedReaderURI(): string {
         return this.url + SEPARATOR + this.reader_id;
     }
 }
