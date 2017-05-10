@@ -1,42 +1,42 @@
 ///<reference path="../../../../typings/index.d.ts"/>
 
-import {expect} from "chai";
-import {LocalConnection, LocalAuthConnection,Connection} from "../../../scripts/core/client/Connection";
-import {CoreService} from "../../../scripts/core/services/CoreService";
-import {CardFactory} from "../../../scripts/Plugins/smartcards/CardFactory";
-import {GCLConfig} from "../../../scripts/core/GCLConfig";
+import { expect } from "chai";
+import { LocalConnection, LocalAuthConnection } from "../../../scripts/core/client/Connection";
+import { CardFactory } from "../../../scripts/Plugins/smartcards/CardFactory";
+import { GCLConfig } from "../../../scripts/core/GCLConfig";
+import { CoreService } from "../../../scripts/core/service/CoreService";
 
-describe('Plugin-Belgian eID', () => {
+describe("Plugin-Belgian eID", () => {
     let gclUnderTest = "https://localhost:10443/v1";
-    let localAuthConnection:LocalAuthConnection;
+    let localAuthConnection: LocalAuthConnection;
     let coreService;
     let cardFactory;
     let beidPlugin;
-    let config = new GCLConfig("https://dist.t1t.be/v1","someapikey");
+    let config = new GCLConfig("https://dist.t1t.be/v1", "someapikey");
 
 
-    beforeEach(()=>{
+    beforeEach(() => {
         localAuthConnection = new LocalAuthConnection(config);
-        coreService = new CoreService(gclUnderTest,localAuthConnection, config);
-        cardFactory = new CardFactory(gclUnderTest,new LocalConnection(config), config);
+        coreService = new CoreService(gclUnderTest, localAuthConnection);
+        cardFactory = new CardFactory(gclUnderTest, new LocalConnection(config));
         beidPlugin = cardFactory.createEidBE();
     });
 
-    describe('Belgian eID Test Cases', () => {
+    describe("Belgian eID Test Cases", () => {
 
-        it('should verify an existing local authentication connection instance', ()=>{
+        it("should verify an existing local authentication connection instance", () => {
             expect(localAuthConnection).not.undefined;
         });
 
-        it('should verify an existing core service instance', ()=>{
+        it("should verify an existing core service instance", () => {
             expect(coreService).not.undefined;
         });
 
-        it('should verify an existing card factory instance', ()=>{
+        it("should verify an existing card factory instance", () => {
             expect(cardFactory).not.undefined;
         });
 
-        it('should return a belgian eid instance', ()=>{
+        it("should return a belgian eid instance", () => {
             expect(beidPlugin).not.undefined;
         });
 

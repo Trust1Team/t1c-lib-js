@@ -77,7 +77,7 @@ var GCLLib =
 	        this.authConnection = new Connection_1.LocalAuthConnection(this.cfg);
 	        this.remoteConnection = new Connection_1.RemoteConnection(this.cfg);
 	        this.localTestConnection = new Connection_1.LocalTestConnection(this.cfg);
-	        this.cardFactory = new CardFactory_1.CardFactory(this.cfg.gclUrl, this.connection, this.cfg);
+	        this.cardFactory = new CardFactory_1.CardFactory(this.cfg.gclUrl, this.connection);
 	        this.coreService = new CoreService_1.CoreService(this.cfg.gclUrl, this.authConnection);
 	        if (this.cfg.localTestMode) {
 	            this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg);
@@ -17496,10 +17496,9 @@ var GCLLib =
 	var Oberthur_1 = __webpack_require__(12);
 	var piv_1 = __webpack_require__(13);
 	var CardFactory = (function () {
-	    function CardFactory(url, connection, cfg) {
+	    function CardFactory(url, connection) {
 	        this.url = url;
 	        this.connection = connection;
-	        this.cfg = cfg;
 	    }
 	    CardFactory.prototype.createEidBE = function (reader_id) { return new EidBe_1.EidBe(this.url, this.connection, reader_id); };
 	    CardFactory.prototype.createEidLUX = function (reader_id, pin) { return new EidLux_1.EidLux(this.url, this.connection, reader_id, pin); };
@@ -17658,7 +17657,7 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	function createFilterQueryParam(filters, pin) {
-	    return { filter: filters.join(','), pin: pin };
+	    return { filter: filters.join(","), pin: pin };
 	}
 	function createPinQueryParam(pin) {
 	    return { pin: pin };
@@ -17691,11 +17690,8 @@ var GCLLib =
 	    EidLux.prototype.allCertFilters = function () {
 	        return ["authentication-certificate", "non-repudiation-certificate", "root-certificates"];
 	    };
-	    EidLux.prototype.resolvedReaderURI = function () {
-	        return this.url + SEPARATOR + this.reader_id;
-	    };
 	    EidLux.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length > 0) {
+	        if (filters && filters.length) {
 	            this.connection.get(this.resolvedReaderURI(), callback, createFilterQueryParam(filters, this.pin));
 	        }
 	        else {
@@ -17703,53 +17699,42 @@ var GCLLib =
 	        }
 	    };
 	    EidLux.prototype.allCerts = function (filters, callback) {
-	        if (filters && filters.length > 0) {
+	        if (filters && filters.length) {
 	            this.connection.get(this.resolvedReaderURI() + LUX_ALL_CERTIFICATES, callback, createFilterQueryParam(filters, this.pin));
 	        }
 	        else {
 	            this.connection.get(this.resolvedReaderURI() + LUX_ALL_CERTIFICATES, callback, createPinQueryParam(this.pin));
 	        }
 	    };
-	    EidLux.prototype.biometric = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_BIOMETRIC, callback, createPinQueryParam(this.pin)); };
-	    EidLux.prototype.picture = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_PHOTO, callback, createPinQueryParam(this.pin)); };
-	    EidLux.prototype.rootCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_CERT_ROOT, callback, createPinQueryParam(this.pin)); };
-	    EidLux.prototype.authenticationCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_CERT_AUTHENTICATION, callback, createPinQueryParam(this.pin)); };
-	    EidLux.prototype.nonRepudiationCertificate = function (callback) { this.connection.get(this.resolvedReaderURI() + LUX_CERT_NON_REPUDIATION, callback, createPinQueryParam(this.pin)); };
+	    EidLux.prototype.biometric = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + LUX_BIOMETRIC, callback, createPinQueryParam(this.pin));
+	    };
+	    EidLux.prototype.picture = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + LUX_PHOTO, callback, createPinQueryParam(this.pin));
+	    };
+	    EidLux.prototype.rootCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + LUX_CERT_ROOT, callback, createPinQueryParam(this.pin));
+	    };
+	    EidLux.prototype.authenticationCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + LUX_CERT_AUTHENTICATION, callback, createPinQueryParam(this.pin));
+	    };
+	    EidLux.prototype.nonRepudiationCertificate = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + LUX_CERT_NON_REPUDIATION, callback, createPinQueryParam(this.pin));
+	    };
 	    EidLux.prototype.verifyPin = function (body, callback) {
-	        var _req = {};
-	        if (body.pin) {
-	            _req.pin = body.pin;
-	        }
-	        this.connection.post(this.resolvedReaderURI() + LUX_VERIFY_PIN, _req, callback, createPinQueryParam(this.pin));
+	        this.connection.post(this.resolvedReaderURI() + LUX_VERIFY_PIN, body, callback, createPinQueryParam(this.pin));
 	    };
 	    EidLux.prototype.signData = function (body, callback) {
-	        var _req = {};
-	        if (body) {
-	            _req.algorithm_reference = body.algorithm_reference;
-	            _req.data = body.data;
-	            if (body.pin) {
-	                _req.pin = body.pin;
-	            }
-	        }
-	        var params;
-	        if (body.pin) {
-	            params = createPinQueryParam(body.pin);
-	        }
-	        this.connection.post(this.resolvedReaderURI() + LUX_SIGN_DATA, _req, callback, params);
+	        this.connection.post(this.resolvedReaderURI() + LUX_SIGN_DATA, body, callback, createPinQueryParam(this.pin));
 	    };
 	    EidLux.prototype.authenticate = function (body, callback) {
-	        var _req = {};
-	        if (body) {
-	            _req.data = body.data;
-	            _req.algorithm_reference = body.algorithm_reference;
-	            if (body.pin) {
-	                _req.pin = body.pin;
-	            }
-	        }
-	        this.connection.post(this.resolvedReaderURI() + LUX_AUTHENTICATE, _req, callback, createPinQueryParam(this.pin));
+	        this.connection.post(this.resolvedReaderURI() + LUX_AUTHENTICATE, body, callback, createPinQueryParam(this.pin));
 	    };
 	    EidLux.prototype.signatureImage = function (callback) {
 	        this.connection.get(this.resolvedReaderURI() + LUX_SIGNATURE_IMAGE, callback, createPinQueryParam(this.pin));
+	    };
+	    EidLux.prototype.resolvedReaderURI = function () {
+	        return this.url + SEPARATOR + this.reader_id;
 	    };
 	    return EidLux;
 	}());

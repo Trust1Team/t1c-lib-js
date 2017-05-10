@@ -9,7 +9,6 @@ import * as _ from "lodash";
 
 import { GCLConfig } from "./GCLConfig";
 import { CardFactory } from "../Plugins/smartcards/CardFactory";
-import { AbstractEidLUX } from "../Plugins/smartcards/eid/lux/EidLux";
 import { CoreService } from "./service/CoreService";
 import { LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection } from "./client/Connection";
 import { AbstractDSClient, DownloadLinkResponse, JWTResponse } from "./ds/DSClientModel";
@@ -24,6 +23,7 @@ import { AbstractLuxTrust } from "../Plugins/smartcards/pki/luxtrust/LuxTrustMod
 import { AbstractOberthur } from "../Plugins/smartcards/pki/oberthur/OberthurModel";
 import { AbstractPiv } from "../Plugins/smartcards/piv/pivModel";
 import { AbstractMobib } from "../Plugins/smartcards/mobib/mobibModel";
+import { AbstractEidLUX } from "../Plugins/smartcards/eid/lux/EidLuxModel";
 
 
 class GCLClient {
@@ -46,7 +46,7 @@ class GCLClient {
         this.authConnection = new LocalAuthConnection(this.cfg);
         this.remoteConnection = new RemoteConnection(this.cfg);
         this.localTestConnection = new LocalTestConnection(this.cfg);
-        this.cardFactory = new CardFactory(this.cfg.gclUrl, this.connection, this.cfg);
+        this.cardFactory = new CardFactory(this.cfg.gclUrl, this.connection);
         this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
         if (this.cfg.localTestMode) { this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg); }
         else { this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg); }

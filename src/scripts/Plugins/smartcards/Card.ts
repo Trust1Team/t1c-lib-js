@@ -1,5 +1,6 @@
 /**
  * @author Michallis Pashidis
+ * @author Maarten Somers
  */
 
 interface Card {
