@@ -17769,7 +17769,7 @@ var GCLLib =
 	var MOBIB_PHOTO = "/picture";
 	var MOBIB_STATUS = "/status";
 	function createFilter(filters) {
-	    return { filter: filters.join(',') };
+	    return { filter: filters.join(",") };
 	}
 	var Mobib = (function () {
 	    function Mobib(url, connection, reader_id) {
@@ -17778,11 +17778,8 @@ var GCLLib =
 	        this.reader_id = reader_id;
 	        this.url = url + PLUGIN_CONTEXT_MOBIB;
 	    }
-	    Mobib.prototype.resolvedReaderURI = function () {
-	        return this.url + SEPARATOR + this.reader_id;
-	    };
 	    Mobib.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length > 0) {
+	        if (filters && filters.length) {
 	            this.connection.get(this.resolvedReaderURI(), callback, createFilter(filters));
 	        }
 	        else {
@@ -17800,6 +17797,9 @@ var GCLLib =
 	    };
 	    Mobib.prototype.status = function (callback) {
 	        this.connection.get(this.resolvedReaderURI() + MOBIB_STATUS, callback);
+	    };
+	    Mobib.prototype.resolvedReaderURI = function () {
+	        return this.url + SEPARATOR + this.reader_id;
 	    };
 	    return Mobib;
 	}());
