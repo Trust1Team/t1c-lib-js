@@ -14,10 +14,17 @@ interface AbstractCore {
     infoBrowser(callback: (error: CoreExceptions.RestException, data: BrowserInfoResponse) => void): void;
     plugins(callback: (error: CoreExceptions.RestException, data: PluginsResponse) => void): void;
     pollCardInserted(secondsToPollCard: number,
-                     callback: (error: CoreExceptions.RestException, data: CardReadersResponse) => void,
+                     callback: (error: CoreExceptions.RestException, data: CardReader) => void,
                      connectReader: () => void,
                      insertCard: () => void,
                      cardTimeout: () => void
+
+    ): void;
+    pollReadersWithCards(secondsToPollCard: number,
+                         callback: (error: CoreExceptions.RestException, data: CardReadersResponse) => void,
+                         connectReader: () => void,
+                         insertCard: () => void,
+                         cardTimeout: () => void
 
     ): void;
     pollReaders(secondsToPollReader: number,
