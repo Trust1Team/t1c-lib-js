@@ -1,31 +1,21 @@
 /**
  * @author Michallis Pashidis
+ * @author Maarten Somers
  * @since 2017
  */
 import {LocalConnection} from "../../../../core/client/Connection";
-import * as CoreExceptions from "../../../../core/exceptions/CoreExceptions";
+import { RestException } from "../../../../core/exceptions/CoreExceptions";
+import { AuthenticateOrSignData, OptionalPin } from "../../Card";
+import { DataArrayResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import { AbstractEidLUX, AllCertsResponse, AllDataResponse,
+    BiometricResponse, PictureResponse, SignatureImageResponse } from "./EidLuxModel";
 
-interface AbstractEidLUX{
-    allDataFilters():Array<string>;
-    allCertFilters():Array<string>;
-    allData(filters:string[],callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    allCerts(filters:string[], callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    biometric(callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    picture(callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    rootCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    authenticationCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    nonRepudiationCertificate(callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    verifyPin(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    signData(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    authenticate(body:any,callback:(error:CoreExceptions.RestException, data:any) => void):void;
-    signatureImage(callback:(error:CoreExceptions.RestException, data:any) => void):void;
-}
 
-function createFilterQueryParam(filters:string[],pin:string):any {
-    return { filter: filters.join(','), pin: pin };
+function createFilterQueryParam(filters: string[], pin: string): { filter: string, pin: string } {
+    return { filter: filters.join(","), pin };
 }
-function createPinQueryParam(pin:string):any {
-    return { pin: pin };
+function createPinQueryParam(pin: string): { pin: string } {
+    return { pin };
 }
 
 const SEPARATOR = "/";
@@ -43,78 +33,79 @@ const LUX_AUTHENTICATE = "/authenticate";
 const LUX_SIGNATURE_IMAGE = "/signature-image";
 
 
-class EidLux implements AbstractEidLUX{
+class EidLux implements AbstractEidLUX {
     // constructor
-    constructor(private url:string, private connection:LocalConnection, private reader_id:string, private pin:string) {
+    constructor(private url: string, private connection: LocalConnection, private reader_id: string, private pin: string) {
         this.url = url + PLUGIN_CONTEXT_LUXEID;
         this.pin = pin;
     }
 
     // filters
-    public allDataFilters(){
-        return ["authentication-certificate","biometric","non-repudiation-certificate","picture","root-certificates"];
+    public allDataFilters() {
+        return [ "authentication-certificate", "biometric", "non-repudiation-certificate", "picture", "root-certificates" ];
     }
 
-    public allCertFilters(){
-        return ["authentication-certificate","non-repudiation-certificate","root-certificates"];
+    public allCertFilters() {
+        return [ "authentication-certificate", "non-repudiation-certificate", "root-certificates" ];
     }
+
+    public allData(filters: string[], callback: (error: RestException, data: AllDataResponse) => void) {
+        if (filters && filters.length) {
+            this.connection.get(this.resolvedReaderURI(), callback, createFilterQueryParam(filters, this.pin));
+        } else { this.connection.get(this.resolvedReaderURI(), callback, createPinQueryParam(this.pin)); }
+    }
+
+    public allCerts(filters: string[], callback: (error: RestException, data: AllCertsResponse) => void) {
+        if (filters && filters.length) {
+            this.connection.get(this.resolvedReaderURI() + LUX_ALL_CERTIFICATES, callback, createFilterQueryParam(filters, this.pin));
+        } else { this.connection.get(this.resolvedReaderURI() + LUX_ALL_CERTIFICATES, callback, createPinQueryParam(this.pin)); }
+    }
+
+    public biometric(callback: (error: RestException, data: BiometricResponse) => void) {
+        this.connection.get(this.resolvedReaderURI() + LUX_BIOMETRIC, callback, createPinQueryParam(this.pin));
+    }
+
+    // in order to access the address information, we need different keys, and on Lux gov level this is protected
+    /*address(callback) {this.connection.get(this.resolvedReaderURI() + LUX_ADDRESS, callback, createPinQueryParam(this.pin));}*/
+
+    public picture(callback: (error: RestException, data: PictureResponse) => void) {
+        this.connection.get(this.resolvedReaderURI() + LUX_PHOTO, callback, createPinQueryParam(this.pin));
+    }
+
+    public rootCertificate(callback: (error: RestException, data: DataArrayResponse) => void) {
+        this.connection.get(this.resolvedReaderURI() + LUX_CERT_ROOT, callback, createPinQueryParam(this.pin));
+    }
+
+    public authenticationCertificate(callback: (error: RestException, data: DataResponse) => void) {
+        this.connection.get(this.resolvedReaderURI() + LUX_CERT_AUTHENTICATION, callback, createPinQueryParam(this.pin));
+    }
+
+    public nonRepudiationCertificate(callback: (error: RestException, data: DataResponse) => void) {
+        this.connection.get(this.resolvedReaderURI() + LUX_CERT_NON_REPUDIATION, callback, createPinQueryParam(this.pin));
+    }
+
+    public verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void) {
+        this.connection.post(this.resolvedReaderURI() + LUX_VERIFY_PIN, body, callback, createPinQueryParam(this.pin));
+    }
+
+    public signData(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void) {
+        this.connection.post(this.resolvedReaderURI() + LUX_SIGN_DATA, body, callback, createPinQueryParam(this.pin));
+    }
+
+    public authenticate(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void) {
+        this.connection.post(this.resolvedReaderURI() + LUX_AUTHENTICATE, body, callback, createPinQueryParam(this.pin));
+    }
+
+    public signatureImage(callback: (error: RestException, data: SignatureImageResponse) => void) {
+        this.connection.get(this.resolvedReaderURI() + LUX_SIGNATURE_IMAGE, callback, createPinQueryParam(this.pin));
+    }
+
 
     // resolves the reader_id in the base URL
-    private resolvedReaderURI():string{
+    private resolvedReaderURI(): string {
         return this.url + SEPARATOR + this.reader_id;
     }
 
-    public allData(filters, callback) {
-        if(filters && filters.length>0){this.connection.get(this.resolvedReaderURI(), callback, createFilterQueryParam(filters,this.pin));}
-        else{this.connection.get(this.resolvedReaderURI(), callback, createPinQueryParam(this.pin));}
-    }
-
-    public allCerts(filters, callback) {
-        if(filters && filters.length>0){this.connection.get(this.resolvedReaderURI() + LUX_ALL_CERTIFICATES, callback, createFilterQueryParam(filters,this.pin));}
-        else{this.connection.get(this.resolvedReaderURI() + LUX_ALL_CERTIFICATES, callback, createPinQueryParam(this.pin));}
-    }
-
-    biometric(callback){this.connection.get(this.resolvedReaderURI() + LUX_BIOMETRIC,callback, createPinQueryParam(this.pin));}
-    //In order to access the address information, we need different keys, and on Lux gov level this is protected
-    /*address(callback) {this.connection.get(this.resolvedReaderURI() + LUX_ADDRESS, callback, createPinQueryParam(this.pin));}*/
-    picture(callback) {this.connection.get(this.resolvedReaderURI() + LUX_PHOTO, callback, createPinQueryParam(this.pin));}
-    rootCertificate(callback) {this.connection.get(this.resolvedReaderURI() + LUX_CERT_ROOT, callback, createPinQueryParam(this.pin));}
-    authenticationCertificate(callback) {this.connection.get(this.resolvedReaderURI() + LUX_CERT_AUTHENTICATION, callback,createPinQueryParam(this.pin));}
-    nonRepudiationCertificate(callback) {this.connection.get(this.resolvedReaderURI() + LUX_CERT_NON_REPUDIATION, callback,createPinQueryParam(this.pin));}
-
-    verifyPin(body, callback) {
-        let _req:any = {};
-        if (body.pin) {_req.pin = body.pin;}
-        this.connection.post(this.resolvedReaderURI() + LUX_VERIFY_PIN, _req, callback, createPinQueryParam(this.pin));
-    }
-
-    signData(body, callback) {
-        let _req:any = {};
-        if (body) {
-            _req.algorithm_reference = body.algorithm_reference;
-            _req.data = body.data;
-            if(body.pin) {_req.pin = body.pin;}
-        }
-        let params;
-        if (body.pin) {
-            params = createPinQueryParam(body.pin);
-        }
-        this.connection.post(this.resolvedReaderURI() + LUX_SIGN_DATA, _req, callback, params);
-    }
-
-    authenticate(body, callback) {
-        let _req:any = {};
-        if(body){
-            _req.data = body.data;
-            _req.algorithm_reference = body.algorithm_reference;
-            if(body.pin) {_req.pin = body.pin;}
-        }
-        this.connection.post(this.resolvedReaderURI() + LUX_AUTHENTICATE, _req, callback, createPinQueryParam(this.pin));
-    }
-
-    signatureImage(callback) {
-        this.connection.get(this.resolvedReaderURI() + LUX_SIGNATURE_IMAGE, callback, createPinQueryParam(this.pin));
-    }
 }
 
-export {AbstractEidLUX, EidLux}
+export { EidLux };
