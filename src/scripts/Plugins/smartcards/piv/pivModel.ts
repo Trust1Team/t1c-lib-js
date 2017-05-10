@@ -3,10 +3,10 @@
  * @since 2017
  */
 import { RestException } from "../../../core/exceptions/CoreExceptions";
-import { AuthenticateOrSignData, OptionalPin } from "../Card";
+import { AuthenticateOrSignData, GenericSecuredCertCard, OptionalPin } from "../Card";
 import { DataArrayResponse, DataResponse, T1CResponse } from "../../../core/service/CoreModel";
 
-interface AbstractPiv {
+interface AbstractPiv extends GenericSecuredCertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allKeyRefs(): string[];
@@ -20,9 +20,6 @@ interface AbstractPiv {
     allCerts(filters: string[], body: OptionalPin, callback: (error: RestException, data: AllCertsResponse) => void): void;
     authenticationCertificate(body: OptionalPin, callback: (error: RestException, data: DataResponse) => void): void;
     signingCertificate(body: OptionalPin, callback: (error: RestException, data: DataResponse) => void): void;
-    verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void): void;
-    signData(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
-    authenticate(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
 
     // promise-based
     // allAlgoRefsForAuthentication(): Promise<DataArrayResponse>;
@@ -33,9 +30,6 @@ interface AbstractPiv {
     // allCerts(filters: string[], body: OptionalPin): Promise<AllCertsResponse>;
     // authenticationCertificate(body: OptionalPin): Promise<DataResponse>;
     // signingCertificate(body: OptionalPin): Promise<DataResponse>;
-    // verifyPin(body: OptionalPin): Promise<T1CResponse>;
-    // signData(body: AuthenticateOrSignData): Promise<DataResponse>;
-    // authenticate(body: AuthenticateOrSignData): Promise<DataResponse>;
 }
 
 interface AllDataResponse extends AllCertsResponse {

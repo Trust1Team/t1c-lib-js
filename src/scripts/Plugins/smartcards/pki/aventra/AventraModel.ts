@@ -4,9 +4,9 @@
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { DataArrayResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
-import { AuthenticateOrSignData, ResetPinData, VerifyPinData } from "../../Card";
+import { AuthenticateOrSignData, CertCard, ResetPinData, VerifyPinData } from "../../Card";
 
-interface AbstractAventra {
+interface AbstractAventra extends CertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allKeyRefs(): string[];
@@ -21,8 +21,6 @@ interface AbstractAventra {
     encryptionCertificate(callback: (error: RestException, data: DataResponse) => void): void;
     verifyPin(body: VerifyPinData, callback: (error: RestException, data: T1CResponse) => void): void;
     resetPin(body: ResetPinData, callback: (error: RestException, data: T1CResponse) => void): void;
-    signData(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
-    authenticate(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
 }
 
 interface AllDataResponse extends T1CResponse {

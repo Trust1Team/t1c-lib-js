@@ -18,9 +18,7 @@ interface AbstractEidBE extends CertCard {
     authenticationCertificate(callback: (error: RestException, data: DataResponse) => void): void;
     nonRepudiationCertificate(callback: (error: RestException, data: DataResponse) => void): void;
     rrnCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void): void;
-    signData(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
-    authenticate(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
+
 
     // promise-based
     // allData(filters: string[]): Promise<AllDataResponse>;
@@ -33,9 +31,6 @@ interface AbstractEidBE extends CertCard {
     // authenticationCertificate(): Promise<DataResponse>;
     // nonRepudiationCertificate(): Promise<DataResponse>;
     // rrnCertificate(): Promise<DataResponse>;
-    // verifyPin(body: any): Promise<T1CResponse>;
-    // signData(body: any): Promise<DataResponse>;
-    // authenticate(body: any): Promise<DataResponse>;
 }
 
 interface AddressResponse extends T1CResponse {
