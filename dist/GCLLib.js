@@ -18250,6 +18250,41 @@ var GCLLib =
 	                    if (maxSeconds === 0) {
 	                        return cardTimeoutCb();
 	                    }
+	                    else if (data.data.length === 0) {
+	                        connectReaderCb();
+	                        poll();
+	                    }
+	                    else {
+	                        var readerWithCard = _.find(data.data, function (reader) {
+	                            return _.has(reader, "card");
+	                        });
+	                        if (readerWithCard != null) {
+	                            return callback(null, readerWithCard);
+	                        }
+	                        else {
+	                            insertCardCb();
+	                            poll();
+	                        }
+	                    }
+	                });
+	            }, 1000);
+	        }
+	    };
+	    CoreService.prototype.pollReadersWithCards = function (secondsToPollCard, callback, connectReaderCb, insertCardCb, cardTimeoutCb) {
+	        var maxSeconds = secondsToPollCard;
+	        var self = this;
+	        poll();
+	        function poll() {
+	            _.delay(function () {
+	                --maxSeconds;
+	                self.readers(function (error, data) {
+	                    if (error) {
+	                        connectReaderCb();
+	                        poll();
+	                    }
+	                    if (maxSeconds === 0) {
+	                        return cardTimeoutCb();
+	                    }
 	                    else if (!_.isEmpty(data) && !_.isEmpty(data.data)) {
 	                        var readersWithCards = _.filter(data.data, function (reader) {
 	                            return _.has(reader, "card");

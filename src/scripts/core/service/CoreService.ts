@@ -7,6 +7,7 @@ import * as CoreExceptions from "../exceptions/CoreExceptions";
 import * as _ from "lodash";
 import * as platform from "platform";
 import * as CoreModel from "./CoreModel";
+import { CardReader } from "./CoreModel";
 
 const CORE_INFO = "/";
 const CORE_PLUGINS = "/plugins";
@@ -62,11 +63,11 @@ class CoreService implements CoreModel.AbstractCore {
         this.connection.get(this.url + CORE_PLUGINS, callback);
     }
 
-    public pollCardInserted(secondsToPollCard: number,
-                            callback: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
-                            connectReaderCb: () => void,
-                            insertCardCb: () => void,
-                            cardTimeoutCb: () => void): void {
+    pollCardInserted(secondsToPollCard: number,
+                     callback: (error: CoreExceptions.RestException, data: CardReader) => void,
+                     connectReaderCb: () => void,
+                     insertCardCb: () => void,
+                     cardTimeoutCb: () => void): void {
         let maxSeconds = secondsToPollCard;
         let self = this;
 
@@ -74,9 +75,50 @@ class CoreService implements CoreModel.AbstractCore {
         poll();
 
         function poll() {
-            _.delay(function () {
+            _.delay(() => {
+                // console.debug("seconds left:",maxSeconds);
                 --maxSeconds;
-                self.readers(function (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) {
+                self.readers((error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => {
+                    if (error) {
+                        connectReaderCb(); // ask to connect reader
+                        poll(); // no reader found and waiting - recursive call
+                    }
+                    // no error but stop
+                    if (maxSeconds === 0) { return cardTimeoutCb(); } // reader timeout
+                    else if (data.data.length === 0) {
+                        connectReaderCb(); // ask to connect reader
+                        poll();
+                    } else {
+                        let readerWithCard = _.find(data.data, (reader: CoreModel.CardReader) => {
+                            return _.has(reader, "card");
+                        });
+                        if (readerWithCard != null) {
+                            return callback(null, readerWithCard);
+                        } else {
+                            insertCardCb();
+                            poll();
+                        }
+                    }
+                });
+            }, 1000);
+        }
+    }
+
+    public pollReadersWithCards(secondsToPollCard: number,
+                                callback: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
+                                connectReaderCb: () => void,
+                                insertCardCb: () => void,
+                                cardTimeoutCb: () => void): void {
+        let maxSeconds = secondsToPollCard;
+        let self = this;
+
+        // recursive function
+        poll();
+
+        function poll() {
+            _.delay(() => {
+                --maxSeconds;
+                self.readers((error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => {
                     if (error) {
                         connectReaderCb();
                         poll();
@@ -84,7 +126,7 @@ class CoreService implements CoreModel.AbstractCore {
                     if (maxSeconds === 0) { return cardTimeoutCb(); } // reader timeout
                     else if (!_.isEmpty(data) && !_.isEmpty(data.data)) {
                         // there are some readers, check if one of them has a card
-                        let readersWithCards = _.filter(data.data, function (reader: CoreModel.CardReader) {
+                        let readersWithCards = _.filter(data.data, (reader: CoreModel.CardReader) => {
                             return _.has(reader, "card");
                         });
                         if (readersWithCards.length) {
