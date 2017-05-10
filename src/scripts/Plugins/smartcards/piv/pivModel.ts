@@ -10,6 +10,8 @@ interface AbstractPiv {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allKeyRefs(): string[];
+
+    // callback-based
     allAlgoRefsForAuthentication(callback: (error: RestException, data: DataArrayResponse) => void): void;
     allAlgoRefsForSigning(callback: (error: RestException, data: DataArrayResponse) => void): void;
     printedInformation(body: OptionalPin, callback: (error: RestException, data: PrintedInformationResponse) => void): void;
@@ -21,6 +23,19 @@ interface AbstractPiv {
     verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void): void;
     signData(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
     authenticate(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
+
+    // promise-based
+    // allAlgoRefsForAuthentication(): Promise<DataArrayResponse>;
+    // allAlgoRefsForSigning(): Promise<DataArrayResponse>;
+    // printedInformation(body: OptionalPin): Promise<PrintedInformationResponse>;
+    // facialImage(body: OptionalPin): Promise<FacialImageResponse>;
+    // allData(filters: string[], body: OptionalPin): Promise<AllDataResponse>;
+    // allCerts(filters: string[], body: OptionalPin): Promise<AllCertsResponse>;
+    // authenticationCertificate(body: OptionalPin): Promise<DataResponse>;
+    // signingCertificate(body: OptionalPin): Promise<DataResponse>;
+    // verifyPin(body: OptionalPin): Promise<T1CResponse>;
+    // signData(body: AuthenticateOrSignData): Promise<DataResponse>;
+    // authenticate(body: AuthenticateOrSignData): Promise<DataResponse>;
 }
 
 interface AllDataResponse extends AllCertsResponse {
@@ -61,4 +76,4 @@ interface AllCertsResponse extends  T1CResponse {
     }
 }
 
-export { AbstractPiv, AllCertsResponse, AllDataResponse, PrintedInformationResponse, FacialImageResponse }
+export { AbstractPiv, AllCertsResponse, AllDataResponse, PrintedInformationResponse, FacialImageResponse };
