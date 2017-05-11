@@ -9,6 +9,9 @@ import * as platform from "platform";
 import * as CoreModel from "./CoreModel";
 import { CardReader } from "./CoreModel";
 
+export { CoreService };
+
+
 const CORE_INFO = "/";
 const CORE_PLUGINS = "/plugins";
 const CORE_READERS = "/card-readers";
@@ -208,5 +211,3 @@ class CoreService implements CoreModel.AbstractCore {
         return "%%GULP_INJECT_VERSION%%";
     }
 }
-
-export { CoreService };

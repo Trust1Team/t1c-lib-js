@@ -2,7 +2,7 @@
 
 import { expect } from "chai";
 import { LocalConnection, LocalAuthConnection } from "../../../scripts/core/client/Connection";
-import { CardFactory } from "../../../scripts/Plugins/smartcards/CardFactory";
+import { CardFactory } from "../../../scripts/plugins/smartcards/CardFactory";
 import { GCLConfig } from "../../../scripts/core/GCLConfig";
 import { CoreService } from "../../../scripts/core/service/CoreService";
 
