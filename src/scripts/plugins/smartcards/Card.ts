@@ -69,9 +69,9 @@ abstract class GenericCard {
 abstract class GenericSmartCard extends GenericCard implements Card {
     public allData(filters: string[], callback: (error: RestException, data: DataObjectResponse) => void): void {
         if (filters && filters.length) {
-            this.connection.get(this.resolvedReaderURI(), callback, GenericCard.createFilterQueryParam(filters));
+            this.connection.get(this.resolvedReaderURI(), GenericCard.createFilterQueryParam(filters), callback);
         }
-        else { this.connection.get(this.resolvedReaderURI(), callback); }
+        else { this.connection.get(this.resolvedReaderURI(), undefined, callback); }
     }
 }
 
@@ -79,7 +79,7 @@ abstract class GenericPinCard extends GenericSmartCard implements PinCard {
     static VERIFY_PIN = "/verify-pin";
 
     public verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + GenericPinCard.VERIFY_PIN, body, callback);
+        this.connection.post(this.resolvedReaderURI() + GenericPinCard.VERIFY_PIN, body, undefined, callback);
     }
 }
 
@@ -98,34 +98,34 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
 
 
     public allAlgoRefsForAuthentication(callback: (error: RestException, data: DataArrayResponse) => void): void {
-        this.connection.get(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, callback);
+        this.connection.get(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, undefined, callback);
     }
 
     public allAlgoRefsForSigning(callback: (error: RestException, data: DataArrayResponse) => void): void {
-        this.connection.get(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, callback);
+        this.connection.get(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, undefined, callback);
     }
 
     public allCerts(filters: string[], callback: (error: RestException, data: DataObjectResponse) => void): void {
         if (filters && filters.length) {
             this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES,
-                callback,
-                GenericCertCard.createFilterQueryParam(filters));
+                GenericCertCard.createFilterQueryParam(filters),
+                callback);
         }
-        else { this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES, callback); }
+        else { this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES, undefined, callback); }
     }
 
     public authenticate(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void) {
         body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
-        this.connection.post(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, body, callback);
+        this.connection.post(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, body, undefined, callback);
     }
 
     public signData(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void) {
         body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
-        this.connection.post(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, callback);
+        this.connection.post(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, undefined, callback);
     }
 
     protected getCertificate(certUrl: string, callback: (error: RestException, data: DataResponse) => void): void {
-        this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, callback);
+        this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, undefined, callback);
     }
 }
 
@@ -140,40 +140,40 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
     static VERIFY_PIN = "/verify-pin";
 
     public allAlgoRefsForAuthentication(callback: (error: RestException, data: DataArrayResponse) => void): void {
-        this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, callback);
+        this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, undefined, callback);
     }
 
     public allAlgoRefsForSigning(callback: (error: RestException, data: DataArrayResponse) => void): void {
-        this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, callback);
+        this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, undefined, callback);
     }
 
     public allData(filters: string[], body: OptionalPin, callback: (error: RestException, data: DataObjectResponse) => void) {
         if (filters && filters.length) { this.connection.post(this.resolvedReaderURI(),
             body,
-            callback,
-            GenericSecuredCertCard.createFilterQueryParam(filters));
-        } else { this.connection.post(this.resolvedReaderURI(), body, callback); }
+            GenericSecuredCertCard.createFilterQueryParam(filters),
+            callback);
+        } else { this.connection.post(this.resolvedReaderURI(), body, undefined, callback); }
     }
 
     public allCerts(filters: string[], body: OptionalPin, callback: (error: RestException, data: DataObjectResponse) => void) {
         if (filters && filters.length) {
             this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES,
                 body,
-                callback,
-                GenericSecuredCertCard.createFilterQueryParam(filters));
-        } else { this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES, body, callback); }
+                GenericSecuredCertCard.createFilterQueryParam(filters),
+                callback);
+        } else { this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES, body, undefined, callback); }
     }
 
     public verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.VERIFY_PIN, body, callback);
+        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.VERIFY_PIN, body, undefined, callback);
     }
 
     public signData(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, body, callback);
+        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, body, undefined, callback);
     }
 
     public authenticate(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, body, callback);
+        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, body, undefined, callback);
     }
 
     protected getCertificate(certUrl: string,
@@ -181,7 +181,7 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
                              callback: (error: RestException,
                                         data: DataResponse) => void,
                              params?: { filter?: string, pin?: string }): void {
-        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, callback, params);
+        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, params, callback);
     }
 
     protected getCertificateArray(certUrl: string,
@@ -189,6 +189,6 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
                                   callback: (error: RestException,
                                              data: DataArrayResponse) => void,
                                   params?: { filter?: string, pin?: string }): void {
-        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, callback, params);
+        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, params, callback);
     }
 }

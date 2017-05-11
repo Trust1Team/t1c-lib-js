@@ -15,10 +15,10 @@ class Ocra extends GenericPinCard implements AbstractOcra {
     static READ_COUNTER = "/read-counter";
 
     public challenge(body: ChallengeData, callback: (error: RestException, data: DataResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + Ocra.CHALLENGE, body, callback);
+        this.connection.post(this.resolvedReaderURI() + Ocra.CHALLENGE, body, undefined, callback);
     }
 
     public readCounter(body: OptionalPin, callback: (error: RestException, data: ReadCounterResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + Ocra.READ_COUNTER, body, callback);
+        this.connection.post(this.resolvedReaderURI() + Ocra.READ_COUNTER, body, undefined, callback);
     }
 }
