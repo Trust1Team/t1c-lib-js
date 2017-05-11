@@ -3,8 +3,8 @@
  * @since 2017
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { DataArrayResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
-import { AuthenticateOrSignData, CertCard, ResetPinData, VerifyPinData } from "../../Card";
+import { DataArrayResponse, DataObjectResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import { CertCard, ResetPinData, VerifyPinData } from "../../Card";
 
 interface AbstractAventra extends CertCard {
     allDataFilters(): string[];
@@ -23,7 +23,7 @@ interface AbstractAventra extends CertCard {
     resetPin(body: ResetPinData, callback: (error: RestException, data: T1CResponse) => void): void;
 }
 
-interface AllDataResponse extends T1CResponse {
+interface AllDataResponse extends AllCertsResponse {
     data: {
         applet_info: {
             change_counter: number
@@ -39,7 +39,7 @@ interface AllDataResponse extends T1CResponse {
     }
 }
 
-interface AllCertsResponse extends T1CResponse {
+interface AllCertsResponse extends DataObjectResponse {
     data: {
         authentication_certificate: string
         encryption_certificate: string

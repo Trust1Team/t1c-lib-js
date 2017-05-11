@@ -3,7 +3,7 @@
  * @since 2017
  */
 import { RestException } from "../../../core/exceptions/CoreExceptions";
-import { DataResponse, T1CResponse } from "../../../core/service/CoreModel";
+import { DataObjectResponse, DataResponse, T1CResponse } from "../../../core/service/CoreModel";
 import { Card } from "../Card";
 
 interface AbstractMobib extends Card {
@@ -22,7 +22,7 @@ interface AbstractMobib extends Card {
     // status(): Promise<StatusResponse>;
 }
 
-interface AllDataResponse extends T1CResponse {
+interface AllDataResponse extends DataObjectResponse {
     data: {
         active: boolean
         "card-issuing": CardIssuing
@@ -31,7 +31,7 @@ interface AllDataResponse extends T1CResponse {
     }
 }
 
-interface StatusResponse extends T1CResponse {
+interface StatusResponse extends DataObjectResponse {
     data: {
         active: boolean
     }
@@ -52,7 +52,7 @@ interface CardIssuing {
     version: number
 }
 
-interface CardIssuingResponse extends T1CResponse {
+interface CardIssuingResponse extends DataObjectResponse {
     data: CardIssuing
 }
 

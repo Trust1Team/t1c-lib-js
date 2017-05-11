@@ -3,8 +3,8 @@
  * @since 2017
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { AuthenticateOrSignData, CertCard, OptionalPin } from "../../Card";
-import { DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import { CertCard } from "../../Card";
+import { DataObjectResponse, DataResponse } from "../../../../core/service/CoreModel";
 
 interface AbstractEidBE extends CertCard {
     // callback-based
@@ -33,7 +33,7 @@ interface AbstractEidBE extends CertCard {
     // rrnCertificate(): Promise<DataResponse>;
 }
 
-interface AddressResponse extends T1CResponse {
+interface AddressResponse extends DataObjectResponse {
     data: Address
 }
 
@@ -46,7 +46,7 @@ interface Address {
     zipcode: string
 }
 
-interface AllCertsResponse extends T1CResponse {
+interface AllCertsResponse extends DataObjectResponse {
     data: {
         authentication_certificate?: string
         citizen_certificate?: string
@@ -56,7 +56,7 @@ interface AllCertsResponse extends T1CResponse {
     }
 }
 
-interface AllDataResponse extends T1CResponse {
+interface AllDataResponse extends AllCertsResponse {
     data: {
         address?: Address
         authentication_certificate?: string
@@ -92,7 +92,7 @@ interface RnData {
     version: number
 }
 
-interface RnDataResponse extends T1CResponse {
+interface RnDataResponse extends DataObjectResponse {
     data: RnData
 }
 

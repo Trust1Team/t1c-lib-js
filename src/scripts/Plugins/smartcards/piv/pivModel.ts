@@ -3,8 +3,8 @@
  * @since 2017
  */
 import { RestException } from "../../../core/exceptions/CoreExceptions";
-import { AuthenticateOrSignData, GenericSecuredCertCard, OptionalPin } from "../Card";
-import { DataArrayResponse, DataResponse, T1CResponse } from "../../../core/service/CoreModel";
+import { GenericSecuredCertCard, OptionalPin } from "../Card";
+import { DataArrayResponse, DataObjectResponse, DataResponse } from "../../../core/service/CoreModel";
 
 interface AbstractPiv extends GenericSecuredCertCard {
     allDataFilters(): string[];
@@ -41,7 +41,7 @@ interface AllDataResponse extends AllCertsResponse {
     }
 }
 
-interface PrintedInformationResponse extends T1CResponse {
+interface PrintedInformationResponse extends DataObjectResponse {
     data: PrintedInformation
 }
 
@@ -55,7 +55,7 @@ interface PrintedInformation {
     organization_affiliation_line_2: string
 }
 
-interface FacialImageResponse extends T1CResponse {
+interface FacialImageResponse extends DataObjectResponse {
     data: FacialImage
 }
 
@@ -63,7 +63,7 @@ interface FacialImage {
     image: string
 }
 
-interface AllCertsResponse extends  T1CResponse {
+interface AllCertsResponse extends DataObjectResponse {
     data: {
         authentication_certificate: string
         signing_certificate: string

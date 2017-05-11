@@ -3,7 +3,7 @@
  * @since 2017
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { DataArrayResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import { DataArrayResponse, DataObjectResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
 import { CertCard, VerifyPinData } from "../../Card";
 
 interface AbstractOberthur extends CertCard {
@@ -38,7 +38,7 @@ interface AllDataResponse extends AllCertsResponse {
     }
 }
 
-interface AllCertsResponse {
+interface AllCertsResponse extends DataObjectResponse {
     data: {
         root_certificate: string
         issuer_certificate: string
