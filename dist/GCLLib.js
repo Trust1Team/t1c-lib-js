@@ -43,7 +43,7 @@ var GCLLib =
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -91,17 +91,17 @@ var GCLLib =
 	        }
 	        this.initSecurityContext(function (err) {
 	            if (err) {
-	                void 0;
+	                console.log(JSON.stringify(err));
 	                return;
 	            }
 	            self.registerAndActivate();
 	        });
 	        this.initOCVContext(function (err) {
 	            if (err) {
-	                void 0;
+	                console.warn("OCV not available for apikey, contact support@trust1team.com to add this capability");
 	            }
 	            else {
-	                void 0;
+	                console.log("OCV available for apikey");
 	            }
 	        });
 	    }
@@ -145,7 +145,7 @@ var GCLLib =
 	        var self_cfg = this.cfg;
 	        self.core().info(function (err, infoResponse) {
 	            if (err) {
-	                void 0;
+	                console.log(JSON.stringify(err));
 	                return;
 	            }
 	            var activated = infoResponse.data.activated;
@@ -157,19 +157,19 @@ var GCLLib =
 	            if (!activated) {
 	                self.dsClient.register(mergedInfo, uuid, function (error, activationResponse) {
 	                    if (err) {
-	                        void 0;
+	                        console.log("Error while registering the device: " + JSON.stringify(err));
 	                        return;
 	                    }
 	                    self_cfg.jwt = activationResponse.token;
 	                    self.core().activate(function (activationError) {
 	                        if (activationError) {
-	                            void 0;
+	                            console.log(JSON.stringify(err));
 	                            return;
 	                        }
 	                        mergedInfo.activated = true;
 	                        self.dsClient.sync(mergedInfo, uuid, function (syncError) {
 	                            if (syncError) {
-	                                void 0;
+	                                console.log("Error while syncing the device: " + JSON.stringify(syncError));
 	                                return;
 	                            }
 	                        });
@@ -179,7 +179,7 @@ var GCLLib =
 	            else {
 	                self.dsClient.sync(mergedInfo, uuid, function (syncError, activationResponse) {
 	                    if (syncError) {
-	                        void 0;
+	                        console.log("Error while syncing the device: " + JSON.stringify(syncError));
 	                        return;
 	                    }
 	                    self_cfg.jwt = activationResponse.token;
@@ -191,13 +191,13 @@ var GCLLib =
 	    GCLClient.prototype.implicitDownload = function () {
 	        var self = this;
 	        this.core().info(function (error) {
-	            void 0;
+	            console.log("implicit error", JSON.stringify(error));
 	            if (error) {
 	                var _info = self.core().infoBrowserSync();
-	                void 0;
+	                console.log("implicit error", JSON.stringify(_info));
 	                self.ds().downloadLink(_info, function (linkError, downloadResponse) {
 	                    if (linkError) {
-	                        void 0;
+	                        console.error("could not download GCL package:", linkError.description);
 	                    }
 	                    window.open(downloadResponse.url);
 	                    return;
@@ -213,9 +213,9 @@ var GCLLib =
 	exports.GCLClient = GCLClient;
 
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
 	 * @license
@@ -17304,9 +17304,9 @@ var GCLLib =
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(2)(module)))
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	module.exports = function(module) {
 		if(!module.webpackPolyfill) {
@@ -17320,9 +17320,9 @@ var GCLLib =
 	}
 
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -17480,9 +17480,9 @@ var GCLLib =
 	exports.GCLConfig = GCLConfig;
 
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -17526,9 +17526,9 @@ var GCLLib =
 	exports.CardFactory = CardFactory;
 
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	var __extends = (this && this.__extends) || (function () {
@@ -17557,9 +17557,9 @@ var GCLLib =
 	exports.EMV = EMV;
 
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	var __extends = (this && this.__extends) || (function () {
@@ -17716,9 +17716,9 @@ var GCLLib =
 	exports.GenericSecuredCertCard = GenericSecuredCertCard;
 
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	var __extends = (this && this.__extends) || (function () {
@@ -17778,9 +17778,9 @@ var GCLLib =
 	exports.EidBe = EidBe;
 
 
-/***/ },
+/***/ }),
 /* 8 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -17866,9 +17866,9 @@ var GCLLib =
 	exports.EidLux = EidLux;
 
 
-/***/ },
+/***/ }),
 /* 9 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	var __extends = (this && this.__extends) || (function () {
@@ -17909,9 +17909,9 @@ var GCLLib =
 	exports.Mobib = Mobib;
 
 
-/***/ },
+/***/ }),
 /* 10 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	var __extends = (this && this.__extends) || (function () {
@@ -17945,9 +17945,9 @@ var GCLLib =
 	exports.LuxTrust = LuxTrust;
 
 
-/***/ },
+/***/ }),
 /* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	var __extends = (this && this.__extends) || (function () {
@@ -17980,9 +17980,9 @@ var GCLLib =
 	exports.Ocra = Ocra;
 
 
-/***/ },
+/***/ }),
 /* 12 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	var __extends = (this && this.__extends) || (function () {
@@ -18039,9 +18039,9 @@ var GCLLib =
 	exports.Aventra = Aventra;
 
 
-/***/ },
+/***/ }),
 /* 13 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	var __extends = (this && this.__extends) || (function () {
@@ -18094,9 +18094,9 @@ var GCLLib =
 	exports.Oberthur = Oberthur;
 
 
-/***/ },
+/***/ }),
 /* 14 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	var __extends = (this && this.__extends) || (function () {
@@ -18145,9 +18145,9 @@ var GCLLib =
 	exports.PIV = PIV;
 
 
-/***/ },
+/***/ }),
 /* 15 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -18320,9 +18320,9 @@ var GCLLib =
 	exports.CoreService = CoreService;
 
 
-/***/ },
+/***/ }),
 /* 16 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*!
 	 * Platform.js <https://mths.be/platform>
@@ -19481,9 +19481,9 @@ var GCLLib =
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)(module), (function() { return this; }())))
 
-/***/ },
+/***/ }),
 /* 17 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -19616,15 +19616,15 @@ var GCLLib =
 	}
 
 
-/***/ },
+/***/ }),
 /* 18 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	module.exports = __webpack_require__(19);
 
-/***/ },
+/***/ }),
 /* 19 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -19680,9 +19680,9 @@ var GCLLib =
 	module.exports.default = axios;
 
 
-/***/ },
+/***/ }),
 /* 20 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -19985,9 +19985,9 @@ var GCLLib =
 	};
 
 
-/***/ },
+/***/ }),
 /* 21 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 	
@@ -20002,9 +20002,9 @@ var GCLLib =
 	};
 
 
-/***/ },
+/***/ }),
 /* 22 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -20093,9 +20093,9 @@ var GCLLib =
 	module.exports = Axios;
 
 
-/***/ },
+/***/ }),
 /* 23 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
@@ -20193,9 +20193,9 @@ var GCLLib =
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(24)))
 
-/***/ },
+/***/ }),
 /* 24 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	// shim for using process in browser
 	var process = module.exports = {};
@@ -20379,9 +20379,9 @@ var GCLLib =
 	process.umask = function() { return 0; };
 
 
-/***/ },
+/***/ }),
 /* 25 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -20397,9 +20397,9 @@ var GCLLib =
 	};
 
 
-/***/ },
+/***/ }),
 /* 26 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
@@ -20581,9 +20581,9 @@ var GCLLib =
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(24)))
 
-/***/ },
+/***/ }),
 /* 27 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -20612,9 +20612,9 @@ var GCLLib =
 	};
 
 
-/***/ },
+/***/ }),
 /* 28 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -20635,9 +20635,9 @@ var GCLLib =
 	};
 
 
-/***/ },
+/***/ }),
 /* 29 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 	
@@ -20660,9 +20660,9 @@ var GCLLib =
 	};
 
 
-/***/ },
+/***/ }),
 /* 30 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -20734,9 +20734,9 @@ var GCLLib =
 	};
 
 
-/***/ },
+/***/ }),
 /* 31 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -20777,9 +20777,9 @@ var GCLLib =
 	};
 
 
-/***/ },
+/***/ }),
 /* 32 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -20851,9 +20851,9 @@ var GCLLib =
 	);
 
 
-/***/ },
+/***/ }),
 /* 33 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 	
@@ -20893,9 +20893,9 @@ var GCLLib =
 	module.exports = btoa;
 
 
-/***/ },
+/***/ }),
 /* 34 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -20952,9 +20952,9 @@ var GCLLib =
 	);
 
 
-/***/ },
+/***/ }),
 /* 35 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -21010,9 +21010,9 @@ var GCLLib =
 	module.exports = InterceptorManager;
 
 
-/***/ },
+/***/ }),
 /* 36 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -21095,9 +21095,9 @@ var GCLLib =
 	};
 
 
-/***/ },
+/***/ }),
 /* 37 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -21121,9 +21121,9 @@ var GCLLib =
 	};
 
 
-/***/ },
+/***/ }),
 /* 38 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 	
@@ -21132,9 +21132,9 @@ var GCLLib =
 	};
 
 
-/***/ },
+/***/ }),
 /* 39 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 	
@@ -21152,9 +21152,9 @@ var GCLLib =
 	};
 
 
-/***/ },
+/***/ }),
 /* 40 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 	
@@ -21170,9 +21170,9 @@ var GCLLib =
 	};
 
 
-/***/ },
+/***/ }),
 /* 41 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 	
@@ -21195,9 +21195,9 @@ var GCLLib =
 	module.exports = Cancel;
 
 
-/***/ },
+/***/ }),
 /* 42 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -21258,9 +21258,9 @@ var GCLLib =
 	module.exports = CancelToken;
 
 
-/***/ },
+/***/ }),
 /* 43 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	'use strict';
 	
@@ -21291,9 +21291,9 @@ var GCLLib =
 	};
 
 
-/***/ },
+/***/ }),
 /* 44 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -21381,9 +21381,9 @@ var GCLLib =
 	exports.DSClient = DSClient;
 
 
-/***/ },
+/***/ }),
 /* 45 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -21429,6 +21429,6 @@ var GCLLib =
 	exports.OCVClient = OCVClient;
 
 
-/***/ }
+/***/ })
 /******/ ]);
 //# sourceMappingURL=GCLLib.js.map
