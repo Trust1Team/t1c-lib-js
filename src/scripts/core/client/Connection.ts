@@ -14,9 +14,17 @@ export { LocalConnection, LocalAuthConnection, RemoteConnection, Connection, Loc
 
 
 interface Connection {
-    get(url: string, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string });
-    post(url: string, body: { [key: string]: any }, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string });
-    put(url: string, body: { [key: string]: any }, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string });
+    get(url: string,
+        callback: (error: any, data: any) => void,
+        queryParams?: { [key: string]: string }): void;
+    post(url: string,
+         body: { [key: string]: any },
+         callback: (error: any, data: any) => void,
+         queryParams?: { [key: string]: string }): void;
+    put(url: string,
+        body: { [key: string]: any },
+        callback: (error: any, data: any) => void,
+        queryParams?: { [key: string]: string }): void;
 }
 
 class LocalAuthConnection implements Connection {
