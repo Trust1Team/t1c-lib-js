@@ -3,27 +3,22 @@
  * @since 2017
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { AuthenticateOrSignData, CertCard, OptionalPin } from "../../Card";
+import { AuthenticateOrSignData, OptionalPin, SecuredCertCard } from "../../Card";
 import { DataArrayResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
 
 export { AbstractEidLUX, AllCertsResponse, AllDataResponse, Biometric, BiometricResponse,
     Picture, PictureResponse, SignatureImage, SignatureImageResponse };
 
 
-interface AbstractEidLUX extends CertCard {
+interface AbstractEidLUX extends SecuredCertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
-    allData(filters: string[], callback: (error: RestException, data: AllDataResponse) => void): void;
-    allCerts(filters: string[], callback: (error: RestException, data: AllCertsResponse) => void): void;
-    biometric(callback: (error: RestException, data: BiometricResponse) => void): void;
-    picture(callback: (error: RestException, data: PictureResponse) => void): void;
-    rootCertificate(callback: (error: RestException, data: DataArrayResponse) => void): void;
-    authenticationCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    nonRepudiationCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void): void;
-    signData(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
-    authenticate(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
-    signatureImage(callback: (error: RestException, data: SignatureImageResponse) => void): void;
+    biometric(body: OptionalPin, callback: (error: RestException, data: BiometricResponse) => void): void;
+    picture(body: OptionalPin, callback: (error: RestException, data: PictureResponse) => void): void;
+    rootCertificate(body: OptionalPin, callback: (error: RestException, data: DataArrayResponse) => void): void;
+    authenticationCertificate(body: OptionalPin, callback: (error: RestException, data: DataResponse) => void): void;
+    nonRepudiationCertificate(body: OptionalPin, callback: (error: RestException, data: DataResponse) => void): void;
+    signatureImage(body: OptionalPin, callback: (error: RestException, data: SignatureImageResponse) => void): void;
 }
 
 interface AllCertsResponse extends T1CResponse {
