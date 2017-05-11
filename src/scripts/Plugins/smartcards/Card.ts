@@ -1,5 +1,5 @@
 import { RestException } from "../../core/exceptions/CoreExceptions";
-import { DataResponse, T1CResponse } from "../../core/service/CoreModel";
+import { DataArrayResponse, DataObjectResponse, DataResponse, T1CResponse } from "../../core/service/CoreModel";
 import { LocalConnection } from "../../core/client/Connection";
 /**
  * @author Michallis Pashidis
@@ -63,7 +63,7 @@ abstract class GenericCard {
 }
 
 abstract class GenericSmartCard extends GenericCard implements Card {
-    public allData(filters: string[], callback: (error: RestException, data: any) => void): void {
+    public allData(filters: string[], callback: (error: RestException, data: DataObjectResponse) => void): void {
         if (filters && filters.length) {
             this.connection.get(this.resolvedReaderURI(), callback, GenericCard.createFilterQueryParam(filters));
         }
@@ -82,17 +82,26 @@ abstract class GenericPinCard extends GenericSmartCard implements PinCard {
 abstract class GenericCertCard extends GenericPinCard implements CertCard {
     static ALL_CERTIFICATES = "/certificates";
     static AUTHENTICATE = "/authenticate";
-    static CERT_ROOT = GenericCertCard.ALL_CERTIFICATES + "/root";
-    static CERT_AUTHENTICATION = GenericCertCard.ALL_CERTIFICATES + "/authentication";
-    static CERT_NON_REPUDIATION = GenericCertCard.ALL_CERTIFICATES + "/non-repudiation";
-    static CERT_ISSUER = GenericCertCard.ALL_CERTIFICATES + "/issuer";
-    static CERT_SIGNING = GenericCertCard.ALL_CERTIFICATES + "/signing";
-    static CERT_ENCRYPTION = GenericCertCard.ALL_CERTIFICATES + "/encryption";
-    static CERT_CITIZEN = GenericCertCard.ALL_CERTIFICATES + "/citizen";
-    static CERT_RRN = GenericCertCard.ALL_CERTIFICATES + "/rrn";
+    static CERT_ROOT = "/root";
+    static CERT_AUTHENTICATION = "/authentication";
+    static CERT_NON_REPUDIATION = "/non-repudiation";
+    static CERT_ISSUER = "/issuer";
+    static CERT_SIGNING = "/signing";
+    static CERT_ENCRYPTION = "/encryption";
+    static CERT_CITIZEN = "/citizen";
+    static CERT_RRN = "/rrn";
     static SIGN_DATA = "/sign";
 
-    public allCerts(filters: string[], callback: (error: RestException, data: any) => void): void {
+
+    public allAlgoRefsForAuthentication(callback: (error: RestException, data: DataArrayResponse) => void): void {
+        this.connection.get(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, callback);
+    }
+
+    public allAlgoRefsForSigning(callback: (error: RestException, data: DataArrayResponse) => void): void {
+        this.connection.get(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, callback);
+    }
+
+    public allCerts(filters: string[], callback: (error: RestException, data: DataObjectResponse) => void): void {
         if (filters && filters.length) {
             this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES,
                 callback,
@@ -111,23 +120,34 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
         this.connection.post(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, callback);
     }
 
+    protected getCertificate(certUrl: string, callback: (error: RestException, data: DataResponse) => void): void {
+        this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, callback);
+    }
 }
 
 abstract class GenericSecuredCertCard extends GenericCard implements SecuredCertCard {
     static ALL_CERTIFICATES = "/certificates";
     static AUTHENTICATE = "/authenticate";
     // static CERT_ROOT = GenericCertCard.ALL_CERTIFICATES + "/root";
-    static CERT_AUTHENTICATION = GenericSecuredCertCard.ALL_CERTIFICATES + "/authentication";
+    static CERT_AUTHENTICATION = "/authentication";
     // static CERT_NON_REPUDIATION = GenericCertCard.ALL_CERTIFICATES + "/non-repudiation";
     // static CERT_ISSUER = GenericCertCard.ALL_CERTIFICATES + "/issuer";
-    static CERT_SIGNING = GenericSecuredCertCard.ALL_CERTIFICATES + "/signing";
+    static CERT_SIGNING = "/signing";
     // static CERT_ENCRYPTION = GenericCertCard.ALL_CERTIFICATES + "/encryption";
     // static CERT_CITIZEN = GenericCertCard.ALL_CERTIFICATES + "/citizen";
     // static CERT_RRN = GenericCertCard.ALL_CERTIFICATES + "/rrn";
     static SIGN_DATA = "/sign";
     static VERIFY_PIN = "/verify-pin";
 
-    public allData(filters: string[], body: OptionalPin, callback: (error: RestException, data: any) => void) {
+    public allAlgoRefsForAuthentication(callback: (error: RestException, data: DataArrayResponse) => void): void {
+        this.connection.get(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, callback);
+    }
+
+    public allAlgoRefsForSigning(callback: (error: RestException, data: DataArrayResponse) => void): void {
+        this.connection.get(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, callback);
+    }
+
+    public allData(filters: string[], body: OptionalPin, callback: (error: RestException, data: DataObjectResponse) => void) {
         if (filters && filters.length) { this.connection.post(this.resolvedReaderURI(),
             body,
             callback,
@@ -135,7 +155,7 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
         } else { this.connection.post(this.resolvedReaderURI(), body, callback); }
     }
 
-    public allCerts(filters: string[], body: OptionalPin, callback: (error: RestException, data: any) => void) {
+    public allCerts(filters: string[], body: OptionalPin, callback: (error: RestException, data: DataObjectResponse) => void) {
         if (filters && filters.length) {
             this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES,
                 body,
@@ -154,6 +174,10 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
 
     public authenticate(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void) {
         this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, body, callback);
+    }
+
+    protected getCertificate(certUrl: string, body: OptionalPin, callback: (error: RestException, data: DataResponse) => void): void {
+        this.connection.post(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, body, callback);
     }
 }
 

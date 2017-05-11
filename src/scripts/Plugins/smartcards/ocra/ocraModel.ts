@@ -3,7 +3,7 @@
  * @since 2017
  */
 import { OptionalPin, PinCard } from "../Card";
-import { DataResponse, T1CResponse } from "../../../core/service/CoreModel";
+import { DataObjectResponse, DataResponse, T1CResponse } from "../../../core/service/CoreModel";
 import { RestException } from "../../../core/exceptions/CoreExceptions";
 
 interface AbstractOcra extends PinCard {
@@ -18,7 +18,7 @@ interface AbstractOcra extends PinCard {
     // readCounter(body: OptionalPin): Promise<ReadCounterResponse>;
 }
 
-interface AllDataResponse extends T1CResponse {
+interface AllDataResponse extends DataObjectResponse {
     data: {
         counter: string
     }

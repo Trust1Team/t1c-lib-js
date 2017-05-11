@@ -3,8 +3,8 @@
  * @since 2017
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
-import { AuthenticateOrSignData, CertCard, OptionalPin } from "../../Card";
+import { DataObjectResponse, DataResponse } from "../../../../core/service/CoreModel";
+import { CertCard } from "../../Card";
 
 interface AbstractLuxTrust extends CertCard {
     // callback-based
@@ -22,7 +22,7 @@ interface AbstractLuxTrust extends CertCard {
     // signingCertificate(): Promise<DataResponse>;
 }
 
-interface AllDataResponse extends T1CResponse {
+interface AllDataResponse extends AllCertsResponse {
     data: {
         authentication_certificate: string
         non_repudiation_certificate: string
@@ -30,7 +30,7 @@ interface AllDataResponse extends T1CResponse {
     }
 }
 
-interface AllCertsResponse extends T1CResponse {
+interface AllCertsResponse extends DataObjectResponse {
     data: {
         authentication_certificate: string
         non_repudiation_certificate: string

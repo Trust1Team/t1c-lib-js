@@ -17547,18 +17547,8 @@ var GCLLib =
 	var EMV = (function (_super) {
 	    __extends(EMV, _super);
 	    function EMV() {
-	        var _this = _super !== null && _super.apply(this, arguments) || this;
-	        _this.CONTAINER_CONTEXT = "/plugins/emv";
-	        return _this;
+	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
-	    EMV.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length) {
-	            this.connection.get(this.resolvedReaderURI(), callback, Card_1.GenericPinCard.createFilterQueryParam(filters));
-	        }
-	        else {
-	            this.connection.get(this.resolvedReaderURI(), callback);
-	        }
-	    };
 	    EMV.prototype.pan = function (callback) {
 	        this.connection.get(this.resolvedReaderURI() + EMV_PAN, callback);
 	    };
@@ -17637,6 +17627,12 @@ var GCLLib =
 	    function GenericCertCard() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
+	    GenericCertCard.prototype.allAlgoRefsForAuthentication = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, callback);
+	    };
+	    GenericCertCard.prototype.allAlgoRefsForSigning = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, callback);
+	    };
 	    GenericCertCard.prototype.allCerts = function (filters, callback) {
 	        if (filters && filters.length) {
 	            this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES, callback, GenericCertCard.createFilterQueryParam(filters));
@@ -17653,18 +17649,21 @@ var GCLLib =
 	        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
 	        this.connection.post(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, callback);
 	    };
+	    GenericCertCard.prototype.getCertificate = function (certUrl, callback) {
+	        this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, callback);
+	    };
 	    return GenericCertCard;
 	}(GenericPinCard));
 	GenericCertCard.ALL_CERTIFICATES = "/certificates";
 	GenericCertCard.AUTHENTICATE = "/authenticate";
-	GenericCertCard.CERT_ROOT = GenericCertCard.ALL_CERTIFICATES + "/root";
-	GenericCertCard.CERT_AUTHENTICATION = GenericCertCard.ALL_CERTIFICATES + "/authentication";
-	GenericCertCard.CERT_NON_REPUDIATION = GenericCertCard.ALL_CERTIFICATES + "/non-repudiation";
-	GenericCertCard.CERT_ISSUER = GenericCertCard.ALL_CERTIFICATES + "/issuer";
-	GenericCertCard.CERT_SIGNING = GenericCertCard.ALL_CERTIFICATES + "/signing";
-	GenericCertCard.CERT_ENCRYPTION = GenericCertCard.ALL_CERTIFICATES + "/encryption";
-	GenericCertCard.CERT_CITIZEN = GenericCertCard.ALL_CERTIFICATES + "/citizen";
-	GenericCertCard.CERT_RRN = GenericCertCard.ALL_CERTIFICATES + "/rrn";
+	GenericCertCard.CERT_ROOT = "/root";
+	GenericCertCard.CERT_AUTHENTICATION = "/authentication";
+	GenericCertCard.CERT_NON_REPUDIATION = "/non-repudiation";
+	GenericCertCard.CERT_ISSUER = "/issuer";
+	GenericCertCard.CERT_SIGNING = "/signing";
+	GenericCertCard.CERT_ENCRYPTION = "/encryption";
+	GenericCertCard.CERT_CITIZEN = "/citizen";
+	GenericCertCard.CERT_RRN = "/rrn";
 	GenericCertCard.SIGN_DATA = "/sign";
 	exports.GenericCertCard = GenericCertCard;
 	var GenericSecuredCertCard = (function (_super) {
@@ -17672,6 +17671,12 @@ var GCLLib =
 	    function GenericSecuredCertCard() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
+	    GenericSecuredCertCard.prototype.allAlgoRefsForAuthentication = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, callback);
+	    };
+	    GenericSecuredCertCard.prototype.allAlgoRefsForSigning = function (callback) {
+	        this.connection.get(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, callback);
+	    };
 	    GenericSecuredCertCard.prototype.allData = function (filters, body, callback) {
 	        if (filters && filters.length) {
 	            this.connection.post(this.resolvedReaderURI(), body, callback, GenericSecuredCertCard.createFilterQueryParam(filters));
@@ -17697,12 +17702,15 @@ var GCLLib =
 	    GenericSecuredCertCard.prototype.authenticate = function (body, callback) {
 	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, body, callback);
 	    };
+	    GenericSecuredCertCard.prototype.getCertificate = function (certUrl, body, callback) {
+	        this.connection.post(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, body, callback);
+	    };
 	    return GenericSecuredCertCard;
 	}(GenericCard));
 	GenericSecuredCertCard.ALL_CERTIFICATES = "/certificates";
 	GenericSecuredCertCard.AUTHENTICATE = "/authenticate";
-	GenericSecuredCertCard.CERT_AUTHENTICATION = GenericSecuredCertCard.ALL_CERTIFICATES + "/authentication";
-	GenericSecuredCertCard.CERT_SIGNING = GenericSecuredCertCard.ALL_CERTIFICATES + "/signing";
+	GenericSecuredCertCard.CERT_AUTHENTICATION = "/authentication";
+	GenericSecuredCertCard.CERT_SIGNING = "/signing";
 	GenericSecuredCertCard.SIGN_DATA = "/sign";
 	GenericSecuredCertCard.VERIFY_PIN = "/verify-pin";
 	exports.GenericSecuredCertCard = GenericSecuredCertCard;
@@ -17730,22 +17738,6 @@ var GCLLib =
 	    function EidBe() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
-	    EidBe.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length) {
-	            this.connection.get(this.resolvedReaderURI(), callback, Card_1.GenericCertCard.createFilterQueryParam(filters));
-	        }
-	        else {
-	            this.connection.get(this.resolvedReaderURI(), callback);
-	        }
-	    };
-	    EidBe.prototype.allCerts = function (filters, callback) {
-	        if (filters && filters.length) {
-	            this.connection.get(this.resolvedReaderURI() + Card_1.GenericCertCard.ALL_CERTIFICATES, callback, Card_1.GenericCertCard.createFilterQueryParam(filters));
-	        }
-	        else {
-	            this.connection.get(this.resolvedReaderURI() + Card_1.GenericCertCard.ALL_CERTIFICATES, callback);
-	        }
-	    };
 	    EidBe.prototype.rnData = function (callback) {
 	        this.connection.get(this.resolvedReaderURI() + EidBe.RN_DATA, callback);
 	    };
@@ -17756,19 +17748,19 @@ var GCLLib =
 	        this.connection.get(this.resolvedReaderURI() + EidBe.PHOTO, callback);
 	    };
 	    EidBe.prototype.rootCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + EidBe.CERT_ROOT, callback);
+	        this.getCertificate(EidBe.CERT_ROOT, callback);
 	    };
 	    EidBe.prototype.citizenCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + EidBe.CERT_CITIZEN, callback);
+	        this.getCertificate(EidBe.CERT_CITIZEN, callback);
 	    };
 	    EidBe.prototype.authenticationCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + EidBe.CERT_AUTHENTICATION, callback);
+	        this.getCertificate(EidBe.CERT_AUTHENTICATION, callback);
 	    };
 	    EidBe.prototype.nonRepudiationCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + EidBe.CERT_NON_REPUDIATION, callback);
+	        this.getCertificate(EidBe.CERT_NON_REPUDIATION, callback);
 	    };
 	    EidBe.prototype.rrnCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + EidBe.CERT_RRN, callback);
+	        this.getCertificate(EidBe.CERT_RRN, callback);
 	    };
 	    EidBe.prototype.verifyPin = function (body, callback) {
 	        var _req = { private_key_reference: EidBe.VERIFY_PRIV_KEY_REF };
@@ -17900,14 +17892,6 @@ var GCLLib =
 	    function Mobib() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
-	    Mobib.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length) {
-	            this.connection.get(this.resolvedReaderURI(), callback, Card_1.GenericCard.createFilterQueryParam(filters));
-	        }
-	        else {
-	            this.connection.get(this.resolvedReaderURI(), callback);
-	        }
-	    };
 	    Mobib.prototype.cardIssuing = function (callback) {
 	        this.connection.get(this.resolvedReaderURI() + MOBIB_CARD_ISSUING, callback);
 	    };
@@ -17921,7 +17905,7 @@ var GCLLib =
 	        this.connection.get(this.resolvedReaderURI() + MOBIB_STATUS, callback);
 	    };
 	    return Mobib;
-	}(Card_1.GenericCard));
+	}(Card_1.GenericSmartCard));
 	exports.Mobib = Mobib;
 
 
@@ -17947,30 +17931,14 @@ var GCLLib =
 	    function LuxTrust() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
-	    LuxTrust.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length) {
-	            this.connection.get(this.resolvedReaderURI(), callback, LuxTrust.createFilterQueryParam(filters));
-	        }
-	        else {
-	            this.connection.get(this.resolvedReaderURI(), callback);
-	        }
-	    };
-	    LuxTrust.prototype.allCerts = function (filters, callback) {
-	        if (filters && filters.length) {
-	            this.connection.get(this.resolvedReaderURI() + LuxTrust.ALL_CERTIFICATES, callback, LuxTrust.createFilterQueryParam(filters));
-	        }
-	        else {
-	            this.connection.get(this.resolvedReaderURI() + LuxTrust.ALL_CERTIFICATES, callback);
-	        }
-	    };
 	    LuxTrust.prototype.rootCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + LuxTrust.CERT_ROOT, callback);
+	        this.getCertificate(LuxTrust.CERT_ROOT, callback);
 	    };
 	    LuxTrust.prototype.authenticationCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + LuxTrust.CERT_AUTHENTICATION, callback);
+	        this.getCertificate(LuxTrust.CERT_AUTHENTICATION, callback);
 	    };
 	    LuxTrust.prototype.signingCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + LuxTrust.CERT_SIGNING, callback);
+	        this.getCertificate(LuxTrust.CERT_SIGNING, callback);
 	    };
 	    return LuxTrust;
 	}(Card_1.GenericCertCard));
@@ -17999,14 +17967,6 @@ var GCLLib =
 	    function Ocra() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
-	    Ocra.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length) {
-	            this.connection.get(this.resolvedReaderURI(), callback, Card_1.GenericPinCard.createFilterQueryParam(filters));
-	        }
-	        else {
-	            this.connection.get(this.resolvedReaderURI(), callback);
-	        }
-	    };
 	    Ocra.prototype.challenge = function (body, callback) {
 	        this.connection.post(this.resolvedReaderURI() + Ocra.CHALLENGE, body, callback);
 	    };
@@ -18052,42 +18012,20 @@ var GCLLib =
 	    Aventra.prototype.allKeyRefs = function () {
 	        return ["authenticate", "sign", "encrypt"];
 	    };
-	    Aventra.prototype.allAlgoRefsForAuthentication = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + Aventra.AUTHENTICATE, callback);
-	    };
-	    Aventra.prototype.allAlgoRefsForSigning = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + Aventra.SIGN_DATA, callback);
-	    };
-	    Aventra.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length) {
-	            this.connection.get(this.resolvedReaderURI(), callback, Aventra.createFilterQueryParam(filters));
-	        }
-	        else {
-	            this.connection.get(this.resolvedReaderURI(), callback);
-	        }
-	    };
-	    Aventra.prototype.allCerts = function (filters, callback) {
-	        if (filters && filters.length) {
-	            this.connection.get(this.resolvedReaderURI() + Aventra.ALL_CERTIFICATES, callback, Aventra.createFilterQueryParam(filters));
-	        }
-	        else {
-	            this.connection.get(this.resolvedReaderURI() + Aventra.ALL_CERTIFICATES, callback);
-	        }
-	    };
 	    Aventra.prototype.rootCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + Aventra.CERT_ROOT, callback);
+	        this.getCertificate(Aventra.CERT_ROOT, callback);
 	    };
 	    Aventra.prototype.issuerCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + Aventra.CERT_ISSUER, callback);
+	        this.getCertificate(Aventra.CERT_ISSUER, callback);
 	    };
 	    Aventra.prototype.authenticationCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + Aventra.CERT_AUTHENTICATION, callback);
+	        this.getCertificate(Aventra.CERT_AUTHENTICATION, callback);
 	    };
 	    Aventra.prototype.signingCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + Aventra.CERT_SIGNING, callback);
+	        this.getCertificate(Aventra.CERT_SIGNING, callback);
 	    };
 	    Aventra.prototype.encryptionCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + Aventra.CERT_ENCRYPTION, callback);
+	        this.getCertificate(Aventra.CERT_ENCRYPTION, callback);
 	    };
 	    Aventra.prototype.verifyPin = function (body, callback) {
 	        this.connection.post(this.resolvedReaderURI() + Aventra.VERIFY_PIN, body, callback);
@@ -18133,42 +18071,20 @@ var GCLLib =
 	    Oberthur.prototype.allKeyRefs = function () {
 	        return ["authenticate", "sign", "encrypt"];
 	    };
-	    Oberthur.prototype.allAlgoRefsForAuthentication = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + Oberthur.AUTHENTICATE, callback);
-	    };
-	    Oberthur.prototype.allAlgoRefsForSigning = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + Oberthur.SIGN_DATA, callback);
-	    };
-	    Oberthur.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length) {
-	            this.connection.get(this.resolvedReaderURI(), callback, Oberthur.createFilterQueryParam(filters));
-	        }
-	        else {
-	            this.connection.get(this.resolvedReaderURI(), callback);
-	        }
-	    };
-	    Oberthur.prototype.allCerts = function (filters, callback) {
-	        if (filters && filters.length) {
-	            this.connection.get(this.resolvedReaderURI() + Oberthur.ALL_CERTIFICATES, callback, Oberthur.createFilterQueryParam(filters));
-	        }
-	        else {
-	            this.connection.get(this.resolvedReaderURI() + Oberthur.ALL_CERTIFICATES, callback);
-	        }
-	    };
 	    Oberthur.prototype.rootCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + Oberthur.CERT_ROOT, callback);
+	        this.getCertificate(Oberthur.CERT_ROOT, callback);
 	    };
 	    Oberthur.prototype.issuerCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + Oberthur.CERT_ISSUER, callback);
+	        this.getCertificate(Oberthur.CERT_ISSUER, callback);
 	    };
 	    Oberthur.prototype.authenticationCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + Oberthur.CERT_AUTHENTICATION, callback);
+	        this.getCertificate(Oberthur.CERT_AUTHENTICATION, callback);
 	    };
 	    Oberthur.prototype.signingCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + Oberthur.CERT_SIGNING, callback);
+	        this.getCertificate(Oberthur.CERT_SIGNING, callback);
 	    };
 	    Oberthur.prototype.encryptionCertificate = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + Oberthur.CERT_ENCRYPTION, callback);
+	        this.getCertificate(Oberthur.CERT_ENCRYPTION, callback);
 	    };
 	    Oberthur.prototype.verifyPin = function (body, callback) {
 	        this.connection.post(this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, callback);
@@ -18210,39 +18126,17 @@ var GCLLib =
 	    PIV.prototype.allKeyRefs = function () {
 	        return ["authenticate", "sign", "encrypt"];
 	    };
-	    PIV.prototype.allAlgoRefsForAuthentication = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + PIV.AUTHENTICATE, callback);
-	    };
-	    PIV.prototype.allAlgoRefsForSigning = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + PIV.SIGN_DATA, callback);
-	    };
 	    PIV.prototype.printedInformation = function (body, callback) {
 	        this.connection.post(this.resolvedReaderURI() + PIV.PRINTED_INFORMATION, body, callback);
 	    };
 	    PIV.prototype.facialImage = function (body, callback) {
 	        this.connection.post(this.resolvedReaderURI() + PIV.FACIAL_IMAGE, body, callback);
 	    };
-	    PIV.prototype.allData = function (filters, body, callback) {
-	        if (filters && filters.length) {
-	            this.connection.post(this.resolvedReaderURI(), body, callback, PIV.createFilterQueryParam(filters));
-	        }
-	        else {
-	            this.connection.post(this.resolvedReaderURI(), body, callback);
-	        }
-	    };
-	    PIV.prototype.allCerts = function (filters, body, callback) {
-	        if (filters && filters.length) {
-	            this.connection.post(this.resolvedReaderURI() + PIV.ALL_CERTIFICATES, body, callback, PIV.createFilterQueryParam(filters));
-	        }
-	        else {
-	            this.connection.post(this.resolvedReaderURI() + PIV.ALL_CERTIFICATES, body, callback);
-	        }
-	    };
 	    PIV.prototype.authenticationCertificate = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + PIV.CERT_AUTHENTICATION, body, callback);
+	        this.getCertificate(PIV.CERT_AUTHENTICATION, body, callback);
 	    };
 	    PIV.prototype.signingCertificate = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + PIV.CERT_SIGNING, body, callback);
+	        this.getCertificate(PIV.CERT_SIGNING, body, callback);
 	    };
 	    return PIV;
 	}(Card_1.GenericSecuredCertCard));

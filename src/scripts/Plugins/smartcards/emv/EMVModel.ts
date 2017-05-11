@@ -3,8 +3,8 @@
  * @since 2017
  */
 import { RestException } from "../../../core/exceptions/CoreExceptions";
-import { OptionalPin, PinCard } from "../Card";
-import { DataResponse, T1CResponse } from "../../../core/service/CoreModel";
+import { PinCard } from "../Card";
+import { DataObjectResponse, DataResponse } from "../../../core/service/CoreModel";
 
 interface AbstractEMV extends PinCard {
     // callback-based
@@ -16,7 +16,7 @@ interface AbstractEMV extends PinCard {
     // allData(filters: string[]): Promise<AllDataResponse>;
 }
 
-interface AllDataResponse extends T1CResponse {
+interface AllDataResponse extends DataObjectResponse {
     data: {
         pan: string
     }
