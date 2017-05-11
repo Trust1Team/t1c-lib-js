@@ -1,17 +1,18 @@
 var webpack = require("webpack"),
-    path = require("path"),
-    yargs = require("yargs");
+    path = require("path");
 
 var libraryName = 'GCLLib',
-    plugins = [],
-    outputFile;
-
-if (yargs.argv.p) {
-    plugins.push(new webpack.optimize.UglifyJsPlugin({ minimize: true }));
-    outputFile = libraryName + ".min.js"
-} else {
-    outputFile = libraryName + ".js";
-}
+    plugins = [ new webpack.optimize.UglifyJsPlugin({
+        minimize: true,
+        compress: {
+            drop_console: true,
+            drop_debugger: true
+        },
+        output: {
+            comments: false
+        }
+    }) ],
+    outputFile = libraryName + ".min.js";
 
 var config = {
     entry: "./src/scripts/core/GCLLib.ts",
@@ -19,9 +20,7 @@ var config = {
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: outputFile,
-        library: libraryName,
-        libraryTarget: "umd",
-        umdNamedDefine: true
+        library: libraryName
     },
     module: {
         preloaders: [
