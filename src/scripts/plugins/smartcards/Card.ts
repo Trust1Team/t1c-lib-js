@@ -132,23 +132,19 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
 abstract class GenericSecuredCertCard extends GenericCard implements SecuredCertCard {
     static ALL_CERTIFICATES = "/certificates";
     static AUTHENTICATE = "/authenticate";
-    // static CERT_ROOT = GenericCertCard.ALL_CERTIFICATES + "/root";
     static CERT_AUTHENTICATION = "/authentication";
-    // static CERT_NON_REPUDIATION = GenericCertCard.ALL_CERTIFICATES + "/non-repudiation";
-    // static CERT_ISSUER = GenericCertCard.ALL_CERTIFICATES + "/issuer";
+    static CERT_NON_REPUDIATION = "/non-repudiation";
+    static CERT_ROOT = "/root";
     static CERT_SIGNING = "/signing";
-    // static CERT_ENCRYPTION = GenericCertCard.ALL_CERTIFICATES + "/encryption";
-    // static CERT_CITIZEN = GenericCertCard.ALL_CERTIFICATES + "/citizen";
-    // static CERT_RRN = GenericCertCard.ALL_CERTIFICATES + "/rrn";
     static SIGN_DATA = "/sign";
     static VERIFY_PIN = "/verify-pin";
 
     public allAlgoRefsForAuthentication(callback: (error: RestException, data: DataArrayResponse) => void): void {
-        this.connection.get(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, callback);
+        this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, callback);
     }
 
     public allAlgoRefsForSigning(callback: (error: RestException, data: DataArrayResponse) => void): void {
-        this.connection.get(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, callback);
+        this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, callback);
     }
 
     public allData(filters: string[], body: OptionalPin, callback: (error: RestException, data: DataObjectResponse) => void) {
@@ -180,7 +176,19 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
         this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, body, callback);
     }
 
-    protected getCertificate(certUrl: string, body: OptionalPin, callback: (error: RestException, data: DataResponse) => void): void {
-        this.connection.post(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, body, callback);
+    protected getCertificate(certUrl: string,
+                             body: OptionalPin,
+                             callback: (error: RestException,
+                                        data: DataResponse) => void,
+                             params?: { filter?: string, pin?: string }): void {
+        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, callback, params);
+    }
+
+    protected getCertificateArray(certUrl: string,
+                                  body: OptionalPin,
+                                  callback: (error: RestException,
+                                             data: DataArrayResponse) => void,
+                                  params?: { filter?: string, pin?: string }): void {
+        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, callback, params);
     }
 }

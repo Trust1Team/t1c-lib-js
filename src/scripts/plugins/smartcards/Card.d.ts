@@ -75,6 +75,8 @@ declare abstract class GenericSecuredCertCard extends GenericCard implements Sec
     static ALL_CERTIFICATES: string;
     static AUTHENTICATE: string;
     static CERT_AUTHENTICATION: string;
+    static CERT_NON_REPUDIATION: string;
+    static CERT_ROOT: string;
     static CERT_SIGNING: string;
     static SIGN_DATA: string;
     static VERIFY_PIN: string;
@@ -85,5 +87,12 @@ declare abstract class GenericSecuredCertCard extends GenericCard implements Sec
     verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void): void;
     signData(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
     authenticate(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
-    protected getCertificate(certUrl: string, body: OptionalPin, callback: (error: RestException, data: DataResponse) => void): void;
+    protected getCertificate(certUrl: string, body: OptionalPin, callback: (error: RestException, data: DataResponse) => void, params?: {
+        filter?: string;
+        pin?: string;
+    }): void;
+    protected getCertificateArray(certUrl: string, body: OptionalPin, callback: (error: RestException, data: DataArrayResponse) => void, params?: {
+        filter?: string;
+        pin?: string;
+    }): void;
 }

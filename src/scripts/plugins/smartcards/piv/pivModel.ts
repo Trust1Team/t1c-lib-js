@@ -15,8 +15,6 @@ interface AbstractPiv extends GenericSecuredCertCard {
     allKeyRefs(): string[];
 
     // callback-based
-    allAlgoRefsForAuthentication(callback: (error: RestException, data: DataArrayResponse) => void): void;
-    allAlgoRefsForSigning(callback: (error: RestException, data: DataArrayResponse) => void): void;
     printedInformation(body: OptionalPin, callback: (error: RestException, data: PrintedInformationResponse) => void): void;
     facialImage(body: OptionalPin, callback: (error: RestException, data: FacialImageResponse) => void): void;
     allData(filters: string[], body: OptionalPin, callback: (error: RestException, data: AllDataResponse) => void): void;
@@ -25,8 +23,6 @@ interface AbstractPiv extends GenericSecuredCertCard {
     signingCertificate(body: OptionalPin, callback: (error: RestException, data: DataResponse) => void): void;
 
     // promise-based
-    // allAlgoRefsForAuthentication(): Promise<DataArrayResponse>;
-    // allAlgoRefsForSigning(): Promise<DataArrayResponse>;
     // printedInformation(body: OptionalPin): Promise<PrintedInformationResponse>;
     // facialImage(body: OptionalPin): Promise<FacialImageResponse>;
     // allData(filters: string[], body: OptionalPin): Promise<AllDataResponse>;

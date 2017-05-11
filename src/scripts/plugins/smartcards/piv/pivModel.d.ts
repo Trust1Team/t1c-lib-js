@@ -1,13 +1,11 @@
 import { RestException } from "../../../core/exceptions/CoreExceptions";
 import { GenericSecuredCertCard, OptionalPin } from "../Card";
-import { DataArrayResponse, DataObjectResponse, DataResponse } from "../../../core/service/CoreModel";
+import { DataObjectResponse, DataResponse } from "../../../core/service/CoreModel";
 export { AbstractPiv, AllCertsResponse, AllDataResponse, PrintedInformation, PrintedInformationResponse, FacialImage, FacialImageResponse };
 interface AbstractPiv extends GenericSecuredCertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allKeyRefs(): string[];
-    allAlgoRefsForAuthentication(callback: (error: RestException, data: DataArrayResponse) => void): void;
-    allAlgoRefsForSigning(callback: (error: RestException, data: DataArrayResponse) => void): void;
     printedInformation(body: OptionalPin, callback: (error: RestException, data: PrintedInformationResponse) => void): void;
     facialImage(body: OptionalPin, callback: (error: RestException, data: FacialImageResponse) => void): void;
     allData(filters: string[], body: OptionalPin, callback: (error: RestException, data: AllDataResponse) => void): void;
