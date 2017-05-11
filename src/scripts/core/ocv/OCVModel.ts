@@ -5,6 +5,10 @@
 
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 
+export { AbstractOCVClient, CertificateAndOrder, CertificateChainData, CertificateChainResponse,
+    ChallengeResponse, ChallengeSignedHashResponse, ChallengeSignedHashData,
+    SignatureValidationData, SignatureValidationResponse, OCVInfoResponse };
+
 
 interface AbstractOCVClient {
     getChallenge(digestAlgorithm: string, callback: (error: CoreExceptions.RestException, data: any) => void): void;
@@ -76,7 +80,3 @@ interface OCVInfoResponse {
     version: string
     environemnt: string
 }
-
-export { AbstractOCVClient, CertificateChainData, CertificateChainResponse,
-    ChallengeResponse, ChallengeSignedHashResponse, ChallengeSignedHashData,
-    SignatureValidationData, SignatureValidationResponse, OCVInfoResponse };

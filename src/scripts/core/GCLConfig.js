@@ -1,10 +1,12 @@
 /**
  * @author Maarten Casteels
  * @author Michallis Pashidis
+ * @author Maarten Somers
  * @since 2016
  */
 "use strict";
-var defaultGclUrl = "https://localhost:10433/v1";
+var _ = require("lodash");
+var defaultGclUrl = "https://localhost:10443/v1";
 var defaultDSUrl = "https://accapim.t1t.be:443";
 var defaultDSContextPath = "/trust1team/gclds/v1";
 var defaultOCVContextPath = "/trust1team/ocv-api/v1";
@@ -22,7 +24,7 @@ var GCLConfig = (function () {
         this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
         this._dsUrlBase = dsUriValue;
         this._apiKey = apiKey;
-        this._jwt = 'none';
+        this._jwt = "none";
         this._allowAutoUpdate = defaultAllowAutoUpdate;
         this._implicitDownload = defaultImplicitDownload;
         this._localTestMode = defaultLocalTestMode;
@@ -52,8 +54,8 @@ var GCLConfig = (function () {
             return this._dsUrl;
         },
         set: function (dsUriValue) {
-            if (strEndsWith(dsUriValue, defaultDSContextPath)) {
-                this._dsUrlBase = dsUriValue.replace(defaultDSContextPath, '');
+            if (_.endsWith(dsUriValue, defaultDSContextPath)) {
+                this._dsUrlBase = _.replace(dsUriValue, defaultDSContextPath, "");
                 this._dsUrl = dsUriValue;
                 this._dsFileDownloadUrl = this._dsUrlBase + fileDownloadUrlPostfix;
             }
@@ -146,8 +148,9 @@ var GCLConfig = (function () {
         },
         set: function (value) {
             this._localTestMode = value;
-            if (this._localTestMode)
+            if (this._localTestMode) {
                 this._dsUrl = this._dsUrlBase + defaultDSContextPathTestMode;
+            }
         },
         enumerable: true,
         configurable: true
@@ -155,6 +158,3 @@ var GCLConfig = (function () {
     return GCLConfig;
 }());
 exports.GCLConfig = GCLConfig;
-function strEndsWith(str, suffix) {
-    return str.match(suffix + "$") == suffix;
-}

@@ -8,22 +8,22 @@ import * as CoreExceptions from "./exceptions/CoreExceptions";
 import * as _ from "lodash";
 
 import { GCLConfig } from "./GCLConfig";
-import { CardFactory } from "../Plugins/smartcards/CardFactory";
+import { CardFactory } from "../plugins/smartcards/CardFactory";
 import { CoreService } from "./service/CoreService";
 import { LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection } from "./client/Connection";
 import { AbstractDSClient, DownloadLinkResponse, JWTResponse } from "./ds/DSClientModel";
 import { DSClient } from "./ds/DSClient";
 import { AbstractOCVClient, OCVClient } from "./ocv/OCVClient";
 import { InfoResponse } from "./service/CoreModel";
-import { AbstractEidBE } from "../Plugins/smartcards/eid/be/EidBeModel";
-import { AbstractEMV } from "../Plugins/smartcards/emv/EMVModel";
-import { AbstractOcra } from "../Plugins/smartcards/ocra/ocraModel";
-import { AbstractAventra } from "../Plugins/smartcards/pki/aventra/AventraModel";
-import { AbstractLuxTrust } from "../Plugins/smartcards/pki/luxtrust/LuxTrustModel";
-import { AbstractOberthur } from "../Plugins/smartcards/pki/oberthur/OberthurModel";
-import { AbstractPiv } from "../Plugins/smartcards/piv/pivModel";
-import { AbstractMobib } from "../Plugins/smartcards/mobib/mobibModel";
-import { AbstractEidLUX } from "../Plugins/smartcards/eid/lux/EidLuxModel";
+import { AbstractEidBE } from "../plugins/smartcards/eid/be/EidBeModel";
+import { AbstractEMV } from "../plugins/smartcards/emv/EMVModel";
+import { AbstractOcra } from "../plugins/smartcards/ocra/ocraModel";
+import { AbstractAventra } from "../plugins/smartcards/pki/aventra/AventraModel";
+import { AbstractLuxTrust } from "../plugins/smartcards/pki/luxtrust/LuxTrustModel";
+import { AbstractOberthur } from "../plugins/smartcards/pki/oberthur/OberthurModel";
+import { AbstractPiv } from "../plugins/smartcards/piv/pivModel";
+import { AbstractMobib } from "../plugins/smartcards/mobib/mobibModel";
+import { AbstractEidLUX } from "../plugins/smartcards/eid/lux/EidLuxModel";
 
 
 class GCLClient {

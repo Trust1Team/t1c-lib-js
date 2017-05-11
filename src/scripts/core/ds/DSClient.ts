@@ -10,6 +10,9 @@ import { BrowserInfoResponse } from "../service/CoreModel";
 import { AbstractDSClient, DeviceResponse, DownloadLinkResponse,
     DSInfoResponse, DSPlatformInfo, DSPubKeyResponse, JWTResponse } from "./DSClientModel";
 
+export { DSClient };
+
+
 const SEPARATOR = "/";
 const QP_APIKEY = "?apikey=";
 const SECURITY = "/security";
@@ -86,6 +89,3 @@ class DSClient implements AbstractDSClient {
     }
 
 }
-
-
-export { DSClient };

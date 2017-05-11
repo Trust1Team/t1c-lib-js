@@ -5,6 +5,9 @@
 
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 
+export { AbstractCore, T1CResponse, DataResponse, DataArrayResponse, DataObjectResponse, InfoResponse, BrowserInfoResponse,
+    Card, CardReader, CardReadersResponse, SingleReaderResponse, PluginsResponse, PubKeyResponse };
+
 
 interface AbstractCore {
     // async
@@ -125,5 +128,3 @@ interface PubKeyResponse extends T1CResponse {
     data: string
 }
 
-export { AbstractCore, T1CResponse, DataResponse, DataArrayResponse, DataObjectResponse, InfoResponse, BrowserInfoResponse,
-    Card, CardReader, CardReadersResponse, SingleReaderResponse, PluginsResponse, PubKeyResponse };

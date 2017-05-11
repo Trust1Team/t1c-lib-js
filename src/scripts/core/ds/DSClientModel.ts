@@ -6,6 +6,9 @@
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 import { BrowserInfoResponse, T1CResponse } from "../service/CoreModel";
 
+export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse,
+    DeviceResponse, DSPlatformInfo };
+
 
 interface AbstractDSClient {
     getUrl(): string;
@@ -73,5 +76,3 @@ interface DSPlatformInfo {
     ua: string
 }
 
-export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse,
-    DeviceResponse, DSPlatformInfo };

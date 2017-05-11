@@ -10,6 +10,9 @@ import {GCLConfig} from "../GCLConfig";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { RestException } from "../exceptions/CoreExceptions";
 
+export { LocalConnection, LocalAuthConnection, RemoteConnection, Connection, LocalTestConnection };
+
+
 interface Connection {
     get(url: string, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string });
     post(url: string, body: { [key: string]: any }, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string });
@@ -140,7 +143,4 @@ function handleTestRequest(url: string,
         else { return callback(error, null); }
     });
 }
-
-
-export { LocalConnection, LocalAuthConnection, RemoteConnection, Connection, LocalTestConnection };
 

@@ -9,6 +9,9 @@ import {
     ChallengeSignedHashResponse, OCVInfoResponse, SignatureValidationData, SignatureValidationResponse
 } from "./OCVModel";
 
+export { AbstractOCVClient, OCVClient };
+
+
 const CHALLENGE = "/challenge";
 const CERTIFICATE = "/certs/validate-chain";
 const SYSTEM_STATUS = "/system/status";
@@ -53,6 +56,3 @@ class OCVClient implements AbstractOCVClient {
     }
 
 }
-
-
-export { AbstractOCVClient, OCVClient };
