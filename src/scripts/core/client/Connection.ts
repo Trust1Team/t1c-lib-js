@@ -8,103 +8,110 @@
 
 import {GCLConfig} from "../GCLConfig";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
-import { RestException } from "../exceptions/CoreExceptions";
+import * as _ from "lodash";
 
-export { LocalConnection, LocalAuthConnection, RemoteConnection, Connection, LocalTestConnection };
+export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteConnection, Connection, LocalTestConnection };
 
 
 interface Connection {
+    // callback-based
     get(url: string,
-        callback: (error: any, data: any) => void,
-        queryParams?: { [key: string]: string }): void;
+        queryParams?: { [key: string]: string },
+        callback?: (error: any, data: any) => void): void | Promise<any>;
     post(url: string,
          body: { [key: string]: any },
-         callback: (error: any, data: any) => void,
-         queryParams?: { [key: string]: string }): void;
+         queryParams?: { [key: string]: string },
+         callback?: (error: any, data: any) => void): void | Promise<any>;
     put(url: string,
         body: { [key: string]: any },
-        callback: (error: any, data: any) => void,
-        queryParams?: { [key: string]: string }): void;
+        queryParams?: { [key: string]: string },
+        callback?: (error: any, data: any) => void): void | Promise<any>;
 }
 
-class LocalAuthConnection implements Connection {
-    constructor(private cfg:  GCLConfig) {}
+abstract class GenericConnection implements Connection {
+    abstract config;
 
-    // using Callback
-    public get(url: string, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
-        return handleRequest(url, "GET", callback, undefined, queryParams, undefined, this.cfg.jwt);
+    constructor(cfg: GCLConfig) {
+        this.config = cfg;
     }
 
-    public post(url: string, body: any, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
-        return handleRequest(url, "POST", callback, body, undefined, undefined, this.cfg.jwt);
-    }
-
-    public put(url: string, body: any, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
-        return handleRequest(url, "PUT", callback, body, undefined, undefined, this.cfg.jwt);
-    }
-}
-
-class LocalConnection implements Connection {
-    constructor(private cfg: GCLConfig) {}
-
-    public get(url: string, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
-        return handleRequest(url, "GET", callback, undefined, queryParams, undefined, this.cfg.jwt);
-    }
-
-    public post(url: string, body: any, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
-        return handleRequest(url, "POST", callback, body, queryParams, undefined, this.cfg.jwt);
-    }
-
-    public put(url: string, body: any, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
-        return handleRequest(url, "PUT", callback, body, undefined, undefined, this.cfg.jwt);
-    }
-}
-
-class RemoteConnection implements Connection {
-    constructor(private cfg: GCLConfig) {}
-
-    // using Callback
-    public get(url: string, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string} ): void {
-        return handleRequest(url, "GET", callback, undefined, queryParams, this.cfg.apiKey, undefined);
-    }
-
-    public post(url: string, body: any, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
-        return handleRequest(url, "POST", callback, body, undefined, this.cfg.apiKey, undefined);
-    }
-
-    public put(url: string, body: any, callback: (error: any, data: any) => void, queryParams?: { [key: string]: string }): void {
-        return handleRequest(url, "PUT", callback, body, undefined, this.cfg.apiKey, undefined);
-    }
-}
-
-class LocalTestConnection implements Connection {
-    constructor(private cfg: GCLConfig) {}
-
-    // using Callback
-    public get(url: string, callback: (error: RestException, data: any) => void, queryParams?: { [key: string]: string }): void {
-        return handleTestRequest(url, "GET", callback, undefined, queryParams, undefined);
+    public get(url: string,
+               queryParams?: { [key: string]: string },
+               callback?: (error: any, data: any) => void): void | Promise<any> {
+        return handleRequest(url, "GET", undefined, queryParams, this.config.apiKey, this.config.jwt, callback);
     }
 
     public post(url: string,
                 body: any,
-                callback: (error: RestException, data: any) => void, queryParams?: { [key: string]: string }): void {
-        return handleTestRequest(url, "POST", callback, body, undefined, undefined);
+                queryParams?: { [key: string]: string },
+                callback?: (error: any, data: any) => void): void | Promise<any> {
+        return handleRequest(url, "POST", body, queryParams, this.config.apiKey, this.config.jwt, callback);
     }
 
-    public put(url: string, body: any, callback: (error: RestException, data: any) => void, queryParams?: { [key: string]: string }): void {
-        return handleTestRequest(url, "PUT", callback, body, undefined, undefined);
+    public put(url: string,
+               body: any,
+               queryParams?: { [key: string]: string },
+               callback?: (error: any, data: any) => void): void | Promise<any> {
+        return handleRequest(url, "PUT", body, queryParams, this.config.apiKey, this.config.jwt, callback);
     }
 }
 
+class LocalAuthConnection extends GenericConnection implements Connection {
+    config = _.omit(this.config, "apiKey");
+
+    constructor(cfg: GCLConfig) {
+        super(cfg);
+    }
+}
+
+class LocalConnection extends GenericConnection implements Connection {
+    config = _.omit(this.config, ["apiKey", "jwt"]);
+
+    constructor(protected cfg: GCLConfig) {
+        super(cfg);
+    }
+}
+
+class RemoteConnection extends GenericConnection implements Connection {
+    config = _.omit(this.config, "jwt");
+
+    constructor(protected cfg: GCLConfig) {
+        super(cfg);
+    }
+}
+
+class LocalTestConnection extends GenericConnection implements Connection {
+    config = undefined;
+
+    public get(url: string,
+               queryParams?: { [key: string]: string },
+               callback?: (error: any, data: any) => void): void | Promise<any> {
+        return handleTestRequest(url, "GET", undefined, queryParams, undefined, callback);
+    }
+
+    public post(url: string,
+                body: any,
+                queryParams?: { [key: string]: string },
+                callback?: (error: any, data: any) => void): void | Promise<any> {
+        return handleTestRequest(url, "POST", body, queryParams, undefined, callback);
+    }
+
+    public put(url: string,
+               body: any,
+               queryParams?: { [key: string]: string },
+               callback?: (error: any, data: any) => void): void | Promise<any> {
+        return handleTestRequest(url, "PUT", body, queryParams, undefined, callback);
+    }
+}
 
 function handleRequest(url: string,
                        method: string,
-                       callback: (error: any, data: any) => void,
                        body?: any,
                        params?: any,
                        apikey?: string,
-                       jwt?: string): void {
-    let request: AxiosRequestConfig = {
+                       jwt?: string,
+                       callback?: (error: any, data: any) => void): void | Promise<any> {
+    let config: AxiosRequestConfig = {
         url,
         method,
         headers:  {
@@ -112,26 +119,32 @@ function handleRequest(url: string,
         },
         responseType:  "json"
     };
-    if (body) { request.data = body; }
-    if (params) { request.params = params; }
-    if (apikey) { request.headers.apikey = apikey; }
-    if (jwt) { request.headers.Authorization = "Bearer " + jwt; }
+    if (body) { config.data = body; }
+    if (params) { config.params = params; }
+    if (apikey) { config.headers.apikey = apikey; }
+    if (jwt) { config.headers.Authorization = "Bearer " + jwt; }
 
-    axios.request(request).then(function (response: AxiosResponse) {
-        return callback(null, response.data);
-    }).catch(function (error: AxiosError) {
-        if (error.response) { return callback(error.response, null); }
-        else { return callback(error, null); }
-    });
+    if (callback) {
+        axios.request(config).then((response: AxiosResponse) => {
+            return callback(null, response.data);
+        }).catch(function (error: AxiosError) {
+            if (error.response) { return callback(error.response, null); }
+            else { return callback(error, null); }
+        });
+    } else {
+        return axios.request(config).then((response: AxiosResponse) => {
+            return response.data;
+        });
+    }
 }
 
 function handleTestRequest(url: string,
                            method: string,
-                           callback: (error: any, data: any) => void,
                            body?: any,
                            params?: any,
-                           jwt?: string): void {
-    let request: AxiosRequestConfig = {
+                           jwt?: string,
+                           callback?: (error: any, data: any) => void): void | Promise<any> {
+    let config: AxiosRequestConfig = {
         url,
         method,
         headers:  {
@@ -140,15 +153,21 @@ function handleTestRequest(url: string,
         },
         responseType:  "json"
     };
-    if (body) { request.data = body; }
-    if (params) { request.params = params; }
-    if (jwt) { request.headers.Authorization = "Bearer " + jwt; }
+    if (body) { config.data = body; }
+    if (params) { config.params = params; }
+    if (jwt) { config.headers.Authorization = "Bearer " + jwt; }
 
-    axios.request(request).then(function (response: AxiosResponse) {
-        return callback(null, response.data);
-    }).catch(function (error: AxiosError) {
-        if (error.response) { return callback(error.response, null); }
-        else { return callback(error, null); }
-    });
+    if (callback) {
+        axios.request(config).then(function (response: AxiosResponse) {
+            return callback(null, response.data);
+        }).catch(function (error: AxiosError) {
+            if (error.response) { return callback(error.response, null); }
+            else { return callback(error, null); }
+        });
+    } else {
+        return axios.request(config).then((response: AxiosResponse) => {
+            return response.data;
+        });
+    }
 }
 

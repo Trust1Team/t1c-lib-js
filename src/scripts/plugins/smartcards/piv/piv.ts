@@ -29,11 +29,11 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
     }
 
     public printedInformation(body: OptionalPin, callback: (error: RestException, data: PrintedInformationResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + PIV.PRINTED_INFORMATION, body, callback);
+        this.connection.post(this.resolvedReaderURI() + PIV.PRINTED_INFORMATION, body, undefined, callback);
     }
 
     public facialImage(body: OptionalPin, callback: (error: RestException, data: FacialImageResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + PIV.FACIAL_IMAGE, body, callback);
+        this.connection.post(this.resolvedReaderURI() + PIV.FACIAL_IMAGE, body, undefined, callback);
     }
 
     public authenticationCertificate(body: OptionalPin, callback: (error: RestException, data: DataResponse) => void) {

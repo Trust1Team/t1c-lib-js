@@ -17,7 +17,7 @@ const EMV_PAN = "/pan";
 class EMV extends GenericPinCard implements AbstractEMV {
 
     public pan(callback: (error: RestException, data: DataResponse) => void): void {
-        this.connection.get(this.resolvedReaderURI() + EMV_PAN, callback);
+        this.connection.get(this.resolvedReaderURI() + EMV_PAN, undefined, callback);
     }
 
 }

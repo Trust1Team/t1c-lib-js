@@ -19,15 +19,15 @@ class EidBe extends GenericCertCard implements AbstractEidBE {
 
 
     public rnData(callback: (error: RestException, data: RnDataResponse) => void) {
-        this.connection.get(this.resolvedReaderURI() + EidBe.RN_DATA, callback);
+        this.connection.get(this.resolvedReaderURI() + EidBe.RN_DATA, undefined, callback);
     }
 
     public address(callback: (error: RestException, data: AddressResponse) => void) {
-        this.connection.get(this.resolvedReaderURI() + EidBe.ADDRESS, callback);
+        this.connection.get(this.resolvedReaderURI() + EidBe.ADDRESS, undefined, callback);
     }
 
     public picture(callback: (error: RestException, data: DataResponse) => void) {
-        this.connection.get(this.resolvedReaderURI() + EidBe.PHOTO, callback);
+        this.connection.get(this.resolvedReaderURI() + EidBe.PHOTO, undefined, callback);
     }
 
     public rootCertificate(callback: (error: RestException, data: DataResponse) => void) {
@@ -53,6 +53,6 @@ class EidBe extends GenericCertCard implements AbstractEidBE {
     public verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void) {
         let _req: VerifyPinData = { private_key_reference: EidBe.VERIFY_PRIV_KEY_REF };
         if (body.pin) { _req.pin = body.pin; }
-        this.connection.post(this.resolvedReaderURI() + GenericCertCard.VERIFY_PIN, _req, callback);
+        this.connection.post(this.resolvedReaderURI() + GenericCertCard.VERIFY_PIN, _req, undefined, callback);
     }
 }

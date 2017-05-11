@@ -48,6 +48,6 @@ class Oberthur extends GenericCertCard implements AbstractOberthur {
     }
 
     public verifyPin(body: VerifyPinData, callback: (error: RestException, data: T1CResponse) => void): void {
-        this.connection.post(this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, callback);
+        this.connection.post(this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, undefined, callback);
     }
 }

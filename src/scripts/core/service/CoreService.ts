@@ -47,15 +47,15 @@ class CoreService implements CoreModel.AbstractCore {
 
     // async
     public activate(callback: (error: CoreExceptions.RestException, data: CoreModel.T1CResponse) => void): void {
-        this.connection.post(this.url + CORE_ACTIVATE, {}, callback);
+        this.connection.post(this.url + CORE_ACTIVATE, {}, undefined, callback);
     }
 
     public getPubKey(callback: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse) => void): void {
-        this.connection.get(this.url + CORE_PUB_KEY, callback);
+        this.connection.get(this.url + CORE_PUB_KEY, undefined, callback);
     }
 
     public info(callback: (error: CoreExceptions.RestException, data: CoreModel.InfoResponse) => void): void {
-        this.connection.get(this.url + CORE_INFO, callback);
+        this.connection.get(this.url + CORE_INFO, undefined, callback);
     }
 
     public infoBrowser(callback: (error: CoreExceptions.RestException, data: CoreModel.BrowserInfoResponse) => void): void {
@@ -63,7 +63,7 @@ class CoreService implements CoreModel.AbstractCore {
     }
 
     public plugins(callback: (error: CoreExceptions.RestException, data: CoreModel.PluginsResponse) => void): void {
-        this.connection.get(this.url + CORE_PLUGINS, callback);
+        this.connection.get(this.url + CORE_PLUGINS, undefined, callback);
     }
 
     pollCardInserted(secondsToPollCard: number,
@@ -183,23 +183,23 @@ class CoreService implements CoreModel.AbstractCore {
     }
 
     public reader(reader_id: string, callback: (error: CoreExceptions.RestException, data: CoreModel.SingleReaderResponse) => void) {
-        this.connection.get(this.url + CORE_READERS + "/" + reader_id, callback);
+        this.connection.get(this.url + CORE_READERS + "/" + reader_id, undefined, callback);
     }
 
     public readers(callback: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void): void {
-        this.connection.get(this.url + CORE_READERS, callback);
+        this.connection.get(this.url + CORE_READERS, undefined, callback);
     }
 
     public readersCardAvailable(callback: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void): void {
-        this.connection.get(this.url + CORE_READERS, callback, CoreService.cardInsertedFilter(true));
+        this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(true), callback);
     }
 
     public readersCardsUnavailable(callback: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void): void {
-        this.connection.get(this.url + CORE_READERS, callback, CoreService.cardInsertedFilter(false));
+        this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(false), callback);
     }
 
     public setPubKey(pubkey: string, callback: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse) => void): void {
-        this.connection.put(this.url + CORE_PUB_KEY, { certificate: pubkey }, callback);
+        this.connection.put(this.url + CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);
     }
 
     // sync

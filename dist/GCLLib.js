@@ -17550,7 +17550,7 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    EMV.prototype.pan = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + EMV_PAN, callback);
+	        this.connection.get(this.resolvedReaderURI() + EMV_PAN, undefined, callback);
 	    };
 	    return EMV;
 	}(Card_1.GenericPinCard));
@@ -17601,10 +17601,10 @@ var GCLLib =
 	    }
 	    GenericSmartCard.prototype.allData = function (filters, callback) {
 	        if (filters && filters.length) {
-	            this.connection.get(this.resolvedReaderURI(), callback, GenericCard.createFilterQueryParam(filters));
+	            this.connection.get(this.resolvedReaderURI(), GenericCard.createFilterQueryParam(filters), callback);
 	        }
 	        else {
-	            this.connection.get(this.resolvedReaderURI(), callback);
+	            this.connection.get(this.resolvedReaderURI(), undefined, callback);
 	        }
 	    };
 	    return GenericSmartCard;
@@ -17616,7 +17616,7 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    GenericPinCard.prototype.verifyPin = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + GenericPinCard.VERIFY_PIN, body, callback);
+	        this.connection.post(this.resolvedReaderURI() + GenericPinCard.VERIFY_PIN, body, undefined, callback);
 	    };
 	    return GenericPinCard;
 	}(GenericSmartCard));
@@ -17628,29 +17628,29 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    GenericCertCard.prototype.allAlgoRefsForAuthentication = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, callback);
+	        this.connection.get(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, undefined, callback);
 	    };
 	    GenericCertCard.prototype.allAlgoRefsForSigning = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, callback);
+	        this.connection.get(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, undefined, callback);
 	    };
 	    GenericCertCard.prototype.allCerts = function (filters, callback) {
 	        if (filters && filters.length) {
-	            this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES, callback, GenericCertCard.createFilterQueryParam(filters));
+	            this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES, GenericCertCard.createFilterQueryParam(filters), callback);
 	        }
 	        else {
-	            this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES, callback);
+	            this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES, undefined, callback);
 	        }
 	    };
 	    GenericCertCard.prototype.authenticate = function (body, callback) {
 	        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
-	        this.connection.post(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, body, callback);
+	        this.connection.post(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, body, undefined, callback);
 	    };
 	    GenericCertCard.prototype.signData = function (body, callback) {
 	        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
-	        this.connection.post(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, callback);
+	        this.connection.post(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, undefined, callback);
 	    };
 	    GenericCertCard.prototype.getCertificate = function (certUrl, callback) {
-	        this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, callback);
+	        this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, undefined, callback);
 	    };
 	    return GenericCertCard;
 	}(GenericPinCard));
@@ -17672,41 +17672,41 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    GenericSecuredCertCard.prototype.allAlgoRefsForAuthentication = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, callback);
+	        this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, undefined, callback);
 	    };
 	    GenericSecuredCertCard.prototype.allAlgoRefsForSigning = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, callback);
+	        this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, undefined, callback);
 	    };
 	    GenericSecuredCertCard.prototype.allData = function (filters, body, callback) {
 	        if (filters && filters.length) {
-	            this.connection.post(this.resolvedReaderURI(), body, callback, GenericSecuredCertCard.createFilterQueryParam(filters));
+	            this.connection.post(this.resolvedReaderURI(), body, GenericSecuredCertCard.createFilterQueryParam(filters), callback);
 	        }
 	        else {
-	            this.connection.post(this.resolvedReaderURI(), body, callback);
+	            this.connection.post(this.resolvedReaderURI(), body, undefined, callback);
 	        }
 	    };
 	    GenericSecuredCertCard.prototype.allCerts = function (filters, body, callback) {
 	        if (filters && filters.length) {
-	            this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES, body, callback, GenericSecuredCertCard.createFilterQueryParam(filters));
+	            this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES, body, GenericSecuredCertCard.createFilterQueryParam(filters), callback);
 	        }
 	        else {
-	            this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES, body, callback);
+	            this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES, body, undefined, callback);
 	        }
 	    };
 	    GenericSecuredCertCard.prototype.verifyPin = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.VERIFY_PIN, body, callback);
+	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.VERIFY_PIN, body, undefined, callback);
 	    };
 	    GenericSecuredCertCard.prototype.signData = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, body, callback);
+	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, body, undefined, callback);
 	    };
 	    GenericSecuredCertCard.prototype.authenticate = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, body, callback);
+	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, body, undefined, callback);
 	    };
 	    GenericSecuredCertCard.prototype.getCertificate = function (certUrl, body, callback, params) {
-	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, callback, params);
+	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, params, callback);
 	    };
 	    GenericSecuredCertCard.prototype.getCertificateArray = function (certUrl, body, callback, params) {
-	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, callback, params);
+	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, params, callback);
 	    };
 	    return GenericSecuredCertCard;
 	}(GenericCard));
@@ -17744,13 +17744,13 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    EidBe.prototype.rnData = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + EidBe.RN_DATA, callback);
+	        this.connection.get(this.resolvedReaderURI() + EidBe.RN_DATA, undefined, callback);
 	    };
 	    EidBe.prototype.address = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + EidBe.ADDRESS, callback);
+	        this.connection.get(this.resolvedReaderURI() + EidBe.ADDRESS, undefined, callback);
 	    };
 	    EidBe.prototype.picture = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + EidBe.PHOTO, callback);
+	        this.connection.get(this.resolvedReaderURI() + EidBe.PHOTO, undefined, callback);
 	    };
 	    EidBe.prototype.rootCertificate = function (callback) {
 	        this.getCertificate(EidBe.CERT_ROOT, callback);
@@ -17772,7 +17772,7 @@ var GCLLib =
 	        if (body.pin) {
 	            _req.pin = body.pin;
 	        }
-	        this.connection.post(this.resolvedReaderURI() + Card_1.GenericCertCard.VERIFY_PIN, _req, callback);
+	        this.connection.post(this.resolvedReaderURI() + Card_1.GenericCertCard.VERIFY_PIN, _req, undefined, callback);
 	    };
 	    return EidBe;
 	}(Card_1.GenericCertCard));
@@ -17824,25 +17824,25 @@ var GCLLib =
 	    };
 	    EidLux.prototype.allData = function (filters, body, callback) {
 	        if (filters && filters.length) {
-	            this.connection.post(this.resolvedReaderURI(), body, callback, createFilterQueryParam(filters, this.pin));
+	            this.connection.post(this.resolvedReaderURI(), body, createFilterQueryParam(filters, this.pin), callback);
 	        }
 	        else {
-	            this.connection.post(this.resolvedReaderURI(), body, callback, createPinQueryParam(this.pin));
+	            this.connection.post(this.resolvedReaderURI(), body, createPinQueryParam(this.pin), callback);
 	        }
 	    };
 	    EidLux.prototype.allCerts = function (filters, body, callback) {
 	        if (filters && filters.length) {
-	            this.connection.post(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, body, callback, createFilterQueryParam(filters, this.pin));
+	            this.connection.post(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, body, createFilterQueryParam(filters, this.pin), callback);
 	        }
 	        else {
-	            this.connection.post(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, body, callback, createPinQueryParam(this.pin));
+	            this.connection.post(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, body, createPinQueryParam(this.pin), callback);
 	        }
 	    };
 	    EidLux.prototype.biometric = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + EidLux.BIOMETRIC, body, callback, createPinQueryParam(this.pin));
+	        this.connection.post(this.resolvedReaderURI() + EidLux.BIOMETRIC, body, createPinQueryParam(this.pin), callback);
 	    };
 	    EidLux.prototype.picture = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + EidLux.PHOTO, body, callback, createPinQueryParam(this.pin));
+	        this.connection.post(this.resolvedReaderURI() + EidLux.PHOTO, body, createPinQueryParam(this.pin), callback);
 	    };
 	    EidLux.prototype.rootCertificate = function (body, callback) {
 	        this.getCertificateArray(EidLux.CERT_ROOT, body, callback, createPinQueryParam(this.pin));
@@ -17854,16 +17854,16 @@ var GCLLib =
 	        this.getCertificate(EidLux.CERT_NON_REPUDIATION, body, callback, createPinQueryParam(this.pin));
 	    };
 	    EidLux.prototype.verifyPin = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, callback, createPinQueryParam(this.pin));
+	        this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(this.pin), callback);
 	    };
 	    EidLux.prototype.signData = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + EidLux.SIGN_DATA, body, callback, createPinQueryParam(this.pin));
+	        this.connection.post(this.resolvedReaderURI() + EidLux.SIGN_DATA, body, createPinQueryParam(this.pin), callback);
 	    };
 	    EidLux.prototype.authenticate = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, callback, createPinQueryParam(this.pin));
+	        this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(this.pin), callback);
 	    };
 	    EidLux.prototype.signatureImage = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + EidLux.SIGNATURE_IMAGE, body, callback, createPinQueryParam(this.pin));
+	        this.connection.post(this.resolvedReaderURI() + EidLux.SIGNATURE_IMAGE, body, createPinQueryParam(this.pin), callback);
 	    };
 	    return EidLux;
 	}(Card_1.GenericSecuredCertCard));
@@ -17901,16 +17901,16 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    Mobib.prototype.cardIssuing = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + MOBIB_CARD_ISSUING, callback);
+	        this.connection.get(this.resolvedReaderURI() + MOBIB_CARD_ISSUING, undefined, callback);
 	    };
 	    Mobib.prototype.contracts = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + MOBIB_CONTRACTS, callback);
+	        this.connection.get(this.resolvedReaderURI() + MOBIB_CONTRACTS, undefined, callback);
 	    };
 	    Mobib.prototype.picture = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + MOBIB_PHOTO, callback);
+	        this.connection.get(this.resolvedReaderURI() + MOBIB_PHOTO, undefined, callback);
 	    };
 	    Mobib.prototype.status = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + MOBIB_STATUS, callback);
+	        this.connection.get(this.resolvedReaderURI() + MOBIB_STATUS, undefined, callback);
 	    };
 	    return Mobib;
 	}(Card_1.GenericSmartCard));
@@ -17976,10 +17976,10 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    Ocra.prototype.challenge = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + Ocra.CHALLENGE, body, callback);
+	        this.connection.post(this.resolvedReaderURI() + Ocra.CHALLENGE, body, undefined, callback);
 	    };
 	    Ocra.prototype.readCounter = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + Ocra.READ_COUNTER, body, callback);
+	        this.connection.post(this.resolvedReaderURI() + Ocra.READ_COUNTER, body, undefined, callback);
 	    };
 	    return Ocra;
 	}(Card_1.GenericPinCard));
@@ -18036,10 +18036,10 @@ var GCLLib =
 	        this.getCertificate(Aventra.CERT_ENCRYPTION, callback);
 	    };
 	    Aventra.prototype.verifyPin = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + Aventra.VERIFY_PIN, body, callback);
+	        this.connection.post(this.resolvedReaderURI() + Aventra.VERIFY_PIN, body, undefined, callback);
 	    };
 	    Aventra.prototype.resetPin = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + Aventra.RESET_PIN, body, callback);
+	        this.connection.post(this.resolvedReaderURI() + Aventra.RESET_PIN, body, undefined, callback);
 	    };
 	    return Aventra;
 	}(Card_1.GenericCertCard));
@@ -18095,7 +18095,7 @@ var GCLLib =
 	        this.getCertificate(Oberthur.CERT_ENCRYPTION, callback);
 	    };
 	    Oberthur.prototype.verifyPin = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, callback);
+	        this.connection.post(this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, undefined, callback);
 	    };
 	    return Oberthur;
 	}(Card_1.GenericCertCard));
@@ -18135,10 +18135,10 @@ var GCLLib =
 	        return ["authenticate", "sign", "encrypt"];
 	    };
 	    PIV.prototype.printedInformation = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + PIV.PRINTED_INFORMATION, body, callback);
+	        this.connection.post(this.resolvedReaderURI() + PIV.PRINTED_INFORMATION, body, undefined, callback);
 	    };
 	    PIV.prototype.facialImage = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + PIV.FACIAL_IMAGE, body, callback);
+	        this.connection.post(this.resolvedReaderURI() + PIV.FACIAL_IMAGE, body, undefined, callback);
 	    };
 	    PIV.prototype.authenticationCertificate = function (body, callback) {
 	        this.getCertificate(PIV.CERT_AUTHENTICATION, body, callback);
@@ -18193,19 +18193,19 @@ var GCLLib =
 	        };
 	    };
 	    CoreService.prototype.activate = function (callback) {
-	        this.connection.post(this.url + CORE_ACTIVATE, {}, callback);
+	        this.connection.post(this.url + CORE_ACTIVATE, {}, undefined, callback);
 	    };
 	    CoreService.prototype.getPubKey = function (callback) {
-	        this.connection.get(this.url + CORE_PUB_KEY, callback);
+	        this.connection.get(this.url + CORE_PUB_KEY, undefined, callback);
 	    };
 	    CoreService.prototype.info = function (callback) {
-	        this.connection.get(this.url + CORE_INFO, callback);
+	        this.connection.get(this.url + CORE_INFO, undefined, callback);
 	    };
 	    CoreService.prototype.infoBrowser = function (callback) {
 	        callback(null, CoreService.platformInfo());
 	    };
 	    CoreService.prototype.plugins = function (callback) {
-	        this.connection.get(this.url + CORE_PLUGINS, callback);
+	        this.connection.get(this.url + CORE_PLUGINS, undefined, callback);
 	    };
 	    CoreService.prototype.pollCardInserted = function (secondsToPollCard, callback, connectReaderCb, insertCardCb, cardTimeoutCb) {
 	        var maxSeconds = secondsToPollCard;
@@ -18304,19 +18304,19 @@ var GCLLib =
 	        }
 	    };
 	    CoreService.prototype.reader = function (reader_id, callback) {
-	        this.connection.get(this.url + CORE_READERS + "/" + reader_id, callback);
+	        this.connection.get(this.url + CORE_READERS + "/" + reader_id, undefined, callback);
 	    };
 	    CoreService.prototype.readers = function (callback) {
-	        this.connection.get(this.url + CORE_READERS, callback);
+	        this.connection.get(this.url + CORE_READERS, undefined, callback);
 	    };
 	    CoreService.prototype.readersCardAvailable = function (callback) {
-	        this.connection.get(this.url + CORE_READERS, callback, CoreService.cardInsertedFilter(true));
+	        this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(true), callback);
 	    };
 	    CoreService.prototype.readersCardsUnavailable = function (callback) {
-	        this.connection.get(this.url + CORE_READERS, callback, CoreService.cardInsertedFilter(false));
+	        this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(false), callback);
 	    };
 	    CoreService.prototype.setPubKey = function (pubkey, callback) {
-	        this.connection.put(this.url + CORE_PUB_KEY, { certificate: pubkey }, callback);
+	        this.connection.put(this.url + CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);
 	    };
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
@@ -19494,74 +19494,88 @@ var GCLLib =
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var axios_1 = __webpack_require__(18);
-	var LocalAuthConnection = (function () {
+	var _ = __webpack_require__(1);
+	var GenericConnection = (function () {
+	    function GenericConnection(cfg) {
+	        this.config = cfg;
+	    }
+	    GenericConnection.prototype.get = function (url, queryParams, callback) {
+	        return handleRequest(url, "GET", undefined, queryParams, this.config.apiKey, this.config.jwt, callback);
+	    };
+	    GenericConnection.prototype.post = function (url, body, queryParams, callback) {
+	        return handleRequest(url, "POST", body, queryParams, this.config.apiKey, this.config.jwt, callback);
+	    };
+	    GenericConnection.prototype.put = function (url, body, queryParams, callback) {
+	        return handleRequest(url, "PUT", body, queryParams, this.config.apiKey, this.config.jwt, callback);
+	    };
+	    return GenericConnection;
+	}());
+	exports.GenericConnection = GenericConnection;
+	var LocalAuthConnection = (function (_super) {
+	    __extends(LocalAuthConnection, _super);
 	    function LocalAuthConnection(cfg) {
-	        this.cfg = cfg;
+	        var _this = _super.call(this, cfg) || this;
+	        _this.config = _.omit(_this.config, "apiKey");
+	        return _this;
 	    }
-	    LocalAuthConnection.prototype.get = function (url, callback, queryParams) {
-	        return handleRequest(url, "GET", callback, undefined, queryParams, undefined, this.cfg.jwt);
-	    };
-	    LocalAuthConnection.prototype.post = function (url, body, callback, queryParams) {
-	        return handleRequest(url, "POST", callback, body, undefined, undefined, this.cfg.jwt);
-	    };
-	    LocalAuthConnection.prototype.put = function (url, body, callback, queryParams) {
-	        return handleRequest(url, "PUT", callback, body, undefined, undefined, this.cfg.jwt);
-	    };
 	    return LocalAuthConnection;
-	}());
+	}(GenericConnection));
 	exports.LocalAuthConnection = LocalAuthConnection;
-	var LocalConnection = (function () {
+	var LocalConnection = (function (_super) {
+	    __extends(LocalConnection, _super);
 	    function LocalConnection(cfg) {
-	        this.cfg = cfg;
+	        var _this = _super.call(this, cfg) || this;
+	        _this.cfg = cfg;
+	        _this.config = _.omit(_this.config, ["apiKey", "jwt"]);
+	        return _this;
 	    }
-	    LocalConnection.prototype.get = function (url, callback, queryParams) {
-	        return handleRequest(url, "GET", callback, undefined, queryParams, undefined, this.cfg.jwt);
-	    };
-	    LocalConnection.prototype.post = function (url, body, callback, queryParams) {
-	        return handleRequest(url, "POST", callback, body, queryParams, undefined, this.cfg.jwt);
-	    };
-	    LocalConnection.prototype.put = function (url, body, callback, queryParams) {
-	        return handleRequest(url, "PUT", callback, body, undefined, undefined, this.cfg.jwt);
-	    };
 	    return LocalConnection;
-	}());
+	}(GenericConnection));
 	exports.LocalConnection = LocalConnection;
-	var RemoteConnection = (function () {
+	var RemoteConnection = (function (_super) {
+	    __extends(RemoteConnection, _super);
 	    function RemoteConnection(cfg) {
-	        this.cfg = cfg;
+	        var _this = _super.call(this, cfg) || this;
+	        _this.cfg = cfg;
+	        _this.config = _.omit(_this.config, "jwt");
+	        return _this;
 	    }
-	    RemoteConnection.prototype.get = function (url, callback, queryParams) {
-	        return handleRequest(url, "GET", callback, undefined, queryParams, this.cfg.apiKey, undefined);
-	    };
-	    RemoteConnection.prototype.post = function (url, body, callback, queryParams) {
-	        return handleRequest(url, "POST", callback, body, undefined, this.cfg.apiKey, undefined);
-	    };
-	    RemoteConnection.prototype.put = function (url, body, callback, queryParams) {
-	        return handleRequest(url, "PUT", callback, body, undefined, this.cfg.apiKey, undefined);
-	    };
 	    return RemoteConnection;
-	}());
+	}(GenericConnection));
 	exports.RemoteConnection = RemoteConnection;
-	var LocalTestConnection = (function () {
-	    function LocalTestConnection(cfg) {
-	        this.cfg = cfg;
+	var LocalTestConnection = (function (_super) {
+	    __extends(LocalTestConnection, _super);
+	    function LocalTestConnection() {
+	        var _this = _super !== null && _super.apply(this, arguments) || this;
+	        _this.config = undefined;
+	        return _this;
 	    }
-	    LocalTestConnection.prototype.get = function (url, callback, queryParams) {
-	        return handleTestRequest(url, "GET", callback, undefined, queryParams, undefined);
+	    LocalTestConnection.prototype.get = function (url, queryParams, callback) {
+	        return handleTestRequest(url, "GET", undefined, queryParams, undefined, callback);
 	    };
-	    LocalTestConnection.prototype.post = function (url, body, callback, queryParams) {
-	        return handleTestRequest(url, "POST", callback, body, undefined, undefined);
+	    LocalTestConnection.prototype.post = function (url, body, queryParams, callback) {
+	        return handleTestRequest(url, "POST", body, queryParams, undefined, callback);
 	    };
-	    LocalTestConnection.prototype.put = function (url, body, callback, queryParams) {
-	        return handleTestRequest(url, "PUT", callback, body, undefined, undefined);
+	    LocalTestConnection.prototype.put = function (url, body, queryParams, callback) {
+	        return handleTestRequest(url, "PUT", body, queryParams, undefined, callback);
 	    };
 	    return LocalTestConnection;
-	}());
+	}(GenericConnection));
 	exports.LocalTestConnection = LocalTestConnection;
-	function handleRequest(url, method, callback, body, params, apikey, jwt) {
-	    var request = {
+	function handleRequest(url, method, body, params, apikey, jwt, callback) {
+	    var config = {
 	        url: url,
 	        method: method,
 	        headers: {
@@ -19570,30 +19584,37 @@ var GCLLib =
 	        responseType: "json"
 	    };
 	    if (body) {
-	        request.data = body;
+	        config.data = body;
 	    }
 	    if (params) {
-	        request.params = params;
+	        config.params = params;
 	    }
 	    if (apikey) {
-	        request.headers.apikey = apikey;
+	        config.headers.apikey = apikey;
 	    }
 	    if (jwt) {
-	        request.headers.Authorization = "Bearer " + jwt;
+	        config.headers.Authorization = "Bearer " + jwt;
 	    }
-	    axios_1.default.request(request).then(function (response) {
-	        return callback(null, response.data);
-	    }).catch(function (error) {
-	        if (error.response) {
-	            return callback(error.response, null);
-	        }
-	        else {
-	            return callback(error, null);
-	        }
-	    });
+	    if (callback) {
+	        axios_1.default.request(config).then(function (response) {
+	            return callback(null, response.data);
+	        }).catch(function (error) {
+	            if (error.response) {
+	                return callback(error.response, null);
+	            }
+	            else {
+	                return callback(error, null);
+	            }
+	        });
+	    }
+	    else {
+	        return axios_1.default.request(config).then(function (response) {
+	            return response.data;
+	        });
+	    }
 	}
-	function handleTestRequest(url, method, callback, body, params, jwt) {
-	    var request = {
+	function handleTestRequest(url, method, body, params, jwt, callback) {
+	    var config = {
 	        url: url,
 	        method: method,
 	        headers: {
@@ -19603,24 +19624,31 @@ var GCLLib =
 	        responseType: "json"
 	    };
 	    if (body) {
-	        request.data = body;
+	        config.data = body;
 	    }
 	    if (params) {
-	        request.params = params;
+	        config.params = params;
 	    }
 	    if (jwt) {
-	        request.headers.Authorization = "Bearer " + jwt;
+	        config.headers.Authorization = "Bearer " + jwt;
 	    }
-	    axios_1.default.request(request).then(function (response) {
-	        return callback(null, response.data);
-	    }).catch(function (error) {
-	        if (error.response) {
-	            return callback(error.response, null);
-	        }
-	        else {
-	            return callback(error, null);
-	        }
-	    });
+	    if (callback) {
+	        axios_1.default.request(config).then(function (response) {
+	            return callback(null, response.data);
+	        }).catch(function (error) {
+	            if (error.response) {
+	                return callback(error.response, null);
+	            }
+	            else {
+	                return callback(error, null);
+	            }
+	        });
+	    }
+	    else {
+	        return axios_1.default.request(config).then(function (response) {
+	            return response.data;
+	        });
+	    }
 	}
 
 
@@ -21324,7 +21352,7 @@ var GCLLib =
 	    DSClient.prototype.getUrl = function () { return this.url; };
 	    DSClient.prototype.getInfo = function (callback) {
 	        var consumerCb = callback;
-	        this.connection.get(this.url + SYS_INFO, function (error, data) {
+	        this.connection.get(this.url + SYS_INFO, undefined, function (error, data) {
 	            if (error) {
 	                return consumerCb(error, null);
 	            }
@@ -21333,7 +21361,7 @@ var GCLLib =
 	    };
 	    DSClient.prototype.getDevice = function (uuid, callback) {
 	        var consumerCb = callback;
-	        this.connection.get(this.url + DEVICE + SEPARATOR + uuid, function (error, data) {
+	        this.connection.get(this.url + DEVICE + SEPARATOR + uuid, undefined, function (error, data) {
 	            if (error) {
 	                return consumerCb(error, null);
 	            }
@@ -21346,7 +21374,7 @@ var GCLLib =
 	    DSClient.prototype.getJWT = function (callback) {
 	        var consumerCb = callback;
 	        var self_cfg = this.cfg;
-	        this.connection.get(this.url + SECURITY_JWT_ISSUE, function (error, data) {
+	        this.connection.get(this.url + SECURITY_JWT_ISSUE, undefined, function (error, data) {
 	            if (error) {
 	                return consumerCb(error, null);
 	            }
@@ -21359,17 +21387,17 @@ var GCLLib =
 	    DSClient.prototype.refreshJWT = function (callback) {
 	        var actualJWT = this.cfg.jwt;
 	        if (actualJWT) {
-	            this.connection.post(this.url + SECURITY_JWT_REFRESH, { originalJWT: actualJWT }, callback);
+	            this.connection.post(this.url + SECURITY_JWT_REFRESH, { originalJWT: actualJWT }, undefined, callback);
 	        }
 	        else {
 	            callback({ code: "500", description: "No JWT available", status: 412 }, null);
 	        }
 	    };
 	    DSClient.prototype.getPubKey = function (callback) {
-	        this.connection.get(this.url + PUB_KEY, callback);
+	        this.connection.get(this.url + PUB_KEY, undefined, callback);
 	    };
 	    DSClient.prototype.downloadLink = function (infoBrowser, callback) {
-	        this.connection.post(this.url + DOWNLOAD, infoBrowser, function (err, data) {
+	        this.connection.post(this.url + DOWNLOAD, infoBrowser, undefined, function (err, data) {
 	            if (err) {
 	                return callback(err, null);
 	            }
@@ -21378,11 +21406,11 @@ var GCLLib =
 	    };
 	    DSClient.prototype.register = function (info, device_id, callback) {
 	        var req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, "core_version"));
-	        this.connection.put(this.url + DEVICE + SEPARATOR + device_id, req, callback);
+	        this.connection.put(this.url + DEVICE + SEPARATOR + device_id, req, undefined, callback);
 	    };
 	    DSClient.prototype.sync = function (info, device_id, callback) {
 	        var req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, "core_version"));
-	        this.connection.post(this.url + DEVICE + SEPARATOR + device_id, req, callback);
+	        this.connection.post(this.url + DEVICE + SEPARATOR + device_id, req, undefined, callback);
 	    };
 	    return DSClient;
 	}());
@@ -21406,11 +21434,11 @@ var GCLLib =
 	    }
 	    OCVClient.prototype.getUrl = function () { return this.url; };
 	    OCVClient.prototype.validateSignature = function (data, callback) {
-	        this.connection.post(this.url + SIGNATURE, data, callback);
+	        this.connection.post(this.url + SIGNATURE, data, undefined, callback);
 	    };
 	    OCVClient.prototype.getInfo = function (callback) {
 	        var cb = callback;
-	        this.connection.get(this.url + SYSTEM_STATUS, function (error, data) {
+	        this.connection.get(this.url + SYSTEM_STATUS, undefined, function (error, data) {
 	            if (error) {
 	                return cb(error, null);
 	            }
@@ -21419,18 +21447,18 @@ var GCLLib =
 	    };
 	    OCVClient.prototype.getChallenge = function (digestAlgorithm, callback) {
 	        var consumerCb = callback;
-	        this.connection.get(this.url + CHALLENGE, function (error, data) {
+	        this.connection.get(this.url + CHALLENGE, { digest: digestAlgorithm }, function (error, data) {
 	            if (error) {
 	                return consumerCb(error, null);
 	            }
 	            return consumerCb(null, data);
-	        }, { digest: digestAlgorithm });
+	        });
 	    };
 	    OCVClient.prototype.validateChallengeSignedHash = function (data, callback) {
-	        this.connection.post(this.url + CHALLENGE, data, callback);
+	        this.connection.post(this.url + CHALLENGE, data, undefined, callback);
 	    };
 	    OCVClient.prototype.validateCertificateChain = function (data, callback) {
-	        this.connection.post(this.url + CERTIFICATE, data, callback);
+	        this.connection.post(this.url + CERTIFICATE, data, undefined, callback);
 	    };
 	    return OCVClient;
 	}());

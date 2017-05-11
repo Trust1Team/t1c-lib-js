@@ -47,26 +47,26 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
 
     public allData(filters: string[], body: OptionalPin, callback: (error: RestException, data: AllDataResponse) => void) {
         if (filters && filters.length) {
-            this.connection.post(this.resolvedReaderURI(), body, callback, createFilterQueryParam(filters, this.pin));
-        } else { this.connection.post(this.resolvedReaderURI(), body, callback, createPinQueryParam(this.pin)); }
+            this.connection.post(this.resolvedReaderURI(), body, createFilterQueryParam(filters, this.pin), callback);
+        } else { this.connection.post(this.resolvedReaderURI(), body, createPinQueryParam(this.pin), callback); }
     }
 
     public allCerts(filters: string[], body: OptionalPin, callback: (error: RestException, data: AllCertsResponse) => void) {
         if (filters && filters.length) {
             this.connection.post(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES,
-                body, callback, createFilterQueryParam(filters, this.pin));
-        } else { this.connection.post(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, body, callback, createPinQueryParam(this.pin)); }
+                body, createFilterQueryParam(filters, this.pin), callback);
+        } else { this.connection.post(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, body, createPinQueryParam(this.pin), callback); }
     }
 
     public biometric(body: OptionalPin, callback: (error: RestException, data: BiometricResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + EidLux.BIOMETRIC, body, callback, createPinQueryParam(this.pin));
+        this.connection.post(this.resolvedReaderURI() + EidLux.BIOMETRIC, body, createPinQueryParam(this.pin), callback);
     }
 
     // in order to access the address information, we need different keys, and on Lux gov level this is protected
     /*address(callback) {this.connection.get(this.resolvedReaderURI() + LUX_ADDRESS, callback, createPinQueryParam(this.pin));}*/
 
     public picture(body: OptionalPin, callback: (error: RestException, data: PictureResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + EidLux.PHOTO, body, callback, createPinQueryParam(this.pin));
+        this.connection.post(this.resolvedReaderURI() + EidLux.PHOTO, body, createPinQueryParam(this.pin), callback);
     }
 
     public rootCertificate(body: OptionalPin, callback: (error: RestException, data: DataArrayResponse) => void) {
@@ -82,18 +82,18 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
     }
 
     public verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, callback, createPinQueryParam(this.pin));
+        this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(this.pin), callback);
     }
 
     public signData(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + EidLux.SIGN_DATA, body, callback, createPinQueryParam(this.pin));
+        this.connection.post(this.resolvedReaderURI() + EidLux.SIGN_DATA, body, createPinQueryParam(this.pin), callback);
     }
 
     public authenticate(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, callback, createPinQueryParam(this.pin));
+        this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(this.pin), callback);
     }
 
     public signatureImage(body: OptionalPin, callback: (error: RestException, data: SignatureImageResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + EidLux.SIGNATURE_IMAGE, body, callback, createPinQueryParam(this.pin));
+        this.connection.post(this.resolvedReaderURI() + EidLux.SIGNATURE_IMAGE, body, createPinQueryParam(this.pin), callback);
     }
 }

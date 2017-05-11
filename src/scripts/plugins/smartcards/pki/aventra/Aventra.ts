@@ -49,10 +49,10 @@ class Aventra extends GenericCertCard implements AbstractAventra {
     }
 
     public verifyPin(body: VerifyPinData, callback: (error: RestException, data: T1CResponse) => void): void {
-        this.connection.post(this.resolvedReaderURI() + Aventra.VERIFY_PIN, body, callback);
+        this.connection.post(this.resolvedReaderURI() + Aventra.VERIFY_PIN, body, undefined, callback);
     }
 
     public resetPin(body: ResetPinData, callback: (error: RestException, data: T1CResponse) => void): void {
-        this.connection.post(this.resolvedReaderURI() + Aventra.RESET_PIN, body, callback);
+        this.connection.post(this.resolvedReaderURI() + Aventra.RESET_PIN, body, undefined, callback);
     }
 }
