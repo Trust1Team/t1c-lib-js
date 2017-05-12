@@ -25,34 +25,30 @@ class OCVClient implements AbstractOCVClient {
     public getUrl() { return this.url; }
 
     public validateSignature(data: SignatureValidationData,
-                             callback: (error: RestException, data: SignatureValidationResponse) => void): void {
-        this.connection.post(this.url + SIGNATURE, data, undefined, callback);
+                             callback?: (error: RestException, data: SignatureValidationResponse)
+                                 => void): void | Promise<SignatureValidationResponse> {
+        return this.connection.post(this.url + SIGNATURE, data, undefined, callback);
     }
 
-    public getInfo(callback: (error: RestException, data: OCVInfoResponse) => void): void {
-        let cb = callback;
-        this.connection.get(this.url + SYSTEM_STATUS, undefined, function(error: RestException, data: OCVInfoResponse) {
-            if (error) { return cb(error, null); }
-            return cb(null, data);
-        });
+    public getInfo(callback?: (error: RestException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse> {
+        return this.connection.get(this.url + SYSTEM_STATUS, undefined, callback);
     }
 
-    public getChallenge(digestAlgorithm: string, callback: (error: RestException, data: ChallengeResponse) => void): void {
-        let consumerCb = callback;
-        this.connection.get(this.url + CHALLENGE, { digest:  digestAlgorithm }, function(error: RestException, data: ChallengeResponse) {
-            if (error) { return consumerCb(error, null); }
-            return consumerCb(null, data);
-        });
+    public getChallenge(digestAlgorithm: string,
+                        callback?: (error: RestException, data: ChallengeResponse) => void): void | Promise<ChallengeResponse> {
+        return this.connection.get(this.url + CHALLENGE, { digest:  digestAlgorithm }, callback);
     }
 
     public validateChallengeSignedHash(data: ChallengeSignedHashData,
-                                       callback: (error: RestException, data: ChallengeSignedHashResponse) => void): void {
-        this.connection.post(this.url + CHALLENGE, data, undefined, callback);
+                                       callback?: (error: RestException, data: ChallengeSignedHashResponse)
+                                           => void): void | Promise<ChallengeSignedHashResponse> {
+        return this.connection.post(this.url + CHALLENGE, data, undefined, callback);
     }
 
     public validateCertificateChain(data: CertificateChainData,
-                                    callback: (error: RestException, data: CertificateChainResponse) => void): void {
-        this.connection.post(this.url + CERTIFICATE, data, undefined, callback);
+                                    callback?: (error: RestException, data: CertificateChainResponse)
+                                        => void): void | Promise<CertificateChainResponse> {
+        return this.connection.post(this.url + CERTIFICATE, data, undefined, callback);
     }
 
 }

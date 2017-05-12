@@ -3,11 +3,11 @@ import { DataObjectResponse, DataResponse } from "../../../../core/service/CoreM
 import { CertCard } from "../../Card";
 export { AbstractLuxTrust, AllCertsResponse, AllDataResponse };
 interface AbstractLuxTrust extends CertCard {
-    allData(filters: string[], callback: (error: RestException, data: AllDataResponse) => void): void;
-    allCerts(filters: string[], callback: (error: RestException, data: AllCertsResponse) => void): void;
-    rootCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    authenticationCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    signingCertificate(callback: (error: RestException, data: DataResponse) => void): void;
+    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): void | Promise<AllDataResponse>;
+    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): void | Promise<AllCertsResponse>;
+    rootCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    signingCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
 }
 interface AllDataResponse extends AllCertsResponse {
     data: {

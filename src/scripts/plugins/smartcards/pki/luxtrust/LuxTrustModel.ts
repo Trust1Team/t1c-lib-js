@@ -10,19 +10,11 @@ export { AbstractLuxTrust, AllCertsResponse, AllDataResponse };
 
 
 interface AbstractLuxTrust extends CertCard {
-    // callback-based
-    allData(filters: string[], callback: (error: RestException, data: AllDataResponse) => void): void;
-    allCerts(filters: string[], callback: (error: RestException, data: AllCertsResponse) => void): void;
-    rootCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    authenticationCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    signingCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-
-    // promise-based
-    // allData(filters: string[]): Promise<AllDataResponse>;
-    // allCerts(filters: string[]): Promise<AllCertsResponse>;
-    // rootCertificate(): Promise<DataResponse>;
-    // authenticationCertificate(): Promise<DataResponse>;
-    // signingCertificate(): Promise<DataResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): void | Promise<AllDataResponse>;
+    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): void | Promise<AllCertsResponse>;
+    rootCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    signingCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
 }
 
 interface AllDataResponse extends AllCertsResponse {

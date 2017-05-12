@@ -7,10 +7,10 @@ declare class Oberthur extends GenericCertCard implements AbstractOberthur {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allKeyRefs(): string[];
-    rootCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    issuerCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    authenticationCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    signingCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    encryptionCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    verifyPin(body: VerifyPinData, callback: (error: RestException, data: T1CResponse) => void): void;
+    rootCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    issuerCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    signingCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    encryptionCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): void | Promise<T1CResponse>;
 }

@@ -8,6 +8,7 @@ import * as _ from "lodash";
 import * as platform from "platform";
 import * as CoreModel from "./CoreModel";
 import { CardReader } from "./CoreModel";
+import { Promise } from "es6-promise";
 
 export { CoreService };
 
@@ -46,60 +47,79 @@ class CoreService implements CoreModel.AbstractCore {
     }
 
     // async
-    public activate(callback: (error: CoreExceptions.RestException, data: CoreModel.T1CResponse) => void): void {
-        this.connection.post(this.url + CORE_ACTIVATE, {}, undefined, callback);
+    public activate(callback?: (error: CoreExceptions.RestException, data: CoreModel.T1CResponse)
+        => void): void | Promise<CoreModel.T1CResponse> {
+        return this.connection.post(this.url + CORE_ACTIVATE, {}, undefined, callback);
     }
 
-    public getPubKey(callback: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse) => void): void {
-        this.connection.get(this.url + CORE_PUB_KEY, undefined, callback);
+    public getPubKey(callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse)
+        => void): void | Promise<CoreModel.PubKeyResponse> {
+        return this.connection.get(this.url + CORE_PUB_KEY, undefined, callback);
     }
 
-    public info(callback: (error: CoreExceptions.RestException, data: CoreModel.InfoResponse) => void): void {
-        this.connection.get(this.url + CORE_INFO, undefined, callback);
+    public info(callback?: (error: CoreExceptions.RestException, data: CoreModel.InfoResponse)
+        => void): void | Promise<CoreModel.InfoResponse> {
+        return this.connection.get(this.url + CORE_INFO, undefined, callback);
     }
 
-    public infoBrowser(callback: (error: CoreExceptions.RestException, data: CoreModel.BrowserInfoResponse) => void): void {
-        callback(null, CoreService.platformInfo());
+    public infoBrowser(callback?: (error: CoreExceptions.RestException, data: CoreModel.BrowserInfoResponse)
+        => void): void | Promise<CoreModel.BrowserInfoResponse> {
+        if (callback) { callback(null, CoreService.platformInfo()); }
+        else { return Promise.resolve(CoreService.platformInfo()); }
     }
 
-    public plugins(callback: (error: CoreExceptions.RestException, data: CoreModel.PluginsResponse) => void): void {
-        this.connection.get(this.url + CORE_PLUGINS, undefined, callback);
+    public plugins(callback?: (error: CoreExceptions.RestException, data: CoreModel.PluginsResponse)
+        => void): void | Promise<CoreModel.PluginsResponse> {
+        return this.connection.get(this.url + CORE_PLUGINS, undefined, callback);
     }
 
-    pollCardInserted(secondsToPollCard: number,
-                     callback: (error: CoreExceptions.RestException, data: CardReader) => void,
-                     connectReaderCb: () => void,
-                     insertCardCb: () => void,
-                     cardTimeoutCb: () => void): void {
-        let maxSeconds = secondsToPollCard;
+    public pollCardInserted(secondsToPollCard?: number,
+                            callback?: (error: CoreExceptions.RestException, data: CardReader) => void,
+                            connectReaderCb?: () => void,
+                            insertCardCb?: () => void,
+                            cardTimeoutCb?: () => void): void | Promise<CardReader> {
+        let maxSeconds = secondsToPollCard || 30;
         let self = this;
 
-        // recursive function
-        poll();
+        if (callback) {
+            poll();
+        } else {
+            // promise
+            return new Promise((resolve, reject) => {
+                poll(resolve, reject);
+            });
+        }
 
-        function poll() {
+        function poll(resolve?: (data: any) => void, reject?: (error: any) => void) {
             _.delay(() => {
-                // console.debug("seconds left:",maxSeconds);
+                // console.debug("seconds left:", maxSeconds);
                 --maxSeconds;
                 self.readers((error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => {
                     if (error) {
-                        connectReaderCb(); // ask to connect reader
-                        poll(); // no reader found and waiting - recursive call
+                        if (connectReaderCb) { connectReaderCb(); } // ask to connect reader
+                        poll(resolve, reject); // no reader found and waiting - recursive call
                     }
                     // no error but stop
-                    if (maxSeconds === 0) { return cardTimeoutCb(); } // reader timeout
+                    if (maxSeconds === 0) {
+                        if (cardTimeoutCb) { return cardTimeoutCb(); }
+                        else {
+                            // TODO improve handling of timeout in combination with promises
+                            if (reject) { reject({ success: false, message: "Timed out" }); }
+                        }
+                    } // reader timeout
                     else if (data.data.length === 0) {
-                        connectReaderCb(); // ask to connect reader
-                        poll();
+                        if (connectReaderCb) { connectReaderCb(); } // ask to connect reader
+                        poll(resolve, reject);
                     } else {
                         let readerWithCard = _.find(data.data, (reader: CoreModel.CardReader) => {
                             return _.has(reader, "card");
                         });
                         if (readerWithCard != null) {
-                            return callback(null, readerWithCard);
+                            if (resolve) { resolve(readerWithCard); }
+                            else { return callback(null, readerWithCard); }
                         } else {
-                            insertCardCb();
-                            poll();
+                            if (insertCardCb) { insertCardCb(); }
+                            poll(resolve, reject);
                         }
                     }
                 });
@@ -107,26 +127,38 @@ class CoreService implements CoreModel.AbstractCore {
         }
     }
 
-    public pollReadersWithCards(secondsToPollCard: number,
-                                callback: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
-                                connectReaderCb: () => void,
-                                insertCardCb: () => void,
-                                cardTimeoutCb: () => void): void {
-        let maxSeconds = secondsToPollCard;
+    public pollReadersWithCards(secondsToPollCard?: number,
+                                callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
+                                connectReaderCb?: () => void,
+                                insertCardCb?: () => void,
+                                cardTimeoutCb?: () => void): void | Promise<CoreModel.CardReadersResponse> {
+        let maxSeconds = secondsToPollCard || 30;
         let self = this;
 
-        // recursive function
-        poll();
+        if (callback) {
+            poll();
+        } else {
+            // promise
+            return new Promise((resolve, reject) => {
+                poll(resolve, reject);
+            });
+        }
 
-        function poll() {
+        function poll(resolve?: (data: any) => void, reject?: (error: any) => void) {
             _.delay(() => {
                 --maxSeconds;
                 self.readers((error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => {
                     if (error) {
-                        connectReaderCb();
-                        poll();
+                        if (connectReaderCb) { connectReaderCb(); }
+                        poll(resolve, reject);
                     }
-                    if (maxSeconds === 0) { return cardTimeoutCb(); } // reader timeout
+                    if (maxSeconds === 0) {
+                        if (cardTimeoutCb) { return cardTimeoutCb(); }
+                        else {
+                            // TODO improve handling of timeout in combination with promises
+                            if (reject) { reject({ success: false, message: "Timed out" }); }
+                        }
+                    } // reader timeout
                     else if (!_.isEmpty(data) && !_.isEmpty(data.data)) {
                         // there are some readers, check if one of them has a card
                         let readersWithCards = _.filter(data.data, (reader: CoreModel.CardReader) => {
@@ -134,72 +166,95 @@ class CoreService implements CoreModel.AbstractCore {
                         });
                         if (readersWithCards.length) {
                             // reader with card found (at least one), return data
-                            return callback(null, { data: readersWithCards, success: true });
+                            let response = { data: readersWithCards, success: true };
+                            if (resolve) { resolve(response); }
+                            else { return callback(null, response); }
                         } else {
                             // no readers with card found, continue polling
-                            insertCardCb();
-                            poll();
+                            if (insertCardCb) { insertCardCb(); }
+                            poll(resolve, reject);
                         }
                     } else {
                         // length is zero, no readers connected
-                        connectReaderCb();
-                        poll();
+                        if (connectReaderCb) { connectReaderCb(); }
+                        poll(resolve, reject);
                     }
                 });
             }, 1000);
         }
     }
 
-    public pollReaders(secondsToPollReader: number,
-                       callback: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
-                       connectReaderCb: () => void,
-                       readerTimeoutCb: () => void): void {
-        let maxSeconds = secondsToPollReader;
+    public pollReaders(secondsToPollReader?: number,
+                       callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
+                       connectReaderCb?: () => void,
+                       readerTimeoutCb?: () => void): void | Promise<CoreModel.CardReadersResponse> {
+        let maxSeconds = secondsToPollReader || 30;
         let self = this;
 
-        // recursive function
-        poll();
+        if (callback) {
+            poll();
+        } else {
+            // promise
+            return new Promise((resolve, reject) => {
+                poll(resolve, reject);
+            });
+        }
 
-        function poll() {
+
+        function poll(resolve?: (data: any) => void, reject?: (error: any) => void) {
             _.delay(function () {
                 --maxSeconds;
                 self.readers(function(error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse): void {
                     if (error) {
-                        connectReaderCb(); // ask to connect reader
-                        poll(); // no reader found and waiting - recursive call
+                        if (connectReaderCb) { connectReaderCb(); } // ask to connect reader
+                        poll(resolve, reject); // no reader found and waiting - recursive call
                     }
                     // no error but stop
-                    if (maxSeconds === 0) { return readerTimeoutCb(); } // reader timeout
+                    if (maxSeconds === 0) {
+                        if (readerTimeoutCb) { return readerTimeoutCb(); } // reader timeout
+                        else {
+                            // TODO improve handling of timeout in combination with promises
+                            if (reject) { reject({ success: false, message: "Timed out" }); }
+                        }
+                    }
                     else if (_.isEmpty(data) || _.isEmpty(data.data)) {
-                        connectReaderCb(); // ask to connect reader
-                        poll();
+                        if (connectReaderCb) { connectReaderCb(); } // ask to connect reader
+                        poll(resolve, reject);
                     }
                     else {
-                        return callback(null, data);
+                        if (resolve) { resolve(data); }
+                        else { return callback(null, data); }
                     }
                 });
             }, 1000);
         }
     }
 
-    public reader(reader_id: string, callback: (error: CoreExceptions.RestException, data: CoreModel.SingleReaderResponse) => void) {
-        this.connection.get(this.url + CORE_READERS + "/" + reader_id, undefined, callback);
+    public reader(reader_id: string,
+                  callback?: (error: CoreExceptions.RestException, data: CoreModel.SingleReaderResponse)
+                      => void): void | Promise<CoreModel.SingleReaderResponse> {
+        return this.connection.get(this.url + CORE_READERS + "/" + reader_id, undefined, callback);
     }
 
-    public readers(callback: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void): void {
-        this.connection.get(this.url + CORE_READERS, undefined, callback);
+    public readers(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
+        => void): void | Promise<CoreModel.CardReadersResponse> {
+        return this.connection.get(this.url + CORE_READERS, undefined, callback);
     }
 
-    public readersCardAvailable(callback: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void): void {
-        this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(true), callback);
+    public readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
+        => void): void | Promise<CoreModel.CardReadersResponse> {
+        return this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(true), callback);
     }
 
-    public readersCardsUnavailable(callback: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void): void {
-        this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(false), callback);
+    public readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
+        => void): void | Promise<CoreModel.CardReadersResponse> {
+        return this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(false), callback);
     }
 
-    public setPubKey(pubkey: string, callback: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse) => void): void {
-        this.connection.put(this.url + CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);
+    public setPubKey(pubkey: string,
+                     callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse)
+                         => void): void | Promise<CoreModel.PubKeyResponse> {
+        return this.connection.put(this.url + CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);
     }
 
     // sync

@@ -3,8 +3,8 @@ import { PinCard } from "../Card";
 import { DataObjectResponse, DataResponse } from "../../../core/service/CoreModel";
 export { AbstractEMV, AllDataResponse };
 interface AbstractEMV extends PinCard {
-    pan(callback: (error: RestException, data: DataResponse) => void): void;
-    allData(filters: string[], callback: (error: RestException, data: AllDataResponse) => void): void;
+    pan(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): void | Promise<AllDataResponse>;
 }
 interface AllDataResponse extends DataObjectResponse {
     data: {

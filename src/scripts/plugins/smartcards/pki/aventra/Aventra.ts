@@ -28,31 +28,31 @@ class Aventra extends GenericCertCard implements AbstractAventra {
         return [ "authenticate", "sign", "encrypt" ];
     }
 
-    public rootCertificate(callback: (error: RestException, data: DataResponse) => void): void {
-        this.getCertificate(Aventra.CERT_ROOT, callback);
+    public rootCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+        return this.getCertificate(Aventra.CERT_ROOT, callback);
     }
 
-    public issuerCertificate(callback: (error: RestException, data: DataResponse) => void): void {
-        this.getCertificate(Aventra.CERT_ISSUER, callback);
+    public issuerCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+        return this.getCertificate(Aventra.CERT_ISSUER, callback);
     }
 
-    public authenticationCertificate(callback: (error: RestException, data: DataResponse) => void): void {
-        this.getCertificate(Aventra.CERT_AUTHENTICATION, callback);
+    public authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+        return this.getCertificate(Aventra.CERT_AUTHENTICATION, callback);
     }
 
-    public signingCertificate(callback: (error: RestException, data: DataResponse) => void): void {
-        this.getCertificate(Aventra.CERT_SIGNING, callback);
+    public signingCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+        return this.getCertificate(Aventra.CERT_SIGNING, callback);
     }
 
-    public encryptionCertificate(callback: (error: RestException, data: DataResponse) => void): void {
-        this.getCertificate(Aventra.CERT_ENCRYPTION, callback);
+    public encryptionCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>{
+        return this.getCertificate(Aventra.CERT_ENCRYPTION, callback);
     }
 
-    public verifyPin(body: VerifyPinData, callback: (error: RestException, data: T1CResponse) => void): void {
-        this.connection.post(this.resolvedReaderURI() + Aventra.VERIFY_PIN, body, undefined, callback);
+    public verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): void | Promise<T1CResponse> {
+        return this.connection.post(this.resolvedReaderURI() + Aventra.VERIFY_PIN, body, undefined, callback);
     }
 
-    public resetPin(body: ResetPinData, callback: (error: RestException, data: T1CResponse) => void): void {
-        this.connection.post(this.resolvedReaderURI() + Aventra.RESET_PIN, body, undefined, callback);
+    public resetPin(body: ResetPinData, callback?: (error: RestException, data: T1CResponse) => void): void | Promise<T1CResponse> {
+        return this.connection.post(this.resolvedReaderURI() + Aventra.RESET_PIN, body, undefined, callback);
     }
 }

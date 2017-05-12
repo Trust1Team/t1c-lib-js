@@ -5,12 +5,12 @@ export { AbstractEidLUX, AllCertsResponse, AllDataResponse, Biometric, Biometric
 interface AbstractEidLUX extends SecuredCertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
-    biometric(body: OptionalPin, callback: (error: RestException, data: BiometricResponse) => void): void;
-    picture(body: OptionalPin, callback: (error: RestException, data: PictureResponse) => void): void;
-    rootCertificate(body: OptionalPin, callback: (error: RestException, data: DataArrayResponse) => void): void;
-    authenticationCertificate(body: OptionalPin, callback: (error: RestException, data: DataResponse) => void): void;
-    nonRepudiationCertificate(body: OptionalPin, callback: (error: RestException, data: DataResponse) => void): void;
-    signatureImage(body: OptionalPin, callback: (error: RestException, data: SignatureImageResponse) => void): void;
+    biometric(body: OptionalPin, callback?: (error: RestException, data: BiometricResponse) => void): void | Promise<BiometricResponse>;
+    picture(body: OptionalPin, callback?: (error: RestException, data: PictureResponse) => void): void | Promise<PictureResponse>;
+    rootCertificate(body: OptionalPin, callback?: (error: RestException, data: DataArrayResponse) => void): void | Promise<DataArrayResponse>;
+    authenticationCertificate(body: OptionalPin, callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    nonRepudiationCertificate(body: OptionalPin, callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    signatureImage(body: OptionalPin, callback?: (error: RestException, data: SignatureImageResponse) => void): void | Promise<SignatureImageResponse>;
 }
 interface AllCertsResponse extends T1CResponse {
     data: {

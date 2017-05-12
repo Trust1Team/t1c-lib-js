@@ -9,8 +9,8 @@ declare class PIV extends GenericSecuredCertCard implements AbstractPiv {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allKeyRefs(): string[];
-    printedInformation(body: OptionalPin, callback: (error: RestException, data: PrintedInformationResponse) => void): void;
-    facialImage(body: OptionalPin, callback: (error: RestException, data: FacialImageResponse) => void): void;
-    authenticationCertificate(body: OptionalPin, callback: (error: RestException, data: DataResponse) => void): void;
-    signingCertificate(body: OptionalPin, callback: (error: RestException, data: DataResponse) => void): void;
+    printedInformation(body: OptionalPin, callback?: (error: RestException, data: PrintedInformationResponse) => void | Promise<PrintedInformationResponse>): void | Promise<any>;
+    facialImage(body: OptionalPin, callback?: (error: RestException, data: FacialImageResponse) => void | Promise<FacialImageResponse>): void | Promise<any>;
+    authenticationCertificate(body: OptionalPin, callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>): void | Promise<DataResponse>;
+    signingCertificate(body: OptionalPin, callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>): void | Promise<DataResponse>;
 }
