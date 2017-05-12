@@ -11,13 +11,18 @@ export { AbstractOCVClient, CertificateAndOrder, CertificateChainData, Certifica
 
 
 interface AbstractOCVClient {
-    getChallenge(digestAlgorithm: string, callback: (error: CoreExceptions.RestException, data: any) => void): void;
+    getChallenge(digestAlgorithm: string,
+                 callback?: (error: CoreExceptions.RestException, data: ChallengeResponse) => void): void | Promise<ChallengeResponse>;
     validateChallengeSignedHash(data: ChallengeSignedHashData,
-                                callback: (error: CoreExceptions.RestException, data: ChallengeSignedHashResponse) => void): void;
+                                callback?: (error: CoreExceptions.RestException, data: ChallengeSignedHashResponse)
+                                    => void): void | Promise<ChallengeSignedHashResponse>;
     validateCertificateChain(data: CertificateChainData,
-                             callback: (error: CoreExceptions.RestException, data: CertificateChainResponse) => void): void;
-    validateSignature(data: SignatureValidationData, callback: (error: CoreExceptions.RestException, data: any) => void): void;
-    getInfo(callback: (error: CoreExceptions.RestException, data: any) => void): void;
+                             callback?: (error: CoreExceptions.RestException, data: CertificateChainResponse)
+                                 => void): void | Promise<CertificateChainResponse>;
+    validateSignature(data: SignatureValidationData,
+                      callback?: (error: CoreExceptions.RestException, data: SignatureValidationResponse)
+                          => void): void | Promise<SignatureValidationResponse>;
+    getInfo(callback?: (error: CoreExceptions.RestException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse>;
 }
 
 interface CertificateChainData {

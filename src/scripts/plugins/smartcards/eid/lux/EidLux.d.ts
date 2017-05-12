@@ -17,15 +17,15 @@ declare class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
     constructor(url: string, connection: LocalConnection, reader_id: string, pin: string);
     allDataFilters(): string[];
     allCertFilters(): string[];
-    allData(filters: string[], body: OptionalPin, callback: (error: RestException, data: AllDataResponse) => void): void;
-    allCerts(filters: string[], body: OptionalPin, callback: (error: RestException, data: AllCertsResponse) => void): void;
-    biometric(body: OptionalPin, callback: (error: RestException, data: BiometricResponse) => void): void;
-    picture(body: OptionalPin, callback: (error: RestException, data: PictureResponse) => void): void;
-    rootCertificate(body: OptionalPin, callback: (error: RestException, data: DataArrayResponse) => void): void;
-    authenticationCertificate(body: OptionalPin, callback: (error: RestException, data: DataResponse) => void): void;
-    nonRepudiationCertificate(body: OptionalPin, callback: (error: RestException, data: DataResponse) => void): void;
-    verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void): void;
-    signData(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
-    authenticate(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): void;
-    signatureImage(body: OptionalPin, callback: (error: RestException, data: SignatureImageResponse) => void): void;
+    allData(filters: string[], body: OptionalPin, callback?: (error: RestException, data: AllDataResponse) => void | Promise<AllDataResponse>): void | Promise<any>;
+    allCerts(filters: string[], body: OptionalPin, callback?: (error: RestException, data: AllCertsResponse) => void | Promise<AllCertsResponse>): void | Promise<any>;
+    biometric(body: OptionalPin, callback?: (error: RestException, data: BiometricResponse) => void | Promise<BiometricResponse>): void | Promise<any>;
+    picture(body: OptionalPin, callback?: (error: RestException, data: PictureResponse) => void | Promise<PictureResponse>): void | Promise<any>;
+    rootCertificate(body: OptionalPin, callback?: (error: RestException, data: DataArrayResponse) => void | Promise<DataArrayResponse>): void | Promise<DataArrayResponse>;
+    authenticationCertificate(body: OptionalPin, callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>): void | Promise<DataResponse>;
+    nonRepudiationCertificate(body: OptionalPin, callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>): void | Promise<DataResponse>;
+    verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>): void | Promise<any>;
+    signData(body: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>): void | Promise<any>;
+    authenticate(body: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>): void | Promise<any>;
+    signatureImage(body: OptionalPin, callback?: (error: RestException, data: SignatureImageResponse) => void | Promise<SignatureImageResponse>): void | Promise<any>;
 }

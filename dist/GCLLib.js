@@ -52,9 +52,9 @@ var GCLLib =
 	exports.GCLConfig = GCLConfig_1.GCLConfig;
 	var CardFactory_1 = __webpack_require__(4);
 	var CoreService_1 = __webpack_require__(15);
-	var Connection_1 = __webpack_require__(17);
-	var DSClient_1 = __webpack_require__(44);
-	var OCVClient_1 = __webpack_require__(45);
+	var Connection_1 = __webpack_require__(20);
+	var DSClient_1 = __webpack_require__(46);
+	var OCVClient_1 = __webpack_require__(47);
 	var GCLClient = (function () {
 	    function GCLClient(cfg) {
 	        var _this = this;
@@ -17550,7 +17550,7 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    EMV.prototype.pan = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + EMV_PAN, undefined, callback);
+	        return this.connection.get(this.resolvedReaderURI() + EMV_PAN, undefined, callback);
 	    };
 	    return EMV;
 	}(Card_1.GenericPinCard));
@@ -17601,10 +17601,10 @@ var GCLLib =
 	    }
 	    GenericSmartCard.prototype.allData = function (filters, callback) {
 	        if (filters && filters.length) {
-	            this.connection.get(this.resolvedReaderURI(), GenericCard.createFilterQueryParam(filters), callback);
+	            return this.connection.get(this.resolvedReaderURI(), GenericCard.createFilterQueryParam(filters), callback);
 	        }
 	        else {
-	            this.connection.get(this.resolvedReaderURI(), undefined, callback);
+	            return this.connection.get(this.resolvedReaderURI(), undefined, callback);
 	        }
 	    };
 	    return GenericSmartCard;
@@ -17616,7 +17616,7 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    GenericPinCard.prototype.verifyPin = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + GenericPinCard.VERIFY_PIN, body, undefined, callback);
+	        return this.connection.post(this.resolvedReaderURI() + GenericPinCard.VERIFY_PIN, body, undefined, callback);
 	    };
 	    return GenericPinCard;
 	}(GenericSmartCard));
@@ -17628,29 +17628,29 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    GenericCertCard.prototype.allAlgoRefsForAuthentication = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, undefined, callback);
+	        return this.connection.get(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, undefined, callback);
 	    };
 	    GenericCertCard.prototype.allAlgoRefsForSigning = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, undefined, callback);
+	        return this.connection.get(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, undefined, callback);
 	    };
 	    GenericCertCard.prototype.allCerts = function (filters, callback) {
 	        if (filters && filters.length) {
-	            this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES, GenericCertCard.createFilterQueryParam(filters), callback);
+	            return this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES, GenericCertCard.createFilterQueryParam(filters), callback);
 	        }
 	        else {
-	            this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES, undefined, callback);
+	            return this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES, undefined, callback);
 	        }
 	    };
 	    GenericCertCard.prototype.authenticate = function (body, callback) {
 	        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
-	        this.connection.post(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, body, undefined, callback);
+	        return this.connection.post(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, body, undefined, callback);
 	    };
 	    GenericCertCard.prototype.signData = function (body, callback) {
 	        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
-	        this.connection.post(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, undefined, callback);
+	        return this.connection.post(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, undefined, callback);
 	    };
 	    GenericCertCard.prototype.getCertificate = function (certUrl, callback) {
-	        this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, undefined, callback);
+	        return this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, undefined, callback);
 	    };
 	    return GenericCertCard;
 	}(GenericPinCard));
@@ -17672,41 +17672,41 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    GenericSecuredCertCard.prototype.allAlgoRefsForAuthentication = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, undefined, callback);
+	        return this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, undefined, callback);
 	    };
 	    GenericSecuredCertCard.prototype.allAlgoRefsForSigning = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, undefined, callback);
+	        return this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, undefined, callback);
 	    };
 	    GenericSecuredCertCard.prototype.allData = function (filters, body, callback) {
 	        if (filters && filters.length) {
-	            this.connection.post(this.resolvedReaderURI(), body, GenericSecuredCertCard.createFilterQueryParam(filters), callback);
+	            return this.connection.post(this.resolvedReaderURI(), body, GenericSecuredCertCard.createFilterQueryParam(filters), callback);
 	        }
 	        else {
-	            this.connection.post(this.resolvedReaderURI(), body, undefined, callback);
+	            return this.connection.post(this.resolvedReaderURI(), body, undefined, callback);
 	        }
 	    };
 	    GenericSecuredCertCard.prototype.allCerts = function (filters, body, callback) {
 	        if (filters && filters.length) {
-	            this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES, body, GenericSecuredCertCard.createFilterQueryParam(filters), callback);
+	            return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES, body, GenericSecuredCertCard.createFilterQueryParam(filters), callback);
 	        }
 	        else {
-	            this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES, body, undefined, callback);
+	            return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES, body, undefined, callback);
 	        }
 	    };
 	    GenericSecuredCertCard.prototype.verifyPin = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.VERIFY_PIN, body, undefined, callback);
+	        return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.VERIFY_PIN, body, undefined, callback);
 	    };
 	    GenericSecuredCertCard.prototype.signData = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, body, undefined, callback);
+	        return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, body, undefined, callback);
 	    };
 	    GenericSecuredCertCard.prototype.authenticate = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, body, undefined, callback);
+	        return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, body, undefined, callback);
 	    };
 	    GenericSecuredCertCard.prototype.getCertificate = function (certUrl, body, callback, params) {
-	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, params, callback);
+	        return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, params, callback);
 	    };
 	    GenericSecuredCertCard.prototype.getCertificateArray = function (certUrl, body, callback, params) {
-	        this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, params, callback);
+	        return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, params, callback);
 	    };
 	    return GenericSecuredCertCard;
 	}(GenericCard));
@@ -17744,35 +17744,35 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    EidBe.prototype.rnData = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + EidBe.RN_DATA, undefined, callback);
+	        return this.connection.get(this.resolvedReaderURI() + EidBe.RN_DATA, undefined, callback);
 	    };
 	    EidBe.prototype.address = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + EidBe.ADDRESS, undefined, callback);
+	        return this.connection.get(this.resolvedReaderURI() + EidBe.ADDRESS, undefined, callback);
 	    };
 	    EidBe.prototype.picture = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + EidBe.PHOTO, undefined, callback);
+	        return this.connection.get(this.resolvedReaderURI() + EidBe.PHOTO, undefined, callback);
 	    };
 	    EidBe.prototype.rootCertificate = function (callback) {
-	        this.getCertificate(EidBe.CERT_ROOT, callback);
+	        return this.getCertificate(EidBe.CERT_ROOT, callback);
 	    };
 	    EidBe.prototype.citizenCertificate = function (callback) {
-	        this.getCertificate(EidBe.CERT_CITIZEN, callback);
+	        return this.getCertificate(EidBe.CERT_CITIZEN, callback);
 	    };
 	    EidBe.prototype.authenticationCertificate = function (callback) {
-	        this.getCertificate(EidBe.CERT_AUTHENTICATION, callback);
+	        return this.getCertificate(EidBe.CERT_AUTHENTICATION, callback);
 	    };
 	    EidBe.prototype.nonRepudiationCertificate = function (callback) {
-	        this.getCertificate(EidBe.CERT_NON_REPUDIATION, callback);
+	        return this.getCertificate(EidBe.CERT_NON_REPUDIATION, callback);
 	    };
 	    EidBe.prototype.rrnCertificate = function (callback) {
-	        this.getCertificate(EidBe.CERT_RRN, callback);
+	        return this.getCertificate(EidBe.CERT_RRN, callback);
 	    };
 	    EidBe.prototype.verifyPin = function (body, callback) {
 	        var _req = { private_key_reference: EidBe.VERIFY_PRIV_KEY_REF };
 	        if (body.pin) {
 	            _req.pin = body.pin;
 	        }
-	        this.connection.post(this.resolvedReaderURI() + Card_1.GenericCertCard.VERIFY_PIN, _req, undefined, callback);
+	        return this.connection.post(this.resolvedReaderURI() + Card_1.GenericCertCard.VERIFY_PIN, _req, undefined, callback);
 	    };
 	    return EidBe;
 	}(Card_1.GenericCertCard));
@@ -17824,46 +17824,46 @@ var GCLLib =
 	    };
 	    EidLux.prototype.allData = function (filters, body, callback) {
 	        if (filters && filters.length) {
-	            this.connection.post(this.resolvedReaderURI(), body, createFilterQueryParam(filters, this.pin), callback);
+	            return this.connection.post(this.resolvedReaderURI(), body, createFilterQueryParam(filters, this.pin), callback);
 	        }
 	        else {
-	            this.connection.post(this.resolvedReaderURI(), body, createPinQueryParam(this.pin), callback);
+	            return this.connection.post(this.resolvedReaderURI(), body, createPinQueryParam(this.pin), callback);
 	        }
 	    };
 	    EidLux.prototype.allCerts = function (filters, body, callback) {
 	        if (filters && filters.length) {
-	            this.connection.post(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, body, createFilterQueryParam(filters, this.pin), callback);
+	            return this.connection.post(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, body, createFilterQueryParam(filters, this.pin), callback);
 	        }
 	        else {
-	            this.connection.post(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, body, createPinQueryParam(this.pin), callback);
+	            return this.connection.post(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, body, createPinQueryParam(this.pin), callback);
 	        }
 	    };
 	    EidLux.prototype.biometric = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + EidLux.BIOMETRIC, body, createPinQueryParam(this.pin), callback);
+	        return this.connection.post(this.resolvedReaderURI() + EidLux.BIOMETRIC, body, createPinQueryParam(this.pin), callback);
 	    };
 	    EidLux.prototype.picture = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + EidLux.PHOTO, body, createPinQueryParam(this.pin), callback);
+	        return this.connection.post(this.resolvedReaderURI() + EidLux.PHOTO, body, createPinQueryParam(this.pin), callback);
 	    };
 	    EidLux.prototype.rootCertificate = function (body, callback) {
-	        this.getCertificateArray(EidLux.CERT_ROOT, body, callback, createPinQueryParam(this.pin));
+	        return this.getCertificateArray(EidLux.CERT_ROOT, body, callback, createPinQueryParam(this.pin));
 	    };
 	    EidLux.prototype.authenticationCertificate = function (body, callback) {
-	        this.getCertificate(EidLux.CERT_AUTHENTICATION, body, callback, createPinQueryParam(this.pin));
+	        return this.getCertificate(EidLux.CERT_AUTHENTICATION, body, callback, createPinQueryParam(this.pin));
 	    };
 	    EidLux.prototype.nonRepudiationCertificate = function (body, callback) {
-	        this.getCertificate(EidLux.CERT_NON_REPUDIATION, body, callback, createPinQueryParam(this.pin));
+	        return this.getCertificate(EidLux.CERT_NON_REPUDIATION, body, callback, createPinQueryParam(this.pin));
 	    };
 	    EidLux.prototype.verifyPin = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(this.pin), callback);
+	        return this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(this.pin), callback);
 	    };
 	    EidLux.prototype.signData = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + EidLux.SIGN_DATA, body, createPinQueryParam(this.pin), callback);
+	        return this.connection.post(this.resolvedReaderURI() + EidLux.SIGN_DATA, body, createPinQueryParam(this.pin), callback);
 	    };
 	    EidLux.prototype.authenticate = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(this.pin), callback);
+	        return this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(this.pin), callback);
 	    };
 	    EidLux.prototype.signatureImage = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + EidLux.SIGNATURE_IMAGE, body, createPinQueryParam(this.pin), callback);
+	        return this.connection.post(this.resolvedReaderURI() + EidLux.SIGNATURE_IMAGE, body, createPinQueryParam(this.pin), callback);
 	    };
 	    return EidLux;
 	}(Card_1.GenericSecuredCertCard));
@@ -17901,16 +17901,16 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    Mobib.prototype.cardIssuing = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + MOBIB_CARD_ISSUING, undefined, callback);
+	        return this.connection.get(this.resolvedReaderURI() + MOBIB_CARD_ISSUING, undefined, callback);
 	    };
 	    Mobib.prototype.contracts = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + MOBIB_CONTRACTS, undefined, callback);
+	        return this.connection.get(this.resolvedReaderURI() + MOBIB_CONTRACTS, undefined, callback);
 	    };
 	    Mobib.prototype.picture = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + MOBIB_PHOTO, undefined, callback);
+	        return this.connection.get(this.resolvedReaderURI() + MOBIB_PHOTO, undefined, callback);
 	    };
 	    Mobib.prototype.status = function (callback) {
-	        this.connection.get(this.resolvedReaderURI() + MOBIB_STATUS, undefined, callback);
+	        return this.connection.get(this.resolvedReaderURI() + MOBIB_STATUS, undefined, callback);
 	    };
 	    return Mobib;
 	}(Card_1.GenericSmartCard));
@@ -17940,13 +17940,13 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    LuxTrust.prototype.rootCertificate = function (callback) {
-	        this.getCertificate(LuxTrust.CERT_ROOT, callback);
+	        return this.getCertificate(LuxTrust.CERT_ROOT, callback);
 	    };
 	    LuxTrust.prototype.authenticationCertificate = function (callback) {
-	        this.getCertificate(LuxTrust.CERT_AUTHENTICATION, callback);
+	        return this.getCertificate(LuxTrust.CERT_AUTHENTICATION, callback);
 	    };
 	    LuxTrust.prototype.signingCertificate = function (callback) {
-	        this.getCertificate(LuxTrust.CERT_SIGNING, callback);
+	        return this.getCertificate(LuxTrust.CERT_SIGNING, callback);
 	    };
 	    return LuxTrust;
 	}(Card_1.GenericCertCard));
@@ -17976,10 +17976,10 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    Ocra.prototype.challenge = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + Ocra.CHALLENGE, body, undefined, callback);
+	        return this.connection.post(this.resolvedReaderURI() + Ocra.CHALLENGE, body, undefined, callback);
 	    };
 	    Ocra.prototype.readCounter = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + Ocra.READ_COUNTER, body, undefined, callback);
+	        return this.connection.post(this.resolvedReaderURI() + Ocra.READ_COUNTER, body, undefined, callback);
 	    };
 	    return Ocra;
 	}(Card_1.GenericPinCard));
@@ -18021,25 +18021,25 @@ var GCLLib =
 	        return ["authenticate", "sign", "encrypt"];
 	    };
 	    Aventra.prototype.rootCertificate = function (callback) {
-	        this.getCertificate(Aventra.CERT_ROOT, callback);
+	        return this.getCertificate(Aventra.CERT_ROOT, callback);
 	    };
 	    Aventra.prototype.issuerCertificate = function (callback) {
-	        this.getCertificate(Aventra.CERT_ISSUER, callback);
+	        return this.getCertificate(Aventra.CERT_ISSUER, callback);
 	    };
 	    Aventra.prototype.authenticationCertificate = function (callback) {
-	        this.getCertificate(Aventra.CERT_AUTHENTICATION, callback);
+	        return this.getCertificate(Aventra.CERT_AUTHENTICATION, callback);
 	    };
 	    Aventra.prototype.signingCertificate = function (callback) {
-	        this.getCertificate(Aventra.CERT_SIGNING, callback);
+	        return this.getCertificate(Aventra.CERT_SIGNING, callback);
 	    };
 	    Aventra.prototype.encryptionCertificate = function (callback) {
-	        this.getCertificate(Aventra.CERT_ENCRYPTION, callback);
+	        return this.getCertificate(Aventra.CERT_ENCRYPTION, callback);
 	    };
 	    Aventra.prototype.verifyPin = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + Aventra.VERIFY_PIN, body, undefined, callback);
+	        return this.connection.post(this.resolvedReaderURI() + Aventra.VERIFY_PIN, body, undefined, callback);
 	    };
 	    Aventra.prototype.resetPin = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + Aventra.RESET_PIN, body, undefined, callback);
+	        return this.connection.post(this.resolvedReaderURI() + Aventra.RESET_PIN, body, undefined, callback);
 	    };
 	    return Aventra;
 	}(Card_1.GenericCertCard));
@@ -18080,22 +18080,22 @@ var GCLLib =
 	        return ["authenticate", "sign", "encrypt"];
 	    };
 	    Oberthur.prototype.rootCertificate = function (callback) {
-	        this.getCertificate(Oberthur.CERT_ROOT, callback);
+	        return this.getCertificate(Oberthur.CERT_ROOT, callback);
 	    };
 	    Oberthur.prototype.issuerCertificate = function (callback) {
-	        this.getCertificate(Oberthur.CERT_ISSUER, callback);
+	        return this.getCertificate(Oberthur.CERT_ISSUER, callback);
 	    };
 	    Oberthur.prototype.authenticationCertificate = function (callback) {
-	        this.getCertificate(Oberthur.CERT_AUTHENTICATION, callback);
+	        return this.getCertificate(Oberthur.CERT_AUTHENTICATION, callback);
 	    };
 	    Oberthur.prototype.signingCertificate = function (callback) {
-	        this.getCertificate(Oberthur.CERT_SIGNING, callback);
+	        return this.getCertificate(Oberthur.CERT_SIGNING, callback);
 	    };
 	    Oberthur.prototype.encryptionCertificate = function (callback) {
-	        this.getCertificate(Oberthur.CERT_ENCRYPTION, callback);
+	        return this.getCertificate(Oberthur.CERT_ENCRYPTION, callback);
 	    };
 	    Oberthur.prototype.verifyPin = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, undefined, callback);
+	        return this.connection.post(this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, undefined, callback);
 	    };
 	    return Oberthur;
 	}(Card_1.GenericCertCard));
@@ -18135,16 +18135,16 @@ var GCLLib =
 	        return ["authenticate", "sign", "encrypt"];
 	    };
 	    PIV.prototype.printedInformation = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + PIV.PRINTED_INFORMATION, body, undefined, callback);
+	        return this.connection.post(this.resolvedReaderURI() + PIV.PRINTED_INFORMATION, body, undefined, callback);
 	    };
 	    PIV.prototype.facialImage = function (body, callback) {
-	        this.connection.post(this.resolvedReaderURI() + PIV.FACIAL_IMAGE, body, undefined, callback);
+	        return this.connection.post(this.resolvedReaderURI() + PIV.FACIAL_IMAGE, body, undefined, callback);
 	    };
 	    PIV.prototype.authenticationCertificate = function (body, callback) {
-	        this.getCertificate(PIV.CERT_AUTHENTICATION, body, callback);
+	        return this.getCertificate(PIV.CERT_AUTHENTICATION, body, callback);
 	    };
 	    PIV.prototype.signingCertificate = function (body, callback) {
-	        this.getCertificate(PIV.CERT_SIGNING, body, callback);
+	        return this.getCertificate(PIV.CERT_SIGNING, body, callback);
 	    };
 	    return PIV;
 	}(Card_1.GenericSecuredCertCard));
@@ -18161,6 +18161,7 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var _ = __webpack_require__(1);
 	var platform = __webpack_require__(16);
+	var es6_promise_1 = __webpack_require__(17);
 	var CORE_INFO = "/";
 	var CORE_PLUGINS = "/plugins";
 	var CORE_READERS = "/card-readers";
@@ -18193,49 +18194,79 @@ var GCLLib =
 	        };
 	    };
 	    CoreService.prototype.activate = function (callback) {
-	        this.connection.post(this.url + CORE_ACTIVATE, {}, undefined, callback);
+	        return this.connection.post(this.url + CORE_ACTIVATE, {}, undefined, callback);
 	    };
 	    CoreService.prototype.getPubKey = function (callback) {
-	        this.connection.get(this.url + CORE_PUB_KEY, undefined, callback);
+	        return this.connection.get(this.url + CORE_PUB_KEY, undefined, callback);
 	    };
 	    CoreService.prototype.info = function (callback) {
-	        this.connection.get(this.url + CORE_INFO, undefined, callback);
+	        return this.connection.get(this.url + CORE_INFO, undefined, callback);
 	    };
 	    CoreService.prototype.infoBrowser = function (callback) {
-	        callback(null, CoreService.platformInfo());
+	        if (callback) {
+	            callback(null, CoreService.platformInfo());
+	        }
+	        else {
+	            return es6_promise_1.Promise.resolve(CoreService.platformInfo());
+	        }
 	    };
 	    CoreService.prototype.plugins = function (callback) {
-	        this.connection.get(this.url + CORE_PLUGINS, undefined, callback);
+	        return this.connection.get(this.url + CORE_PLUGINS, undefined, callback);
 	    };
 	    CoreService.prototype.pollCardInserted = function (secondsToPollCard, callback, connectReaderCb, insertCardCb, cardTimeoutCb) {
-	        var maxSeconds = secondsToPollCard;
+	        var maxSeconds = secondsToPollCard || 30;
 	        var self = this;
-	        poll();
-	        function poll() {
+	        if (callback) {
+	            poll();
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                poll(resolve, reject);
+	            });
+	        }
+	        function poll(resolve, reject) {
 	            _.delay(function () {
 	                --maxSeconds;
 	                self.readers(function (error, data) {
 	                    if (error) {
-	                        connectReaderCb();
-	                        poll();
+	                        if (connectReaderCb) {
+	                            connectReaderCb();
+	                        }
+	                        poll(resolve, reject);
 	                    }
 	                    if (maxSeconds === 0) {
-	                        return cardTimeoutCb();
+	                        if (cardTimeoutCb) {
+	                            return cardTimeoutCb();
+	                        }
+	                        else {
+	                            if (reject) {
+	                                reject({ success: false, message: "Timed out" });
+	                            }
+	                        }
 	                    }
 	                    else if (data.data.length === 0) {
-	                        connectReaderCb();
-	                        poll();
+	                        if (connectReaderCb) {
+	                            connectReaderCb();
+	                        }
+	                        poll(resolve, reject);
 	                    }
 	                    else {
 	                        var readerWithCard = _.find(data.data, function (reader) {
 	                            return _.has(reader, "card");
 	                        });
 	                        if (readerWithCard != null) {
-	                            return callback(null, readerWithCard);
+	                            if (resolve) {
+	                                resolve(readerWithCard);
+	                            }
+	                            else {
+	                                return callback(null, readerWithCard);
+	                            }
 	                        }
 	                        else {
-	                            insertCardCb();
-	                            poll();
+	                            if (insertCardCb) {
+	                                insertCardCb();
+	                            }
+	                            poll(resolve, reject);
 	                        }
 	                    }
 	                });
@@ -18243,80 +18274,129 @@ var GCLLib =
 	        }
 	    };
 	    CoreService.prototype.pollReadersWithCards = function (secondsToPollCard, callback, connectReaderCb, insertCardCb, cardTimeoutCb) {
-	        var maxSeconds = secondsToPollCard;
+	        var maxSeconds = secondsToPollCard || 30;
 	        var self = this;
-	        poll();
-	        function poll() {
+	        if (callback) {
+	            poll();
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                poll(resolve, reject);
+	            });
+	        }
+	        function poll(resolve, reject) {
 	            _.delay(function () {
 	                --maxSeconds;
 	                self.readers(function (error, data) {
 	                    if (error) {
-	                        connectReaderCb();
-	                        poll();
+	                        if (connectReaderCb) {
+	                            connectReaderCb();
+	                        }
+	                        poll(resolve, reject);
 	                    }
 	                    if (maxSeconds === 0) {
-	                        return cardTimeoutCb();
+	                        if (cardTimeoutCb) {
+	                            return cardTimeoutCb();
+	                        }
+	                        else {
+	                            if (reject) {
+	                                reject({ success: false, message: "Timed out" });
+	                            }
+	                        }
 	                    }
 	                    else if (!_.isEmpty(data) && !_.isEmpty(data.data)) {
 	                        var readersWithCards = _.filter(data.data, function (reader) {
 	                            return _.has(reader, "card");
 	                        });
 	                        if (readersWithCards.length) {
-	                            return callback(null, { data: readersWithCards, success: true });
+	                            var response = { data: readersWithCards, success: true };
+	                            if (resolve) {
+	                                resolve(response);
+	                            }
+	                            else {
+	                                return callback(null, response);
+	                            }
 	                        }
 	                        else {
-	                            insertCardCb();
-	                            poll();
+	                            if (insertCardCb) {
+	                                insertCardCb();
+	                            }
+	                            poll(resolve, reject);
 	                        }
 	                    }
 	                    else {
-	                        connectReaderCb();
-	                        poll();
+	                        if (connectReaderCb) {
+	                            connectReaderCb();
+	                        }
+	                        poll(resolve, reject);
 	                    }
 	                });
 	            }, 1000);
 	        }
 	    };
 	    CoreService.prototype.pollReaders = function (secondsToPollReader, callback, connectReaderCb, readerTimeoutCb) {
-	        var maxSeconds = secondsToPollReader;
+	        var maxSeconds = secondsToPollReader || 30;
 	        var self = this;
-	        poll();
-	        function poll() {
+	        if (callback) {
+	            poll();
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                poll(resolve, reject);
+	            });
+	        }
+	        function poll(resolve, reject) {
 	            _.delay(function () {
 	                --maxSeconds;
 	                self.readers(function (error, data) {
 	                    if (error) {
-	                        connectReaderCb();
-	                        poll();
+	                        if (connectReaderCb) {
+	                            connectReaderCb();
+	                        }
+	                        poll(resolve, reject);
 	                    }
 	                    if (maxSeconds === 0) {
-	                        return readerTimeoutCb();
+	                        if (readerTimeoutCb) {
+	                            return readerTimeoutCb();
+	                        }
+	                        else {
+	                            if (reject) {
+	                                reject({ success: false, message: "Timed out" });
+	                            }
+	                        }
 	                    }
 	                    else if (_.isEmpty(data) || _.isEmpty(data.data)) {
-	                        connectReaderCb();
-	                        poll();
+	                        if (connectReaderCb) {
+	                            connectReaderCb();
+	                        }
+	                        poll(resolve, reject);
 	                    }
 	                    else {
-	                        return callback(null, data);
+	                        if (resolve) {
+	                            resolve(data);
+	                        }
+	                        else {
+	                            return callback(null, data);
+	                        }
 	                    }
 	                });
 	            }, 1000);
 	        }
 	    };
 	    CoreService.prototype.reader = function (reader_id, callback) {
-	        this.connection.get(this.url + CORE_READERS + "/" + reader_id, undefined, callback);
+	        return this.connection.get(this.url + CORE_READERS + "/" + reader_id, undefined, callback);
 	    };
 	    CoreService.prototype.readers = function (callback) {
-	        this.connection.get(this.url + CORE_READERS, undefined, callback);
+	        return this.connection.get(this.url + CORE_READERS, undefined, callback);
 	    };
 	    CoreService.prototype.readersCardAvailable = function (callback) {
-	        this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(true), callback);
+	        return this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(true), callback);
 	    };
 	    CoreService.prototype.readersCardsUnavailable = function (callback) {
-	        this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(false), callback);
+	        return this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(false), callback);
 	    };
 	    CoreService.prototype.setPubKey = function (pubkey, callback) {
-	        this.connection.put(this.url + CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);
+	        return this.connection.put(this.url + CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);
 	    };
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
@@ -19493,6 +19573,1358 @@ var GCLLib =
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	var require;/* WEBPACK VAR INJECTION */(function(process, global) {/*!
+	 * @overview es6-promise - a tiny implementation of Promises/A+.
+	 * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
+	 * @license   Licensed under MIT license
+	 *            See https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
+	 * @version   3.3.1
+	 */
+	
+	(function (global, factory) {
+	     true ? module.exports = factory() :
+	    typeof define === 'function' && define.amd ? define(factory) :
+	    (global.ES6Promise = factory());
+	}(this, (function () { 'use strict';
+	
+	function objectOrFunction(x) {
+	  return typeof x === 'function' || typeof x === 'object' && x !== null;
+	}
+	
+	function isFunction(x) {
+	  return typeof x === 'function';
+	}
+	
+	var _isArray = undefined;
+	if (!Array.isArray) {
+	  _isArray = function (x) {
+	    return Object.prototype.toString.call(x) === '[object Array]';
+	  };
+	} else {
+	  _isArray = Array.isArray;
+	}
+	
+	var isArray = _isArray;
+	
+	var len = 0;
+	var vertxNext = undefined;
+	var customSchedulerFn = undefined;
+	
+	var asap = function asap(callback, arg) {
+	  queue[len] = callback;
+	  queue[len + 1] = arg;
+	  len += 2;
+	  if (len === 2) {
+	    // If len is 2, that means that we need to schedule an async flush.
+	    // If additional callbacks are queued before the queue is flushed, they
+	    // will be processed by this flush that we are scheduling.
+	    if (customSchedulerFn) {
+	      customSchedulerFn(flush);
+	    } else {
+	      scheduleFlush();
+	    }
+	  }
+	};
+	
+	function setScheduler(scheduleFn) {
+	  customSchedulerFn = scheduleFn;
+	}
+	
+	function setAsap(asapFn) {
+	  asap = asapFn;
+	}
+	
+	var browserWindow = typeof window !== 'undefined' ? window : undefined;
+	var browserGlobal = browserWindow || {};
+	var BrowserMutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
+	var isNode = typeof self === 'undefined' && typeof process !== 'undefined' && ({}).toString.call(process) === '[object process]';
+	
+	// test for web worker but not in IE10
+	var isWorker = typeof Uint8ClampedArray !== 'undefined' && typeof importScripts !== 'undefined' && typeof MessageChannel !== 'undefined';
+	
+	// node
+	function useNextTick() {
+	  // node version 0.10.x displays a deprecation warning when nextTick is used recursively
+	  // see https://github.com/cujojs/when/issues/410 for details
+	  return function () {
+	    return process.nextTick(flush);
+	  };
+	}
+	
+	// vertx
+	function useVertxTimer() {
+	  return function () {
+	    vertxNext(flush);
+	  };
+	}
+	
+	function useMutationObserver() {
+	  var iterations = 0;
+	  var observer = new BrowserMutationObserver(flush);
+	  var node = document.createTextNode('');
+	  observer.observe(node, { characterData: true });
+	
+	  return function () {
+	    node.data = iterations = ++iterations % 2;
+	  };
+	}
+	
+	// web worker
+	function useMessageChannel() {
+	  var channel = new MessageChannel();
+	  channel.port1.onmessage = flush;
+	  return function () {
+	    return channel.port2.postMessage(0);
+	  };
+	}
+	
+	function useSetTimeout() {
+	  // Store setTimeout reference so es6-promise will be unaffected by
+	  // other code modifying setTimeout (like sinon.useFakeTimers())
+	  var globalSetTimeout = setTimeout;
+	  return function () {
+	    return globalSetTimeout(flush, 1);
+	  };
+	}
+	
+	var queue = new Array(1000);
+	function flush() {
+	  for (var i = 0; i < len; i += 2) {
+	    var callback = queue[i];
+	    var arg = queue[i + 1];
+	
+	    callback(arg);
+	
+	    queue[i] = undefined;
+	    queue[i + 1] = undefined;
+	  }
+	
+	  len = 0;
+	}
+	
+	function attemptVertx() {
+	  try {
+	    var r = require;
+	    var vertx = __webpack_require__(19);
+	    vertxNext = vertx.runOnLoop || vertx.runOnContext;
+	    return useVertxTimer();
+	  } catch (e) {
+	    return useSetTimeout();
+	  }
+	}
+	
+	var scheduleFlush = undefined;
+	// Decide what async method to use to triggering processing of queued callbacks:
+	if (isNode) {
+	  scheduleFlush = useNextTick();
+	} else if (BrowserMutationObserver) {
+	  scheduleFlush = useMutationObserver();
+	} else if (isWorker) {
+	  scheduleFlush = useMessageChannel();
+	} else if (browserWindow === undefined && "function" === 'function') {
+	  scheduleFlush = attemptVertx();
+	} else {
+	  scheduleFlush = useSetTimeout();
+	}
+	
+	function then(onFulfillment, onRejection) {
+	  var _arguments = arguments;
+	
+	  var parent = this;
+	
+	  var child = new this.constructor(noop);
+	
+	  if (child[PROMISE_ID] === undefined) {
+	    makePromise(child);
+	  }
+	
+	  var _state = parent._state;
+	
+	  if (_state) {
+	    (function () {
+	      var callback = _arguments[_state - 1];
+	      asap(function () {
+	        return invokeCallback(_state, child, callback, parent._result);
+	      });
+	    })();
+	  } else {
+	    subscribe(parent, child, onFulfillment, onRejection);
+	  }
+	
+	  return child;
+	}
+	
+	/**
+	  `Promise.resolve` returns a promise that will become resolved with the
+	  passed `value`. It is shorthand for the following:
+	
+	  ```javascript
+	  let promise = new Promise(function(resolve, reject){
+	    resolve(1);
+	  });
+	
+	  promise.then(function(value){
+	    // value === 1
+	  });
+	  ```
+	
+	  Instead of writing the above, your code now simply becomes the following:
+	
+	  ```javascript
+	  let promise = Promise.resolve(1);
+	
+	  promise.then(function(value){
+	    // value === 1
+	  });
+	  ```
+	
+	  @method resolve
+	  @static
+	  @param {Any} value value that the returned promise will be resolved with
+	  Useful for tooling.
+	  @return {Promise} a promise that will become fulfilled with the given
+	  `value`
+	*/
+	function resolve(object) {
+	  /*jshint validthis:true */
+	  var Constructor = this;
+	
+	  if (object && typeof object === 'object' && object.constructor === Constructor) {
+	    return object;
+	  }
+	
+	  var promise = new Constructor(noop);
+	  _resolve(promise, object);
+	  return promise;
+	}
+	
+	var PROMISE_ID = Math.random().toString(36).substring(16);
+	
+	function noop() {}
+	
+	var PENDING = void 0;
+	var FULFILLED = 1;
+	var REJECTED = 2;
+	
+	var GET_THEN_ERROR = new ErrorObject();
+	
+	function selfFulfillment() {
+	  return new TypeError("You cannot resolve a promise with itself");
+	}
+	
+	function cannotReturnOwn() {
+	  return new TypeError('A promises callback cannot return that same promise.');
+	}
+	
+	function getThen(promise) {
+	  try {
+	    return promise.then;
+	  } catch (error) {
+	    GET_THEN_ERROR.error = error;
+	    return GET_THEN_ERROR;
+	  }
+	}
+	
+	function tryThen(then, value, fulfillmentHandler, rejectionHandler) {
+	  try {
+	    then.call(value, fulfillmentHandler, rejectionHandler);
+	  } catch (e) {
+	    return e;
+	  }
+	}
+	
+	function handleForeignThenable(promise, thenable, then) {
+	  asap(function (promise) {
+	    var sealed = false;
+	    var error = tryThen(then, thenable, function (value) {
+	      if (sealed) {
+	        return;
+	      }
+	      sealed = true;
+	      if (thenable !== value) {
+	        _resolve(promise, value);
+	      } else {
+	        fulfill(promise, value);
+	      }
+	    }, function (reason) {
+	      if (sealed) {
+	        return;
+	      }
+	      sealed = true;
+	
+	      _reject(promise, reason);
+	    }, 'Settle: ' + (promise._label || ' unknown promise'));
+	
+	    if (!sealed && error) {
+	      sealed = true;
+	      _reject(promise, error);
+	    }
+	  }, promise);
+	}
+	
+	function handleOwnThenable(promise, thenable) {
+	  if (thenable._state === FULFILLED) {
+	    fulfill(promise, thenable._result);
+	  } else if (thenable._state === REJECTED) {
+	    _reject(promise, thenable._result);
+	  } else {
+	    subscribe(thenable, undefined, function (value) {
+	      return _resolve(promise, value);
+	    }, function (reason) {
+	      return _reject(promise, reason);
+	    });
+	  }
+	}
+	
+	function handleMaybeThenable(promise, maybeThenable, then$$) {
+	  if (maybeThenable.constructor === promise.constructor && then$$ === then && maybeThenable.constructor.resolve === resolve) {
+	    handleOwnThenable(promise, maybeThenable);
+	  } else {
+	    if (then$$ === GET_THEN_ERROR) {
+	      _reject(promise, GET_THEN_ERROR.error);
+	    } else if (then$$ === undefined) {
+	      fulfill(promise, maybeThenable);
+	    } else if (isFunction(then$$)) {
+	      handleForeignThenable(promise, maybeThenable, then$$);
+	    } else {
+	      fulfill(promise, maybeThenable);
+	    }
+	  }
+	}
+	
+	function _resolve(promise, value) {
+	  if (promise === value) {
+	    _reject(promise, selfFulfillment());
+	  } else if (objectOrFunction(value)) {
+	    handleMaybeThenable(promise, value, getThen(value));
+	  } else {
+	    fulfill(promise, value);
+	  }
+	}
+	
+	function publishRejection(promise) {
+	  if (promise._onerror) {
+	    promise._onerror(promise._result);
+	  }
+	
+	  publish(promise);
+	}
+	
+	function fulfill(promise, value) {
+	  if (promise._state !== PENDING) {
+	    return;
+	  }
+	
+	  promise._result = value;
+	  promise._state = FULFILLED;
+	
+	  if (promise._subscribers.length !== 0) {
+	    asap(publish, promise);
+	  }
+	}
+	
+	function _reject(promise, reason) {
+	  if (promise._state !== PENDING) {
+	    return;
+	  }
+	  promise._state = REJECTED;
+	  promise._result = reason;
+	
+	  asap(publishRejection, promise);
+	}
+	
+	function subscribe(parent, child, onFulfillment, onRejection) {
+	  var _subscribers = parent._subscribers;
+	  var length = _subscribers.length;
+	
+	  parent._onerror = null;
+	
+	  _subscribers[length] = child;
+	  _subscribers[length + FULFILLED] = onFulfillment;
+	  _subscribers[length + REJECTED] = onRejection;
+	
+	  if (length === 0 && parent._state) {
+	    asap(publish, parent);
+	  }
+	}
+	
+	function publish(promise) {
+	  var subscribers = promise._subscribers;
+	  var settled = promise._state;
+	
+	  if (subscribers.length === 0) {
+	    return;
+	  }
+	
+	  var child = undefined,
+	      callback = undefined,
+	      detail = promise._result;
+	
+	  for (var i = 0; i < subscribers.length; i += 3) {
+	    child = subscribers[i];
+	    callback = subscribers[i + settled];
+	
+	    if (child) {
+	      invokeCallback(settled, child, callback, detail);
+	    } else {
+	      callback(detail);
+	    }
+	  }
+	
+	  promise._subscribers.length = 0;
+	}
+	
+	function ErrorObject() {
+	  this.error = null;
+	}
+	
+	var TRY_CATCH_ERROR = new ErrorObject();
+	
+	function tryCatch(callback, detail) {
+	  try {
+	    return callback(detail);
+	  } catch (e) {
+	    TRY_CATCH_ERROR.error = e;
+	    return TRY_CATCH_ERROR;
+	  }
+	}
+	
+	function invokeCallback(settled, promise, callback, detail) {
+	  var hasCallback = isFunction(callback),
+	      value = undefined,
+	      error = undefined,
+	      succeeded = undefined,
+	      failed = undefined;
+	
+	  if (hasCallback) {
+	    value = tryCatch(callback, detail);
+	
+	    if (value === TRY_CATCH_ERROR) {
+	      failed = true;
+	      error = value.error;
+	      value = null;
+	    } else {
+	      succeeded = true;
+	    }
+	
+	    if (promise === value) {
+	      _reject(promise, cannotReturnOwn());
+	      return;
+	    }
+	  } else {
+	    value = detail;
+	    succeeded = true;
+	  }
+	
+	  if (promise._state !== PENDING) {
+	    // noop
+	  } else if (hasCallback && succeeded) {
+	      _resolve(promise, value);
+	    } else if (failed) {
+	      _reject(promise, error);
+	    } else if (settled === FULFILLED) {
+	      fulfill(promise, value);
+	    } else if (settled === REJECTED) {
+	      _reject(promise, value);
+	    }
+	}
+	
+	function initializePromise(promise, resolver) {
+	  try {
+	    resolver(function resolvePromise(value) {
+	      _resolve(promise, value);
+	    }, function rejectPromise(reason) {
+	      _reject(promise, reason);
+	    });
+	  } catch (e) {
+	    _reject(promise, e);
+	  }
+	}
+	
+	var id = 0;
+	function nextId() {
+	  return id++;
+	}
+	
+	function makePromise(promise) {
+	  promise[PROMISE_ID] = id++;
+	  promise._state = undefined;
+	  promise._result = undefined;
+	  promise._subscribers = [];
+	}
+	
+	function Enumerator(Constructor, input) {
+	  this._instanceConstructor = Constructor;
+	  this.promise = new Constructor(noop);
+	
+	  if (!this.promise[PROMISE_ID]) {
+	    makePromise(this.promise);
+	  }
+	
+	  if (isArray(input)) {
+	    this._input = input;
+	    this.length = input.length;
+	    this._remaining = input.length;
+	
+	    this._result = new Array(this.length);
+	
+	    if (this.length === 0) {
+	      fulfill(this.promise, this._result);
+	    } else {
+	      this.length = this.length || 0;
+	      this._enumerate();
+	      if (this._remaining === 0) {
+	        fulfill(this.promise, this._result);
+	      }
+	    }
+	  } else {
+	    _reject(this.promise, validationError());
+	  }
+	}
+	
+	function validationError() {
+	  return new Error('Array Methods must be provided an Array');
+	};
+	
+	Enumerator.prototype._enumerate = function () {
+	  var length = this.length;
+	  var _input = this._input;
+	
+	  for (var i = 0; this._state === PENDING && i < length; i++) {
+	    this._eachEntry(_input[i], i);
+	  }
+	};
+	
+	Enumerator.prototype._eachEntry = function (entry, i) {
+	  var c = this._instanceConstructor;
+	  var resolve$$ = c.resolve;
+	
+	  if (resolve$$ === resolve) {
+	    var _then = getThen(entry);
+	
+	    if (_then === then && entry._state !== PENDING) {
+	      this._settledAt(entry._state, i, entry._result);
+	    } else if (typeof _then !== 'function') {
+	      this._remaining--;
+	      this._result[i] = entry;
+	    } else if (c === Promise) {
+	      var promise = new c(noop);
+	      handleMaybeThenable(promise, entry, _then);
+	      this._willSettleAt(promise, i);
+	    } else {
+	      this._willSettleAt(new c(function (resolve$$) {
+	        return resolve$$(entry);
+	      }), i);
+	    }
+	  } else {
+	    this._willSettleAt(resolve$$(entry), i);
+	  }
+	};
+	
+	Enumerator.prototype._settledAt = function (state, i, value) {
+	  var promise = this.promise;
+	
+	  if (promise._state === PENDING) {
+	    this._remaining--;
+	
+	    if (state === REJECTED) {
+	      _reject(promise, value);
+	    } else {
+	      this._result[i] = value;
+	    }
+	  }
+	
+	  if (this._remaining === 0) {
+	    fulfill(promise, this._result);
+	  }
+	};
+	
+	Enumerator.prototype._willSettleAt = function (promise, i) {
+	  var enumerator = this;
+	
+	  subscribe(promise, undefined, function (value) {
+	    return enumerator._settledAt(FULFILLED, i, value);
+	  }, function (reason) {
+	    return enumerator._settledAt(REJECTED, i, reason);
+	  });
+	};
+	
+	/**
+	  `Promise.all` accepts an array of promises, and returns a new promise which
+	  is fulfilled with an array of fulfillment values for the passed promises, or
+	  rejected with the reason of the first passed promise to be rejected. It casts all
+	  elements of the passed iterable to promises as it runs this algorithm.
+	
+	  Example:
+	
+	  ```javascript
+	  let promise1 = resolve(1);
+	  let promise2 = resolve(2);
+	  let promise3 = resolve(3);
+	  let promises = [ promise1, promise2, promise3 ];
+	
+	  Promise.all(promises).then(function(array){
+	    // The array here would be [ 1, 2, 3 ];
+	  });
+	  ```
+	
+	  If any of the `promises` given to `all` are rejected, the first promise
+	  that is rejected will be given as an argument to the returned promises's
+	  rejection handler. For example:
+	
+	  Example:
+	
+	  ```javascript
+	  let promise1 = resolve(1);
+	  let promise2 = reject(new Error("2"));
+	  let promise3 = reject(new Error("3"));
+	  let promises = [ promise1, promise2, promise3 ];
+	
+	  Promise.all(promises).then(function(array){
+	    // Code here never runs because there are rejected promises!
+	  }, function(error) {
+	    // error.message === "2"
+	  });
+	  ```
+	
+	  @method all
+	  @static
+	  @param {Array} entries array of promises
+	  @param {String} label optional string for labeling the promise.
+	  Useful for tooling.
+	  @return {Promise} promise that is fulfilled when all `promises` have been
+	  fulfilled, or rejected if any of them become rejected.
+	  @static
+	*/
+	function all(entries) {
+	  return new Enumerator(this, entries).promise;
+	}
+	
+	/**
+	  `Promise.race` returns a new promise which is settled in the same way as the
+	  first passed promise to settle.
+	
+	  Example:
+	
+	  ```javascript
+	  let promise1 = new Promise(function(resolve, reject){
+	    setTimeout(function(){
+	      resolve('promise 1');
+	    }, 200);
+	  });
+	
+	  let promise2 = new Promise(function(resolve, reject){
+	    setTimeout(function(){
+	      resolve('promise 2');
+	    }, 100);
+	  });
+	
+	  Promise.race([promise1, promise2]).then(function(result){
+	    // result === 'promise 2' because it was resolved before promise1
+	    // was resolved.
+	  });
+	  ```
+	
+	  `Promise.race` is deterministic in that only the state of the first
+	  settled promise matters. For example, even if other promises given to the
+	  `promises` array argument are resolved, but the first settled promise has
+	  become rejected before the other promises became fulfilled, the returned
+	  promise will become rejected:
+	
+	  ```javascript
+	  let promise1 = new Promise(function(resolve, reject){
+	    setTimeout(function(){
+	      resolve('promise 1');
+	    }, 200);
+	  });
+	
+	  let promise2 = new Promise(function(resolve, reject){
+	    setTimeout(function(){
+	      reject(new Error('promise 2'));
+	    }, 100);
+	  });
+	
+	  Promise.race([promise1, promise2]).then(function(result){
+	    // Code here never runs
+	  }, function(reason){
+	    // reason.message === 'promise 2' because promise 2 became rejected before
+	    // promise 1 became fulfilled
+	  });
+	  ```
+	
+	  An example real-world use case is implementing timeouts:
+	
+	  ```javascript
+	  Promise.race([ajax('foo.json'), timeout(5000)])
+	  ```
+	
+	  @method race
+	  @static
+	  @param {Array} promises array of promises to observe
+	  Useful for tooling.
+	  @return {Promise} a promise which settles in the same way as the first passed
+	  promise to settle.
+	*/
+	function race(entries) {
+	  /*jshint validthis:true */
+	  var Constructor = this;
+	
+	  if (!isArray(entries)) {
+	    return new Constructor(function (_, reject) {
+	      return reject(new TypeError('You must pass an array to race.'));
+	    });
+	  } else {
+	    return new Constructor(function (resolve, reject) {
+	      var length = entries.length;
+	      for (var i = 0; i < length; i++) {
+	        Constructor.resolve(entries[i]).then(resolve, reject);
+	      }
+	    });
+	  }
+	}
+	
+	/**
+	  `Promise.reject` returns a promise rejected with the passed `reason`.
+	  It is shorthand for the following:
+	
+	  ```javascript
+	  let promise = new Promise(function(resolve, reject){
+	    reject(new Error('WHOOPS'));
+	  });
+	
+	  promise.then(function(value){
+	    // Code here doesn't run because the promise is rejected!
+	  }, function(reason){
+	    // reason.message === 'WHOOPS'
+	  });
+	  ```
+	
+	  Instead of writing the above, your code now simply becomes the following:
+	
+	  ```javascript
+	  let promise = Promise.reject(new Error('WHOOPS'));
+	
+	  promise.then(function(value){
+	    // Code here doesn't run because the promise is rejected!
+	  }, function(reason){
+	    // reason.message === 'WHOOPS'
+	  });
+	  ```
+	
+	  @method reject
+	  @static
+	  @param {Any} reason value that the returned promise will be rejected with.
+	  Useful for tooling.
+	  @return {Promise} a promise rejected with the given `reason`.
+	*/
+	function reject(reason) {
+	  /*jshint validthis:true */
+	  var Constructor = this;
+	  var promise = new Constructor(noop);
+	  _reject(promise, reason);
+	  return promise;
+	}
+	
+	function needsResolver() {
+	  throw new TypeError('You must pass a resolver function as the first argument to the promise constructor');
+	}
+	
+	function needsNew() {
+	  throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
+	}
+	
+	/**
+	  Promise objects represent the eventual result of an asynchronous operation. The
+	  primary way of interacting with a promise is through its `then` method, which
+	  registers callbacks to receive either a promise's eventual value or the reason
+	  why the promise cannot be fulfilled.
+	
+	  Terminology
+	  -----------
+	
+	  - `promise` is an object or function with a `then` method whose behavior conforms to this specification.
+	  - `thenable` is an object or function that defines a `then` method.
+	  - `value` is any legal JavaScript value (including undefined, a thenable, or a promise).
+	  - `exception` is a value that is thrown using the throw statement.
+	  - `reason` is a value that indicates why a promise was rejected.
+	  - `settled` the final resting state of a promise, fulfilled or rejected.
+	
+	  A promise can be in one of three states: pending, fulfilled, or rejected.
+	
+	  Promises that are fulfilled have a fulfillment value and are in the fulfilled
+	  state.  Promises that are rejected have a rejection reason and are in the
+	  rejected state.  A fulfillment value is never a thenable.
+	
+	  Promises can also be said to *resolve* a value.  If this value is also a
+	  promise, then the original promise's settled state will match the value's
+	  settled state.  So a promise that *resolves* a promise that rejects will
+	  itself reject, and a promise that *resolves* a promise that fulfills will
+	  itself fulfill.
+	
+	
+	  Basic Usage:
+	  ------------
+	
+	  ```js
+	  let promise = new Promise(function(resolve, reject) {
+	    // on success
+	    resolve(value);
+	
+	    // on failure
+	    reject(reason);
+	  });
+	
+	  promise.then(function(value) {
+	    // on fulfillment
+	  }, function(reason) {
+	    // on rejection
+	  });
+	  ```
+	
+	  Advanced Usage:
+	  ---------------
+	
+	  Promises shine when abstracting away asynchronous interactions such as
+	  `XMLHttpRequest`s.
+	
+	  ```js
+	  function getJSON(url) {
+	    return new Promise(function(resolve, reject){
+	      let xhr = new XMLHttpRequest();
+	
+	      xhr.open('GET', url);
+	      xhr.onreadystatechange = handler;
+	      xhr.responseType = 'json';
+	      xhr.setRequestHeader('Accept', 'application/json');
+	      xhr.send();
+	
+	      function handler() {
+	        if (this.readyState === this.DONE) {
+	          if (this.status === 200) {
+	            resolve(this.response);
+	          } else {
+	            reject(new Error('getJSON: `' + url + '` failed with status: [' + this.status + ']'));
+	          }
+	        }
+	      };
+	    });
+	  }
+	
+	  getJSON('/posts.json').then(function(json) {
+	    // on fulfillment
+	  }, function(reason) {
+	    // on rejection
+	  });
+	  ```
+	
+	  Unlike callbacks, promises are great composable primitives.
+	
+	  ```js
+	  Promise.all([
+	    getJSON('/posts'),
+	    getJSON('/comments')
+	  ]).then(function(values){
+	    values[0] // => postsJSON
+	    values[1] // => commentsJSON
+	
+	    return values;
+	  });
+	  ```
+	
+	  @class Promise
+	  @param {function} resolver
+	  Useful for tooling.
+	  @constructor
+	*/
+	function Promise(resolver) {
+	  this[PROMISE_ID] = nextId();
+	  this._result = this._state = undefined;
+	  this._subscribers = [];
+	
+	  if (noop !== resolver) {
+	    typeof resolver !== 'function' && needsResolver();
+	    this instanceof Promise ? initializePromise(this, resolver) : needsNew();
+	  }
+	}
+	
+	Promise.all = all;
+	Promise.race = race;
+	Promise.resolve = resolve;
+	Promise.reject = reject;
+	Promise._setScheduler = setScheduler;
+	Promise._setAsap = setAsap;
+	Promise._asap = asap;
+	
+	Promise.prototype = {
+	  constructor: Promise,
+	
+	  /**
+	    The primary way of interacting with a promise is through its `then` method,
+	    which registers callbacks to receive either a promise's eventual value or the
+	    reason why the promise cannot be fulfilled.
+	  
+	    ```js
+	    findUser().then(function(user){
+	      // user is available
+	    }, function(reason){
+	      // user is unavailable, and you are given the reason why
+	    });
+	    ```
+	  
+	    Chaining
+	    --------
+	  
+	    The return value of `then` is itself a promise.  This second, 'downstream'
+	    promise is resolved with the return value of the first promise's fulfillment
+	    or rejection handler, or rejected if the handler throws an exception.
+	  
+	    ```js
+	    findUser().then(function (user) {
+	      return user.name;
+	    }, function (reason) {
+	      return 'default name';
+	    }).then(function (userName) {
+	      // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
+	      // will be `'default name'`
+	    });
+	  
+	    findUser().then(function (user) {
+	      throw new Error('Found user, but still unhappy');
+	    }, function (reason) {
+	      throw new Error('`findUser` rejected and we're unhappy');
+	    }).then(function (value) {
+	      // never reached
+	    }, function (reason) {
+	      // if `findUser` fulfilled, `reason` will be 'Found user, but still unhappy'.
+	      // If `findUser` rejected, `reason` will be '`findUser` rejected and we're unhappy'.
+	    });
+	    ```
+	    If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
+	  
+	    ```js
+	    findUser().then(function (user) {
+	      throw new PedagogicalException('Upstream error');
+	    }).then(function (value) {
+	      // never reached
+	    }).then(function (value) {
+	      // never reached
+	    }, function (reason) {
+	      // The `PedgagocialException` is propagated all the way down to here
+	    });
+	    ```
+	  
+	    Assimilation
+	    ------------
+	  
+	    Sometimes the value you want to propagate to a downstream promise can only be
+	    retrieved asynchronously. This can be achieved by returning a promise in the
+	    fulfillment or rejection handler. The downstream promise will then be pending
+	    until the returned promise is settled. This is called *assimilation*.
+	  
+	    ```js
+	    findUser().then(function (user) {
+	      return findCommentsByAuthor(user);
+	    }).then(function (comments) {
+	      // The user's comments are now available
+	    });
+	    ```
+	  
+	    If the assimliated promise rejects, then the downstream promise will also reject.
+	  
+	    ```js
+	    findUser().then(function (user) {
+	      return findCommentsByAuthor(user);
+	    }).then(function (comments) {
+	      // If `findCommentsByAuthor` fulfills, we'll have the value here
+	    }, function (reason) {
+	      // If `findCommentsByAuthor` rejects, we'll have the reason here
+	    });
+	    ```
+	  
+	    Simple Example
+	    --------------
+	  
+	    Synchronous Example
+	  
+	    ```javascript
+	    let result;
+	  
+	    try {
+	      result = findResult();
+	      // success
+	    } catch(reason) {
+	      // failure
+	    }
+	    ```
+	  
+	    Errback Example
+	  
+	    ```js
+	    findResult(function(result, err){
+	      if (err) {
+	        // failure
+	      } else {
+	        // success
+	      }
+	    });
+	    ```
+	  
+	    Promise Example;
+	  
+	    ```javascript
+	    findResult().then(function(result){
+	      // success
+	    }, function(reason){
+	      // failure
+	    });
+	    ```
+	  
+	    Advanced Example
+	    --------------
+	  
+	    Synchronous Example
+	  
+	    ```javascript
+	    let author, books;
+	  
+	    try {
+	      author = findAuthor();
+	      books  = findBooksByAuthor(author);
+	      // success
+	    } catch(reason) {
+	      // failure
+	    }
+	    ```
+	  
+	    Errback Example
+	  
+	    ```js
+	  
+	    function foundBooks(books) {
+	  
+	    }
+	  
+	    function failure(reason) {
+	  
+	    }
+	  
+	    findAuthor(function(author, err){
+	      if (err) {
+	        failure(err);
+	        // failure
+	      } else {
+	        try {
+	          findBoooksByAuthor(author, function(books, err) {
+	            if (err) {
+	              failure(err);
+	            } else {
+	              try {
+	                foundBooks(books);
+	              } catch(reason) {
+	                failure(reason);
+	              }
+	            }
+	          });
+	        } catch(error) {
+	          failure(err);
+	        }
+	        // success
+	      }
+	    });
+	    ```
+	  
+	    Promise Example;
+	  
+	    ```javascript
+	    findAuthor().
+	      then(findBooksByAuthor).
+	      then(function(books){
+	        // found books
+	    }).catch(function(reason){
+	      // something went wrong
+	    });
+	    ```
+	  
+	    @method then
+	    @param {Function} onFulfilled
+	    @param {Function} onRejected
+	    Useful for tooling.
+	    @return {Promise}
+	  */
+	  then: then,
+	
+	  /**
+	    `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
+	    as the catch block of a try/catch statement.
+	  
+	    ```js
+	    function findAuthor(){
+	      throw new Error('couldn't find that author');
+	    }
+	  
+	    // synchronous
+	    try {
+	      findAuthor();
+	    } catch(reason) {
+	      // something went wrong
+	    }
+	  
+	    // async with promises
+	    findAuthor().catch(function(reason){
+	      // something went wrong
+	    });
+	    ```
+	  
+	    @method catch
+	    @param {Function} onRejection
+	    Useful for tooling.
+	    @return {Promise}
+	  */
+	  'catch': function _catch(onRejection) {
+	    return this.then(null, onRejection);
+	  }
+	};
+	
+	function polyfill() {
+	    var local = undefined;
+	
+	    if (typeof global !== 'undefined') {
+	        local = global;
+	    } else if (typeof self !== 'undefined') {
+	        local = self;
+	    } else {
+	        try {
+	            local = Function('return this')();
+	        } catch (e) {
+	            throw new Error('polyfill failed because global object is unavailable in this environment');
+	        }
+	    }
+	
+	    var P = local.Promise;
+	
+	    if (P) {
+	        var promiseToString = null;
+	        try {
+	            promiseToString = Object.prototype.toString.call(P.resolve());
+	        } catch (e) {
+	            // silently ignored
+	        }
+	
+	        if (promiseToString === '[object Promise]' && !P.cast) {
+	            return;
+	        }
+	    }
+	
+	    local.Promise = Promise;
+	}
+	
+	polyfill();
+	// Strange compat..
+	Promise.polyfill = polyfill;
+	Promise.Promise = Promise;
+	
+	return Promise;
+	
+	})));
+	//# sourceMappingURL=es6-promise.map
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18), (function() { return this; }())))
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports) {
+
+	// shim for using process in browser
+	var process = module.exports = {};
+	
+	// cached from whatever global is present so that test runners that stub it
+	// don't break things.  But we need to wrap it in a try catch in case it is
+	// wrapped in strict mode code which doesn't define any globals.  It's inside a
+	// function because try/catches deoptimize in certain engines.
+	
+	var cachedSetTimeout;
+	var cachedClearTimeout;
+	
+	function defaultSetTimout() {
+	    throw new Error('setTimeout has not been defined');
+	}
+	function defaultClearTimeout () {
+	    throw new Error('clearTimeout has not been defined');
+	}
+	(function () {
+	    try {
+	        if (typeof setTimeout === 'function') {
+	            cachedSetTimeout = setTimeout;
+	        } else {
+	            cachedSetTimeout = defaultSetTimout;
+	        }
+	    } catch (e) {
+	        cachedSetTimeout = defaultSetTimout;
+	    }
+	    try {
+	        if (typeof clearTimeout === 'function') {
+	            cachedClearTimeout = clearTimeout;
+	        } else {
+	            cachedClearTimeout = defaultClearTimeout;
+	        }
+	    } catch (e) {
+	        cachedClearTimeout = defaultClearTimeout;
+	    }
+	} ())
+	function runTimeout(fun) {
+	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    // if setTimeout wasn't available but was latter defined
+	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+	        cachedSetTimeout = setTimeout;
+	        return setTimeout(fun, 0);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+	
+	
+	}
+	function runClearTimeout(marker) {
+	    if (cachedClearTimeout === clearTimeout) {
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    // if clearTimeout wasn't available but was latter defined
+	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+	        cachedClearTimeout = clearTimeout;
+	        return clearTimeout(marker);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+	
+	
+	
+	}
+	var queue = [];
+	var draining = false;
+	var currentQueue;
+	var queueIndex = -1;
+	
+	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
+	    draining = false;
+	    if (currentQueue.length) {
+	        queue = currentQueue.concat(queue);
+	    } else {
+	        queueIndex = -1;
+	    }
+	    if (queue.length) {
+	        drainQueue();
+	    }
+	}
+	
+	function drainQueue() {
+	    if (draining) {
+	        return;
+	    }
+	    var timeout = runTimeout(cleanUpNextTick);
+	    draining = true;
+	
+	    var len = queue.length;
+	    while(len) {
+	        currentQueue = queue;
+	        queue = [];
+	        while (++queueIndex < len) {
+	            if (currentQueue) {
+	                currentQueue[queueIndex].run();
+	            }
+	        }
+	        queueIndex = -1;
+	        len = queue.length;
+	    }
+	    currentQueue = null;
+	    draining = false;
+	    runClearTimeout(timeout);
+	}
+	
+	process.nextTick = function (fun) {
+	    var args = new Array(arguments.length - 1);
+	    if (arguments.length > 1) {
+	        for (var i = 1; i < arguments.length; i++) {
+	            args[i - 1] = arguments[i];
+	        }
+	    }
+	    queue.push(new Item(fun, args));
+	    if (queue.length === 1 && !draining) {
+	        runTimeout(drainQueue);
+	    }
+	};
+	
+	// v8 likes predictible objects
+	function Item(fun, array) {
+	    this.fun = fun;
+	    this.array = array;
+	}
+	Item.prototype.run = function () {
+	    this.fun.apply(null, this.array);
+	};
+	process.title = 'browser';
+	process.browser = true;
+	process.env = {};
+	process.argv = [];
+	process.version = ''; // empty string to avoid regexp issues
+	process.versions = {};
+	
+	function noop() {}
+	
+	process.on = noop;
+	process.addListener = noop;
+	process.once = noop;
+	process.off = noop;
+	process.removeListener = noop;
+	process.removeAllListeners = noop;
+	process.emit = noop;
+	
+	process.binding = function (name) {
+	    throw new Error('process.binding is not supported');
+	};
+	
+	process.cwd = function () { return '/' };
+	process.chdir = function (dir) {
+	    throw new Error('process.chdir is not supported');
+	};
+	process.umask = function() { return 0; };
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports) {
+
+	/* (ignored) */
+
+/***/ }),
+/* 20 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	"use strict";
 	var __extends = (this && this.__extends) || (function () {
 	    var extendStatics = Object.setPrototypeOf ||
@@ -19505,7 +20937,7 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var axios_1 = __webpack_require__(18);
+	var axios_1 = __webpack_require__(21);
 	var _ = __webpack_require__(1);
 	var GenericConnection = (function () {
 	    function GenericConnection(cfg) {
@@ -19653,21 +21085,21 @@ var GCLLib =
 
 
 /***/ }),
-/* 18 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(19);
+	module.exports = __webpack_require__(22);
 
 /***/ }),
-/* 19 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(20);
-	var bind = __webpack_require__(21);
-	var Axios = __webpack_require__(22);
-	var defaults = __webpack_require__(23);
+	var utils = __webpack_require__(23);
+	var bind = __webpack_require__(24);
+	var Axios = __webpack_require__(25);
+	var defaults = __webpack_require__(26);
 	
 	/**
 	 * Create an instance of Axios
@@ -19700,15 +21132,15 @@ var GCLLib =
 	};
 	
 	// Expose Cancel & CancelToken
-	axios.Cancel = __webpack_require__(41);
-	axios.CancelToken = __webpack_require__(42);
-	axios.isCancel = __webpack_require__(38);
+	axios.Cancel = __webpack_require__(43);
+	axios.CancelToken = __webpack_require__(44);
+	axios.isCancel = __webpack_require__(40);
 	
 	// Expose all/spread
 	axios.all = function all(promises) {
 	  return Promise.all(promises);
 	};
-	axios.spread = __webpack_require__(43);
+	axios.spread = __webpack_require__(45);
 	
 	module.exports = axios;
 	
@@ -19717,12 +21149,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 20 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var bind = __webpack_require__(21);
+	var bind = __webpack_require__(24);
 	
 	/*global toString:true*/
 	
@@ -20022,7 +21454,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 21 */
+/* 24 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -20039,17 +21471,17 @@ var GCLLib =
 
 
 /***/ }),
-/* 22 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var defaults = __webpack_require__(23);
-	var utils = __webpack_require__(20);
-	var InterceptorManager = __webpack_require__(35);
-	var dispatchRequest = __webpack_require__(36);
-	var isAbsoluteURL = __webpack_require__(39);
-	var combineURLs = __webpack_require__(40);
+	var defaults = __webpack_require__(26);
+	var utils = __webpack_require__(23);
+	var InterceptorManager = __webpack_require__(37);
+	var dispatchRequest = __webpack_require__(38);
+	var isAbsoluteURL = __webpack_require__(41);
+	var combineURLs = __webpack_require__(42);
 	
 	/**
 	 * Create a new instance of Axios
@@ -20130,13 +21562,13 @@ var GCLLib =
 
 
 /***/ }),
-/* 23 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(20);
-	var normalizeHeaderName = __webpack_require__(25);
+	var utils = __webpack_require__(23);
+	var normalizeHeaderName = __webpack_require__(27);
 	
 	var PROTECTION_PREFIX = /^\)\]\}',?\n/;
 	var DEFAULT_CONTENT_TYPE = {
@@ -20153,10 +21585,10 @@ var GCLLib =
 	  var adapter;
 	  if (typeof XMLHttpRequest !== 'undefined') {
 	    // For browsers use XHR adapter
-	    adapter = __webpack_require__(26);
+	    adapter = __webpack_require__(28);
 	  } else if (typeof process !== 'undefined') {
 	    // For node use HTTP adapter
-	    adapter = __webpack_require__(26);
+	    adapter = __webpack_require__(28);
 	  }
 	  return adapter;
 	}
@@ -20227,201 +21659,15 @@ var GCLLib =
 	
 	module.exports = defaults;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(24)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18)))
 
 /***/ }),
-/* 24 */
-/***/ (function(module, exports) {
-
-	// shim for using process in browser
-	var process = module.exports = {};
-	
-	// cached from whatever global is present so that test runners that stub it
-	// don't break things.  But we need to wrap it in a try catch in case it is
-	// wrapped in strict mode code which doesn't define any globals.  It's inside a
-	// function because try/catches deoptimize in certain engines.
-	
-	var cachedSetTimeout;
-	var cachedClearTimeout;
-	
-	function defaultSetTimout() {
-	    throw new Error('setTimeout has not been defined');
-	}
-	function defaultClearTimeout () {
-	    throw new Error('clearTimeout has not been defined');
-	}
-	(function () {
-	    try {
-	        if (typeof setTimeout === 'function') {
-	            cachedSetTimeout = setTimeout;
-	        } else {
-	            cachedSetTimeout = defaultSetTimout;
-	        }
-	    } catch (e) {
-	        cachedSetTimeout = defaultSetTimout;
-	    }
-	    try {
-	        if (typeof clearTimeout === 'function') {
-	            cachedClearTimeout = clearTimeout;
-	        } else {
-	            cachedClearTimeout = defaultClearTimeout;
-	        }
-	    } catch (e) {
-	        cachedClearTimeout = defaultClearTimeout;
-	    }
-	} ())
-	function runTimeout(fun) {
-	    if (cachedSetTimeout === setTimeout) {
-	        //normal enviroments in sane situations
-	        return setTimeout(fun, 0);
-	    }
-	    // if setTimeout wasn't available but was latter defined
-	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-	        cachedSetTimeout = setTimeout;
-	        return setTimeout(fun, 0);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedSetTimeout(fun, 0);
-	    } catch(e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-	            return cachedSetTimeout.call(null, fun, 0);
-	        } catch(e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-	            return cachedSetTimeout.call(this, fun, 0);
-	        }
-	    }
-	
-	
-	}
-	function runClearTimeout(marker) {
-	    if (cachedClearTimeout === clearTimeout) {
-	        //normal enviroments in sane situations
-	        return clearTimeout(marker);
-	    }
-	    // if clearTimeout wasn't available but was latter defined
-	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-	        cachedClearTimeout = clearTimeout;
-	        return clearTimeout(marker);
-	    }
-	    try {
-	        // when when somebody has screwed with setTimeout but no I.E. maddness
-	        return cachedClearTimeout(marker);
-	    } catch (e){
-	        try {
-	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-	            return cachedClearTimeout.call(null, marker);
-	        } catch (e){
-	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-	            return cachedClearTimeout.call(this, marker);
-	        }
-	    }
-	
-	
-	
-	}
-	var queue = [];
-	var draining = false;
-	var currentQueue;
-	var queueIndex = -1;
-	
-	function cleanUpNextTick() {
-	    if (!draining || !currentQueue) {
-	        return;
-	    }
-	    draining = false;
-	    if (currentQueue.length) {
-	        queue = currentQueue.concat(queue);
-	    } else {
-	        queueIndex = -1;
-	    }
-	    if (queue.length) {
-	        drainQueue();
-	    }
-	}
-	
-	function drainQueue() {
-	    if (draining) {
-	        return;
-	    }
-	    var timeout = runTimeout(cleanUpNextTick);
-	    draining = true;
-	
-	    var len = queue.length;
-	    while(len) {
-	        currentQueue = queue;
-	        queue = [];
-	        while (++queueIndex < len) {
-	            if (currentQueue) {
-	                currentQueue[queueIndex].run();
-	            }
-	        }
-	        queueIndex = -1;
-	        len = queue.length;
-	    }
-	    currentQueue = null;
-	    draining = false;
-	    runClearTimeout(timeout);
-	}
-	
-	process.nextTick = function (fun) {
-	    var args = new Array(arguments.length - 1);
-	    if (arguments.length > 1) {
-	        for (var i = 1; i < arguments.length; i++) {
-	            args[i - 1] = arguments[i];
-	        }
-	    }
-	    queue.push(new Item(fun, args));
-	    if (queue.length === 1 && !draining) {
-	        runTimeout(drainQueue);
-	    }
-	};
-	
-	// v8 likes predictible objects
-	function Item(fun, array) {
-	    this.fun = fun;
-	    this.array = array;
-	}
-	Item.prototype.run = function () {
-	    this.fun.apply(null, this.array);
-	};
-	process.title = 'browser';
-	process.browser = true;
-	process.env = {};
-	process.argv = [];
-	process.version = ''; // empty string to avoid regexp issues
-	process.versions = {};
-	
-	function noop() {}
-	
-	process.on = noop;
-	process.addListener = noop;
-	process.once = noop;
-	process.off = noop;
-	process.removeListener = noop;
-	process.removeAllListeners = noop;
-	process.emit = noop;
-	
-	process.binding = function (name) {
-	    throw new Error('process.binding is not supported');
-	};
-	
-	process.cwd = function () { return '/' };
-	process.chdir = function (dir) {
-	    throw new Error('process.chdir is not supported');
-	};
-	process.umask = function() { return 0; };
-
-
-/***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(20);
+	var utils = __webpack_require__(23);
 	
 	module.exports = function normalizeHeaderName(headers, normalizedName) {
 	  utils.forEach(headers, function processHeader(value, name) {
@@ -20434,18 +21680,18 @@ var GCLLib =
 
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(20);
-	var settle = __webpack_require__(27);
-	var buildURL = __webpack_require__(30);
-	var parseHeaders = __webpack_require__(31);
-	var isURLSameOrigin = __webpack_require__(32);
-	var createError = __webpack_require__(28);
-	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(33);
+	var utils = __webpack_require__(23);
+	var settle = __webpack_require__(29);
+	var buildURL = __webpack_require__(32);
+	var parseHeaders = __webpack_require__(33);
+	var isURLSameOrigin = __webpack_require__(34);
+	var createError = __webpack_require__(30);
+	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(35);
 	
 	module.exports = function xhrAdapter(config) {
 	  return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -20541,7 +21787,7 @@ var GCLLib =
 	    // This is only done if running in a standard browser environment.
 	    // Specifically not if we're in a web worker, or react-native.
 	    if (utils.isStandardBrowserEnv()) {
-	      var cookies = __webpack_require__(34);
+	      var cookies = __webpack_require__(36);
 	
 	      // Add xsrf header
 	      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -20615,15 +21861,15 @@ var GCLLib =
 	  });
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(24)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18)))
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var createError = __webpack_require__(28);
+	var createError = __webpack_require__(30);
 	
 	/**
 	 * Resolve or reject a Promise based on response status.
@@ -20649,12 +21895,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var enhanceError = __webpack_require__(29);
+	var enhanceError = __webpack_require__(31);
 	
 	/**
 	 * Create an Error with the specified message, config, error code, and response.
@@ -20672,7 +21918,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -20697,12 +21943,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(20);
+	var utils = __webpack_require__(23);
 	
 	function encode(val) {
 	  return encodeURIComponent(val).
@@ -20771,12 +22017,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(20);
+	var utils = __webpack_require__(23);
 	
 	/**
 	 * Parse headers into an object
@@ -20814,12 +22060,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(20);
+	var utils = __webpack_require__(23);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -20888,7 +22134,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -20930,12 +22176,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(20);
+	var utils = __webpack_require__(23);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -20989,12 +22235,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(20);
+	var utils = __webpack_require__(23);
 	
 	function InterceptorManager() {
 	  this.handlers = [];
@@ -21047,15 +22293,15 @@ var GCLLib =
 
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(20);
-	var transformData = __webpack_require__(37);
-	var isCancel = __webpack_require__(38);
-	var defaults = __webpack_require__(23);
+	var utils = __webpack_require__(23);
+	var transformData = __webpack_require__(39);
+	var isCancel = __webpack_require__(40);
+	var defaults = __webpack_require__(26);
 	
 	/**
 	 * Throws a `Cancel` if cancellation has been requested.
@@ -21132,12 +22378,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(20);
+	var utils = __webpack_require__(23);
 	
 	/**
 	 * Transform the data for a request or a response
@@ -21158,7 +22404,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -21169,7 +22415,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -21189,7 +22435,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -21207,7 +22453,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -21232,12 +22478,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var Cancel = __webpack_require__(41);
+	var Cancel = __webpack_require__(43);
 	
 	/**
 	 * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -21295,7 +22541,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -21328,12 +22574,13 @@ var GCLLib =
 
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var _ = __webpack_require__(1);
+	var es6_promise_1 = __webpack_require__(17);
 	var SEPARATOR = "/";
 	var QP_APIKEY = "?apikey=";
 	var SECURITY = "/security";
@@ -21351,66 +22598,81 @@ var GCLLib =
 	    }
 	    DSClient.prototype.getUrl = function () { return this.url; };
 	    DSClient.prototype.getInfo = function (callback) {
-	        var consumerCb = callback;
-	        this.connection.get(this.url + SYS_INFO, undefined, function (error, data) {
-	            if (error) {
-	                return consumerCb(error, null);
-	            }
-	            return consumerCb(null, data);
-	        });
+	        return this.connection.get(this.url + SYS_INFO, undefined, callback);
 	    };
 	    DSClient.prototype.getDevice = function (uuid, callback) {
-	        var consumerCb = callback;
-	        this.connection.get(this.url + DEVICE + SEPARATOR + uuid, undefined, function (error, data) {
-	            if (error) {
-	                return consumerCb(error, null);
-	            }
-	            if (data) {
-	                return consumerCb(null, data);
-	            }
-	            return consumerCb(null, data);
-	        });
+	        return this.connection.get(this.url + DEVICE + SEPARATOR + uuid, undefined, callback);
 	    };
 	    DSClient.prototype.getJWT = function (callback) {
-	        var consumerCb = callback;
 	        var self_cfg = this.cfg;
-	        this.connection.get(this.url + SECURITY_JWT_ISSUE, undefined, function (error, data) {
+	        return this.connection.get(this.url + SECURITY_JWT_ISSUE, undefined, function (error, data) {
 	            if (error) {
-	                return consumerCb(error, null);
+	                if (callback) {
+	                    return callback(error, null);
+	                }
+	                else {
+	                    return es6_promise_1.Promise.reject(error);
+	                }
 	            }
-	            if (data && data.token) {
-	                self_cfg.jwt = data.token;
+	            else {
+	                if (data && data.token) {
+	                    self_cfg.jwt = data.token;
+	                }
+	                if (callback) {
+	                    return callback(null, data);
+	                }
+	                else {
+	                    return es6_promise_1.Promise.resolve(data);
+	                }
 	            }
-	            return consumerCb(null, data);
 	        });
 	    };
 	    DSClient.prototype.refreshJWT = function (callback) {
 	        var actualJWT = this.cfg.jwt;
 	        if (actualJWT) {
-	            this.connection.post(this.url + SECURITY_JWT_REFRESH, { originalJWT: actualJWT }, undefined, callback);
+	            return this.connection.post(this.url + SECURITY_JWT_REFRESH, { originalJWT: actualJWT }, undefined, callback);
 	        }
 	        else {
-	            callback({ code: "500", description: "No JWT available", status: 412 }, null);
+	            var error = { code: "500", description: "No JWT available", status: 412 };
+	            if (callback) {
+	                return callback(error, null);
+	            }
+	            else {
+	                return es6_promise_1.Promise.reject(error);
+	            }
 	        }
 	    };
 	    DSClient.prototype.getPubKey = function (callback) {
-	        this.connection.get(this.url + PUB_KEY, undefined, callback);
+	        return this.connection.get(this.url + PUB_KEY, undefined, callback);
 	    };
 	    DSClient.prototype.downloadLink = function (infoBrowser, callback) {
 	        this.connection.post(this.url + DOWNLOAD, infoBrowser, undefined, function (err, data) {
 	            if (err) {
-	                return callback(err, null);
+	                if (callback) {
+	                    return callback(err, null);
+	                }
+	                else {
+	                    return es6_promise_1.Promise.reject(err);
+	                }
 	            }
-	            return callback(null, { url: this.cfg.dsUrlBase + data.path + QP_APIKEY + this.cfg.apiKey });
+	            else {
+	                var returnObject = { url: this.cfg.dsUrlBase + data.path + QP_APIKEY + this.cfg.apiKey };
+	                if (callback) {
+	                    return callback(null, returnObject);
+	                }
+	                else {
+	                    return es6_promise_1.Promise.resolve(returnObject);
+	                }
+	            }
 	        });
 	    };
 	    DSClient.prototype.register = function (info, device_id, callback) {
 	        var req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, "core_version"));
-	        this.connection.put(this.url + DEVICE + SEPARATOR + device_id, req, undefined, callback);
+	        return this.connection.put(this.url + DEVICE + SEPARATOR + device_id, req, undefined, callback);
 	    };
 	    DSClient.prototype.sync = function (info, device_id, callback) {
 	        var req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, "core_version"));
-	        this.connection.post(this.url + DEVICE + SEPARATOR + device_id, req, undefined, callback);
+	        return this.connection.post(this.url + DEVICE + SEPARATOR + device_id, req, undefined, callback);
 	    };
 	    return DSClient;
 	}());
@@ -21418,7 +22680,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -21434,31 +22696,19 @@ var GCLLib =
 	    }
 	    OCVClient.prototype.getUrl = function () { return this.url; };
 	    OCVClient.prototype.validateSignature = function (data, callback) {
-	        this.connection.post(this.url + SIGNATURE, data, undefined, callback);
+	        return this.connection.post(this.url + SIGNATURE, data, undefined, callback);
 	    };
 	    OCVClient.prototype.getInfo = function (callback) {
-	        var cb = callback;
-	        this.connection.get(this.url + SYSTEM_STATUS, undefined, function (error, data) {
-	            if (error) {
-	                return cb(error, null);
-	            }
-	            return cb(null, data);
-	        });
+	        return this.connection.get(this.url + SYSTEM_STATUS, undefined, callback);
 	    };
 	    OCVClient.prototype.getChallenge = function (digestAlgorithm, callback) {
-	        var consumerCb = callback;
-	        this.connection.get(this.url + CHALLENGE, { digest: digestAlgorithm }, function (error, data) {
-	            if (error) {
-	                return consumerCb(error, null);
-	            }
-	            return consumerCb(null, data);
-	        });
+	        return this.connection.get(this.url + CHALLENGE, { digest: digestAlgorithm }, callback);
 	    };
 	    OCVClient.prototype.validateChallengeSignedHash = function (data, callback) {
-	        this.connection.post(this.url + CHALLENGE, data, undefined, callback);
+	        return this.connection.post(this.url + CHALLENGE, data, undefined, callback);
 	    };
 	    OCVClient.prototype.validateCertificateChain = function (data, callback) {
-	        this.connection.post(this.url + CERTIFICATE, data, undefined, callback);
+	        return this.connection.post(this.url + CERTIFICATE, data, undefined, callback);
 	    };
 	    return OCVClient;
 	}());

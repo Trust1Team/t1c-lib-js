@@ -28,20 +28,24 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
         return [ "authenticate", "sign", "encrypt" ];
     }
 
-    public printedInformation(body: OptionalPin, callback: (error: RestException, data: PrintedInformationResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + PIV.PRINTED_INFORMATION, body, undefined, callback);
+    public printedInformation(body: OptionalPin,
+                              callback?: (error: RestException,
+                                          data: PrintedInformationResponse) => void | Promise<PrintedInformationResponse>) {
+        return this.connection.post(this.resolvedReaderURI() + PIV.PRINTED_INFORMATION, body, undefined, callback);
     }
 
-    public facialImage(body: OptionalPin, callback: (error: RestException, data: FacialImageResponse) => void) {
-        this.connection.post(this.resolvedReaderURI() + PIV.FACIAL_IMAGE, body, undefined, callback);
+    public facialImage(body: OptionalPin,
+                       callback?: (error: RestException, data: FacialImageResponse) => void | Promise<FacialImageResponse>) {
+        return this.connection.post(this.resolvedReaderURI() + PIV.FACIAL_IMAGE, body, undefined, callback);
     }
 
-    public authenticationCertificate(body: OptionalPin, callback: (error: RestException, data: DataResponse) => void) {
-        this.getCertificate(PIV.CERT_AUTHENTICATION, body, callback);
+    public authenticationCertificate(body: OptionalPin,
+                                     callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+        return this.getCertificate(PIV.CERT_AUTHENTICATION, body, callback);
     }
 
-    public signingCertificate(body: OptionalPin, callback: (error: RestException, data: DataResponse) => void) {
-        this.getCertificate(PIV.CERT_SIGNING, body, callback);
+    public signingCertificate(body: OptionalPin, callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+        return this.getCertificate(PIV.CERT_SIGNING, body, callback);
     }
 }
 

@@ -3,9 +3,9 @@ import { DataObjectResponse, DataResponse, T1CResponse } from "../../../core/ser
 import { RestException } from "../../../core/exceptions/CoreExceptions";
 export { AbstractOcra, AllDataResponse, ChallengeData, ReadCounterResponse };
 interface AbstractOcra extends PinCard {
-    allData(filters: string[], callback: (error: RestException, data: AllDataResponse) => void): void;
-    challenge(body: ChallengeData, callback: (error: RestException, data: DataResponse) => void): void;
-    readCounter(body: OptionalPin, callback: (error: RestException, data: ReadCounterResponse) => void): void;
+    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): void | Promise<AllDataResponse>;
+    challenge(body: ChallengeData, callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    readCounter(body: OptionalPin, callback?: (error: RestException, data: ReadCounterResponse) => void): void | Promise<ReadCounterResponse>;
 }
 interface AllDataResponse extends DataObjectResponse {
     data: {

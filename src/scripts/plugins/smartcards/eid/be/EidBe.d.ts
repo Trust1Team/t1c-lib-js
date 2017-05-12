@@ -8,13 +8,13 @@ declare class EidBe extends GenericCertCard implements AbstractEidBE {
     static ADDRESS: string;
     static PHOTO: string;
     static VERIFY_PRIV_KEY_REF: string;
-    rnData(callback: (error: RestException, data: RnDataResponse) => void): void;
-    address(callback: (error: RestException, data: AddressResponse) => void): void;
-    picture(callback: (error: RestException, data: DataResponse) => void): void;
-    rootCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    citizenCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    authenticationCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    nonRepudiationCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    rrnCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void): void;
+    rnData(callback?: (error: RestException, data: RnDataResponse) => void | Promise<RnDataResponse>): void | Promise<any>;
+    address(callback?: (error: RestException, data: AddressResponse) => void | Promise<AddressResponse>): void | Promise<any>;
+    picture(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>): void | Promise<any>;
+    rootCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>): void | Promise<DataResponse>;
+    citizenCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>): void | Promise<DataResponse>;
+    authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>): void | Promise<DataResponse>;
+    nonRepudiationCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>): void | Promise<DataResponse>;
+    rrnCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>): void | Promise<DataResponse>;
+    verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>): void | Promise<any>;
 }

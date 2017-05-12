@@ -1,11 +1,11 @@
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 export { AbstractOCVClient, CertificateAndOrder, CertificateChainData, CertificateChainResponse, ChallengeResponse, ChallengeSignedHashResponse, ChallengeSignedHashData, SignatureValidationData, SignatureValidationResponse, OCVInfoResponse };
 interface AbstractOCVClient {
-    getChallenge(digestAlgorithm: string, callback: (error: CoreExceptions.RestException, data: any) => void): void;
-    validateChallengeSignedHash(data: ChallengeSignedHashData, callback: (error: CoreExceptions.RestException, data: ChallengeSignedHashResponse) => void): void;
-    validateCertificateChain(data: CertificateChainData, callback: (error: CoreExceptions.RestException, data: CertificateChainResponse) => void): void;
-    validateSignature(data: SignatureValidationData, callback: (error: CoreExceptions.RestException, data: any) => void): void;
-    getInfo(callback: (error: CoreExceptions.RestException, data: any) => void): void;
+    getChallenge(digestAlgorithm: string, callback?: (error: CoreExceptions.RestException, data: ChallengeResponse) => void): void | Promise<ChallengeResponse>;
+    validateChallengeSignedHash(data: ChallengeSignedHashData, callback?: (error: CoreExceptions.RestException, data: ChallengeSignedHashResponse) => void): void | Promise<ChallengeSignedHashResponse>;
+    validateCertificateChain(data: CertificateChainData, callback?: (error: CoreExceptions.RestException, data: CertificateChainResponse) => void): void | Promise<CertificateChainResponse>;
+    validateSignature(data: SignatureValidationData, callback?: (error: CoreExceptions.RestException, data: SignatureValidationResponse) => void): void | Promise<SignatureValidationResponse>;
+    getInfo(callback?: (error: CoreExceptions.RestException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse>;
 }
 interface CertificateChainData {
     certificateChain: CertificateAndOrder[];

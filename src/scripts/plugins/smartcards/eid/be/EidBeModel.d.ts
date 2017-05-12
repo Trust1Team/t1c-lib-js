@@ -3,16 +3,16 @@ import { CertCard } from "../../Card";
 import { DataObjectResponse, DataResponse } from "../../../../core/service/CoreModel";
 export { AbstractEidBE, Address, AddressResponse, AllCertsResponse, AllDataResponse, RnData, RnDataResponse };
 interface AbstractEidBE extends CertCard {
-    allData(filters: string[], callback: (error: RestException, data: AllDataResponse) => void): void;
-    allCerts(filters: string[], callback: (error: RestException, data: AllCertsResponse) => void): void;
-    rnData(callback: (error: RestException, data: RnDataResponse) => void): void;
-    address(callback: (error: RestException, data: AddressResponse) => void): void;
-    picture(callback: (error: RestException, data: DataResponse) => void): void;
-    rootCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    citizenCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    authenticationCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    nonRepudiationCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    rrnCertificate(callback: (error: RestException, data: DataResponse) => void): void;
+    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): void | Promise<AllDataResponse>;
+    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): void | Promise<AllCertsResponse>;
+    rnData(callback?: (error: RestException, data: RnDataResponse) => void): void | Promise<RnDataResponse>;
+    address(callback?: (error: RestException, data: AddressResponse) => void): void | Promise<AddressResponse>;
+    picture(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    rootCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    citizenCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    nonRepudiationCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    rrnCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
 }
 interface AddressResponse extends DataObjectResponse {
     data: Address;

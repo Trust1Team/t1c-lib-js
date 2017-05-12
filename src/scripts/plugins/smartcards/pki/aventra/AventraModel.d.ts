@@ -6,17 +6,17 @@ interface AbstractAventra extends CertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allKeyRefs(): string[];
-    allAlgoRefsForAuthentication(callback: (error: RestException, data: DataArrayResponse) => void): void;
-    allAlgoRefsForSigning(callback: (error: RestException, data: DataArrayResponse) => void): void;
-    allData(filters: string[], callback: (error: RestException, data: AllDataResponse) => void): void;
-    allCerts(filters: string[], callback: (error: RestException, data: AllCertsResponse) => void): void;
-    rootCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    issuerCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    authenticationCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    signingCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    encryptionCertificate(callback: (error: RestException, data: DataResponse) => void): void;
-    verifyPin(body: VerifyPinData, callback: (error: RestException, data: T1CResponse) => void): void;
-    resetPin(body: ResetPinData, callback: (error: RestException, data: T1CResponse) => void): void;
+    allAlgoRefsForAuthentication(callback?: (error: RestException, data: DataArrayResponse) => void): void | Promise<DataArrayResponse>;
+    allAlgoRefsForSigning(callback?: (error: RestException, data: DataArrayResponse) => void): void | Promise<DataArrayResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): void | Promise<AllDataResponse>;
+    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): void | Promise<AllCertsResponse>;
+    rootCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    issuerCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    signingCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    encryptionCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): void | Promise<T1CResponse>;
+    resetPin(body: ResetPinData, callback?: (error: RestException, data: T1CResponse) => void): void | Promise<T1CResponse>;
 }
 interface AllDataResponse extends AllCertsResponse {
     data: {

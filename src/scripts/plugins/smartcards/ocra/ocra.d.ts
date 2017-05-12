@@ -6,6 +6,6 @@ export { Ocra };
 declare class Ocra extends GenericPinCard implements AbstractOcra {
     static CHALLENGE: string;
     static READ_COUNTER: string;
-    challenge(body: ChallengeData, callback: (error: RestException, data: DataResponse) => void): void;
-    readCounter(body: OptionalPin, callback: (error: RestException, data: ReadCounterResponse) => void): void;
+    challenge(body: ChallengeData, callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>): void | Promise<any>;
+    readCounter(body: OptionalPin, callback?: (error: RestException, data: ReadCounterResponse) => void | Promise<ReadCounterResponse>): void | Promise<any>;
 }

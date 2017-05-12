@@ -27,27 +27,27 @@ class Oberthur extends GenericCertCard implements AbstractOberthur {
         return [ "authenticate", "sign", "encrypt" ];
     }
 
-    public rootCertificate(callback: (error: RestException, data: DataResponse) => void): void {
-        this.getCertificate(Oberthur.CERT_ROOT, callback);
+    public rootCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+        return this.getCertificate(Oberthur.CERT_ROOT, callback);
     }
 
-    public issuerCertificate(callback: (error: RestException, data: DataResponse) => void): void {
-        this.getCertificate(Oberthur.CERT_ISSUER, callback);
+    public issuerCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+        return this.getCertificate(Oberthur.CERT_ISSUER, callback);
     }
 
-    public authenticationCertificate(callback: (error: RestException, data: DataResponse) => void): void {
-        this.getCertificate(Oberthur.CERT_AUTHENTICATION, callback);
+    public authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+        return this.getCertificate(Oberthur.CERT_AUTHENTICATION, callback);
     }
 
-    public signingCertificate(callback: (error: RestException, data: DataResponse) => void): void {
-        this.getCertificate(Oberthur.CERT_SIGNING, callback);
+    public signingCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+        return this.getCertificate(Oberthur.CERT_SIGNING, callback);
     }
 
-    public encryptionCertificate(callback: (error: RestException, data: DataResponse) => void): void {
-        this.getCertificate(Oberthur.CERT_ENCRYPTION, callback);
+    public encryptionCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+        return this.getCertificate(Oberthur.CERT_ENCRYPTION, callback);
     }
 
-    public verifyPin(body: VerifyPinData, callback: (error: RestException, data: T1CResponse) => void): void {
-        this.connection.post(this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, undefined, callback);
+    public verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): void | Promise<T1CResponse>{
+        return this.connection.post(this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, undefined, callback);
     }
 }
