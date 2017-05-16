@@ -40,19 +40,29 @@ class DSClient implements AbstractDSClient {
     }
 
     public getJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse> {
-        let self_cfg = this.cfg;
-        return this.connection.get(this.url + SECURITY_JWT_ISSUE, undefined,
-            function(error: CoreExceptions.RestException, data: JWTResponse) {
+        let self = this;
+
+        if (callback) {
+            doGetJwt();
+        } else {
+            // promise
+            return new Promise((resolve, reject) => {
+                doGetJwt(resolve, reject);
+            });
+        }
+
+        function doGetJwt(resolve?: (data: any) => void, reject?: (data: any) => void) {
+            self.connection.get(self.url + SECURITY_JWT_ISSUE, undefined, function (error, data) {
                 if (error) {
                     if (callback) { return callback(error, null); }
-                    else { return Promise.reject(error); }
+                    else { reject(error); }
                 } else {
-                    if (data && data.token) { self_cfg.jwt = data.token; }
+                    if (data && data.token) { self.cfg.jwt = data.token; }
                     if (callback) { return callback(null, data); }
-                    else { return Promise.resolve(data); }
+                    else { resolve(data); }
                 }
-            }
-        );
+            });
+        }
     }
 
     public refreshJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse> {
@@ -73,19 +83,27 @@ class DSClient implements AbstractDSClient {
     public downloadLink(infoBrowser: BrowserInfoResponse,
                         callback?: (error: CoreExceptions.RestException,
                                     data: DownloadLinkResponse) => void): void | Promise<DownloadLinkResponse> {
-        this.connection.post(this.url + DOWNLOAD,
-            infoBrowser,
-            undefined,
-            function(err: CoreExceptions.RestException, data: { path: string }) {
+        let self = this;
+        if (callback) {
+            doGetDownloadLink();
+        } else {
+            // promise
+            return new Promise((resolve, reject) => {
+                doGetDownloadLink(resolve, reject);
+            });
+        }
+        function doGetDownloadLink(resolve?: (data: any) => void, reject?: (data: any) => void) {
+            self.connection.post(self.url + DOWNLOAD, infoBrowser, undefined, function (err, data) {
                 if (err) {
                     if (callback) { return callback(err, null); }
-                    else { return Promise.reject(err); }
+                    else { reject(err); }
                 } else {
-                    let returnObject = { url: this.cfg.dsUrlBase + data.path + QP_APIKEY + this.cfg.apiKey };
+                    let returnObject = { url: self.cfg.dsUrlBase + data.path + QP_APIKEY + self.cfg.apiKey };
                     if (callback) { return callback(null, returnObject); }
-                    else { return Promise.resolve(returnObject); }
+                    else { return resolve(returnObject); }
                 }
             });
+        }
     }
 
     public register(info: DSPlatformInfo, device_id: string,

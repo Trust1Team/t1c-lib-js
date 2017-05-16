@@ -22604,28 +22604,38 @@ var GCLLib =
 	        return this.connection.get(this.url + DEVICE + SEPARATOR + uuid, undefined, callback);
 	    };
 	    DSClient.prototype.getJWT = function (callback) {
-	        var self_cfg = this.cfg;
-	        return this.connection.get(this.url + SECURITY_JWT_ISSUE, undefined, function (error, data) {
-	            if (error) {
-	                if (callback) {
-	                    return callback(error, null);
+	        var self = this;
+	        if (callback) {
+	            doGetJwt();
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                doGetJwt(resolve, reject);
+	            });
+	        }
+	        function doGetJwt(resolve, reject) {
+	            self.connection.get(self.url + SECURITY_JWT_ISSUE, undefined, function (error, data) {
+	                if (error) {
+	                    if (callback) {
+	                        return callback(error, null);
+	                    }
+	                    else {
+	                        reject(error);
+	                    }
 	                }
 	                else {
-	                    return es6_promise_1.Promise.reject(error);
+	                    if (data && data.token) {
+	                        self.cfg.jwt = data.token;
+	                    }
+	                    if (callback) {
+	                        return callback(null, data);
+	                    }
+	                    else {
+	                        resolve(data);
+	                    }
 	                }
-	            }
-	            else {
-	                if (data && data.token) {
-	                    self_cfg.jwt = data.token;
-	                }
-	                if (callback) {
-	                    return callback(null, data);
-	                }
-	                else {
-	                    return es6_promise_1.Promise.resolve(data);
-	                }
-	            }
-	        });
+	            });
+	        }
 	    };
 	    DSClient.prototype.refreshJWT = function (callback) {
 	        var actualJWT = this.cfg.jwt;
@@ -22646,25 +22656,36 @@ var GCLLib =
 	        return this.connection.get(this.url + PUB_KEY, undefined, callback);
 	    };
 	    DSClient.prototype.downloadLink = function (infoBrowser, callback) {
-	        this.connection.post(this.url + DOWNLOAD, infoBrowser, undefined, function (err, data) {
-	            if (err) {
-	                if (callback) {
-	                    return callback(err, null);
+	        var self = this;
+	        if (callback) {
+	            doGetDownloadLink();
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                doGetDownloadLink(resolve, reject);
+	            });
+	        }
+	        function doGetDownloadLink(resolve, reject) {
+	            self.connection.post(self.url + DOWNLOAD, infoBrowser, undefined, function (err, data) {
+	                if (err) {
+	                    if (callback) {
+	                        return callback(err, null);
+	                    }
+	                    else {
+	                        reject(err);
+	                    }
 	                }
 	                else {
-	                    return es6_promise_1.Promise.reject(err);
+	                    var returnObject = { url: self.cfg.dsUrlBase + data.path + QP_APIKEY + self.cfg.apiKey };
+	                    if (callback) {
+	                        return callback(null, returnObject);
+	                    }
+	                    else {
+	                        return resolve(returnObject);
+	                    }
 	                }
-	            }
-	            else {
-	                var returnObject = { url: this.cfg.dsUrlBase + data.path + QP_APIKEY + this.cfg.apiKey };
-	                if (callback) {
-	                    return callback(null, returnObject);
-	                }
-	                else {
-	                    return es6_promise_1.Promise.resolve(returnObject);
-	                }
-	            }
-	        });
+	            });
+	        }
 	    };
 	    DSClient.prototype.register = function (info, device_id, callback) {
 	        var req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, "core_version"));
