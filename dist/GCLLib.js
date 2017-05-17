@@ -51,10 +51,10 @@ var GCLLib =
 	var GCLConfig_1 = __webpack_require__(3);
 	exports.GCLConfig = GCLConfig_1.GCLConfig;
 	var CardFactory_1 = __webpack_require__(4);
-	var CoreService_1 = __webpack_require__(15);
-	var Connection_1 = __webpack_require__(20);
-	var DSClient_1 = __webpack_require__(46);
-	var OCVClient_1 = __webpack_require__(47);
+	var CoreService_1 = __webpack_require__(16);
+	var Connection_1 = __webpack_require__(21);
+	var DSClient_1 = __webpack_require__(47);
+	var OCVClient_1 = __webpack_require__(48);
 	var GCLClient = (function () {
 	    function GCLClient(cfg) {
 	        var _this = this;
@@ -63,6 +63,7 @@ var GCLLib =
 	        this.ds = function () { return _this.dsClient; };
 	        this.ocv = function () { return _this.ocvClient; };
 	        this.beid = function (reader_id) { return _this.cardFactory.createEidBE(reader_id); };
+	        this.dni = function (reader_id) { return _this.cardFactory.createDNI(reader_id); };
 	        this.luxeid = function (reader_id, pin) { return _this.cardFactory.createEidLUX(reader_id, pin); };
 	        this.luxtrust = function (reader_id, pin) { return _this.cardFactory.createLuxTrust(reader_id); };
 	        this.emv = function (reader_id) { return _this.cardFactory.createEmv(reader_id); };
@@ -17495,9 +17496,11 @@ var GCLLib =
 	var Aventra_1 = __webpack_require__(12);
 	var Oberthur_1 = __webpack_require__(13);
 	var piv_1 = __webpack_require__(14);
+	var dni_1 = __webpack_require__(15);
 	var CONTAINER_CONTEXT_PATH = "/plugins/";
 	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + "beid";
 	var CONTAINER_LUXEID = CONTAINER_CONTEXT_PATH + "luxeid";
+	var CONTAINER_DNI = CONTAINER_CONTEXT_PATH + "dni";
 	var CONTAINER_EMV = CONTAINER_CONTEXT_PATH + "emv";
 	var CONTAINER_LUXTRUST = CONTAINER_CONTEXT_PATH + "luxtrust";
 	var CONTAINER_MOBIB = CONTAINER_CONTEXT_PATH + "mobib";
@@ -17510,6 +17513,7 @@ var GCLLib =
 	        this.url = url;
 	        this.connection = connection;
 	    }
+	    CardFactory.prototype.createDNI = function (reader_id) { return new dni_1.DNI(this.url + CONTAINER_DNI, this.connection, reader_id); };
 	    CardFactory.prototype.createEidBE = function (reader_id) { return new EidBe_1.EidBe(this.url + CONTAINER_BEID, this.connection, reader_id); };
 	    CardFactory.prototype.createEidLUX = function (reader_id, pin) {
 	        return new EidLux_1.EidLux(this.url + CONTAINER_LUXEID, this.connection, reader_id, pin);
@@ -18158,10 +18162,53 @@ var GCLLib =
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Card_1 = __webpack_require__(6);
+	var DNI = (function (_super) {
+	    __extends(DNI, _super);
+	    function DNI() {
+	        return _super !== null && _super.apply(this, arguments) || this;
+	    }
+	    DNI.prototype.picture = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + DNI.PHOTO, undefined, callback);
+	    };
+	    DNI.prototype.rootCertificate = function (callback) {
+	        return this.getCertificate(DNI.CERT_ROOT, callback);
+	    };
+	    DNI.prototype.authenticationCertificate = function (callback) {
+	        return this.getCertificate(DNI.CERT_AUTHENTICATION, callback);
+	    };
+	    DNI.prototype.nonRepudiationCertificate = function (callback) {
+	        return this.getCertificate(DNI.CERT_NON_REPUDIATION, callback);
+	    };
+	    return DNI;
+	}(Card_1.GenericCertCard));
+	DNI.RN_DATA = "/rn";
+	DNI.ADDRESS = "/address";
+	DNI.PHOTO = "/picture";
+	DNI.VERIFY_PRIV_KEY_REF = "non-repudiation";
+	exports.DNI = DNI;
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var _ = __webpack_require__(1);
-	var platform = __webpack_require__(16);
-	var es6_promise_1 = __webpack_require__(17);
+	var platform = __webpack_require__(17);
+	var es6_promise_1 = __webpack_require__(18);
 	var CORE_INFO = "/";
 	var CORE_PLUGINS = "/plugins";
 	var CORE_READERS = "/card-readers";
@@ -18409,7 +18456,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*!
@@ -19570,7 +19617,7 @@ var GCLLib =
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)(module), (function() { return this; }())))
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var require;/* WEBPACK VAR INJECTION */(function(process, global) {/*!
@@ -19705,7 +19752,7 @@ var GCLLib =
 	function attemptVertx() {
 	  try {
 	    var r = require;
-	    var vertx = __webpack_require__(19);
+	    var vertx = __webpack_require__(20);
 	    vertxNext = vertx.runOnLoop || vertx.runOnContext;
 	    return useVertxTimer();
 	  } catch (e) {
@@ -20727,10 +20774,10 @@ var GCLLib =
 	
 	})));
 	//# sourceMappingURL=es6-promise.map
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19), (function() { return this; }())))
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports) {
 
 	// shim for using process in browser
@@ -20916,13 +20963,13 @@ var GCLLib =
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
 	/* (ignored) */
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -20937,7 +20984,7 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var axios_1 = __webpack_require__(21);
+	var axios_1 = __webpack_require__(22);
 	var _ = __webpack_require__(1);
 	var GenericConnection = (function () {
 	    function GenericConnection(cfg) {
@@ -21085,21 +21132,21 @@ var GCLLib =
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(22);
+	module.exports = __webpack_require__(23);
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(23);
-	var bind = __webpack_require__(24);
-	var Axios = __webpack_require__(25);
-	var defaults = __webpack_require__(26);
+	var utils = __webpack_require__(24);
+	var bind = __webpack_require__(25);
+	var Axios = __webpack_require__(26);
+	var defaults = __webpack_require__(27);
 	
 	/**
 	 * Create an instance of Axios
@@ -21132,15 +21179,15 @@ var GCLLib =
 	};
 	
 	// Expose Cancel & CancelToken
-	axios.Cancel = __webpack_require__(43);
-	axios.CancelToken = __webpack_require__(44);
-	axios.isCancel = __webpack_require__(40);
+	axios.Cancel = __webpack_require__(44);
+	axios.CancelToken = __webpack_require__(45);
+	axios.isCancel = __webpack_require__(41);
 	
 	// Expose all/spread
 	axios.all = function all(promises) {
 	  return Promise.all(promises);
 	};
-	axios.spread = __webpack_require__(45);
+	axios.spread = __webpack_require__(46);
 	
 	module.exports = axios;
 	
@@ -21149,12 +21196,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 23 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var bind = __webpack_require__(24);
+	var bind = __webpack_require__(25);
 	
 	/*global toString:true*/
 	
@@ -21454,7 +21501,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -21471,17 +21518,17 @@ var GCLLib =
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var defaults = __webpack_require__(26);
-	var utils = __webpack_require__(23);
-	var InterceptorManager = __webpack_require__(37);
-	var dispatchRequest = __webpack_require__(38);
-	var isAbsoluteURL = __webpack_require__(41);
-	var combineURLs = __webpack_require__(42);
+	var defaults = __webpack_require__(27);
+	var utils = __webpack_require__(24);
+	var InterceptorManager = __webpack_require__(38);
+	var dispatchRequest = __webpack_require__(39);
+	var isAbsoluteURL = __webpack_require__(42);
+	var combineURLs = __webpack_require__(43);
 	
 	/**
 	 * Create a new instance of Axios
@@ -21562,13 +21609,13 @@ var GCLLib =
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(23);
-	var normalizeHeaderName = __webpack_require__(27);
+	var utils = __webpack_require__(24);
+	var normalizeHeaderName = __webpack_require__(28);
 	
 	var PROTECTION_PREFIX = /^\)\]\}',?\n/;
 	var DEFAULT_CONTENT_TYPE = {
@@ -21585,10 +21632,10 @@ var GCLLib =
 	  var adapter;
 	  if (typeof XMLHttpRequest !== 'undefined') {
 	    // For browsers use XHR adapter
-	    adapter = __webpack_require__(28);
+	    adapter = __webpack_require__(29);
 	  } else if (typeof process !== 'undefined') {
 	    // For node use HTTP adapter
-	    adapter = __webpack_require__(28);
+	    adapter = __webpack_require__(29);
 	  }
 	  return adapter;
 	}
@@ -21659,15 +21706,15 @@ var GCLLib =
 	
 	module.exports = defaults;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19)))
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(23);
+	var utils = __webpack_require__(24);
 	
 	module.exports = function normalizeHeaderName(headers, normalizedName) {
 	  utils.forEach(headers, function processHeader(value, name) {
@@ -21680,18 +21727,18 @@ var GCLLib =
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(23);
-	var settle = __webpack_require__(29);
-	var buildURL = __webpack_require__(32);
-	var parseHeaders = __webpack_require__(33);
-	var isURLSameOrigin = __webpack_require__(34);
-	var createError = __webpack_require__(30);
-	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(35);
+	var utils = __webpack_require__(24);
+	var settle = __webpack_require__(30);
+	var buildURL = __webpack_require__(33);
+	var parseHeaders = __webpack_require__(34);
+	var isURLSameOrigin = __webpack_require__(35);
+	var createError = __webpack_require__(31);
+	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(36);
 	
 	module.exports = function xhrAdapter(config) {
 	  return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -21787,7 +21834,7 @@ var GCLLib =
 	    // This is only done if running in a standard browser environment.
 	    // Specifically not if we're in a web worker, or react-native.
 	    if (utils.isStandardBrowserEnv()) {
-	      var cookies = __webpack_require__(36);
+	      var cookies = __webpack_require__(37);
 	
 	      // Add xsrf header
 	      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -21861,15 +21908,15 @@ var GCLLib =
 	  });
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(19)))
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var createError = __webpack_require__(30);
+	var createError = __webpack_require__(31);
 	
 	/**
 	 * Resolve or reject a Promise based on response status.
@@ -21895,12 +21942,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var enhanceError = __webpack_require__(31);
+	var enhanceError = __webpack_require__(32);
 	
 	/**
 	 * Create an Error with the specified message, config, error code, and response.
@@ -21918,7 +21965,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -21943,12 +21990,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(23);
+	var utils = __webpack_require__(24);
 	
 	function encode(val) {
 	  return encodeURIComponent(val).
@@ -22017,12 +22064,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(23);
+	var utils = __webpack_require__(24);
 	
 	/**
 	 * Parse headers into an object
@@ -22060,12 +22107,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(23);
+	var utils = __webpack_require__(24);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -22134,7 +22181,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -22176,12 +22223,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(23);
+	var utils = __webpack_require__(24);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -22235,12 +22282,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(23);
+	var utils = __webpack_require__(24);
 	
 	function InterceptorManager() {
 	  this.handlers = [];
@@ -22293,15 +22340,15 @@ var GCLLib =
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(23);
-	var transformData = __webpack_require__(39);
-	var isCancel = __webpack_require__(40);
-	var defaults = __webpack_require__(26);
+	var utils = __webpack_require__(24);
+	var transformData = __webpack_require__(40);
+	var isCancel = __webpack_require__(41);
+	var defaults = __webpack_require__(27);
 	
 	/**
 	 * Throws a `Cancel` if cancellation has been requested.
@@ -22378,12 +22425,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(23);
+	var utils = __webpack_require__(24);
 	
 	/**
 	 * Transform the data for a request or a response
@@ -22404,7 +22451,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -22415,7 +22462,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -22435,7 +22482,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -22453,7 +22500,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -22478,12 +22525,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var Cancel = __webpack_require__(43);
+	var Cancel = __webpack_require__(44);
 	
 	/**
 	 * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -22541,7 +22588,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -22574,13 +22621,13 @@ var GCLLib =
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var _ = __webpack_require__(1);
-	var es6_promise_1 = __webpack_require__(17);
+	var es6_promise_1 = __webpack_require__(18);
 	var SEPARATOR = "/";
 	var QP_APIKEY = "?apikey=";
 	var SECURITY = "/security";
@@ -22701,7 +22748,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports) {
 
 	"use strict";
