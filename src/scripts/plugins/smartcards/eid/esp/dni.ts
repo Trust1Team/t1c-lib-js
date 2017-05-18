@@ -5,31 +5,30 @@
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { DataResponse } from "../../../../core/service/CoreModel";
-import { GenericCertCard } from "../../Card";
-import { AbstractDNI } from "./dniModel";
+import { GenericSecuredCertCard, OptionalPin } from "../../Card";
+import { AbstractDNI, InfoResponse } from "./dniModel";
 
 export { DNI };
 
 
-class DNI extends GenericCertCard implements AbstractDNI {
-    static RN_DATA = "/rn";
-    static ADDRESS = "/address";
-    static PHOTO = "/picture";
-    static VERIFY_PRIV_KEY_REF = "non-repudiation";
+class DNI extends GenericSecuredCertCard implements AbstractDNI {
+    static INFO = "/info";
 
-    public picture(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
-        return this.connection.get(this.resolvedReaderURI() + DNI.PHOTO, undefined, callback);
+    public info(callback?: (error: RestException, data: InfoResponse) => void | Promise<InfoResponse>) {
+        return this.connection.get(this.resolvedReaderURI() + DNI.INFO, undefined, callback);
     }
 
-    public rootCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
-        return this.getCertificate(DNI.CERT_ROOT, callback);
+    public intermediateCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+        return this.connection.get(this.resolvedReaderURI() + DNI.ALL_CERTIFICATES + DNI.CERT_INTERMEDIATE, undefined, callback);
     }
 
-    public authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
-        return this.getCertificate(DNI.CERT_AUTHENTICATION, callback);
+    public authenticationCertificate(body: OptionalPin,
+                                     callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+        return this.getCertificate(DNI.CERT_AUTHENTICATION, body, callback);
     }
 
-    public nonRepudiationCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
-        return this.getCertificate(DNI.CERT_NON_REPUDIATION, callback);
+    public signingCertificate(body: OptionalPin,
+                              callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+        return this.getCertificate(DNI.CERT_SIGNING, body, callback);
     }
 }
