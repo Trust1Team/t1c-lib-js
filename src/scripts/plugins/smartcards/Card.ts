@@ -139,6 +139,7 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
     static AUTHENTICATE = "/authenticate";
     static CERT_AUTHENTICATION = "/authentication";
     static CERT_NON_REPUDIATION = "/non-repudiation";
+    static CERT_INTERMEDIATE = "/intermediate";
     static CERT_ROOT = "/root";
     static CERT_SIGNING = "/signing";
     static SIGN_DATA = "/sign";

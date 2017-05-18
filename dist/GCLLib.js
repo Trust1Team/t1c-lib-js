@@ -17498,9 +17498,10 @@ var GCLLib =
 	var piv_1 = __webpack_require__(14);
 	var dni_1 = __webpack_require__(15);
 	var CONTAINER_CONTEXT_PATH = "/plugins/";
+	var CONTAINER_NEW_CONTEXT_PATH = "/containers/";
 	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + "beid";
 	var CONTAINER_LUXEID = CONTAINER_CONTEXT_PATH + "luxeid";
-	var CONTAINER_DNI = CONTAINER_CONTEXT_PATH + "dni";
+	var CONTAINER_DNI = CONTAINER_NEW_CONTEXT_PATH + "dnie";
 	var CONTAINER_EMV = CONTAINER_CONTEXT_PATH + "emv";
 	var CONTAINER_LUXTRUST = CONTAINER_CONTEXT_PATH + "luxtrust";
 	var CONTAINER_MOBIB = CONTAINER_CONTEXT_PATH + "mobib";
@@ -17718,6 +17719,7 @@ var GCLLib =
 	GenericSecuredCertCard.AUTHENTICATE = "/authenticate";
 	GenericSecuredCertCard.CERT_AUTHENTICATION = "/authentication";
 	GenericSecuredCertCard.CERT_NON_REPUDIATION = "/non-repudiation";
+	GenericSecuredCertCard.CERT_INTERMEDIATE = "/intermediate";
 	GenericSecuredCertCard.CERT_ROOT = "/root";
 	GenericSecuredCertCard.CERT_SIGNING = "/signing";
 	GenericSecuredCertCard.SIGN_DATA = "/sign";
@@ -18179,24 +18181,21 @@ var GCLLib =
 	    function DNI() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
-	    DNI.prototype.picture = function (callback) {
-	        return this.connection.get(this.resolvedReaderURI() + DNI.PHOTO, undefined, callback);
+	    DNI.prototype.info = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + DNI.INFO, undefined, callback);
 	    };
-	    DNI.prototype.rootCertificate = function (callback) {
-	        return this.getCertificate(DNI.CERT_ROOT, callback);
+	    DNI.prototype.intermediateCertificate = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + DNI.ALL_CERTIFICATES + DNI.CERT_INTERMEDIATE, undefined, callback);
 	    };
-	    DNI.prototype.authenticationCertificate = function (callback) {
-	        return this.getCertificate(DNI.CERT_AUTHENTICATION, callback);
+	    DNI.prototype.authenticationCertificate = function (body, callback) {
+	        return this.getCertificate(DNI.CERT_AUTHENTICATION, body, callback);
 	    };
-	    DNI.prototype.nonRepudiationCertificate = function (callback) {
-	        return this.getCertificate(DNI.CERT_NON_REPUDIATION, callback);
+	    DNI.prototype.signingCertificate = function (body, callback) {
+	        return this.getCertificate(DNI.CERT_SIGNING, body, callback);
 	    };
 	    return DNI;
-	}(Card_1.GenericCertCard));
-	DNI.RN_DATA = "/rn";
-	DNI.ADDRESS = "/address";
-	DNI.PHOTO = "/picture";
-	DNI.VERIFY_PRIV_KEY_REF = "non-repudiation";
+	}(Card_1.GenericSecuredCertCard));
+	DNI.INFO = "/info";
 	exports.DNI = DNI;
 
 
