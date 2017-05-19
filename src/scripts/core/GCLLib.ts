@@ -19,6 +19,7 @@ import {AbstractLuxTrust} from "../Plugins/smartcards/luxtrust/LuxTrust";
 import {AbstractOcra} from "../Plugins/smartcards/ocra/ocra";
 import {AbstractAventra} from "../Plugins/smartcards/pki/Aventra";
 import {AbstractOberthur} from "../Plugins/smartcards/pki/Oberthur";
+import {AbstractPiv} from "../Plugins/smartcards/piv/piv";
 
 class GCLClient {
     private cfg: GCLConfig;
@@ -187,6 +188,8 @@ class GCLClient {
     public aventra = (reader_id?:string):AbstractAventra => { return this.cardFactory.createAventraNO(reader_id); };
     // get instance for Oberthur
     public oberthur = (reader_id?:string):AbstractOberthur => { return this.cardFactory.createOberthurNO(reader_id); };
+    // get instance for PIV
+    public piv = (reader_id?:string):AbstractPiv => { return this.cardFactory.createPIV(reader_id); };
 
     // facade implementation
 
