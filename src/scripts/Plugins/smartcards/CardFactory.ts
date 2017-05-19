@@ -12,6 +12,7 @@ import {LuxTrust, AbstractLuxTrust} from "./luxtrust/LuxTrust";
 import {Ocra, AbstractOcra} from "./ocra/ocra";
 import {AbstractAventra, Aventra} from "./pki/Aventra";
 import {AbstractOberthur, Oberthur} from "./pki/Oberthur";
+import {AbstractPiv, PIV} from "./piv/piv";
 
 interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
@@ -22,6 +23,7 @@ interface AbstractFactory {
     createOcra(reader_id?:string): AbstractOcra;
     createAventraNO(reader_id?:string): AbstractAventra;
     createOberthurNO(reader_id?:string): AbstractOberthur;
+    createPIV(reader_id?:string): AbstractPiv;
 }
 
 export class CardFactory implements AbstractFactory{
@@ -42,4 +44,6 @@ export class CardFactory implements AbstractFactory{
     public createAventraNO(reader_id?:string): Aventra { return new Aventra(this.url, this.connection, reader_id); }
 
     public createOberthurNO(reader_id?:string): Oberthur { return new Oberthur(this.url, this.connection, reader_id); }
+
+    public createPIV(reader_id?:string): PIV { return new PIV(this.url, this.connection, reader_id); }
 }
