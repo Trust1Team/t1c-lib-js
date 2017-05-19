@@ -4,7 +4,6 @@
     "assertion-error": "github:DefinitelyTyped/DefinitelyTyped/assertion-error/assertion-error.d.ts#830e4aaac859e4f648efaa16712f1d6e378e6902",
     "chai": "github:DefinitelyTyped/DefinitelyTyped/chai/chai.d.ts#830e4aaac859e4f648efaa16712f1d6e378e6902",
     "jquery": "registry:dt/jquery#1.10.0+20160704162008",
-    "jwtDecode": "github:retyped/jwt-decode-tsd-ambient/jwt-decode.d.ts",
     "mocha": "github:DefinitelyTyped/DefinitelyTyped/mocha/mocha.d.ts#830e4aaac859e4f648efaa16712f1d6e378e6902",
     "platform": "registry:dt/platform#1.0.0+20160316155526",
     "sinon": "github:DefinitelyTyped/DefinitelyTyped/sinon/sinon.d.ts#830e4aaac859e4f648efaa16712f1d6e378e6902"
