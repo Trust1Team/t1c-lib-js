@@ -15,7 +15,7 @@ class Oberthur extends GenericCertCard implements AbstractOberthur {
 
     // filters
     public allDataFilters() {
-        return [ "applet-info", "root_certificate", "authentication-certificate",
+        return [ "root_certificate", "authentication-certificate",
                 "encryption_certificate", "issuer_certificate", "signing_certificate" ];
     }
 
