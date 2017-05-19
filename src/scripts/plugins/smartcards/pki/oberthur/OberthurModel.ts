@@ -27,12 +27,6 @@ interface AbstractOberthur extends CertCard {
 
 interface AllDataResponse extends AllCertsResponse {
     data: {
-        applet_info: {
-            change_counter: number
-            name: string
-            serial: string
-            version: string
-        }
         root_certificate: string
         issuer_certificate: string
         authentication_certificate: string
