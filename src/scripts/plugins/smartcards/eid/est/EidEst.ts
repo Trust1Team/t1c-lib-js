@@ -1,0 +1,2 @@
+interface AbstractEidEST {}
+export { AbstractEidEST }

@@ -2,8 +2,17 @@ var webpack = require("webpack"),
     path = require("path");
 
 var libraryName = 'GCLLib',
-    outputFile = libraryName + ".js";
-
+    plugins = [ new webpack.optimize.UglifyJsPlugin({
+        minimize: true,
+        compress: {
+            drop_console: true,
+            drop_debugger: true
+        },
+        output: {
+            comments: false
+        }
+    }) ],
+    outputFile = libraryName + ".min.js";
 
 var config = {
     entry: "./src/scripts/core/GCLLib.ts",
@@ -28,6 +37,7 @@ var config = {
     resolve: {
         extensions: [".ts", ".js", ".tsx", ".jsx", ""]
     },
+    plugins: plugins,
     tslint: {
         emitErrors: true,
         failOnHint: true
