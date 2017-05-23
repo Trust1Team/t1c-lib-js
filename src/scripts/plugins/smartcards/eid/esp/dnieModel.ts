@@ -6,20 +6,17 @@ import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { OptionalPin, SecuredCertCard } from "../../Card";
 import { DataObjectResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
 
-export { AbstractDNI, AllCertsResponse, AllDataResponse, InfoResponse };
+export { AbstractDNIe, AllCertsResponse, AllDataResponse, InfoResponse };
 
 
-interface AbstractDNI extends SecuredCertCard {
+interface AbstractDNIe extends SecuredCertCard {
     allData(filters: string[], body: OptionalPin,
             callback?: (error: RestException, data: AllDataResponse) => void): void | Promise<AllDataResponse>;
-    allCerts(filters: string[], body: OptionalPin,
-             callback?: (error: RestException, data: AllCertsResponse) => void): void | Promise<AllCertsResponse>;
+    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): void | Promise<AllCertsResponse>;
     info(callback?: (error: RestException, data: InfoResponse) => void): void | Promise<InfoResponse>
     intermediateCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
-    authenticationCertificate(body: OptionalPin,
-                              callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
-    signingCertificate(body: OptionalPin,
-                       callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    signingCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
 }
 
 interface AllCertsResponse extends DataObjectResponse {
