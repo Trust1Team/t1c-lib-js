@@ -22,8 +22,8 @@ import { AbstractOberthur } from "./pki/oberthur/OberthurModel";
 import { AbstractPiv } from "./piv/pivModel";
 import { AbstractMobib } from "./mobib/mobibModel";
 import { AbstractEidLUX } from "./eid/lux/EidLuxModel";
-import { AbstractDNI } from "./eid/esp/dniModel";
-import { DNI } from "./eid/esp/dni";
+import { AbstractDNIe } from "./eid/esp/dnieModel";
+import { DNIe } from "./eid/esp/dnie";
 
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
@@ -35,13 +35,14 @@ export interface AbstractFactory {
     createAventraNO(reader_id?: string): AbstractAventra;
     createOberthurNO(reader_id?: string): AbstractOberthur;
     createPIV(reader_id?: string): AbstractPiv;
+    createDNIe(reader_id?: string) : AbstractDNIe;
 }
 
 const CONTAINER_CONTEXT_PATH = "/plugins/";
 const CONTAINER_NEW_CONTEXT_PATH = "/containers/";
 const CONTAINER_BEID = CONTAINER_CONTEXT_PATH + "beid";
 const CONTAINER_LUXEID = CONTAINER_CONTEXT_PATH + "luxeid";
-const CONTAINER_DNI = CONTAINER_NEW_CONTEXT_PATH + "dnie";
+const CONTAINER_DNI = CONTAINER_CONTEXT_PATH + "dnie";
 const CONTAINER_EMV = CONTAINER_CONTEXT_PATH + "emv";
 const CONTAINER_LUXTRUST = CONTAINER_CONTEXT_PATH + "luxtrust";
 const CONTAINER_MOBIB = CONTAINER_CONTEXT_PATH + "mobib";
@@ -54,7 +55,7 @@ const CONTAINER_PIV = CONTAINER_CONTEXT_PATH + "piv";
 export class CardFactory implements AbstractFactory {
     constructor(private url: string, private connection: LocalConnection) {}
 
-    public createDNI(reader_id?: string): AbstractDNI { return new DNI(this.url + CONTAINER_DNI, this.connection, reader_id); }
+    public createDNIe(reader_id?: string): AbstractDNIe { return new DNIe(this.url + CONTAINER_DNI, this.connection, reader_id); }
 
     public createEidBE(reader_id?: string): AbstractEidBE { return new EidBe(this.url + CONTAINER_BEID, this.connection, reader_id); }
 

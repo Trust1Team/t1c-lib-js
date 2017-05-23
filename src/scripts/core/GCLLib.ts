@@ -24,7 +24,7 @@ import { AbstractOberthur } from "../plugins/smartcards/pki/oberthur/OberthurMod
 import { AbstractPiv } from "../plugins/smartcards/piv/pivModel";
 import { AbstractMobib } from "../plugins/smartcards/mobib/mobibModel";
 import { AbstractEidLUX } from "../plugins/smartcards/eid/lux/EidLuxModel";
-import { AbstractDNI } from "../plugins/smartcards/eid/esp/dniModel";
+import { AbstractDNIe } from "../plugins/smartcards/eid/esp/dnieModel";
 
 
 class GCLClient {
@@ -97,7 +97,7 @@ class GCLClient {
     // get instance for belgian eID card
     public beid = (reader_id?: string): AbstractEidBE => { return this.cardFactory.createEidBE(reader_id); };
     // get instance for spanish DNI card
-    public dni = (reader_id?: string): AbstractDNI => { return this.cardFactory.createDNI(reader_id); };
+    public dnie = (reader_id?: string): AbstractDNIe => { return this.cardFactory.createDNIe(reader_id); };
     // get instance for luxemburg eID card
     public luxeid = (reader_id?: string, pin?: string): AbstractEidLUX => { return this.cardFactory.createEidLUX(reader_id, pin); };
     // get instance for luxtrust card
