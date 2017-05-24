@@ -45,5 +45,6 @@ interface Info {
     last_names: string
     national_number: string
     card_number: string
+    serial: string
 }
 
