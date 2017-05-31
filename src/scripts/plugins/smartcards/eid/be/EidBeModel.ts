@@ -10,16 +10,22 @@ export { AbstractEidBE, Address, AddressResponse, AllCertsResponse, AllDataRespo
 
 
 interface AbstractEidBE extends CertCard {
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): void | Promise<AllDataResponse>;
-    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): void | Promise<AllCertsResponse>;
-    rnData(callback?: (error: RestException, data: RnDataResponse) => void): void | Promise<RnDataResponse>;
-    address(callback?: (error: RestException, data: AddressResponse) => void): void | Promise<AddressResponse>;
-    picture(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
-    rootCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
-    citizenCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
-    authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
-    nonRepudiationCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
-    rrnCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    allData(filters: string[],
+            callback?: (error: RestException, data: AllDataResponse) => void,
+            agentPort?: number): void | Promise<AllDataResponse>;
+    allCerts(filters: string[],
+             callback?: (error: RestException, data: AllCertsResponse) => void,
+             agentPort?: number): void | Promise<AllCertsResponse>;
+    rnData(callback?: (error: RestException, data: RnDataResponse) => void, agentPort?: number): void | Promise<RnDataResponse>;
+    address(callback?: (error: RestException, data: AddressResponse) => void, agentPort?: number): void | Promise<AddressResponse>;
+    picture(callback?: (error: RestException, data: DataResponse) => void, agentPort?: number): void | Promise<DataResponse>;
+    rootCertificate(callback?: (error: RestException, data: DataResponse) => void, agentPort?: number): void | Promise<DataResponse>;
+    citizenCertificate(callback?: (error: RestException, data: DataResponse) => void, agentPort?: number): void | Promise<DataResponse>;
+    authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void,
+                              agentPort?: number): void | Promise<DataResponse>;
+    nonRepudiationCertificate(callback?: (error: RestException, data: DataResponse) => void,
+                              agentPort?: number): void | Promise<DataResponse>;
+    rrnCertificate(callback?: (error: RestException, data: DataResponse) => void, agentPort?: number): void | Promise<DataResponse>;
 }
 
 interface AddressResponse extends DataObjectResponse {

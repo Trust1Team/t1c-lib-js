@@ -25,6 +25,8 @@ import { AbstractPiv } from "../plugins/smartcards/piv/pivModel";
 import { AbstractMobib } from "../plugins/smartcards/mobib/mobibModel";
 import { AbstractEidLUX } from "../plugins/smartcards/eid/lux/EidLuxModel";
 import { AbstractDNI } from "../plugins/smartcards/eid/esp/dniModel";
+import { AgentClient } from "./agent/agent";
+import { AbstractAgent } from "./agent/agentModel";
 
 
 class GCLClient {
@@ -35,6 +37,7 @@ class GCLClient {
     private authConnection: LocalAuthConnection;
     private remoteConnection: RemoteConnection;
     private localTestConnection: LocalTestConnection;
+    private agentClient: AgentClient;
     private dsClient: DSClient;
     private ocvClient: OCVClient;
 
@@ -49,6 +52,7 @@ class GCLClient {
         this.localTestConnection = new LocalTestConnection(this.cfg);
         this.cardFactory = new CardFactory(this.cfg.gclUrl, this.connection);
         this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
+        this.agentClient = new AgentClient(this.cfg.gclUrl, this.connection);
         if (this.cfg.localTestMode) { this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg); }
         else { this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg); }
         this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteConnection);
@@ -90,6 +94,8 @@ class GCLClient {
     public core = (): CoreService => { return this.coreService; };
     // get core config
     public config = (): GCLConfig => { return this.cfg; };
+    // get agent client services
+    public agent = (): AbstractAgent => { return this.agentClient; };
     // get ds client services
     public ds = (): AbstractDSClient => { return this.dsClient; };
     // get ocv client services
