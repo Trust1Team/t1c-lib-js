@@ -17557,8 +17557,8 @@ var GCLLib =
 	    function EMV() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
-	    EMV.prototype.pan = function (callback) {
-	        return this.connection.get(this.resolvedReaderURI() + EMV_PAN, undefined, callback);
+	    EMV.prototype.pan = function (callback, agentPort) {
+	        return this.connection.get(this.resolvedReaderURI(agentPort) + EMV_PAN, undefined, callback);
 	    };
 	    return EMV;
 	}(Card_1.GenericPinCard));
@@ -17738,12 +17738,13 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var agent_1 = __webpack_require__(8);
+	var _ = __webpack_require__(1);
 	var UrlUtil = (function () {
 	    function UrlUtil() {
 	    }
 	    UrlUtil.create = function (base, suffix, agentPort) {
 	        if (agentPort) {
-	            return base + agent_1.AgentClient.urlPrefix(agentPort) + suffix;
+	            return _.join(_.split(base, "/v1"), "/v1" + agent_1.AgentClient.urlPrefix(agentPort)) + suffix;
 	        }
 	        else {
 	            return base + suffix;
@@ -17766,7 +17767,7 @@ var GCLLib =
 	        this.connection = connection;
 	    }
 	    AgentClient.urlPrefix = function (port) {
-	        return AgentClient.AGENT_PATH + port.toString();
+	        return AgentClient.AGENT_PATH + "/" + port;
 	    };
 	    AgentClient.createHostnameFilter = function (hostName) {
 	        if (hostName) {
@@ -17778,6 +17779,9 @@ var GCLLib =
 	    };
 	    AgentClient.prototype.get = function (hostName, callback) {
 	        return this.connection.get(this.url + AgentClient.AGENT_PATH, AgentClient.createHostnameFilter(hostName), callback);
+	    };
+	    AgentClient.prototype.getConsent = function (agentPort, title, text, callback) {
+	        return this.connection.post(this.url + AgentClient.AGENT_PATH + "/" + agentPort + "/consent", { title: title, text: text }, undefined, callback);
 	    };
 	    return AgentClient;
 	}());

@@ -15,7 +15,7 @@ class AgentClient implements AbstractAgent {
     constructor(private url: string, private connection: Connection) {}
 
     public static urlPrefix(port: number) {
-        return AgentClient.AGENT_PATH + port.toString();
+        return AgentClient.AGENT_PATH + "/" + port;
     }
 
     private static createHostnameFilter(hostName: string) {
@@ -25,6 +25,10 @@ class AgentClient implements AbstractAgent {
 
     public get(hostName?: string, callback?: (error: RestException, data: AgentResponse) => void) {
         return this.connection.get(this.url + AgentClient.AGENT_PATH, AgentClient.createHostnameFilter(hostName), callback);
+    }
+
+    public getConsent(agentPort: number, title: string, text: string, callback?: (error: RestException, data: any) => void) {
+        return this.connection.post(this.url + AgentClient.AGENT_PATH + "/" + agentPort + "/consent", { title, text }, undefined, callback);
     }
 
 }
