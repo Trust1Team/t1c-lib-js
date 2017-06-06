@@ -109,22 +109,46 @@ var GCLLib =
 	            }
 	        });
 	    }
-	    GCLClient.initialize = function (cfg) {
-	        return new es6_promise_1.Promise(function (resolve, reject) {
+	    GCLClient.initialize = function (cfg, callback) {
+	        if (callback) {
+	            init();
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                init(resolve, reject);
+	            });
+	        }
+	        function init(resolve, reject) {
 	            var client = new GCLClient(cfg, true);
 	            client.initSecurityContext(function (err) {
 	                if (err) {
 	                    console.log(JSON.stringify(err));
+	                    if (reject) {
+	                        reject(err);
+	                    }
+	                    else {
+	                        callback(err, null);
+	                    }
 	                }
 	                else {
 	                    client.registerAndActivate().then(function () {
-	                        resolve(client);
+	                        if (resolve) {
+	                            resolve(client);
+	                        }
+	                        else {
+	                            callback(null, client);
+	                        }
 	                    }, function (error) {
-	                        reject(error);
+	                        if (reject) {
+	                            reject(error);
+	                        }
+	                        else {
+	                            callback(error, null);
+	                        }
 	                    });
 	                }
 	            });
-	        });
+	        }
 	    };
 	    GCLClient.resolveConfig = function (cfg) {
 	        var resolvedCfg = new GCLConfig_1.GCLConfig(cfg.dsUrlBase, cfg.apiKey);

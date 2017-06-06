@@ -76,22 +76,35 @@ class GCLClient {
         });
     }
 
-    public static initialize(cfg: GCLConfig): Promise<GCLClient> {
-        return new Promise((resolve, reject) => {
+    public static initialize(cfg: GCLConfig,
+                             callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): void | Promise<GCLClient> {
+        if (callback) {
+            init();
+        } else {
+            return new Promise((resolve, reject) => {
+                init(resolve, reject);
+            });
+        }
+
+        function init(resolve?: (data: any) => void, reject?: (error: any) => void) {
             let client = new GCLClient(cfg, true);
 
-            client.initSecurityContext(function(err: {}) {
+            client.initSecurityContext(function(err: CoreExceptions.RestException) {
                 if (err) {
                     console.log(JSON.stringify(err));
+                    if (reject) { reject(err); }
+                    else { callback(err, null); }
                 } else {
                     client.registerAndActivate().then(() => {
-                        resolve(client);
+                        if (resolve) { resolve(client); }
+                        else { callback(null, client); }
                     }, error => {
-                        reject(error);
+                        if (reject) { reject(error); }
+                        else { callback(error, null); }
                     });
                 }
             });
-        });
+        }
     }
 
     private static resolveConfig(cfg: GCLConfig) {
@@ -146,7 +159,6 @@ class GCLClient {
     /**
      * Init security context
      */
-    // TODO rework
     private initSecurityContext(cb: (error: CoreExceptions.RestException, data: {}) => void) {
         let self = this;
         let clientCb = cb;
