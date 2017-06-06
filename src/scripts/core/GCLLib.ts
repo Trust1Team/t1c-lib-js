@@ -25,6 +25,7 @@ import { AbstractPiv } from "../plugins/smartcards/piv/pivModel";
 import { AbstractMobib } from "../plugins/smartcards/mobib/mobibModel";
 import { AbstractEidLUX } from "../plugins/smartcards/eid/lux/EidLuxModel";
 import { AbstractDNI } from "../plugins/smartcards/eid/esp/dniModel";
+import { Promise } from "es6-promise";
 
 
 class GCLClient {
@@ -38,7 +39,7 @@ class GCLClient {
     private dsClient: DSClient;
     private ocvClient: OCVClient;
 
-    constructor(cfg: GCLConfig) {
+    constructor(cfg: GCLConfig, automatic: boolean) {
         let self = this;
         // resolve config to singleton
         this.cfg = GCLClient.resolveConfig(cfg);
@@ -56,20 +57,40 @@ class GCLClient {
         // check if implicit download has been set
         if (this.cfg.implicitDownload && true) { this.implicitDownload(); }
 
-        // setup security - fail safe
-        this.initSecurityContext(function(err: {}) {
-            if (err) {
-                console.log(JSON.stringify(err));
-                return;
-            }
-            self.registerAndActivate();
-        });
+        if (!automatic) {
+            // setup security - fail safe
+            this.initSecurityContext(function(err: {}) {
+                if (err) {
+                    console.log(JSON.stringify(err));
+                    return;
+                }
+                self.registerAndActivate();
+            });
+        }
 
         // verify OCV accessibility
         this.initOCVContext(function(err: {}) {
             if (err) {
                 console.warn("OCV not available for apikey, contact support@trust1team.com to add this capability");
             } else { console.log("OCV available for apikey"); }
+        });
+    }
+
+    public static initialize(cfg: GCLConfig): Promise<GCLClient> {
+        return new Promise((resolve, reject) => {
+            let client = new GCLClient(cfg, true);
+
+            client.initSecurityContext(function(err: {}) {
+                if (err) {
+                    console.log(JSON.stringify(err));
+                } else {
+                    client.registerAndActivate().then(() => {
+                        resolve(client);
+                    }, error => {
+                        reject(error);
+                    });
+                }
+            });
         });
     }
 
@@ -150,55 +171,67 @@ class GCLClient {
     private registerAndActivate() {
         let self = this;
         let self_cfg = this.cfg;
-        // get GCL info
-        self.core().info(function(err: CoreExceptions.RestException, infoResponse: InfoResponse) {
-            if (err) {
-                console.log(JSON.stringify(err));
-                return;
-            }
-            let activated = infoResponse.data.activated;
-            let managed = infoResponse.data.managed;
-            let core_version = infoResponse.data.version;
-            let uuid = infoResponse.data.uid;
-            // compose info
-            let info = self.core().infoBrowserSync();
-            let mergedInfo = _.merge({ managed, core_version, activated }, info.data);
-            if (!activated) {
-                // we need to register the device
-                // console.log("Register device:"+uuid);
-                self.dsClient.register(mergedInfo, uuid, function(error: CoreExceptions.RestException, activationResponse: JWTResponse) {
-                    if (err) {
-                        console.log("Error while registering the device: " + JSON.stringify(err));
-                        return;
-                    }
-                    self_cfg.jwt = activationResponse.token;
-                    self.core().activate(function(activationError: CoreExceptions.RestException) {
-                        if (activationError) {
-                            console.log(JSON.stringify(err));
-                            return;
-                        }
-                        // sync
-                        mergedInfo.activated = true;
-                        self.dsClient.sync(mergedInfo, uuid, function(syncError: CoreExceptions.RestException) {
-                            if (syncError) {
-                                console.log("Error while syncing the device: " + JSON.stringify(syncError));
+        return new Promise((resolve, reject) => {
+            // get GCL info
+            self.core().info(function(err: CoreExceptions.RestException, infoResponse: InfoResponse) {
+                if (err) {
+                    console.log(JSON.stringify(err));
+                    reject(err);
+                    return;
+                }
+                let activated = infoResponse.data.activated;
+                let managed = infoResponse.data.managed;
+                let core_version = infoResponse.data.version;
+                let uuid = infoResponse.data.uid;
+                // compose info
+                let info = self.core().infoBrowserSync();
+                let mergedInfo = _.merge({ managed, core_version, activated }, info.data);
+                if (!activated) {
+                    // we need to register the device
+                    // console.log("Register device:"+uuid);
+                    self.dsClient.register(mergedInfo, uuid,
+                        function(error: CoreExceptions.RestException, activationResponse: JWTResponse) {
+                            if (err) {
+                                console.log("Error while registering the device: " + JSON.stringify(err));
+                                reject(err);
                                 return;
                             }
+                            self_cfg.jwt = activationResponse.token;
+                            self.core().activate(function(activationError: CoreExceptions.RestException) {
+                                if (activationError) {
+                                    console.log(JSON.stringify(err));
+                                    reject(err);
+                                    return;
+                                }
+                                // sync
+                                mergedInfo.activated = true;
+                                self.dsClient.sync(mergedInfo, uuid, function(syncError: CoreExceptions.RestException) {
+                                    if (syncError) {
+                                        console.log("Error while syncing the device: " + JSON.stringify(syncError));
+                                        reject(syncError);
+                                        return;
+                                    } else {
+                                        resolve();
+                                    }
+                                });
+                            });
                         });
-                    });
-                });
-            } else {
-                // we need to synchronize the device
-                // console.log("Sync device:"+uuid);
-                self.dsClient.sync(mergedInfo, uuid, function(syncError: CoreExceptions.RestException, activationResponse: JWTResponse) {
-                    if (syncError) {
-                        console.log("Error while syncing the device: " + JSON.stringify(syncError));
-                        return;
-                    }
-                    self_cfg.jwt = activationResponse.token;
-                    return;
-                });
-            }
+                } else {
+                    // we need to synchronize the device
+                    // console.log("Sync device:"+uuid);
+                    self.dsClient.sync(mergedInfo, uuid,
+                        function(syncError: CoreExceptions.RestException, activationResponse: JWTResponse) {
+                            if (syncError) {
+                                console.log("Error while syncing the device: " + JSON.stringify(syncError));
+                                reject(syncError);
+                                return;
+                            }
+                            self_cfg.jwt = activationResponse.token;
+                            resolve();
+                            return;
+                        });
+                }
+            });
         });
     }
 
