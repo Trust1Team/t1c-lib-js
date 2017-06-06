@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>GCL Javascript Lux eID Test Page</title>
+    <title>GCL Javascript Test Page</title>
     <!--Add bootstrap and dependencies-->
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <style media="screen">
@@ -40,7 +40,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">T1C-JS (LUX ID)</a>
+                <a class="navbar-brand" href="#">T1C-JS</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -359,8 +359,8 @@
         $("#pollCard").on('click', function () {
             $("#information").empty();
             connector.core().pollCardInserted(20,callback,function(){console.log('Please connect a reader')},
-                    function(){console.log("Please insert card")},
-                    function(){console.log("Stop waiting for card, none found")}
+                function(){console.log("Please insert card")},
+                function(){console.log("Stop waiting for card, none found")}
             );
         });
         $("#getReadersAvailable").on('click', function () {
@@ -522,15 +522,15 @@
             var core = connector.core();
             var self = this;
             core.infoBrowser(function(error,data){
-               if(error){$("#error").append('Could not retrieve browser info');}
-               connector.ds().downloadLink(data,function(error,data){
-                   if(error)$("#error").append('Error retrieving download link');
-                   $("#error").empty();
-                   $("#information").empty();
-                   $("#downloadModal").modal('toggle');
-                   $("a").remove('.downloadlinkref');
-                   $("#modalDownloadLink").append('<a class= "downloadlinkref" href="'+ data.url +'">Download link GCL</a>');
-               });
+                if(error){$("#error").append('Could not retrieve browser info');}
+                connector.ds().downloadLink(data,function(error,data){
+                    if(error)$("#error").append('Error retrieving download link');
+                    $("#error").empty();
+                    $("#information").empty();
+                    $("#downloadModal").modal('toggle');
+                    $("a").remove('.downloadlinkref');
+                    $("#modalDownloadLink").append('<a class= "downloadlinkref" href="'+ data.url +'">Download link GCL</a>');
+                });
             });
         });
 
