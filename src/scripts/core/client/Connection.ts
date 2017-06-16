@@ -16,12 +16,33 @@ export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteConnecti
 interface Connection {
     // callback-based
     get(url: string,
-        queryParams?: { [key: string]: string },
+        queryParams: { [key: string]: string }): Promise<any>;
+    get(url: string,
+        queryParams: { [key: string]: string },
+        callback: (error: any, data: any) => void): void;
+    get(url: string,
+        queryParams: { [key: string]: string },
         callback?: (error: any, data: any) => void): void | Promise<any>;
+
+    post(url: string,
+         body: { [key: string]: any },
+         queryParams: { [key: string]: string }): Promise<any>;
+    post(url: string,
+         body: { [key: string]: any },
+         queryParams: { [key: string]: string },
+         callback: (error: any, data: any) => void): void;
     post(url: string,
          body: { [key: string]: any },
          queryParams?: { [key: string]: string },
          callback?: (error: any, data: any) => void): void | Promise<any>;
+
+    put(url: string,
+        body: { [key: string]: any },
+        queryParams: { [key: string]: string }): Promise<any>;
+    put(url: string,
+        body: { [key: string]: any },
+        queryParams: { [key: string]: string },
+        callback: (error: any, data: any) => void): void;
     put(url: string,
         body: { [key: string]: any },
         queryParams?: { [key: string]: string },
@@ -36,21 +57,40 @@ abstract class GenericConnection implements Connection {
     }
 
     public get(url: string,
-               queryParams?: { [key: string]: string },
+               queryParams: { [key: string]: string }): Promise<any>;
+    public get(url: string,
+               queryParams: { [key: string]: string },
+               callback: (error: any, data: any) => void): void;
+    public get(url: string,
+               queryParams: { [key: string]: string },
                callback?: (error: any, data: any) => void): void | Promise<any> {
         return handleRequest(url, "GET", undefined, queryParams, this.config.apiKey, this.config.jwt, callback);
     }
 
     public post(url: string,
                 body: any,
-                queryParams?: { [key: string]: string },
+                queryParams: { [key: string]: string }): Promise<any>;
+    public post(url: string,
+                body: any,
+                queryParams: { [key: string]: string },
+                callback: (error: any, data: any) => void): void;
+    public post(url: string,
+                body: any,
+                queryParams: { [key: string]: string },
                 callback?: (error: any, data: any) => void): void | Promise<any> {
         return handleRequest(url, "POST", body, queryParams, this.config.apiKey, this.config.jwt, callback);
     }
 
     public put(url: string,
                body: any,
-               queryParams?: { [key: string]: string },
+               queryParams: { [key: string]: string }): Promise<any>;
+    public put(url: string,
+               body: any,
+               queryParams: { [key: string]: string },
+               callback: (error: any, data: any) => void): void;
+    public put(url: string,
+               body: any,
+               queryParams: { [key: string]: string },
                callback?: (error: any, data: any) => void): void | Promise<any> {
         return handleRequest(url, "PUT", body, queryParams, this.config.apiKey, this.config.jwt, callback);
     }
@@ -84,11 +124,23 @@ class LocalTestConnection extends GenericConnection implements Connection {
     config = undefined;
 
     public get(url: string,
+               queryParams: { [key: string]: string }): Promise<any>;
+    public get(url: string,
+               queryParams: { [key: string]: string },
+               callback: (error: any, data: any) => void): void;
+    public get(url: string,
                queryParams?: { [key: string]: string },
                callback?: (error: any, data: any) => void): void | Promise<any> {
         return handleTestRequest(url, "GET", undefined, queryParams, undefined, callback);
     }
 
+    public post(url: string,
+                body: any,
+                queryParams: { [key: string]: string }): Promise<any>;
+    public post(url: string,
+                body: any,
+                queryParams: { [key: string]: string },
+                callback: (error: any, data: any) => void): void;
     public post(url: string,
                 body: any,
                 queryParams?: { [key: string]: string },
@@ -98,7 +150,14 @@ class LocalTestConnection extends GenericConnection implements Connection {
 
     public put(url: string,
                body: any,
-               queryParams?: { [key: string]: string },
+               queryParams: { [key: string]: string }): Promise<any>;
+    public put(url: string,
+               body: any,
+               queryParams: { [key: string]: string },
+               callback: (error: any, data: any) => void): void;
+    public put(url: string,
+               body: any,
+               queryParams: { [key: string]: string },
                callback?: (error: any, data: any) => void): void | Promise<any> {
         return handleTestRequest(url, "PUT", body, queryParams, undefined, callback);
     }
