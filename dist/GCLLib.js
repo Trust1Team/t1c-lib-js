@@ -17883,36 +17883,36 @@ var GCLLib =
 	    EidLux.prototype.allCertFilters = function () {
 	        return ["authentication-certificate", "non-repudiation-certificate", "root-certificates"];
 	    };
-	    EidLux.prototype.allData = function (filters, body, callback) {
+	    EidLux.prototype.allData = function (filters, callback) {
 	        if (filters && filters.length) {
-	            return this.connection.post(this.resolvedReaderURI(), body, createFilterQueryParam(filters, this.pin), callback);
+	            return this.connection.get(this.resolvedReaderURI(), createFilterQueryParam(filters, this.pin), callback);
 	        }
 	        else {
-	            return this.connection.post(this.resolvedReaderURI(), body, createPinQueryParam(this.pin), callback);
+	            return this.connection.get(this.resolvedReaderURI(), createPinQueryParam(this.pin), callback);
 	        }
 	    };
-	    EidLux.prototype.allCerts = function (filters, body, callback) {
+	    EidLux.prototype.allCerts = function (filters, callback) {
 	        if (filters && filters.length) {
-	            return this.connection.post(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, body, createFilterQueryParam(filters, this.pin), callback);
+	            return this.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, createFilterQueryParam(filters, this.pin), callback);
 	        }
 	        else {
-	            return this.connection.post(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, body, createPinQueryParam(this.pin), callback);
+	            return this.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, createPinQueryParam(this.pin), callback);
 	        }
 	    };
-	    EidLux.prototype.biometric = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + EidLux.BIOMETRIC, body, createPinQueryParam(this.pin), callback);
+	    EidLux.prototype.biometric = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + EidLux.BIOMETRIC, createPinQueryParam(this.pin), callback);
 	    };
-	    EidLux.prototype.picture = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + EidLux.PHOTO, body, createPinQueryParam(this.pin), callback);
+	    EidLux.prototype.picture = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + EidLux.PHOTO, createPinQueryParam(this.pin), callback);
 	    };
-	    EidLux.prototype.rootCertificate = function (body, callback) {
-	        return this.getCertificateArray(EidLux.CERT_ROOT, body, callback, createPinQueryParam(this.pin));
+	    EidLux.prototype.rootCertificate = function (callback) {
+	        return this.getCertificateArray(EidLux.CERT_ROOT, callback, createPinQueryParam(this.pin));
 	    };
-	    EidLux.prototype.authenticationCertificate = function (body, callback) {
-	        return this.getCertificate(EidLux.CERT_AUTHENTICATION, body, callback, createPinQueryParam(this.pin));
+	    EidLux.prototype.authenticationCertificate = function (callback) {
+	        return this.getCertificate(EidLux.CERT_AUTHENTICATION, callback, createPinQueryParam(this.pin));
 	    };
-	    EidLux.prototype.nonRepudiationCertificate = function (body, callback) {
-	        return this.getCertificate(EidLux.CERT_NON_REPUDIATION, body, callback, createPinQueryParam(this.pin));
+	    EidLux.prototype.nonRepudiationCertificate = function (callback) {
+	        return this.getCertificate(EidLux.CERT_NON_REPUDIATION, callback, createPinQueryParam(this.pin));
 	    };
 	    EidLux.prototype.verifyPin = function (body, callback) {
 	        return this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(this.pin), callback);
@@ -17923,8 +17923,14 @@ var GCLLib =
 	    EidLux.prototype.authenticate = function (body, callback) {
 	        return this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(this.pin), callback);
 	    };
-	    EidLux.prototype.signatureImage = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + EidLux.SIGNATURE_IMAGE, body, createPinQueryParam(this.pin), callback);
+	    EidLux.prototype.signatureImage = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + EidLux.SIGNATURE_IMAGE, createPinQueryParam(this.pin), callback);
+	    };
+	    EidLux.prototype.getCertificate = function (certUrl, callback, params) {
+	        return this.connection.get(this.resolvedReaderURI() + Card_1.GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, params, callback);
+	    };
+	    EidLux.prototype.getCertificateArray = function (certUrl, callback, params) {
+	        return this.connection.get(this.resolvedReaderURI() + Card_1.GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, params, callback);
 	    };
 	    return EidLux;
 	}(Card_1.GenericSecuredCertCard));
