@@ -12,6 +12,8 @@ import {
     BiometricResponse, PictureResponse, SignatureImageResponse
 } from "./EidLuxModel";
 import { AllDataResponse } from "../../pki/luxtrust/LuxTrustModel";
+import { Promise } from "es6-promise";
+import * as _ from "lodash";
 
 export { EidLux };
 
@@ -103,16 +105,44 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
     }
 
     protected getCertificate(certUrl: string,
-                             callback: (error: RestException,
-                                        data: DataResponse) => void,
+                             callback: (error: RestException, data: DataResponse) => void,
                              params?: { filter?: string, pin?: string }): void | Promise<DataResponse> {
-        return this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, params, callback);
+        let self = this;
+
+        if (callback && typeof callback === "function") {
+            self.retrieveAndParseCert(self, certUrl, params, callback);
+        } else {
+            return new Promise((resolve, reject) => {
+                self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
+            });
+        }
     }
 
     protected getCertificateArray(certUrl: string,
                                   callback: (error: RestException,
                                              data: DataArrayResponse) => void,
                                   params?: { filter?: string, pin?: string }): void | Promise<DataArrayResponse> {
-        return this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, params, callback);
+        let self = this;
+
+        if (callback && typeof callback === "function") {
+            self.retrieveAndParseCert(self, certUrl, params, callback);
+        } else {
+            return new Promise((resolve, reject) => {
+                self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
+            });
+        }
+    }
+
+    protected retrieveAndParseCert(self: EidLux, certUrl: string,
+                                   params: { filter?: string, pin?: string },
+                                   callback: (error: RestException, data: T1CResponse) => void,
+                                   resolve?: (data: any) => void, reject?: (data: any) => void) {
+        self.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES + certUrl, params).then(certData => {
+            if (resolve) { resolve(certData); }
+            else { callback(null, certData); }
+        }, err => {
+            if (reject) { reject(err); }
+            else { callback(err, null); }
+        });
     }
 }

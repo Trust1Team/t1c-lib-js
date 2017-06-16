@@ -1,6 +1,7 @@
 import { RestException } from "../../core/exceptions/CoreExceptions";
 import { DataArrayResponse, DataObjectResponse, DataResponse, T1CResponse } from "../../core/service/CoreModel";
 import { LocalConnection } from "../../core/client/Connection";
+import { Promise } from "es6-promise";
 /**
  * @author Michallis Pashidis
  * @author Maarten Somers
@@ -130,7 +131,26 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
     }
 
     protected getCertificate(certUrl: string, callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
-        return this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, undefined, callback);
+        let self = this;
+
+        if (callback && typeof callback === "function") {
+            retrieveAndParseCert();
+        } else {
+            return new Promise((resolve, reject) => {
+                retrieveAndParseCert(resolve, reject);
+            });
+        }
+
+        function retrieveAndParseCert(resolve?: (data: any) => void, reject?: (data: any) => void) {
+            self.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, undefined).then(certData => {
+                console.log(certData);
+                if (resolve) { resolve(certData); }
+                else { callback(null, certData); }
+            }, err => {
+                if (reject) { reject(err); }
+                else { callback(err, null); }
+            });
+        }
     }
 }
 
@@ -185,12 +205,29 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
         return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, body, undefined, callback);
     }
 
-    protected getCertificate(certUrl: string,
-                             body: OptionalPin,
-                             callback: (error: RestException,
-                                        data: DataResponse) => void,
+    protected getCertificate(certUrl: string, body: OptionalPin,
+                             callback: (error: RestException, data: DataResponse) => void,
                              params?: { filter?: string, pin?: string }): void | Promise<DataResponse> {
-        return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, params, callback);
+        let self = this;
+
+        if (callback && typeof callback === "function") {
+            retrieveAndParseCert();
+        } else {
+            return new Promise((resolve, reject) => {
+                retrieveAndParseCert(resolve, reject);
+            });
+        }
+
+        function retrieveAndParseCert(resolve?: (data: any) => void, reject?: (data: any) => void) {
+            self.connection.post(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, body, params).then(certData => {
+                console.log(certData);
+                if (resolve) { resolve(certData); }
+                else { callback(null, certData); }
+            }, err => {
+                if (reject) { reject(err); }
+                else { callback(err, null); }
+            });
+        }
     }
 
     protected getCertificateArray(certUrl: string,
