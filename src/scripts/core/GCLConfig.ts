@@ -32,6 +32,7 @@ class GCLConfig {
     private _allowAutoUpdate: boolean;
     private _implicitDownload: boolean;
     private _localTestMode: boolean;
+    private _forceHardwarePinpad: boolean;
 
     // constructor for DTO
     constructor (dsUriValue?: string, apiKey?: string) {
@@ -45,6 +46,7 @@ class GCLConfig {
         this._allowAutoUpdate = defaultAllowAutoUpdate;
         this._implicitDownload = defaultImplicitDownload;
         this._localTestMode = defaultLocalTestMode;
+        this._forceHardwarePinpad = false;
     }
 
     get ocvUrl(): string {
