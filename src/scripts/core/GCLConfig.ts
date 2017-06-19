@@ -122,14 +122,14 @@ class GCLConfig {
     }
 
     get implicitDownload(): boolean {
-        return this._implicitDownload;
+                                     return this._implicitDownload;
     }
 
     set implicitDownload(value: boolean) {
         this._implicitDownload = value;
     }
 
-    get dsFilDownloadUrl(): string {
+    get dsFileDownloadUrl(): string {
         return this._dsFileDownloadUrl;
     }
 
@@ -144,6 +144,14 @@ class GCLConfig {
     set localTestMode(value: boolean) {
         this._localTestMode = value;
         if (this._localTestMode) { this._dsUrl = this._dsUrlBase + defaultDSContextPathTestMode; }
+    }
+
+    get forceHardwarePinpad(): boolean {
+        return this._forceHardwarePinpad;
+    }
+
+    set forceHardwarePinpad(value: boolean) {
+        this._forceHardwarePinpad = value;
     }
 }
 

@@ -37,8 +37,12 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
 
 
     // constructor
-    constructor(protected url: string, protected connection: LocalConnection, protected reader_id: string, private pin: string) {
-        super(url, connection, reader_id);
+    constructor(protected baseUrl: string,
+                protected containerUrl: string,
+                protected connection: LocalConnection,
+                protected reader_id: string,
+                private pin: string) {
+        super(baseUrl, containerUrl, connection, reader_id);
     }
 
     // filters

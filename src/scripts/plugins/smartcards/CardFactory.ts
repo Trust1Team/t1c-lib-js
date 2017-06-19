@@ -54,25 +54,25 @@ const CONTAINER_PIV = CONTAINER_CONTEXT_PATH + "piv";
 export class CardFactory implements AbstractFactory {
     constructor(private url: string, private connection: LocalConnection) {}
 
-    public createDNI(reader_id?: string): AbstractDNI { return new DNI(this.url + CONTAINER_DNI, this.connection, reader_id); }
+    public createDNI(reader_id?: string): AbstractDNI { return new DNI(this.url, CONTAINER_DNI, this.connection, reader_id); }
 
-    public createEidBE(reader_id?: string): AbstractEidBE { return new EidBe(this.url + CONTAINER_BEID, this.connection, reader_id); }
+    public createEidBE(reader_id?: string): AbstractEidBE { return new EidBe(this.url, CONTAINER_BEID, this.connection, reader_id); }
 
     public createEidLUX(reader_id?: string, pin?: string): AbstractEidLUX {
-        return new EidLux(this.url + CONTAINER_LUXEID, this.connection, reader_id, pin);
+        return new EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin);
     }
 
-    public createEmv(reader_id?: string): EMV { return new EMV(this.url + CONTAINER_EMV, this.connection, reader_id); }
+    public createEmv(reader_id?: string): EMV { return new EMV(this.url, CONTAINER_EMV, this.connection, reader_id); }
 
-    public createLuxTrust(reader_id?: string): LuxTrust { return new LuxTrust(this.url + CONTAINER_LUXTRUST, this.connection, reader_id); }
+    public createLuxTrust(reader_id?: string): LuxTrust { return new LuxTrust(this.url, CONTAINER_LUXTRUST, this.connection, reader_id); }
 
-    public createMobib(reader_id?: string): Mobib { return new Mobib(this.url + CONTAINER_MOBIB, this.connection, reader_id); }
+    public createMobib(reader_id?: string): Mobib { return new Mobib(this.url, CONTAINER_MOBIB, this.connection, reader_id); }
 
-    public createOcra(reader_id?: string): Ocra { return new Ocra(this.url + CONTAINER_OCRA, this.connection, reader_id); }
+    public createOcra(reader_id?: string): Ocra { return new Ocra(this.url, CONTAINER_OCRA, this.connection, reader_id); }
 
-    public createAventraNO(reader_id?: string): Aventra { return new Aventra(this.url + CONTAINER_AVENTRA, this.connection, reader_id); }
+    public createAventraNO(reader_id?: string): Aventra { return new Aventra(this.url, CONTAINER_AVENTRA, this.connection, reader_id); }
 
-    public createOberthurNO(reader_id?: string): Oberthur {return new Oberthur(this.url + CONTAINER_OBERTHUR, this.connection, reader_id); }
+    public createOberthurNO(reader_id?: string): Oberthur {return new Oberthur(this.url, CONTAINER_OBERTHUR, this.connection, reader_id); }
 
-    public createPIV(reader_id?: string): PIV { return new PIV(this.url + CONTAINER_PIV, this.connection, reader_id); }
+    public createPIV(reader_id?: string): PIV { return new PIV(this.url, CONTAINER_PIV, this.connection, reader_id); }
 }

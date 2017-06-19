@@ -6,6 +6,7 @@ import * as _ from "lodash";
 import * as asn1js from "asn1js";
 import * as Base64 from "Base64";
 import { Certificate } from "pkijs";
+import { PinEnforcer } from "../../util/PinEnforcer";
 
 /**
  * @author Michallis Pashidis
@@ -59,7 +60,10 @@ interface ResetPinData {
 
 abstract class GenericCard {
 
-    constructor(protected url: string, protected connection: LocalConnection, protected reader_id: string) {}
+    constructor(protected baseUrl: string,
+                protected containerUrl: string,
+                protected connection: LocalConnection,
+                protected reader_id: string) {}
 
     protected static createFilterQueryParam(filters: string[], pin?: string): { filter: string, pin?: string } {
         let filter = filters.join(",");
@@ -69,7 +73,7 @@ abstract class GenericCard {
 
     // resolves the reader_id in the base URL
     protected resolvedReaderURI(): string {
-        return this.url + "/" + this.reader_id;
+        return this.baseUrl + this.containerUrl + "/" + this.reader_id;
     }
 }
 
@@ -87,7 +91,19 @@ abstract class GenericPinCard extends GenericSmartCard implements PinCard {
     static VERIFY_PIN = "/verify-pin";
 
     public verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>) {
-        return this.connection.post(this.resolvedReaderURI() + GenericPinCard.VERIFY_PIN, body, undefined, callback);
+        if (callback && typeof callback === "function") {
+            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                return this.connection.post(this.resolvedReaderURI() + GenericCertCard.VERIFY_PIN, body, undefined, callback);
+            }, error => {
+                return callback(error, null);
+            });
+        } else {
+            return new Promise((resolve, reject) => {
+                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                    resolve(this.connection.post(this.resolvedReaderURI() + GenericCertCard.VERIFY_PIN, body, undefined));
+                }, error => { reject(error); });
+            });
+        }
     }
 }
 
@@ -127,12 +143,39 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
     public authenticate(body: AuthenticateOrSignData,
                         callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
         body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
-        return this.connection.post(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, body, undefined, callback);
+
+        if (callback && typeof callback === "function") {
+            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                return this.connection.post(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, body, undefined, callback);
+            }, error => {
+                return callback(error, null);
+            });
+        } else {
+            return new Promise((resolve, reject) => {
+                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                    resolve(this.connection.post(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, body, undefined));
+                }, error => { reject(error); });
+            });
+        }
     }
 
     public signData(body: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
         body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
-        return this.connection.post(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, undefined, callback);
+
+        if (callback && typeof callback === "function") {
+            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                return this.connection.post(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, undefined, callback);
+            }, error => {
+                return callback(error, null);
+            });
+        } else {
+            return new Promise((resolve, reject) => {
+                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                    resolve(this.connection.post(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, undefined));
+                }, error => { reject(error); });
+            });
+        }
+
     }
 
     protected getCertificate(certUrl: string, callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
@@ -245,10 +288,16 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
         let self = this;
 
         if (callback && typeof callback === "function") {
-            self.retrieveAndParseCert(self, certUrl, body, params, callback);
+            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                self.retrieveAndParseCert(self, certUrl, body, params, callback);
+            }, error => {
+                return callback(error, null);
+            });
         } else {
             return new Promise((resolve, reject) => {
-                self.retrieveAndParseCert(self, certUrl, body, params, callback, resolve, reject);
+                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                    self.retrieveAndParseCert(self, certUrl, body, params, callback, resolve, reject);
+                }, error => { reject(error); });
             });
         }
     }
@@ -261,10 +310,16 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
         let self = this;
 
         if (callback && typeof callback === "function") {
-            self.retrieveAndParseCert(self, certUrl, body, params, callback);
+            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                self.retrieveAndParseCert(self, certUrl, body, params, callback);
+            }, error => {
+                return callback(error, null);
+            });
         } else {
             return new Promise((resolve, reject) => {
-                self.retrieveAndParseCert(self, certUrl, body, params, callback, resolve, reject);
+                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                    self.retrieveAndParseCert(self, certUrl, body, params, callback, resolve, reject);
+                }, error => { reject(error); });
             });
         }
     }
