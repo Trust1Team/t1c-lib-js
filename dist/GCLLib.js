@@ -51,10 +51,10 @@ var GCLLib =
 	var GCLConfig_1 = __webpack_require__(3);
 	exports.GCLConfig = GCLConfig_1.GCLConfig;
 	var CardFactory_1 = __webpack_require__(4);
-	var CoreService_1 = __webpack_require__(127);
-	var Connection_1 = __webpack_require__(129);
-	var DSClient_1 = __webpack_require__(155);
-	var OCVClient_1 = __webpack_require__(156);
+	var CoreService_1 = __webpack_require__(128);
+	var Connection_1 = __webpack_require__(130);
+	var DSClient_1 = __webpack_require__(156);
+	var OCVClient_1 = __webpack_require__(157);
 	var es6_promise_1 = __webpack_require__(7);
 	var GCLClient = (function () {
 	    function GCLClient(cfg, automatic) {
@@ -159,6 +159,7 @@ var GCLLib =
 	        resolvedCfg.gclUrl = cfg.gclUrl;
 	        resolvedCfg.implicitDownload = cfg.implicitDownload;
 	        resolvedCfg.localTestMode = cfg.localTestMode;
+	        resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
 	        return resolvedCfg;
 	    };
 	    GCLClient.prototype.initOCVContext = function (cb) {
@@ -17507,7 +17508,7 @@ var GCLLib =
 	        enumerable: true,
 	        configurable: true
 	    });
-	    Object.defineProperty(GCLConfig.prototype, "dsFilDownloadUrl", {
+	    Object.defineProperty(GCLConfig.prototype, "dsFileDownloadUrl", {
 	        get: function () {
 	            return this._dsFileDownloadUrl;
 	        },
@@ -17534,6 +17535,16 @@ var GCLLib =
 	        enumerable: true,
 	        configurable: true
 	    });
+	    Object.defineProperty(GCLConfig.prototype, "forceHardwarePinpad", {
+	        get: function () {
+	            return this._forceHardwarePinpad;
+	        },
+	        set: function (value) {
+	            this._forceHardwarePinpad = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
 	    return GCLConfig;
 	}());
 	exports.GCLConfig = GCLConfig;
@@ -17546,15 +17557,15 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var EMV_1 = __webpack_require__(5);
-	var EidBe_1 = __webpack_require__(118);
-	var EidLux_1 = __webpack_require__(119);
-	var mobib_1 = __webpack_require__(120);
-	var LuxTrust_1 = __webpack_require__(121);
-	var ocra_1 = __webpack_require__(122);
-	var Aventra_1 = __webpack_require__(123);
-	var Oberthur_1 = __webpack_require__(124);
-	var piv_1 = __webpack_require__(125);
-	var dni_1 = __webpack_require__(126);
+	var EidBe_1 = __webpack_require__(119);
+	var EidLux_1 = __webpack_require__(120);
+	var mobib_1 = __webpack_require__(121);
+	var LuxTrust_1 = __webpack_require__(122);
+	var ocra_1 = __webpack_require__(123);
+	var Aventra_1 = __webpack_require__(124);
+	var Oberthur_1 = __webpack_require__(125);
+	var piv_1 = __webpack_require__(126);
+	var dni_1 = __webpack_require__(127);
 	var CONTAINER_CONTEXT_PATH = "/plugins/";
 	var CONTAINER_NEW_CONTEXT_PATH = "/containers/";
 	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + "beid";
@@ -17572,18 +17583,18 @@ var GCLLib =
 	        this.url = url;
 	        this.connection = connection;
 	    }
-	    CardFactory.prototype.createDNI = function (reader_id) { return new dni_1.DNI(this.url + CONTAINER_DNI, this.connection, reader_id); };
-	    CardFactory.prototype.createEidBE = function (reader_id) { return new EidBe_1.EidBe(this.url + CONTAINER_BEID, this.connection, reader_id); };
+	    CardFactory.prototype.createDNI = function (reader_id) { return new dni_1.DNI(this.url, CONTAINER_DNI, this.connection, reader_id); };
+	    CardFactory.prototype.createEidBE = function (reader_id) { return new EidBe_1.EidBe(this.url, CONTAINER_BEID, this.connection, reader_id); };
 	    CardFactory.prototype.createEidLUX = function (reader_id, pin) {
-	        return new EidLux_1.EidLux(this.url + CONTAINER_LUXEID, this.connection, reader_id, pin);
+	        return new EidLux_1.EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin);
 	    };
-	    CardFactory.prototype.createEmv = function (reader_id) { return new EMV_1.EMV(this.url + CONTAINER_EMV, this.connection, reader_id); };
-	    CardFactory.prototype.createLuxTrust = function (reader_id) { return new LuxTrust_1.LuxTrust(this.url + CONTAINER_LUXTRUST, this.connection, reader_id); };
-	    CardFactory.prototype.createMobib = function (reader_id) { return new mobib_1.Mobib(this.url + CONTAINER_MOBIB, this.connection, reader_id); };
-	    CardFactory.prototype.createOcra = function (reader_id) { return new ocra_1.Ocra(this.url + CONTAINER_OCRA, this.connection, reader_id); };
-	    CardFactory.prototype.createAventraNO = function (reader_id) { return new Aventra_1.Aventra(this.url + CONTAINER_AVENTRA, this.connection, reader_id); };
-	    CardFactory.prototype.createOberthurNO = function (reader_id) { return new Oberthur_1.Oberthur(this.url + CONTAINER_OBERTHUR, this.connection, reader_id); };
-	    CardFactory.prototype.createPIV = function (reader_id) { return new piv_1.PIV(this.url + CONTAINER_PIV, this.connection, reader_id); };
+	    CardFactory.prototype.createEmv = function (reader_id) { return new EMV_1.EMV(this.url, CONTAINER_EMV, this.connection, reader_id); };
+	    CardFactory.prototype.createLuxTrust = function (reader_id) { return new LuxTrust_1.LuxTrust(this.url, CONTAINER_LUXTRUST, this.connection, reader_id); };
+	    CardFactory.prototype.createMobib = function (reader_id) { return new mobib_1.Mobib(this.url, CONTAINER_MOBIB, this.connection, reader_id); };
+	    CardFactory.prototype.createOcra = function (reader_id) { return new ocra_1.Ocra(this.url, CONTAINER_OCRA, this.connection, reader_id); };
+	    CardFactory.prototype.createAventraNO = function (reader_id) { return new Aventra_1.Aventra(this.url, CONTAINER_AVENTRA, this.connection, reader_id); };
+	    CardFactory.prototype.createOberthurNO = function (reader_id) { return new Oberthur_1.Oberthur(this.url, CONTAINER_OBERTHUR, this.connection, reader_id); };
+	    CardFactory.prototype.createPIV = function (reader_id) { return new piv_1.PIV(this.url, CONTAINER_PIV, this.connection, reader_id); };
 	    return CardFactory;
 	}());
 	exports.CardFactory = CardFactory;
@@ -17641,9 +17652,11 @@ var GCLLib =
 	var asn1js = __webpack_require__(10);
 	var Base64 = __webpack_require__(12);
 	var pkijs_1 = __webpack_require__(13);
+	var PinEnforcer_1 = __webpack_require__(118);
 	var GenericCard = (function () {
-	    function GenericCard(url, connection, reader_id) {
-	        this.url = url;
+	    function GenericCard(baseUrl, containerUrl, connection, reader_id) {
+	        this.baseUrl = baseUrl;
+	        this.containerUrl = containerUrl;
 	        this.connection = connection;
 	        this.reader_id = reader_id;
 	    }
@@ -17657,7 +17670,7 @@ var GCLLib =
 	        }
 	    };
 	    GenericCard.prototype.resolvedReaderURI = function () {
-	        return this.url + "/" + this.reader_id;
+	        return this.baseUrl + this.containerUrl + "/" + this.reader_id;
 	    };
 	    return GenericCard;
 	}());
@@ -17684,7 +17697,21 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    GenericPinCard.prototype.verifyPin = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + GenericPinCard.VERIFY_PIN, body, undefined, callback);
+	        var _this = this;
+	        if (callback && typeof callback === "function") {
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	                return _this.connection.post(_this.resolvedReaderURI() + GenericCertCard.VERIFY_PIN, body, undefined, callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
+	                    resolve(_this.connection.post(_this.resolvedReaderURI() + GenericCertCard.VERIFY_PIN, body, undefined));
+	                }, function (error) { reject(error); });
+	            });
+	        }
 	    };
 	    return GenericPinCard;
 	}(GenericSmartCard));
@@ -17710,12 +17737,40 @@ var GCLLib =
 	        }
 	    };
 	    GenericCertCard.prototype.authenticate = function (body, callback) {
+	        var _this = this;
 	        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
-	        return this.connection.post(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, body, undefined, callback);
+	        if (callback && typeof callback === "function") {
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	                return _this.connection.post(_this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, body, undefined, callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
+	                    resolve(_this.connection.post(_this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, body, undefined));
+	                }, function (error) { reject(error); });
+	            });
+	        }
 	    };
 	    GenericCertCard.prototype.signData = function (body, callback) {
+	        var _this = this;
 	        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
-	        return this.connection.post(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, undefined, callback);
+	        if (callback && typeof callback === "function") {
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	                return _this.connection.post(_this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, undefined, callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
+	                    resolve(_this.connection.post(_this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, undefined));
+	                }, function (error) { reject(error); });
+	            });
+	        }
 	    };
 	    GenericCertCard.prototype.getCertificate = function (certUrl, callback) {
 	        var self = this;
@@ -17821,24 +17876,38 @@ var GCLLib =
 	        return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, body, undefined, callback);
 	    };
 	    GenericSecuredCertCard.prototype.getCertificate = function (certUrl, body, callback, params) {
+	        var _this = this;
 	        var self = this;
 	        if (callback && typeof callback === "function") {
-	            self.retrieveAndParseCert(self, certUrl, body, params, callback);
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	                self.retrieveAndParseCert(self, certUrl, body, params, callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
 	        }
 	        else {
 	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                self.retrieveAndParseCert(self, certUrl, body, params, callback, resolve, reject);
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
+	                    self.retrieveAndParseCert(self, certUrl, body, params, callback, resolve, reject);
+	                }, function (error) { reject(error); });
 	            });
 	        }
 	    };
 	    GenericSecuredCertCard.prototype.getCertificateArray = function (certUrl, body, callback, params) {
+	        var _this = this;
 	        var self = this;
 	        if (callback && typeof callback === "function") {
-	            self.retrieveAndParseCert(self, certUrl, body, params, callback);
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	                self.retrieveAndParseCert(self, certUrl, body, params, callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
 	        }
 	        else {
 	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                self.retrieveAndParseCert(self, certUrl, body, params, callback, resolve, reject);
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
+	                    self.retrieveAndParseCert(self, certUrl, body, params, callback, resolve, reject);
+	                }, function (error) { reject(error); });
 	            });
 	        }
 	    };
@@ -61690,6 +61759,53 @@ var GCLLib =
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var es6_promise_1 = __webpack_require__(7);
+	var CORE_READERS = "/card-readers";
+	var PinEnforcer = (function () {
+	    function PinEnforcer() {
+	    }
+	    PinEnforcer.check = function (connection, baseUrl, readerId, pinValue) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            if (connection.config.forceHardwarePinpad) {
+	                connection.get(baseUrl + CORE_READERS + "/" + readerId, undefined).then(function (reader) {
+	                    if (reader.data.pinpad) {
+	                        if (pinValue) {
+	                            reject({ data: { message: "Strict pinpad enforcement is enabled. This request was sent with a PIN, but the" +
+	                                        " reader has a pinpad." } });
+	                        }
+	                        else {
+	                            resolve("ok");
+	                        }
+	                    }
+	                    else {
+	                        if (pinValue) {
+	                            reject({ data: { message: "Strict pinpad enforcement is enabled. This request was sent without a PIN, but the" +
+	                                        " reader does not have a pinpad." } });
+	                        }
+	                        else {
+	                            resolve("ok");
+	                        }
+	                    }
+	                }, function (error) {
+	                    reject(error);
+	                });
+	            }
+	            else {
+	                resolve("ok");
+	            }
+	        });
+	    };
+	    return PinEnforcer;
+	}());
+	exports.PinEnforcer = PinEnforcer;
+
+
+/***/ }),
+/* 119 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
 	var __extends = (this && this.__extends) || (function () {
 	    var extendStatics = Object.setPrototypeOf ||
 	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -61702,6 +61818,8 @@ var GCLLib =
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(6);
+	var PinEnforcer_1 = __webpack_require__(118);
+	var es6_promise_1 = __webpack_require__(7);
 	var EidBe = (function (_super) {
 	    __extends(EidBe, _super);
 	    function EidBe() {
@@ -61732,11 +61850,25 @@ var GCLLib =
 	        return this.getCertificate(EidBe.CERT_RRN, callback);
 	    };
 	    EidBe.prototype.verifyPin = function (body, callback) {
+	        var _this = this;
 	        var _req = { private_key_reference: EidBe.VERIFY_PRIV_KEY_REF };
 	        if (body.pin) {
 	            _req.pin = body.pin;
 	        }
-	        return this.connection.post(this.resolvedReaderURI() + Card_1.GenericCertCard.VERIFY_PIN, _req, undefined, callback);
+	        if (callback && typeof callback === "function") {
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	                return _this.connection.post(_this.resolvedReaderURI() + Card_1.GenericCertCard.VERIFY_PIN, _req, undefined, callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
+	                    resolve(_this.connection.post(_this.resolvedReaderURI() + Card_1.GenericCertCard.VERIFY_PIN, _req, undefined));
+	                }, function (error) { reject(error); });
+	            });
+	        }
 	    };
 	    return EidBe;
 	}(Card_1.GenericCertCard));
@@ -61748,7 +61880,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 119 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -61777,9 +61909,10 @@ var GCLLib =
 	}
 	var EidLux = (function (_super) {
 	    __extends(EidLux, _super);
-	    function EidLux(url, connection, reader_id, pin) {
-	        var _this = _super.call(this, url, connection, reader_id) || this;
-	        _this.url = url;
+	    function EidLux(baseUrl, containerUrl, connection, reader_id, pin) {
+	        var _this = _super.call(this, baseUrl, containerUrl, connection, reader_id) || this;
+	        _this.baseUrl = baseUrl;
+	        _this.containerUrl = containerUrl;
 	        _this.connection = connection;
 	        _this.reader_id = reader_id;
 	        _this.pin = pin;
@@ -61908,7 +62041,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 120 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -61951,7 +62084,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 121 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -61987,41 +62120,6 @@ var GCLLib =
 
 
 /***/ }),
-/* 122 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || (function () {
-	    var extendStatics = Object.setPrototypeOf ||
-	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-	    return function (d, b) {
-	        extendStatics(d, b);
-	        function __() { this.constructor = d; }
-	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	    };
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(6);
-	var Ocra = (function (_super) {
-	    __extends(Ocra, _super);
-	    function Ocra() {
-	        return _super !== null && _super.apply(this, arguments) || this;
-	    }
-	    Ocra.prototype.challenge = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + Ocra.CHALLENGE, body, undefined, callback);
-	    };
-	    Ocra.prototype.readCounter = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + Ocra.READ_COUNTER, body, undefined, callback);
-	    };
-	    return Ocra;
-	}(Card_1.GenericPinCard));
-	Ocra.CHALLENGE = "/challenge";
-	Ocra.READ_COUNTER = "/read-counter";
-	exports.Ocra = Ocra;
-
-
-/***/ }),
 /* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -62038,6 +62136,73 @@ var GCLLib =
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(6);
+	var PinEnforcer_1 = __webpack_require__(118);
+	var es6_promise_1 = __webpack_require__(7);
+	var Ocra = (function (_super) {
+	    __extends(Ocra, _super);
+	    function Ocra() {
+	        return _super !== null && _super.apply(this, arguments) || this;
+	    }
+	    Ocra.prototype.challenge = function (body, callback) {
+	        var _this = this;
+	        if (callback && typeof callback === "function") {
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	                return _this.connection.post(_this.resolvedReaderURI() + Ocra.CHALLENGE, body, undefined, callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
+	                    resolve(_this.connection.post(_this.resolvedReaderURI() + Ocra.CHALLENGE, body, undefined));
+	                }, function (error) { reject(error); });
+	            });
+	        }
+	    };
+	    Ocra.prototype.readCounter = function (body, callback) {
+	        var _this = this;
+	        if (callback && typeof callback === "function") {
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	                return _this.connection.post(_this.resolvedReaderURI() + Ocra.READ_COUNTER, body, undefined, callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
+	                    resolve(_this.connection.post(_this.resolvedReaderURI() + Ocra.READ_COUNTER, body, undefined));
+	                }, function (error) { reject(error); });
+	            });
+	        }
+	    };
+	    return Ocra;
+	}(Card_1.GenericPinCard));
+	Ocra.CHALLENGE = "/challenge";
+	Ocra.READ_COUNTER = "/read-counter";
+	exports.Ocra = Ocra;
+
+
+/***/ }),
+/* 124 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Card_1 = __webpack_require__(6);
+	var PinEnforcer_1 = __webpack_require__(118);
+	var es6_promise_1 = __webpack_require__(7);
 	var Aventra = (function (_super) {
 	    __extends(Aventra, _super);
 	    function Aventra() {
@@ -62069,7 +62234,21 @@ var GCLLib =
 	        return this.getCertificate(Aventra.CERT_ENCRYPTION, callback);
 	    };
 	    Aventra.prototype.verifyPin = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + Aventra.VERIFY_PIN, body, undefined, callback);
+	        var _this = this;
+	        if (callback && typeof callback === "function") {
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	                return _this.connection.post(_this.resolvedReaderURI() + Aventra.VERIFY_PIN, body, undefined, callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
+	                    resolve(_this.connection.post(_this.resolvedReaderURI() + Aventra.VERIFY_PIN, body, undefined));
+	                }, function (error) { reject(error); });
+	            });
+	        }
 	    };
 	    Aventra.prototype.resetPin = function (body, callback) {
 	        return this.connection.post(this.resolvedReaderURI() + Aventra.RESET_PIN, body, undefined, callback);
@@ -62081,7 +62260,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 124 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -62097,6 +62276,8 @@ var GCLLib =
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(6);
+	var PinEnforcer_1 = __webpack_require__(118);
+	var es6_promise_1 = __webpack_require__(7);
 	var Oberthur = (function (_super) {
 	    __extends(Oberthur, _super);
 	    function Oberthur() {
@@ -62128,7 +62309,21 @@ var GCLLib =
 	        return this.getCertificate(Oberthur.CERT_ENCRYPTION, callback);
 	    };
 	    Oberthur.prototype.verifyPin = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, undefined, callback);
+	        var _this = this;
+	        if (callback && typeof callback === "function") {
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	                return _this.connection.post(_this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, undefined, callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
+	                    resolve(_this.connection.post(_this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, undefined));
+	                }, function (error) { reject(error); });
+	            });
+	        }
 	    };
 	    return Oberthur;
 	}(Card_1.GenericCertCard));
@@ -62136,7 +62331,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 125 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -62152,6 +62347,8 @@ var GCLLib =
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(6);
+	var PinEnforcer_1 = __webpack_require__(118);
+	var es6_promise_1 = __webpack_require__(7);
 	var PIV = (function (_super) {
 	    __extends(PIV, _super);
 	    function PIV() {
@@ -62168,10 +62365,38 @@ var GCLLib =
 	        return ["authenticate", "sign", "encrypt"];
 	    };
 	    PIV.prototype.printedInformation = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + PIV.PRINTED_INFORMATION, body, undefined, callback);
+	        var _this = this;
+	        if (callback && typeof callback === "function") {
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	                return _this.connection.post(_this.resolvedReaderURI() + PIV.PRINTED_INFORMATION, body, undefined, callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
+	                    resolve(_this.connection.post(_this.resolvedReaderURI() + PIV.PRINTED_INFORMATION, body, undefined));
+	                }, function (error) { reject(error); });
+	            });
+	        }
 	    };
 	    PIV.prototype.facialImage = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + PIV.FACIAL_IMAGE, body, undefined, callback);
+	        var _this = this;
+	        if (callback && typeof callback === "function") {
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	                return _this.connection.post(_this.resolvedReaderURI() + PIV.FACIAL_IMAGE, body, undefined, callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
+	                    resolve(_this.connection.post(_this.resolvedReaderURI() + PIV.FACIAL_IMAGE, body, undefined));
+	                }, function (error) { reject(error); });
+	            });
+	        }
 	    };
 	    PIV.prototype.authenticationCertificate = function (body, callback) {
 	        return this.getCertificate(PIV.CERT_AUTHENTICATION, body, callback);
@@ -62187,7 +62412,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 126 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -62227,13 +62452,13 @@ var GCLLib =
 
 
 /***/ }),
-/* 127 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var _ = __webpack_require__(1);
-	var platform = __webpack_require__(128);
+	var platform = __webpack_require__(129);
 	var es6_promise_1 = __webpack_require__(7);
 	var CORE_INFO = "/";
 	var CORE_PLUGINS = "/plugins";
@@ -62482,7 +62707,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 128 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*!
@@ -63643,7 +63868,7 @@ var GCLLib =
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)(module), (function() { return this; }())))
 
 /***/ }),
-/* 129 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -63658,7 +63883,7 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var axios_1 = __webpack_require__(130);
+	var axios_1 = __webpack_require__(131);
 	var _ = __webpack_require__(1);
 	var GenericConnection = (function () {
 	    function GenericConnection(cfg) {
@@ -63806,21 +64031,21 @@ var GCLLib =
 
 
 /***/ }),
-/* 130 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(131);
+	module.exports = __webpack_require__(132);
 
 /***/ }),
-/* 131 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(132);
-	var bind = __webpack_require__(133);
-	var Axios = __webpack_require__(134);
-	var defaults = __webpack_require__(135);
+	var utils = __webpack_require__(133);
+	var bind = __webpack_require__(134);
+	var Axios = __webpack_require__(135);
+	var defaults = __webpack_require__(136);
 	
 	/**
 	 * Create an instance of Axios
@@ -63853,15 +64078,15 @@ var GCLLib =
 	};
 	
 	// Expose Cancel & CancelToken
-	axios.Cancel = __webpack_require__(152);
-	axios.CancelToken = __webpack_require__(153);
-	axios.isCancel = __webpack_require__(149);
+	axios.Cancel = __webpack_require__(153);
+	axios.CancelToken = __webpack_require__(154);
+	axios.isCancel = __webpack_require__(150);
 	
 	// Expose all/spread
 	axios.all = function all(promises) {
 	  return Promise.all(promises);
 	};
-	axios.spread = __webpack_require__(154);
+	axios.spread = __webpack_require__(155);
 	
 	module.exports = axios;
 	
@@ -63870,12 +64095,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 132 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var bind = __webpack_require__(133);
+	var bind = __webpack_require__(134);
 	
 	/*global toString:true*/
 	
@@ -64175,7 +64400,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 133 */
+/* 134 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -64192,17 +64417,17 @@ var GCLLib =
 
 
 /***/ }),
-/* 134 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var defaults = __webpack_require__(135);
-	var utils = __webpack_require__(132);
-	var InterceptorManager = __webpack_require__(146);
-	var dispatchRequest = __webpack_require__(147);
-	var isAbsoluteURL = __webpack_require__(150);
-	var combineURLs = __webpack_require__(151);
+	var defaults = __webpack_require__(136);
+	var utils = __webpack_require__(133);
+	var InterceptorManager = __webpack_require__(147);
+	var dispatchRequest = __webpack_require__(148);
+	var isAbsoluteURL = __webpack_require__(151);
+	var combineURLs = __webpack_require__(152);
 	
 	/**
 	 * Create a new instance of Axios
@@ -64283,13 +64508,13 @@ var GCLLib =
 
 
 /***/ }),
-/* 135 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(132);
-	var normalizeHeaderName = __webpack_require__(136);
+	var utils = __webpack_require__(133);
+	var normalizeHeaderName = __webpack_require__(137);
 	
 	var PROTECTION_PREFIX = /^\)\]\}',?\n/;
 	var DEFAULT_CONTENT_TYPE = {
@@ -64306,10 +64531,10 @@ var GCLLib =
 	  var adapter;
 	  if (typeof XMLHttpRequest !== 'undefined') {
 	    // For browsers use XHR adapter
-	    adapter = __webpack_require__(137);
+	    adapter = __webpack_require__(138);
 	  } else if (typeof process !== 'undefined') {
 	    // For node use HTTP adapter
-	    adapter = __webpack_require__(137);
+	    adapter = __webpack_require__(138);
 	  }
 	  return adapter;
 	}
@@ -64383,12 +64608,12 @@ var GCLLib =
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
-/* 136 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(132);
+	var utils = __webpack_require__(133);
 	
 	module.exports = function normalizeHeaderName(headers, normalizedName) {
 	  utils.forEach(headers, function processHeader(value, name) {
@@ -64401,18 +64626,18 @@ var GCLLib =
 
 
 /***/ }),
-/* 137 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(132);
-	var settle = __webpack_require__(138);
-	var buildURL = __webpack_require__(141);
-	var parseHeaders = __webpack_require__(142);
-	var isURLSameOrigin = __webpack_require__(143);
-	var createError = __webpack_require__(139);
-	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(144);
+	var utils = __webpack_require__(133);
+	var settle = __webpack_require__(139);
+	var buildURL = __webpack_require__(142);
+	var parseHeaders = __webpack_require__(143);
+	var isURLSameOrigin = __webpack_require__(144);
+	var createError = __webpack_require__(140);
+	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(145);
 	
 	module.exports = function xhrAdapter(config) {
 	  return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -64508,7 +64733,7 @@ var GCLLib =
 	    // This is only done if running in a standard browser environment.
 	    // Specifically not if we're in a web worker, or react-native.
 	    if (utils.isStandardBrowserEnv()) {
-	      var cookies = __webpack_require__(145);
+	      var cookies = __webpack_require__(146);
 	
 	      // Add xsrf header
 	      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -64585,12 +64810,12 @@ var GCLLib =
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
-/* 138 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var createError = __webpack_require__(139);
+	var createError = __webpack_require__(140);
 	
 	/**
 	 * Resolve or reject a Promise based on response status.
@@ -64616,12 +64841,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 139 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var enhanceError = __webpack_require__(140);
+	var enhanceError = __webpack_require__(141);
 	
 	/**
 	 * Create an Error with the specified message, config, error code, and response.
@@ -64639,7 +64864,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 140 */
+/* 141 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -64664,12 +64889,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 141 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(132);
+	var utils = __webpack_require__(133);
 	
 	function encode(val) {
 	  return encodeURIComponent(val).
@@ -64738,12 +64963,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 142 */
+/* 143 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(132);
+	var utils = __webpack_require__(133);
 	
 	/**
 	 * Parse headers into an object
@@ -64781,12 +65006,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 143 */
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(132);
+	var utils = __webpack_require__(133);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -64855,7 +65080,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 144 */
+/* 145 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -64897,12 +65122,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 145 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(132);
+	var utils = __webpack_require__(133);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -64956,12 +65181,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 146 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(132);
+	var utils = __webpack_require__(133);
 	
 	function InterceptorManager() {
 	  this.handlers = [];
@@ -65014,15 +65239,15 @@ var GCLLib =
 
 
 /***/ }),
-/* 147 */
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(132);
-	var transformData = __webpack_require__(148);
-	var isCancel = __webpack_require__(149);
-	var defaults = __webpack_require__(135);
+	var utils = __webpack_require__(133);
+	var transformData = __webpack_require__(149);
+	var isCancel = __webpack_require__(150);
+	var defaults = __webpack_require__(136);
 	
 	/**
 	 * Throws a `Cancel` if cancellation has been requested.
@@ -65099,12 +65324,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 148 */
+/* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(132);
+	var utils = __webpack_require__(133);
 	
 	/**
 	 * Transform the data for a request or a response
@@ -65125,7 +65350,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 149 */
+/* 150 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -65136,7 +65361,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 150 */
+/* 151 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -65156,7 +65381,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 151 */
+/* 152 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -65174,7 +65399,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 152 */
+/* 153 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -65199,12 +65424,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 153 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var Cancel = __webpack_require__(152);
+	var Cancel = __webpack_require__(153);
 	
 	/**
 	 * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -65262,7 +65487,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 154 */
+/* 155 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -65295,7 +65520,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 155 */
+/* 156 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65422,7 +65647,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 156 */
+/* 157 */
 /***/ (function(module, exports) {
 
 	"use strict";

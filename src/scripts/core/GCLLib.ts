@@ -117,6 +117,7 @@ class GCLClient {
         resolvedCfg.gclUrl = cfg.gclUrl;
         resolvedCfg.implicitDownload = cfg.implicitDownload;
         resolvedCfg.localTestMode = cfg.localTestMode;
+        resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
         return resolvedCfg;
     }
 
