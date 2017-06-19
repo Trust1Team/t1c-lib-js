@@ -166,7 +166,7 @@ class GCLClient {
             if (err && err.data && !err.data.success) {
                 // console.log('no certificate set - retrieve cert from DS');
                 self.dsClient.getPubKey(function(error: any, dsResponse: any) {
-                    if (err) { return clientCb(err, null); }
+                    if (error) { return clientCb(err, null); }
                     let innerCb = clientCb;
 
                     self.core().setPubKey(dsResponse.pubkey, function(pubKeyError: CoreExceptions.RestException) {
@@ -209,9 +209,11 @@ class GCLClient {
                                 return;
                             }
                             self_cfg.jwt = activationResponse.token;
+                            self.authConnection = new LocalAuthConnection(self.cfg);
+                            self.coreService = new CoreService(self.cfg.gclUrl, self.authConnection);
                             self.core().activate(function(activationError: CoreExceptions.RestException) {
                                 if (activationError) {
-                                    console.log(JSON.stringify(err));
+                                    console.log("Error while activating the device: " + JSON.stringify(activationError));
                                     reject(err);
                                     return;
                                 }

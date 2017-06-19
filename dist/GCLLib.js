@@ -170,7 +170,7 @@ var GCLLib =
 	        this.core().getPubKey(function (err) {
 	            if (err && err.data && !err.data.success) {
 	                self.dsClient.getPubKey(function (error, dsResponse) {
-	                    if (err) {
+	                    if (error) {
 	                        return clientCb(err, null);
 	                    }
 	                    var innerCb = clientCb;
@@ -209,9 +209,11 @@ var GCLLib =
 	                            return;
 	                        }
 	                        self_cfg.jwt = activationResponse.token;
+	                        self.authConnection = new Connection_1.LocalAuthConnection(self.cfg);
+	                        self.coreService = new CoreService_1.CoreService(self.cfg.gclUrl, self.authConnection);
 	                        self.core().activate(function (activationError) {
 	                            if (activationError) {
-	                                console.log(JSON.stringify(err));
+	                                console.log("Error while activating the device: " + JSON.stringify(activationError));
 	                                reject(err);
 	                                return;
 	                            }
