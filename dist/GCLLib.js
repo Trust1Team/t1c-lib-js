@@ -17544,8 +17544,8 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var EMV_1 = __webpack_require__(5);
-	var EidBe_1 = __webpack_require__(10);
-	var EidLux_1 = __webpack_require__(11);
+	var EidBe_1 = __webpack_require__(118);
+	var EidLux_1 = __webpack_require__(119);
 	var mobib_1 = __webpack_require__(120);
 	var LuxTrust_1 = __webpack_require__(121);
 	var ocra_1 = __webpack_require__(122);
@@ -17635,6 +17635,10 @@ var GCLLib =
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(7);
+	var _ = __webpack_require__(1);
+	var asn1js = __webpack_require__(10);
+	var Base64 = __webpack_require__(12);
+	var pkijs_1 = __webpack_require__(13);
 	var GenericCard = (function () {
 	    function GenericCard(url, connection, reader_id) {
 	        this.url = url;
@@ -17714,30 +17718,54 @@ var GCLLib =
 	    GenericCertCard.prototype.getCertificate = function (certUrl, callback) {
 	        var self = this;
 	        if (callback && typeof callback === "function") {
-	            retrieveAndParseCert();
+	            self.retrieveAndParseCert(self, certUrl, callback);
 	        }
 	        else {
 	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                retrieveAndParseCert(resolve, reject);
+	                self.retrieveAndParseCert(self, certUrl, callback, resolve, reject);
 	            });
 	        }
-	        function retrieveAndParseCert(resolve, reject) {
-	            self.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, undefined).then(function (certData) {
-	                console.log(certData);
-	                if (resolve) {
-	                    resolve(certData);
-	                }
-	                else {
-	                    callback(null, certData);
-	                }
-	            }, function (err) {
-	                if (reject) {
-	                    reject(err);
-	                }
-	                else {
-	                    callback(err, null);
-	                }
-	            });
+	    };
+	    GenericCertCard.prototype.retrieveAndParseCert = function (self, certUrl, callback, resolve, reject) {
+	        self.connection.get(self.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, undefined).then(function (certData) {
+	            if (_.isArray(certData.data)) {
+	                var newData_1 = [];
+	                _.forEach(certData.data, function (certificate) {
+	                    newData_1.push({ certificate: certificate, parsed: processCert(certificate) });
+	                });
+	                certData.data = newData_1;
+	            }
+	            else {
+	                var certificate = certData.data;
+	                certData.data = { certificate: certificate, parsed: processCert(certificate) };
+	            }
+	            if (resolve) {
+	                resolve(certData);
+	            }
+	            else {
+	                callback(null, certData);
+	            }
+	        }, function (err) {
+	            if (reject) {
+	                reject(err);
+	            }
+	            else {
+	                callback(err, null);
+	            }
+	        });
+	        function processCert(certificate) {
+	            var rawCert = Base64.atob(certificate);
+	            var buffer = str2ab(rawCert);
+	            var asn1 = asn1js.fromBER(buffer);
+	            return new pkijs_1.Certificate({ schema: asn1.result });
+	        }
+	        function str2ab(str) {
+	            var buf = new ArrayBuffer(str.length);
+	            var bufView = new Uint8Array(buf);
+	            for (var i = 0, strLen = str.length; i < strLen; i++) {
+	                bufView[i] = str.charCodeAt(i);
+	            }
+	            return buf;
 	        }
 	    };
 	    return GenericCertCard;
@@ -17793,34 +17821,66 @@ var GCLLib =
 	    GenericSecuredCertCard.prototype.getCertificate = function (certUrl, body, callback, params) {
 	        var self = this;
 	        if (callback && typeof callback === "function") {
-	            retrieveAndParseCert();
+	            self.retrieveAndParseCert(self, certUrl, body, params, callback);
 	        }
 	        else {
 	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                retrieveAndParseCert(resolve, reject);
-	            });
-	        }
-	        function retrieveAndParseCert(resolve, reject) {
-	            self.connection.post(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, body, params).then(function (certData) {
-	                console.log(certData);
-	                if (resolve) {
-	                    resolve(certData);
-	                }
-	                else {
-	                    callback(null, certData);
-	                }
-	            }, function (err) {
-	                if (reject) {
-	                    reject(err);
-	                }
-	                else {
-	                    callback(err, null);
-	                }
+	                self.retrieveAndParseCert(self, certUrl, body, params, callback, resolve, reject);
 	            });
 	        }
 	    };
 	    GenericSecuredCertCard.prototype.getCertificateArray = function (certUrl, body, callback, params) {
-	        return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, params, callback);
+	        var self = this;
+	        if (callback && typeof callback === "function") {
+	            self.retrieveAndParseCert(self, certUrl, body, params, callback);
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                self.retrieveAndParseCert(self, certUrl, body, params, callback, resolve, reject);
+	            });
+	        }
+	    };
+	    GenericSecuredCertCard.prototype.retrieveAndParseCert = function (self, certUrl, body, params, callback, resolve, reject) {
+	        self.connection.post(self.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, params).then(function (certData) {
+	            if (_.isArray(certData.data)) {
+	                var newData_2 = [];
+	                _.forEach(certData.data, function (certificate) {
+	                    newData_2.push({ certificate: certificate, parsed: processCert(certificate) });
+	                });
+	                certData.data = newData_2;
+	            }
+	            else {
+	                var certificate = certData.data;
+	                certData.data = { certificate: certificate, parsed: processCert(certificate) };
+	            }
+	            if (resolve) {
+	                resolve(certData);
+	            }
+	            else {
+	                callback(null, certData);
+	            }
+	        }, function (err) {
+	            if (reject) {
+	                reject(err);
+	            }
+	            else {
+	                callback(err, null);
+	            }
+	        });
+	        function processCert(certificate) {
+	            var rawCert = Base64.atob(certificate);
+	            var buffer = str2ab(rawCert);
+	            var asn1 = asn1js.fromBER(buffer);
+	            return new pkijs_1.Certificate({ schema: asn1.result });
+	        }
+	        function str2ab(str) {
+	            var buf = new ArrayBuffer(str.length);
+	            var bufView = new Uint8Array(buf);
+	            for (var i = 0, strLen = str.length; i < strLen; i++) {
+	                bufView[i] = str.charCodeAt(i);
+	            }
+	            return buf;
+	        }
 	    };
 	    return GenericSecuredCertCard;
 	}(GenericCard));
@@ -19193,228 +19253,6 @@ var GCLLib =
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var __extends = (this && this.__extends) || (function () {
-	    var extendStatics = Object.setPrototypeOf ||
-	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-	    return function (d, b) {
-	        extendStatics(d, b);
-	        function __() { this.constructor = d; }
-	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	    };
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(6);
-	var EidBe = (function (_super) {
-	    __extends(EidBe, _super);
-	    function EidBe() {
-	        return _super !== null && _super.apply(this, arguments) || this;
-	    }
-	    EidBe.prototype.rnData = function (callback) {
-	        return this.connection.get(this.resolvedReaderURI() + EidBe.RN_DATA, undefined, callback);
-	    };
-	    EidBe.prototype.address = function (callback) {
-	        return this.connection.get(this.resolvedReaderURI() + EidBe.ADDRESS, undefined, callback);
-	    };
-	    EidBe.prototype.picture = function (callback) {
-	        return this.connection.get(this.resolvedReaderURI() + EidBe.PHOTO, undefined, callback);
-	    };
-	    EidBe.prototype.rootCertificate = function (callback) {
-	        return this.getCertificate(EidBe.CERT_ROOT, callback);
-	    };
-	    EidBe.prototype.citizenCertificate = function (callback) {
-	        return this.getCertificate(EidBe.CERT_CITIZEN, callback);
-	    };
-	    EidBe.prototype.authenticationCertificate = function (callback) {
-	        return this.getCertificate(EidBe.CERT_AUTHENTICATION, callback);
-	    };
-	    EidBe.prototype.nonRepudiationCertificate = function (callback) {
-	        return this.getCertificate(EidBe.CERT_NON_REPUDIATION, callback);
-	    };
-	    EidBe.prototype.rrnCertificate = function (callback) {
-	        return this.getCertificate(EidBe.CERT_RRN, callback);
-	    };
-	    EidBe.prototype.verifyPin = function (body, callback) {
-	        var _req = { private_key_reference: EidBe.VERIFY_PRIV_KEY_REF };
-	        if (body.pin) {
-	            _req.pin = body.pin;
-	        }
-	        return this.connection.post(this.resolvedReaderURI() + Card_1.GenericCertCard.VERIFY_PIN, _req, undefined, callback);
-	    };
-	    return EidBe;
-	}(Card_1.GenericCertCard));
-	EidBe.RN_DATA = "/rn";
-	EidBe.ADDRESS = "/address";
-	EidBe.PHOTO = "/picture";
-	EidBe.VERIFY_PRIV_KEY_REF = "non-repudiation";
-	exports.EidBe = EidBe;
-
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || (function () {
-	    var extendStatics = Object.setPrototypeOf ||
-	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-	    return function (d, b) {
-	        extendStatics(d, b);
-	        function __() { this.constructor = d; }
-	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	    };
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(6);
-	var es6_promise_1 = __webpack_require__(7);
-	var _ = __webpack_require__(1);
-	var asn1js = __webpack_require__(12);
-	var Base64 = __webpack_require__(14);
-	var pkijs_1 = __webpack_require__(15);
-	function createFilterQueryParam(filters, pin) {
-	    return { filter: filters.join(","), pin: pin };
-	}
-	function createPinQueryParam(pin) {
-	    return { pin: pin };
-	}
-	var EidLux = (function (_super) {
-	    __extends(EidLux, _super);
-	    function EidLux(url, connection, reader_id, pin) {
-	        var _this = _super.call(this, url, connection, reader_id) || this;
-	        _this.url = url;
-	        _this.connection = connection;
-	        _this.reader_id = reader_id;
-	        _this.pin = pin;
-	        return _this;
-	    }
-	    EidLux.prototype.allDataFilters = function () {
-	        return ["authentication-certificate", "biometric", "non-repudiation-certificate", "picture", "root-certificates"];
-	    };
-	    EidLux.prototype.allCertFilters = function () {
-	        return ["authentication-certificate", "non-repudiation-certificate", "root-certificates"];
-	    };
-	    EidLux.prototype.allData = function (filters, callback) {
-	        if (filters && filters.length) {
-	            return this.connection.get(this.resolvedReaderURI(), createFilterQueryParam(filters, this.pin), callback);
-	        }
-	        else {
-	            return this.connection.get(this.resolvedReaderURI(), createPinQueryParam(this.pin), callback);
-	        }
-	    };
-	    EidLux.prototype.allCerts = function (filters, callback) {
-	        if (filters && filters.length) {
-	            return this.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, createFilterQueryParam(filters, this.pin), callback);
-	        }
-	        else {
-	            return this.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, createPinQueryParam(this.pin), callback);
-	        }
-	    };
-	    EidLux.prototype.biometric = function (callback) {
-	        return this.connection.get(this.resolvedReaderURI() + EidLux.BIOMETRIC, createPinQueryParam(this.pin), callback);
-	    };
-	    EidLux.prototype.picture = function (callback) {
-	        return this.connection.get(this.resolvedReaderURI() + EidLux.PHOTO, createPinQueryParam(this.pin), callback);
-	    };
-	    EidLux.prototype.rootCertificate = function (callback) {
-	        return this.getCertificateArray(EidLux.CERT_ROOT, callback, createPinQueryParam(this.pin));
-	    };
-	    EidLux.prototype.authenticationCertificate = function (callback) {
-	        return this.getCertificate(EidLux.CERT_AUTHENTICATION, callback, createPinQueryParam(this.pin));
-	    };
-	    EidLux.prototype.nonRepudiationCertificate = function (callback) {
-	        return this.getCertificate(EidLux.CERT_NON_REPUDIATION, callback, createPinQueryParam(this.pin));
-	    };
-	    EidLux.prototype.verifyPin = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(this.pin), callback);
-	    };
-	    EidLux.prototype.signData = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + EidLux.SIGN_DATA, body, createPinQueryParam(this.pin), callback);
-	    };
-	    EidLux.prototype.authenticate = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(this.pin), callback);
-	    };
-	    EidLux.prototype.signatureImage = function (callback) {
-	        return this.connection.get(this.resolvedReaderURI() + EidLux.SIGNATURE_IMAGE, createPinQueryParam(this.pin), callback);
-	    };
-	    EidLux.prototype.getCertificate = function (certUrl, callback, params) {
-	        var self = this;
-	        if (callback && typeof callback === "function") {
-	            self.retrieveAndParseCert(self, certUrl, params, callback);
-	        }
-	        else {
-	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
-	            });
-	        }
-	    };
-	    EidLux.prototype.getCertificateArray = function (certUrl, callback, params) {
-	        var self = this;
-	        if (callback && typeof callback === "function") {
-	            self.retrieveAndParseCert(self, certUrl, params, callback);
-	        }
-	        else {
-	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
-	            });
-	        }
-	    };
-	    EidLux.prototype.retrieveAndParseCert = function (self, certUrl, params, callback, resolve, reject) {
-	        self.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES + certUrl, params).then(function (certData) {
-	            if (_.isArray(certData.data)) {
-	                var newData_1 = [];
-	                _.forEach(certData.data, function (certificate) {
-	                    newData_1.push({ certificate: certificate, parsed: processCert(certificate) });
-	                });
-	                certData.data = newData_1;
-	            }
-	            else {
-	                var certificate = certData.data;
-	                certData.data = { certificate: certificate, parsed: processCert(certificate) };
-	            }
-	            if (resolve) {
-	                resolve(certData);
-	            }
-	            else {
-	                callback(null, certData);
-	            }
-	        }, function (err) {
-	            if (reject) {
-	                reject(err);
-	            }
-	            else {
-	                callback(err, null);
-	            }
-	        });
-	        function processCert(certificate) {
-	            var rawCert = Base64.atob(certificate);
-	            var buffer = str2ab(rawCert);
-	            var asn1 = asn1js.fromBER(buffer);
-	            return new pkijs_1.Certificate({ schema: asn1.result });
-	        }
-	        function str2ab(str) {
-	            var buf = new ArrayBuffer(str.length);
-	            var bufView = new Uint8Array(buf);
-	            for (var i = 0, strLen = str.length; i < strLen; i++) {
-	                bufView[i] = str.charCodeAt(i);
-	            }
-	            return buf;
-	        }
-	    };
-	    return EidLux;
-	}(Card_1.GenericSecuredCertCard));
-	EidLux.BIOMETRIC = "/biometric";
-	EidLux.ADDRESS = "/address";
-	EidLux.PHOTO = "/picture";
-	EidLux.SIGNATURE_IMAGE = "/signature-image";
-	exports.EidLux = EidLux;
-
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 		value: true
@@ -19463,7 +19301,7 @@ var GCLLib =
 	exports.verifySchema = verifySchema;
 	exports.fromJSON = fromJSON;
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 	
@@ -25512,7 +25350,7 @@ var GCLLib =
 	//# sourceMappingURL=asn1.js.map
 
 /***/ }),
-/* 13 */
+/* 11 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -26181,7 +26019,7 @@ var GCLLib =
 	//# sourceMappingURL=utils.js.map
 
 /***/ }),
-/* 14 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	;(function () {
@@ -26252,7 +26090,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 15 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -26263,417 +26101,417 @@ var GCLLib =
 	exports.TimeStampResp = exports.TimeStampReq = exports.Time = exports.TSTInfo = exports.TBSRequest = exports.SubjectDirectoryAttributes = exports.SingleResponse = exports.SignerInfo = exports.SignedData = exports.SignedAndUnsignedAttributes = exports.Signature = exports.SecretBag = exports.SafeContents = exports.SafeBag = exports.RevokedCertificate = exports.RevocationInfoChoices = undefined;
 	exports.ResponseData = exports.ResponseBytes = exports.Request = exports.RelativeDistinguishedNames = exports.RecipientKeyIdentifier = exports.RecipientInfo = exports.RecipientIdentifier = exports.RecipientEncryptedKeys = exports.RecipientEncryptedKey = exports.RSASSAPSSParams = exports.RSAPublicKey = exports.RSAPrivateKey = exports.RSAESOAEPParams = exports.PublicKeyInfo = exports.PrivateKeyUsagePeriod = exports.PrivateKeyInfo = exports.PolicyQualifierInfo = exports.PolicyMappings = exports.PolicyMapping = exports.PolicyInformation = exports.PolicyConstraints = exports.PasswordRecipientinfo = exports.PKIStatusInfo = exports.PKCS8ShroudedKeyBag = exports.PFX = exports.PBKDF2Params = exports.PBES2Params = exports.OtherRevocationInfoFormat = exports.OtherRecipientInfo = exports.OtherPrimeInfo = exports.OtherKeyAttribute = exports.OtherCertificateFormat = exports.OriginatorPublicKey = exports.OriginatorInfo = exports.OriginatorIdentifierOrKey = exports.OCSPResponse = exports.OCSPRequest = exports.NameConstraints = exports.MessageImprint = exports.MacData = exports.KeyTransRecipientInfo = exports.KeyBag = exports.KeyAgreeRecipientInfo = exports.KeyAgreeRecipientIdentifier = exports.KEKRecipientInfo = exports.KEKIdentifier = exports.IssuingDistributionPoint = exports.IssuerAndSerialNumber = exports.InfoAccess = exports.GeneratorsDriver = exports.GeneralSubtree = exports.GeneralNames = exports.GeneralName = exports.Extensions = exports.Extension = exports.ExtKeyUsage = exports.EnvelopedData = exports.EncryptedData = exports.EncryptedContentInfo = exports.EncapsulatedContentInfo = exports.ECPublicKey = exports.ECPrivateKey = exports.ECCCMSSharedInfo = exports.DistributionPoint = exports.DigestInfo = exports.CryptoEngine = exports.ContentInfo = exports.CertificationRequest = exports.CertificateSet = exports.CertificateRevocationList = exports.CertificatePolicies = exports.CertificateChainValidationEngine = exports.Certificate = exports.CertID = exports.CertBag = exports.CRLDistributionPoints = exports.CRLBag = exports.BasicOCSPResponse = exports.BasicConstraints = exports.AuthorityKeyIdentifier = exports.AuthenticatedSafe = exports.AttributeTypeAndValue = exports.Attribute = exports.AltName = exports.AlgorithmIdentifier = exports.Accuracy = exports.AccessDescription = exports.kdf = exports.kdfWithCounter = exports.getHashAlgorithm = exports.getAlgorithmByOID = exports.createECDSASignatureFromCMS = exports.stringPrep = exports.createCMSECDSASignature = exports.getAlgorithmParameters = exports.getOIDByAlgorithm = exports.getRandomValues = exports.getCrypto = exports.getEngine = exports.setEngine = undefined;
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(14);
 	
-	var _AccessDescription = __webpack_require__(28);
+	var _AccessDescription = __webpack_require__(26);
 	
 	var _AccessDescription2 = _interopRequireDefault(_AccessDescription);
 	
-	var _Accuracy = __webpack_require__(32);
+	var _Accuracy = __webpack_require__(30);
 	
 	var _Accuracy2 = _interopRequireDefault(_Accuracy);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _AltName = __webpack_require__(33);
+	var _AltName = __webpack_require__(31);
 	
 	var _AltName2 = _interopRequireDefault(_AltName);
 	
-	var _Attribute = __webpack_require__(24);
+	var _Attribute = __webpack_require__(22);
 	
 	var _Attribute2 = _interopRequireDefault(_Attribute);
 	
-	var _AttributeTypeAndValue = __webpack_require__(31);
+	var _AttributeTypeAndValue = __webpack_require__(29);
 	
 	var _AttributeTypeAndValue2 = _interopRequireDefault(_AttributeTypeAndValue);
 	
-	var _AuthenticatedSafe = __webpack_require__(34);
+	var _AuthenticatedSafe = __webpack_require__(32);
 	
 	var _AuthenticatedSafe2 = _interopRequireDefault(_AuthenticatedSafe);
 	
-	var _AuthorityKeyIdentifier = __webpack_require__(61);
+	var _AuthorityKeyIdentifier = __webpack_require__(59);
 	
 	var _AuthorityKeyIdentifier2 = _interopRequireDefault(_AuthorityKeyIdentifier);
 	
-	var _BasicConstraints = __webpack_require__(49);
+	var _BasicConstraints = __webpack_require__(47);
 	
 	var _BasicConstraints2 = _interopRequireDefault(_BasicConstraints);
 	
-	var _BasicOCSPResponse = __webpack_require__(93);
+	var _BasicOCSPResponse = __webpack_require__(91);
 	
 	var _BasicOCSPResponse2 = _interopRequireDefault(_BasicOCSPResponse);
 	
-	var _CRLBag = __webpack_require__(66);
+	var _CRLBag = __webpack_require__(64);
 	
 	var _CRLBag2 = _interopRequireDefault(_CRLBag);
 	
-	var _CRLDistributionPoints = __webpack_require__(54);
+	var _CRLDistributionPoints = __webpack_require__(52);
 	
 	var _CRLDistributionPoints2 = _interopRequireDefault(_CRLDistributionPoints);
 	
-	var _CertBag = __webpack_require__(43);
+	var _CertBag = __webpack_require__(41);
 	
 	var _CertBag2 = _interopRequireDefault(_CertBag);
 	
-	var _CertID = __webpack_require__(96);
+	var _CertID = __webpack_require__(94);
 	
 	var _CertID2 = _interopRequireDefault(_CertID);
 	
-	var _Certificate = __webpack_require__(44);
+	var _Certificate = __webpack_require__(42);
 	
 	var _Certificate2 = _interopRequireDefault(_Certificate);
 	
-	var _CertificateChainValidationEngine = __webpack_require__(97);
+	var _CertificateChainValidationEngine = __webpack_require__(95);
 	
 	var _CertificateChainValidationEngine2 = _interopRequireDefault(_CertificateChainValidationEngine);
 	
-	var _CertificatePolicies = __webpack_require__(56);
+	var _CertificatePolicies = __webpack_require__(54);
 	
 	var _CertificatePolicies2 = _interopRequireDefault(_CertificatePolicies);
 	
-	var _CertificateRevocationList = __webpack_require__(67);
+	var _CertificateRevocationList = __webpack_require__(65);
 	
 	var _CertificateRevocationList2 = _interopRequireDefault(_CertificateRevocationList);
 	
-	var _CertificateSet = __webpack_require__(72);
+	var _CertificateSet = __webpack_require__(70);
 	
 	var _CertificateSet2 = _interopRequireDefault(_CertificateSet);
 	
-	var _CertificationRequest = __webpack_require__(99);
+	var _CertificationRequest = __webpack_require__(97);
 	
 	var _CertificationRequest2 = _interopRequireDefault(_CertificationRequest);
 	
-	var _ContentInfo = __webpack_require__(35);
+	var _ContentInfo = __webpack_require__(33);
 	
 	var _ContentInfo2 = _interopRequireDefault(_ContentInfo);
 	
-	var _CryptoEngine = __webpack_require__(19);
+	var _CryptoEngine = __webpack_require__(17);
 	
 	var _CryptoEngine2 = _interopRequireDefault(_CryptoEngine);
 	
-	var _DigestInfo = __webpack_require__(100);
+	var _DigestInfo = __webpack_require__(98);
 	
 	var _DigestInfo2 = _interopRequireDefault(_DigestInfo);
 	
-	var _DistributionPoint = __webpack_require__(55);
+	var _DistributionPoint = __webpack_require__(53);
 	
 	var _DistributionPoint2 = _interopRequireDefault(_DistributionPoint);
 	
-	var _ECCCMSSharedInfo = __webpack_require__(92);
+	var _ECCCMSSharedInfo = __webpack_require__(90);
 	
 	var _ECCCMSSharedInfo2 = _interopRequireDefault(_ECCCMSSharedInfo);
 	
-	var _ECPrivateKey = __webpack_require__(25);
+	var _ECPrivateKey = __webpack_require__(23);
 	
 	var _ECPrivateKey2 = _interopRequireDefault(_ECPrivateKey);
 	
-	var _ECPublicKey = __webpack_require__(21);
+	var _ECPublicKey = __webpack_require__(19);
 	
 	var _ECPublicKey2 = _interopRequireDefault(_ECPublicKey);
 	
-	var _EncapsulatedContentInfo = __webpack_require__(101);
+	var _EncapsulatedContentInfo = __webpack_require__(99);
 	
 	var _EncapsulatedContentInfo2 = _interopRequireDefault(_EncapsulatedContentInfo);
 	
-	var _EncryptedContentInfo = __webpack_require__(40);
+	var _EncryptedContentInfo = __webpack_require__(38);
 	
 	var _EncryptedContentInfo2 = _interopRequireDefault(_EncryptedContentInfo);
 	
-	var _EncryptedData = __webpack_require__(39);
+	var _EncryptedData = __webpack_require__(37);
 	
 	var _EncryptedData2 = _interopRequireDefault(_EncryptedData);
 	
-	var _EnvelopedData = __webpack_require__(70);
+	var _EnvelopedData = __webpack_require__(68);
 	
 	var _EnvelopedData2 = _interopRequireDefault(_EnvelopedData);
 	
-	var _ExtKeyUsage = __webpack_require__(63);
+	var _ExtKeyUsage = __webpack_require__(61);
 	
 	var _ExtKeyUsage2 = _interopRequireDefault(_ExtKeyUsage);
 	
-	var _Extension = __webpack_require__(46);
+	var _Extension = __webpack_require__(44);
 	
 	var _Extension2 = _interopRequireDefault(_Extension);
 	
-	var _Extensions = __webpack_require__(65);
+	var _Extensions = __webpack_require__(63);
 	
 	var _Extensions2 = _interopRequireDefault(_Extensions);
 	
-	var _GeneralName = __webpack_require__(29);
+	var _GeneralName = __webpack_require__(27);
 	
 	var _GeneralName2 = _interopRequireDefault(_GeneralName);
 	
-	var _GeneralNames = __webpack_require__(51);
+	var _GeneralNames = __webpack_require__(49);
 	
 	var _GeneralNames2 = _interopRequireDefault(_GeneralNames);
 	
-	var _GeneralSubtree = __webpack_require__(53);
+	var _GeneralSubtree = __webpack_require__(51);
 	
 	var _GeneralSubtree2 = _interopRequireDefault(_GeneralSubtree);
 	
-	var _GeneratorsDriver = __webpack_require__(98);
+	var _GeneratorsDriver = __webpack_require__(96);
 	
 	var _GeneratorsDriver2 = _interopRequireDefault(_GeneratorsDriver);
 	
-	var _InfoAccess = __webpack_require__(64);
+	var _InfoAccess = __webpack_require__(62);
 	
 	var _InfoAccess2 = _interopRequireDefault(_InfoAccess);
 	
-	var _IssuerAndSerialNumber = __webpack_require__(78);
+	var _IssuerAndSerialNumber = __webpack_require__(76);
 	
 	var _IssuerAndSerialNumber2 = _interopRequireDefault(_IssuerAndSerialNumber);
 	
-	var _IssuingDistributionPoint = __webpack_require__(50);
+	var _IssuingDistributionPoint = __webpack_require__(48);
 	
 	var _IssuingDistributionPoint2 = _interopRequireDefault(_IssuingDistributionPoint);
 	
-	var _KEKIdentifier = __webpack_require__(88);
+	var _KEKIdentifier = __webpack_require__(86);
 	
 	var _KEKIdentifier2 = _interopRequireDefault(_KEKIdentifier);
 	
-	var _KEKRecipientInfo = __webpack_require__(87);
+	var _KEKRecipientInfo = __webpack_require__(85);
 	
 	var _KEKRecipientInfo2 = _interopRequireDefault(_KEKRecipientInfo);
 	
-	var _KeyAgreeRecipientIdentifier = __webpack_require__(84);
+	var _KeyAgreeRecipientIdentifier = __webpack_require__(82);
 	
 	var _KeyAgreeRecipientIdentifier2 = _interopRequireDefault(_KeyAgreeRecipientIdentifier);
 	
-	var _KeyAgreeRecipientInfo = __webpack_require__(79);
+	var _KeyAgreeRecipientInfo = __webpack_require__(77);
 	
 	var _KeyAgreeRecipientInfo2 = _interopRequireDefault(_KeyAgreeRecipientInfo);
 	
-	var _KeyBag = __webpack_require__(102);
+	var _KeyBag = __webpack_require__(100);
 	
 	var _KeyBag2 = _interopRequireDefault(_KeyBag);
 	
-	var _KeyTransRecipientInfo = __webpack_require__(76);
+	var _KeyTransRecipientInfo = __webpack_require__(74);
 	
 	var _KeyTransRecipientInfo2 = _interopRequireDefault(_KeyTransRecipientInfo);
 	
-	var _MacData = __webpack_require__(103);
+	var _MacData = __webpack_require__(101);
 	
 	var _MacData2 = _interopRequireDefault(_MacData);
 	
-	var _MessageImprint = __webpack_require__(104);
+	var _MessageImprint = __webpack_require__(102);
 	
 	var _MessageImprint2 = _interopRequireDefault(_MessageImprint);
 	
-	var _NameConstraints = __webpack_require__(52);
+	var _NameConstraints = __webpack_require__(50);
 	
 	var _NameConstraints2 = _interopRequireDefault(_NameConstraints);
 	
-	var _OCSPRequest = __webpack_require__(105);
+	var _OCSPRequest = __webpack_require__(103);
 	
 	var _OCSPRequest2 = _interopRequireDefault(_OCSPRequest);
 	
-	var _OCSPResponse = __webpack_require__(109);
+	var _OCSPResponse = __webpack_require__(107);
 	
 	var _OCSPResponse2 = _interopRequireDefault(_OCSPResponse);
 	
-	var _OriginatorIdentifierOrKey = __webpack_require__(80);
+	var _OriginatorIdentifierOrKey = __webpack_require__(78);
 	
 	var _OriginatorIdentifierOrKey2 = _interopRequireDefault(_OriginatorIdentifierOrKey);
 	
-	var _OriginatorInfo = __webpack_require__(71);
+	var _OriginatorInfo = __webpack_require__(69);
 	
 	var _OriginatorInfo2 = _interopRequireDefault(_OriginatorInfo);
 	
-	var _OriginatorPublicKey = __webpack_require__(81);
+	var _OriginatorPublicKey = __webpack_require__(79);
 	
 	var _OriginatorPublicKey2 = _interopRequireDefault(_OriginatorPublicKey);
 	
-	var _OtherCertificateFormat = __webpack_require__(111);
+	var _OtherCertificateFormat = __webpack_require__(109);
 	
 	var _OtherCertificateFormat2 = _interopRequireDefault(_OtherCertificateFormat);
 	
-	var _OtherKeyAttribute = __webpack_require__(86);
+	var _OtherKeyAttribute = __webpack_require__(84);
 	
 	var _OtherKeyAttribute2 = _interopRequireDefault(_OtherKeyAttribute);
 	
-	var _OtherPrimeInfo = __webpack_require__(27);
+	var _OtherPrimeInfo = __webpack_require__(25);
 	
 	var _OtherPrimeInfo2 = _interopRequireDefault(_OtherPrimeInfo);
 	
-	var _OtherRecipientInfo = __webpack_require__(90);
+	var _OtherRecipientInfo = __webpack_require__(88);
 	
 	var _OtherRecipientInfo2 = _interopRequireDefault(_OtherRecipientInfo);
 	
-	var _OtherRevocationInfoFormat = __webpack_require__(74);
+	var _OtherRevocationInfoFormat = __webpack_require__(72);
 	
 	var _OtherRevocationInfoFormat2 = _interopRequireDefault(_OtherRevocationInfoFormat);
 	
-	var _PBES2Params = __webpack_require__(42);
+	var _PBES2Params = __webpack_require__(40);
 	
 	var _PBES2Params2 = _interopRequireDefault(_PBES2Params);
 	
-	var _PBKDF2Params = __webpack_require__(41);
+	var _PBKDF2Params = __webpack_require__(39);
 	
 	var _PBKDF2Params2 = _interopRequireDefault(_PBKDF2Params);
 	
-	var _PFX = __webpack_require__(112);
+	var _PFX = __webpack_require__(110);
 	
 	var _PFX2 = _interopRequireDefault(_PFX);
 	
-	var _PKCS8ShroudedKeyBag = __webpack_require__(38);
+	var _PKCS8ShroudedKeyBag = __webpack_require__(36);
 	
 	var _PKCS8ShroudedKeyBag2 = _interopRequireDefault(_PKCS8ShroudedKeyBag);
 	
-	var _PKIStatusInfo = __webpack_require__(117);
+	var _PKIStatusInfo = __webpack_require__(115);
 	
 	var _PKIStatusInfo2 = _interopRequireDefault(_PKIStatusInfo);
 	
-	var _PasswordRecipientinfo = __webpack_require__(89);
+	var _PasswordRecipientinfo = __webpack_require__(87);
 	
 	var _PasswordRecipientinfo2 = _interopRequireDefault(_PasswordRecipientinfo);
 	
-	var _PolicyConstraints = __webpack_require__(62);
+	var _PolicyConstraints = __webpack_require__(60);
 	
 	var _PolicyConstraints2 = _interopRequireDefault(_PolicyConstraints);
 	
-	var _PolicyInformation = __webpack_require__(57);
+	var _PolicyInformation = __webpack_require__(55);
 	
 	var _PolicyInformation2 = _interopRequireDefault(_PolicyInformation);
 	
-	var _PolicyMapping = __webpack_require__(60);
+	var _PolicyMapping = __webpack_require__(58);
 	
 	var _PolicyMapping2 = _interopRequireDefault(_PolicyMapping);
 	
-	var _PolicyMappings = __webpack_require__(59);
+	var _PolicyMappings = __webpack_require__(57);
 	
 	var _PolicyMappings2 = _interopRequireDefault(_PolicyMappings);
 	
-	var _PolicyQualifierInfo = __webpack_require__(58);
+	var _PolicyQualifierInfo = __webpack_require__(56);
 	
 	var _PolicyQualifierInfo2 = _interopRequireDefault(_PolicyQualifierInfo);
 	
-	var _PrivateKeyInfo = __webpack_require__(23);
+	var _PrivateKeyInfo = __webpack_require__(21);
 	
 	var _PrivateKeyInfo2 = _interopRequireDefault(_PrivateKeyInfo);
 	
-	var _PrivateKeyUsagePeriod = __webpack_require__(48);
+	var _PrivateKeyUsagePeriod = __webpack_require__(46);
 	
 	var _PrivateKeyUsagePeriod2 = _interopRequireDefault(_PrivateKeyUsagePeriod);
 	
-	var _PublicKeyInfo = __webpack_require__(20);
+	var _PublicKeyInfo = __webpack_require__(18);
 	
 	var _PublicKeyInfo2 = _interopRequireDefault(_PublicKeyInfo);
 	
-	var _RSAESOAEPParams = __webpack_require__(91);
+	var _RSAESOAEPParams = __webpack_require__(89);
 	
 	var _RSAESOAEPParams2 = _interopRequireDefault(_RSAESOAEPParams);
 	
-	var _RSAPrivateKey = __webpack_require__(26);
+	var _RSAPrivateKey = __webpack_require__(24);
 	
 	var _RSAPrivateKey2 = _interopRequireDefault(_RSAPrivateKey);
 	
-	var _RSAPublicKey = __webpack_require__(22);
+	var _RSAPublicKey = __webpack_require__(20);
 	
 	var _RSAPublicKey2 = _interopRequireDefault(_RSAPublicKey);
 	
-	var _RSASSAPSSParams = __webpack_require__(18);
+	var _RSASSAPSSParams = __webpack_require__(16);
 	
 	var _RSASSAPSSParams2 = _interopRequireDefault(_RSASSAPSSParams);
 	
-	var _RecipientEncryptedKey = __webpack_require__(83);
+	var _RecipientEncryptedKey = __webpack_require__(81);
 	
 	var _RecipientEncryptedKey2 = _interopRequireDefault(_RecipientEncryptedKey);
 	
-	var _RecipientEncryptedKeys = __webpack_require__(82);
+	var _RecipientEncryptedKeys = __webpack_require__(80);
 	
 	var _RecipientEncryptedKeys2 = _interopRequireDefault(_RecipientEncryptedKeys);
 	
-	var _RecipientIdentifier = __webpack_require__(77);
+	var _RecipientIdentifier = __webpack_require__(75);
 	
 	var _RecipientIdentifier2 = _interopRequireDefault(_RecipientIdentifier);
 	
-	var _RecipientInfo = __webpack_require__(75);
+	var _RecipientInfo = __webpack_require__(73);
 	
 	var _RecipientInfo2 = _interopRequireDefault(_RecipientInfo);
 	
-	var _RecipientKeyIdentifier = __webpack_require__(85);
+	var _RecipientKeyIdentifier = __webpack_require__(83);
 	
 	var _RecipientKeyIdentifier2 = _interopRequireDefault(_RecipientKeyIdentifier);
 	
-	var _RelativeDistinguishedNames = __webpack_require__(30);
+	var _RelativeDistinguishedNames = __webpack_require__(28);
 	
 	var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 	
-	var _Request = __webpack_require__(107);
+	var _Request = __webpack_require__(105);
 	
 	var _Request2 = _interopRequireDefault(_Request);
 	
-	var _ResponseBytes = __webpack_require__(110);
+	var _ResponseBytes = __webpack_require__(108);
 	
 	var _ResponseBytes2 = _interopRequireDefault(_ResponseBytes);
 	
-	var _ResponseData = __webpack_require__(94);
+	var _ResponseData = __webpack_require__(92);
 	
 	var _ResponseData2 = _interopRequireDefault(_ResponseData);
 	
-	var _RevocationInfoChoices = __webpack_require__(73);
+	var _RevocationInfoChoices = __webpack_require__(71);
 	
 	var _RevocationInfoChoices2 = _interopRequireDefault(_RevocationInfoChoices);
 	
-	var _RevokedCertificate = __webpack_require__(68);
+	var _RevokedCertificate = __webpack_require__(66);
 	
 	var _RevokedCertificate2 = _interopRequireDefault(_RevokedCertificate);
 	
-	var _SafeBag = __webpack_require__(37);
+	var _SafeBag = __webpack_require__(35);
 	
 	var _SafeBag2 = _interopRequireDefault(_SafeBag);
 	
-	var _SafeContents = __webpack_require__(36);
+	var _SafeContents = __webpack_require__(34);
 	
 	var _SafeContents2 = _interopRequireDefault(_SafeContents);
 	
-	var _SecretBag = __webpack_require__(69);
+	var _SecretBag = __webpack_require__(67);
 	
 	var _SecretBag2 = _interopRequireDefault(_SecretBag);
 	
-	var _Signature = __webpack_require__(108);
+	var _Signature = __webpack_require__(106);
 	
 	var _Signature2 = _interopRequireDefault(_Signature);
 	
-	var _SignedAndUnsignedAttributes = __webpack_require__(115);
+	var _SignedAndUnsignedAttributes = __webpack_require__(113);
 	
 	var _SignedAndUnsignedAttributes2 = _interopRequireDefault(_SignedAndUnsignedAttributes);
 	
-	var _SignedData = __webpack_require__(113);
+	var _SignedData = __webpack_require__(111);
 	
 	var _SignedData2 = _interopRequireDefault(_SignedData);
 	
-	var _SignerInfo = __webpack_require__(114);
+	var _SignerInfo = __webpack_require__(112);
 	
 	var _SignerInfo2 = _interopRequireDefault(_SignerInfo);
 	
-	var _SingleResponse = __webpack_require__(95);
+	var _SingleResponse = __webpack_require__(93);
 	
 	var _SingleResponse2 = _interopRequireDefault(_SingleResponse);
 	
-	var _SubjectDirectoryAttributes = __webpack_require__(47);
+	var _SubjectDirectoryAttributes = __webpack_require__(45);
 	
 	var _SubjectDirectoryAttributes2 = _interopRequireDefault(_SubjectDirectoryAttributes);
 	
-	var _TBSRequest = __webpack_require__(106);
+	var _TBSRequest = __webpack_require__(104);
 	
 	var _TBSRequest2 = _interopRequireDefault(_TBSRequest);
 	
-	var _TSTInfo = __webpack_require__(116);
+	var _TSTInfo = __webpack_require__(114);
 	
 	var _TSTInfo2 = _interopRequireDefault(_TSTInfo);
 	
-	var _Time = __webpack_require__(45);
+	var _Time = __webpack_require__(43);
 	
 	var _Time2 = _interopRequireDefault(_Time);
 	
-	var _TimeStampReq = __webpack_require__(118);
+	var _TimeStampReq = __webpack_require__(116);
 	
 	var _TimeStampReq2 = _interopRequireDefault(_TimeStampReq);
 	
-	var _TimeStampResp = __webpack_require__(119);
+	var _TimeStampResp = __webpack_require__(117);
 	
 	var _TimeStampResp2 = _interopRequireDefault(_TimeStampResp);
 	
@@ -26798,7 +26636,7 @@ var GCLLib =
 	//# sourceMappingURL=index.js.map
 
 /***/ }),
-/* 16 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -26820,21 +26658,21 @@ var GCLLib =
 	exports.kdfWithCounter = kdfWithCounter;
 	exports.kdf = kdf;
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _RSASSAPSSParams = __webpack_require__(18);
+	var _RSASSAPSSParams = __webpack_require__(16);
 	
 	var _RSASSAPSSParams2 = _interopRequireDefault(_RSASSAPSSParams);
 	
-	var _CryptoEngine = __webpack_require__(19);
+	var _CryptoEngine = __webpack_require__(17);
 	
 	var _CryptoEngine2 = _interopRequireDefault(_CryptoEngine);
 	
@@ -28051,7 +27889,7 @@ var GCLLib =
 	//# sourceMappingURL=common.js.map
 
 /***/ }),
-/* 17 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28062,11 +27900,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -28285,7 +28123,7 @@ var GCLLib =
 	//# sourceMappingURL=AlgorithmIdentifier.js.map
 
 /***/ }),
-/* 18 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28296,13 +28134,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
@@ -28581,7 +28419,7 @@ var GCLLib =
 	//# sourceMappingURL=RSASSAPSSParams.js.map
 
 /***/ }),
-/* 19 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28592,17 +28430,17 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _PublicKeyInfo = __webpack_require__(20);
+	var _PublicKeyInfo = __webpack_require__(18);
 	
 	var _PublicKeyInfo2 = _interopRequireDefault(_PublicKeyInfo);
 	
-	var _PrivateKeyInfo = __webpack_require__(23);
+	var _PrivateKeyInfo = __webpack_require__(21);
 	
 	var _PrivateKeyInfo2 = _interopRequireDefault(_PrivateKeyInfo);
 	
@@ -29420,7 +29258,7 @@ var GCLLib =
 	//# sourceMappingURL=CryptoEngine.js.map
 
 /***/ }),
-/* 20 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -29431,23 +29269,23 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(14);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _ECPublicKey = __webpack_require__(21);
+	var _ECPublicKey = __webpack_require__(19);
 	
 	var _ECPublicKey2 = _interopRequireDefault(_ECPublicKey);
 	
-	var _RSAPublicKey = __webpack_require__(22);
+	var _RSAPublicKey = __webpack_require__(20);
 	
 	var _RSAPublicKey2 = _interopRequireDefault(_RSAPublicKey);
 	
@@ -29774,7 +29612,7 @@ var GCLLib =
 	//# sourceMappingURL=PublicKeyInfo.js.map
 
 /***/ }),
-/* 21 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -29785,11 +29623,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -30023,7 +29861,7 @@ var GCLLib =
 	//# sourceMappingURL=ECPublicKey.js.map
 
 /***/ }),
-/* 22 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -30034,11 +29872,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -30210,7 +30048,7 @@ var GCLLib =
 	//# sourceMappingURL=RSAPublicKey.js.map
 
 /***/ }),
-/* 23 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -30221,25 +30059,25 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _Attribute = __webpack_require__(24);
+	var _Attribute = __webpack_require__(22);
 	
 	var _Attribute2 = _interopRequireDefault(_Attribute);
 	
-	var _ECPrivateKey = __webpack_require__(25);
+	var _ECPrivateKey = __webpack_require__(23);
 	
 	var _ECPrivateKey2 = _interopRequireDefault(_ECPrivateKey);
 	
-	var _RSAPrivateKey = __webpack_require__(26);
+	var _RSAPrivateKey = __webpack_require__(24);
 	
 	var _RSAPrivateKey2 = _interopRequireDefault(_RSAPrivateKey);
 	
@@ -30586,7 +30424,7 @@ var GCLLib =
 	//# sourceMappingURL=PrivateKeyInfo.js.map
 
 /***/ }),
-/* 24 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -30597,11 +30435,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -30792,7 +30630,7 @@ var GCLLib =
 	//# sourceMappingURL=Attribute.js.map
 
 /***/ }),
-/* 25 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -30803,13 +30641,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _ECPublicKey = __webpack_require__(21);
+	var _ECPublicKey = __webpack_require__(19);
 	
 	var _ECPublicKey2 = _interopRequireDefault(_ECPublicKey);
 	
@@ -31123,7 +30961,7 @@ var GCLLib =
 	//# sourceMappingURL=ECPrivateKey.js.map
 
 /***/ }),
-/* 26 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31134,13 +30972,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _OtherPrimeInfo = __webpack_require__(27);
+	var _OtherPrimeInfo = __webpack_require__(25);
 	
 	var _OtherPrimeInfo2 = _interopRequireDefault(_OtherPrimeInfo);
 	
@@ -31471,7 +31309,7 @@ var GCLLib =
 	//# sourceMappingURL=RSAPrivateKey.js.map
 
 /***/ }),
-/* 27 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31482,11 +31320,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -31670,7 +31508,7 @@ var GCLLib =
 	//# sourceMappingURL=OtherPrimeInfo.js.map
 
 /***/ }),
-/* 28 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31681,13 +31519,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _GeneralName = __webpack_require__(29);
+	var _GeneralName = __webpack_require__(27);
 	
 	var _GeneralName2 = _interopRequireDefault(_GeneralName);
 	
@@ -31849,7 +31687,7 @@ var GCLLib =
 	//# sourceMappingURL=AccessDescription.js.map
 
 /***/ }),
-/* 29 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -31860,13 +31698,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _RelativeDistinguishedNames = __webpack_require__(30);
+	var _RelativeDistinguishedNames = __webpack_require__(28);
 	
 	var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 	
@@ -32441,7 +32279,7 @@ var GCLLib =
 	//# sourceMappingURL=GeneralName.js.map
 
 /***/ }),
-/* 30 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -32454,13 +32292,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AttributeTypeAndValue = __webpack_require__(31);
+	var _AttributeTypeAndValue = __webpack_require__(29);
 	
 	var _AttributeTypeAndValue2 = _interopRequireDefault(_AttributeTypeAndValue);
 	
@@ -32717,7 +32555,7 @@ var GCLLib =
 	//# sourceMappingURL=RelativeDistinguishedNames.js.map
 
 /***/ }),
-/* 31 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -32728,13 +32566,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(14);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -32928,7 +32766,7 @@ var GCLLib =
 	//# sourceMappingURL=AttributeTypeAndValue.js.map
 
 /***/ }),
-/* 32 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -32939,11 +32777,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -33191,7 +33029,7 @@ var GCLLib =
 	//# sourceMappingURL=Accuracy.js.map
 
 /***/ }),
-/* 33 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -33202,13 +33040,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _GeneralName = __webpack_require__(29);
+	var _GeneralName = __webpack_require__(27);
 	
 	var _GeneralName2 = _interopRequireDefault(_GeneralName);
 	
@@ -33365,7 +33203,7 @@ var GCLLib =
 	//# sourceMappingURL=AltName.js.map
 
 /***/ }),
-/* 34 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -33380,25 +33218,25 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _ContentInfo = __webpack_require__(35);
+	var _ContentInfo = __webpack_require__(33);
 	
 	var _ContentInfo2 = _interopRequireDefault(_ContentInfo);
 	
-	var _SafeContents = __webpack_require__(36);
+	var _SafeContents = __webpack_require__(34);
 	
 	var _SafeContents2 = _interopRequireDefault(_SafeContents);
 	
-	var _EnvelopedData = __webpack_require__(70);
+	var _EnvelopedData = __webpack_require__(68);
 	
 	var _EnvelopedData2 = _interopRequireDefault(_EnvelopedData);
 	
-	var _EncryptedData = __webpack_require__(39);
+	var _EncryptedData = __webpack_require__(37);
 	
 	var _EncryptedData2 = _interopRequireDefault(_EncryptedData);
 	
@@ -33957,7 +33795,7 @@ var GCLLib =
 	//# sourceMappingURL=AuthenticatedSafe.js.map
 
 /***/ }),
-/* 35 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -33968,11 +33806,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -34158,7 +33996,7 @@ var GCLLib =
 	//# sourceMappingURL=ContentInfo.js.map
 
 /***/ }),
-/* 36 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -34169,13 +34007,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _SafeBag = __webpack_require__(37);
+	var _SafeBag = __webpack_require__(35);
 	
 	var _SafeBag2 = _interopRequireDefault(_SafeBag);
 	
@@ -34346,7 +34184,7 @@ var GCLLib =
 	//# sourceMappingURL=SafeContents.js.map
 
 /***/ }),
-/* 37 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -34357,37 +34195,37 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _Attribute = __webpack_require__(24);
+	var _Attribute = __webpack_require__(22);
 	
 	var _Attribute2 = _interopRequireDefault(_Attribute);
 	
-	var _PrivateKeyInfo = __webpack_require__(23);
+	var _PrivateKeyInfo = __webpack_require__(21);
 	
 	var _PrivateKeyInfo2 = _interopRequireDefault(_PrivateKeyInfo);
 	
-	var _PKCS8ShroudedKeyBag = __webpack_require__(38);
+	var _PKCS8ShroudedKeyBag = __webpack_require__(36);
 	
 	var _PKCS8ShroudedKeyBag2 = _interopRequireDefault(_PKCS8ShroudedKeyBag);
 	
-	var _CertBag = __webpack_require__(43);
+	var _CertBag = __webpack_require__(41);
 	
 	var _CertBag2 = _interopRequireDefault(_CertBag);
 	
-	var _CRLBag = __webpack_require__(66);
+	var _CRLBag = __webpack_require__(64);
 	
 	var _CRLBag2 = _interopRequireDefault(_CRLBag);
 	
-	var _SecretBag = __webpack_require__(69);
+	var _SecretBag = __webpack_require__(67);
 	
 	var _SecretBag2 = _interopRequireDefault(_SecretBag);
 	
-	var _SafeContents = __webpack_require__(36);
+	var _SafeContents = __webpack_require__(34);
 	
 	var _SafeContents2 = _interopRequireDefault(_SafeContents);
 	
@@ -34664,7 +34502,7 @@ var GCLLib =
 	//# sourceMappingURL=SafeBag.js.map
 
 /***/ }),
-/* 38 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -34675,25 +34513,25 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _EncryptedData = __webpack_require__(39);
+	var _EncryptedData = __webpack_require__(37);
 	
 	var _EncryptedData2 = _interopRequireDefault(_EncryptedData);
 	
-	var _EncryptedContentInfo = __webpack_require__(40);
+	var _EncryptedContentInfo = __webpack_require__(38);
 	
 	var _EncryptedContentInfo2 = _interopRequireDefault(_EncryptedContentInfo);
 	
-	var _PrivateKeyInfo = __webpack_require__(23);
+	var _PrivateKeyInfo = __webpack_require__(21);
 	
 	var _PrivateKeyInfo2 = _interopRequireDefault(_PrivateKeyInfo);
 	
@@ -34984,7 +34822,7 @@ var GCLLib =
 	//# sourceMappingURL=PKCS8ShroudedKeyBag.js.map
 
 /***/ }),
-/* 39 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -34995,31 +34833,31 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(14);
 	
-	var _EncryptedContentInfo = __webpack_require__(40);
+	var _EncryptedContentInfo = __webpack_require__(38);
 	
 	var _EncryptedContentInfo2 = _interopRequireDefault(_EncryptedContentInfo);
 	
-	var _Attribute = __webpack_require__(24);
+	var _Attribute = __webpack_require__(22);
 	
 	var _Attribute2 = _interopRequireDefault(_Attribute);
 	
-	var _PBKDF2Params = __webpack_require__(41);
+	var _PBKDF2Params = __webpack_require__(39);
 	
 	var _PBKDF2Params2 = _interopRequireDefault(_PBKDF2Params);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _PBES2Params = __webpack_require__(42);
+	var _PBES2Params = __webpack_require__(40);
 	
 	var _PBES2Params2 = _interopRequireDefault(_PBES2Params);
 	
@@ -35532,7 +35370,7 @@ var GCLLib =
 	//# sourceMappingURL=EncryptedData.js.map
 
 /***/ }),
-/* 40 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -35543,13 +35381,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
@@ -35834,7 +35672,7 @@ var GCLLib =
 	//# sourceMappingURL=EncryptedContentInfo.js.map
 
 /***/ }),
-/* 41 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -35845,13 +35683,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
@@ -36073,7 +35911,7 @@ var GCLLib =
 	//# sourceMappingURL=PBKDF2Params.js.map
 
 /***/ }),
-/* 42 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -36084,13 +35922,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
@@ -36256,7 +36094,7 @@ var GCLLib =
 	//# sourceMappingURL=PBES2Params.js.map
 
 /***/ }),
-/* 43 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -36267,13 +36105,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _Certificate = __webpack_require__(44);
+	var _Certificate = __webpack_require__(42);
 	
 	var _Certificate2 = _interopRequireDefault(_Certificate);
 	
@@ -36492,7 +36330,7 @@ var GCLLib =
 	//# sourceMappingURL=CertBag.js.map
 
 /***/ }),
-/* 44 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -36503,39 +36341,39 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(14);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _RelativeDistinguishedNames = __webpack_require__(30);
+	var _RelativeDistinguishedNames = __webpack_require__(28);
 	
 	var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 	
-	var _Time = __webpack_require__(45);
+	var _Time = __webpack_require__(43);
 	
 	var _Time2 = _interopRequireDefault(_Time);
 	
-	var _PublicKeyInfo = __webpack_require__(20);
+	var _PublicKeyInfo = __webpack_require__(18);
 	
 	var _PublicKeyInfo2 = _interopRequireDefault(_PublicKeyInfo);
 	
-	var _Extension = __webpack_require__(46);
+	var _Extension = __webpack_require__(44);
 	
 	var _Extension2 = _interopRequireDefault(_Extension);
 	
-	var _Extensions = __webpack_require__(65);
+	var _Extensions = __webpack_require__(63);
 	
 	var _Extensions2 = _interopRequireDefault(_Extensions);
 	
-	var _RSASSAPSSParams = __webpack_require__(18);
+	var _RSASSAPSSParams = __webpack_require__(16);
 	
 	var _RSASSAPSSParams2 = _interopRequireDefault(_RSASSAPSSParams);
 	
@@ -37369,7 +37207,7 @@ var GCLLib =
 	//# sourceMappingURL=Certificate.js.map
 
 /***/ }),
-/* 45 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -37380,11 +37218,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -37547,7 +37385,7 @@ var GCLLib =
 	//# sourceMappingURL=Time.js.map
 
 /***/ }),
-/* 46 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -37558,65 +37396,65 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _SubjectDirectoryAttributes = __webpack_require__(47);
+	var _SubjectDirectoryAttributes = __webpack_require__(45);
 	
 	var _SubjectDirectoryAttributes2 = _interopRequireDefault(_SubjectDirectoryAttributes);
 	
-	var _PrivateKeyUsagePeriod = __webpack_require__(48);
+	var _PrivateKeyUsagePeriod = __webpack_require__(46);
 	
 	var _PrivateKeyUsagePeriod2 = _interopRequireDefault(_PrivateKeyUsagePeriod);
 	
-	var _AltName = __webpack_require__(33);
+	var _AltName = __webpack_require__(31);
 	
 	var _AltName2 = _interopRequireDefault(_AltName);
 	
-	var _BasicConstraints = __webpack_require__(49);
+	var _BasicConstraints = __webpack_require__(47);
 	
 	var _BasicConstraints2 = _interopRequireDefault(_BasicConstraints);
 	
-	var _IssuingDistributionPoint = __webpack_require__(50);
+	var _IssuingDistributionPoint = __webpack_require__(48);
 	
 	var _IssuingDistributionPoint2 = _interopRequireDefault(_IssuingDistributionPoint);
 	
-	var _GeneralNames = __webpack_require__(51);
+	var _GeneralNames = __webpack_require__(49);
 	
 	var _GeneralNames2 = _interopRequireDefault(_GeneralNames);
 	
-	var _NameConstraints = __webpack_require__(52);
+	var _NameConstraints = __webpack_require__(50);
 	
 	var _NameConstraints2 = _interopRequireDefault(_NameConstraints);
 	
-	var _CRLDistributionPoints = __webpack_require__(54);
+	var _CRLDistributionPoints = __webpack_require__(52);
 	
 	var _CRLDistributionPoints2 = _interopRequireDefault(_CRLDistributionPoints);
 	
-	var _CertificatePolicies = __webpack_require__(56);
+	var _CertificatePolicies = __webpack_require__(54);
 	
 	var _CertificatePolicies2 = _interopRequireDefault(_CertificatePolicies);
 	
-	var _PolicyMappings = __webpack_require__(59);
+	var _PolicyMappings = __webpack_require__(57);
 	
 	var _PolicyMappings2 = _interopRequireDefault(_PolicyMappings);
 	
-	var _AuthorityKeyIdentifier = __webpack_require__(61);
+	var _AuthorityKeyIdentifier = __webpack_require__(59);
 	
 	var _AuthorityKeyIdentifier2 = _interopRequireDefault(_AuthorityKeyIdentifier);
 	
-	var _PolicyConstraints = __webpack_require__(62);
+	var _PolicyConstraints = __webpack_require__(60);
 	
 	var _PolicyConstraints2 = _interopRequireDefault(_PolicyConstraints);
 	
-	var _ExtKeyUsage = __webpack_require__(63);
+	var _ExtKeyUsage = __webpack_require__(61);
 	
 	var _ExtKeyUsage2 = _interopRequireDefault(_ExtKeyUsage);
 	
-	var _InfoAccess = __webpack_require__(64);
+	var _InfoAccess = __webpack_require__(62);
 	
 	var _InfoAccess2 = _interopRequireDefault(_InfoAccess);
 	
@@ -37907,7 +37745,7 @@ var GCLLib =
 	//# sourceMappingURL=Extension.js.map
 
 /***/ }),
-/* 47 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -37918,13 +37756,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _Attribute = __webpack_require__(24);
+	var _Attribute = __webpack_require__(22);
 	
 	var _Attribute2 = _interopRequireDefault(_Attribute);
 	
@@ -38081,7 +37919,7 @@ var GCLLib =
 	//# sourceMappingURL=SubjectDirectoryAttributes.js.map
 
 /***/ }),
-/* 48 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -38092,11 +37930,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -38306,7 +38144,7 @@ var GCLLib =
 	//# sourceMappingURL=PrivateKeyUsagePeriod.js.map
 
 /***/ }),
-/* 49 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -38317,11 +38155,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -38503,7 +38341,7 @@ var GCLLib =
 	//# sourceMappingURL=BasicConstraints.js.map
 
 /***/ }),
-/* 50 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -38514,17 +38352,17 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _GeneralName = __webpack_require__(29);
+	var _GeneralName = __webpack_require__(27);
 	
 	var _GeneralName2 = _interopRequireDefault(_GeneralName);
 	
-	var _RelativeDistinguishedNames = __webpack_require__(30);
+	var _RelativeDistinguishedNames = __webpack_require__(28);
 	
 	var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 	
@@ -38951,7 +38789,7 @@ var GCLLib =
 	//# sourceMappingURL=IssuingDistributionPoint.js.map
 
 /***/ }),
-/* 51 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -38962,13 +38800,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _GeneralName = __webpack_require__(29);
+	var _GeneralName = __webpack_require__(27);
 	
 	var _GeneralName2 = _interopRequireDefault(_GeneralName);
 	
@@ -39115,7 +38953,7 @@ var GCLLib =
 	//# sourceMappingURL=GeneralNames.js.map
 
 /***/ }),
-/* 52 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -39126,13 +38964,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _GeneralSubtree = __webpack_require__(53);
+	var _GeneralSubtree = __webpack_require__(51);
 	
 	var _GeneralSubtree2 = _interopRequireDefault(_GeneralSubtree);
 	
@@ -39361,7 +39199,7 @@ var GCLLib =
 	//# sourceMappingURL=NameConstraints.js.map
 
 /***/ }),
-/* 53 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -39372,13 +39210,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _GeneralName = __webpack_require__(29);
+	var _GeneralName = __webpack_require__(27);
 	
 	var _GeneralName2 = _interopRequireDefault(_GeneralName);
 	
@@ -39621,7 +39459,7 @@ var GCLLib =
 	//# sourceMappingURL=GeneralSubtree.js.map
 
 /***/ }),
-/* 54 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -39632,13 +39470,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _DistributionPoint = __webpack_require__(55);
+	var _DistributionPoint = __webpack_require__(53);
 	
 	var _DistributionPoint2 = _interopRequireDefault(_DistributionPoint);
 	
@@ -39794,7 +39632,7 @@ var GCLLib =
 	//# sourceMappingURL=CRLDistributionPoints.js.map
 
 /***/ }),
-/* 55 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -39805,17 +39643,17 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _GeneralName = __webpack_require__(29);
+	var _GeneralName = __webpack_require__(27);
 	
 	var _GeneralName2 = _interopRequireDefault(_GeneralName);
 	
-	var _RelativeDistinguishedNames = __webpack_require__(30);
+	var _RelativeDistinguishedNames = __webpack_require__(28);
 	
 	var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 	
@@ -40145,7 +39983,7 @@ var GCLLib =
 	//# sourceMappingURL=DistributionPoint.js.map
 
 /***/ }),
-/* 56 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -40156,13 +39994,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _PolicyInformation = __webpack_require__(57);
+	var _PolicyInformation = __webpack_require__(55);
 	
 	var _PolicyInformation2 = _interopRequireDefault(_PolicyInformation);
 	
@@ -40318,7 +40156,7 @@ var GCLLib =
 	//# sourceMappingURL=CertificatePolicies.js.map
 
 /***/ }),
-/* 57 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -40329,13 +40167,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _PolicyQualifierInfo = __webpack_require__(58);
+	var _PolicyQualifierInfo = __webpack_require__(56);
 	
 	var _PolicyQualifierInfo2 = _interopRequireDefault(_PolicyQualifierInfo);
 	
@@ -40526,7 +40364,7 @@ var GCLLib =
 	//# sourceMappingURL=PolicyInformation.js.map
 
 /***/ }),
-/* 58 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -40537,11 +40375,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -40701,7 +40539,7 @@ var GCLLib =
 	//# sourceMappingURL=PolicyQualifierInfo.js.map
 
 /***/ }),
-/* 59 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -40712,13 +40550,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _PolicyMapping = __webpack_require__(60);
+	var _PolicyMapping = __webpack_require__(58);
 	
 	var _PolicyMapping2 = _interopRequireDefault(_PolicyMapping);
 	
@@ -40875,7 +40713,7 @@ var GCLLib =
 	//# sourceMappingURL=PolicyMappings.js.map
 
 /***/ }),
-/* 60 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -40886,11 +40724,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -41044,7 +40882,7 @@ var GCLLib =
 	//# sourceMappingURL=PolicyMapping.js.map
 
 /***/ }),
-/* 61 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -41055,13 +40893,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _GeneralName = __webpack_require__(29);
+	var _GeneralName = __webpack_require__(27);
 	
 	var _GeneralName2 = _interopRequireDefault(_GeneralName);
 	
@@ -41321,7 +41159,7 @@ var GCLLib =
 	//# sourceMappingURL=AuthorityKeyIdentifier.js.map
 
 /***/ }),
-/* 62 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -41332,11 +41170,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -41559,7 +41397,7 @@ var GCLLib =
 	//# sourceMappingURL=PolicyConstraints.js.map
 
 /***/ }),
-/* 63 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -41570,11 +41408,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -41726,7 +41564,7 @@ var GCLLib =
 	//# sourceMappingURL=ExtKeyUsage.js.map
 
 /***/ }),
-/* 64 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -41737,13 +41575,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AccessDescription = __webpack_require__(28);
+	var _AccessDescription = __webpack_require__(26);
 	
 	var _AccessDescription2 = _interopRequireDefault(_AccessDescription);
 	
@@ -41901,7 +41739,7 @@ var GCLLib =
 	//# sourceMappingURL=InfoAccess.js.map
 
 /***/ }),
-/* 65 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -41912,13 +41750,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _Extension = __webpack_require__(46);
+	var _Extension = __webpack_require__(44);
 	
 	var _Extension2 = _interopRequireDefault(_Extension);
 	
@@ -42076,7 +41914,7 @@ var GCLLib =
 	//# sourceMappingURL=Extensions.js.map
 
 /***/ }),
-/* 66 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -42087,13 +41925,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _CertificateRevocationList = __webpack_require__(67);
+	var _CertificateRevocationList = __webpack_require__(65);
 	
 	var _CertificateRevocationList2 = _interopRequireDefault(_CertificateRevocationList);
 	
@@ -42311,7 +42149,7 @@ var GCLLib =
 	//# sourceMappingURL=CRLBag.js.map
 
 /***/ }),
-/* 67 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -42322,39 +42160,39 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(14);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _RelativeDistinguishedNames = __webpack_require__(30);
+	var _RelativeDistinguishedNames = __webpack_require__(28);
 	
 	var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 	
-	var _Time = __webpack_require__(45);
+	var _Time = __webpack_require__(43);
 	
 	var _Time2 = _interopRequireDefault(_Time);
 	
-	var _RevokedCertificate = __webpack_require__(68);
+	var _RevokedCertificate = __webpack_require__(66);
 	
 	var _RevokedCertificate2 = _interopRequireDefault(_RevokedCertificate);
 	
-	var _Extensions = __webpack_require__(65);
+	var _Extensions = __webpack_require__(63);
 	
 	var _Extensions2 = _interopRequireDefault(_Extensions);
 	
-	var _RSASSAPSSParams = __webpack_require__(18);
+	var _RSASSAPSSParams = __webpack_require__(16);
 	
 	var _RSASSAPSSParams2 = _interopRequireDefault(_RSASSAPSSParams);
 	
-	var _PublicKeyInfo = __webpack_require__(20);
+	var _PublicKeyInfo = __webpack_require__(18);
 	
 	var _PublicKeyInfo2 = _interopRequireDefault(_PublicKeyInfo);
 	
@@ -43071,7 +42909,7 @@ var GCLLib =
 	//# sourceMappingURL=CertificateRevocationList.js.map
 
 /***/ }),
-/* 68 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -43082,17 +42920,17 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _Time = __webpack_require__(45);
+	var _Time = __webpack_require__(43);
 	
 	var _Time2 = _interopRequireDefault(_Time);
 	
-	var _Extensions = __webpack_require__(65);
+	var _Extensions = __webpack_require__(63);
 	
 	var _Extensions2 = _interopRequireDefault(_Extensions);
 	
@@ -43272,7 +43110,7 @@ var GCLLib =
 	//# sourceMappingURL=RevokedCertificate.js.map
 
 /***/ }),
-/* 69 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -43283,11 +43121,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -43473,7 +43311,7 @@ var GCLLib =
 	//# sourceMappingURL=SecretBag.js.map
 
 /***/ }),
-/* 70 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -43484,87 +43322,87 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(14);
 	
-	var _OriginatorInfo = __webpack_require__(71);
+	var _OriginatorInfo = __webpack_require__(69);
 	
 	var _OriginatorInfo2 = _interopRequireDefault(_OriginatorInfo);
 	
-	var _RecipientInfo = __webpack_require__(75);
+	var _RecipientInfo = __webpack_require__(73);
 	
 	var _RecipientInfo2 = _interopRequireDefault(_RecipientInfo);
 	
-	var _EncryptedContentInfo = __webpack_require__(40);
+	var _EncryptedContentInfo = __webpack_require__(38);
 	
 	var _EncryptedContentInfo2 = _interopRequireDefault(_EncryptedContentInfo);
 	
-	var _Attribute = __webpack_require__(24);
+	var _Attribute = __webpack_require__(22);
 	
 	var _Attribute2 = _interopRequireDefault(_Attribute);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _RSAESOAEPParams = __webpack_require__(91);
+	var _RSAESOAEPParams = __webpack_require__(89);
 	
 	var _RSAESOAEPParams2 = _interopRequireDefault(_RSAESOAEPParams);
 	
-	var _KeyTransRecipientInfo = __webpack_require__(76);
+	var _KeyTransRecipientInfo = __webpack_require__(74);
 	
 	var _KeyTransRecipientInfo2 = _interopRequireDefault(_KeyTransRecipientInfo);
 	
-	var _IssuerAndSerialNumber = __webpack_require__(78);
+	var _IssuerAndSerialNumber = __webpack_require__(76);
 	
 	var _IssuerAndSerialNumber2 = _interopRequireDefault(_IssuerAndSerialNumber);
 	
-	var _RecipientEncryptedKey = __webpack_require__(83);
+	var _RecipientEncryptedKey = __webpack_require__(81);
 	
 	var _RecipientEncryptedKey2 = _interopRequireDefault(_RecipientEncryptedKey);
 	
-	var _KeyAgreeRecipientIdentifier = __webpack_require__(84);
+	var _KeyAgreeRecipientIdentifier = __webpack_require__(82);
 	
 	var _KeyAgreeRecipientIdentifier2 = _interopRequireDefault(_KeyAgreeRecipientIdentifier);
 	
-	var _KeyAgreeRecipientInfo = __webpack_require__(79);
+	var _KeyAgreeRecipientInfo = __webpack_require__(77);
 	
 	var _KeyAgreeRecipientInfo2 = _interopRequireDefault(_KeyAgreeRecipientInfo);
 	
-	var _RecipientEncryptedKeys = __webpack_require__(82);
+	var _RecipientEncryptedKeys = __webpack_require__(80);
 	
 	var _RecipientEncryptedKeys2 = _interopRequireDefault(_RecipientEncryptedKeys);
 	
-	var _KEKRecipientInfo = __webpack_require__(87);
+	var _KEKRecipientInfo = __webpack_require__(85);
 	
 	var _KEKRecipientInfo2 = _interopRequireDefault(_KEKRecipientInfo);
 	
-	var _KEKIdentifier = __webpack_require__(88);
+	var _KEKIdentifier = __webpack_require__(86);
 	
 	var _KEKIdentifier2 = _interopRequireDefault(_KEKIdentifier);
 	
-	var _PBKDF2Params = __webpack_require__(41);
+	var _PBKDF2Params = __webpack_require__(39);
 	
 	var _PBKDF2Params2 = _interopRequireDefault(_PBKDF2Params);
 	
-	var _PasswordRecipientinfo = __webpack_require__(89);
+	var _PasswordRecipientinfo = __webpack_require__(87);
 	
 	var _PasswordRecipientinfo2 = _interopRequireDefault(_PasswordRecipientinfo);
 	
-	var _ECCCMSSharedInfo = __webpack_require__(92);
+	var _ECCCMSSharedInfo = __webpack_require__(90);
 	
 	var _ECCCMSSharedInfo2 = _interopRequireDefault(_ECCCMSSharedInfo);
 	
-	var _OriginatorIdentifierOrKey = __webpack_require__(80);
+	var _OriginatorIdentifierOrKey = __webpack_require__(78);
 	
 	var _OriginatorIdentifierOrKey2 = _interopRequireDefault(_OriginatorIdentifierOrKey);
 	
-	var _OriginatorPublicKey = __webpack_require__(81);
+	var _OriginatorPublicKey = __webpack_require__(79);
 	
 	var _OriginatorPublicKey2 = _interopRequireDefault(_OriginatorPublicKey);
 	
@@ -45130,7 +44968,7 @@ var GCLLib =
 	//# sourceMappingURL=EnvelopedData.js.map
 
 /***/ }),
-/* 71 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -45141,17 +44979,17 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _CertificateSet = __webpack_require__(72);
+	var _CertificateSet = __webpack_require__(70);
 	
 	var _CertificateSet2 = _interopRequireDefault(_CertificateSet);
 	
-	var _RevocationInfoChoices = __webpack_require__(73);
+	var _RevocationInfoChoices = __webpack_require__(71);
 	
 	var _RevocationInfoChoices2 = _interopRequireDefault(_RevocationInfoChoices);
 	
@@ -45365,7 +45203,7 @@ var GCLLib =
 	//# sourceMappingURL=OriginatorInfo.js.map
 
 /***/ }),
-/* 72 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -45376,13 +45214,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _Certificate = __webpack_require__(44);
+	var _Certificate = __webpack_require__(42);
 	
 	var _Certificate2 = _interopRequireDefault(_Certificate);
 	
@@ -45570,7 +45408,7 @@ var GCLLib =
 	//# sourceMappingURL=CertificateSet.js.map
 
 /***/ }),
-/* 73 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -45581,17 +45419,17 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _CertificateRevocationList = __webpack_require__(67);
+	var _CertificateRevocationList = __webpack_require__(65);
 	
 	var _CertificateRevocationList2 = _interopRequireDefault(_CertificateRevocationList);
 	
-	var _OtherRevocationInfoFormat = __webpack_require__(74);
+	var _OtherRevocationInfoFormat = __webpack_require__(72);
 	
 	var _OtherRevocationInfoFormat2 = _interopRequireDefault(_OtherRevocationInfoFormat);
 	
@@ -45812,7 +45650,7 @@ var GCLLib =
 	//# sourceMappingURL=RevocationInfoChoices.js.map
 
 /***/ }),
-/* 74 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -45823,11 +45661,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -45979,7 +45817,7 @@ var GCLLib =
 	//# sourceMappingURL=OtherRevocationInfoFormat.js.map
 
 /***/ }),
-/* 75 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -45990,29 +45828,29 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _KeyTransRecipientInfo = __webpack_require__(76);
+	var _KeyTransRecipientInfo = __webpack_require__(74);
 	
 	var _KeyTransRecipientInfo2 = _interopRequireDefault(_KeyTransRecipientInfo);
 	
-	var _KeyAgreeRecipientInfo = __webpack_require__(79);
+	var _KeyAgreeRecipientInfo = __webpack_require__(77);
 	
 	var _KeyAgreeRecipientInfo2 = _interopRequireDefault(_KeyAgreeRecipientInfo);
 	
-	var _KEKRecipientInfo = __webpack_require__(87);
+	var _KEKRecipientInfo = __webpack_require__(85);
 	
 	var _KEKRecipientInfo2 = _interopRequireDefault(_KEKRecipientInfo);
 	
-	var _PasswordRecipientinfo = __webpack_require__(89);
+	var _PasswordRecipientinfo = __webpack_require__(87);
 	
 	var _PasswordRecipientinfo2 = _interopRequireDefault(_PasswordRecipientinfo);
 	
-	var _OtherRecipientInfo = __webpack_require__(90);
+	var _OtherRecipientInfo = __webpack_require__(88);
 	
 	var _OtherRecipientInfo2 = _interopRequireDefault(_OtherRecipientInfo);
 	
@@ -46272,7 +46110,7 @@ var GCLLib =
 	//# sourceMappingURL=RecipientInfo.js.map
 
 /***/ }),
-/* 76 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -46283,25 +46121,25 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _Certificate = __webpack_require__(44);
+	var _Certificate = __webpack_require__(42);
 	
 	var _Certificate2 = _interopRequireDefault(_Certificate);
 	
-	var _RecipientIdentifier = __webpack_require__(77);
+	var _RecipientIdentifier = __webpack_require__(75);
 	
 	var _RecipientIdentifier2 = _interopRequireDefault(_RecipientIdentifier);
 	
-	var _IssuerAndSerialNumber = __webpack_require__(78);
+	var _IssuerAndSerialNumber = __webpack_require__(76);
 	
 	var _IssuerAndSerialNumber2 = _interopRequireDefault(_IssuerAndSerialNumber);
 	
@@ -46550,7 +46388,7 @@ var GCLLib =
 	//# sourceMappingURL=KeyTransRecipientInfo.js.map
 
 /***/ }),
-/* 77 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -46561,13 +46399,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _IssuerAndSerialNumber = __webpack_require__(78);
+	var _IssuerAndSerialNumber = __webpack_require__(76);
 	
 	var _IssuerAndSerialNumber2 = _interopRequireDefault(_IssuerAndSerialNumber);
 	
@@ -46774,7 +46612,7 @@ var GCLLib =
 	//# sourceMappingURL=RecipientIdentifier.js.map
 
 /***/ }),
-/* 78 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -46785,13 +46623,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _RelativeDistinguishedNames = __webpack_require__(30);
+	var _RelativeDistinguishedNames = __webpack_require__(28);
 	
 	var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 	
@@ -46955,7 +46793,7 @@ var GCLLib =
 	//# sourceMappingURL=IssuerAndSerialNumber.js.map
 
 /***/ }),
-/* 79 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -46966,25 +46804,25 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _OriginatorIdentifierOrKey = __webpack_require__(80);
+	var _OriginatorIdentifierOrKey = __webpack_require__(78);
 	
 	var _OriginatorIdentifierOrKey2 = _interopRequireDefault(_OriginatorIdentifierOrKey);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _RecipientEncryptedKeys = __webpack_require__(82);
+	var _RecipientEncryptedKeys = __webpack_require__(80);
 	
 	var _RecipientEncryptedKeys2 = _interopRequireDefault(_RecipientEncryptedKeys);
 	
-	var _Certificate = __webpack_require__(44);
+	var _Certificate = __webpack_require__(42);
 	
 	var _Certificate2 = _interopRequireDefault(_Certificate);
 	
@@ -47273,7 +47111,7 @@ var GCLLib =
 	//# sourceMappingURL=KeyAgreeRecipientInfo.js.map
 
 /***/ }),
-/* 80 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -47284,17 +47122,17 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _IssuerAndSerialNumber = __webpack_require__(78);
+	var _IssuerAndSerialNumber = __webpack_require__(76);
 	
 	var _IssuerAndSerialNumber2 = _interopRequireDefault(_IssuerAndSerialNumber);
 	
-	var _OriginatorPublicKey = __webpack_require__(81);
+	var _OriginatorPublicKey = __webpack_require__(79);
 	
 	var _OriginatorPublicKey2 = _interopRequireDefault(_OriginatorPublicKey);
 	
@@ -47527,7 +47365,7 @@ var GCLLib =
 	//# sourceMappingURL=OriginatorIdentifierOrKey.js.map
 
 /***/ }),
-/* 81 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -47538,13 +47376,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
@@ -47724,7 +47562,7 @@ var GCLLib =
 	//# sourceMappingURL=OriginatorPublicKey.js.map
 
 /***/ }),
-/* 82 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -47735,13 +47573,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _RecipientEncryptedKey = __webpack_require__(83);
+	var _RecipientEncryptedKey = __webpack_require__(81);
 	
 	var _RecipientEncryptedKey2 = _interopRequireDefault(_RecipientEncryptedKey);
 	
@@ -47912,7 +47750,7 @@ var GCLLib =
 	//# sourceMappingURL=RecipientEncryptedKeys.js.map
 
 /***/ }),
-/* 83 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -47923,13 +47761,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _KeyAgreeRecipientIdentifier = __webpack_require__(84);
+	var _KeyAgreeRecipientIdentifier = __webpack_require__(82);
 	
 	var _KeyAgreeRecipientIdentifier2 = _interopRequireDefault(_KeyAgreeRecipientIdentifier);
 	
@@ -48112,7 +47950,7 @@ var GCLLib =
 	//# sourceMappingURL=RecipientEncryptedKey.js.map
 
 /***/ }),
-/* 84 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -48123,17 +47961,17 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _IssuerAndSerialNumber = __webpack_require__(78);
+	var _IssuerAndSerialNumber = __webpack_require__(76);
 	
 	var _IssuerAndSerialNumber2 = _interopRequireDefault(_IssuerAndSerialNumber);
 	
-	var _RecipientKeyIdentifier = __webpack_require__(85);
+	var _RecipientKeyIdentifier = __webpack_require__(83);
 	
 	var _RecipientKeyIdentifier2 = _interopRequireDefault(_RecipientKeyIdentifier);
 	
@@ -48346,7 +48184,7 @@ var GCLLib =
 	//# sourceMappingURL=KeyAgreeRecipientIdentifier.js.map
 
 /***/ }),
-/* 85 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -48357,13 +48195,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _OtherKeyAttribute = __webpack_require__(86);
+	var _OtherKeyAttribute = __webpack_require__(84);
 	
 	var _OtherKeyAttribute2 = _interopRequireDefault(_OtherKeyAttribute);
 	
@@ -48581,7 +48419,7 @@ var GCLLib =
 	//# sourceMappingURL=RecipientKeyIdentifier.js.map
 
 /***/ }),
-/* 86 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -48592,11 +48430,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -48788,7 +48626,7 @@ var GCLLib =
 	//# sourceMappingURL=OtherKeyAttribute.js.map
 
 /***/ }),
-/* 87 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -48799,17 +48637,17 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _KEKIdentifier = __webpack_require__(88);
+	var _KEKIdentifier = __webpack_require__(86);
 	
 	var _KEKIdentifier2 = _interopRequireDefault(_KEKIdentifier);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
@@ -49031,7 +48869,7 @@ var GCLLib =
 	//# sourceMappingURL=KEKRecipientInfo.js.map
 
 /***/ }),
-/* 88 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -49042,13 +48880,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _OtherKeyAttribute = __webpack_require__(86);
+	var _OtherKeyAttribute = __webpack_require__(84);
 	
 	var _OtherKeyAttribute2 = _interopRequireDefault(_OtherKeyAttribute);
 	
@@ -49265,7 +49103,7 @@ var GCLLib =
 	//# sourceMappingURL=KEKIdentifier.js.map
 
 /***/ }),
-/* 89 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -49276,13 +49114,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
@@ -49535,7 +49373,7 @@ var GCLLib =
 	//# sourceMappingURL=PasswordRecipientinfo.js.map
 
 /***/ }),
-/* 90 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -49546,11 +49384,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -49726,7 +49564,7 @@ var GCLLib =
 	//# sourceMappingURL=OtherRecipientInfo.js.map
 
 /***/ }),
-/* 91 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -49737,13 +49575,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
@@ -49999,7 +49837,7 @@ var GCLLib =
 	//# sourceMappingURL=RSAESOAEPParams.js.map
 
 /***/ }),
-/* 92 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -50010,13 +49848,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
@@ -50257,7 +50095,7 @@ var GCLLib =
 	//# sourceMappingURL=ECCCMSSharedInfo.js.map
 
 /***/ }),
-/* 93 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -50270,39 +50108,39 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(14);
 	
-	var _ResponseData = __webpack_require__(94);
+	var _ResponseData = __webpack_require__(92);
 	
 	var _ResponseData2 = _interopRequireDefault(_ResponseData);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _Certificate = __webpack_require__(44);
+	var _Certificate = __webpack_require__(42);
 	
 	var _Certificate2 = _interopRequireDefault(_Certificate);
 	
-	var _CertID = __webpack_require__(96);
+	var _CertID = __webpack_require__(94);
 	
 	var _CertID2 = _interopRequireDefault(_CertID);
 	
-	var _RSASSAPSSParams = __webpack_require__(18);
+	var _RSASSAPSSParams = __webpack_require__(16);
 	
 	var _RSASSAPSSParams2 = _interopRequireDefault(_RSASSAPSSParams);
 	
-	var _RelativeDistinguishedNames = __webpack_require__(30);
+	var _RelativeDistinguishedNames = __webpack_require__(28);
 	
 	var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 	
-	var _CertificateChainValidationEngine = __webpack_require__(97);
+	var _CertificateChainValidationEngine = __webpack_require__(95);
 	
 	var _CertificateChainValidationEngine2 = _interopRequireDefault(_CertificateChainValidationEngine);
 	
@@ -51157,7 +50995,7 @@ var GCLLib =
 	//# sourceMappingURL=BasicOCSPResponse.js.map
 
 /***/ }),
-/* 94 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -51168,25 +51006,25 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _RelativeDistinguishedNames = __webpack_require__(30);
+	var _RelativeDistinguishedNames = __webpack_require__(28);
 	
 	var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 	
-	var _SingleResponse = __webpack_require__(95);
+	var _SingleResponse = __webpack_require__(93);
 	
 	var _SingleResponse2 = _interopRequireDefault(_SingleResponse);
 	
-	var _Extension = __webpack_require__(46);
+	var _Extension = __webpack_require__(44);
 	
 	var _Extension2 = _interopRequireDefault(_Extension);
 	
-	var _Extensions = __webpack_require__(65);
+	var _Extensions = __webpack_require__(63);
 	
 	var _Extensions2 = _interopRequireDefault(_Extensions);
 	
@@ -51526,7 +51364,7 @@ var GCLLib =
 	//# sourceMappingURL=ResponseData.js.map
 
 /***/ }),
-/* 95 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -51537,21 +51375,21 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _CertID = __webpack_require__(96);
+	var _CertID = __webpack_require__(94);
 	
 	var _CertID2 = _interopRequireDefault(_CertID);
 	
-	var _Extension = __webpack_require__(46);
+	var _Extension = __webpack_require__(44);
 	
 	var _Extension2 = _interopRequireDefault(_Extension);
 	
-	var _Extensions = __webpack_require__(65);
+	var _Extensions = __webpack_require__(63);
 	
 	var _Extensions2 = _interopRequireDefault(_Extensions);
 	
@@ -51862,7 +51700,7 @@ var GCLLib =
 	//# sourceMappingURL=SingleResponse.js.map
 
 /***/ }),
-/* 96 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -51873,19 +51711,19 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(14);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _Certificate = __webpack_require__(44);
+	var _Certificate = __webpack_require__(42);
 	
 	var _Certificate2 = _interopRequireDefault(_Certificate);
 	
@@ -52197,7 +52035,7 @@ var GCLLib =
 	//# sourceMappingURL=CertID.js.map
 
 /***/ }),
-/* 97 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -52208,19 +52046,19 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(14);
 	
-	var _CertificateRevocationList = __webpack_require__(67);
+	var _CertificateRevocationList = __webpack_require__(65);
 	
 	var _CertificateRevocationList2 = _interopRequireDefault(_CertificateRevocationList);
 	
-	var _Certificate = __webpack_require__(44);
+	var _Certificate = __webpack_require__(42);
 	
 	var _Certificate2 = _interopRequireDefault(_Certificate);
 	
-	var _GeneratorsDriver = __webpack_require__(98);
+	var _GeneratorsDriver = __webpack_require__(96);
 	
 	var _GeneratorsDriver2 = _interopRequireDefault(_GeneratorsDriver);
 	
@@ -54251,7 +54089,7 @@ var GCLLib =
 	//# sourceMappingURL=CertificateChainValidationEngine.js.map
 
 /***/ }),
-/* 98 */
+/* 96 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -54354,7 +54192,7 @@ var GCLLib =
 	//# sourceMappingURL=GeneratorsDriver.js.map
 
 /***/ }),
-/* 99 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -54365,31 +54203,31 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(14);
 	
-	var _PublicKeyInfo = __webpack_require__(20);
+	var _PublicKeyInfo = __webpack_require__(18);
 	
 	var _PublicKeyInfo2 = _interopRequireDefault(_PublicKeyInfo);
 	
-	var _RelativeDistinguishedNames = __webpack_require__(30);
+	var _RelativeDistinguishedNames = __webpack_require__(28);
 	
 	var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _Attribute = __webpack_require__(24);
+	var _Attribute = __webpack_require__(22);
 	
 	var _Attribute2 = _interopRequireDefault(_Attribute);
 	
-	var _RSASSAPSSParams = __webpack_require__(18);
+	var _RSASSAPSSParams = __webpack_require__(16);
 	
 	var _RSASSAPSSParams2 = _interopRequireDefault(_RSASSAPSSParams);
 	
@@ -54933,7 +54771,7 @@ var GCLLib =
 	//# sourceMappingURL=CertificationRequest.js.map
 
 /***/ }),
-/* 100 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -54944,13 +54782,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
@@ -55144,7 +54982,7 @@ var GCLLib =
 	//# sourceMappingURL=DigestInfo.js.map
 
 /***/ }),
-/* 101 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -55155,11 +54993,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -55395,7 +55233,7 @@ var GCLLib =
 	//# sourceMappingURL=EncapsulatedContentInfo.js.map
 
 /***/ }),
-/* 102 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -55404,7 +55242,7 @@ var GCLLib =
 		value: true
 	});
 	
-	var _PrivateKeyInfo2 = __webpack_require__(23);
+	var _PrivateKeyInfo2 = __webpack_require__(21);
 	
 	var _PrivateKeyInfo3 = _interopRequireDefault(_PrivateKeyInfo2);
 	
@@ -55448,7 +55286,7 @@ var GCLLib =
 	//# sourceMappingURL=KeyBag.js.map
 
 /***/ }),
-/* 103 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -55459,13 +55297,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _DigestInfo = __webpack_require__(100);
+	var _DigestInfo = __webpack_require__(98);
 	
 	var _DigestInfo2 = _interopRequireDefault(_DigestInfo);
 	
@@ -55688,7 +55526,7 @@ var GCLLib =
 	//# sourceMappingURL=MacData.js.map
 
 /***/ }),
-/* 104 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -55699,13 +55537,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
@@ -55886,7 +55724,7 @@ var GCLLib =
 	//# sourceMappingURL=MessageImprint.js.map
 
 /***/ }),
-/* 105 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -55897,39 +55735,39 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(14);
 	
-	var _TBSRequest = __webpack_require__(106);
+	var _TBSRequest = __webpack_require__(104);
 	
 	var _TBSRequest2 = _interopRequireDefault(_TBSRequest);
 	
-	var _Signature = __webpack_require__(108);
+	var _Signature = __webpack_require__(106);
 	
 	var _Signature2 = _interopRequireDefault(_Signature);
 	
-	var _Request = __webpack_require__(107);
+	var _Request = __webpack_require__(105);
 	
 	var _Request2 = _interopRequireDefault(_Request);
 	
-	var _CertID = __webpack_require__(96);
+	var _CertID = __webpack_require__(94);
 	
 	var _CertID2 = _interopRequireDefault(_CertID);
 	
-	var _Certificate = __webpack_require__(44);
+	var _Certificate = __webpack_require__(42);
 	
 	var _Certificate2 = _interopRequireDefault(_Certificate);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _RSASSAPSSParams = __webpack_require__(18);
+	var _RSASSAPSSParams = __webpack_require__(16);
 	
 	var _RSASSAPSSParams2 = _interopRequireDefault(_RSASSAPSSParams);
 	
@@ -56302,7 +56140,7 @@ var GCLLib =
 	//# sourceMappingURL=OCSPRequest.js.map
 
 /***/ }),
-/* 106 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56313,25 +56151,25 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _GeneralName = __webpack_require__(29);
+	var _GeneralName = __webpack_require__(27);
 	
 	var _GeneralName2 = _interopRequireDefault(_GeneralName);
 	
-	var _Request = __webpack_require__(107);
+	var _Request = __webpack_require__(105);
 	
 	var _Request2 = _interopRequireDefault(_Request);
 	
-	var _Extension = __webpack_require__(46);
+	var _Extension = __webpack_require__(44);
 	
 	var _Extension2 = _interopRequireDefault(_Extension);
 	
-	var _Extensions = __webpack_require__(65);
+	var _Extensions = __webpack_require__(63);
 	
 	var _Extensions2 = _interopRequireDefault(_Extensions);
 	
@@ -56659,7 +56497,7 @@ var GCLLib =
 	//# sourceMappingURL=TBSRequest.js.map
 
 /***/ }),
-/* 107 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56670,17 +56508,17 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _CertID = __webpack_require__(96);
+	var _CertID = __webpack_require__(94);
 	
 	var _CertID2 = _interopRequireDefault(_CertID);
 	
-	var _Extension = __webpack_require__(46);
+	var _Extension = __webpack_require__(44);
 	
 	var _Extension2 = _interopRequireDefault(_Extension);
 	
@@ -56908,7 +56746,7 @@ var GCLLib =
 	//# sourceMappingURL=Request.js.map
 
 /***/ }),
-/* 108 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -56919,17 +56757,17 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _Certificate = __webpack_require__(44);
+	var _Certificate = __webpack_require__(42);
 	
 	var _Certificate2 = _interopRequireDefault(_Certificate);
 	
@@ -57168,7 +57006,7 @@ var GCLLib =
 	//# sourceMappingURL=Signature.js.map
 
 /***/ }),
-/* 109 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -57179,17 +57017,17 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _ResponseBytes = __webpack_require__(110);
+	var _ResponseBytes = __webpack_require__(108);
 	
 	var _ResponseBytes2 = _interopRequireDefault(_ResponseBytes);
 	
-	var _BasicOCSPResponse = __webpack_require__(93);
+	var _BasicOCSPResponse = __webpack_require__(91);
 	
 	var _BasicOCSPResponse2 = _interopRequireDefault(_BasicOCSPResponse);
 	
@@ -57484,7 +57322,7 @@ var GCLLib =
 	//# sourceMappingURL=OCSPResponse.js.map
 
 /***/ }),
-/* 110 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -57495,11 +57333,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -57672,7 +57510,7 @@ var GCLLib =
 	//# sourceMappingURL=ResponseBytes.js.map
 
 /***/ }),
-/* 111 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -57683,11 +57521,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -57839,7 +57677,7 @@ var GCLLib =
 	//# sourceMappingURL=OtherCertificateFormat.js.map
 
 /***/ }),
-/* 112 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -57850,55 +57688,55 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(14);
 	
-	var _ContentInfo = __webpack_require__(35);
+	var _ContentInfo = __webpack_require__(33);
 	
 	var _ContentInfo2 = _interopRequireDefault(_ContentInfo);
 	
-	var _MacData = __webpack_require__(103);
+	var _MacData = __webpack_require__(101);
 	
 	var _MacData2 = _interopRequireDefault(_MacData);
 	
-	var _DigestInfo = __webpack_require__(100);
+	var _DigestInfo = __webpack_require__(98);
 	
 	var _DigestInfo2 = _interopRequireDefault(_DigestInfo);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _SignedData = __webpack_require__(113);
+	var _SignedData = __webpack_require__(111);
 	
 	var _SignedData2 = _interopRequireDefault(_SignedData);
 	
-	var _EncapsulatedContentInfo = __webpack_require__(101);
+	var _EncapsulatedContentInfo = __webpack_require__(99);
 	
 	var _EncapsulatedContentInfo2 = _interopRequireDefault(_EncapsulatedContentInfo);
 	
-	var _Attribute = __webpack_require__(24);
+	var _Attribute = __webpack_require__(22);
 	
 	var _Attribute2 = _interopRequireDefault(_Attribute);
 	
-	var _SignerInfo = __webpack_require__(114);
+	var _SignerInfo = __webpack_require__(112);
 	
 	var _SignerInfo2 = _interopRequireDefault(_SignerInfo);
 	
-	var _IssuerAndSerialNumber = __webpack_require__(78);
+	var _IssuerAndSerialNumber = __webpack_require__(76);
 	
 	var _IssuerAndSerialNumber2 = _interopRequireDefault(_IssuerAndSerialNumber);
 	
-	var _SignedAndUnsignedAttributes = __webpack_require__(115);
+	var _SignedAndUnsignedAttributes = __webpack_require__(113);
 	
 	var _SignedAndUnsignedAttributes2 = _interopRequireDefault(_SignedAndUnsignedAttributes);
 	
-	var _AuthenticatedSafe = __webpack_require__(34);
+	var _AuthenticatedSafe = __webpack_require__(32);
 	
 	var _AuthenticatedSafe2 = _interopRequireDefault(_AuthenticatedSafe);
 	
@@ -58596,7 +58434,7 @@ var GCLLib =
 	//# sourceMappingURL=PFX.js.map
 
 /***/ }),
-/* 113 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -58609,67 +58447,67 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(14);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _EncapsulatedContentInfo = __webpack_require__(101);
+	var _EncapsulatedContentInfo = __webpack_require__(99);
 	
 	var _EncapsulatedContentInfo2 = _interopRequireDefault(_EncapsulatedContentInfo);
 	
-	var _Certificate = __webpack_require__(44);
+	var _Certificate = __webpack_require__(42);
 	
 	var _Certificate2 = _interopRequireDefault(_Certificate);
 	
-	var _OtherCertificateFormat = __webpack_require__(111);
+	var _OtherCertificateFormat = __webpack_require__(109);
 	
 	var _OtherCertificateFormat2 = _interopRequireDefault(_OtherCertificateFormat);
 	
-	var _CertificateRevocationList = __webpack_require__(67);
+	var _CertificateRevocationList = __webpack_require__(65);
 	
 	var _CertificateRevocationList2 = _interopRequireDefault(_CertificateRevocationList);
 	
-	var _OtherRevocationInfoFormat = __webpack_require__(74);
+	var _OtherRevocationInfoFormat = __webpack_require__(72);
 	
 	var _OtherRevocationInfoFormat2 = _interopRequireDefault(_OtherRevocationInfoFormat);
 	
-	var _SignerInfo = __webpack_require__(114);
+	var _SignerInfo = __webpack_require__(112);
 	
 	var _SignerInfo2 = _interopRequireDefault(_SignerInfo);
 	
-	var _CertificateSet = __webpack_require__(72);
+	var _CertificateSet = __webpack_require__(70);
 	
 	var _CertificateSet2 = _interopRequireDefault(_CertificateSet);
 	
-	var _RevocationInfoChoices = __webpack_require__(73);
+	var _RevocationInfoChoices = __webpack_require__(71);
 	
 	var _RevocationInfoChoices2 = _interopRequireDefault(_RevocationInfoChoices);
 	
-	var _IssuerAndSerialNumber = __webpack_require__(78);
+	var _IssuerAndSerialNumber = __webpack_require__(76);
 	
 	var _IssuerAndSerialNumber2 = _interopRequireDefault(_IssuerAndSerialNumber);
 	
-	var _TSTInfo = __webpack_require__(116);
+	var _TSTInfo = __webpack_require__(114);
 	
 	var _TSTInfo2 = _interopRequireDefault(_TSTInfo);
 	
-	var _CertificateChainValidationEngine = __webpack_require__(97);
+	var _CertificateChainValidationEngine = __webpack_require__(95);
 	
 	var _CertificateChainValidationEngine2 = _interopRequireDefault(_CertificateChainValidationEngine);
 	
-	var _BasicOCSPResponse = __webpack_require__(93);
+	var _BasicOCSPResponse = __webpack_require__(91);
 	
 	var _BasicOCSPResponse2 = _interopRequireDefault(_BasicOCSPResponse);
 	
-	var _RSASSAPSSParams = __webpack_require__(18);
+	var _RSASSAPSSParams = __webpack_require__(16);
 	
 	var _RSASSAPSSParams2 = _interopRequireDefault(_RSASSAPSSParams);
 	
@@ -59993,7 +59831,7 @@ var GCLLib =
 	//# sourceMappingURL=SignedData.js.map
 
 /***/ }),
-/* 114 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -60004,21 +59842,21 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _AlgorithmIdentifier = __webpack_require__(17);
+	var _AlgorithmIdentifier = __webpack_require__(15);
 	
 	var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 	
-	var _SignedAndUnsignedAttributes = __webpack_require__(115);
+	var _SignedAndUnsignedAttributes = __webpack_require__(113);
 	
 	var _SignedAndUnsignedAttributes2 = _interopRequireDefault(_SignedAndUnsignedAttributes);
 	
-	var _IssuerAndSerialNumber = __webpack_require__(78);
+	var _IssuerAndSerialNumber = __webpack_require__(76);
 	
 	var _IssuerAndSerialNumber2 = _interopRequireDefault(_IssuerAndSerialNumber);
 	
@@ -60337,7 +60175,7 @@ var GCLLib =
 	//# sourceMappingURL=SignerInfo.js.map
 
 /***/ }),
-/* 115 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -60348,13 +60186,13 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _Attribute = __webpack_require__(24);
+	var _Attribute = __webpack_require__(22);
 	
 	var _Attribute2 = _interopRequireDefault(_Attribute);
 	
@@ -60577,7 +60415,7 @@ var GCLLib =
 	//# sourceMappingURL=SignedAndUnsignedAttributes.js.map
 
 /***/ }),
-/* 116 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -60588,27 +60426,27 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _common = __webpack_require__(16);
+	var _common = __webpack_require__(14);
 	
-	var _MessageImprint = __webpack_require__(104);
+	var _MessageImprint = __webpack_require__(102);
 	
 	var _MessageImprint2 = _interopRequireDefault(_MessageImprint);
 	
-	var _Accuracy = __webpack_require__(32);
+	var _Accuracy = __webpack_require__(30);
 	
 	var _Accuracy2 = _interopRequireDefault(_Accuracy);
 	
-	var _GeneralName = __webpack_require__(29);
+	var _GeneralName = __webpack_require__(27);
 	
 	var _GeneralName2 = _interopRequireDefault(_GeneralName);
 	
-	var _Extension = __webpack_require__(46);
+	var _Extension = __webpack_require__(44);
 	
 	var _Extension2 = _interopRequireDefault(_Extension);
 	
@@ -61026,7 +60864,7 @@ var GCLLib =
 	//# sourceMappingURL=TSTInfo.js.map
 
 /***/ }),
-/* 117 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -61037,11 +60875,11 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 	
@@ -61267,7 +61105,7 @@ var GCLLib =
 	//# sourceMappingURL=PKIStatusInfo.js.map
 
 /***/ }),
-/* 118 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -61278,17 +61116,17 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _MessageImprint = __webpack_require__(104);
+	var _MessageImprint = __webpack_require__(102);
 	
 	var _MessageImprint2 = _interopRequireDefault(_MessageImprint);
 	
-	var _Extension = __webpack_require__(46);
+	var _Extension = __webpack_require__(44);
 	
 	var _Extension2 = _interopRequireDefault(_Extension);
 	
@@ -61575,7 +61413,7 @@ var GCLLib =
 	//# sourceMappingURL=TimeStampReq.js.map
 
 /***/ }),
-/* 119 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -61586,21 +61424,21 @@ var GCLLib =
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _asn1js = __webpack_require__(12);
+	var _asn1js = __webpack_require__(10);
 	
 	var asn1js = _interopRequireWildcard(_asn1js);
 	
-	var _pvutils = __webpack_require__(13);
+	var _pvutils = __webpack_require__(11);
 	
-	var _PKIStatusInfo = __webpack_require__(117);
+	var _PKIStatusInfo = __webpack_require__(115);
 	
 	var _PKIStatusInfo2 = _interopRequireDefault(_PKIStatusInfo);
 	
-	var _ContentInfo = __webpack_require__(35);
+	var _ContentInfo = __webpack_require__(33);
 	
 	var _ContentInfo2 = _interopRequireDefault(_ContentInfo);
 	
-	var _SignedData = __webpack_require__(113);
+	var _SignedData = __webpack_require__(111);
 	
 	var _SignedData2 = _interopRequireDefault(_SignedData);
 	
@@ -61844,6 +61682,228 @@ var GCLLib =
 	
 	exports.default = TimeStampResp;
 	//# sourceMappingURL=TimeStampResp.js.map
+
+/***/ }),
+/* 118 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Card_1 = __webpack_require__(6);
+	var EidBe = (function (_super) {
+	    __extends(EidBe, _super);
+	    function EidBe() {
+	        return _super !== null && _super.apply(this, arguments) || this;
+	    }
+	    EidBe.prototype.rnData = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + EidBe.RN_DATA, undefined, callback);
+	    };
+	    EidBe.prototype.address = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + EidBe.ADDRESS, undefined, callback);
+	    };
+	    EidBe.prototype.picture = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + EidBe.PHOTO, undefined, callback);
+	    };
+	    EidBe.prototype.rootCertificate = function (callback) {
+	        return this.getCertificate(EidBe.CERT_ROOT, callback);
+	    };
+	    EidBe.prototype.citizenCertificate = function (callback) {
+	        return this.getCertificate(EidBe.CERT_CITIZEN, callback);
+	    };
+	    EidBe.prototype.authenticationCertificate = function (callback) {
+	        return this.getCertificate(EidBe.CERT_AUTHENTICATION, callback);
+	    };
+	    EidBe.prototype.nonRepudiationCertificate = function (callback) {
+	        return this.getCertificate(EidBe.CERT_NON_REPUDIATION, callback);
+	    };
+	    EidBe.prototype.rrnCertificate = function (callback) {
+	        return this.getCertificate(EidBe.CERT_RRN, callback);
+	    };
+	    EidBe.prototype.verifyPin = function (body, callback) {
+	        var _req = { private_key_reference: EidBe.VERIFY_PRIV_KEY_REF };
+	        if (body.pin) {
+	            _req.pin = body.pin;
+	        }
+	        return this.connection.post(this.resolvedReaderURI() + Card_1.GenericCertCard.VERIFY_PIN, _req, undefined, callback);
+	    };
+	    return EidBe;
+	}(Card_1.GenericCertCard));
+	EidBe.RN_DATA = "/rn";
+	EidBe.ADDRESS = "/address";
+	EidBe.PHOTO = "/picture";
+	EidBe.VERIFY_PRIV_KEY_REF = "non-repudiation";
+	exports.EidBe = EidBe;
+
+
+/***/ }),
+/* 119 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Card_1 = __webpack_require__(6);
+	var es6_promise_1 = __webpack_require__(7);
+	var _ = __webpack_require__(1);
+	var asn1js = __webpack_require__(10);
+	var Base64 = __webpack_require__(12);
+	var pkijs_1 = __webpack_require__(13);
+	function createFilterQueryParam(filters, pin) {
+	    return { filter: filters.join(","), pin: pin };
+	}
+	function createPinQueryParam(pin) {
+	    return { pin: pin };
+	}
+	var EidLux = (function (_super) {
+	    __extends(EidLux, _super);
+	    function EidLux(url, connection, reader_id, pin) {
+	        var _this = _super.call(this, url, connection, reader_id) || this;
+	        _this.url = url;
+	        _this.connection = connection;
+	        _this.reader_id = reader_id;
+	        _this.pin = pin;
+	        return _this;
+	    }
+	    EidLux.prototype.allDataFilters = function () {
+	        return ["authentication-certificate", "biometric", "non-repudiation-certificate", "picture", "root-certificates"];
+	    };
+	    EidLux.prototype.allCertFilters = function () {
+	        return ["authentication-certificate", "non-repudiation-certificate", "root-certificates"];
+	    };
+	    EidLux.prototype.allData = function (filters, callback) {
+	        if (filters && filters.length) {
+	            return this.connection.get(this.resolvedReaderURI(), createFilterQueryParam(filters, this.pin), callback);
+	        }
+	        else {
+	            return this.connection.get(this.resolvedReaderURI(), createPinQueryParam(this.pin), callback);
+	        }
+	    };
+	    EidLux.prototype.allCerts = function (filters, callback) {
+	        if (filters && filters.length) {
+	            return this.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, createFilterQueryParam(filters, this.pin), callback);
+	        }
+	        else {
+	            return this.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, createPinQueryParam(this.pin), callback);
+	        }
+	    };
+	    EidLux.prototype.biometric = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + EidLux.BIOMETRIC, createPinQueryParam(this.pin), callback);
+	    };
+	    EidLux.prototype.picture = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + EidLux.PHOTO, createPinQueryParam(this.pin), callback);
+	    };
+	    EidLux.prototype.rootCertificate = function (callback) {
+	        return this.getCertificateArray(EidLux.CERT_ROOT, callback, createPinQueryParam(this.pin));
+	    };
+	    EidLux.prototype.authenticationCertificate = function (callback) {
+	        return this.getCertificate(EidLux.CERT_AUTHENTICATION, callback, createPinQueryParam(this.pin));
+	    };
+	    EidLux.prototype.nonRepudiationCertificate = function (callback) {
+	        return this.getCertificate(EidLux.CERT_NON_REPUDIATION, callback, createPinQueryParam(this.pin));
+	    };
+	    EidLux.prototype.verifyPin = function (body, callback) {
+	        return this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(this.pin), callback);
+	    };
+	    EidLux.prototype.signData = function (body, callback) {
+	        return this.connection.post(this.resolvedReaderURI() + EidLux.SIGN_DATA, body, createPinQueryParam(this.pin), callback);
+	    };
+	    EidLux.prototype.authenticate = function (body, callback) {
+	        return this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(this.pin), callback);
+	    };
+	    EidLux.prototype.signatureImage = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + EidLux.SIGNATURE_IMAGE, createPinQueryParam(this.pin), callback);
+	    };
+	    EidLux.prototype.getCertificate = function (certUrl, callback, params) {
+	        var self = this;
+	        if (callback && typeof callback === "function") {
+	            self.retrieveAndParseCert(self, certUrl, params, callback);
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
+	            });
+	        }
+	    };
+	    EidLux.prototype.getCertificateArray = function (certUrl, callback, params) {
+	        var self = this;
+	        if (callback && typeof callback === "function") {
+	            self.retrieveAndParseCert(self, certUrl, params, callback);
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
+	            });
+	        }
+	    };
+	    EidLux.prototype.retrieveAndParseCert = function (self, certUrl, params, callback, resolve, reject) {
+	        self.connection.get(self.resolvedReaderURI() + EidLux.ALL_CERTIFICATES + certUrl, params).then(function (certData) {
+	            if (_.isArray(certData.data)) {
+	                var newData_1 = [];
+	                _.forEach(certData.data, function (certificate) {
+	                    newData_1.push({ certificate: certificate, parsed: processCert(certificate) });
+	                });
+	                certData.data = newData_1;
+	            }
+	            else {
+	                var certificate = certData.data;
+	                certData.data = { certificate: certificate, parsed: processCert(certificate) };
+	            }
+	            if (resolve) {
+	                resolve(certData);
+	            }
+	            else {
+	                callback(null, certData);
+	            }
+	        }, function (err) {
+	            if (reject) {
+	                reject(err);
+	            }
+	            else {
+	                callback(err, null);
+	            }
+	        });
+	        function processCert(certificate) {
+	            var rawCert = Base64.atob(certificate);
+	            var buffer = str2ab(rawCert);
+	            var asn1 = asn1js.fromBER(buffer);
+	            return new pkijs_1.Certificate({ schema: asn1.result });
+	        }
+	        function str2ab(str) {
+	            var buf = new ArrayBuffer(str.length);
+	            var bufView = new Uint8Array(buf);
+	            for (var i = 0, strLen = str.length; i < strLen; i++) {
+	                bufView[i] = str.charCodeAt(i);
+	            }
+	            return buf;
+	        }
+	    };
+	    return EidLux;
+	}(Card_1.GenericSecuredCertCard));
+	EidLux.BIOMETRIC = "/biometric";
+	EidLux.ADDRESS = "/address";
+	EidLux.PHOTO = "/picture";
+	EidLux.SIGNATURE_IMAGE = "/signature-image";
+	exports.EidLux = EidLux;
+
 
 /***/ }),
 /* 120 */
