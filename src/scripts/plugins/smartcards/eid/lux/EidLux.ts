@@ -17,6 +17,7 @@ import * as _ from "lodash";
 import * as asn1js from "asn1js";
 import * as Base64 from "Base64";
 import { Certificate } from "pkijs";
+import { PinEnforcer } from "../../../../util/PinEnforcer";
 
 export { EidLux };
 
@@ -95,16 +96,52 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
     }
 
     public verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>) {
-        return this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(this.pin), callback);
+        if (callback && typeof callback === "function") {
+            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                return this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(this.pin), callback);
+            }, error => {
+                return callback(error, null);
+            });
+        } else {
+            return new Promise((resolve, reject) => {
+                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                    resolve(this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(this.pin)));
+                }, error => { reject(error); });
+            });
+        }
     }
 
     public signData(body: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
-        return this.connection.post(this.resolvedReaderURI() + EidLux.SIGN_DATA, body, createPinQueryParam(this.pin), callback);
+        if (callback && typeof callback === "function") {
+            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                return this.connection.post(this.resolvedReaderURI() + EidLux.SIGN_DATA, body, createPinQueryParam(this.pin), callback);
+            }, error => {
+                return callback(error, null);
+            });
+        } else {
+            return new Promise((resolve, reject) => {
+                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                    resolve(this.connection.post(this.resolvedReaderURI() + EidLux.SIGN_DATA, body, createPinQueryParam(this.pin)));
+                }, error => { reject(error); });
+            });
+        }
     }
 
     public authenticate(body: AuthenticateOrSignData,
                         callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
-        return this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(this.pin), callback);
+        if (callback && typeof callback === "function") {
+            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                return this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(this.pin), callback);
+            }, error => {
+                return callback(error, null);
+            });
+        } else {
+            return new Promise((resolve, reject) => {
+                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+                    resolve(this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(this.pin)));
+                }, error => { reject(error); });
+            });
+        }
     }
 
     public signatureImage(callback?: (error: RestException, data: SignatureImageResponse) => void | Promise<SignatureImageResponse>) {
@@ -117,10 +154,16 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
         let self = this;
 
         if (callback && typeof callback === "function") {
-            self.retrieveAndParseCert(self, certUrl, params, callback);
+            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {
+                self.retrieveAndParseCert(self, certUrl, params, callback);
+            }, error => {
+                return callback(error, null);
+            });
         } else {
             return new Promise((resolve, reject) => {
-                self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
+                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {
+                    self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
+                }, error => { reject(error); });
             });
         }
     }
@@ -132,10 +175,16 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
         let self = this;
 
         if (callback && typeof callback === "function") {
-            self.retrieveAndParseCert(self, certUrl, params, callback);
+            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {
+                self.retrieveAndParseCert(self, certUrl, params, callback);
+            }, error => {
+                return callback(error, null);
+            });
         } else {
             return new Promise((resolve, reject) => {
-                self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
+                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {
+                    self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
+                }, error => { reject(error); });
             });
         }
     }

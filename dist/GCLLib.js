@@ -61901,6 +61901,7 @@ var GCLLib =
 	var asn1js = __webpack_require__(10);
 	var Base64 = __webpack_require__(12);
 	var pkijs_1 = __webpack_require__(13);
+	var PinEnforcer_1 = __webpack_require__(118);
 	function createFilterQueryParam(filters, pin) {
 	    return { filter: filters.join(","), pin: pin };
 	}
@@ -61956,36 +61957,92 @@ var GCLLib =
 	        return this.getCertificate(EidLux.CERT_NON_REPUDIATION, callback, createPinQueryParam(this.pin));
 	    };
 	    EidLux.prototype.verifyPin = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(this.pin), callback);
+	        var _this = this;
+	        if (callback && typeof callback === "function") {
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	                return _this.connection.post(_this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(_this.pin), callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
+	                    resolve(_this.connection.post(_this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(_this.pin)));
+	                }, function (error) { reject(error); });
+	            });
+	        }
 	    };
 	    EidLux.prototype.signData = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + EidLux.SIGN_DATA, body, createPinQueryParam(this.pin), callback);
+	        var _this = this;
+	        if (callback && typeof callback === "function") {
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	                return _this.connection.post(_this.resolvedReaderURI() + EidLux.SIGN_DATA, body, createPinQueryParam(_this.pin), callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
+	                    resolve(_this.connection.post(_this.resolvedReaderURI() + EidLux.SIGN_DATA, body, createPinQueryParam(_this.pin)));
+	                }, function (error) { reject(error); });
+	            });
+	        }
 	    };
 	    EidLux.prototype.authenticate = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(this.pin), callback);
+	        var _this = this;
+	        if (callback && typeof callback === "function") {
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	                return _this.connection.post(_this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(_this.pin), callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
+	        }
+	        else {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
+	                    resolve(_this.connection.post(_this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(_this.pin)));
+	                }, function (error) { reject(error); });
+	            });
+	        }
 	    };
 	    EidLux.prototype.signatureImage = function (callback) {
 	        return this.connection.get(this.resolvedReaderURI() + EidLux.SIGNATURE_IMAGE, createPinQueryParam(this.pin), callback);
 	    };
 	    EidLux.prototype.getCertificate = function (certUrl, callback, params) {
+	        var _this = this;
 	        var self = this;
 	        if (callback && typeof callback === "function") {
-	            self.retrieveAndParseCert(self, certUrl, params, callback);
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(function () {
+	                self.retrieveAndParseCert(self, certUrl, params, callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
 	        }
 	        else {
 	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, params.pin).then(function () {
+	                    self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
+	                }, function (error) { reject(error); });
 	            });
 	        }
 	    };
 	    EidLux.prototype.getCertificateArray = function (certUrl, callback, params) {
+	        var _this = this;
 	        var self = this;
 	        if (callback && typeof callback === "function") {
-	            self.retrieveAndParseCert(self, certUrl, params, callback);
+	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(function () {
+	                self.retrieveAndParseCert(self, certUrl, params, callback);
+	            }, function (error) {
+	                return callback(error, null);
+	            });
 	        }
 	        else {
 	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
+	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, params.pin).then(function () {
+	                    self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
+	                }, function (error) { reject(error); });
 	            });
 	        }
 	    };
