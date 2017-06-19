@@ -140,7 +140,7 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
                                    params: { filter?: string, pin?: string },
                                    callback: (error: RestException, data: T1CResponse) => void,
                                    resolve?: (data: any) => void, reject?: (data: any) => void) {
-        self.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES + certUrl, params).then(certData => {
+        self.connection.get(self.resolvedReaderURI() + EidLux.ALL_CERTIFICATES + certUrl, params).then(certData => {
             if (_.isArray(certData.data)) {
                 let newData = [];
                 _.forEach(certData.data, certificate => {

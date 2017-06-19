@@ -2,6 +2,11 @@ import { RestException } from "../../core/exceptions/CoreExceptions";
 import { DataArrayResponse, DataObjectResponse, DataResponse, T1CResponse } from "../../core/service/CoreModel";
 import { LocalConnection } from "../../core/client/Connection";
 import { Promise } from "es6-promise";
+import * as _ from "lodash";
+import * as asn1js from "asn1js";
+import * as Base64 from "Base64";
+import { Certificate } from "pkijs";
+
 /**
  * @author Michallis Pashidis
  * @author Maarten Somers
@@ -134,22 +139,51 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
         let self = this;
 
         if (callback && typeof callback === "function") {
-            retrieveAndParseCert();
+            self.retrieveAndParseCert(self, certUrl, callback);
         } else {
             return new Promise((resolve, reject) => {
-                retrieveAndParseCert(resolve, reject);
+                self.retrieveAndParseCert(self, certUrl, callback, resolve, reject);
             });
         }
+    }
 
-        function retrieveAndParseCert(resolve?: (data: any) => void, reject?: (data: any) => void) {
-            self.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, undefined).then(certData => {
-                console.log(certData);
-                if (resolve) { resolve(certData); }
-                else { callback(null, certData); }
-            }, err => {
-                if (reject) { reject(err); }
-                else { callback(err, null); }
-            });
+    protected retrieveAndParseCert(self: GenericCertCard,
+                                   certUrl: string,
+                                   callback: (error: RestException, data: T1CResponse) => void,
+                                   resolve?: (data: any) => void, reject?: (data: any) => void) {
+        self.connection.get(self.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, undefined).then(certData => {
+            if (_.isArray(certData.data)) {
+                let newData = [];
+                _.forEach(certData.data, certificate => {
+                    newData.push({ certificate, parsed: processCert(certificate) });
+                });
+                certData.data = newData;
+            } else {
+                let certificate = certData.data;
+                certData.data = { certificate, parsed: processCert(certificate) };
+            }
+            if (resolve) { resolve(certData); }
+            else { callback(null, certData); }
+        }, err => {
+            if (reject) { reject(err); }
+            else { callback(err, null); }
+        });
+
+        function processCert(certificate: string): Certificate {
+            let rawCert = Base64.atob(certificate);
+            let buffer = str2ab(rawCert);
+            const asn1 = asn1js.fromBER(buffer);
+            return new Certificate({ schema: asn1.result });
+        }
+
+        // function to convert string to ArrayBuffer
+        function str2ab(str: string) {
+            let buf = new ArrayBuffer(str.length);
+            let bufView = new Uint8Array(buf);
+
+            for (let i = 0, strLen = str.length; i < strLen; i++) { bufView[i] = str.charCodeAt(i); }
+
+            return buf;
         }
     }
 }
@@ -211,21 +245,10 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
         let self = this;
 
         if (callback && typeof callback === "function") {
-            retrieveAndParseCert();
+            self.retrieveAndParseCert(self, certUrl, body, params, callback);
         } else {
             return new Promise((resolve, reject) => {
-                retrieveAndParseCert(resolve, reject);
-            });
-        }
-
-        function retrieveAndParseCert(resolve?: (data: any) => void, reject?: (data: any) => void) {
-            self.connection.post(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, body, params).then(certData => {
-                console.log(certData);
-                if (resolve) { resolve(certData); }
-                else { callback(null, certData); }
-            }, err => {
-                if (reject) { reject(err); }
-                else { callback(err, null); }
+                self.retrieveAndParseCert(self, certUrl, body, params, callback, resolve, reject);
             });
         }
     }
@@ -235,6 +258,55 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
                                   callback: (error: RestException,
                                              data: DataArrayResponse) => void,
                                   params?: { filter?: string, pin?: string }): void | Promise<DataArrayResponse> {
-        return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, params, callback);
+        let self = this;
+
+        if (callback && typeof callback === "function") {
+            self.retrieveAndParseCert(self, certUrl, body, params, callback);
+        } else {
+            return new Promise((resolve, reject) => {
+                self.retrieveAndParseCert(self, certUrl, body, params, callback, resolve, reject);
+            });
+        }
+    }
+
+    protected retrieveAndParseCert(self: GenericSecuredCertCard, certUrl: string,
+                                   body: OptionalPin,
+                                   params: { filter?: string, pin?: string },
+                                   callback: (error: RestException, data: T1CResponse) => void,
+                                   resolve?: (data: any) => void, reject?: (data: any) => void) {
+        self.connection.post(self.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, params).then(certData => {
+            if (_.isArray(certData.data)) {
+                let newData = [];
+                _.forEach(certData.data, certificate => {
+                    newData.push({ certificate, parsed: processCert(certificate) });
+                });
+                certData.data = newData;
+            } else {
+                let certificate = certData.data;
+                certData.data = { certificate, parsed: processCert(certificate) };
+            }
+            if (resolve) { resolve(certData); }
+            else { callback(null, certData); }
+        }, err => {
+            if (reject) { reject(err); }
+            else { callback(err, null); }
+        });
+
+        function processCert(certificate: string): Certificate {
+            let rawCert = Base64.atob(certificate);
+            let buffer = str2ab(rawCert);
+            const asn1 = asn1js.fromBER(buffer);
+            return new Certificate({ schema: asn1.result });
+        }
+
+        // function to convert string to ArrayBuffer
+        function str2ab(str: string) {
+            let buf = new ArrayBuffer(str.length);
+            let bufView = new Uint8Array(buf);
+
+            for (let i = 0, strLen = str.length; i < strLen; i++) { bufView[i] = str.charCodeAt(i); }
+
+            return buf;
+        }
     }
 }
