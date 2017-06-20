@@ -20,8 +20,16 @@ interface AbstractPiv extends GenericSecuredCertCard {
                                    data: PrintedInformationResponse) => void): void | Promise<PrintedInformationResponse>;
     facialImage(body: OptionalPin,
                 callback?: (error: RestException, data: FacialImageResponse) => void): void | Promise<FacialImageResponse>;
+
+    allData(filters: string[], body: OptionalPin): Promise<AllDataResponse>;
+    allData(filters: string[], body: OptionalPin,
+            callback: (error: RestException, data: AllDataResponse) => void): void;
     allData(filters: string[], body: OptionalPin,
             callback?: (error: RestException, data: AllDataResponse) => void): void | Promise<AllDataResponse>;
+
+    allCerts(filters: string[], body: OptionalPin): Promise<AllCertsResponse>;
+    allCerts(filters: string[], body: OptionalPin,
+             callback: (error: RestException, data: AllCertsResponse) => void): void;
     allCerts(filters: string[], body: OptionalPin,
              callback?: (error: RestException, data: AllCertsResponse) => void): void | Promise<AllCertsResponse>;
     authenticationCertificate(body: OptionalPin,

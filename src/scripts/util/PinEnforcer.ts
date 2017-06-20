@@ -10,6 +10,7 @@ const CORE_READERS = "/card-readers";
 
 class PinEnforcer  {
 
+    // TODO figure out how to use generics to return a promise with correct type
     public static check(connection: GenericConnection, baseUrl: string, readerId: string, pinValue: string): Promise<any> {
         // if forceHardwarePinpad enabled,
         return new Promise((resolve, reject) => {
@@ -21,18 +22,18 @@ class PinEnforcer  {
                         if (pinValue) {
                             reject({ data: { message: "Strict pinpad enforcement is enabled. This request was sent with a PIN, but the" +
                                                    " reader has a pinpad." } });
-                        } else { resolve("ok"); }
+                        } else { resolve(); }
                     } else {
                         // if false, check if a pin was sent
                         if (pinValue) {
                             reject({ data: { message: "Strict pinpad enforcement is enabled. This request was sent without a PIN, but the" +
                                                 " reader does not have a pinpad."} });
-                        } else { resolve("ok"); }
+                        } else { resolve(); }
                     }
                 }, error => {
                     reject(error);
                 });
-            } else { resolve("ok"); }
+            } else { resolve(); }
         });
     }
 

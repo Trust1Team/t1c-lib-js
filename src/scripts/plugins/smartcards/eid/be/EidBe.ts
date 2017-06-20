@@ -48,27 +48,16 @@ class EidBe extends GenericCertCard implements AbstractEidBE {
         return this.getCertificate(EidBe.CERT_NON_REPUDIATION, callback);
     }
 
-    public rrnCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+    public rrnCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
         return this.getCertificate(EidBe.CERT_RRN, callback);
     }
 
-    public verifyPin(body: OptionalPin): Promise<T1CResponse>;
-    public verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void): void;
-    public verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void): void | Promise<T1CResponse> {
+
+    public verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void): Promise<any> {
         let _req: VerifyPinData = { private_key_reference: EidBe.VERIFY_PRIV_KEY_REF };
         if (body.pin) { _req.pin = body.pin; }
-        if (callback && typeof callback === "function") {
-            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                return this.connection.post(this.resolvedReaderURI() + GenericCertCard.VERIFY_PIN, _req, undefined, callback);
-            }, error => {
-                return callback(error, null);
-            });
-        } else {
-            return new Promise((resolve, reject) => {
-                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                    resolve(this.connection.post(this.resolvedReaderURI() + GenericCertCard.VERIFY_PIN, _req, undefined));
-                }, error => { reject(error); });
-            });
-        }
+        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+            return this.connection.post(this.resolvedReaderURI() + GenericCertCard.VERIFY_PIN, _req, undefined, callback);
+        });
     }
 }

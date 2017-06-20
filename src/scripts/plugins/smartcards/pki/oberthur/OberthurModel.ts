@@ -22,7 +22,7 @@ interface AbstractOberthur extends CertCard {
     authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
     signingCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
     encryptionCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
-    verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): void | Promise<T1CResponse>;
+    verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): void | Promise<any>;
 }
 
 interface AllDataResponse extends AllCertsResponse {

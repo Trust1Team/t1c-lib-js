@@ -52,6 +52,7 @@
     }
 
     function handleError(err) {
+        console.log(err);
         $("#error").empty();$("#error").append("ERROR:\n", JSON.stringify(err, null, '  '));
     }
 
