@@ -19262,7 +19262,7 @@ var GCLLib =
 	            if (res && res.data && typeof res.data === "object") {
 	                _.forEach(res.data, function (value, key) {
 	                    if (key.indexOf("certificate") > -1 && typeof value === "string") {
-	                        res.data[key] = { certificate: value, parsed: CertParser.processCert(value) };
+	                        res.data[key] = { base64: value, parsed: CertParser.processCert(value) };
 	                    }
 	                });
 	            }
@@ -19270,13 +19270,13 @@ var GCLLib =
 	                if (_.isArray(res.data)) {
 	                    var newData_1 = [];
 	                    _.forEach(res.data, function (certificate) {
-	                        newData_1.push({ certificate: certificate, parsed: CertParser.processCert(certificate) });
+	                        newData_1.push({ base64: certificate, parsed: CertParser.processCert(certificate) });
 	                    });
 	                    res.data = newData_1;
 	                }
 	                else {
 	                    var certificate = res.data;
-	                    res.data = { certificate: certificate, parsed: CertParser.processCert(certificate) };
+	                    res.data = { base64: certificate, parsed: CertParser.processCert(certificate) };
 	                }
 	            }
 	            if (resolve) {

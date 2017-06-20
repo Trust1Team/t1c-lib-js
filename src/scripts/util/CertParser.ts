@@ -31,7 +31,7 @@ class CertParser {
             if (res && res.data && typeof res.data === "object") {
                 _.forEach(res.data, (value, key) => {
                     if (key.indexOf("certificate") > -1 && typeof value === "string") {
-                        res.data[key] = { certificate: value, parsed: CertParser.processCert(value) };
+                        res.data[key] = { base64: value, parsed: CertParser.processCert(value) };
                     }
                 });
             } else {
@@ -39,12 +39,12 @@ class CertParser {
                 if (_.isArray(res.data)) {
                     let newData = [];
                     _.forEach(res.data, (certificate: string) => {
-                        newData.push({ certificate, parsed: CertParser.processCert(certificate) });
+                        newData.push({ base64: certificate, parsed: CertParser.processCert(certificate) });
                     });
                     res.data = newData;
                 } else {
                     let certificate: string = res.data;
-                    res.data = { certificate, parsed: CertParser.processCert(certificate) };
+                    res.data = { base64: certificate, parsed: CertParser.processCert(certificate) };
                 }
             }
             if (resolve) { resolve(res); }
