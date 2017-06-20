@@ -18,7 +18,7 @@ class Oberthur extends GenericCertCard implements AbstractOberthur {
     // filters
     public allDataFilters() {
         return [ "root_certificate", "authentication-certificate",
-                "encryption_certificate", "issuer_certificate", "signing_certificate" ];
+                 "encryption_certificate", "issuer_certificate", "signing_certificate" ];
     }
 
     public allCertFilters() {
@@ -49,21 +49,9 @@ class Oberthur extends GenericCertCard implements AbstractOberthur {
         return this.getCertificate(Oberthur.CERT_ENCRYPTION, callback);
     }
 
-    public verifyPin(body: VerifyPinData): Promise<T1CResponse>;
-    public verifyPin(body: VerifyPinData, callback: (error: RestException, data: T1CResponse) => void): void;
-    public verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): void | Promise<T1CResponse> {
-        if (callback && typeof callback === "function") {
-            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                return this.connection.post(this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, undefined, callback);
-            }, error => {
-                return callback(error, null);
-            });
-        } else {
-            return new Promise((resolve, reject) => {
-                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                    resolve(this.connection.post(this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, undefined));
-                }, error => { reject(error); });
-            });
-        }
+    public verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<any> {
+        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+            return this.connection.post(this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, undefined, callback);
+        });
     }
 }

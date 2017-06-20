@@ -9,6 +9,7 @@
 import {GCLConfig} from "../GCLConfig";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import * as _ from "lodash";
+import { Promise } from "es6-promise";
 
 export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteConnection, Connection, LocalTestConnection };
 
@@ -183,18 +184,24 @@ function handleRequest(url: string,
     if (apikey) { config.headers.apikey = apikey; }
     if (jwt) { config.headers.Authorization = "Bearer " + jwt; }
 
-    if (callback) {
+    callback = callback || function () {
+        // no-op
+        };
+
+    return new Promise((resolve, reject) => {
         axios.request(config).then((response: AxiosResponse) => {
-            return callback(null, response.data);
+            callback(null, response.data);
+            return resolve(response.data);
         }).catch(function (error: AxiosError) {
-            if (error.response) { return callback(error.response, null); }
-            else { return callback(error, null); }
+            if (error.response) {
+                callback(error.response, null);
+                return reject(error.response);
+            } else {
+                callback(error, null);
+                return reject(error);
+            }
         });
-    } else {
-        return axios.request(config).then((response: AxiosResponse) => {
-            return response.data;
-        });
-    }
+    });
 }
 
 function handleTestRequest(url: string,
@@ -216,17 +223,23 @@ function handleTestRequest(url: string,
     if (params) { config.params = params; }
     if (jwt) { config.headers.Authorization = "Bearer " + jwt; }
 
-    if (callback) {
-        axios.request(config).then(function (response: AxiosResponse) {
-            return callback(null, response.data);
+    callback = callback || function () {
+            // no-op
+        };
+
+    return new Promise((resolve, reject) => {
+        axios.request(config).then((response: AxiosResponse) => {
+            callback(null, response.data);
+            return resolve(response.data);
         }).catch(function (error: AxiosError) {
-            if (error.response) { return callback(error.response, null); }
-            else { return callback(error, null); }
+            if (error.response) {
+                callback(error.response, null);
+                return reject(error.response);
+            } else {
+                callback(error, null);
+                return reject(error);
+            }
         });
-    } else {
-        return axios.request(config).then((response: AxiosResponse) => {
-            return response.data;
-        });
-    }
+    });
 }
 

@@ -18,12 +18,16 @@ import * as asn1js from "asn1js";
 import * as Base64 from "Base64";
 import { Certificate } from "pkijs";
 import { PinEnforcer } from "../../../../util/PinEnforcer";
+import { CertParser } from "../../../../util/CertParser";
+import { ResponseHandler } from "../../../../util/ResponseHandler";
 
 export { EidLux };
 
 
-function createFilterQueryParam(filters: string[], pin: string): { filter: string, pin: string } {
-    return { filter: filters.join(","), pin };
+function createFilterQueryParam(filters: string[], pin: string): { filter?: string, pin: string } {
+    if (filters && filters.length) {
+        return { filter: filters.join(","), pin };
+    } else { return { pin }; }
 }
 function createPinQueryParam(pin: string): { pin: string } {
     return { pin };
@@ -57,19 +61,21 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
 
     public allData(filters: string[],
                    callback?: (error: RestException, data: AllDataResponse) => void | Promise<AllDataResponse>) {
-        if (filters && filters.length) {
-            return this.connection.get(this.resolvedReaderURI(), createFilterQueryParam(filters, this.pin), callback);
-        } else { return this.connection.get(this.resolvedReaderURI(), createPinQueryParam(this.pin), callback); }
+        return this.connection.get(this.resolvedReaderURI(), createFilterQueryParam(filters, this.pin)).then(data => {
+            return CertParser.process(data, callback);
+        }, err => {
+            return ResponseHandler.error(err, callback);
+        });
     }
 
     public allCerts(filters: string[],
                     callback?: (error: RestException, data: AllCertsResponse) => void | Promise<AllCertsResponse>) {
-        if (filters && filters.length) {
-            return this.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES,
-                createFilterQueryParam(filters, this.pin), callback);
-        } else {
-            return this.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, createPinQueryParam(this.pin), callback);
-        }
+        return this.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES,
+            createFilterQueryParam(filters, this.pin)).then(data => {
+            return CertParser.process(data, callback);
+        }, err => {
+            return ResponseHandler.error(err, callback);
+        });
     }
 
     public biometric(callback?: (error: RestException, data: BiometricResponse) => void | Promise<BiometricResponse>) {
@@ -96,52 +102,22 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
     }
 
     public verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>) {
-        if (callback && typeof callback === "function") {
-            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                return this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(this.pin), callback);
-            }, error => {
-                return callback(error, null);
-            });
-        } else {
-            return new Promise((resolve, reject) => {
-                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                    resolve(this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(this.pin)));
-                }, error => { reject(error); });
-            });
-        }
+        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+            return this.connection.post(this.resolvedReaderURI() + EidLux.VERIFY_PIN, body, createPinQueryParam(this.pin), callback);
+        });
     }
 
     public signData(body: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
-        if (callback && typeof callback === "function") {
-            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                return this.connection.post(this.resolvedReaderURI() + EidLux.SIGN_DATA, body, createPinQueryParam(this.pin), callback);
-            }, error => {
-                return callback(error, null);
-            });
-        } else {
-            return new Promise((resolve, reject) => {
-                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                    resolve(this.connection.post(this.resolvedReaderURI() + EidLux.SIGN_DATA, body, createPinQueryParam(this.pin)));
-                }, error => { reject(error); });
-            });
-        }
+        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+            return this.connection.post(this.resolvedReaderURI() + EidLux.SIGN_DATA, body, createPinQueryParam(this.pin), callback);
+        });
     }
 
     public authenticate(body: AuthenticateOrSignData,
                         callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
-        if (callback && typeof callback === "function") {
-            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                return this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(this.pin), callback);
-            }, error => {
-                return callback(error, null);
-            });
-        } else {
-            return new Promise((resolve, reject) => {
-                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                    resolve(this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(this.pin)));
-                }, error => { reject(error); });
-            });
-        }
+        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+            return this.connection.post(this.resolvedReaderURI() + EidLux.AUTHENTICATE, body, createPinQueryParam(this.pin), callback);
+        });
     }
 
     public signatureImage(callback?: (error: RestException, data: SignatureImageResponse) => void | Promise<SignatureImageResponse>) {
@@ -153,19 +129,11 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
                              params?: { filter?: string, pin?: string }): void | Promise<DataResponse> {
         let self = this;
 
-        if (callback && typeof callback === "function") {
-            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {
-                self.retrieveAndParseCert(self, certUrl, params, callback);
-            }, error => {
-                return callback(error, null);
-            });
-        } else {
-            return new Promise((resolve, reject) => {
-                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {
-                    self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
-                }, error => { reject(error); });
-            });
-        }
+        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {
+            return self.connection.get(self.resolvedReaderURI() + EidLux.ALL_CERTIFICATES + certUrl, params).then(certData => {
+                return CertParser.process(certData, callback);
+            }, err => { return ResponseHandler.error(err, callback); });
+        });
     }
 
     protected getCertificateArray(certUrl: string,
@@ -174,58 +142,10 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
                                   params?: { filter?: string, pin?: string }): void | Promise<DataArrayResponse> {
         let self = this;
 
-        if (callback && typeof callback === "function") {
-            PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {
-                self.retrieveAndParseCert(self, certUrl, params, callback);
-            }, error => {
-                return callback(error, null);
-            });
-        } else {
-            return new Promise((resolve, reject) => {
-                PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {
-                    self.retrieveAndParseCert(self, certUrl, params, callback, resolve, reject);
-                }, error => { reject(error); });
-            });
-        }
-    }
-
-    protected retrieveAndParseCert(self: EidLux, certUrl: string,
-                                   params: { filter?: string, pin?: string },
-                                   callback: (error: RestException, data: T1CResponse) => void,
-                                   resolve?: (data: any) => void, reject?: (data: any) => void) {
-        self.connection.get(self.resolvedReaderURI() + EidLux.ALL_CERTIFICATES + certUrl, params).then(certData => {
-            if (_.isArray(certData.data)) {
-                let newData = [];
-                _.forEach(certData.data, certificate => {
-                    newData.push({ certificate, parsed: processCert(certificate) });
-                });
-                certData.data = newData;
-            } else {
-                let certificate = certData.data;
-                certData.data = { certificate, parsed: processCert(certificate) };
-            }
-            if (resolve) { resolve(certData); }
-            else { callback(null, certData); }
-        }, err => {
-            if (reject) { reject(err); }
-            else { callback(err, null); }
+        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {
+            return self.connection.get(self.resolvedReaderURI() + EidLux.ALL_CERTIFICATES + certUrl, params).then(certData => {
+                return CertParser.process(certData, callback);
+            }, err => { return ResponseHandler.error(err, callback); });
         });
-
-        function processCert(certificate: string): Certificate {
-            let rawCert = Base64.atob(certificate);
-            let buffer = str2ab(rawCert);
-            const asn1 = asn1js.fromBER(buffer);
-            return new Certificate({ schema: asn1.result });
-        }
-
-        // function to convert string to ArrayBuffer
-        function str2ab(str: string) {
-            let buf = new ArrayBuffer(str.length);
-            let bufView = new Uint8Array(buf);
-
-            for (let i = 0, strLen = str.length; i < strLen; i++) { bufView[i] = str.charCodeAt(i); }
-
-            return buf;
-        }
     }
 }
