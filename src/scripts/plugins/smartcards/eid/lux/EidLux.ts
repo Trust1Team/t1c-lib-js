@@ -60,7 +60,7 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
     }
 
     public allData(filters: string[],
-                   callback?: (error: RestException, data: AllDataResponse) => void | Promise<AllDataResponse>) {
+                   callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse> {
         return this.connection.get(this.resolvedReaderURI(), createFilterQueryParam(filters, this.pin)).then(data => {
             return CertParser.process(data, callback);
         }, err => {
@@ -69,7 +69,7 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
     }
 
     public allCerts(filters: string[],
-                    callback?: (error: RestException, data: AllCertsResponse) => void | Promise<AllCertsResponse>) {
+                    callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse> {
         return this.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES,
             createFilterQueryParam(filters, this.pin)).then(data => {
             return CertParser.process(data, callback);
@@ -78,18 +78,18 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
         });
     }
 
-    public biometric(callback?: (error: RestException, data: BiometricResponse) => void | Promise<BiometricResponse>) {
+    public biometric(callback?: (error: RestException, data: BiometricResponse) => void): Promise<BiometricResponse> {
         return this.connection.get(this.resolvedReaderURI() + EidLux.BIOMETRIC, createPinQueryParam(this.pin), callback);
     }
 
     // in order to access the address information, we need different keys, and on Lux gov level this is protected
     /*address(callback) {this.connection.get(this.resolvedReaderURI() + LUX_ADDRESS, callback, createPinQueryParam(this.pin));}*/
 
-    public picture(callback?: (error: RestException, data: PictureResponse) => void | Promise<PictureResponse>) {
+    public picture(callback?: (error: RestException, data: PictureResponse) => void): Promise<PictureResponse> {
         return this.connection.get(this.resolvedReaderURI() + EidLux.PHOTO, createPinQueryParam(this.pin), callback);
     }
 
-    public rootCertificate(callback?: (error: RestException, data: DataArrayResponse) => void | Promise<DataArrayResponse>) {
+    public rootCertificate(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
         return this.getCertificateArray(EidLux.CERT_ROOT, callback, createPinQueryParam(this.pin));
     }
 
@@ -126,7 +126,7 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
 
     protected getCertificate(certUrl: string,
                              callback: (error: RestException, data: DataResponse) => void,
-                             params?: { filter?: string, pin?: string }): void | Promise<DataResponse> {
+                             params?: { filter?: string, pin?: string }): Promise<DataResponse> {
         let self = this;
 
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {
@@ -139,7 +139,7 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
     protected getCertificateArray(certUrl: string,
                                   callback: (error: RestException,
                                              data: DataArrayResponse) => void,
-                                  params?: { filter?: string, pin?: string }): void | Promise<DataArrayResponse> {
+                                  params?: { filter?: string, pin?: string }): Promise<DataArrayResponse> {
         let self = this;
 
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {

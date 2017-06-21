@@ -16,9 +16,7 @@ class Ocra extends GenericPinCard implements AbstractOcra {
     static CHALLENGE = "/challenge";
     static READ_COUNTER = "/read-counter";
 
-    public challenge(body: ChallengeData): Promise<DataResponse>;
-    public challenge(body: ChallengeData, callback: (error: RestException, data: DataResponse) => void): void;
-    public challenge(body: ChallengeData, callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+    public challenge(body: ChallengeData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         if (callback && typeof callback === "function") {
             PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
                 return this.connection.post(this.resolvedReaderURI() + Ocra.CHALLENGE, body, undefined, callback);
@@ -33,11 +31,9 @@ class Ocra extends GenericPinCard implements AbstractOcra {
             });
         }
     }
-    public readCounter(body: OptionalPin): Promise<ReadCounterResponse>;
+
     public readCounter(body: OptionalPin,
-                       callback: (error: RestException, data: ReadCounterResponse) => void): void;
-    public readCounter(body: OptionalPin,
-                       callback?: (error: RestException, data: ReadCounterResponse) => void): void | Promise<ReadCounterResponse> {
+                       callback?: (error: RestException, data: ReadCounterResponse) => void): Promise<ReadCounterResponse> {
         if (callback && typeof callback === "function") {
             PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
                 return this.connection.post(this.resolvedReaderURI() + Ocra.READ_COUNTER, body, undefined, callback);

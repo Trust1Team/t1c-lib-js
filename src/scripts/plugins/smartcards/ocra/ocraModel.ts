@@ -10,10 +10,10 @@ export { AbstractOcra, AllDataResponse, ChallengeData, ReadCounterResponse };
 
 
 interface AbstractOcra extends PinCard {
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): void | Promise<AllDataResponse>;
-    challenge(body: ChallengeData, callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+    challenge(body: ChallengeData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     readCounter(body: OptionalPin,
-                callback?: (error: RestException, data: ReadCounterResponse) => void): void | Promise<ReadCounterResponse>;
+                callback?: (error: RestException, data: ReadCounterResponse) => void): Promise<ReadCounterResponse>;
 }
 
 interface AllDataResponse extends DataObjectResponse {

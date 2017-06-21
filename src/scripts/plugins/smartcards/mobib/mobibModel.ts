@@ -10,11 +10,11 @@ export { AbstractMobib, AllDataResponse, StatusResponse, CardIssuing, CardIssuin
 
 
 interface AbstractMobib extends Card {
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): void | Promise<AllDataResponse>;
-    cardIssuing(callback?: (error: RestException, data: CardIssuingResponse) => void): void | Promise<CardIssuingResponse>;
-    contracts(callback?: (error: RestException, data: ContractsResponse) => void): void | Promise<ContractsResponse>;
-    picture(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
-    status(callback?: (error: RestException, data: StatusResponse) => void): void | Promise<StatusResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+    cardIssuing(callback?: (error: RestException, data: CardIssuingResponse) => void): Promise<CardIssuingResponse>;
+    contracts(callback?: (error: RestException, data: ContractsResponse) => void): Promise<ContractsResponse>;
+    picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    status(callback?: (error: RestException, data: StatusResponse) => void): Promise<StatusResponse>;
 }
 
 interface AllDataResponse extends DataObjectResponse {
