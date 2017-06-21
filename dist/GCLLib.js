@@ -65958,14 +65958,14 @@ var GCLLib =
 	            }
 	        });
 	    };
-	    SafeNet.prototype.info = function (body, callback) {
+	    SafeNet.prototype.info = function (callback) {
 	        var _this = this;
-	        var req = _.extend(body, { module: this.modulePath });
+	        var req = { module: this.modulePath };
 	        return this.connection.post(this.resolvedURI() + SafeNet.INFO, req, undefined).then(function (data) {
 	            return ResponseHandler_1.ResponseHandler.response(data, callback);
 	        }, function (err) {
 	            if (_this.moduleConfig) {
-	                var defaultReq = _.extend(body, { module: SafeNet.DEFAULT_CONFIG[_this.os] });
+	                var defaultReq = { module: SafeNet.DEFAULT_CONFIG[_this.os] };
 	                return _this.connection.post(_this.resolvedURI() + SafeNet.INFO, defaultReq, undefined, callback);
 	            }
 	            else {
@@ -65973,14 +65973,14 @@ var GCLLib =
 	            }
 	        });
 	    };
-	    SafeNet.prototype.slots = function (body, callback) {
+	    SafeNet.prototype.slots = function (callback) {
 	        var _this = this;
-	        var req = _.extend(body, { module: this.modulePath });
+	        var req = { module: this.modulePath };
 	        return this.connection.post(this.resolvedURI() + SafeNet.SLOTS, req, undefined).then(function (data) {
 	            return ResponseHandler_1.ResponseHandler.response(data, callback);
 	        }, function (err) {
 	            if (_this.moduleConfig) {
-	                var defaultReq = _.extend(body, { module: SafeNet.DEFAULT_CONFIG[_this.os] });
+	                var defaultReq = { module: SafeNet.DEFAULT_CONFIG[_this.os] };
 	                return _this.connection.post(_this.resolvedURI() + SafeNet.SLOTS, defaultReq, undefined, callback);
 	            }
 	            else {
@@ -65988,14 +65988,14 @@ var GCLLib =
 	            }
 	        });
 	    };
-	    SafeNet.prototype.slotsWithTokenPresent = function (body, callback) {
+	    SafeNet.prototype.slotsWithTokenPresent = function (callback) {
 	        var _this = this;
-	        var req = _.extend(body, { module: this.modulePath });
+	        var req = { module: this.modulePath };
 	        return this.connection.post(this.resolvedURI() + SafeNet.SLOTS, req, { "token-present": "true" }).then(function (data) {
 	            return ResponseHandler_1.ResponseHandler.response(data, callback);
 	        }, function (err) {
 	            if (_this.moduleConfig) {
-	                var defaultReq = _.extend(body, { module: SafeNet.DEFAULT_CONFIG[_this.os] });
+	                var defaultReq = { module: SafeNet.DEFAULT_CONFIG[_this.os] };
 	                return _this.connection.post(_this.resolvedURI() + SafeNet.SLOTS, defaultReq, { "token-present": "true" }, callback);
 	            }
 	            else {
