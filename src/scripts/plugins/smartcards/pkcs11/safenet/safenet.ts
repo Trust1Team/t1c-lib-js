@@ -4,7 +4,7 @@ import { LocalConnection } from "../../../../core/client/Connection";
 import * as _ from "lodash";
 import { CertParser } from "../../../../util/CertParser";
 import { ResponseHandler } from "../../../../util/ResponseHandler";
-import { AbstractSafeNet, InfoResponse, Pin, SlotAndPin, SlotsResponse } from "./safenetModel";
+import { AbstractSafeNet, InfoResponse, SlotAndPin, SlotsResponse } from "./safenetModel";
 import * as platform from "platform";
 
 
@@ -61,37 +61,37 @@ class SafeNet implements AbstractSafeNet {
         });
     }
 
-    public info(body: Pin, callback: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse> {
-        let req = _.extend(body, { module: this.modulePath });
+    public info(callback: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse> {
+        let req = { module: this.modulePath };
         return this.connection.post(this.resolvedURI() + SafeNet.INFO, req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
         }, err => {
             if (this.moduleConfig) {
-                let defaultReq = _.extend(body, { module: SafeNet.DEFAULT_CONFIG[this.os] });
+                let defaultReq = { module: SafeNet.DEFAULT_CONFIG[this.os] };
                 return this.connection.post(this.resolvedURI() + SafeNet.INFO, defaultReq, undefined, callback);
             } else { return ResponseHandler.error(err, callback); }
         });
     }
 
-    public slots(body: Pin, callback: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse> {
-        let req = _.extend(body, { module: this.modulePath });
+    public slots(callback: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse> {
+        let req = { module: this.modulePath };
         return this.connection.post(this.resolvedURI() + SafeNet.SLOTS, req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
         }, err => {
             if (this.moduleConfig) {
-                let defaultReq = _.extend(body, { module: SafeNet.DEFAULT_CONFIG[this.os] });
+                let defaultReq = { module: SafeNet.DEFAULT_CONFIG[this.os] };
                 return this.connection.post(this.resolvedURI() + SafeNet.SLOTS, defaultReq, undefined, callback);
             } else { return ResponseHandler.error(err, callback); }
         });
     }
 
-    public slotsWithTokenPresent(body: Pin, callback: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse> {
-        let req = _.extend(body, { module: this.modulePath });
+    public slotsWithTokenPresent(callback: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse> {
+        let req = { module: this.modulePath };
         return this.connection.post(this.resolvedURI() + SafeNet.SLOTS, req, { "token-present": "true" }).then(data => {
             return ResponseHandler.response(data, callback);
         }, err => {
             if (this.moduleConfig) {
-                let defaultReq = _.extend(body, { module: SafeNet.DEFAULT_CONFIG[this.os] });
+                let defaultReq = { module: SafeNet.DEFAULT_CONFIG[this.os] };
                 return this.connection.post(this.resolvedURI() + SafeNet.SLOTS, defaultReq, { "token-present": "true" }, callback);
             } else { return ResponseHandler.error(err, callback); }
         });
