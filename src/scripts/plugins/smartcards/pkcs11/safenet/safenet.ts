@@ -32,7 +32,6 @@ class SafeNet implements AbstractSafeNet {
     constructor(protected baseUrl: string,
                 protected containerUrl: string,
                 protected connection: LocalConnection,
-                protected reader_id: string,
                 protected moduleConfig?: { linux: string, mac: string, win: string}) {
         // determine os
         if (platform.os.indexOf("Win") > -1) { this.os = "win"; }

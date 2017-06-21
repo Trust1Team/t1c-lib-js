@@ -37,7 +37,7 @@ export interface AbstractFactory {
     createAventraNO(reader_id?: string): AbstractAventra;
     createOberthurNO(reader_id?: string): AbstractOberthur;
     createPIV(reader_id?: string): AbstractPiv;
-    createSafeNet(reader_id?: string, config?: { linux: string, mac: string, win: string }): AbstractSafeNet;
+    createSafeNet(config?: { linux: string, mac: string, win: string }): AbstractSafeNet;
 }
 
 const CONTAINER_CONTEXT_PATH = "/plugins/";
@@ -80,7 +80,7 @@ export class PluginFactory implements AbstractFactory {
 
     public createPIV(reader_id?: string): PIV { return new PIV(this.url, CONTAINER_PIV, this.connection, reader_id); }
 
-    public createSafeNet(reader_id: string, config: { linux: string, mac: string, win: string }): AbstractSafeNet {
-        return new SafeNet(this.url, CONTAINER_SAFENET, this.connection, reader_id, config);
+    public createSafeNet(config: { linux: string, mac: string, win: string }): AbstractSafeNet {
+        return new SafeNet(this.url, CONTAINER_SAFENET, this.connection, config);
     }
 }
