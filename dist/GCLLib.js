@@ -19217,6 +19217,10 @@ var GCLLib =
 	process.removeListener = noop;
 	process.removeAllListeners = noop;
 	process.emit = noop;
+	process.prependListener = noop;
+	process.prependOnceListener = noop;
+	
+	process.listeners = function (name) { return [] }
 	
 	process.binding = function (name) {
 	    throw new Error('process.binding is not supported');
@@ -19259,7 +19263,7 @@ var GCLLib =
 	            });
 	        }
 	        function doProcess(res, resolve, reject) {
-	            if (res && res.data && typeof res.data === "object") {
+	            if (res && res.data && typeof res.data === "object" && !_.isArray(res.data)) {
 	                _.forEach(res.data, function (value, key) {
 	                    if (key.indexOf("certificate") > -1 && typeof value === "string") {
 	                        res.data[key] = { base64: value, parsed: CertParser.processCert(value) };
@@ -19368,6 +19372,15 @@ var GCLLib =
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	//**************************************************************************************
+	//region Declaration of global variables
+	//**************************************************************************************
+	var zero = new Uint8Array([0x00]);
+	
+	var powers2 = [new Uint8Array([1])];
+	var digitsString = "0123456789";
+	//**************************************************************************************
+	//endregion
+	//**************************************************************************************
 	//region Declaration for "LocalBaseBlock" class
 	//**************************************************************************************
 	/**
@@ -19379,6 +19392,7 @@ var GCLLib =
 	 * @property {Array.<string>} warnings
 	 * @property {ArrayBuffer} valueBeforeDecode
 	 */
+	
 	var LocalBaseBlock = function () {
 		//**********************************************************************************
 		/**
@@ -21861,6 +21875,178 @@ var GCLLib =
 				return object;
 			}
 			//**********************************************************************************
+			/**
+	   * Convert current value to decimal string representation
+	   */
+	
+		}, {
+			key: "toString",
+			value: function toString() {
+				//region Aux functions
+				function viewAdd(first, second) {
+					//region Initial variables
+					var c = new Uint8Array([0]);
+	
+					var firstView = new Uint8Array(first);
+					var secondView = new Uint8Array(second);
+	
+					var firstViewCopy = firstView.slice(0);
+					var firstViewCopyLength = firstViewCopy.length - 1;
+					var secondViewCopy = secondView.slice(0);
+					var secondViewCopyLength = secondViewCopy.length - 1;
+	
+					var value = 0;
+	
+					var max = secondViewCopyLength < firstViewCopyLength ? firstViewCopyLength : secondViewCopyLength;
+	
+					var counter = 0;
+					//endregion
+	
+					for (var i = max; i >= 0; i--, counter++) {
+						switch (true) {
+							case counter < secondViewCopy.length:
+								value = firstViewCopy[firstViewCopyLength - counter] + secondViewCopy[secondViewCopyLength - counter] + c[0];
+								break;
+							default:
+								value = firstViewCopy[firstViewCopyLength - counter] + c[0];
+						}
+	
+						c[0] = value / 10;
+	
+						switch (true) {
+							case counter >= firstViewCopy.length:
+								firstViewCopy = (0, _pvutils.utilConcatView)(new Uint8Array([value % 10]), firstViewCopy);
+								break;
+							default:
+								firstViewCopy[firstViewCopyLength - counter] = value % 10;
+						}
+					}
+	
+					if (c[0] > 0) firstViewCopy = (0, _pvutils.utilConcatView)(c, firstViewCopy);
+	
+					return firstViewCopy.slice(0);
+				}
+	
+				function power2(n) {
+					if (n >= powers2.length) {
+						for (var p = powers2.length; p <= n; p++) {
+							var c = new Uint8Array([0]);
+							var _digits = powers2[p - 1].slice(0);
+	
+							for (var i = _digits.length - 1; i >= 0; i--) {
+								var newValue = new Uint8Array([(_digits[i] << 1) + c[0]]);
+								c[0] = newValue[0] / 10;
+								_digits[i] = newValue[0] % 10;
+							}
+	
+							if (c[0] > 0) _digits = (0, _pvutils.utilConcatView)(c, _digits);
+	
+							powers2.push(_digits);
+						}
+					}
+	
+					return powers2[n];
+				}
+	
+				function viewSub(first, second) {
+					//region Initial variables
+					var b = 0;
+	
+					var firstView = new Uint8Array(first);
+					var secondView = new Uint8Array(second);
+	
+					var firstViewCopy = firstView.slice(0);
+					var firstViewCopyLength = firstViewCopy.length - 1;
+					var secondViewCopy = secondView.slice(0);
+					var secondViewCopyLength = secondViewCopy.length - 1;
+	
+					var value = void 0;
+	
+					var counter = 0;
+					//endregion
+	
+					for (var i = secondViewCopyLength; i >= 0; i--, counter++) {
+						value = firstViewCopy[firstViewCopyLength - counter] - secondViewCopy[secondViewCopyLength - counter] - b;
+	
+						switch (true) {
+							case value < 0:
+								b = 1;
+								firstViewCopy[firstViewCopyLength - counter] = value + 10;
+								break;
+							default:
+								b = 0;
+								firstViewCopy[firstViewCopyLength - counter] = value;
+						}
+					}
+	
+					if (b > 0) {
+						for (var _i4 = firstViewCopyLength - secondViewCopyLength + 1; _i4 >= 0; _i4--, counter++) {
+							value = firstViewCopy[firstViewCopyLength - counter] - b;
+	
+							if (value < 0) {
+								b = 1;
+								firstViewCopy[firstViewCopyLength - counter] = value + 10;
+							} else {
+								b = 0;
+								firstViewCopy[firstViewCopyLength - counter] = value;
+								break;
+							}
+						}
+					}
+	
+					return firstViewCopy.slice();
+				}
+				//endregion
+	
+				//region Initial variables
+				var firstBit = this._valueHex.byteLength * 8 - 1;
+	
+				var digits = new Uint8Array(this._valueHex.byteLength * 8 / 3);
+				var bitNumber = 0;
+				var currentByte = void 0;
+	
+				var asn1View = new Uint8Array(this._valueHex);
+	
+				var result = "";
+	
+				var flag = false;
+				//endregion
+	
+				//region Calculate number
+				for (var byteNumber = this._valueHex.byteLength - 1; byteNumber >= 0; byteNumber--) {
+					currentByte = asn1View[byteNumber];
+	
+					for (var i = 0; i < 8; i++) {
+						if ((currentByte & 1) === 1) {
+							switch (bitNumber) {
+								case firstBit:
+									digits = viewSub(power2(bitNumber), digits);
+									result = "-";
+									break;
+								default:
+									digits = viewAdd(digits, power2(bitNumber));
+							}
+						}
+	
+						bitNumber++;
+						currentByte >>= 1;
+					}
+				}
+				//endregion
+	
+				//region Print number
+				for (var _i5 = 0; _i5 < digits.length; _i5++) {
+					if (digits[_i5]) flag = true;
+	
+					if (flag) result += digitsString.charAt(digits[_i5]);
+				}
+	
+				if (flag === false) result += digitsString.charAt(0);
+				//endregion
+	
+				return result;
+			}
+			//**********************************************************************************
 	
 		}, {
 			key: "valueHex",
@@ -22126,8 +22312,8 @@ var GCLLib =
 				var tempValueHex = new ArrayBuffer(this.blockLength);
 				var tempView = new Uint8Array(tempValueHex);
 	
-				for (var _i4 = 0; _i4 < this.blockLength; _i4++) {
-					tempView[_i4] = view[_i4];
+				for (var _i6 = 0; _i6 < this.blockLength; _i6++) {
+					tempView[_i6] = view[_i6];
 				} //noinspection JSCheckFunctionSignatures
 				this.valueHex = tempValueHex.slice(0);
 				view = new Uint8Array(this.valueHex);
@@ -22191,8 +22377,8 @@ var GCLLib =
 					var encodedView = new Uint8Array(encodedBuf);
 					retView = new Uint8Array(retBuf);
 	
-					for (var _i5 = 0; _i5 < encodedBuf.byteLength - 1; _i5++) {
-						retView[_i5] = encodedView[_i5] | 0x80;
+					for (var _i7 = 0; _i7 < encodedBuf.byteLength - 1; _i7++) {
+						retView[_i7] = encodedView[_i7] | 0x80;
 					}retView[encodedBuf.byteLength - 1] = encodedView[encodedBuf.byteLength - 1];
 				}
 	
@@ -25202,8 +25388,8 @@ var GCLLib =
 			if (inputData.valueBlock.value.length === 0 && inputSchema.valueBlock.value.length !== 0) {
 				var _optional = true;
 	
-				for (var _i6 = 0; _i6 < inputSchema.valueBlock.value.length; _i6++) {
-					_optional = _optional && (inputSchema.valueBlock.value[_i6].optional || false);
+				for (var _i8 = 0; _i8 < inputSchema.valueBlock.value.length; _i8++) {
+					_optional = _optional && (inputSchema.valueBlock.value[_i8].optional || false);
 				}if (_optional === true) {
 					return {
 						verified: true,
@@ -25227,10 +25413,10 @@ var GCLLib =
 			}
 			//endregion
 	
-			for (var _i7 = 0; _i7 < maxLength; _i7++) {
+			for (var _i9 = 0; _i9 < maxLength; _i9++) {
 				//region Special case when there is an "optional" element of ASN.1 schema at the end
-				if (_i7 - admission >= inputData.valueBlock.value.length) {
-					if (inputSchema.valueBlock.value[_i7].optional === false) {
+				if (_i9 - admission >= inputData.valueBlock.value.length) {
+					if (inputSchema.valueBlock.value[_i9].optional === false) {
 						var _result3 = {
 							verified: false,
 							result: root
@@ -25255,7 +25441,7 @@ var GCLLib =
 				else {
 						//region Special case for Repeated type of ASN.1 schema element
 						if (inputSchema.valueBlock.value[0] instanceof Repeated) {
-							_result2 = compareSchema(root, inputData.valueBlock.value[_i7], inputSchema.valueBlock.value[0].value);
+							_result2 = compareSchema(root, inputData.valueBlock.value[_i9], inputSchema.valueBlock.value[0].value);
 							if (_result2.verified === false) {
 								if (inputSchema.valueBlock.value[0].optional === true) admission++;else {
 									//region Delete early added name of block
@@ -25276,14 +25462,14 @@ var GCLLib =
 	
 								if (typeof arrayRoot[inputSchema.valueBlock.value[0].name] === "undefined") arrayRoot[inputSchema.valueBlock.value[0].name] = [];
 	
-								arrayRoot[inputSchema.valueBlock.value[0].name].push(inputData.valueBlock.value[_i7]);
+								arrayRoot[inputSchema.valueBlock.value[0].name].push(inputData.valueBlock.value[_i9]);
 							}
 						}
 						//endregion
 						else {
-								_result2 = compareSchema(root, inputData.valueBlock.value[_i7 - admission], inputSchema.valueBlock.value[_i7]);
+								_result2 = compareSchema(root, inputData.valueBlock.value[_i9 - admission], inputSchema.valueBlock.value[_i9]);
 								if (_result2.verified === false) {
-									if (inputSchema.valueBlock.value[_i7].optional === true) admission++;else {
+									if (inputSchema.valueBlock.value[_i9].optional === true) admission++;else {
 										//region Delete early added name of block
 										if (inputSchema.hasOwnProperty("name")) {
 											inputSchema.name = inputSchema.name.replace(/^\s+|\s+$/g, "");
@@ -25423,6 +25609,7 @@ var GCLLib =
 	exports.utilFromBase = utilFromBase;
 	exports.utilToBase = utilToBase;
 	exports.utilConcatBuf = utilConcatBuf;
+	exports.utilConcatView = utilConcatView;
 	exports.utilDecodeTC = utilDecodeTC;
 	exports.utilEncodeTC = utilEncodeTC;
 	exports.isEqualBuffer = isEqualBuffer;
@@ -25601,7 +25788,7 @@ var GCLLib =
 	//**************************************************************************************
 	/**
 	 * Concatenate two ArrayBuffers
-	 * @param {...ArrayBuffer} buffers First ArrayBuffer (first part of concatenated array)
+	 * @param {...ArrayBuffer} buffers Set of ArrayBuffer
 	 */
 	function utilConcatBuf() {
 		//region Initial variables
@@ -25670,6 +25857,79 @@ var GCLLib =
 		}
 	
 		return retBuf;
+	}
+	//**************************************************************************************
+	/**
+	 * Concatenate two Uint8Array
+	 * @param {...Uint8Array} views Set of Uint8Array
+	 */
+	function utilConcatView() {
+		//region Initial variables
+		var outputLength = 0;
+		var prevLength = 0;
+		//endregion
+	
+		//region Calculate output length
+	
+		for (var _len2 = arguments.length, views = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+			views[_key2] = arguments[_key2];
+		}
+	
+		var _iteratorNormalCompletion4 = true;
+		var _didIteratorError4 = false;
+		var _iteratorError4 = undefined;
+	
+		try {
+			for (var _iterator4 = views[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+				var view = _step4.value;
+	
+				outputLength += view.length;
+			} //endregion
+		} catch (err) {
+			_didIteratorError4 = true;
+			_iteratorError4 = err;
+		} finally {
+			try {
+				if (!_iteratorNormalCompletion4 && _iterator4.return) {
+					_iterator4.return();
+				}
+			} finally {
+				if (_didIteratorError4) {
+					throw _iteratorError4;
+				}
+			}
+		}
+	
+		var retBuf = new ArrayBuffer(outputLength);
+		var retView = new Uint8Array(retBuf);
+	
+		var _iteratorNormalCompletion5 = true;
+		var _didIteratorError5 = false;
+		var _iteratorError5 = undefined;
+	
+		try {
+			for (var _iterator5 = views[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+				var _view = _step5.value;
+	
+				retView.set(_view, prevLength);
+				prevLength += _view.length;
+			}
+		} catch (err) {
+			_didIteratorError5 = true;
+			_iteratorError5 = err;
+		} finally {
+			try {
+				if (!_iteratorNormalCompletion5 && _iterator5.return) {
+					_iterator5.return();
+				}
+			} finally {
+				if (_didIteratorError5) {
+					throw _iteratorError5;
+				}
+			}
+		}
+	
+		return retView;
 	}
 	//**************************************************************************************
 	/**
@@ -25929,27 +26189,27 @@ var GCLLib =
 		var resultString = "";
 		var view = new Uint8Array(buffer);
 	
-		var _iteratorNormalCompletion4 = true;
-		var _didIteratorError4 = false;
-		var _iteratorError4 = undefined;
+		var _iteratorNormalCompletion6 = true;
+		var _didIteratorError6 = false;
+		var _iteratorError6 = undefined;
 	
 		try {
-			for (var _iterator4 = view[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-				var element = _step4.value;
+			for (var _iterator6 = view[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+				var element = _step6.value;
 	
 				resultString = resultString + String.fromCharCode(element);
 			}
 		} catch (err) {
-			_didIteratorError4 = true;
-			_iteratorError4 = err;
+			_didIteratorError6 = true;
+			_iteratorError6 = err;
 		} finally {
 			try {
-				if (!_iteratorNormalCompletion4 && _iterator4.return) {
-					_iterator4.return();
+				if (!_iteratorNormalCompletion6 && _iterator6.return) {
+					_iterator6.return();
 				}
 			} finally {
-				if (_didIteratorError4) {
-					throw _iteratorError4;
+				if (_didIteratorError6) {
+					throw _iteratorError6;
 				}
 			}
 		}
@@ -27271,8 +27531,8 @@ var GCLLib =
 						result = {
 							algorithm: {
 								name: "AES-CBC",
-								iv: getRandomValues(new Uint8Array(16) // For "decrypt" the value should be replaced with value got on "encrypt" step
-								) },
+								iv: getRandomValues(new Uint8Array(16)) // For "decrypt" the value should be replaced with value got on "encrypt" step
+							},
 							usages: ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
 						};
 						break;
@@ -27303,8 +27563,8 @@ var GCLLib =
 						result = {
 							algorithm: {
 								name: "AES-GCM",
-								iv: getRandomValues(new Uint8Array(16) // For "decrypt" the value should be replaced with value got on "encrypt" step
-								) },
+								iv: getRandomValues(new Uint8Array(16)) // For "decrypt" the value should be replaced with value got on "encrypt" step
+							},
 							usages: ["encrypt", "decrypt", "wrapKey", "unwrapKey"]
 						};
 						break;
@@ -62956,6 +63216,7 @@ var GCLLib =
 	      'Avant Browser',
 	      'Breach',
 	      'Camino',
+	      'Electron',
 	      'Epiphany',
 	      'Fennec',
 	      'Flock',
@@ -62975,6 +63236,7 @@ var GCLLib =
 	      'Raven',
 	      'Rekonq',
 	      'RockMelt',
+	      { 'label': 'Samsung Internet', 'pattern': 'SamsungBrowser' },
 	      'SeaMonkey',
 	      { 'label': 'Silk', 'pattern': '(?:Cloud9|Silk-Accelerated)' },
 	      'Sleipnir',
@@ -62982,6 +63244,7 @@ var GCLLib =
 	      { 'label': 'SRWare Iron', 'pattern': 'Iron' },
 	      'Sunrise',
 	      'Swiftfox',
+	      'Waterfox',
 	      'WebPositive',
 	      'Opera Mini',
 	      { 'label': 'Opera Mini', 'pattern': 'OPiOS' },
@@ -63004,6 +63267,11 @@ var GCLLib =
 	      { 'label': 'Galaxy S2', 'pattern': 'GT-I9100' },
 	      { 'label': 'Galaxy S3', 'pattern': 'GT-I9300' },
 	      { 'label': 'Galaxy S4', 'pattern': 'GT-I9500' },
+	      { 'label': 'Galaxy S5', 'pattern': 'SM-G900' },
+	      { 'label': 'Galaxy S6', 'pattern': 'SM-G920' },
+	      { 'label': 'Galaxy S6 Edge', 'pattern': 'SM-G925' },
+	      { 'label': 'Galaxy S7', 'pattern': 'SM-G930' },
+	      { 'label': 'Galaxy S7 Edge', 'pattern': 'SM-G935' },
 	      'Google TV',
 	      'Lumia',
 	      'iPad',
@@ -63014,9 +63282,8 @@ var GCLLib =
 	      'Nexus',
 	      'Nook',
 	      'PlayBook',
-	      'PlayStation 3',
-	      'PlayStation 4',
 	      'PlayStation Vita',
+	      'PlayStation',
 	      'TouchPad',
 	      'Transformer',
 	      { 'label': 'Wii U', 'pattern': 'WiiU' },
@@ -63043,7 +63310,7 @@ var GCLLib =
 	      'Nintendo': { 'Wii U': 1,  'Wii': 1 },
 	      'Nokia': { 'Lumia': 1 },
 	      'Samsung': { 'Galaxy S': 1, 'Galaxy S2': 1, 'Galaxy S3': 1, 'Galaxy S4': 1 },
-	      'Sony': { 'PlayStation 4': 1, 'PlayStation 3': 1, 'PlayStation Vita': 1 }
+	      'Sony': { 'PlayStation': 1, 'PlayStation Vita': 1 }
 	    });
 	
 	    /* Detectable operating systems (order is important). */
@@ -63070,6 +63337,7 @@ var GCLLib =
 	      'webOS ',
 	      'webOS',
 	      'Tablet OS',
+	      'Tizen',
 	      'Linux',
 	      'Mac OS X',
 	      'Macintosh',
@@ -63159,6 +63427,7 @@ var GCLLib =
 	        var pattern = guess.pattern || qualify(guess);
 	        if (!result && (result =
 	              RegExp('\\b' + pattern + ' *\\d+[.\\w_]*', 'i').exec(ua) ||
+	              RegExp('\\b' + pattern + ' *\\w+-[\\w]*', 'i').exec(ua) ||
 	              RegExp('\\b' + pattern + '(?:; *(?:[a-z]+[_-])?[a-z]+\\d+|[^ ();-]*)', 'i').exec(ua)
 	            )) {
 	          // Split by forward slash and append product version if needed.
@@ -63278,10 +63547,14 @@ var GCLLib =
 	        name = /[a-z]+(?: Hat)?/i.exec(/\bAndroid\b/.test(os) ? os : data) + ' Browser';
 	      }
 	    }
+	    // Add Chrome version to description for Electron.
+	    else if (name == 'Electron' && (data = (/\bChrome\/([\d.]+)\b/.exec(ua) || 0)[1])) {
+	      description.push('Chromium ' + data);
+	    }
 	    // Detect non-Opera (Presto-based) versions (order is important).
 	    if (!version) {
 	      version = getVersion([
-	        '(?:Cloud9|CriOS|CrMo|Edge|FxiOS|IEMobile|Iron|Opera ?Mini|OPiOS|OPR|Raven|Silk(?!/[\\d.]+$))',
+	        '(?:Cloud9|CriOS|CrMo|Edge|FxiOS|IEMobile|Iron|Opera ?Mini|OPiOS|OPR|Raven|SamsungBrowser|Silk(?!/[\\d.]+$))',
 	        'Version',
 	        qualify(name),
 	        '(?:Firefox|Minefield|NetFront)'
@@ -63310,7 +63583,7 @@ var GCLLib =
 	      description.unshift('desktop mode');
 	      version || (version = (/\brv:([\d.]+)/.exec(ua) || 0)[1]);
 	    }
-	    // Detect IE 11.
+	    // Detect IE 11 identifying as other browsers.
 	    else if (name != 'IE' && layout == 'Trident' && (data = /\brv:([\d.]+)/.exec(ua))) {
 	      if (name) {
 	        description.push('identifying as ' + name + (version ? ' ' + version : ''));
@@ -63344,10 +63617,23 @@ var GCLLib =
 	          typeof context.process == 'object' && !context.process.browser &&
 	          (data = context.process)
 	        ) {
-	          name = 'Node.js';
-	          arch = data.arch;
-	          os = data.platform;
-	          version = /[\d.]+/.exec(data.version)[0];
+	          if (typeof data.versions == 'object') {
+	            if (typeof data.versions.electron == 'string') {
+	              description.push('Node ' + data.versions.node);
+	              name = 'Electron';
+	              version = data.versions.electron;
+	            } else if (typeof data.versions.nw == 'string') {
+	              description.push('Chromium ' + version, 'Node ' + data.versions.node);
+	              name = 'NW.js';
+	              version = data.versions.nw;
+	            }
+	          } else {
+	            name = 'Node.js';
+	            arch = data.arch;
+	            os = data.platform;
+	            version = /[\d.]+/.exec(data.version)
+	            version = version ? version[0] : 'unknown';
+	          }
 	        }
 	        else if (rhino) {
 	          name = 'Rhino';
@@ -63375,6 +63661,14 @@ var GCLLib =
 	        }
 	        version = name == 'IE' ? String(version[1].toFixed(1)) : version[0];
 	      }
+	      // Detect IE 11 masking as other browsers.
+	      else if (typeof doc.documentMode == 'number' && /^(?:Chrome|Firefox)\b/.test(name)) {
+	        description.push('masking as ' + name + ' ' + version);
+	        name = 'IE';
+	        version = '11.0';
+	        layout = ['Trident'];
+	        os = 'Windows';
+	      }
 	      os = os && format(os);
 	    }
 	    // Detect prerelease phases.
@@ -63397,7 +63691,9 @@ var GCLLib =
 	    }
 	    // Detect Xbox 360 and Xbox One.
 	    else if (/\bXbox\b/i.test(product)) {
-	      os = null;
+	      if (product == 'Xbox 360') {
+	        os = null;
+	      }
 	      if (product == 'Xbox 360' && /\bIEMobile\b/.test(ua)) {
 	        description.unshift('mobile mode');
 	      }
@@ -63408,8 +63704,14 @@ var GCLLib =
 	      name += ' Mobile';
 	    }
 	    // Detect IE platform preview.
-	    else if (name == 'IE' && useFeatures && context.external === null) {
-	      description.unshift('platform preview');
+	    else if (name == 'IE' && useFeatures) {
+	      try {
+	        if (context.external === null) {
+	          description.unshift('platform preview');
+	        }
+	      } catch(e) {
+	        description.unshift('embedded');
+	      }
 	    }
 	    // Detect BlackBerry OS version.
 	    // http://docs.blackberry.com/en/developers/deliverables/18169/HTTP_headers_sent_by_BB_Browser_1234911_11.jsp
@@ -63531,7 +63833,7 @@ var GCLLib =
 	    if (layout && !/\b(?:Avant|Nook)\b/.test(name) && (
 	        /Browser|Lunascape|Maxthon/.test(name) ||
 	        name != 'Safari' && /^iOS/.test(os) && /\bSafari\b/.test(layout[1]) ||
-	        /^(?:Adobe|Arora|Breach|Midori|Opera|Phantom|Rekonq|Rock|Sleipnir|Web)/.test(name) && layout[1])) {
+	        /^(?:Adobe|Arora|Breach|Midori|Opera|Phantom|Rekonq|Rock|Samsung Internet|Sleipnir|Web)/.test(name) && layout[1])) {
 	      // Don't add layout details to description if they are falsey.
 	      (data = layout[layout.length - 1]) && description.push(data);
 	    }
@@ -63605,6 +63907,9 @@ var GCLLib =
 	    /**
 	     * The name of the browser's layout engine.
 	     *
+	     * The list of common layout engines include:
+	     * "Blink", "EdgeHTML", "Gecko", "Trident" and "WebKit"
+	     *
 	     * @memberOf platform
 	     * @type string|null
 	     */
@@ -63613,6 +63918,11 @@ var GCLLib =
 	    /**
 	     * The name of the product's manufacturer.
 	     *
+	     * The list of manufacturers include:
+	     * "Apple", "Archos", "Amazon", "Asus", "Barnes & Noble", "BlackBerry",
+	     * "Google", "HP", "HTC", "LG", "Microsoft", "Motorola", "Nintendo",
+	     * "Nokia", "Samsung" and "Sony"
+	     *
 	     * @memberOf platform
 	     * @type string|null
 	     */
@@ -63620,6 +63930,14 @@ var GCLLib =
 	
 	    /**
 	     * The name of the browser/environment.
+	     *
+	     * The list of common browser names include:
+	     * "Chrome", "Electron", "Firefox", "Firefox for iOS", "IE",
+	     * "Microsoft Edge", "PhantomJS", "Safari", "SeaMonkey", "Silk",
+	     * "Opera Mini" and "Opera"
+	     *
+	     * Mobile versions of some browsers have "Mobile" appended to their name:
+	     * eg. "Chrome Mobile", "Firefox Mobile", "IE Mobile" and "Opera Mobile"
 	     *
 	     * @memberOf platform
 	     * @type string|null
@@ -63636,6 +63954,11 @@ var GCLLib =
 	
 	    /**
 	     * The name of the product hosting the browser.
+	     *
+	     * The list of common products include:
+	     *
+	     * "BlackBerry", "Galaxy S4", "Lumia", "iPad", "iPod", "iPhone", "Kindle",
+	     * "Kindle Fire", "Nexus", "Nook", "PlayBook", "TouchPad" and "Transformer"
 	     *
 	     * @memberOf platform
 	     * @type string|null
