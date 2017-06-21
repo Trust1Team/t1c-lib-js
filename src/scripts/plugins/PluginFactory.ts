@@ -52,7 +52,7 @@ const CONTAINER_OCRA = CONTAINER_CONTEXT_PATH + "ocra";
 const CONTAINER_AVENTRA = CONTAINER_CONTEXT_PATH + "aventra";
 const CONTAINER_OBERTHUR = CONTAINER_CONTEXT_PATH + "oberthur";
 const CONTAINER_PIV = CONTAINER_CONTEXT_PATH + "piv";
-const CONTAINER_SAFENET = CONTAINER_CONTEXT_PATH + "safenet";
+const CONTAINER_SAFENET = "/safenet";
 
 
 export class PluginFactory implements AbstractFactory {
