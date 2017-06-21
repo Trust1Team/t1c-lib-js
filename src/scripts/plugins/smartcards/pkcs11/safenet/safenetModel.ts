@@ -19,7 +19,7 @@ interface Pin {
     pin: string
 }
 interface SlotAndPin {
-    slot_id: string,
+    slot_id: number,
     pin: string
 }
 
