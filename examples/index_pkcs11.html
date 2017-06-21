@@ -123,8 +123,14 @@
     <hr />
     <div>
         <h3>SafeNet PKCS11</h3>
-        <label for="safenetPin">PIN</label>
-        <input type="password" id="safenetPin">
+        <div>
+            <label for="safenetPin">PIN</label>
+            <input type="password" id="safenetPin">
+        </div>
+        <div>
+            <label for="safenetSlot">Slot</label>
+            <input type="text" id="safenetSlot">
+        </div>
         <div>
             <button id="safenetCerts" type="button" class="btn btn-default btn-lg">Certificates</button>
             <button id="safenetInfo" type="button" class="btn btn-default btn-lg">Info</button>
@@ -134,16 +140,7 @@
         </div>
         <hr />
     </div>
-    <hr />
-    <h3>Open Certificate Validation API</h3>
-    <div>
-        <div><button id="ocvGetInfo" type="button" class="btn btn-default btn-lg">OCV - Get Service Info</button></div>
-        <div><button id="ocvGetChallenge" type="button" class="btn btn-default btn-lg">OCV - Get Challenge</button></div>
-        <div><button id="ocvBeIDAuthenticate" type="button" class="btn btn-default btn-lg">OCV - Authenticate Server Challenge</button></div>
-        <div><button id="ocvValidateCertChain" type="button" class="btn btn-default btn-lg">OCV - Validate Certificate Chain</button></div>
-        <div><button id="ocvValidateSignature" type="button" class="btn btn-default btn-lg">OCV - Validate Signature</button></div>
-        <hr />
-    </div>
+
     <pre id="information"></pre>
     <pre id="error"></pre>
     <!-- PIN verify Modal -->
