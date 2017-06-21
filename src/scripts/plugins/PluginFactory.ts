@@ -24,8 +24,8 @@ import { AbstractMobib } from "./smartcards/mobib/mobibModel";
 import { AbstractEidLUX } from "./smartcards/eid/lux/EidLuxModel";
 import { AbstractDNI } from "./smartcards/eid/esp/dniModel";
 import { DNI } from "./smartcards/eid/esp/dni";
-import { AbstractPkcs11 } from "./smartcards/pkcs11/pkcs11Model";
-import { Pkcs11 } from "./smartcards/pkcs11/pkcs11";
+import { AbstractSafeNet } from "./smartcards/pkcs11/safenet/safenetModel";
+import { SafeNet } from "./smartcards/pkcs11/safenet/safenet";
 
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
@@ -37,7 +37,7 @@ export interface AbstractFactory {
     createAventraNO(reader_id?: string): AbstractAventra;
     createOberthurNO(reader_id?: string): AbstractOberthur;
     createPIV(reader_id?: string): AbstractPiv;
-    createPKCS11(modulePath?: string): AbstractPkcs11;
+    createSafeNet(reader_id?: string, config?: { linux: string, mac: string, win: string }): AbstractSafeNet;
 }
 
 const CONTAINER_CONTEXT_PATH = "/plugins/";
@@ -52,7 +52,7 @@ const CONTAINER_OCRA = CONTAINER_CONTEXT_PATH + "ocra";
 const CONTAINER_AVENTRA = CONTAINER_CONTEXT_PATH + "aventra";
 const CONTAINER_OBERTHUR = CONTAINER_CONTEXT_PATH + "oberthur";
 const CONTAINER_PIV = CONTAINER_CONTEXT_PATH + "piv";
-const CONTAINER_PKCS11 = CONTAINER_CONTEXT_PATH + "pkcs11";
+const CONTAINER_SAFENET = CONTAINER_CONTEXT_PATH + "safenet";
 
 
 export class PluginFactory implements AbstractFactory {
@@ -80,5 +80,7 @@ export class PluginFactory implements AbstractFactory {
 
     public createPIV(reader_id?: string): PIV { return new PIV(this.url, CONTAINER_PIV, this.connection, reader_id); }
 
-    public createPKCS11(modulePath: string): AbstractPkcs11 { return new Pkcs11(this.url, CONTAINER_PKCS11, this.connection, modulePath); }
+    public createSafeNet(reader_id: string, config: { linux: string, mac: string, win: string }): AbstractSafeNet {
+        return new SafeNet(this.url, CONTAINER_SAFENET, this.connection, reader_id, config);
+    }
 }
