@@ -65576,10 +65576,11 @@ var GCLLib =
 
 /***/ }),
 /* 160 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
+	var _ = __webpack_require__(1);
 	var Pkcs11 = (function () {
 	    function Pkcs11(baseUrl, containerUrl, connection, modulePath) {
 	        this.baseUrl = baseUrl;
@@ -65588,8 +65589,20 @@ var GCLLib =
 	        this.modulePath = modulePath;
 	    }
 	    Pkcs11.prototype.certificates = function (body, callback) {
-	        var req = { module: this.modulePath, pin: body.pin };
+	        var req = _.extend(body, { module: this.modulePath });
 	        return this.connection.post(this.resolvedURI() + Pkcs11.ALL_CERTIFICATES, req, undefined, callback);
+	    };
+	    Pkcs11.prototype.info = function (body, callback) {
+	        var req = _.extend(body, { module: this.modulePath });
+	        return this.connection.post(this.resolvedURI() + Pkcs11.INFO, req, undefined, callback);
+	    };
+	    Pkcs11.prototype.slots = function (body, callback) {
+	        var req = _.extend(body, { module: this.modulePath });
+	        return this.connection.post(this.resolvedURI() + Pkcs11.SLOTS, req, undefined, callback);
+	    };
+	    Pkcs11.prototype.slotsWithTokenPresent = function (body, callback) {
+	        var req = _.extend(body, { module: this.modulePath });
+	        return this.connection.post(this.resolvedURI() + Pkcs11.SLOTS, req, { "token-present": "true" }, callback);
 	    };
 	    Pkcs11.prototype.resolvedURI = function () {
 	        return this.baseUrl + this.containerUrl;
@@ -65597,6 +65610,8 @@ var GCLLib =
 	    return Pkcs11;
 	}());
 	Pkcs11.ALL_CERTIFICATES = "/certificates";
+	Pkcs11.INFO = "/info";
+	Pkcs11.SLOTS = "/slots";
 	exports.Pkcs11 = Pkcs11;
 
 
