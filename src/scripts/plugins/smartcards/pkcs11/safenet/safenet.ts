@@ -39,7 +39,7 @@ class SafeNet implements AbstractSafeNet {
         // assume we are dealing with linux ==> will not always be correct!
         if (!this.os) { this.os = "linux"; }
 
-        if (moduleConfig) { this.modulePath = moduleConfig[this.os]; }
+        if (moduleConfig && moduleConfig[this.os]) { this.modulePath = moduleConfig[this.os]; }
         else { this.modulePath = SafeNet.DEFAULT_CONFIG[this.os]; }
     }
 
