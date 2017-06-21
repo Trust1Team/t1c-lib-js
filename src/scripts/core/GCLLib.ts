@@ -26,7 +26,7 @@ import { AbstractEidLUX } from "../plugins/smartcards/eid/lux/EidLuxModel";
 import { AbstractDNI } from "../plugins/smartcards/eid/esp/dniModel";
 import { Promise } from "es6-promise";
 import { PluginFactory } from "../plugins/PluginFactory";
-import { AbstractPkcs11 } from "../plugins/smartcards/pkcs11/pkcs11Model";
+import { AbstractSafeNet } from "../plugins/smartcards/pkcs11/safenet/safenetModel";
 
 
 class GCLClient {
@@ -151,7 +151,9 @@ class GCLClient {
     // get instance for PIV
     public piv = (reader_id?: string): AbstractPiv => { return this.pluginFactory.createPIV(reader_id); };
     // get instance for PKCS11
-    public pkcs11 = (modulePath: string): AbstractPkcs11 => { return this.pluginFactory.createPKCS11(modulePath); };
+    public safenet = (reader_id: string, moduleConfig: { linux: string, mac: string, win: string }): AbstractSafeNet => {
+        return this.pluginFactory.createSafeNet(reader_id, moduleConfig);
+    };
 
     /**
      * Init OCV - verify if OCV is available
