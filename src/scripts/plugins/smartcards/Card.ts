@@ -16,7 +16,7 @@ export { Card, CertCard, PinCard, SecuredCertCard, AuthenticateOrSignData, Reset
     GenericCard, GenericSmartCard, GenericPinCard, GenericCertCard, GenericSecuredCertCard };
 
 interface Card {
-    allData: (filters: string[], callback?: () => void) => void | Promise<DataObjectResponse>;
+    allData: (filters: string[], callback?: () => void) => Promise<DataObjectResponse>;
 }
 
 interface OptionalPin {
@@ -28,21 +28,21 @@ interface VerifyPinData extends OptionalPin {
 }
 
 interface PinCard extends Card {
-    verifyPin: (body: VerifyPinData, callback?: () => void) => void | Promise<any>;
+    verifyPin: (body: VerifyPinData, callback?: () => void) => Promise<T1CResponse>;
 }
 
 interface CertCard extends PinCard {
-    allCerts: (filters: string[], callback?: () => void) => void | Promise<DataObjectResponse>
-    authenticate: (body: any, callback?: () => void) => void | Promise<any>
-    signData: (body: any, callback?: () => void) => void | Promise<any>
+    allCerts: (filters: string[], callback?: () => void) => Promise<DataObjectResponse>
+    authenticate: (body: any, callback?: () => void) => Promise<DataResponse>
+    signData: (body: any, callback?: () => void) => Promise<DataResponse>
 }
 
 interface SecuredCertCard {
-    allCerts: (filters: string[], body: OptionalPin, callback: () => void) => void | Promise<DataObjectResponse>
-    allData: (filters: string[], body: OptionalPin, callback: () => void) => void | Promise<DataObjectResponse>
-    authenticate: (body: any, callback: () => void) => void | Promise<any>
-    signData: (body: any, callback: () => void) => void | Promise<any>
-    verifyPin: (body: OptionalPin, callback?: () => void) => void | Promise<any>
+    allCerts: (filters: string[], body: OptionalPin, callback: () => void) => Promise<DataObjectResponse>
+    allData: (filters: string[], body: OptionalPin, callback: () => void) => Promise<DataObjectResponse>
+    authenticate: (body: any, callback: () => void) => Promise<DataResponse>
+    signData: (body: any, callback: () => void) => Promise<DataResponse>
+    verifyPin: (body: OptionalPin, callback?: () => void) => Promise<T1CResponse>
 }
 
 interface AuthenticateOrSignData extends OptionalPin {
@@ -77,7 +77,7 @@ abstract class GenericCard {
 
 abstract class GenericSmartCard extends GenericCard implements Card {
     public allData(filters: string[],
-                   callback?: (error: RestException, data: DataObjectResponse) => void): void | Promise<DataObjectResponse> {
+                   callback?: (error: RestException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
         return this.connection.get(this.resolvedReaderURI(), GenericCard.createFilterQueryParam(filters)).then(data => {
             return CertParser.process(data, callback);
         }, err => {
@@ -89,7 +89,7 @@ abstract class GenericSmartCard extends GenericCard implements Card {
 abstract class GenericPinCard extends GenericSmartCard implements PinCard {
     static VERIFY_PIN = "/verify-pin";
 
-    public verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>) {
+    public verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
             return this.connection.post(this.resolvedReaderURI() + GenericCertCard.VERIFY_PIN, body, undefined, callback);
         });
@@ -111,16 +111,16 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
 
 
     public allAlgoRefsForAuthentication(callback?:
-                                            (error: RestException, data: DataArrayResponse) => void): void | Promise<DataArrayResponse> {
+                                            (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
         return this.connection.get(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, undefined, callback);
     }
 
-    public allAlgoRefsForSigning(callback?: (error: RestException, data: DataArrayResponse) => void): void | Promise<DataArrayResponse> {
+    public allAlgoRefsForSigning(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
         return this.connection.get(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, undefined, callback);
     }
 
     public allCerts(filters: string[],
-                    callback?: (error: RestException, data: DataObjectResponse) => void): void | Promise<DataObjectResponse> {
+                    callback?: (error: RestException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
         return this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES,
             GenericCertCard.createFilterQueryParam(filters)).then(data => {
             return CertParser.process(data, callback);
@@ -130,21 +130,21 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
     }
 
     public authenticate(body: AuthenticateOrSignData,
-                        callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+                        callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
             return this.connection.post(this.resolvedReaderURI() + GenericCertCard.AUTHENTICATE, body, undefined, callback);
         });
     }
 
-    public signData(body: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+    public signData(body: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
             return this.connection.post(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, undefined, callback);
         });
     }
 
-    protected getCertificate(certUrl: string, callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+    protected getCertificate(certUrl: string, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         let self = this;
         return self.connection.get(self.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl,
             undefined).then(data => {
@@ -167,18 +167,17 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
     static VERIFY_PIN = "/verify-pin";
 
     public allAlgoRefsForAuthentication(callback?: (error: RestException,
-                                                    data: DataArrayResponse) => void): void | Promise<DataArrayResponse> {
+                                                    data: DataArrayResponse) => void): Promise<DataArrayResponse> {
         return this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, undefined, callback);
     }
 
-    public allAlgoRefsForSigning(callback?: (error: RestException, data: DataArrayResponse) => void): void | Promise<DataArrayResponse> {
+    public allAlgoRefsForSigning(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
         return this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, undefined, callback);
     }
 
-    public allData(filters: string[], body: OptionalPin): Promise<DataObjectResponse>;
-    public allData(filters: string[], body: OptionalPin, callback: (error: RestException, data: DataObjectResponse) => void): void;
+
     public allData(filters: string[], body: OptionalPin,
-                   callback?: (error: RestException, data: DataObjectResponse) => void): void | Promise<DataObjectResponse> {
+                   callback?: (error: RestException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
         return this.connection.post(this.resolvedReaderURI(), body, GenericSecuredCertCard.createFilterQueryParam(filters)).then(data => {
             return CertParser.process(data, callback);
         }, err => {
@@ -197,19 +196,19 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
         });
     }
 
-    public verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void) {
+    public verifyPin(body: OptionalPin, callback: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
             return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.VERIFY_PIN, body, undefined, callback);
         });
     }
 
-    public signData(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void) {
+    public signData(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
             return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, body, undefined, callback);
         });
     }
 
-    public authenticate(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void) {
+    public authenticate(body: AuthenticateOrSignData, callback: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
             return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, body, undefined, callback);
         });
@@ -217,7 +216,7 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
 
     protected getCertificate(certUrl: string, body: OptionalPin,
                              callback: (error: RestException, data: DataResponse) => void,
-                             params?: { filter?: string, pin?: string }): void | Promise<DataResponse> {
+                             params?: { filter?: string, pin?: string }): Promise<DataResponse> {
         let self = this;
 
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin)
@@ -236,7 +235,7 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
                                   body: OptionalPin,
                                   callback: (error: RestException,
                                              data: DataArrayResponse) => void,
-                                  params?: { filter?: string, pin?: string }): void | Promise<DataArrayResponse> {
+                                  params?: { filter?: string, pin?: string }): Promise<DataArrayResponse> {
         let self = this;
 
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin)

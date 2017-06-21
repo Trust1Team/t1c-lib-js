@@ -12,15 +12,15 @@ export { LuxTrust };
 
 class LuxTrust extends GenericCertCard implements AbstractLuxTrust {
 
-    public rootCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+    public rootCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         return this.getCertificate(LuxTrust.CERT_ROOT, callback);
     }
 
-    public authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+    public authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         return this.getCertificate(LuxTrust.CERT_AUTHENTICATION, callback);
     }
 
-    public signingCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+    public signingCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         return this.getCertificate(LuxTrust.CERT_SIGNING, callback);
     }
 }

@@ -29,27 +29,27 @@ class Oberthur extends GenericCertCard implements AbstractOberthur {
         return [ "authenticate", "sign", "encrypt" ];
     }
 
-    public rootCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+    public rootCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         return this.getCertificate(Oberthur.CERT_ROOT, callback);
     }
 
-    public issuerCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+    public issuerCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         return this.getCertificate(Oberthur.CERT_ISSUER, callback);
     }
 
-    public authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+    public authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         return this.getCertificate(Oberthur.CERT_AUTHENTICATION, callback);
     }
 
-    public signingCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+    public signingCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         return this.getCertificate(Oberthur.CERT_SIGNING, callback);
     }
 
-    public encryptionCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse> {
+    public encryptionCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         return this.getCertificate(Oberthur.CERT_ENCRYPTION, callback);
     }
 
-    public verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<any> {
+    public verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
             return this.connection.post(this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, undefined, callback);
         });

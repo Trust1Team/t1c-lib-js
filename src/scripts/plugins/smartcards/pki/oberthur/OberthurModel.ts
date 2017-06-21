@@ -13,16 +13,16 @@ interface AbstractOberthur extends CertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allKeyRefs(): string[];
-    allAlgoRefsForAuthentication(callback?: (error: RestException, data: DataArrayResponse) => void): void | Promise<DataArrayResponse>;
-    allAlgoRefsForSigning(callback?: (error: RestException, data: DataArrayResponse) => void): void | Promise<DataArrayResponse>;
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): void | Promise<AllDataResponse>;
-    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): void | Promise<AllCertsResponse>;
-    rootCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
-    issuerCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
-    authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
-    signingCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
-    encryptionCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
-    verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): void | Promise<any>;
+    allAlgoRefsForAuthentication(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
+    allAlgoRefsForSigning(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
+    rootCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    issuerCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    signingCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    encryptionCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
 }
 
 interface AllDataResponse extends AllCertsResponse {

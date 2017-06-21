@@ -11,8 +11,8 @@ export { AbstractEMV, AllDataResponse };
 
 interface AbstractEMV extends PinCard {
     // callback-based
-    pan(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): void | Promise<AllDataResponse>;
+    pan(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
 }
 
 interface AllDataResponse extends DataObjectResponse {

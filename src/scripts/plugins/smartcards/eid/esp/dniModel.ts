@@ -11,15 +11,15 @@ export { AbstractDNI, AllCertsResponse, AllDataResponse, InfoResponse };
 
 interface AbstractDNI extends SecuredCertCard {
     allData(filters: string[], body: OptionalPin,
-            callback?: (error: RestException, data: AllDataResponse) => void): void | Promise<AllDataResponse>;
+            callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
     allCerts(filters: string[], body: OptionalPin,
-             callback?: (error: RestException, data: AllCertsResponse) => void): void | Promise<AllCertsResponse>;
-    info(callback?: (error: RestException, data: InfoResponse) => void): void | Promise<InfoResponse>
-    intermediateCertificate(callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+             callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
+    info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>
+    intermediateCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     authenticationCertificate(body: OptionalPin,
-                              callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+                              callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     signingCertificate(body: OptionalPin,
-                       callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+                       callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
 }
 
 interface AllCertsResponse extends DataObjectResponse {
