@@ -24,8 +24,8 @@ import { AbstractMobib } from "./smartcards/mobib/mobibModel";
 import { AbstractEidLUX } from "./smartcards/eid/lux/EidLuxModel";
 import { AbstractDNI } from "./smartcards/eid/esp/dniModel";
 import { DNI } from "./smartcards/eid/esp/dni";
-import { AbstractPkcs11 } from "./pkcs11/pkcs11Model";
-import { Pkcs11 } from "./pkcs11/pkcs11";
+import { AbstractPkcs11 } from "./smartcards/pkcs11/pkcs11Model";
+import { Pkcs11 } from "./smartcards/pkcs11/pkcs11";
 
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;

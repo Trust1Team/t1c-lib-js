@@ -26,7 +26,7 @@ import { AbstractEidLUX } from "../plugins/smartcards/eid/lux/EidLuxModel";
 import { AbstractDNI } from "../plugins/smartcards/eid/esp/dniModel";
 import { Promise } from "es6-promise";
 import { PluginFactory } from "../plugins/PluginFactory";
-import { AbstractPkcs11 } from "../plugins/pkcs11/pkcs11Model";
+import { AbstractPkcs11 } from "../plugins/smartcards/pkcs11/pkcs11Model";
 
 
 class GCLClient {
