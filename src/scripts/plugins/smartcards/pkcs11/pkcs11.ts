@@ -3,6 +3,8 @@ import { RestException } from "../../../core/exceptions/CoreExceptions";
 import { CertificatesResponse } from "../../../core/service/CoreModel";
 import { LocalConnection } from "../../../core/client/Connection";
 import * as _ from "lodash";
+import { CertParser } from "../../../util/CertParser";
+import { ResponseHandler } from "../../../util/ResponseHandler";
 
 /**
  * @author Maarten Somers
@@ -25,7 +27,11 @@ class Pkcs11 implements AbstractPkcs11 {
     public certificates(body: SlotAndPin,
                         callback?: (error: RestException, data: CertificatesResponse) => void): Promise<CertificatesResponse> {
         let req = _.extend(body, { module: this.modulePath });
-        return this.connection.post(this.resolvedURI() + Pkcs11.ALL_CERTIFICATES, req, undefined, callback);
+        return this.connection.post(this.resolvedURI() + Pkcs11.ALL_CERTIFICATES, req, undefined).then(data => {
+            return CertParser.process(data, callback);
+        }, err => {
+            return ResponseHandler.error(err, callback);
+        });
     }
 
     public info(body: Pin, callback: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse> {
