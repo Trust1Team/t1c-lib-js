@@ -337,7 +337,7 @@
         $("#information").empty();
         var safenet = connector.safenet();
         var body = {
-            slot: "1",
+            slot: $("#safenetSlot").val(),
             pin: $("#safenetPin").val()
         };
         safenet.certificates(body).then(handleSuccess, handleError);
