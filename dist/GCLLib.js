@@ -65932,7 +65932,7 @@ var GCLLib =
 	        if (!this.os) {
 	            this.os = "linux";
 	        }
-	        if (moduleConfig) {
+	        if (moduleConfig && moduleConfig[this.os]) {
 	            this.modulePath = moduleConfig[this.os];
 	        }
 	        else {
