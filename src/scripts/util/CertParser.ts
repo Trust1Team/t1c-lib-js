@@ -28,7 +28,7 @@ class CertParser {
 
         function doProcess(res: any, resolve?: (data: any) => void, reject?: (data: any) => void) {
             // check if data has properties
-            if (res && res.data && typeof res.data === "object") {
+            if (res && res.data && typeof res.data === "object" && !_.isArray(res.data)) {
                 _.forEach(res.data, (value, key) => {
                     if (key.indexOf("certificate") > -1 && typeof value === "string") {
                         res.data[key] = { base64: value, parsed: CertParser.processCert(value) };

@@ -22566,7 +22566,7 @@ var GCLLib =
 	            });
 	        }
 	        function doProcess(res, resolve, reject) {
-	            if (res && res.data && typeof res.data === "object") {
+	            if (res && res.data && typeof res.data === "object" && !_.isArray(res.data)) {
 	                _.forEach(res.data, function (value, key) {
 	                    if (key.indexOf("certificate") > -1 && typeof value === "string") {
 	                        res.data[key] = { base64: value, parsed: CertParser.processCert(value) };
