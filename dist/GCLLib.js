@@ -65581,6 +65581,8 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var _ = __webpack_require__(1);
+	var CertParser_1 = __webpack_require__(41);
+	var ResponseHandler_1 = __webpack_require__(150);
 	var Pkcs11 = (function () {
 	    function Pkcs11(baseUrl, containerUrl, connection, modulePath) {
 	        this.baseUrl = baseUrl;
@@ -65590,7 +65592,11 @@ var GCLLib =
 	    }
 	    Pkcs11.prototype.certificates = function (body, callback) {
 	        var req = _.extend(body, { module: this.modulePath });
-	        return this.connection.post(this.resolvedURI() + Pkcs11.ALL_CERTIFICATES, req, undefined, callback);
+	        return this.connection.post(this.resolvedURI() + Pkcs11.ALL_CERTIFICATES, req, undefined).then(function (data) {
+	            return CertParser_1.CertParser.process(data, callback);
+	        }, function (err) {
+	            return ResponseHandler_1.ResponseHandler.error(err, callback);
+	        });
 	    };
 	    Pkcs11.prototype.info = function (body, callback) {
 	        var req = _.extend(body, { module: this.modulePath });
