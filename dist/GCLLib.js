@@ -22233,7 +22233,7 @@ var GCLLib =
 	var CONTAINER_AVENTRA = CONTAINER_CONTEXT_PATH + "aventra";
 	var CONTAINER_OBERTHUR = CONTAINER_CONTEXT_PATH + "oberthur";
 	var CONTAINER_PIV = CONTAINER_CONTEXT_PATH + "piv";
-	var CONTAINER_SAFENET = CONTAINER_CONTEXT_PATH + "safenet";
+	var CONTAINER_SAFENET = "/safenet";
 	var PluginFactory = (function () {
 	    function PluginFactory(url, connection) {
 	        this.url = url;
@@ -65923,10 +65923,10 @@ var GCLLib =
 	        this.containerUrl = containerUrl;
 	        this.connection = connection;
 	        this.moduleConfig = moduleConfig;
-	        if (platform.os.indexOf("Win") > -1) {
+	        if (platform.os.family.indexOf("Win") > -1) {
 	            this.os = "win";
 	        }
-	        if (platform.os.indexOf("OS X") > -1) {
+	        if (platform.os.family.indexOf("OS X") > -1) {
 	            this.os = "mac";
 	        }
 	        if (!this.os) {

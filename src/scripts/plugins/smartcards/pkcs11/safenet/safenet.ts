@@ -34,8 +34,8 @@ class SafeNet implements AbstractSafeNet {
                 protected connection: LocalConnection,
                 protected moduleConfig?: { linux: string, mac: string, win: string}) {
         // determine os
-        if (platform.os.indexOf("Win") > -1) { this.os = "win"; }
-        if (platform.os.indexOf("OS X") > -1) { this.os = "mac"; }
+        if (platform.os.family.indexOf("Win") > -1) { this.os = "win"; }
+        if (platform.os.family.indexOf("OS X") > -1) { this.os = "mac"; }
         // assume we are dealing with linux ==> will not always be correct!
         if (!this.os) { this.os = "linux"; }
 
