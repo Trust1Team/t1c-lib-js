@@ -74,7 +74,7 @@ var GCLLib =
 	        this.oberthur = function (reader_id) { return _this.pluginFactory.createOberthurNO(reader_id); };
 	        this.piv = function (reader_id) { return _this.pluginFactory.createPIV(reader_id); };
 	        this.safenet = function (reader_id, moduleConfig) {
-	            return _this.pluginFactory.createSafeNet(reader_id, moduleConfig);
+	            return _this.pluginFactory.createSafeNet(moduleConfig);
 	        };
 	        var self = this;
 	        this.cfg = GCLClient.resolveConfig(cfg);
@@ -22251,8 +22251,8 @@ var GCLLib =
 	    PluginFactory.prototype.createAventraNO = function (reader_id) { return new Aventra_1.Aventra(this.url, CONTAINER_AVENTRA, this.connection, reader_id); };
 	    PluginFactory.prototype.createOberthurNO = function (reader_id) { return new Oberthur_1.Oberthur(this.url, CONTAINER_OBERTHUR, this.connection, reader_id); };
 	    PluginFactory.prototype.createPIV = function (reader_id) { return new piv_1.PIV(this.url, CONTAINER_PIV, this.connection, reader_id); };
-	    PluginFactory.prototype.createSafeNet = function (reader_id, config) {
-	        return new safenet_1.SafeNet(this.url, CONTAINER_SAFENET, this.connection, reader_id, config);
+	    PluginFactory.prototype.createSafeNet = function (config) {
+	        return new safenet_1.SafeNet(this.url, CONTAINER_SAFENET, this.connection, config);
 	    };
 	    return PluginFactory;
 	}());
@@ -65918,11 +65918,10 @@ var GCLLib =
 	var ResponseHandler_1 = __webpack_require__(150);
 	var platform = __webpack_require__(5);
 	var SafeNet = (function () {
-	    function SafeNet(baseUrl, containerUrl, connection, reader_id, moduleConfig) {
+	    function SafeNet(baseUrl, containerUrl, connection, moduleConfig) {
 	        this.baseUrl = baseUrl;
 	        this.containerUrl = containerUrl;
 	        this.connection = connection;
-	        this.reader_id = reader_id;
 	        this.moduleConfig = moduleConfig;
 	        if (platform.os.indexOf("Win") > -1) {
 	            this.os = "win";

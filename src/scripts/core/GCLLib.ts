@@ -152,7 +152,7 @@ class GCLClient {
     public piv = (reader_id?: string): AbstractPiv => { return this.pluginFactory.createPIV(reader_id); };
     // get instance for PKCS11
     public safenet = (reader_id: string, moduleConfig: { linux: string, mac: string, win: string }): AbstractSafeNet => {
-        return this.pluginFactory.createSafeNet(reader_id, moduleConfig);
+        return this.pluginFactory.createSafeNet(moduleConfig);
     };
 
     /**
