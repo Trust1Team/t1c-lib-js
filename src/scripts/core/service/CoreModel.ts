@@ -127,7 +127,7 @@ interface CertificatesResponse extends T1CResponse {
 
 interface Certificate {
     base64: string,
-    parsed: object
+    parsed?: object
 }
 
 interface SingleReaderResponse extends T1CResponse {

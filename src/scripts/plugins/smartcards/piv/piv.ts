@@ -8,6 +8,7 @@ import { DataResponse } from "../../../core/service/CoreModel";
 import { AbstractPiv, FacialImageResponse, PrintedInformationResponse } from "./pivModel";
 import { PinEnforcer } from "../../../util/PinEnforcer";
 import { Promise } from "es6-promise";
+import { Options, RequestHandler } from "../../../util/RequestHandler";
 
 export { PIV };
 
@@ -66,12 +67,15 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
     }
 
     public authenticationCertificate(body: OptionalPin,
+                                     options?: Options,
                                      callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.getCertificate(PIV.CERT_AUTHENTICATION, body, callback);
+        return this.getCertificate(PIV.CERT_AUTHENTICATION, body, RequestHandler.determineOptions(options, callback));
     }
 
-    public signingCertificate(body: OptionalPin, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.getCertificate(PIV.CERT_SIGNING, body, callback);
+    public signingCertificate(body: OptionalPin,
+                              options?: Options,
+                              callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.getCertificate(PIV.CERT_SIGNING, body, RequestHandler.determineOptions(options, callback));
     }
 }
 
