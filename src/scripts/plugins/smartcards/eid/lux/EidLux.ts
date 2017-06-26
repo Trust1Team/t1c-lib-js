@@ -13,21 +13,20 @@ import {
 } from "./EidLuxModel";
 import { AllDataResponse } from "../../pki/luxtrust/LuxTrustModel";
 import { Promise } from "es6-promise";
-import * as _ from "lodash";
-import * as asn1js from "asn1js";
-import * as Base64 from "Base64";
 import { Certificate } from "pkijs";
 import { PinEnforcer } from "../../../../util/PinEnforcer";
 import { CertParser } from "../../../../util/CertParser";
 import { ResponseHandler } from "../../../../util/ResponseHandler";
+import { Options, RequestHandler, RequestOptions } from "../../../../util/RequestHandler";
 
 export { EidLux };
 
 
-function createFilterQueryParam(filters: string[], pin: string): { filter?: string, pin: string } {
-    if (filters && filters.length) {
-        return { filter: filters.join(","), pin };
-    } else { return { pin }; }
+function createFilterQueryParam(filterParams: { filter?: string }, pin: string): { filter?: string, pin: string } {
+    return {
+        filter: filterParams.filter,
+        pin
+    };
 }
 function createPinQueryParam(pin: string): { pin: string } {
     return { pin };
@@ -59,20 +58,22 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
         return [ "authentication-certificate", "non-repudiation-certificate", "root-certificates" ];
     }
 
-    public allData(filters: string[],
+    public allData(options?: string[] | Options,
                    callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse> {
-        return this.connection.get(this.resolvedReaderURI(), createFilterQueryParam(filters, this.pin)).then(data => {
-            return CertParser.process(data, callback);
+        const reqOptions = RequestHandler.determineOptionsWithFilter(options);
+        return this.connection.get(this.resolvedReaderURI(), createFilterQueryParam(reqOptions.params, this.pin)).then(data => {
+            return CertParser.process(data, reqOptions.parseCerts, callback);
         }, err => {
             return ResponseHandler.error(err, callback);
         });
     }
 
-    public allCerts(filters: string[],
+    public allCerts(options?: string[] | Options,
                     callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse> {
+        const reqOptions = RequestHandler.determineOptionsWithFilter(options);
         return this.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES,
-            createFilterQueryParam(filters, this.pin)).then(data => {
-            return CertParser.process(data, callback);
+            createFilterQueryParam(reqOptions.params, this.pin)).then(data => {
+            return CertParser.process(data, reqOptions.parseCerts, callback);
         }, err => {
             return ResponseHandler.error(err, callback);
         });
@@ -89,16 +90,22 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
         return this.connection.get(this.resolvedReaderURI() + EidLux.PHOTO, createPinQueryParam(this.pin), callback);
     }
 
-    public rootCertificate(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
-        return this.getCertificateArray(EidLux.CERT_ROOT, callback, createPinQueryParam(this.pin));
+    public rootCertificate(options?: Options,
+                           callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
+        return this.getCertificateArray(EidLux.CERT_ROOT,
+            RequestHandler.determineOptions(options, callback), createPinQueryParam(this.pin));
     }
 
-    public authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
-        return this.getCertificate(EidLux.CERT_AUTHENTICATION, callback, createPinQueryParam(this.pin));
+    public authenticationCertificate(options?: Options,
+                                     callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+        return this.getCertificate(EidLux.CERT_AUTHENTICATION,
+            RequestHandler.determineOptions(options, callback), createPinQueryParam(this.pin));
     }
 
-    public nonRepudiationCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
-        return this.getCertificate(EidLux.CERT_NON_REPUDIATION, callback, createPinQueryParam(this.pin));
+    public nonRepudiationCertificate(options?: Options,
+                                     callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+        return this.getCertificate(EidLux.CERT_NON_REPUDIATION,
+            RequestHandler.determineOptions(options, callback), createPinQueryParam(this.pin));
     }
 
     public verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>) {
@@ -125,27 +132,26 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
     }
 
     protected getCertificate(certUrl: string,
-                             callback: (error: RestException, data: DataResponse) => void,
+                             options: RequestOptions,
                              params?: { filter?: string, pin?: string }): Promise<DataResponse> {
         let self = this;
 
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {
             return self.connection.get(self.resolvedReaderURI() + EidLux.ALL_CERTIFICATES + certUrl, params).then(certData => {
-                return CertParser.process(certData, callback);
-            }, err => { return ResponseHandler.error(err, callback); });
+                return CertParser.process(certData, options.parseCerts, options.callback);
+            }, err => { return ResponseHandler.error(err, options.callback); });
         });
     }
 
     protected getCertificateArray(certUrl: string,
-                                  callback: (error: RestException,
-                                             data: DataArrayResponse) => void,
+                                  options: RequestOptions,
                                   params?: { filter?: string, pin?: string }): Promise<DataArrayResponse> {
         let self = this;
 
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {
             return self.connection.get(self.resolvedReaderURI() + EidLux.ALL_CERTIFICATES + certUrl, params).then(certData => {
-                return CertParser.process(certData, callback);
-            }, err => { return ResponseHandler.error(err, callback); });
+                return CertParser.process(certData, options.parseCerts, options.callback);
+            }, err => { return ResponseHandler.error(err, options.callback); });
         });
     }
 }

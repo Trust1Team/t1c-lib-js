@@ -9,6 +9,7 @@ import { DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
 import { GenericCertCard, OptionalPin, VerifyPinData } from "../../Card";
 import { PinEnforcer } from "../../../../util/PinEnforcer";
 import { Promise } from "es6-promise";
+import { Options, RequestHandler } from "../../../../util/RequestHandler";
 
 export { EidBe };
 
@@ -32,24 +33,26 @@ class EidBe extends GenericCertCard implements AbstractEidBE {
         return this.connection.get(this.resolvedReaderURI() + EidBe.PHOTO, undefined, callback);
     }
 
-    public rootCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.getCertificate(EidBe.CERT_ROOT, callback);
+    public rootCertificate(options: Options, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.getCertificate(EidBe.CERT_ROOT, RequestHandler.determineOptions(options, callback));
     }
 
-    public citizenCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.getCertificate(EidBe.CERT_CITIZEN, callback);
+    public citizenCertificate(options: Options, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.getCertificate(EidBe.CERT_CITIZEN, RequestHandler.determineOptions(options, callback));
     }
 
-    public authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.getCertificate(EidBe.CERT_AUTHENTICATION, callback);
+    public authenticationCertificate(options: Options,
+                                     callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.getCertificate(EidBe.CERT_AUTHENTICATION, RequestHandler.determineOptions(options, callback));
     }
 
-    public nonRepudiationCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.getCertificate(EidBe.CERT_NON_REPUDIATION, callback);
+    public nonRepudiationCertificate(options: Options,
+                                     callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.getCertificate(EidBe.CERT_NON_REPUDIATION, RequestHandler.determineOptions(options, callback));
     }
 
-    public rrnCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.getCertificate(EidBe.CERT_RRN, callback);
+    public rrnCertificate(options: Options, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.getCertificate(EidBe.CERT_RRN, RequestHandler.determineOptions(options, callback));
     }
 
 

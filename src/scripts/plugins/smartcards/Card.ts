@@ -5,7 +5,7 @@ import { Promise } from "es6-promise";
 import { PinEnforcer } from "../../util/PinEnforcer";
 import { CertParser } from "../../util/CertParser";
 import { ResponseHandler } from "../../util/ResponseHandler";
-
+import { Options, RequestHandler, RequestOptions } from "../../util/RequestHandler";
 /**
  * @author Michallis Pashidis
  * @author Maarten Somers
@@ -76,10 +76,11 @@ abstract class GenericCard {
 }
 
 abstract class GenericSmartCard extends GenericCard implements Card {
-    public allData(filters: string[],
+    public allData(options: string[] | Options,
                    callback?: (error: RestException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
-        return this.connection.get(this.resolvedReaderURI(), GenericCard.createFilterQueryParam(filters)).then(data => {
-            return CertParser.process(data, callback);
+        const requestOptions = RequestHandler.determineOptionsWithFilter(options);
+        return this.connection.get(this.resolvedReaderURI(), requestOptions.params).then(data => {
+            return CertParser.process(data, requestOptions.parseCerts, callback);
         }, err => {
             return ResponseHandler.error(err, callback);
         });
@@ -119,11 +120,12 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
         return this.connection.get(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, undefined, callback);
     }
 
-    public allCerts(filters: string[],
+    public allCerts(options: string[] | Options,
                     callback?: (error: RestException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
+        const reqOptions = RequestHandler.determineOptionsWithFilter(options);
         return this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES,
-            GenericCertCard.createFilterQueryParam(filters)).then(data => {
-            return CertParser.process(data, callback);
+            reqOptions.params).then(data => {
+            return CertParser.process(data, reqOptions.parseCerts, callback);
         }, err => {
             return ResponseHandler.error(err, callback);
         });
@@ -144,13 +146,13 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
         });
     }
 
-    protected getCertificate(certUrl: string, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+    protected getCertificate(certUrl: string, options: RequestOptions): Promise<DataResponse> {
         let self = this;
         return self.connection.get(self.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl,
             undefined).then(data => {
-            return CertParser.process(data, callback);
+            return CertParser.process(data, options.parseCerts, options.callback);
         }, err => {
-            return ResponseHandler.error(err, callback);
+            return ResponseHandler.error(err, options.callback);
         });
     }
 }
@@ -176,21 +178,22 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
     }
 
 
-    public allData(filters: string[], body: OptionalPin,
+    public allData(options: string[] | Options, body: OptionalPin,
                    callback?: (error: RestException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
-        return this.connection.post(this.resolvedReaderURI(), body, GenericSecuredCertCard.createFilterQueryParam(filters)).then(data => {
-            return CertParser.process(data, callback);
+        const reqOptions = RequestHandler.determineOptionsWithFilter(options);
+        return this.connection.post(this.resolvedReaderURI(), body, reqOptions.params).then(data => {
+            return CertParser.process(data, reqOptions.parseCerts, callback);
         }, err => {
             return ResponseHandler.error(err, callback);
         });
     }
 
-    public allCerts(filters: string[], body: OptionalPin,
+    public allCerts(options: string[] | Options, body: OptionalPin,
                     callback?: (error: RestException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
-        return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES,
-            body,
-            GenericSecuredCertCard.createFilterQueryParam(filters)).then(data => {
-            return CertParser.process(data, callback);
+        const reqOptions = RequestHandler.determineOptionsWithFilter(options);
+        return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES, body,
+            reqOptions.params).then(data => {
+            return CertParser.process(data, reqOptions.parseCerts, callback);
         }, err => {
             return ResponseHandler.error(err, callback);
         });
@@ -214,8 +217,9 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
         });
     }
 
-    protected getCertificate(certUrl: string, body: OptionalPin,
-                             callback: (error: RestException, data: DataResponse) => void,
+    protected getCertificate(certUrl: string,
+                             body: OptionalPin,
+                             options: RequestOptions,
                              params?: { filter?: string, pin?: string }): Promise<DataResponse> {
         let self = this;
 
@@ -225,16 +229,15 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
                                   body, params);
                           })
                           .then(data => {
-                              return CertParser.process(data, callback);
+                              return CertParser.process(data, options.parseCerts, options.callback);
                           }).catch(err => {
-                return ResponseHandler.error(err, callback);
+                return ResponseHandler.error(err, options.callback);
             });
     }
 
     protected getCertificateArray(certUrl: string,
                                   body: OptionalPin,
-                                  callback: (error: RestException,
-                                             data: DataArrayResponse) => void,
+                                  options: RequestOptions,
                                   params?: { filter?: string, pin?: string }): Promise<DataArrayResponse> {
         let self = this;
 
@@ -244,9 +247,9 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
                                   body, params);
                           })
                           .then(data => {
-                              return CertParser.process(data, callback);
+                              return CertParser.process(data, options.parseCerts, options.callback);
                           }).catch(err => {
-                return ResponseHandler.error(err, callback);
+                return ResponseHandler.error(err, options.callback);
             });
     }
 }

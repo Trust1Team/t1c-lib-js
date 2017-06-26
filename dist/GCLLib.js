@@ -22211,16 +22211,16 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var EMV_1 = __webpack_require__(38);
-	var EidBe_1 = __webpack_require__(151);
-	var EidLux_1 = __webpack_require__(152);
-	var mobib_1 = __webpack_require__(153);
-	var LuxTrust_1 = __webpack_require__(154);
-	var ocra_1 = __webpack_require__(155);
-	var Aventra_1 = __webpack_require__(156);
-	var Oberthur_1 = __webpack_require__(157);
-	var piv_1 = __webpack_require__(158);
-	var dni_1 = __webpack_require__(159);
-	var safenet_1 = __webpack_require__(160);
+	var EidBe_1 = __webpack_require__(152);
+	var EidLux_1 = __webpack_require__(153);
+	var mobib_1 = __webpack_require__(154);
+	var LuxTrust_1 = __webpack_require__(155);
+	var ocra_1 = __webpack_require__(156);
+	var Aventra_1 = __webpack_require__(157);
+	var Oberthur_1 = __webpack_require__(158);
+	var piv_1 = __webpack_require__(159);
+	var dni_1 = __webpack_require__(160);
+	var safenet_1 = __webpack_require__(161);
 	var CONTAINER_CONTEXT_PATH = "/plugins/";
 	var CONTAINER_NEW_CONTEXT_PATH = "/containers/";
 	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + "beid";
@@ -22233,7 +22233,7 @@ var GCLLib =
 	var CONTAINER_AVENTRA = CONTAINER_CONTEXT_PATH + "aventra";
 	var CONTAINER_OBERTHUR = CONTAINER_CONTEXT_PATH + "oberthur";
 	var CONTAINER_PIV = CONTAINER_CONTEXT_PATH + "piv";
-	var CONTAINER_SAFENET = "/safenet";
+	var CONTAINER_SAFENET = CONTAINER_CONTEXT_PATH + "safenet";
 	var PluginFactory = (function () {
 	    function PluginFactory(url, connection) {
 	        this.url = url;
@@ -22309,6 +22309,7 @@ var GCLLib =
 	var PinEnforcer_1 = __webpack_require__(40);
 	var CertParser_1 = __webpack_require__(41);
 	var ResponseHandler_1 = __webpack_require__(150);
+	var RequestHandler_1 = __webpack_require__(151);
 	var GenericCard = (function () {
 	    function GenericCard(baseUrl, containerUrl, connection, reader_id) {
 	        this.baseUrl = baseUrl;
@@ -22335,9 +22336,10 @@ var GCLLib =
 	    function GenericSmartCard() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
-	    GenericSmartCard.prototype.allData = function (filters, callback) {
-	        return this.connection.get(this.resolvedReaderURI(), GenericCard.createFilterQueryParam(filters)).then(function (data) {
-	            return CertParser_1.CertParser.process(data, callback);
+	    GenericSmartCard.prototype.allData = function (options, callback) {
+	        var requestOptions = RequestHandler_1.RequestHandler.determineOptionsWithFilter(options);
+	        return this.connection.get(this.resolvedReaderURI(), requestOptions.params).then(function (data) {
+	            return CertParser_1.CertParser.process(data, requestOptions.parseCerts, callback);
 	        }, function (err) {
 	            return ResponseHandler_1.ResponseHandler.error(err, callback);
 	        });
@@ -22371,9 +22373,10 @@ var GCLLib =
 	    GenericCertCard.prototype.allAlgoRefsForSigning = function (callback) {
 	        return this.connection.get(this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, undefined, callback);
 	    };
-	    GenericCertCard.prototype.allCerts = function (filters, callback) {
-	        return this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES, GenericCertCard.createFilterQueryParam(filters)).then(function (data) {
-	            return CertParser_1.CertParser.process(data, callback);
+	    GenericCertCard.prototype.allCerts = function (options, callback) {
+	        var reqOptions = RequestHandler_1.RequestHandler.determineOptionsWithFilter(options);
+	        return this.connection.get(this.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES, reqOptions.params).then(function (data) {
+	            return CertParser_1.CertParser.process(data, reqOptions.parseCerts, callback);
 	        }, function (err) {
 	            return ResponseHandler_1.ResponseHandler.error(err, callback);
 	        });
@@ -22392,12 +22395,12 @@ var GCLLib =
 	            return _this.connection.post(_this.resolvedReaderURI() + GenericCertCard.SIGN_DATA, body, undefined, callback);
 	        });
 	    };
-	    GenericCertCard.prototype.getCertificate = function (certUrl, callback) {
+	    GenericCertCard.prototype.getCertificate = function (certUrl, options) {
 	        var self = this;
 	        return self.connection.get(self.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl, undefined).then(function (data) {
-	            return CertParser_1.CertParser.process(data, callback);
+	            return CertParser_1.CertParser.process(data, options.parseCerts, options.callback);
 	        }, function (err) {
-	            return ResponseHandler_1.ResponseHandler.error(err, callback);
+	            return ResponseHandler_1.ResponseHandler.error(err, options.callback);
 	        });
 	    };
 	    return GenericCertCard;
@@ -22425,16 +22428,18 @@ var GCLLib =
 	    GenericSecuredCertCard.prototype.allAlgoRefsForSigning = function (callback) {
 	        return this.connection.get(this.resolvedReaderURI() + GenericSecuredCertCard.SIGN_DATA, undefined, callback);
 	    };
-	    GenericSecuredCertCard.prototype.allData = function (filters, body, callback) {
-	        return this.connection.post(this.resolvedReaderURI(), body, GenericSecuredCertCard.createFilterQueryParam(filters)).then(function (data) {
-	            return CertParser_1.CertParser.process(data, callback);
+	    GenericSecuredCertCard.prototype.allData = function (options, body, callback) {
+	        var reqOptions = RequestHandler_1.RequestHandler.determineOptionsWithFilter(options);
+	        return this.connection.post(this.resolvedReaderURI(), body, reqOptions.params).then(function (data) {
+	            return CertParser_1.CertParser.process(data, reqOptions.parseCerts, callback);
 	        }, function (err) {
 	            return ResponseHandler_1.ResponseHandler.error(err, callback);
 	        });
 	    };
-	    GenericSecuredCertCard.prototype.allCerts = function (filters, body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES, body, GenericSecuredCertCard.createFilterQueryParam(filters)).then(function (data) {
-	            return CertParser_1.CertParser.process(data, callback);
+	    GenericSecuredCertCard.prototype.allCerts = function (options, body, callback) {
+	        var reqOptions = RequestHandler_1.RequestHandler.determineOptionsWithFilter(options);
+	        return this.connection.post(this.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES, body, reqOptions.params).then(function (data) {
+	            return CertParser_1.CertParser.process(data, reqOptions.parseCerts, callback);
 	        }, function (err) {
 	            return ResponseHandler_1.ResponseHandler.error(err, callback);
 	        });
@@ -22457,28 +22462,28 @@ var GCLLib =
 	            return _this.connection.post(_this.resolvedReaderURI() + GenericSecuredCertCard.AUTHENTICATE, body, undefined, callback);
 	        });
 	    };
-	    GenericSecuredCertCard.prototype.getCertificate = function (certUrl, body, callback, params) {
+	    GenericSecuredCertCard.prototype.getCertificate = function (certUrl, body, options, params) {
 	        var self = this;
 	        return PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin)
 	            .then(function () {
 	            return self.connection.post(self.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, params);
 	        })
 	            .then(function (data) {
-	            return CertParser_1.CertParser.process(data, callback);
+	            return CertParser_1.CertParser.process(data, options.parseCerts, options.callback);
 	        }).catch(function (err) {
-	            return ResponseHandler_1.ResponseHandler.error(err, callback);
+	            return ResponseHandler_1.ResponseHandler.error(err, options.callback);
 	        });
 	    };
-	    GenericSecuredCertCard.prototype.getCertificateArray = function (certUrl, body, callback, params) {
+	    GenericSecuredCertCard.prototype.getCertificateArray = function (certUrl, body, options, params) {
 	        var self = this;
 	        return PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin)
 	            .then(function () {
 	            return self.connection.post(self.resolvedReaderURI() + GenericSecuredCertCard.ALL_CERTIFICATES + certUrl, body, params);
 	        })
 	            .then(function (data) {
-	            return CertParser_1.CertParser.process(data, callback);
+	            return CertParser_1.CertParser.process(data, options.parseCerts, options.callback);
 	        }).catch(function (err) {
-	            return ResponseHandler_1.ResponseHandler.error(err, callback);
+	            return ResponseHandler_1.ResponseHandler.error(err, options.callback);
 	        });
 	    };
 	    return GenericSecuredCertCard;
@@ -22548,57 +22553,52 @@ var GCLLib =
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var es6_promise_1 = __webpack_require__(6);
 	var _ = __webpack_require__(1);
 	var asn1js = __webpack_require__(42);
 	var Base64 = __webpack_require__(44);
-	var pkijs_1 = __webpack_require__(45);
+	var pkijs = __webpack_require__(45);
+	var ResponseHandler_1 = __webpack_require__(150);
 	var CertParser = (function () {
 	    function CertParser() {
 	    }
-	    CertParser.process = function (response, callback) {
-	        if (callback && typeof callback === "function") {
-	            doProcess(response);
-	        }
-	        else {
-	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                doProcess(response, resolve, reject);
+	    CertParser.process = function (response, parseCerts, callback) {
+	        if (response && response.data && typeof response.data === "object" && !_.isArray(response.data)) {
+	            _.forEach(response.data, function (value, key) {
+	                if (key.indexOf("certificate") > -1 && typeof value === "string") {
+	                    response.data[key] = { base64: value };
+	                    if (parseCerts) {
+	                        response.data[key].parsed = CertParser.processCert(value);
+	                    }
+	                }
 	            });
 	        }
-	        function doProcess(res, resolve, reject) {
-	            if (res && res.data && typeof res.data === "object" && !_.isArray(res.data)) {
-	                _.forEach(res.data, function (value, key) {
-	                    if (key.indexOf("certificate") > -1 && typeof value === "string") {
-	                        res.data[key] = { base64: value, parsed: CertParser.processCert(value) };
+	        else {
+	            if (_.isArray(response.data)) {
+	                var newData_1 = [];
+	                _.forEach(response.data, function (certificate) {
+	                    var cert = { base64: certificate };
+	                    if (parseCerts) {
+	                        cert.parsed = CertParser.processCert(certificate);
 	                    }
+	                    newData_1.push(cert);
 	                });
+	                response.data = newData_1;
 	            }
 	            else {
-	                if (_.isArray(res.data)) {
-	                    var newData_1 = [];
-	                    _.forEach(res.data, function (certificate) {
-	                        newData_1.push({ base64: certificate, parsed: CertParser.processCert(certificate) });
-	                    });
-	                    res.data = newData_1;
+	                var cert = { base64: response.data };
+	                if (parseCerts) {
+	                    cert.parsed = CertParser.processCert(response.data);
 	                }
-	                else {
-	                    var certificate = res.data;
-	                    res.data = { base64: certificate, parsed: CertParser.processCert(certificate) };
-	                }
-	            }
-	            if (resolve) {
-	                resolve(res);
-	            }
-	            else {
-	                callback(null, res);
+	                response.data = cert;
 	            }
 	        }
+	        return ResponseHandler_1.ResponseHandler.response(response, callback);
 	    };
 	    CertParser.processCert = function (certificate) {
 	        var rawCert = Base64.atob(certificate);
 	        var buffer = CertParser.str2ab(rawCert);
 	        var asn1 = asn1js.fromBER(buffer);
-	        return new pkijs_1.Certificate({ schema: asn1.result });
+	        return new pkijs.Certificate({ schema: asn1.result });
 	    };
 	    CertParser.str2ab = function (str) {
 	        var buf = new ArrayBuffer(str.length);
@@ -65336,6 +65336,63 @@ var GCLLib =
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var _ = __webpack_require__(1);
+	var RequestHandler = (function () {
+	    function RequestHandler() {
+	    }
+	    RequestHandler.determineOptions = function (firstParam, secondParam) {
+	        var result = { parseCerts: false };
+	        if (firstParam) {
+	            if (typeof firstParam === "function") {
+	                result.callback = firstParam;
+	            }
+	            else {
+	                result.callback = secondParam;
+	                if (_.has(firstParam, "parseCerts")) {
+	                    result.parseCerts = firstParam.parseCerts;
+	                }
+	            }
+	        }
+	        else {
+	            if (typeof secondParam === "function") {
+	                result.callback = secondParam;
+	            }
+	        }
+	        return result;
+	    };
+	    RequestHandler.determineOptionsWithFilter = function (firstParam) {
+	        var result = { parseCerts: false, params: {} };
+	        if (_.isArray(firstParam)) {
+	            if (firstParam.length) {
+	                result.params.filter = firstParam.join(",");
+	            }
+	        }
+	        else if (_.isObject(firstParam)) {
+	            if (_.has(firstParam, "filters") && _.isArray(firstParam.filters)) {
+	                if (firstParam.filters.length) {
+	                    result.params.filter = firstParam.filters.join(",");
+	                }
+	            }
+	            if (_.has(firstParam, "parseCerts")) {
+	                result.parseCerts = firstParam.parseCerts;
+	            }
+	        }
+	        if (_.isEmpty(result.params)) {
+	            delete result.params;
+	        }
+	        return result;
+	    };
+	    return RequestHandler;
+	}());
+	exports.RequestHandler = RequestHandler;
+
+
+/***/ }),
+/* 152 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
 	var __extends = (this && this.__extends) || (function () {
 	    var extendStatics = Object.setPrototypeOf ||
 	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -65349,6 +65406,7 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(39);
 	var PinEnforcer_1 = __webpack_require__(40);
+	var RequestHandler_1 = __webpack_require__(151);
 	var EidBe = (function (_super) {
 	    __extends(EidBe, _super);
 	    function EidBe() {
@@ -65363,20 +65421,20 @@ var GCLLib =
 	    EidBe.prototype.picture = function (callback) {
 	        return this.connection.get(this.resolvedReaderURI() + EidBe.PHOTO, undefined, callback);
 	    };
-	    EidBe.prototype.rootCertificate = function (callback) {
-	        return this.getCertificate(EidBe.CERT_ROOT, callback);
+	    EidBe.prototype.rootCertificate = function (options, callback) {
+	        return this.getCertificate(EidBe.CERT_ROOT, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
-	    EidBe.prototype.citizenCertificate = function (callback) {
-	        return this.getCertificate(EidBe.CERT_CITIZEN, callback);
+	    EidBe.prototype.citizenCertificate = function (options, callback) {
+	        return this.getCertificate(EidBe.CERT_CITIZEN, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
-	    EidBe.prototype.authenticationCertificate = function (callback) {
-	        return this.getCertificate(EidBe.CERT_AUTHENTICATION, callback);
+	    EidBe.prototype.authenticationCertificate = function (options, callback) {
+	        return this.getCertificate(EidBe.CERT_AUTHENTICATION, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
-	    EidBe.prototype.nonRepudiationCertificate = function (callback) {
-	        return this.getCertificate(EidBe.CERT_NON_REPUDIATION, callback);
+	    EidBe.prototype.nonRepudiationCertificate = function (options, callback) {
+	        return this.getCertificate(EidBe.CERT_NON_REPUDIATION, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
-	    EidBe.prototype.rrnCertificate = function (callback) {
-	        return this.getCertificate(EidBe.CERT_RRN, callback);
+	    EidBe.prototype.rrnCertificate = function (options, callback) {
+	        return this.getCertificate(EidBe.CERT_RRN, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
 	    EidBe.prototype.verifyPin = function (body, callback) {
 	        var _this = this;
@@ -65398,7 +65456,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 152 */
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65417,13 +65475,12 @@ var GCLLib =
 	var PinEnforcer_1 = __webpack_require__(40);
 	var CertParser_1 = __webpack_require__(41);
 	var ResponseHandler_1 = __webpack_require__(150);
-	function createFilterQueryParam(filters, pin) {
-	    if (filters && filters.length) {
-	        return { filter: filters.join(","), pin: pin };
-	    }
-	    else {
-	        return { pin: pin };
-	    }
+	var RequestHandler_1 = __webpack_require__(151);
+	function createFilterQueryParam(filterParams, pin) {
+	    return {
+	        filter: filterParams.filter,
+	        pin: pin
+	    };
 	}
 	function createPinQueryParam(pin) {
 	    return { pin: pin };
@@ -65445,16 +65502,18 @@ var GCLLib =
 	    EidLux.prototype.allCertFilters = function () {
 	        return ["authentication-certificate", "non-repudiation-certificate", "root-certificates"];
 	    };
-	    EidLux.prototype.allData = function (filters, callback) {
-	        return this.connection.get(this.resolvedReaderURI(), createFilterQueryParam(filters, this.pin)).then(function (data) {
-	            return CertParser_1.CertParser.process(data, callback);
+	    EidLux.prototype.allData = function (options, callback) {
+	        var reqOptions = RequestHandler_1.RequestHandler.determineOptionsWithFilter(options);
+	        return this.connection.get(this.resolvedReaderURI(), createFilterQueryParam(reqOptions.params, this.pin)).then(function (data) {
+	            return CertParser_1.CertParser.process(data, reqOptions.parseCerts, callback);
 	        }, function (err) {
 	            return ResponseHandler_1.ResponseHandler.error(err, callback);
 	        });
 	    };
-	    EidLux.prototype.allCerts = function (filters, callback) {
-	        return this.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, createFilterQueryParam(filters, this.pin)).then(function (data) {
-	            return CertParser_1.CertParser.process(data, callback);
+	    EidLux.prototype.allCerts = function (options, callback) {
+	        var reqOptions = RequestHandler_1.RequestHandler.determineOptionsWithFilter(options);
+	        return this.connection.get(this.resolvedReaderURI() + EidLux.ALL_CERTIFICATES, createFilterQueryParam(reqOptions.params, this.pin)).then(function (data) {
+	            return CertParser_1.CertParser.process(data, reqOptions.parseCerts, callback);
 	        }, function (err) {
 	            return ResponseHandler_1.ResponseHandler.error(err, callback);
 	        });
@@ -65465,14 +65524,14 @@ var GCLLib =
 	    EidLux.prototype.picture = function (callback) {
 	        return this.connection.get(this.resolvedReaderURI() + EidLux.PHOTO, createPinQueryParam(this.pin), callback);
 	    };
-	    EidLux.prototype.rootCertificate = function (callback) {
-	        return this.getCertificateArray(EidLux.CERT_ROOT, callback, createPinQueryParam(this.pin));
+	    EidLux.prototype.rootCertificate = function (options, callback) {
+	        return this.getCertificateArray(EidLux.CERT_ROOT, RequestHandler_1.RequestHandler.determineOptions(options, callback), createPinQueryParam(this.pin));
 	    };
-	    EidLux.prototype.authenticationCertificate = function (callback) {
-	        return this.getCertificate(EidLux.CERT_AUTHENTICATION, callback, createPinQueryParam(this.pin));
+	    EidLux.prototype.authenticationCertificate = function (options, callback) {
+	        return this.getCertificate(EidLux.CERT_AUTHENTICATION, RequestHandler_1.RequestHandler.determineOptions(options, callback), createPinQueryParam(this.pin));
 	    };
-	    EidLux.prototype.nonRepudiationCertificate = function (callback) {
-	        return this.getCertificate(EidLux.CERT_NON_REPUDIATION, callback, createPinQueryParam(this.pin));
+	    EidLux.prototype.nonRepudiationCertificate = function (options, callback) {
+	        return this.getCertificate(EidLux.CERT_NON_REPUDIATION, RequestHandler_1.RequestHandler.determineOptions(options, callback), createPinQueryParam(this.pin));
 	    };
 	    EidLux.prototype.verifyPin = function (body, callback) {
 	        var _this = this;
@@ -65495,20 +65554,20 @@ var GCLLib =
 	    EidLux.prototype.signatureImage = function (callback) {
 	        return this.connection.get(this.resolvedReaderURI() + EidLux.SIGNATURE_IMAGE, createPinQueryParam(this.pin), callback);
 	    };
-	    EidLux.prototype.getCertificate = function (certUrl, callback, params) {
+	    EidLux.prototype.getCertificate = function (certUrl, options, params) {
 	        var self = this;
 	        return PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(function () {
 	            return self.connection.get(self.resolvedReaderURI() + EidLux.ALL_CERTIFICATES + certUrl, params).then(function (certData) {
-	                return CertParser_1.CertParser.process(certData, callback);
-	            }, function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
+	                return CertParser_1.CertParser.process(certData, options.parseCerts, options.callback);
+	            }, function (err) { return ResponseHandler_1.ResponseHandler.error(err, options.callback); });
 	        });
 	    };
-	    EidLux.prototype.getCertificateArray = function (certUrl, callback, params) {
+	    EidLux.prototype.getCertificateArray = function (certUrl, options, params) {
 	        var self = this;
 	        return PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(function () {
 	            return self.connection.get(self.resolvedReaderURI() + EidLux.ALL_CERTIFICATES + certUrl, params).then(function (certData) {
-	                return CertParser_1.CertParser.process(certData, callback);
-	            }, function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
+	                return CertParser_1.CertParser.process(certData, options.parseCerts, options.callback);
+	            }, function (err) { return ResponseHandler_1.ResponseHandler.error(err, options.callback); });
 	        });
 	    };
 	    return EidLux;
@@ -65521,7 +65580,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 153 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65564,7 +65623,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 154 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65580,19 +65639,20 @@ var GCLLib =
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(39);
+	var RequestHandler_1 = __webpack_require__(151);
 	var LuxTrust = (function (_super) {
 	    __extends(LuxTrust, _super);
 	    function LuxTrust() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
-	    LuxTrust.prototype.rootCertificate = function (callback) {
-	        return this.getCertificate(LuxTrust.CERT_ROOT, callback);
+	    LuxTrust.prototype.rootCertificate = function (options, callback) {
+	        return this.getCertificate(LuxTrust.CERT_ROOT, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
-	    LuxTrust.prototype.authenticationCertificate = function (callback) {
-	        return this.getCertificate(LuxTrust.CERT_AUTHENTICATION, callback);
+	    LuxTrust.prototype.authenticationCertificate = function (options, callback) {
+	        return this.getCertificate(LuxTrust.CERT_AUTHENTICATION, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
-	    LuxTrust.prototype.signingCertificate = function (callback) {
-	        return this.getCertificate(LuxTrust.CERT_SIGNING, callback);
+	    LuxTrust.prototype.signingCertificate = function (options, callback) {
+	        return this.getCertificate(LuxTrust.CERT_SIGNING, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
 	    return LuxTrust;
 	}(Card_1.GenericCertCard));
@@ -65600,7 +65660,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 155 */
+/* 156 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65665,69 +65725,6 @@ var GCLLib =
 
 
 /***/ }),
-/* 156 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || (function () {
-	    var extendStatics = Object.setPrototypeOf ||
-	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-	    return function (d, b) {
-	        extendStatics(d, b);
-	        function __() { this.constructor = d; }
-	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	    };
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(39);
-	var PinEnforcer_1 = __webpack_require__(40);
-	var Aventra = (function (_super) {
-	    __extends(Aventra, _super);
-	    function Aventra() {
-	        return _super !== null && _super.apply(this, arguments) || this;
-	    }
-	    Aventra.prototype.allDataFilters = function () {
-	        return ["applet-info", "root_certificate", "authentication-certificate",
-	            "encryption_certificate", "issuer_certificate", "signing_certificate"];
-	    };
-	    Aventra.prototype.allCertFilters = function () {
-	        return ["root_certificate", "authentication-certificate", "encryption_certificate", "issuer_certificate", "signing_certificate"];
-	    };
-	    Aventra.prototype.allKeyRefs = function () {
-	        return ["authenticate", "sign", "encrypt"];
-	    };
-	    Aventra.prototype.rootCertificate = function (callback) {
-	        return this.getCertificate(Aventra.CERT_ROOT, callback);
-	    };
-	    Aventra.prototype.issuerCertificate = function (callback) {
-	        return this.getCertificate(Aventra.CERT_ISSUER, callback);
-	    };
-	    Aventra.prototype.authenticationCertificate = function (callback) {
-	        return this.getCertificate(Aventra.CERT_AUTHENTICATION, callback);
-	    };
-	    Aventra.prototype.signingCertificate = function (callback) {
-	        return this.getCertificate(Aventra.CERT_SIGNING, callback);
-	    };
-	    Aventra.prototype.encryptionCertificate = function (callback) {
-	        return this.getCertificate(Aventra.CERT_ENCRYPTION, callback);
-	    };
-	    Aventra.prototype.verifyPin = function (body, callback) {
-	        var _this = this;
-	        return PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
-	            return _this.connection.post(_this.resolvedReaderURI() + Aventra.VERIFY_PIN, body, undefined, callback);
-	        });
-	    };
-	    Aventra.prototype.resetPin = function (body, callback) {
-	        return this.connection.post(this.resolvedReaderURI() + Aventra.RESET_PIN, body, undefined, callback);
-	    };
-	    return Aventra;
-	}(Card_1.GenericCertCard));
-	Aventra.RESET_PIN = "/reset-pin";
-	exports.Aventra = Aventra;
-
-
-/***/ }),
 /* 157 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -65745,45 +65742,50 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(39);
 	var PinEnforcer_1 = __webpack_require__(40);
-	var Oberthur = (function (_super) {
-	    __extends(Oberthur, _super);
-	    function Oberthur() {
+	var RequestHandler_1 = __webpack_require__(151);
+	var Aventra = (function (_super) {
+	    __extends(Aventra, _super);
+	    function Aventra() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
-	    Oberthur.prototype.allDataFilters = function () {
-	        return ["root_certificate", "authentication-certificate",
+	    Aventra.prototype.allDataFilters = function () {
+	        return ["applet-info", "root_certificate", "authentication-certificate",
 	            "encryption_certificate", "issuer_certificate", "signing_certificate"];
 	    };
-	    Oberthur.prototype.allCertFilters = function () {
+	    Aventra.prototype.allCertFilters = function () {
 	        return ["root_certificate", "authentication-certificate", "encryption_certificate", "issuer_certificate", "signing_certificate"];
 	    };
-	    Oberthur.prototype.allKeyRefs = function () {
+	    Aventra.prototype.allKeyRefs = function () {
 	        return ["authenticate", "sign", "encrypt"];
 	    };
-	    Oberthur.prototype.rootCertificate = function (callback) {
-	        return this.getCertificate(Oberthur.CERT_ROOT, callback);
+	    Aventra.prototype.rootCertificate = function (options, callback) {
+	        return this.getCertificate(Aventra.CERT_ROOT, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
-	    Oberthur.prototype.issuerCertificate = function (callback) {
-	        return this.getCertificate(Oberthur.CERT_ISSUER, callback);
+	    Aventra.prototype.issuerCertificate = function (options, callback) {
+	        return this.getCertificate(Aventra.CERT_ISSUER, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
-	    Oberthur.prototype.authenticationCertificate = function (callback) {
-	        return this.getCertificate(Oberthur.CERT_AUTHENTICATION, callback);
+	    Aventra.prototype.authenticationCertificate = function (options, callback) {
+	        return this.getCertificate(Aventra.CERT_AUTHENTICATION, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
-	    Oberthur.prototype.signingCertificate = function (callback) {
-	        return this.getCertificate(Oberthur.CERT_SIGNING, callback);
+	    Aventra.prototype.signingCertificate = function (options, callback) {
+	        return this.getCertificate(Aventra.CERT_SIGNING, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
-	    Oberthur.prototype.encryptionCertificate = function (callback) {
-	        return this.getCertificate(Oberthur.CERT_ENCRYPTION, callback);
+	    Aventra.prototype.encryptionCertificate = function (options, callback) {
+	        return this.getCertificate(Aventra.CERT_ENCRYPTION, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
-	    Oberthur.prototype.verifyPin = function (body, callback) {
+	    Aventra.prototype.verifyPin = function (body, callback) {
 	        var _this = this;
 	        return PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
-	            return _this.connection.post(_this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, undefined, callback);
+	            return _this.connection.post(_this.resolvedReaderURI() + Aventra.VERIFY_PIN, body, undefined, callback);
 	        });
 	    };
-	    return Oberthur;
+	    Aventra.prototype.resetPin = function (body, callback) {
+	        return this.connection.post(this.resolvedReaderURI() + Aventra.RESET_PIN, body, undefined, callback);
+	    };
+	    return Aventra;
 	}(Card_1.GenericCertCard));
-	exports.Oberthur = Oberthur;
+	Aventra.RESET_PIN = "/reset-pin";
+	exports.Aventra = Aventra;
 
 
 /***/ }),
@@ -65804,7 +65806,68 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(39);
 	var PinEnforcer_1 = __webpack_require__(40);
+	var RequestHandler_1 = __webpack_require__(151);
+	var Oberthur = (function (_super) {
+	    __extends(Oberthur, _super);
+	    function Oberthur() {
+	        return _super !== null && _super.apply(this, arguments) || this;
+	    }
+	    Oberthur.prototype.allDataFilters = function () {
+	        return ["root_certificate", "authentication-certificate",
+	            "encryption_certificate", "issuer_certificate", "signing_certificate"];
+	    };
+	    Oberthur.prototype.allCertFilters = function () {
+	        return ["root_certificate", "authentication-certificate", "encryption_certificate", "issuer_certificate", "signing_certificate"];
+	    };
+	    Oberthur.prototype.allKeyRefs = function () {
+	        return ["authenticate", "sign", "encrypt"];
+	    };
+	    Oberthur.prototype.rootCertificate = function (options, callback) {
+	        return this.getCertificate(Oberthur.CERT_ROOT, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+	    };
+	    Oberthur.prototype.issuerCertificate = function (options, callback) {
+	        return this.getCertificate(Oberthur.CERT_ISSUER, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+	    };
+	    Oberthur.prototype.authenticationCertificate = function (options, callback) {
+	        return this.getCertificate(Oberthur.CERT_AUTHENTICATION, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+	    };
+	    Oberthur.prototype.signingCertificate = function (options, callback) {
+	        return this.getCertificate(Oberthur.CERT_SIGNING, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+	    };
+	    Oberthur.prototype.encryptionCertificate = function (options, callback) {
+	        return this.getCertificate(Oberthur.CERT_ENCRYPTION, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+	    };
+	    Oberthur.prototype.verifyPin = function (body, callback) {
+	        var _this = this;
+	        return PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
+	            return _this.connection.post(_this.resolvedReaderURI() + Oberthur.VERIFY_PIN, body, undefined, callback);
+	        });
+	    };
+	    return Oberthur;
+	}(Card_1.GenericCertCard));
+	exports.Oberthur = Oberthur;
+
+
+/***/ }),
+/* 159 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Card_1 = __webpack_require__(39);
+	var PinEnforcer_1 = __webpack_require__(40);
 	var es6_promise_1 = __webpack_require__(6);
+	var RequestHandler_1 = __webpack_require__(151);
 	var PIV = (function (_super) {
 	    __extends(PIV, _super);
 	    function PIV() {
@@ -65854,11 +65917,11 @@ var GCLLib =
 	            });
 	        }
 	    };
-	    PIV.prototype.authenticationCertificate = function (body, callback) {
-	        return this.getCertificate(PIV.CERT_AUTHENTICATION, body, callback);
+	    PIV.prototype.authenticationCertificate = function (body, options, callback) {
+	        return this.getCertificate(PIV.CERT_AUTHENTICATION, body, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
-	    PIV.prototype.signingCertificate = function (body, callback) {
-	        return this.getCertificate(PIV.CERT_SIGNING, body, callback);
+	    PIV.prototype.signingCertificate = function (body, options, callback) {
+	        return this.getCertificate(PIV.CERT_SIGNING, body, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
 	    return PIV;
 	}(Card_1.GenericSecuredCertCard));
@@ -65868,7 +65931,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 159 */
+/* 160 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65884,6 +65947,9 @@ var GCLLib =
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(39);
+	var RequestHandler_1 = __webpack_require__(151);
+	var CertParser_1 = __webpack_require__(41);
+	var ResponseHandler_1 = __webpack_require__(150);
 	var DNI = (function (_super) {
 	    __extends(DNI, _super);
 	    function DNI() {
@@ -65892,14 +65958,20 @@ var GCLLib =
 	    DNI.prototype.info = function (callback) {
 	        return this.connection.get(this.resolvedReaderURI() + DNI.INFO, undefined, callback);
 	    };
-	    DNI.prototype.intermediateCertificate = function (callback) {
-	        return this.connection.get(this.resolvedReaderURI() + DNI.ALL_CERTIFICATES + DNI.CERT_INTERMEDIATE, undefined, callback);
+	    DNI.prototype.intermediateCertificate = function (options, callback) {
+	        var reqOptions = RequestHandler_1.RequestHandler.determineOptions(options, callback);
+	        var self = this;
+	        return self.connection.get(self.resolvedReaderURI() + DNI.ALL_CERTIFICATES + DNI.CERT_INTERMEDIATE, undefined).then(function (data) {
+	            return CertParser_1.CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
+	        }, function (err) {
+	            return ResponseHandler_1.ResponseHandler.error(err, reqOptions.callback);
+	        });
 	    };
-	    DNI.prototype.authenticationCertificate = function (body, callback) {
-	        return this.getCertificate(DNI.CERT_AUTHENTICATION, body, callback);
+	    DNI.prototype.authenticationCertificate = function (body, options, callback) {
+	        return this.getCertificate(DNI.CERT_AUTHENTICATION, body, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
-	    DNI.prototype.signingCertificate = function (body, callback) {
-	        return this.getCertificate(DNI.CERT_SIGNING, body, callback);
+	    DNI.prototype.signingCertificate = function (body, options, callback) {
+	        return this.getCertificate(DNI.CERT_SIGNING, body, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
 	    return DNI;
 	}(Card_1.GenericSecuredCertCard));
@@ -65908,7 +65980,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 160 */
+/* 161 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -65917,6 +65989,7 @@ var GCLLib =
 	var CertParser_1 = __webpack_require__(41);
 	var ResponseHandler_1 = __webpack_require__(150);
 	var platform = __webpack_require__(5);
+	var RequestHandler_1 = __webpack_require__(151);
 	var SafeNet = (function () {
 	    function SafeNet(baseUrl, containerUrl, connection, moduleConfig) {
 	        this.baseUrl = baseUrl;
@@ -65939,22 +66012,23 @@ var GCLLib =
 	            this.modulePath = SafeNet.DEFAULT_CONFIG[this.os];
 	        }
 	    }
-	    SafeNet.prototype.certificates = function (body, callback) {
+	    SafeNet.prototype.certificates = function (body, options, callback) {
 	        var _this = this;
 	        var req = _.extend(body, { module: this.modulePath });
+	        var reqOptions = RequestHandler_1.RequestHandler.determineOptions(options, callback);
 	        return this.connection.post(this.resolvedURI() + SafeNet.ALL_CERTIFICATES, req, undefined).then(function (data) {
-	            return CertParser_1.CertParser.process(data, callback);
+	            return CertParser_1.CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
 	        }, function (err) {
 	            if (_this.moduleConfig) {
 	                var defaultReq = _.extend(body, { module: SafeNet.DEFAULT_CONFIG[_this.os] });
 	                return _this.connection.post(_this.resolvedURI() + SafeNet.ALL_CERTIFICATES, defaultReq, undefined).then(function (data) {
-	                    return CertParser_1.CertParser.process(data, callback);
+	                    return CertParser_1.CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
 	                }, function (defaultErr) {
-	                    return ResponseHandler_1.ResponseHandler.error(defaultErr, callback);
+	                    return ResponseHandler_1.ResponseHandler.error(defaultErr, reqOptions.callback);
 	                });
 	            }
 	            else {
-	                return ResponseHandler_1.ResponseHandler.error(err, callback);
+	                return ResponseHandler_1.ResponseHandler.error(err, reqOptions.callback);
 	            }
 	        });
 	    };

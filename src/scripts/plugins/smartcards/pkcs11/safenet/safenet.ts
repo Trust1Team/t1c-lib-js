@@ -6,6 +6,7 @@ import { CertParser } from "../../../../util/CertParser";
 import { ResponseHandler } from "../../../../util/ResponseHandler";
 import { AbstractSafeNet, InfoResponse, SlotAndPin, SlotsResponse } from "./safenetModel";
 import * as platform from "platform";
+import { Options, RequestHandler } from "../../../../util/RequestHandler";
 
 
 /**
@@ -44,20 +45,22 @@ class SafeNet implements AbstractSafeNet {
     }
 
     public certificates(body: SlotAndPin,
+                        options?: Options,
                         callback?: (error: RestException, data: CertificatesResponse) => void): Promise<CertificatesResponse> {
         let req = _.extend(body, { module: this.modulePath });
+        const reqOptions = RequestHandler.determineOptions(options, callback);
         return this.connection.post(this.resolvedURI() + SafeNet.ALL_CERTIFICATES, req, undefined).then(data => {
-            return CertParser.process(data, callback);
+            return CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
         }, err => {
             // if we encounter error try again with default (if possible)
             if (this.moduleConfig) {
                 let defaultReq = _.extend(body, { module: SafeNet.DEFAULT_CONFIG[this.os] });
                 return this.connection.post(this.resolvedURI() + SafeNet.ALL_CERTIFICATES, defaultReq, undefined).then(data => {
-                    return CertParser.process(data, callback);
+                    return CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
                 }, defaultErr => {
-                    return ResponseHandler.error(defaultErr, callback);
+                    return ResponseHandler.error(defaultErr, reqOptions.callback);
                 });
-            } else { return ResponseHandler.error(err, callback); }
+            } else { return ResponseHandler.error(err, reqOptions.callback); }
         });
     }
 
