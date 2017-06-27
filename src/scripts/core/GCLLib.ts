@@ -8,7 +8,6 @@ import * as CoreExceptions from "./exceptions/CoreExceptions";
 import * as _ from "lodash";
 
 import { GCLConfig } from "./GCLConfig";
-import { CardFactory } from "../plugins/smartcards/CardFactory";
 import { CoreService } from "./service/CoreService";
 import { LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection } from "./client/Connection";
 import { AbstractDSClient, DownloadLinkResponse, JWTResponse } from "./ds/DSClientModel";
@@ -26,11 +25,13 @@ import { AbstractMobib } from "../plugins/smartcards/mobib/mobibModel";
 import { AbstractEidLUX } from "../plugins/smartcards/eid/lux/EidLuxModel";
 import { AbstractDNI } from "../plugins/smartcards/eid/esp/dniModel";
 import { Promise } from "es6-promise";
+import { PluginFactory } from "../plugins/PluginFactory";
+import { AbstractSafeNet } from "../plugins/smartcards/pkcs11/safenet/safenetModel";
 
 
 class GCLClient {
     private cfg: GCLConfig;
-    private cardFactory: CardFactory;
+    private pluginFactory: PluginFactory;
     private coreService: CoreService;
     private connection: LocalConnection;
     private authConnection: LocalAuthConnection;
@@ -48,7 +49,7 @@ class GCLClient {
         this.authConnection = new LocalAuthConnection(this.cfg);
         this.remoteConnection = new RemoteConnection(this.cfg);
         this.localTestConnection = new LocalTestConnection(this.cfg);
-        this.cardFactory = new CardFactory(this.cfg.gclUrl, this.connection);
+        this.pluginFactory = new PluginFactory(this.cfg.gclUrl, this.connection);
         this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
         if (this.cfg.localTestMode) { this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg); }
         else { this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg); }
@@ -130,25 +131,29 @@ class GCLClient {
     // get ocv client services
     public ocv = (): AbstractOCVClient => { return this.ocvClient; };
     // get instance for belgian eID card
-    public beid = (reader_id?: string): AbstractEidBE => { return this.cardFactory.createEidBE(reader_id); };
+    public beid = (reader_id?: string): AbstractEidBE => { return this.pluginFactory.createEidBE(reader_id); };
     // get instance for spanish DNI card
-    public dni = (reader_id?: string): AbstractDNI => { return this.cardFactory.createDNI(reader_id); };
+    public dni = (reader_id?: string): AbstractDNI => { return this.pluginFactory.createDNI(reader_id); };
     // get instance for luxemburg eID card
-    public luxeid = (reader_id?: string, pin?: string): AbstractEidLUX => { return this.cardFactory.createEidLUX(reader_id, pin); };
+    public luxeid = (reader_id?: string, pin?: string): AbstractEidLUX => { return this.pluginFactory.createEidLUX(reader_id, pin); };
     // get instance for luxtrust card
-    public luxtrust = (reader_id?: string, pin?: string): AbstractLuxTrust => { return this.cardFactory.createLuxTrust(reader_id); };
+    public luxtrust = (reader_id?: string, pin?: string): AbstractLuxTrust => { return this.pluginFactory.createLuxTrust(reader_id); };
     // get instance for EMV
-    public emv = (reader_id?: string): AbstractEMV => { return this.cardFactory.createEmv(reader_id); };
+    public emv = (reader_id?: string): AbstractEMV => { return this.pluginFactory.createEmv(reader_id); };
     // get instance for MOBIB
-    public mobib = (reader_id?: string): AbstractMobib => { return this.cardFactory.createMobib(reader_id); };
+    public mobib = (reader_id?: string): AbstractMobib => { return this.pluginFactory.createMobib(reader_id); };
     // get instance for OCRA
-    public ocra = (reader_id?: string): AbstractOcra => { return this.cardFactory.createOcra(reader_id); };
+    public ocra = (reader_id?: string): AbstractOcra => { return this.pluginFactory.createOcra(reader_id); };
     // get instance for Aventra
-    public aventra = (reader_id?: string): AbstractAventra => { return this.cardFactory.createAventraNO(reader_id); };
+    public aventra = (reader_id?: string): AbstractAventra => { return this.pluginFactory.createAventraNO(reader_id); };
     // get instance for Oberthur
-    public oberthur = (reader_id?: string): AbstractOberthur => { return this.cardFactory.createOberthurNO(reader_id); };
+    public oberthur = (reader_id?: string): AbstractOberthur => { return this.pluginFactory.createOberthurNO(reader_id); };
     // get instance for PIV
-    public piv = (reader_id?: string): AbstractPiv => { return this.cardFactory.createPIV(reader_id); };
+    public piv = (reader_id?: string): AbstractPiv => { return this.pluginFactory.createPIV(reader_id); };
+    // get instance for PKCS11
+    public safenet = (reader_id: string, moduleConfig: { linux: string, mac: string, win: string }): AbstractSafeNet => {
+        return this.pluginFactory.createSafeNet(moduleConfig);
+    };
 
     /**
      * Init OCV - verify if OCV is available

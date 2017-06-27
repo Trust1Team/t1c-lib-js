@@ -15,39 +15,19 @@ export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteConnecti
 
 
 interface Connection {
-    // callback-based
-    get(url: string,
-        queryParams: { [key: string]: string }): Promise<any>;
     get(url: string,
         queryParams: { [key: string]: string },
-        callback: (error: any, data: any) => void): void;
-    get(url: string,
-        queryParams: { [key: string]: string },
-        callback?: (error: any, data: any) => void): void | Promise<any>;
+        callback?: (error: any, data: any) => void): Promise<any>;
 
-    post(url: string,
-         body: { [key: string]: any },
-         queryParams: { [key: string]: string }): Promise<any>;
-    post(url: string,
-         body: { [key: string]: any },
-         queryParams: { [key: string]: string },
-         callback: (error: any, data: any) => void): void;
     post(url: string,
          body: { [key: string]: any },
          queryParams?: { [key: string]: string },
-         callback?: (error: any, data: any) => void): void | Promise<any>;
+         callback?: (error: any, data: any) => void): Promise<any>;
 
     put(url: string,
         body: { [key: string]: any },
-        queryParams: { [key: string]: string }): Promise<any>;
-    put(url: string,
-        body: { [key: string]: any },
-        queryParams: { [key: string]: string },
-        callback: (error: any, data: any) => void): void;
-    put(url: string,
-        body: { [key: string]: any },
         queryParams?: { [key: string]: string },
-        callback?: (error: any, data: any) => void): void | Promise<any>;
+        callback?: (error: any, data: any) => void): Promise<any>;
 }
 
 abstract class GenericConnection implements Connection {
@@ -58,41 +38,22 @@ abstract class GenericConnection implements Connection {
     }
 
     public get(url: string,
-               queryParams: { [key: string]: string }): Promise<any>;
-    public get(url: string,
                queryParams: { [key: string]: string },
-               callback: (error: any, data: any) => void): void;
-    public get(url: string,
-               queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): void | Promise<any> {
+               callback?: (error: any, data: any) => void): Promise<any> {
         return handleRequest(url, "GET", undefined, queryParams, this.config.apiKey, this.config.jwt, callback);
     }
 
     public post(url: string,
                 body: any,
-                queryParams: { [key: string]: string }): Promise<any>;
-    public post(url: string,
-                body: any,
                 queryParams: { [key: string]: string },
-                callback: (error: any, data: any) => void): void;
-    public post(url: string,
-                body: any,
-                queryParams: { [key: string]: string },
-                callback?: (error: any, data: any) => void): void | Promise<any> {
+                callback?: (error: any, data: any) => void): Promise<any> {
         return handleRequest(url, "POST", body, queryParams, this.config.apiKey, this.config.jwt, callback);
     }
 
     public put(url: string,
                body: any,
-               queryParams: { [key: string]: string }): Promise<any>;
-    public put(url: string,
-               body: any,
                queryParams: { [key: string]: string },
-               callback: (error: any, data: any) => void): void;
-    public put(url: string,
-               body: any,
-               queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): void | Promise<any> {
+               callback?: (error: any, data: any) => void): Promise<any> {
         return handleRequest(url, "PUT", body, queryParams, this.config.apiKey, this.config.jwt, callback);
     }
 }
@@ -170,7 +131,7 @@ function handleRequest(url: string,
                        params?: any,
                        apikey?: string,
                        jwt?: string,
-                       callback?: (error: any, data: any) => void): void | Promise<any> {
+                       callback?: (error: any, data: any) => void): Promise<any> {
     let config: AxiosRequestConfig = {
         url,
         method,
@@ -185,7 +146,7 @@ function handleRequest(url: string,
     if (jwt) { config.headers.Authorization = "Bearer " + jwt; }
 
     callback = callback || function () {
-        // no-op
+            // no-op
         };
 
     return new Promise((resolve, reject) => {

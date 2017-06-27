@@ -6,21 +6,23 @@ import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { DataResponse } from "../../../../core/service/CoreModel";
 import { GenericCertCard } from "../../Card";
 import { AbstractLuxTrust } from "./LuxTrustModel";
+import { Options, RequestHandler } from "../../../../util/RequestHandler";
 
 export { LuxTrust };
 
 
 class LuxTrust extends GenericCertCard implements AbstractLuxTrust {
 
-    public rootCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
-        return this.getCertificate(LuxTrust.CERT_ROOT, callback);
+    public rootCertificate(options?: Options, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.getCertificate(LuxTrust.CERT_ROOT, RequestHandler.determineOptions(options, callback));
     }
 
-    public authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
-        return this.getCertificate(LuxTrust.CERT_AUTHENTICATION, callback);
+    public authenticationCertificate(options?: Options,
+                                     callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.getCertificate(LuxTrust.CERT_AUTHENTICATION, RequestHandler.determineOptions(options, callback));
     }
 
-    public signingCertificate(callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
-        return this.getCertificate(LuxTrust.CERT_SIGNING, callback);
+    public signingCertificate(options?: Options, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.getCertificate(LuxTrust.CERT_SIGNING, RequestHandler.determineOptions(options, callback));
     }
 }

@@ -8,6 +8,7 @@ import { DataResponse } from "../../../core/service/CoreModel";
 import { AbstractPiv, FacialImageResponse, PrintedInformationResponse } from "./pivModel";
 import { PinEnforcer } from "../../../util/PinEnforcer";
 import { Promise } from "es6-promise";
+import { Options, RequestHandler } from "../../../util/RequestHandler";
 
 export { PIV };
 
@@ -30,13 +31,9 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
         return [ "authenticate", "sign", "encrypt" ];
     }
 
-    public printedInformation(body: OptionalPin): Promise<PrintedInformationResponse>;
-    public printedInformation(body: OptionalPin,
-                              callback: (error: RestException,
-                                         data: PrintedInformationResponse) => void): void;
     public printedInformation(body: OptionalPin,
                               callback?: (error: RestException,
-                                          data: PrintedInformationResponse) => void): void | Promise<PrintedInformationResponse> {
+                                          data: PrintedInformationResponse) => void): Promise<PrintedInformationResponse> {
         if (callback && typeof callback === "function") {
             PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
                 return this.connection.post(this.resolvedReaderURI() + PIV.PRINTED_INFORMATION, body, undefined, callback);
@@ -52,11 +49,8 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
         }
     }
 
-    public facialImage(body: OptionalPin): Promise<FacialImageResponse>;
     public facialImage(body: OptionalPin,
-                       callback: (error: RestException, data: FacialImageResponse) => void): void | Promise<FacialImageResponse>;
-    public facialImage(body: OptionalPin,
-                       callback?: (error: RestException, data: FacialImageResponse) => void): void | Promise<FacialImageResponse> {
+                       callback?: (error: RestException, data: FacialImageResponse) => void): Promise<FacialImageResponse> {
         if (callback && typeof callback === "function") {
             PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
                 return this.connection.post(this.resolvedReaderURI() + PIV.FACIAL_IMAGE, body, undefined, callback);
@@ -73,12 +67,15 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
     }
 
     public authenticationCertificate(body: OptionalPin,
-                                     callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
-        return this.getCertificate(PIV.CERT_AUTHENTICATION, body, callback);
+                                     options?: Options,
+                                     callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.getCertificate(PIV.CERT_AUTHENTICATION, body, RequestHandler.determineOptions(options, callback));
     }
 
-    public signingCertificate(body: OptionalPin, callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
-        return this.getCertificate(PIV.CERT_SIGNING, body, callback);
+    public signingCertificate(body: OptionalPin,
+                              options?: Options,
+                              callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.getCertificate(PIV.CERT_SIGNING, body, RequestHandler.determineOptions(options, callback));
     }
 }
 
