@@ -6,7 +6,8 @@
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 
 export { AbstractCore, T1CResponse, DataResponse, DataArrayResponse, DataObjectResponse, InfoResponse, BrowserInfoResponse,
-    Card, CardReader, CardReadersResponse, SingleReaderResponse, PluginsResponse, PubKeyResponse };
+    Card, CardReader, CardReadersResponse, Certificate, CertificateResponse, CertificatesResponse,
+    SingleReaderResponse, PluginsResponse, PubKeyResponse };
 
 
 interface AbstractCore {
@@ -114,6 +115,19 @@ interface CardReader {
 
 interface CardReadersResponse extends T1CResponse {
     data: CardReader[]
+}
+
+interface CertificateResponse extends T1CResponse {
+    data: Certificate
+}
+
+interface CertificatesResponse extends T1CResponse {
+    data: Certificate[]
+}
+
+interface Certificate {
+    base64: string,
+    parsed?: object
 }
 
 interface SingleReaderResponse extends T1CResponse {

@@ -17,25 +17,21 @@ interface AbstractPiv extends GenericSecuredCertCard {
     // callback-based
     printedInformation(body: OptionalPin,
                        callback?: (error: RestException,
-                                   data: PrintedInformationResponse) => void): void | Promise<PrintedInformationResponse>;
+                                   data: PrintedInformationResponse) => void): Promise<PrintedInformationResponse>;
     facialImage(body: OptionalPin,
-                callback?: (error: RestException, data: FacialImageResponse) => void): void | Promise<FacialImageResponse>;
+                callback?: (error: RestException, data: FacialImageResponse) => void): Promise<FacialImageResponse>;
 
-    allData(filters: string[], body: OptionalPin): Promise<AllDataResponse>;
     allData(filters: string[], body: OptionalPin,
-            callback: (error: RestException, data: AllDataResponse) => void): void;
-    allData(filters: string[], body: OptionalPin,
-            callback?: (error: RestException, data: AllDataResponse) => void): void | Promise<AllDataResponse>;
+            callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
 
-    allCerts(filters: string[], body: OptionalPin): Promise<AllCertsResponse>;
     allCerts(filters: string[], body: OptionalPin,
-             callback: (error: RestException, data: AllCertsResponse) => void): void;
-    allCerts(filters: string[], body: OptionalPin,
-             callback?: (error: RestException, data: AllCertsResponse) => void): void | Promise<AllCertsResponse>;
+             callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
+
     authenticationCertificate(body: OptionalPin,
-                              callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+                              callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+
     signingCertificate(body: OptionalPin,
-                       callback?: (error: RestException, data: DataResponse) => void): void | Promise<DataResponse>;
+                       callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
 }
 
 interface AllDataResponse extends AllCertsResponse {
