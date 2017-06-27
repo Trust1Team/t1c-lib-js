@@ -265,7 +265,7 @@
         if($("#nonrepcert").is(":checked"))filter.push($("#nonrepcert").val());
         if($("#citizencert").is(":checked"))filter.push($("#citizencert").val());
         if($("#rrncert").is(":checked"))filter.push($("#rrncert").val());
-        beid.allData({ filters: filter, parseCerts: true }, callback);
+        beid.allData({ filters: filter, parseCerts: $("#parseCerts").is(":checked") }, callback);
     });
     $("#beidFilteredPromise").on('click', function () {
         $("#information").empty();
@@ -279,7 +279,7 @@
         if($("#nonrepcert").is(":checked"))filter.push($("#nonrepcert").val());
         if($("#citizencert").is(":checked"))filter.push($("#citizencert").val());
         if($("#rrncert").is(":checked"))filter.push($("#rrncert").val());
-        beid.allData({ filters: filter, parseCerts: true }).then(handleSuccess, handleError);
+        beid.allData({ filters: filter, parseCerts: $("#parseCerts").is(":checked") }).then(handleSuccess, handleError);
     });
     $("#beidCertsFiltered").on('click', function () {
         $("#information").empty();
@@ -290,7 +290,7 @@
         if($("#nonrepcertx").is(":checked"))filter.push($("#nonrepcertx").val());
         if($("#citizencertx").is(":checked"))filter.push($("#citizencertx").val());
         if($("#rrncertx").is(":checked"))filter.push($("#rrncertx").val());
-        beid.allCerts({ filters: filter, parseCerts: true }, callback);
+        beid.allCerts({ filters: filter, parseCerts: $("#parseCerts").is(":checked") }, callback);
     });
     $("#beidCertsFilteredPromise").on('click', function () {
         $("#information").empty();
@@ -301,7 +301,7 @@
         if($("#nonrepcertx").is(":checked"))filter.push($("#nonrepcertx").val());
         if($("#citizencertx").is(":checked"))filter.push($("#citizencertx").val());
         if($("#rrncertx").is(":checked"))filter.push($("#rrncertx").val());
-        beid.allCerts({ filters: filter, parseCerts: true }).then(handleSuccess, handleError);
+        beid.allCerts({ filters: filter, parseCerts: $("#parseCerts").is(":checked") }).then(handleSuccess, handleError);
     });
     $("#beidRn").on('click', function () {
         $("#information").empty();
@@ -336,62 +336,62 @@
     $("#beidAllCert").on('click', function () {
         $("#information").empty();
         var beid = connector.beid($("#selected_reader").text());
-        beid.allCerts([],callback);
+        beid.allCerts({ filters: [], parseCerts: $("#parseCerts").is(":checked") }, callback);
     });
     $("#beidAllCertPromise").on('click', function () {
         $("#information").empty();
         var beid = connector.beid($("#selected_reader").text());
-        beid.allCerts([]).then(handleSuccess, handleError);
+        beid.allCerts({ filters: [], parseCerts: $("#parseCerts").is(":checked") }).then(handleSuccess, handleError);
     });
     $("#beidRootCert").on('click', function () {
         $("#information").empty();
         var beid = connector.beid($("#selected_reader").text());
-        beid.rootCertificate(callback);
+        beid.rootCertificate({ parseCerts: $("#parseCerts").is(":checked") }, callback);
     });
     $("#beidRootCertPromise").on('click', function () {
         $("#information").empty();
         var beid = connector.beid($("#selected_reader").text());
-        beid.rootCertificate().then(handleSuccess, handleError);
+        beid.rootCertificate({ parseCerts: $("#parseCerts").is(":checked") }).then(handleSuccess, handleError);
     });
     $("#beidCitizenCert").on('click', function () {
         $("#information").empty();
         var beid = connector.beid($("#selected_reader").text());
-        beid.citizenCertificate(callback);
+        beid.citizenCertificate({ parseCerts: $("#parseCerts").is(":checked") }, callback);
     });
     $("#beidCitizenCertPromise").on('click', function () {
         $("#information").empty();
         var beid = connector.beid($("#selected_reader").text());
-        beid.citizenCertificate().then(handleSuccess, handleError);
+        beid.citizenCertificate({ parseCerts: $("#parseCerts").is(":checked") }).then(handleSuccess, handleError);
     });
     $("#beidRRNCert").on('click', function () {
         $("#information").empty();
         var beid = connector.beid($("#selected_reader").text());
-        beid.rrnCertificate(callback);
+        beid.rrnCertificate({ parseCerts: $("#parseCerts").is(":checked") }, callback);
     });
     $("#beidRRNCertPromise").on('click', function () {
         $("#information").empty();
         var beid = connector.beid($("#selected_reader").text());
-        beid.rrnCertificate().then(handleSuccess, handleError);
+        beid.rrnCertificate({ parseCerts: $("#parseCerts").is(":checked") }).then(handleSuccess, handleError);
     });
     $("#beidAuthCert").on('click', function () {
         $("#information").empty();
         var beid = connector.beid($("#selected_reader").text());
-        beid.authenticationCertificate(callback);
+        beid.authenticationCertificate({ parseCerts: $("#parseCerts").is(":checked") }, callback);
     });
     $("#beidAuthCertPromise").on('click', function () {
         $("#information").empty();
         var beid = connector.beid($("#selected_reader").text());
-        beid.authenticationCertificate().then(handleSuccess, handleError);
+        beid.authenticationCertificate({ parseCerts: $("#parseCerts").is(":checked") }).then(handleSuccess, handleError);
     });
     $("#beidNonRepCert").on('click', function () {
         $("#information").empty();
         var beid = connector.beid($("#selected_reader").text());
-        beid.nonRepudiationCertificate(callback);
+        beid.nonRepudiationCertificate({ parseCerts: $("#parseCerts").is(":checked") }, callback);
     });
     $("#beidNonRepCertPromise").on('click', function () {
         $("#information").empty();
         var beid = connector.beid($("#selected_reader").text());
-        beid.nonRepudiationCertificate().then(handleSuccess, handleError);
+        beid.nonRepudiationCertificate({ parseCerts: $("#parseCerts").is(":checked") }).then(handleSuccess, handleError);
     });
     $("#beidVerifyPin").on('click', function () {
         $("#information").empty();
@@ -509,23 +509,36 @@
     $("#testAll").on('click', function () {
         $("#information").empty();
         $("#error").empty();
-        $("#testAllPsw").val("");
+        $("#testAllPswLabel").show();
+        $("#buttonRunTests").show();
+        $("#testAllPsw").val("").show();
         $("#testAllInfo").empty().hide();
         $("#testAllError").empty().hide();
         $("#testAllModal").modal('toggle');
     });
     $("#buttonRunTests").on('click', function () {
-        var pin = $("#testAllPsw").val();
+        var pinField = $("#testAllPsw");
+        var pin = pinField.val();
+        var parseCerts = $("#parseCerts").is(":checked");
         var readerId = $("#selected_reader").text();
-        $("#testAllModal").modal('toggle');
 
         var promises = [];
+
+        $("#testAllPswLabel").hide();
+        pinField.hide();
+        $("#buttonRunTests").hide();
+        $("#testAllInfo").append("Running tests, please wait...").show();
 
         // RN Data
         promises.push(connector.beid(readerId).rnData().then(function(value) {
             return {
                 operation: 'RN Data (Promise)',
                 result: value
+            }
+        }, function(error) {
+            return {
+                operation: 'RN Data (Promise)',
+                result: error
             }
         }));
         promises.push(new Promise(function(resolve, reject) {
@@ -542,6 +555,11 @@
                 operation: 'Address (Promise)',
                 result: value
             }
+        }, function(error) {
+            return {
+                operation: 'Address (Promise)',
+                result: error
+            }
         }));
         promises.push(new Promise(function(resolve, reject) {
             connector.beid(readerId).address(function(error, data) {
@@ -557,6 +575,11 @@
                 operation: 'Picture (Promise)',
                 result: value
             }
+        }, function(error) {
+            return {
+                operation: 'Picture (Promise)',
+                result: error
+            }
         }));
         promises.push(new Promise(function(resolve, reject) {
             connector.beid(readerId).picture(function(error, data) {
@@ -567,14 +590,19 @@
         }));
 
         // All Cert
-        promises.push(connector.beid(readerId).allCerts([]).then(function(value) {
+        promises.push(connector.beid(readerId).allCerts({ filters: [], parseCerts: parseCerts }).then(function(value) {
             return {
                 operation: 'All Certs (Promise)',
                 result: value
             }
+        }, function(error) {
+            return {
+                operation: 'All Certs (Promise)',
+                result: error
+            }
         }));
         promises.push(new Promise(function(resolve, reject) {
-            connector.beid(readerId).allCerts([], function(error, data) {
+            connector.beid(readerId).allCerts({ filters: [], parseCerts: parseCerts }, function(error, data) {
                 if (error) reject( { operation: 'All Certs (Callback)', error: error });
                 else resolve({ operation: 'All Certs (Callback)',
                     result: data });
@@ -582,14 +610,19 @@
         }));
 
         // Root Cert
-        promises.push(connector.beid(readerId).rootCertificate().then(function(value) {
+        promises.push(connector.beid(readerId).rootCertificate({ parseCerts: parseCerts }).then(function(value) {
             return {
                 operation: 'Root Cert (Promise)',
                 result: value
             }
+        }, function(error) {
+            return {
+                operation: 'Root Cert (Promise)',
+                result: error
+            }
         }));
         promises.push(new Promise(function(resolve, reject) {
-            connector.beid(readerId).rootCertificate(function(error, data) {
+            connector.beid(readerId).rootCertificate({ parseCerts: parseCerts }, function(error, data) {
                 if (error) reject( { operation: 'Root Cert (Callback)', error: error });
                 else resolve({ operation: 'Root Cert (Callback)',
                     result: data });
@@ -597,14 +630,19 @@
         }));
 
         // Citizen Cert
-        promises.push(connector.beid(readerId).citizenCertificate().then(function(value) {
+        promises.push(connector.beid(readerId).citizenCertificate({ parseCerts: parseCerts }).then(function(value) {
             return {
                 operation: 'Citizen Cert (Promise)',
                 result: value
             }
+        }, function(error) {
+            return {
+                operation: 'Citizen Cert (Promise)',
+                result: error
+            }
         }));
         promises.push(new Promise(function(resolve, reject) {
-            connector.beid(readerId).citizenCertificate(function(error, data) {
+            connector.beid(readerId).citizenCertificate({ parseCerts: parseCerts }, function(error, data) {
                 if (error) reject( { operation: 'Citizen Cert (Callback)', error: error });
                 else resolve({ operation: 'Citizen Cert (Callback)',
                     result: data });
@@ -612,14 +650,19 @@
         }));
 
         // Auth Cert
-        promises.push(connector.beid(readerId).authenticationCertificate().then(function(value) {
+        promises.push(connector.beid(readerId).authenticationCertificate({ parseCerts: parseCerts }).then(function(value) {
             return {
                 operation: 'Auth Cert (Promise)',
                 result: value
             }
+        }, function(error) {
+            return {
+                operation: 'Auth Cert (Promise)',
+                result: error
+            }
         }));
         promises.push(new Promise(function(resolve, reject) {
-            connector.beid(readerId).authenticationCertificate(function(error, data) {
+            connector.beid(readerId).authenticationCertificate({ parseCerts: parseCerts }, function(error, data) {
                 if (error) reject( { operation: 'Auth Cert (Callback)', error: error });
                 else resolve({ operation: 'Auth Cert (Callback)',
                     result: data });
@@ -627,14 +670,19 @@
         }));
 
         // Non Repudiation Cert
-        promises.push(connector.beid(readerId).nonRepudiationCertificate().then(function(value) {
+        promises.push(connector.beid(readerId).nonRepudiationCertificate({ parseCerts: parseCerts }).then(function(value) {
             return {
                 operation: 'Non Repudiation Cert (Promise)',
                 result: value
             }
+        }, function(error) {
+            return {
+                operation: 'Non Repudiation Cert (Promise)',
+                result: error
+            }
         }));
         promises.push(new Promise(function(resolve, reject) {
-            connector.beid(readerId).nonRepudiationCertificate(function(error, data) {
+            connector.beid(readerId).nonRepudiationCertificate({ parseCerts: parseCerts }, function(error, data) {
                 if (error) reject( { operation: 'Non Repudiation Cert (Callback)', error: error });
                 else resolve({ operation: 'Non Repudiation Cert (Callback)',
                     result: data });
@@ -642,14 +690,19 @@
         }));
 
         // RRN Cert
-        promises.push(connector.beid(readerId).rrnCertificate().then(function(value) {
+        promises.push(connector.beid(readerId).rrnCertificate({ parseCerts: parseCerts }).then(function(value) {
             return {
                 operation: 'RRN Cert (Promise)',
                 result: value
             }
+        }, function(error) {
+            return {
+                operation: 'RRN Cert (Promise)',
+                result: error
+            }
         }));
         promises.push(new Promise(function(resolve, reject) {
-            connector.beid(readerId).rrnCertificate(function(error, data) {
+            connector.beid(readerId).rrnCertificate({ parseCerts: parseCerts }, function(error, data) {
                 if (error) reject( { operation: 'RRN Cert (Callback)', error: error });
                 else resolve({ operation: 'RRN Cert (Callback)',
                     result: data });
@@ -662,6 +715,11 @@
             return {
                 operation: 'Verify PIN (Promise)',
                 result: value
+            }
+        }, function(error) {
+            return {
+                operation: 'Verify PIN (Promise)',
+                result: error
             }
         }));
         promises.push(new Promise(function(resolve, reject) {
@@ -682,6 +740,11 @@
             return {
                 operation: 'Sign Data (Promise)',
                 result: value
+            }
+        }, function(error) {
+            return {
+                operation: 'Sign Data (Promise)',
+                result: error
             }
         }));
         promises.push(new Promise(function(resolve, reject) {
@@ -704,6 +767,11 @@
                 operation: 'Authenticate (Promise)',
                 result: value
             }
+        }, function(error) {
+            return {
+                operation: 'Authenticate (Promise)',
+                result: error
+            }
         }));
         promises.push(new Promise(function(resolve, reject) {
             connector.beid(readerId).authenticate(authBody, function(error, data) {
@@ -714,7 +782,13 @@
         }));
 
 
-        Promise.all(promises).then(handleSuccess, handleError);
+        Promise.all(promises).then(function(data) {
+            $("#testAllModal").modal('toggle');
+            handleSuccess(data);
+        }, function(err) {
+            $("#testAllModal").modal('toggle');
+            handleError(err);
+        });
     });
 
     //call to gcl in order to sign the server generated hash
