@@ -48,28 +48,28 @@ class CoreService implements CoreModel.AbstractCore {
 
     // async
     public activate(callback?: (error: CoreExceptions.RestException, data: CoreModel.T1CResponse)
-        => void): void | Promise<CoreModel.T1CResponse> {
+        => void): Promise<CoreModel.T1CResponse> {
         return this.connection.post(this.url + CORE_ACTIVATE, {}, undefined, callback);
     }
 
     public getPubKey(callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse)
-        => void): void | Promise<CoreModel.PubKeyResponse> {
+        => void): Promise<CoreModel.PubKeyResponse> {
         return this.connection.get(this.url + CORE_PUB_KEY, undefined, callback);
     }
 
     public info(callback?: (error: CoreExceptions.RestException, data: CoreModel.InfoResponse)
-        => void): void | Promise<CoreModel.InfoResponse> {
+        => void): Promise<CoreModel.InfoResponse> {
         return this.connection.get(this.url + CORE_INFO, undefined, callback);
     }
 
     public infoBrowser(callback?: (error: CoreExceptions.RestException, data: CoreModel.BrowserInfoResponse)
-        => void): void | Promise<CoreModel.BrowserInfoResponse> {
+        => void): Promise<CoreModel.BrowserInfoResponse> {
         if (callback) { callback(null, CoreService.platformInfo()); }
         else { return Promise.resolve(CoreService.platformInfo()); }
     }
 
     public plugins(callback?: (error: CoreExceptions.RestException, data: CoreModel.PluginsResponse)
-        => void): void | Promise<CoreModel.PluginsResponse> {
+        => void): Promise<CoreModel.PluginsResponse> {
         return this.connection.get(this.url + CORE_PLUGINS, undefined, callback);
     }
 
@@ -77,7 +77,7 @@ class CoreService implements CoreModel.AbstractCore {
                             callback?: (error: CoreExceptions.RestException, data: CardReader) => void,
                             connectReaderCb?: () => void,
                             insertCardCb?: () => void,
-                            cardTimeoutCb?: () => void): void | Promise<CardReader> {
+                            cardTimeoutCb?: () => void): Promise<CardReader> {
         let maxSeconds = secondsToPollCard || 30;
         let self = this;
 
@@ -131,7 +131,7 @@ class CoreService implements CoreModel.AbstractCore {
                                 callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
                                 connectReaderCb?: () => void,
                                 insertCardCb?: () => void,
-                                cardTimeoutCb?: () => void): void | Promise<CoreModel.CardReadersResponse> {
+                                cardTimeoutCb?: () => void): Promise<CoreModel.CardReadersResponse> {
         let maxSeconds = secondsToPollCard || 30;
         let self = this;
 
@@ -187,7 +187,7 @@ class CoreService implements CoreModel.AbstractCore {
     public pollReaders(secondsToPollReader?: number,
                        callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
                        connectReaderCb?: () => void,
-                       readerTimeoutCb?: () => void): void | Promise<CoreModel.CardReadersResponse> {
+                       readerTimeoutCb?: () => void): Promise<CoreModel.CardReadersResponse> {
         let maxSeconds = secondsToPollReader || 30;
         let self = this;
 
@@ -237,23 +237,23 @@ class CoreService implements CoreModel.AbstractCore {
     }
 
     public readers(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
-        => void): void | Promise<CoreModel.CardReadersResponse> {
+        => void): Promise<CoreModel.CardReadersResponse> {
         return this.connection.get(this.url + CORE_READERS, undefined, callback);
     }
 
     public readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
-        => void): void | Promise<CoreModel.CardReadersResponse> {
+        => void): Promise<CoreModel.CardReadersResponse> {
         return this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(true), callback);
     }
 
     public readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
-        => void): void | Promise<CoreModel.CardReadersResponse> {
+        => void): Promise<CoreModel.CardReadersResponse> {
         return this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(false), callback);
     }
 
     public setPubKey(pubkey: string,
                      callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse)
-                         => void): void | Promise<CoreModel.PubKeyResponse> {
+                         => void): Promise<CoreModel.PubKeyResponse> {
         return this.connection.put(this.url + CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);
     }
 
