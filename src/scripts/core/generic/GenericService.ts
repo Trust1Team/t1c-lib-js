@@ -3,7 +3,6 @@
  */
 
 import { Promise } from "es6-promise";
-import { GenericInterface } from "./GenericInterface";
 import { GCLClient } from "../GCLLib";
 import { AuthenticateOrSignData, OptionalPin, VerifyPinData } from "../../plugins/smartcards/Card";
 import { EidBe } from "../../plugins/smartcards/eid/be/EidBe";
@@ -17,18 +16,31 @@ export { GenericService };
 
 class GenericService {
 
-    public static authenticationCertificates() {
-        // TODO implementation
-        // TODO support callback
-
-        return [];
+    public static authenticateCapable(client: GCLClient, callback?: (error: RestException, data: CardReadersResponse) => void) {
+        return client.core().readersCardAvailable()
+                     .then(this.checkCanAuthenticate)
+                     .then(res => { return { client, readers: res }; })
+                     .then(this.filterByAvailableContainers)
+                     .then(res => { return ResponseHandler.response(res, callback); })
+                     .catch(err => { return ResponseHandler.error(err, callback); });
     }
 
-    public static signingCertificates() {
-        // TODO implementation
-        // TODO support callback
+    public static signCapable(client: GCLClient, callback?: (error: RestException, data: CardReadersResponse) => void) {
+        return client.core().readersCardAvailable()
+                     .then(this.checkCanSign)
+                     .then(res => { return { client, readers: res }; })
+                     .then(this.filterByAvailableContainers)
+                     .then(res => { return ResponseHandler.response(res, callback); })
+                     .catch(err => { return ResponseHandler.error(err, callback); });
+    }
 
-        return [];
+    public static verifyPinCapable(client: GCLClient, callback?: (error: RestException, data: CardReadersResponse) => void) {
+        return client.core().readersCardAvailable()
+                     .then(this.checkCanVerifyPin)
+                     .then(res => { return { client, readers: res }; })
+                     .then(this.filterByAvailableContainers)
+                     .then(res => { return ResponseHandler.response(res, callback); })
+                     .catch(err => { return ResponseHandler.error(err, callback); });
     }
 
     public static authenticate(client: GCLClient,
@@ -39,8 +51,8 @@ class GenericService {
         return this.checkPrerequisites(client, readerId, data)
                    .then(this.determineAlgorithm)
                    .then(GenericService.doAuthenticate)
-                   .then(res => { return ResponseHandler.response(res, callback); },
-                       err => { return ResponseHandler.error(err, callback); });
+                   .then(res => { return ResponseHandler.response(res, callback); })
+                   .catch(err => { return ResponseHandler.error(err, callback); });
     }
 
     public static sign(client: GCLClient,
@@ -51,8 +63,8 @@ class GenericService {
         return this.checkPrerequisites(client, readerId, data)
                    .then(this.determineAlgorithm)
                    .then(GenericService.doSign)
-                   .then(res => { return ResponseHandler.response(res, callback); },
-                       err => { return ResponseHandler.error(err, callback); });
+                   .then(res => { return ResponseHandler.response(res, callback); })
+                   .catch(err => { return ResponseHandler.error(err, callback); });
     }
 
     public static verifyPin(client: GCLClient,
@@ -62,8 +74,41 @@ class GenericService {
 
         return this.checkPrerequisites(client, readerId, data)
                    .then(GenericService.doVerifyPin)
-                   .then(res => { return ResponseHandler.response(res, callback); },
-                       err => { return ResponseHandler.error(err, callback); });
+                   .then(res => { return ResponseHandler.response(res, callback); })
+                   .catch(err => { return ResponseHandler.error(err, callback); });
+    }
+
+    private static checkCanAuthenticate(data: CardReadersResponse) {
+        return new Promise((resolve) => {
+            data.data = _.filter(data.data, reader => { return CardUtil.canAuthenticate(reader.card); });
+            resolve(data);
+        });
+    }
+
+    private static checkCanSign(data: CardReadersResponse) {
+        return new Promise((resolve) => {
+            data.data = _.filter(data.data, reader => { return CardUtil.canSign(reader.card); });
+            resolve(data);
+        });
+    }
+
+    private static checkCanVerifyPin(data: CardReadersResponse) {
+        return new Promise((resolve) => {
+            data.data = _.filter(data.data, reader => { return CardUtil.canVerifyPin(reader.card); });
+            resolve(data);
+        });
+    }
+
+    private static filterByAvailableContainers(args: { client: GCLClient, readers: CardReadersResponse }): Promise<CardReadersResponse> {
+        return args.client.core().plugins().then(plugins => {
+            return new Promise((resolve) => {
+                args.readers.data = _.filter(args.readers.data, reader => {
+                    // TODO optimize
+                    return _.find(plugins.data, ct => { return ct.id === CardUtil.determineContainer(reader.card); });
+                });
+                resolve(args.readers);
+            });
+        });
     }
 
     private static checkPrerequisites(client: GCLClient, readerId: string, data: OptionalPin) {

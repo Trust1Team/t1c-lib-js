@@ -8,6 +8,66 @@ export { CardUtil };
 
 class CardUtil {
 
+    public static canAuthenticate(card: Card): boolean {
+        let container = this.determineContainer(card);
+
+        switch (container) {
+            case "aventra":
+            case "beid":
+            case "dni":
+            case "luxeid":
+            case "luxtrust":
+            case "oberthur":
+            case "piv":
+                return true;
+            case "ocra":
+            case "emv":
+            case "mobib":
+            default:
+                return false;
+        }
+    }
+
+    public static canSign(card: Card): boolean {
+        let container = this.determineContainer(card);
+
+        switch (container) {
+            case "aventra":
+            case "beid":
+            case "dni":
+            case "luxeid":
+            case "luxtrust":
+            case "oberthur":
+            case "piv":
+                return true;
+            case "ocra":
+            case "emv":
+            case "mobib":
+            default:
+                return false;
+        }
+    }
+
+    public static canVerifyPin(card: Card): boolean {
+        let container = this.determineContainer(card);
+
+        switch (container) {
+            case "aventra":
+            case "beid":
+            case "dni":
+            case "luxeid":
+            case "luxtrust":
+            case "oberthur":
+            case "ocra":
+            case "piv":
+                return true;
+            case "emv":
+            case "mobib":
+            default:
+                return false;
+        }
+    }
+
     public static determineContainer(card: Card): string {
         if (!_.isEmpty(card) && !_.isEmpty(card.description)) {
             if (findDescription( card.description, "Belgium Electronic ID card")) { return "beid"; }
