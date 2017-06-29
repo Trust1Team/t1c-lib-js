@@ -173,7 +173,7 @@ class GCLClient {
     }
     public sign(readerId: string, data: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void) {
         return GenericService.sign(this, readerId, data, callback);
-    };
+    }
 
     public readersCanVerifyPin(callback?: (error: RestException, data: CardReadersResponse) => void) {
         return GenericService.verifyPinCapable(this, callback);
