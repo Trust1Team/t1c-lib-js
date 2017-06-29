@@ -166,13 +166,22 @@ var GCLLib =
 	        resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
 	        return resolvedCfg;
 	    };
+	    GCLClient.prototype.readersCanAuthenticate = function (callback) {
+	        return GenericService_1.GenericService.authenticateCapable(this, callback);
+	    };
 	    GCLClient.prototype.authenticate = function (readerId, data, callback) {
 	        return GenericService_1.GenericService.authenticate(this, readerId, data, callback);
+	    };
+	    GCLClient.prototype.readersCanSign = function (callback) {
+	        return GenericService_1.GenericService.signCapable(this, callback);
 	    };
 	    GCLClient.prototype.sign = function (readerId, data, callback) {
 	        return GenericService_1.GenericService.sign(this, readerId, data, callback);
 	    };
 	    ;
+	    GCLClient.prototype.readersCanVerifyPin = function (callback) {
+	        return GenericService_1.GenericService.verifyPinCapable(this, callback);
+	    };
 	    GCLClient.prototype.verifyPin = function (readerId, data, callback) {
 	        return GenericService_1.GenericService.verifyPin(this, readerId, data, callback);
 	    };
@@ -66118,28 +66127,77 @@ var GCLLib =
 	var GenericService = (function () {
 	    function GenericService() {
 	    }
-	    GenericService.authenticationCertificates = function () {
-	        return [];
+	    GenericService.authenticateCapable = function (client, callback) {
+	        return client.core().readersCardAvailable()
+	            .then(this.checkCanAuthenticate)
+	            .then(function (res) { return { client: client, readers: res }; })
+	            .then(this.filterByAvailableContainers)
+	            .then(function (res) { return ResponseHandler_1.ResponseHandler.response(res, callback); })
+	            .catch(function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
 	    };
-	    GenericService.signingCertificates = function () {
-	        return [];
+	    GenericService.signCapable = function (client, callback) {
+	        return client.core().readersCardAvailable()
+	            .then(this.checkCanSign)
+	            .then(function (res) { return { client: client, readers: res }; })
+	            .then(this.filterByAvailableContainers)
+	            .then(function (res) { return ResponseHandler_1.ResponseHandler.response(res, callback); })
+	            .catch(function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
+	    };
+	    GenericService.verifyPinCapable = function (client, callback) {
+	        return client.core().readersCardAvailable()
+	            .then(this.checkCanVerifyPin)
+	            .then(function (res) { return { client: client, readers: res }; })
+	            .then(this.filterByAvailableContainers)
+	            .then(function (res) { return ResponseHandler_1.ResponseHandler.response(res, callback); })
+	            .catch(function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
 	    };
 	    GenericService.authenticate = function (client, readerId, data, callback) {
 	        return this.checkPrerequisites(client, readerId, data)
 	            .then(this.determineAlgorithm)
 	            .then(GenericService.doAuthenticate)
-	            .then(function (res) { return ResponseHandler_1.ResponseHandler.response(res, callback); }, function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
+	            .then(function (res) { return ResponseHandler_1.ResponseHandler.response(res, callback); })
+	            .catch(function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
 	    };
 	    GenericService.sign = function (client, readerId, data, callback) {
 	        return this.checkPrerequisites(client, readerId, data)
 	            .then(this.determineAlgorithm)
 	            .then(GenericService.doSign)
-	            .then(function (res) { return ResponseHandler_1.ResponseHandler.response(res, callback); }, function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
+	            .then(function (res) { return ResponseHandler_1.ResponseHandler.response(res, callback); })
+	            .catch(function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
 	    };
 	    GenericService.verifyPin = function (client, readerId, data, callback) {
 	        return this.checkPrerequisites(client, readerId, data)
 	            .then(GenericService.doVerifyPin)
-	            .then(function (res) { return ResponseHandler_1.ResponseHandler.response(res, callback); }, function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
+	            .then(function (res) { return ResponseHandler_1.ResponseHandler.response(res, callback); })
+	            .catch(function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
+	    };
+	    GenericService.checkCanAuthenticate = function (data) {
+	        return new es6_promise_1.Promise(function (resolve) {
+	            data.data = _.filter(data.data, function (reader) { return CardUtil_1.CardUtil.canAuthenticate(reader.card); });
+	            resolve(data);
+	        });
+	    };
+	    GenericService.checkCanSign = function (data) {
+	        return new es6_promise_1.Promise(function (resolve) {
+	            data.data = _.filter(data.data, function (reader) { return CardUtil_1.CardUtil.canSign(reader.card); });
+	            resolve(data);
+	        });
+	    };
+	    GenericService.checkCanVerifyPin = function (data) {
+	        return new es6_promise_1.Promise(function (resolve) {
+	            data.data = _.filter(data.data, function (reader) { return CardUtil_1.CardUtil.canVerifyPin(reader.card); });
+	            resolve(data);
+	        });
+	    };
+	    GenericService.filterByAvailableContainers = function (args) {
+	        return args.client.core().plugins().then(function (plugins) {
+	            return new es6_promise_1.Promise(function (resolve) {
+	                args.readers.data = _.filter(args.readers.data, function (reader) {
+	                    return _.find(plugins.data, function (ct) { return ct.id === CardUtil_1.CardUtil.determineContainer(reader.card); });
+	                });
+	                resolve(args.readers);
+	            });
+	        });
 	    };
 	    GenericService.checkPrerequisites = function (client, readerId, data) {
 	        return client.core().readersCardAvailable()
@@ -66249,6 +66307,60 @@ var GCLLib =
 	var CardUtil = (function () {
 	    function CardUtil() {
 	    }
+	    CardUtil.canAuthenticate = function (card) {
+	        var container = this.determineContainer(card);
+	        switch (container) {
+	            case "aventra":
+	            case "beid":
+	            case "dni":
+	            case "luxeid":
+	            case "luxtrust":
+	            case "oberthur":
+	            case "piv":
+	                return true;
+	            case "ocra":
+	            case "emv":
+	            case "mobib":
+	            default:
+	                return false;
+	        }
+	    };
+	    CardUtil.canSign = function (card) {
+	        var container = this.determineContainer(card);
+	        switch (container) {
+	            case "aventra":
+	            case "beid":
+	            case "dni":
+	            case "luxeid":
+	            case "luxtrust":
+	            case "oberthur":
+	            case "piv":
+	                return true;
+	            case "ocra":
+	            case "emv":
+	            case "mobib":
+	            default:
+	                return false;
+	        }
+	    };
+	    CardUtil.canVerifyPin = function (card) {
+	        var container = this.determineContainer(card);
+	        switch (container) {
+	            case "aventra":
+	            case "beid":
+	            case "dni":
+	            case "luxeid":
+	            case "luxtrust":
+	            case "oberthur":
+	            case "ocra":
+	            case "piv":
+	                return true;
+	            case "emv":
+	            case "mobib":
+	            default:
+	                return false;
+	        }
+	    };
 	    CardUtil.determineContainer = function (card) {
 	        if (!_.isEmpty(card) && !_.isEmpty(card.description)) {
 	            if (findDescription(card.description, "Belgium Electronic ID card")) {

@@ -413,6 +413,18 @@
         $("#validationErrorPromise").hide();
         $("#pinModalPromise").modal('toggle');
     });
+    $("#genericCanAuthenticate").on('click', function () {
+        $("#information").empty();
+        connector.readersCanAuthenticate().then(handleSuccess, handleError);
+    });
+    $("#genericCanSign").on('click', function () {
+        $("#information").empty();
+        connector.readersCanSign().then(handleSuccess, handleError);
+    });
+    $("#genericCanVerifyPin").on('click', function () {
+        $("#information").empty();
+        connector.readersCanVerifyPin().then(handleSuccess, handleError);
+    });
     $("#genericAuthenticate").on('click', function () {
         $("#information").empty();
         var data = {

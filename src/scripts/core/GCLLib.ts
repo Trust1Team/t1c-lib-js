@@ -161,12 +161,23 @@ class GCLClient {
     };
 
     // generic methods
+    public readersCanAuthenticate(callback?: (error: RestException, data: CardReadersResponse) => void) {
+        return GenericService.authenticateCapable(this, callback);
+    }
     public authenticate(readerId: string, data: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void) {
         return GenericService.authenticate(this, readerId, data, callback);
+    }
+
+    public readersCanSign(callback?: (error: RestException, data: CardReadersResponse) => void) {
+        return GenericService.signCapable(this, callback);
     }
     public sign(readerId: string, data: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void) {
         return GenericService.sign(this, readerId, data, callback);
     };
+
+    public readersCanVerifyPin(callback?: (error: RestException, data: CardReadersResponse) => void) {
+        return GenericService.verifyPinCapable(this, callback);
+    }
     public verifyPin(readerId: string, data: OptionalPin, callback?: (error: RestException, data: DataResponse) => void) {
         return GenericService.verifyPin(this, readerId, data, callback);
     }
