@@ -178,7 +178,6 @@ var GCLLib =
 	    GCLClient.prototype.sign = function (readerId, data, callback) {
 	        return GenericService_1.GenericService.sign(this, readerId, data, callback);
 	    };
-	    ;
 	    GCLClient.prototype.readersCanVerifyPin = function (callback) {
 	        return GenericService_1.GenericService.verifyPinCapable(this, callback);
 	    };
