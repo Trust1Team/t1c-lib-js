@@ -13,7 +13,7 @@ import { LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnec
 import { AbstractDSClient, DownloadLinkResponse, JWTResponse } from "./ds/DSClientModel";
 import { DSClient } from "./ds/DSClient";
 import { AbstractOCVClient, OCVClient } from "./ocv/OCVClient";
-import { InfoResponse } from "./service/CoreModel";
+import { CardReader, CardReadersResponse, DataResponse, InfoResponse } from "./service/CoreModel";
 import { AbstractEidBE } from "../plugins/smartcards/eid/be/EidBeModel";
 import { AbstractEMV } from "../plugins/smartcards/emv/EMVModel";
 import { AbstractOcra } from "../plugins/smartcards/ocra/ocraModel";
@@ -27,6 +27,11 @@ import { AbstractDNI } from "../plugins/smartcards/eid/esp/dniModel";
 import { Promise } from "es6-promise";
 import { PluginFactory } from "../plugins/PluginFactory";
 import { AbstractSafeNet } from "../plugins/smartcards/pkcs11/safenet/safenetModel";
+import { CardUtil } from "../util/CardUtil";
+import { AuthenticateOrSignData, OptionalPin, VerifyPinData } from "../plugins/smartcards/Card";
+import { RestException } from "./exceptions/CoreExceptions";
+import { ResponseHandler } from "../util/ResponseHandler";
+import { GenericService } from "./generic/GenericService";
 
 
 class GCLClient {
@@ -154,6 +159,28 @@ class GCLClient {
     public safenet = (reader_id: string, moduleConfig: { linux: string, mac: string, win: string }): AbstractSafeNet => {
         return this.pluginFactory.createSafeNet(moduleConfig);
     };
+
+    // generic methods
+    public readersCanAuthenticate(callback?: (error: RestException, data: CardReadersResponse) => void) {
+        return GenericService.authenticateCapable(this, callback);
+    }
+    public authenticate(readerId: string, data: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void) {
+        return GenericService.authenticate(this, readerId, data, callback);
+    }
+
+    public readersCanSign(callback?: (error: RestException, data: CardReadersResponse) => void) {
+        return GenericService.signCapable(this, callback);
+    }
+    public sign(readerId: string, data: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void) {
+        return GenericService.sign(this, readerId, data, callback);
+    }
+
+    public readersCanVerifyPin(callback?: (error: RestException, data: CardReadersResponse) => void) {
+        return GenericService.verifyPinCapable(this, callback);
+    }
+    public verifyPin(readerId: string, data: OptionalPin, callback?: (error: RestException, data: DataResponse) => void) {
+        return GenericService.verifyPin(this, readerId, data, callback);
+    }
 
     /**
      * Init OCV - verify if OCV is available
