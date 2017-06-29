@@ -56,6 +56,7 @@ var GCLLib =
 	var OCVClient_1 = __webpack_require__(36);
 	var es6_promise_1 = __webpack_require__(6);
 	var PluginFactory_1 = __webpack_require__(37);
+	var GenericService_1 = __webpack_require__(162);
 	var GCLClient = (function () {
 	    function GCLClient(cfg, automatic) {
 	        var _this = this;
@@ -164,6 +165,16 @@ var GCLLib =
 	        resolvedCfg.localTestMode = cfg.localTestMode;
 	        resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
 	        return resolvedCfg;
+	    };
+	    GCLClient.prototype.authenticate = function (readerId, data, callback) {
+	        return GenericService_1.GenericService.authenticate(this, readerId, data, callback);
+	    };
+	    GCLClient.prototype.sign = function (readerId, data, callback) {
+	        return GenericService_1.GenericService.sign(this, readerId, data, callback);
+	    };
+	    ;
+	    GCLClient.prototype.verifyPin = function (readerId, data, callback) {
+	        return GenericService_1.GenericService.verifyPin(this, readerId, data, callback);
 	    };
 	    GCLClient.prototype.initOCVContext = function (cb) {
 	        return this.ocvClient.getInfo(cb);
@@ -66091,6 +66102,203 @@ var GCLLib =
 	    win: "C:\\Windows\\System32\\eTPKCS11.dll"
 	};
 	exports.SafeNet = SafeNet;
+
+
+/***/ }),
+/* 162 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var es6_promise_1 = __webpack_require__(6);
+	var EidBe_1 = __webpack_require__(152);
+	var ResponseHandler_1 = __webpack_require__(150);
+	var _ = __webpack_require__(1);
+	var CardUtil_1 = __webpack_require__(163);
+	var GenericService = (function () {
+	    function GenericService() {
+	    }
+	    GenericService.authenticationCertificates = function () {
+	        return [];
+	    };
+	    GenericService.signingCertificates = function () {
+	        return [];
+	    };
+	    GenericService.authenticate = function (client, readerId, data, callback) {
+	        return this.checkPrerequisites(client, readerId, data)
+	            .then(this.determineAlgorithm)
+	            .then(GenericService.doAuthenticate)
+	            .then(function (res) { return ResponseHandler_1.ResponseHandler.response(res, callback); }, function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
+	    };
+	    GenericService.sign = function (client, readerId, data, callback) {
+	        return this.checkPrerequisites(client, readerId, data)
+	            .then(this.determineAlgorithm)
+	            .then(GenericService.doSign)
+	            .then(function (res) { return ResponseHandler_1.ResponseHandler.response(res, callback); }, function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
+	    };
+	    GenericService.verifyPin = function (client, readerId, data, callback) {
+	        return this.checkPrerequisites(client, readerId, data)
+	            .then(GenericService.doVerifyPin)
+	            .then(function (res) { return ResponseHandler_1.ResponseHandler.response(res, callback); }, function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
+	    };
+	    GenericService.checkPrerequisites = function (client, readerId, data) {
+	        return client.core().readersCardAvailable()
+	            .then(function (readers) { return { readerId: readerId, readers: readers }; })
+	            .then(this.checkReaderPresent)
+	            .then(this.determineContainerForCard)
+	            .then(function (container) { return { client: client, container: container }; })
+	            .then(this.checkContainerAvailable)
+	            .then(function (args) {
+	            return { client: args.client, readerId: readerId, container: args.container, data: data };
+	        });
+	    };
+	    GenericService.checkReaderPresent = function (args) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            var reader = _.find(args.readers.data, function (rd) { return rd.id === args.readerId; });
+	            if (reader) {
+	                resolve(reader);
+	            }
+	            else {
+	                if (args.readerId && args.readerId.length) {
+	                    reject("No card found for this ID");
+	                }
+	                else {
+	                    reject("Reader ID is required.");
+	                }
+	            }
+	        });
+	    };
+	    GenericService.checkContainerAvailable = function (args) {
+	        return args.client.core().plugins().then(function (res) {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                if (_.find(res.data, function (ct) { return ct.id === args.container; })) {
+	                    resolve(args);
+	                }
+	                else {
+	                    reject("Container for this card is not available");
+	                }
+	            });
+	        });
+	    };
+	    GenericService.determineAlgorithm = function (args) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            if (!args.data.algorithm_reference || !args.data.algorithm_reference.length) {
+	                args.data.algorithm_reference = CardUtil_1.CardUtil.defaultAlgo(args.container);
+	            }
+	            if (!args.data.algorithm_reference) {
+	                reject("No algorithm reference provided and cannot determine default algorithm");
+	            }
+	            else {
+	                resolve(args);
+	            }
+	        });
+	    };
+	    GenericService.determineContainerForCard = function (reader) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            if (reader && reader.card) {
+	                resolve(CardUtil_1.CardUtil.determineContainer(reader.card));
+	            }
+	            else {
+	                reject("No card present in reader");
+	            }
+	        });
+	    };
+	    GenericService.doSign = function (args) {
+	        if (args.container === "luxeid") {
+	            return args.client.luxeid(args.readerId, args.data.pin).signData(args.data);
+	        }
+	        else {
+	            return args.client[args.container](args.readerId).signData(args.data);
+	        }
+	    };
+	    GenericService.doAuthenticate = function (args) {
+	        if (args.container === "luxeid") {
+	            return args.client.luxeid(args.readerId, args.data.pin).authenticate(args.data);
+	        }
+	        else {
+	            return args.client[args.container](args.readerId).authenticate(args.data);
+	        }
+	    };
+	    GenericService.doVerifyPin = function (args) {
+	        if (args.container === "luxeid") {
+	            return args.client.luxeid(args.readerId, args.data.pin).verifyPin(args.data);
+	        }
+	        else if (args.container === "beid") {
+	            var verifyPinData = {
+	                pin: args.data.pin,
+	                private_key_reference: EidBe_1.EidBe.VERIFY_PRIV_KEY_REF
+	            };
+	            return args.client.beid(args.readerId).verifyPin(verifyPinData);
+	        }
+	        else {
+	            return args.client[args.container](args.readerId).verifyPin(args.data);
+	        }
+	    };
+	    return GenericService;
+	}());
+	exports.GenericService = GenericService;
+
+
+/***/ }),
+/* 163 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var _ = __webpack_require__(1);
+	var CardUtil = (function () {
+	    function CardUtil() {
+	    }
+	    CardUtil.determineContainer = function (card) {
+	        if (!_.isEmpty(card) && !_.isEmpty(card.description)) {
+	            if (findDescription(card.description, "Belgium Electronic ID card")) {
+	                return "beid";
+	            }
+	            else if (findDescription(card.description, "Grand Duchy of Luxembourg / Identity card with LuxTrust certificate (eID)")) {
+	                return "luxeid";
+	            }
+	            else if (findDescription(card.description, "LuxTrust card")) {
+	                return "luxtrust";
+	            }
+	            else if (findDescription(card.description, "Juridic Person's Token (PKI)")) {
+	                return "ocra";
+	            }
+	            else if (findDescription(card.description, "MOBIB")) {
+	                return "mobib";
+	            }
+	            else if (findDescription(card.description, "Mastercard")) {
+	                return "emv";
+	            }
+	            else {
+	                return undefined;
+	            }
+	        }
+	        else {
+	            return undefined;
+	        }
+	        function findDescription(descriptions, toFind) {
+	            return !!_.find(descriptions, function (desc) {
+	                return desc.indexOf(toFind) > -1;
+	            });
+	        }
+	    };
+	    CardUtil.defaultAlgo = function (container) {
+	        switch (container) {
+	            case "aventra":
+	            case "beid":
+	            case "dni":
+	            case "oberthur":
+	            case "piv":
+	            case "luxeid":
+	            case "luxtrust":
+	                return "sha256";
+	            default:
+	                return undefined;
+	        }
+	    };
+	    return CardUtil;
+	}());
+	exports.CardUtil = CardUtil;
 
 
 /***/ })
