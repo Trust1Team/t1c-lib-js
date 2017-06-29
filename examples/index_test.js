@@ -413,6 +413,42 @@
         $("#validationErrorPromise").hide();
         $("#pinModalPromise").modal('toggle');
     });
+    $("#genericCanAuthenticate").on('click', function () {
+        $("#information").empty();
+        connector.readersCanAuthenticate().then(handleSuccess, handleError);
+    });
+    $("#genericCanSign").on('click', function () {
+        $("#information").empty();
+        connector.readersCanSign().then(handleSuccess, handleError);
+    });
+    $("#genericCanVerifyPin").on('click', function () {
+        $("#information").empty();
+        connector.readersCanVerifyPin().then(handleSuccess, handleError);
+    });
+    $("#genericAuthenticate").on('click', function () {
+        $("#information").empty();
+        var data = {
+            data: "E1uHACbPvhLew0gGmBH83lvtKIAKxU2/RezfBOsT6Vs=",
+            pin: "3945"
+        };
+        connector.authenticate($("#selected_reader").text(), data).then(handleSuccess, handleError);
+    });
+    $("#genericVerifyPin").on('click', function () {
+        $("#information").empty();
+        var data = {
+            pin: "3945"
+        };
+        connector.verifyPin($("#selected_reader").text(), data).then(handleSuccess, handleError);
+    });
+    $("#genericSign").on('click', function () {
+        $("#information").empty();
+        var data = {
+            data: "E1uHACbPvhLew0gGmBH83lvtKIAKxU2/RezfBOsT6Vs=",
+            pin: "3945",
+            algorithm_reference: "sha256"
+        };
+        connector.sign($("#selected_reader").text(), data).then(handleSuccess, handleError);
+    });
 
     $("#buttonValidate").on('click', function () {
         var _body={};
