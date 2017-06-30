@@ -11,6 +11,7 @@ import { CardReader, CardReadersResponse, DataResponse } from "../service/CoreMo
 import { ResponseHandler } from "../../util/ResponseHandler";
 import * as _ from "lodash";
 import { CardUtil } from "../../util/CardUtil";
+import { Aventra } from "../../plugins/smartcards/pki/aventra/Aventra";
 
 export { GenericService };
 
@@ -190,6 +191,12 @@ class GenericService {
                 private_key_reference: EidBe.VERIFY_PRIV_KEY_REF
             };
             return args.client.beid(args.readerId).verifyPin(verifyPinData);
+        } else if (args.container === "aventra") {
+            let verifyPinData: VerifyPinData = {
+                pin: args.data.pin,
+                private_key_reference: Aventra.DEFAULT_VERIFY_PIN
+            };
+            return args.client.aventra(args.readerId).verifyPin(verifyPinData);
         } else {
             return args.client[args.container](args.readerId).verifyPin(args.data);
         }
