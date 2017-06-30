@@ -15,6 +15,7 @@ export { Aventra };
 
 
 class Aventra extends GenericCertCard implements AbstractAventra {
+    static DEFAULT_VERIFY_PIN = "sign";
     static RESET_PIN = "/reset-pin";
 
     // filters

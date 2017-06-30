@@ -413,6 +413,8 @@
         $("#validationErrorPromise").hide();
         $("#pinModalPromise").modal('toggle');
     });
+
+
     $("#genericCanAuthenticate").on('click', function () {
         $("#information").empty();
         connector.readersCanAuthenticate().then(handleSuccess, handleError);
@@ -425,26 +427,77 @@
         $("#information").empty();
         connector.readersCanVerifyPin().then(handleSuccess, handleError);
     });
+
     $("#genericAuthenticate").on('click', function () {
+        $("#information").empty();
+        $("#error").empty();
+        $("#testAllPswLabel").show();
+        $("#buttonRunTests").hide();
+        $("#buttonGenericAuthenticate").show();
+        $("#buttonGenericSign").hide();
+        $("#buttonGenericVerifyPin").hide();
+        $("#testAllPsw").val("").show();
+        $("#testAllInfo").empty().hide();
+        $("#testAllError").empty().hide();
+        $("#testAllModal").modal('toggle');
+    });
+    $("#buttonGenericAuthenticate").on('click', function () {
+        var pinField = $("#testAllPsw");
+        var pin = pinField.val();
+        $("#testAllModal").modal('toggle');
         $("#information").empty();
         var data = {
             data: "E1uHACbPvhLew0gGmBH83lvtKIAKxU2/RezfBOsT6Vs=",
-            pin: "3945"
+            pin: pin
         };
         connector.authenticate($("#selected_reader").text(), data).then(handleSuccess, handleError);
     });
+
     $("#genericVerifyPin").on('click', function () {
         $("#information").empty();
+        $("#error").empty();
+        $("#testAllPswLabel").show();
+        $("#buttonRunTests").hide();
+        $("#buttonGenericAuthenticate").hide();
+        $("#buttonGenericSign").hide();
+        $("#buttonGenericVerifyPin").show();
+        $("#testAllPsw").val("").show();
+        $("#testAllInfo").empty().hide();
+        $("#testAllError").empty().hide();
+        $("#testAllModal").modal('toggle');
+    });
+    $("#buttonGenericVerifyPin").on('click', function () {
+        var pinField = $("#testAllPsw");
+        var pin = pinField.val();
+        $("#testAllModal").modal('toggle');
+        $("#information").empty();
         var data = {
-            pin: "3945"
+            pin: pin
         };
         connector.verifyPin($("#selected_reader").text(), data).then(handleSuccess, handleError);
     });
+
     $("#genericSign").on('click', function () {
+        $("#information").empty();
+        $("#error").empty();
+        $("#testAllPswLabel").show();
+        $("#buttonRunTests").hide();
+        $("#buttonGenericAuthenticate").hide();
+        $("#buttonGenericSign").show();
+        $("#buttonGenericVerifyPin").hide();
+        $("#testAllPsw").val("").show();
+        $("#testAllInfo").empty().hide();
+        $("#testAllError").empty().hide();
+        $("#testAllModal").modal('toggle');
+    });
+    $("#buttonGenericSign").on('click', function () {
+        var pinField = $("#testAllPsw");
+        var pin = pinField.val();
+        $("#testAllModal").modal('toggle');
         $("#information").empty();
         var data = {
             data: "E1uHACbPvhLew0gGmBH83lvtKIAKxU2/RezfBOsT6Vs=",
-            pin: "3945",
+            pin: pin,
             algorithm_reference: "sha256"
         };
         connector.sign($("#selected_reader").text(), data).then(handleSuccess, handleError);
@@ -547,6 +600,9 @@
         $("#error").empty();
         $("#testAllPswLabel").show();
         $("#buttonRunTests").show();
+        $("#buttonGenericAuthenticate").hide();
+        $("#buttonGenericSign").hide();
+        $("#buttonGenericVerifyPin").hide();
         $("#testAllPsw").val("").show();
         $("#testAllInfo").empty().hide();
         $("#testAllError").empty().hide();

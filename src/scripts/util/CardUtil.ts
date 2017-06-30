@@ -77,6 +77,8 @@ class CardUtil {
             else if (findDescription(card.description, "Juridic Person's Token (PKI)")) { return "ocra"; }
             else if (findDescription(card.description, "MOBIB")) { return "mobib"; }
             else if (findDescription(card.description, "Mastercard")) { return "emv"; }
+            else if (findDescription(card.description, "Oberthur")) { return "oberthur"; }
+            else if (findDescription(card.description, "Aventra")) { return "aventra"; }
             else { return undefined; }
         } else {
             return undefined;

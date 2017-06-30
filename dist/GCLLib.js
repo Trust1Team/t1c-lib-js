@@ -65534,6 +65534,7 @@ var GCLLib =
 	    };
 	    return Aventra;
 	}(Card_1.GenericCertCard));
+	Aventra.DEFAULT_VERIFY_PIN = "sign";
 	Aventra.RESET_PIN = "/reset-pin";
 	exports.Aventra = Aventra;
 
@@ -65854,6 +65855,7 @@ var GCLLib =
 	var ResponseHandler_1 = __webpack_require__(151);
 	var _ = __webpack_require__(1);
 	var CardUtil_1 = __webpack_require__(164);
+	var Aventra_1 = __webpack_require__(158);
 	var GenericService = (function () {
 	    function GenericService() {
 	    }
@@ -66018,6 +66020,13 @@ var GCLLib =
 	            };
 	            return args.client.beid(args.readerId).verifyPin(verifyPinData);
 	        }
+	        else if (args.container === "aventra") {
+	            var verifyPinData = {
+	                pin: args.data.pin,
+	                private_key_reference: Aventra_1.Aventra.DEFAULT_VERIFY_PIN
+	            };
+	            return args.client.aventra(args.readerId).verifyPin(verifyPinData);
+	        }
 	        else {
 	            return args.client[args.container](args.readerId).verifyPin(args.data);
 	        }
@@ -66110,6 +66119,12 @@ var GCLLib =
 	            }
 	            else if (findDescription(card.description, "Mastercard")) {
 	                return "emv";
+	            }
+	            else if (findDescription(card.description, "Oberthur")) {
+	                return "oberthur";
+	            }
+	            else if (findDescription(card.description, "Aventra")) {
+	                return "aventra";
 	            }
 	            else {
 	                return undefined;
