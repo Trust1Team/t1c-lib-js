@@ -22,10 +22,10 @@ import { AbstractOberthur } from "./smartcards/pki/oberthur/OberthurModel";
 import { AbstractPiv } from "./smartcards/piv/pivModel";
 import { AbstractMobib } from "./smartcards/mobib/mobibModel";
 import { AbstractEidLUX } from "./smartcards/eid/lux/EidLuxModel";
-import { AbstractDNI } from "./smartcards/eid/esp/dniModel";
-import { DNI } from "./smartcards/eid/esp/dni";
 import { AbstractSafeNet } from "./smartcards/pkcs11/safenet/safenetModel";
 import { SafeNet } from "./smartcards/pkcs11/safenet/safenet";
+import { DNIe } from "./smartcards/eid/esp/dnie";
+import { AbstractDNIe } from "./smartcards/eid/esp/dnieModel";
 
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
@@ -58,7 +58,7 @@ const CONTAINER_SAFENET = CONTAINER_CONTEXT_PATH + "safenet";
 export class PluginFactory implements AbstractFactory {
     constructor(private url: string, private connection: LocalConnection) {}
 
-    public createDNI(reader_id?: string): AbstractDNI { return new DNI(this.url, CONTAINER_DNI, this.connection, reader_id); }
+    public createDNIe(reader_id?: string): AbstractDNIe { return new DNIe(this.url, CONTAINER_DNI, this.connection, reader_id); }
 
     public createEidBE(reader_id?: string): AbstractEidBE { return new EidBe(this.url, CONTAINER_BEID, this.connection, reader_id); }
 
