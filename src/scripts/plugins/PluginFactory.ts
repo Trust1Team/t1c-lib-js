@@ -44,7 +44,7 @@ const CONTAINER_CONTEXT_PATH = "/plugins/";
 const CONTAINER_NEW_CONTEXT_PATH = "/containers/";
 const CONTAINER_BEID = CONTAINER_CONTEXT_PATH + "beid";
 const CONTAINER_LUXEID = CONTAINER_CONTEXT_PATH + "luxeid";
-const CONTAINER_DNI = CONTAINER_NEW_CONTEXT_PATH + "dnie";
+const CONTAINER_DNIE = CONTAINER_CONTEXT_PATH + "dnie";
 const CONTAINER_EMV = CONTAINER_CONTEXT_PATH + "emv";
 const CONTAINER_LUXTRUST = CONTAINER_CONTEXT_PATH + "luxtrust";
 const CONTAINER_MOBIB = CONTAINER_CONTEXT_PATH + "mobib";
@@ -58,7 +58,7 @@ const CONTAINER_SAFENET = CONTAINER_CONTEXT_PATH + "safenet";
 export class PluginFactory implements AbstractFactory {
     constructor(private url: string, private connection: LocalConnection) {}
 
-    public createDNIe(reader_id?: string): AbstractDNIe { return new DNIe(this.url, CONTAINER_DNI, this.connection, reader_id); }
+    public createDNIe(reader_id?: string): AbstractDNIe { return new DNIe(this.url, CONTAINER_DNIE, this.connection, reader_id); }
 
     public createEidBE(reader_id?: string): AbstractEidBE { return new EidBe(this.url, CONTAINER_BEID, this.connection, reader_id); }
 
