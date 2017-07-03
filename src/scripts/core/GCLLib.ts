@@ -13,7 +13,7 @@ import { LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnec
 import { AbstractDSClient, DownloadLinkResponse, JWTResponse } from "./ds/DSClientModel";
 import { DSClient } from "./ds/DSClient";
 import { AbstractOCVClient, OCVClient } from "./ocv/OCVClient";
-import { CardReader, CardReadersResponse, DataResponse, InfoResponse } from "./service/CoreModel";
+import { CardReadersResponse, DataResponse, InfoResponse } from "./service/CoreModel";
 import { AbstractEidBE } from "../plugins/smartcards/eid/be/EidBeModel";
 import { AbstractEMV } from "../plugins/smartcards/emv/EMVModel";
 import { AbstractOcra } from "../plugins/smartcards/ocra/ocraModel";
@@ -23,14 +23,12 @@ import { AbstractOberthur } from "../plugins/smartcards/pki/oberthur/OberthurMod
 import { AbstractPiv } from "../plugins/smartcards/piv/pivModel";
 import { AbstractMobib } from "../plugins/smartcards/mobib/mobibModel";
 import { AbstractEidLUX } from "../plugins/smartcards/eid/lux/EidLuxModel";
-import { AbstractDNI } from "../plugins/smartcards/eid/esp/dniModel";
+import { AbstractDNIe } from "../plugins/smartcards/eid/esp/dnieModel";
 import { Promise } from "es6-promise";
 import { PluginFactory } from "../plugins/PluginFactory";
 import { AbstractSafeNet } from "../plugins/smartcards/pkcs11/safenet/safenetModel";
-import { CardUtil } from "../util/CardUtil";
-import { AuthenticateOrSignData, OptionalPin, VerifyPinData } from "../plugins/smartcards/Card";
+import { AuthenticateOrSignData, OptionalPin } from "../plugins/smartcards/Card";
 import { RestException } from "./exceptions/CoreExceptions";
-import { ResponseHandler } from "../util/ResponseHandler";
 import { GenericService } from "./generic/GenericService";
 
 
@@ -137,8 +135,8 @@ class GCLClient {
     public ocv = (): AbstractOCVClient => { return this.ocvClient; };
     // get instance for belgian eID card
     public beid = (reader_id?: string): AbstractEidBE => { return this.pluginFactory.createEidBE(reader_id); };
-    // get instance for spanish DNI card
-    public dni = (reader_id?: string): AbstractDNI => { return this.pluginFactory.createDNI(reader_id); };
+    // get instance for spanish DNIe card
+    public dnie = (reader_id?: string): AbstractDNIe => { return this.pluginFactory.createDNIe(reader_id); };
     // get instance for luxemburg eID card
     public luxeid = (reader_id?: string, pin?: string): AbstractEidLUX => { return this.pluginFactory.createEidLUX(reader_id, pin); };
     // get instance for luxtrust card

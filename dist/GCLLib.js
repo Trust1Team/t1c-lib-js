@@ -65,7 +65,7 @@ var GCLLib =
 	        this.ds = function () { return _this.dsClient; };
 	        this.ocv = function () { return _this.ocvClient; };
 	        this.beid = function (reader_id) { return _this.pluginFactory.createEidBE(reader_id); };
-	        this.dni = function (reader_id) { return _this.pluginFactory.createDNI(reader_id); };
+	        this.dnie = function (reader_id) { return _this.pluginFactory.createDNIe(reader_id); };
 	        this.luxeid = function (reader_id, pin) { return _this.pluginFactory.createEidLUX(reader_id, pin); };
 	        this.luxtrust = function (reader_id, pin) { return _this.pluginFactory.createLuxTrust(reader_id); };
 	        this.emv = function (reader_id) { return _this.pluginFactory.createEmv(reader_id); };
@@ -21969,8 +21969,8 @@ var GCLLib =
 	var Aventra_1 = __webpack_require__(158);
 	var Oberthur_1 = __webpack_require__(159);
 	var piv_1 = __webpack_require__(160);
-	var dni_1 = __webpack_require__(161);
-	var safenet_1 = __webpack_require__(162);
+	var safenet_1 = __webpack_require__(161);
+	var dnie_1 = __webpack_require__(162);
 	var CONTAINER_CONTEXT_PATH = "/plugins/";
 	var CONTAINER_NEW_CONTEXT_PATH = "/containers/";
 	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + "beid";
@@ -21989,7 +21989,7 @@ var GCLLib =
 	        this.url = url;
 	        this.connection = connection;
 	    }
-	    PluginFactory.prototype.createDNI = function (reader_id) { return new dni_1.DNI(this.url, CONTAINER_DNI, this.connection, reader_id); };
+	    PluginFactory.prototype.createDNIe = function (reader_id) { return new dnie_1.DNIe(this.url, CONTAINER_DNI, this.connection, reader_id); };
 	    PluginFactory.prototype.createEidBE = function (reader_id) { return new EidBe_1.EidBe(this.url, CONTAINER_BEID, this.connection, reader_id); };
 	    PluginFactory.prototype.createEidLUX = function (reader_id, pin) {
 	        return new EidLux_1.EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin);
@@ -65686,55 +65686,6 @@ var GCLLib =
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var __extends = (this && this.__extends) || (function () {
-	    var extendStatics = Object.setPrototypeOf ||
-	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-	    return function (d, b) {
-	        extendStatics(d, b);
-	        function __() { this.constructor = d; }
-	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	    };
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(40);
-	var RequestHandler_1 = __webpack_require__(152);
-	var CertParser_1 = __webpack_require__(42);
-	var ResponseHandler_1 = __webpack_require__(151);
-	var DNI = (function (_super) {
-	    __extends(DNI, _super);
-	    function DNI() {
-	        return _super !== null && _super.apply(this, arguments) || this;
-	    }
-	    DNI.prototype.info = function (callback) {
-	        return this.connection.get(this.resolvedReaderURI() + DNI.INFO, undefined, callback);
-	    };
-	    DNI.prototype.intermediateCertificate = function (options, callback) {
-	        var reqOptions = RequestHandler_1.RequestHandler.determineOptions(options, callback);
-	        var self = this;
-	        return self.connection.get(self.resolvedReaderURI() + DNI.ALL_CERTIFICATES + DNI.CERT_INTERMEDIATE, undefined).then(function (data) {
-	            return CertParser_1.CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
-	        }, function (err) {
-	            return ResponseHandler_1.ResponseHandler.error(err, reqOptions.callback);
-	        });
-	    };
-	    DNI.prototype.authenticationCertificate = function (body, options, callback) {
-	        return this.getCertificate(DNI.CERT_AUTHENTICATION, body, RequestHandler_1.RequestHandler.determineOptions(options, callback));
-	    };
-	    DNI.prototype.signingCertificate = function (body, options, callback) {
-	        return this.getCertificate(DNI.CERT_SIGNING, body, RequestHandler_1.RequestHandler.determineOptions(options, callback));
-	    };
-	    return DNI;
-	}(Card_1.GenericSecuredCertCard));
-	DNI.INFO = "/info";
-	exports.DNI = DNI;
-
-
-/***/ }),
-/* 162 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var _ = __webpack_require__(1);
 	var CertParser_1 = __webpack_require__(42);
@@ -65842,6 +65793,56 @@ var GCLLib =
 	    win: "C:\\Windows\\System32\\eTPKCS11.dll"
 	};
 	exports.SafeNet = SafeNet;
+
+
+/***/ }),
+/* 162 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Card_1 = __webpack_require__(40);
+	var RequestHandler_1 = __webpack_require__(152);
+	var CertParser_1 = __webpack_require__(42);
+	var ResponseHandler_1 = __webpack_require__(151);
+	var DNIe = (function (_super) {
+	    __extends(DNIe, _super);
+	    function DNIe() {
+	        return _super !== null && _super.apply(this, arguments) || this;
+	    }
+	    DNIe.prototype.info = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + DNIe.INFO, undefined, callback);
+	    };
+	    DNIe.prototype.intermediateCertificate = function (options, callback) {
+	        var reqOptions = RequestHandler_1.RequestHandler.determineOptions(options, callback);
+	        var self = this;
+	        return self.connection.get(self.resolvedReaderURI() + DNIe.ALL_CERTIFICATES + DNIe.CERT_INTERMEDIATE, undefined).then(function (data) {
+	            return CertParser_1.CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
+	        }, function (err) {
+	            return ResponseHandler_1.ResponseHandler.error(err, reqOptions.callback);
+	        });
+	    };
+	    DNIe.prototype.authenticationCertificate = function (options, callback) {
+	        return this.getCertificate(DNIe.CERT_AUTHENTICATION, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+	    };
+	    DNIe.prototype.signingCertificate = function (options, callback) {
+	        return this.getCertificate(DNIe.CERT_SIGNING, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+	    };
+	    return DNIe;
+	}(Card_1.GenericCertCard));
+	DNIe.INFO = "/info";
+	DNIe.CERT_INTERMEDIATE = "/intermediate";
+	exports.DNIe = DNIe;
 
 
 /***/ }),
