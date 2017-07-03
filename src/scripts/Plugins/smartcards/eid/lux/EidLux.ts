@@ -1,2 +1,0 @@
-interface AbstractEidLUX{}
-export {AbstractEidLUX}

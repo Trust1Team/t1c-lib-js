@@ -26,11 +26,18 @@ gulp.task("tslint", function () {
         .pipe(tslint.report());
 });
 
-gulp.task('webpack', function() {
+gulp.task('webpack-debug', function() {
     return gulp.src('src/scripts/GCLLib.ts')
         .pipe(webpackstream( require('./webpack.config.js') ))
         .pipe(injectVersion())
         .pipe(gulp.dest('dist/'));
+});
+
+gulp.task('webpack', ['webpack-debug'], function () {
+    return gulp.src('src/scripts/GCLLib.ts')
+               .pipe(webpackstream( require('./webpack.config.publish.js') ))
+               .pipe(injectVersion())
+               .pipe(gulp.dest('dist/'))
 });
 
 gulp.task('webpack-dev-server', function (callback) {

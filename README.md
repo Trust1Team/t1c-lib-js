@@ -58,6 +58,10 @@ To build the Javascript library, compressed:
 ```bash
 $ gulp webpack
 ```
+Alternatively, if you want to keep debug statements, run
+```bash
+$ gulp webpack-debug
+```
 
 ## Roadmap ##
 Setup Typescript compiler options

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>GCL Javascript Test Page</title>
+  <!--Add bootstrap and dependencies-->
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <style media="screen">
+    pre {
+      background-color: #ddd;
+      border: 2px solid #333;
+      padding: .3em .5em;
+    }
+
+    pre#error,pre#validationError {
+      border-color: #900;
+    }
+    .modal-header, h4, .close {
+      background-color: #5cb85c;
+      color:white !important;
+      text-align: center;
+      font-size: 30px;
+    }
+    .modal-footer {
+      background-color: #f9f9f9;
+    }
+    .dropdown-menu {
+      width: 400px !important;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <nav class="navbar navbar-inverse">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">T1C-JS (Belgian eID)</a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">Select Reader <span class="caret"></span></a>
+            <ul id="readerlist" class="dropdown-menu" role="menu">
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <hr />
+  <div><span id='selected_reader' class="label label-default">No card reader selected</span></div>
+  <hr />
+  <div style="margin-top: 20px;">
+    <h3>Toggles</h3>
+    <input type="checkbox" name="type" value="rn" id="parseCerts" />
+    <label for="parseCerts"><span class="glyphicon"></span> Parse certificates?</label>
+  </div>
+  <hr />
+  <div>
+    <button id="info" type="button" class="btn btn-default btn-lg">Info</button>
+    <button id="infoBrowser" type="button" class="btn btn-default btn-lg">Browser Info</button>
+    <button id="downloadgcl" type="button" class="btn btn-default btn-lg">Download GCL</button>
+    <button id="getReaders" type="button" class="btn btn-default btn-lg">Readers</button>
+    <button id="pollReaders" type="button" class="btn btn-default btn-lg">Poll Readers</button>
+    <button id="pollCard" type="button" class="btn btn-default btn-lg">Poll Cards</button>
+    <button id="getReadersAvailable" type="button" class="btn btn-default btn-lg">Readers (card available)</button>
+    <button id="getReadersUnavailable" type="button" class="btn btn-default btn-lg">Readers (card unavailable)</button>
+    <button id="getKey" type="button" class="btn btn-default btn-lg">Get API key</button>
+    <button id="getPubKeyDS" type="button" class="btn btn-default btn-lg">Get Public Key (DS)</button>
+    <button id="getPubKeyGCL" type="button" class="btn btn-default btn-lg">Get Public Key (GCL)</button>
+    <button id="getJWT" type="button" class="btn btn-default btn-lg">Get JWT</button>
+    <button id="getJWTRefresh" type="button" class="btn btn-default btn-lg">Refresh JWT</button>
+    <button id="getPlugins" type="button" class="btn btn-default btn-lg">Get Plugins</button>
+    <hr />
+    <h3>Callbacks</h3>
+    <button id="beidRn" type="button" class="btn btn-default btn-lg">BeID Rn Data</button>
+    <button id="beidAddress" type="button" class="btn btn-default btn-lg">BeID Address</button>
+    <button id="beidPic" type="button" class="btn btn-default btn-lg">BeID Picture</button>
+    <button id="beidAllCert" type="button" class="btn btn-default btn-lg">BeID All Cert</button>
+    <button id="beidRootCert" type="button" class="btn btn-default btn-lg">BeID Root Cert</button>
+    <button id="beidCitizenCert" type="button" class="btn btn-default btn-lg">BeID Citizen Cert</button>
+    <button id="beidAuthCert" type="button" class="btn btn-default btn-lg">BeID Authentication Cert</button>
+    <button id="beidNonRepCert" type="button" class="btn btn-default btn-lg">BeID Non Repudiation Cert</button>
+    <button id="beidRRNCert" type="button" class="btn btn-default btn-lg">BeID RRN Cert</button>
+    <button id="beidVerifyPin" type="button" class="btn btn-default btn-lg">BeID Verify Pin</button>
+    <button id="beidSign" type="button" class="btn btn-default btn-lg">BeID Sign</button>
+    <button id="beidAuthenticate" type="button" class="btn btn-default btn-lg">BeID Authenticate</button>
+    <hr />
+
+    <h3>Promises</h3>
+    <button id="beidRnPromise" type="button" class="btn btn-default btn-lg">BeID Rn
+      Data</button>
+    <button id="beidAddressPromise" type="button" class="btn btn-default btn-lg">BeID
+      Address</button>
+    <button id="beidPicPromise" type="button" class="btn btn-default btn-lg">BeID
+      Picture</button>
+    <button id="beidAllCertPromise" type="button" class="btn btn-default btn-lg">BeID All
+      Cert</button>
+    <button id="beidRootCertPromise" type="button" class="btn btn-default btn-lg">BeID Root
+      Cert</button>
+    <button id="beidCitizenCertPromise" type="button" class="btn btn-default btn-lg">BeID
+      Citizen Cert</button>
+    <button id="beidAuthCertPromise" type="button" class="btn btn-default btn-lg">BeID
+      Authentication Cert</button>
+    <button id="beidNonRepCertPromise" type="button" class="btn btn-default btn-lg">BeID Non
+      Repudiation Cert</button>
+    <button id="beidRRNCertPromise" type="button" class="btn btn-default btn-lg">BeID RRN
+      Cert</button>
+    <button id="beidVerifyPinPromise" type="button" class="btn btn-default btn-lg">BeID Verify
+      Pin</button>
+    <button id="beidSignPromise" type="button" class="btn btn-default btn-lg">BeID Sign</button>
+    <button id="beidAuthenticatePromise" type="button" class="btn btn-default btn-lg">BeID
+      Authenticate</button>
+
+    <hr>
+
+    <h3>Filters</h3>
+    <div style="margin-top: 20px;">
+      <button id="beidFiltered" type="button" class="btn btn-default btn-lg">AllData
+        Callback</button>
+      <button id="beidFilteredPromise" type="button" class="btn btn-default btn-lg">AllData
+        Promise</button>
+      <div class="form-group">
+        <input type="checkbox" name="type" value="rn" id="rndata" />
+        <label for="rndata"><span class="glyphicon"></span> data</label>
+        <input type="checkbox" name="type" value="address" id="address" />
+        <label for="address"><span class="glyphicon "></span> address</label>
+        <input type="checkbox" name="type" value="picture" id="photo"/>
+        <label for="photo"><span class="glyphicon"></span> picture</label>
+        <input type="checkbox" name="type" value="root-certificate" id="rootcert"/>
+        <label for="rootcert"><span class="glyphicon"></span> root certificate</label>
+        <input type="checkbox" name="type" value="authentication-certificate" id="authcert"/>
+        <label for="authcert"><span class="glyphicon "></span> authentication certificate</label>
+        <input type="checkbox" name="type" value="citizen-certificate" id="citizencert"/>
+        <label for="citizencert"><span class="glyphicon "></span> citizen certificate</label>
+        <input type="checkbox" name="type" value="non-repudiation-certificate" id="nonrepcert"/>
+        <label for="nonrepcert"><span class="glyphicon "></span> non-repudiation certificate</label>
+        <input type="checkbox" name="type" value="rrn-certificate" id="rrncert"/>
+        <label for="rrncert"><span class="glyphicon "></span> rrn certificate</label>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <button id="beidCertsFiltered" type="button" class="btn btn-default btn-lg">AllCerts
+        Callback</button>
+      <button id="beidCertsFilteredPromise" type="button"
+              class="btn btn-default btn-lg">AllCerts Promise
+      </button>
+      <div class="form-group">
+        <input type="checkbox" name="type" value="root-certificate" id="rootcertx"/>
+        <label for="rootcertx"><span class="glyphicon"></span> root certificate</label>
+        <input type="checkbox" name="type" value="authentication-certificate" id="authcertx"/>
+        <label for="authcertx"><span class="glyphicon "></span> authentication certificate</label>
+        <input type="checkbox" name="type" value="citizen-certificate" id="citizencertx"/>
+        <label for="citizencertx"><span class="glyphicon "></span> citizen certificate</label>
+        <input type="checkbox" name="type" value="non-repudiation-certificate" id="nonrepcertx"/>
+        <label for="nonrepcertx"><span class="glyphicon "></span> non-repudiation certificate</label>
+        <input type="checkbox" name="type" value="rrn-certificate" id="rrncertx"/>
+        <label for="rrncertx"><span class="glyphicon "></span> rrn certificate</label>
+      </div>
+
+    </div>
+
+    <hr>
+    <div style="margin-top: 20px;">
+      <button id="testAll" class="btn btn-warning btn-lg">Test All</button>
+      <button id="clear" type="button" class="btn btn-default btn-lg">Clear</button>
+      <button id="genericSign" type="button" class="btn btn-default btn-lg">Generic Sign
+        Test</button>
+      <button id="genericAuthenticate" type="button" class="btn btn-default btn-lg">Generic
+      Authenticate
+      Test</button>
+      <button id="genericVerifyPin" type="button" class="btn btn-default btn-lg">Generic
+        Verify Pin
+        Test</button>
+      <button id="genericCanSign" type="button" class="btn btn-default btn-lg">Can Sign
+        Test</button>
+      <button id="genericCanAuthenticate" type="button" class="btn btn-default btn-lg">Can
+        Authenticate
+        Test</button>
+      <button id="genericCanVerifyPin" type="button" class="btn btn-default btn-lg">Can
+        Verify Pin
+        Test</button>
+    </div>
+
+  </div>
+  <hr />
+  <pre id="information"></pre>
+  <pre id="error"></pre>
+  <!-- PIN verify Modal -->
+  <div class="modal fade" id="pinModal" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header" style="padding:35px 50px;">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4><span class="glyphicon glyphicon-lock"></span> Validate PIN</h4>
+        </div>
+        <div class="modal-body" style="padding:40px 50px;">
+          <div class="form-group">
+            <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+            <input type="password" class="form-control" id="psw" placeholder="Enter pin code">
+          </div>
+          <div class="form-group">
+            <pre id="validationInfo" hidden="true"></pre>
+            <pre id="validationError" hidden="true"></pre>
+          </div>
+          <button id="buttonValidate" type="button" class="btn btn-default btn-lg">Validate</button>
+        </div>
+        <div class="modal-footer">
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="pinModalPromise" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header" style="padding:35px 50px;">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4><span class="glyphicon glyphicon-lock"></span> Validate PIN</h4>
+        </div>
+        <div class="modal-body" style="padding:40px 50px;">
+          <div class="form-group">
+            <label for="pswPromise"><span class="glyphicon glyphicon-eye-open"></span> Pin
+            </label>
+            <input type="password" class="form-control" id="pswPromise"
+                   placeholder="Enter pin code">
+          </div>
+          <div class="form-group">
+            <pre id="validationInfoPromise" hidden="true"></pre>
+            <pre id="validationErrorPromise" hidden="true"></pre>
+          </div>
+          <button id="buttonValidatePromise" type="button" class="btn btn-default btn-lg">
+            Validate</button>
+        </div>
+        <div class="modal-footer">
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sign Modal -->
+  <div class="modal fade" id="signModal" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header" style="padding:35px 50px;">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4><span class="glyphicon glyphicon-lock"></span> Sign example data</h4>
+        </div>
+        <div class="modal-body" style="padding:40px 50px;">
+          <div class="form-group">
+            <p><strong>Base64-encoded data to be signed:</strong></p>
+            <p>E1uHACbPvhLew0gGmBH83lvtKIAKxU2/RezfBOsT6Vs=</p>
+            <label for="signpsw"><span class="glyphicon glyphicon-eye-open"></span> Pin
+            </label>
+            <input type="password" class="form-control" id="signpsw" placeholder="Enter pin code">
+          </div>
+          <div class="form-group">
+            <pre id="signInfo" hidden="true"></pre>
+            <pre id="signError" hidden="true"></pre>
+          </div>
+          <button id="buttonSign" type="button" class="btn btn-default btn-lg">Sign</button>
+        </div>
+        <div class="modal-footer">
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="signModalPromise" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header" style="padding:35px 50px;">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4><span class="glyphicon glyphicon-lock"></span> Sign example data</h4>
+        </div>
+        <div class="modal-body" style="padding:40px 50px;">
+          <div class="form-group">
+            <p><strong>Base64-encoded data to be signed:</strong></p>
+            <p>E1uHACbPvhLew0gGmBH83lvtKIAKxU2/RezfBOsT6Vs=</p>
+            <label for="signpswPromise"><span
+              class="glyphicon glyphicon-eye-open"></span>
+              Pin
+            </label>
+            <input type="password" class="form-control" id="signpswPromise"
+                   placeholder="Enter pin code">
+          </div>
+          <div class="form-group">
+            <pre id="signInfoPromise" hidden="true"></pre>
+            <pre id="signErrorPromise" hidden="true"></pre>
+          </div>
+          <button id="buttonSignPromise" type="button" class="btn btn-default btn-lg">Sign
+          </button>
+        </div>
+        <div class="modal-footer">
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Authenticate Modal -->
+  <div class="modal fade" id="authModal" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header" style="padding:35px 50px;">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4><span class="glyphicon glyphicon-lock"></span> Authentication</h4>
+        </div>
+        <div class="modal-body" style="padding:40px 50px;">
+          <div class="form-group">
+            <p><strong>Base64-encoded challenge:</strong></p>
+            <p>I2e+u/sgy7fYgh+DWA0p2jzXQ7E=</p>
+            <label for="authpsw"><span class="glyphicon glyphicon-eye-open"></span> Pin
+            </label>
+            <input type="password" class="form-control" id="authpsw" placeholder="Enter pin code">
+          </div>
+          <div class="form-group">
+            <pre id="authInfo" hidden="true"></pre>
+            <pre id="authError" hidden="true"></pre>
+          </div>
+          <button id="buttonAuth" type="button" class="btn btn-default btn-lg">Authenticate</button>
+        </div>
+        <div class="modal-footer">
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="authModalPromise" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header" style="padding:35px 50px;">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4><span class="glyphicon glyphicon-lock"></span> Authentication</h4>
+        </div>
+        <div class="modal-body" style="padding:40px 50px;">
+          <div class="form-group">
+            <p><strong>Base64-encoded challenge:</strong></p>
+            <p>I2e+u/sgy7fYgh+DWA0p2jzXQ7E=</p>
+            <label for="authpswPromise"><span
+              class="glyphicon glyphicon-eye-open"></span> Pin</label>
+            <input type="password" class="form-control" id="authpswPromise"
+                   placeholder="Enter pin code">
+          </div>
+          <div class="form-group">
+            <pre id="authInfoPromise" hidden="true"></pre>
+            <pre id="authErrorPromise" hidden="true"></pre>
+          </div>
+          <button id="buttonAuthPromise" type="button" class="btn btn-default btn-lg">
+            Authenticate</button>
+        </div>
+        <div class="modal-footer">
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test All Pin Modal -->
+  <div class="modal fade" id="testAllModal" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header" style="padding:35px 50px;">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4><span class="glyphicon glyphicon-lock"></span> Enter PIN</h4>
+        </div>
+        <div class="modal-body" style="padding:40px 50px;">
+          <div class="form-group">
+            <label id="testAllPswLabel" for="testAllPsw"><span
+              class="glyphicon glyphicon-eye-open"></span> Pin
+            </label>
+            <input type="password" class="form-control" id="testAllPsw"
+                   placeholder="Enter pin code">
+          </div>
+          <div class="form-group">
+            <pre id="testAllInfo" hidden="true"></pre>
+            <pre id="testAllError" hidden="true"></pre>
+          </div>
+          <button id="buttonGenericSign" type="button" class="btn btn-default btn-lg">Sign</button>
+          <button id="buttonGenericAuthenticate" type="button"
+                  class="btn btn-default btn-lg">Authenticate
+          </button>
+          <button id="buttonGenericVerifyPin" type="button" class="btn btn-default btn-lg">Verify
+            Pin
+          </button>
+          <button id="buttonRunTests" type="button" class="btn btn-default btn-lg">
+            Run Tests</button>
+        </div>
+        <div class="modal-footer">
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OCV Authenticate Modal -->
+  <div class="modal fade" id="ocvAuthModal" role="dialog">
+    <div class="modal-dialog">
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header" style="padding:35px 50px;">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4><span class="glyphicon glyphicon-lock"></span> Authentication</h4>
+        </div>
+        <div class="modal-body" style="padding:40px 50px;">
+          <div class="form-group">
+            <input class="form-control" id="ocvtempvalue" placeholder="Challenge should appear here">
+            <input type="password" class="form-control" id="ocvAuthpsw" placeholder="Enter pin code">
+          </div>
+          <div class="form-group">
+            <pre id="ocvAuthInfo" hidden="true"></pre>
+            <pre id="ocvAuthError" hidden="true"></pre>
+          </div>
+          <button id="ocvButtonAuth" type="button" class="btn btn-default btn-lg">OCV Authenticate</button>
+        </div>
+        <div class="modal-footer">
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Download Modal -->
+  <div class="modal fade" id="downloadModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header" style="padding:35px 50px;">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4><span class="glyphicon glyphicon-lock"></span> Download Instructions</h4>
+        </div>
+        <div class="modal-body" style="padding:40px 50px;">
+          <div id="modalDownloadLink" class="form-group">
+            <label for="psw">Click the download link to start downloading</label>
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          Download provided by Trust1Team.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/platform/1.3.1/platform.min.js"></script>
+<script src="../dist/GCLLib.js" charset="utf-8"></script>
+<script src="index_test.js"></script>
+</body>
+</html>
