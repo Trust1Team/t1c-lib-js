@@ -17820,7 +17820,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return "v1.0.3";
+	        return "v1.0.4";
 	    };
 	    return CoreService;
 	}());
@@ -21975,7 +21975,7 @@ var GCLLib =
 	var CONTAINER_NEW_CONTEXT_PATH = "/containers/";
 	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + "beid";
 	var CONTAINER_LUXEID = CONTAINER_CONTEXT_PATH + "luxeid";
-	var CONTAINER_DNI = CONTAINER_NEW_CONTEXT_PATH + "dnie";
+	var CONTAINER_DNIE = CONTAINER_CONTEXT_PATH + "dnie";
 	var CONTAINER_EMV = CONTAINER_CONTEXT_PATH + "emv";
 	var CONTAINER_LUXTRUST = CONTAINER_CONTEXT_PATH + "luxtrust";
 	var CONTAINER_MOBIB = CONTAINER_CONTEXT_PATH + "mobib";
@@ -21989,7 +21989,7 @@ var GCLLib =
 	        this.url = url;
 	        this.connection = connection;
 	    }
-	    PluginFactory.prototype.createDNIe = function (reader_id) { return new dnie_1.DNIe(this.url, CONTAINER_DNI, this.connection, reader_id); };
+	    PluginFactory.prototype.createDNIe = function (reader_id) { return new dnie_1.DNIe(this.url, CONTAINER_DNIE, this.connection, reader_id); };
 	    PluginFactory.prototype.createEidBE = function (reader_id) { return new EidBe_1.EidBe(this.url, CONTAINER_BEID, this.connection, reader_id); };
 	    PluginFactory.prototype.createEidLUX = function (reader_id, pin) {
 	        return new EidLux_1.EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin);
