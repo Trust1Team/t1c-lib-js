@@ -1,39 +1,39 @@
 ///<reference path="../../../typings/index.d.ts"/>
 import {expect} from "chai";
-import {AbstractDSClient,DSClient} from "../../scripts/core/ds/DSClient";
+import {DSClient} from "../../scripts/core/ds/DSClient";
 import {RemoteConnection} from "../../scripts/core/client/Connection";
 import {GCLClient} from "../../scripts/core/GCLLib";
 import {GCLConfig} from "../../scripts/core/GCLConfig";
-//workaround in order to use require for non available module in DefinitlyTyped
+// workaround in order to use require for non available module in DefinitlyTyped
 declare var require: any;
-var jwtDecode = require('jwt-decode');
+var jwtDecode = require("jwt-decode");
 
-describe('DSClient', () => {
+describe("DSClient", () => {
     let dsUnderTest = "http://localhost:8080/gcl-ds-web/v1";
-    let remoteConnection:RemoteConnection;
-    let dsClient:DSClient;
-    let config = new GCLConfig("https://dist.t1t.be/v1","someapikey");
+    let remoteConnection: RemoteConnection;
+    let dsClient: DSClient;
+    let config = new GCLConfig("https://dist.t1t.be/v1", "someapikey");
 
     beforeEach(() => {
         remoteConnection = new RemoteConnection(config);
-        dsClient = new DSClient(dsUnderTest,remoteConnection,config);
+        dsClient = new DSClient(dsUnderTest, remoteConnection, config);
     });
 
-    describe('DSClient Service Expectations', () => {
+    describe("DSClient Service Expectations", () => {
 
-        it('should verify that a ds client has been instantiated', () => {
+        it("should verify that a ds client has been instantiated", () => {
             expect(dsClient).not.undefined;
         });
 
-        it('should verify that jwt decoder has been instantiated', () => {
+        it("should verify that jwt decoder has been instantiated", () => {
             expect(jwtDecode).not.undefined;
         });
 
-        it('should return the url for DS under test', () => {
+        it("should return the url for DS under test", () => {
             expect(dsClient.getUrl()).to.equals(dsUnderTest);
         });
 
-        it('should return information for the distribution service', (done) => {
+        it("should return information for the distribution service", (done) => {
             // needs access to the distribution server, cannot be tests
             done();
 
@@ -44,15 +44,15 @@ describe('DSClient', () => {
             // });
         });
 
-        it('should get device information when UUID is given', (done) => {
+        it("should get device information when UUID is given", (done) => {
             done();
         });
 
-        it('should fail to get device info without providing UUID param', (done) => {
+        it("should fail to get device info without providing UUID param", (done) => {
             done();
         });
 
-        it('should get a JWT token', (done) => {
+        it("should get a JWT token", (done) => {
             // JWT functionality not yet implemented, cannot be tested
             done();
 
@@ -64,7 +64,7 @@ describe('DSClient', () => {
             // });
         });
 
-        it('should get verify JWT claims', (done) => {
+        it("should get verify JWT claims", (done) => {
             // JWT functionality not yet implemented, cannot be reliably tested
             done();
 
@@ -84,39 +84,39 @@ describe('DSClient', () => {
             // });
         });
 
-        it('should refresh an existing valid JWT with a new expiration time - greater then the former', (done) => {
+        it("should refresh an existing valid JWT with a new expiration time - greater then the former", (done) => {
             done();
         });
 
-        it('should fail to get a JWT token when given JWT is expired', (done) => {
+        it("should fail to get a JWT token when given JWT is expired", (done) => {
             done();
         });
 
-        it('should fail to get a JWT token when given JWT is expired', (done) => {
+        it("should fail to get a JWT token when given JWT is expired", (done) => {
             done();
         });
 
-        it('should get a public key', (done) => {
+        it("should get a public key", (done) => {
             done();
         });
 
-        it('should get a valid download link', (done) => {
+        it("should get a valid download link", (done) => {
             done();
         });
 
-        it('should register a new device when not activated and un-registered', (done) => {
+        it("should register a new device when not activated and un-registered", (done) => {
             done();
         });
 
-        it('should register a new device when activated and un-registered', (done) => {
+        it("should register a new device when activated and un-registered", (done) => {
             done();
         });
 
-        it('should sync a given device when activated and registered', (done) => {
+        it("should sync a given device when activated and registered", (done) => {
             done();
         });
 
-        it('should sync a given device when not activated and registered', (done) => {
+        it("should sync a given device when not activated and registered", (done) => {
             done();
         });
     });

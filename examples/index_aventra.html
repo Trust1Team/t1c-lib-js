@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>GCL Javascript Aventra Test Page</title>
+    <!--Add bootstrap and dependencies-->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <style media="screen">
+        pre {
+            background-color: #ddd;
+            border: 2px solid #333;
+            padding: .3em .5em;
+        }
+
+        pre#error,pre#validationError {
+            border-color: #900;
+        }
+        .modal-header, h4, .close {
+            background-color: #5cb85c;
+            color:white !important;
+            text-align: center;
+            font-size: 30px;
+        }
+        .modal-footer {
+            background-color: #f9f9f9;
+        }
+        .dropdown-menu {
+            width: 400px !important;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">T1C-JS (AVENTRA)</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">Select Reader <span class="caret"></span></a>
+                        <ul id="readerlist" class="dropdown-menu" role="menu">
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <hr />
+    <div><span id='selected_reader' class="label label-default">No card reader selected</span></div>
+    <hr />
+    <div>
+        <button id="info" type="button" class="btn btn-default btn-lg">Info</button>
+        <button id="downloadgcl" type="button" class="btn btn-default btn-lg">Download GCL</button>
+        <button id="getReaders" type="button" class="btn btn-default btn-lg">Readers</button>
+        <hr />
+        <button id="aventraAllData" type="button" class="btn btn-default btn-lg">Aventra allData</button>
+        <button id="aventraAllCert" type="button" class="btn btn-default btn-lg">Aventra All Cert</button>
+        <button id="aventraRootCert" type="button" class="btn btn-default btn-lg">Aventra Root Cert</button>
+        <button id="aventraAuthenticationCert" type="button" class="btn btn-default btn-lg">Aventra Authentication Cert</button>
+        <button id="aventraIssuerCert" type="button" class="btn btn-default btn-lg">Aventra Issuer Cert</button>
+        <button id="aventraSigningCert" type="button" class="btn btn-default btn-lg">Aventra Signing Cert</button>
+        <button id="aventraEncryptionCert" type="button" class="btn btn-default btn-lg">Aventra Encryption Cert</button>
+        <button id="aventraVerifyPin" type="button" class="btn btn-default btn-lg">Aventra Verify Auth Pin</button>
+        <button id="aventraVerifySignPin" type="button" class="btn btn-default btn-lg">Aventra Verify Sign Pin</button>
+        <button id="aventraSignAlgo" type="button" class="btn btn-default btn-lg">Available sign algorithm refs</button>
+        <button id="aventraAuthAlgo" type="button" class="btn btn-default btn-lg">Available authentication algorithm refs</button>
+        <button id="aventraSign" type="button" class="btn btn-default btn-lg">Aventra Sign</button>
+        <button id="aventraAuthenticate" type="button" class="btn btn-default btn-lg">Aventra Authenticate</button>
+        <button id="aventraResetAuthenticationCert" type="button" class="btn btn-default btn-lg">Aventra Reset Auth Cert</button>
+        <button id="aventraResetSigningCert" type="button" class="btn btn-default btn-lg">Aventra Reset Sign Cert</button>
+        <button id="clear" type="button" class="btn btn-default btn-lg">Clear</button>
+        <hr />
+    </div>
+    <hr />
+    <pre id="information"></pre>
+    <pre id="error"></pre>
+
+    <!-- PIN verify Auth Modal -->
+    <div class="modal fade" id="pinVerifyAuthModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Validate Authentication PIN</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="psw" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <pre id="validationInfo" hidden="true"></pre>
+                        <pre id="validationError" hidden="true"></pre>
+                    </div>
+                    <button id="buttonValidate" type="button" class="btn btn-default btn-lg">Validate</button>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIN reset Auth PIN Modal -->
+    <div class="modal fade" id="resetAuthPINModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Reset Authentication PIN</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <label for="pswResetAuthPUK"><span class="glyphicon glyphicon-eye-open"></span> Puk</label>
+                        <input type="password" class="form-control" id="pswResetAuthPUK" placeholder="Enter the PUK">
+                    </div>
+                    <div class="form-group">
+                        <label for="pswResetAuthPIN"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="pswResetAuthPIN" placeholder="Enter a new PIN">
+                    </div>
+                    <div class="form-group">
+                        <pre id="validationResetAuthPINInfo" hidden="true"></pre>
+                        <pre id="validationResetAuthPINError" hidden="true"></pre>
+                    </div>
+                    <button id="buttonAuthPINReset" type="button" class="btn btn-default btn-lg">Reset Authentication PIN</button>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIN verify Sign Modal -->
+    <div class="modal fade" id="pinVerifySignModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Validate Signature PIN</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <label for="pswSignPIN"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="pswSignPIN" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <pre id="validationSignInfo" hidden="true"></pre>
+                        <pre id="validationSignError" hidden="true"></pre>
+                    </div>
+                    <button id="buttonSignPinValidate" type="button" class="btn btn-default btn-lg">Validate</button>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIN reset Sign PIN Modal -->
+    <div class="modal fade" id="resetSignPINModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Reset Signature PIN</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <label for="pswResetSignPUK"><span class="glyphicon glyphicon-eye-open"></span> Puk</label>
+                        <input type="password" class="form-control" id="pswResetSignPUK" placeholder="Enter the PUK">
+                    </div>
+                    <div class="form-group">
+                        <label for="pswResetSignPIN"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="pswResetSignPIN" placeholder="Enter a new PIN">
+                    </div>
+                    <div class="form-group">
+                        <pre id="validationResetSignPINInfo" hidden="true"></pre>
+                        <pre id="validationResetSignPINError" hidden="true"></pre>
+                    </div>
+                    <button id="buttonSignPINReset" type="button" class="btn btn-default btn-lg">Reset Signature PIN</button>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sign Modal -->
+    <div class="modal fade" id="signModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Sign example data</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <label for="psw">Base64-encoded data to be signed (SHA1): K4d2IAU03FedJ74fV7n/QfXkk/o=</label>
+                        <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="signpsw" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <pre id="signInfo" hidden="true"></pre>
+                        <pre id="signError" hidden="true"></pre>
+                    </div>
+                    <button id="buttonSign" type="button" class="btn btn-default btn-lg">Sign</button>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authenticate Modal -->
+    <div class="modal fade" id="authModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Authentication</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <label for="psw">Base64-encoded challenge (SHA1): I2e+u/sgy7fYgh+DWA0p2jzXQ7E=</label>
+                        <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="authpsw" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <pre id="authInfo" hidden="true"></pre>
+                        <pre id="authError" hidden="true"></pre>
+                    </div>
+                    <button id="buttonAuth" type="button" class="btn btn-default btn-lg">Authenticate</button>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Modal -->
+    <div class="modal fade" id="downloadModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Download Instructions</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div id="modalDownloadLink" class="form-group">
+                        <label for="psw">Click the download link to start downloading</label>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    Download provided by Trust1Team.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/platform/1.3.1/platform.min.js"></script>
+<script src="../dist/GCLLib.js" charset="utf-8"></script>
+<script type="text/javascript">
+    (function ($) {
+        var gclConfig = new GCLLib.GCLConfig();
+        gclConfig.apiKey = "2cc27598-2af7-48af-a2df-c7352e5368ff"; //test apikey rate limited
+        gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
+        //gclConfig.gclUrl = "http://localhost:10080/v1"; //override config for local dev
+        gclConfig.ocvUrl = "https://accapim.t1t.be:443/trust1team/ocv-api/v1";
+        //gclConfig.ocvUrl = "http://localhost:8080/ocv-api-web/v1";
+        gclConfig.localTestMode=false;
+        gclConfig.allowAutoUpdate = false;
+        gclConfig.implicitDownload = false;
+
+        if(gclConfig.localTestMode){
+            gclConfig.dsUrl = "http://localhost:8080";
+        }else gclConfig.dsUrl = "https://accapim.t1t.be:443";
+
+        var connector = new GCLLib.GCLClient(gclConfig);
+
+        // TEST PIN ENTRY
+        var pin ="1234";
+
+
+        connector.core().info(function(err,data) {
+            $("#error").empty();
+            $("#error").append(data.data.version);
+            if(data && data.data.activated==true){
+                //check card readers upon refresh and provide the info
+                var core = connector.core();
+                core.readers(function(err,data){
+                    if(err) {
+                        console.log(JSON.stringify(err));
+                        return;
+                    }
+                    if(data && data.data){
+                        for(var i=0; i < data.data.length ; i ++){
+                            if(data.data[i].card){
+                                $("#readerlist").append( '<li id="liid"><a href="#" ><h5><span class="label label-success" >' + data.data[i].id + '</span></h5></a></li>' );
+                            }else{
+                                $("#readerlist").append( '<li><a href="#"><h5><span class="label label-warning">' + data.data[i].id + '</span></h5></a></li>' );
+                            }
+                        }
+                    }else $("#readerlist").append( '<li> No readers connected </li>' );
+                });
+            }
+        });
+
+        function callback(err,data) {
+            if(err){$("#error").empty();$("#error").append("ERROR:\n", JSON.stringify(err, null, '  '));}
+            else {
+                $("#information").append(JSON.stringify(data, null, '  '));
+            }
+        }
+
+        function validationCallback(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#validationError").empty();
+            $("#validationInfo").empty();
+            $("#validationError").hide();
+            $("#validationInfo").hide();
+
+            if(err){
+                $("#validationError").append(JSON.stringify(err, null, '  '));
+                $("#validationError").show();
+            }
+            else{
+                $("#validationInfo").append(JSON.stringify(data, null, '  '));
+                $("#validationInfo").show();
+            }
+        }
+
+        function resetAuthPINCallback(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#validationResetAuthPINError").empty();
+            $("#validationResetAuthPINInfo").empty();
+            $("#validationResetAuthPINError").hide();
+            $("#validationResetAuthPINInfo").hide();
+
+            if(err){
+                $("#validationResetAuthPINError").append(JSON.stringify(err, null, '  '));
+                $("#validationResetAuthPINError").show();
+            }
+            else{
+                $("#validationResetAuthPINInfo").append(JSON.stringify(data, null, '  '));
+                $("#validationResetAuthPINInfo").show();
+            }
+        }
+
+        function validationSignPINCallback(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#validationSignError").empty();
+            $("#validationSignInfo").empty();
+            $("#validationSignError").hide();
+            $("#validationSignInfo").hide();
+
+            if(err){
+                $("#validationSignError").append(JSON.stringify(err, null, '  '));
+                $("#validationSignError").show();
+            }
+            else{
+                $("#validationSignInfo").append(JSON.stringify(data, null, '  '));
+                $("#validationSignInfo").show();
+            }
+        }
+
+        function resetSignPINCallback(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#validationResetSignPINError").empty();
+            $("#validationResetSignPINInfo").empty();
+            $("#validationResetSignPINError").hide();
+            $("#validationResetSignPINInfo").hide();
+
+            if(err){
+                $("#validationResetSignPINError").append(JSON.stringify(err, null, '  '));
+                $("#validationResetSignPINError").show();
+            }
+            else{
+                $("#validationResetSignPINInfo").append(JSON.stringify(data, null, '  '));
+                $("#validationResetSignPINInfo").show();
+            }
+        }
+
+        function signCallback(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#signError").empty();
+            $("#signInfo").empty();
+            $("#signError").hide();
+            $("#signInfo").hide();
+
+            if(err){
+                $("#signError").append(JSON.stringify(err, null, '  '));
+                $("#signError").show();
+            }
+            else{
+                $("#signInfo").append(JSON.stringify(data, null, '  '));
+                $("#signInfo").show();
+            }
+        }
+
+        function authCallback(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#authError").empty();
+            $("#authInfo").empty();
+            $("#authError").hide();
+            $("#authInfo").hide();
+
+            if(err){
+                $("#authError").append(JSON.stringify(err, null, '  '));
+                $("#authError").show();
+            }
+            else{
+                $("#authInfo").append(JSON.stringify(data, null, '  '));
+                $("#authInfo").show();
+            }
+        }
+
+        //show selected reader in menu
+        $('.dropdown-menu').on('click', function(event){
+            $('#selected_reader').empty();
+            $('#selected_reader').append(event.target.innerHTML);
+            $('.dropdown-toggle').html($(this).html() + '<span class="caret"></span>');
+        });
+
+        // Core Functionality
+        $("#info").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.info(callback);
+        });
+
+        $("#getReaders").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.readers(callback);
+        });
+
+        $("#pollReaders").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.pollReaders(15,callback,function(){console.log('Please connect a reader')},function(){console.log('Stop waiting for readers, none found')});
+        });
+        $("#pollCard").on('click', function () {
+            $("#information").empty();
+            connector.core().pollCardInserted(20,callback,function(){console.log('Please connect a reader')},
+                function(){console.log("Please insert card")},
+                function(){console.log("Stop waiting for card, none found")}
+            );
+        });
+
+        $("#getReadersAvailable").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.readersCardAvailable(callback);
+        });
+
+        $("#getReadersUnavailable").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.readersCardsUnavailable(callback);
+        });
+
+        // aventra eid functionality
+        $("#aventraAllData").on('click', function () {
+            $("#information").empty();
+            var aventra = connector.aventra($("#selected_reader").text(),pin);
+            aventra.allData([],callback);
+        });
+
+        $("#aventraAllCert").on('click', function () {
+            $("#information").empty();
+            var aventra = connector.aventra($("#selected_reader").text(),pin);
+            aventra.allCerts([],callback);
+        });
+        $("#aventraRootCert").on('click', function () {
+            $("#information").empty();
+            var aventra = connector.aventra($("#selected_reader").text(),pin);
+            aventra.rootCertificate(callback);
+        });
+
+        $("#aventraAuthenticationCert").on('click', function () {
+            $("#information").empty();
+            var aventra = connector.aventra($("#selected_reader").text(),pin);
+            aventra.authenticationCertificate(callback);
+        });
+
+        $("#aventraSigningCert").on('click', function () {
+            $("#information").empty();
+            var aventra = connector.aventra($("#selected_reader").text(),pin);
+            aventra.signingCertificate(callback);
+        });
+
+        $("#aventraIssuerCert").on('click', function () {
+            $("#information").empty();
+            var aventra = connector.aventra($("#selected_reader").text(),pin);
+            aventra.issuerCertificate(callback);
+        });
+
+        $("#aventraEncryptionCert").on('click', function () {
+            $("#information").empty();
+            var aventra = connector.aventra($("#selected_reader").text(),pin);
+            aventra.encryptionCertificate(callback);
+        });
+
+        $("#aventraVerifyPin").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            $("#validationInformation").empty();
+            $("#validationInformation").hide();
+            $("#validationError").empty();
+            $("#validationError").hide();
+            $("#pinVerifyAuthModal").modal('toggle');
+        });
+
+        $("#aventraResetAuthenticationCert").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            $("#validationResetAuthPINInfo").empty();
+            $("#validationResetAuthPINInfo").hide();
+            $("#validationResetSignPINError").empty();
+            $("#validationResetSignPINError").hide();
+            $("#resetAuthPINModal").modal('toggle');
+        });
+
+        $("#aventraVerifySignPin").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            $("#validationSignInformation").empty();
+            $("#validationSignInformation").hide();
+            $("#validationSignError").empty();
+            $("#validationSignError").hide();
+            $("#pinVerifySignModal").modal('toggle');
+        });
+
+        $("#aventraResetSigningCert").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            $("#validationResetSignPINInfo").empty();
+            $("#validationResetSignPINInfo").hide();
+            $("#validationResetSignPINError").empty();
+            $("#validationResetSignPINError").hide();
+            $("#resetSignPINModal").modal('toggle');
+        });
+
+        $("#buttonValidate").on('click', function () {
+            var _body={};
+            _body.pin = $("#psw").val();
+            _body.private_key_reference = "authenticate";
+            connector.aventra($("#selected_reader").text()).verifyPin(_body, validationCallback);
+        });
+
+        $("#buttonAuthPINReset").on('click', function () {
+            var _body={};
+            _body.new_pin = $("#pswResetAuthPIN").val();
+            _body.puk = $("#pswResetAuthPUK").val();
+            _body.private_key_reference = "authenticate";
+            connector.aventra($("#selected_reader").text()).resetPin(_body, resetAuthPINCallback);
+        });
+
+        $("#buttonSignPinValidate").on('click', function () {
+            var _body={};
+            _body.pin = $("#pswSignPIN").val();
+            _body.private_key_reference = "sign";
+            connector.aventra($("#selected_reader").text()).verifyPin(_body, validationSignPINCallback);
+        });
+
+        $("#buttonSignPINReset").on('click', function () {
+            var _body={};
+            _body.new_pin = $("#pswResetSignPIN").val();
+            _body.puk = $("#pswResetSignPUK").val();
+            _body.private_key_reference = "sign";
+            connector.aventra($("#selected_reader").text()).resetPin(_body, resetSignPINCallback);
+        });
+
+        $("#aventraSignAlgo").on('click', function () {
+            $("#information").empty();
+            connector.aventra($("#selected_reader").text()).allAlgoRefsForSigning(callback);
+        });
+
+        $("#aventraAuthAlgo").on('click', function () {
+            $("#information").empty();
+            connector.aventra($("#selected_reader").text()).allAlgoRefsForAuthentication(callback);
+        });
+
+        $("#aventraSign").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            $("#signInformation").empty();
+            $("#signInformation").hide();
+            $("#signError").empty();
+            $("#signError").hide();
+            $("#signModal").modal('toggle');
+        });
+
+        $("#buttonSign").on('click', function () {
+            var _body={};
+            _body.pin = $("#signpsw").val();
+            _body.algorithm_reference = "sha1";
+            _body.data = "K4d2IAU03FedJ74fV7n/QfXkk/o=";
+            connector.aventra($("#selected_reader").text()).signData(_body, signCallback);
+        });
+
+        $("#aventraAuthenticate").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            $("#authInformation").empty();
+            $("#authInformation").hide();
+            $("#vauthError").empty();
+            $("#vauthError").hide();
+            $("#authModal").modal('toggle');
+        });
+
+        $("#buttonAuth").on('click', function () {
+            var _body={};
+            _body.data = "K4d2IAU03FedJ74fV7n/QfXkk/o=";
+            _body.algorithm_reference = "sha1";
+            _body.pin = $("#authpsw").val();
+            connector.aventra($("#selected_reader").text()).authenticate(_body, authCallback);
+        });
+
+        $("#downloadgcl").on('click',function(){
+            var core = connector.core();
+            var self = this;
+            core.infoBrowser(function(error,data){
+                if(error){$("#error").append('Could not retrieve browser info');}
+                connector.ds().downloadLink(data,function(error,data){
+                    if(error)$("#error").append('Error retrieving download link');
+                    $("#error").empty();
+                    $("#information").empty();
+                    $("#downloadModal").modal('toggle');
+                    $("a").remove('.downloadlinkref');
+                    $("#modalDownloadLink").append('<a class= "downloadlinkref" href="'+ data.url +'">Download link GCL</a>');
+                });
+            });
+        });
+
+        $("#clear").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+
+        });
+
+
+    })(window.jQuery);
+</script>
+</body>
+</html>

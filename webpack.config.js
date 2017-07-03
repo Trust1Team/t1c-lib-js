@@ -1,22 +1,37 @@
-var path = require("path");
-module.exports = {
-    entry: './src/scripts/core/GCLLib.ts',
+var webpack = require("webpack"),
+    path = require("path");
+
+var libraryName = 'GCLLib',
+    outputFile = libraryName + ".js";
+
+
+var config = {
+    entry: "./src/scripts/core/GCLLib.ts",
+    devtool: "source-map",
     output: {
         path: path.resolve(__dirname, "dist"),
-        filename: 'GCLLib.js',
-        library: ['GCLLib']
-    },
-    devtool: 'source-map',
-    resolve: {
-        extensions: ['.ts', '.js', '.tsx', '.jsx', '']
+        filename: outputFile,
+        library: libraryName
     },
     module: {
+        preloaders: [
+            { test: /\.tsx?$/, loader: "tslint", exclude: /node_modules/ }
+        ],
         loaders: [
             {
                 test: /\.tsx?$/,
                 exclude: /node_modules/,
-                loader: 'ts-loader'
+                loader: "ts-loader"
             }
         ]
+    },
+    resolve: {
+        extensions: [".ts", ".js", ".tsx", ".jsx", ""]
+    },
+    tslint: {
+        emitErrors: true,
+        failOnHint: true
     }
 };
+
+module.exports = config;

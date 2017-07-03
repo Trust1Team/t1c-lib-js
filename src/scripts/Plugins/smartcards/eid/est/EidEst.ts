@@ -1,2 +1,0 @@
-interface AbstractEidEST{}
-export {AbstractEidEST}
