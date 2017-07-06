@@ -17,6 +17,14 @@ export { GenericService };
 
 class GenericService {
 
+    public static containerForReader(client: GCLClient,
+                                   readerId: string,
+                                   callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.checkPrerequisites(client, readerId, {}).then(res => {
+            return ResponseHandler.response({ data: res.container, success: true }, callback);
+        }).catch(err => { return ResponseHandler.error(err, callback); });
+    }
+
     public static authenticateCapable(client: GCLClient, callback?: (error: RestException, data: CardReadersResponse) => void) {
         return client.core().readersCardAvailable()
                      .then(this.checkCanAuthenticate)
