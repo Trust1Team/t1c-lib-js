@@ -22317,25 +22317,38 @@ var GCLLib =
 	    CertParser.process = function (response, parseCerts, callback) {
 	        if (response && response.data && typeof response.data === "object" && !_.isArray(response.data)) {
 	            _.forEach(response.data, function (value, key) {
-	                if (key.indexOf("certificate") > -1 && typeof value === "string") {
-	                    response.data[key] = { base64: value };
-	                    if (parseCerts) {
-	                        response.data[key].parsed = CertParser.processCert(value);
+	                if (key.indexOf("certificate") > -1) {
+	                    if (typeof value === "string") {
+	                        response.data[key] = { base64: value };
+	                        if (parseCerts) {
+	                            response.data[key].parsed = CertParser.processCert(value);
+	                        }
+	                    }
+	                    if (_.isArray(value)) {
+	                        var newData_1 = [];
+	                        _.forEach(value, function (certificate) {
+	                            var cert = { base64: certificate };
+	                            if (parseCerts) {
+	                                cert.parsed = CertParser.processCert(certificate);
+	                            }
+	                            newData_1.push(cert);
+	                        });
+	                        response.data[key] = newData_1;
 	                    }
 	                }
 	            });
 	        }
 	        else {
 	            if (_.isArray(response.data)) {
-	                var newData_1 = [];
+	                var newData_2 = [];
 	                _.forEach(response.data, function (certificate) {
 	                    var cert = { base64: certificate };
 	                    if (parseCerts) {
 	                        cert.parsed = CertParser.processCert(certificate);
 	                    }
-	                    newData_1.push(cert);
+	                    newData_2.push(cert);
 	                });
-	                response.data = newData_1;
+	                response.data = newData_2;
 	            }
 	            else {
 	                var cert = { base64: response.data };
@@ -65130,9 +65143,6 @@ var GCLLib =
 	            if (_.has(firstParam, "parseCerts")) {
 	                result.parseCerts = firstParam.parseCerts;
 	            }
-	        }
-	        if (_.isEmpty(result.params)) {
-	            delete result.params;
 	        }
 	        return result;
 	    };
