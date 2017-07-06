@@ -17823,7 +17823,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return "v1.0.4";
+	        return "v1.0.5";
 	    };
 	    return CoreService;
 	}());
