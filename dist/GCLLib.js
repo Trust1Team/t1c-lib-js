@@ -166,6 +166,9 @@ var GCLLib =
 	        resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
 	        return resolvedCfg;
 	    };
+	    GCLClient.prototype.containerFor = function (readerId, callback) {
+	        return GenericService_1.GenericService.containerForReader(this, readerId, callback);
+	    };
 	    GCLClient.prototype.readersCanAuthenticate = function (callback) {
 	        return GenericService_1.GenericService.authenticateCapable(this, callback);
 	    };
@@ -17820,7 +17823,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return "v1.0.4";
+	        return "v1.0.5";
 	    };
 	    return CoreService;
 	}());
@@ -65860,6 +65863,11 @@ var GCLLib =
 	var GenericService = (function () {
 	    function GenericService() {
 	    }
+	    GenericService.containerForReader = function (client, readerId, callback) {
+	        return this.checkPrerequisites(client, readerId, {}).then(function (res) {
+	            return ResponseHandler_1.ResponseHandler.response({ data: res.container, success: true }, callback);
+	        }).catch(function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
+	    };
 	    GenericService.authenticateCapable = function (client, callback) {
 	        return client.core().readersCardAvailable()
 	            .then(this.checkCanAuthenticate)
