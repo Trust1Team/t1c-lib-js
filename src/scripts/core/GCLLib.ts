@@ -159,6 +159,10 @@ class GCLClient {
     };
 
     // generic methods
+    public containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void) {
+        return GenericService.containerForReader(this, readerId, callback);
+    }
+
     public readersCanAuthenticate(callback?: (error: RestException, data: CardReadersResponse) => void) {
         return GenericService.authenticateCapable(this, callback);
     }
