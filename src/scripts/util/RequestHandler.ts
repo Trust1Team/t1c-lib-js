@@ -48,7 +48,6 @@ class RequestHandler {
             }
             if (_.has(firstParam, "parseCerts")) { result.parseCerts = firstParam.parseCerts; }
         }
-        if (_.isEmpty(result.params)) { delete result.params; }
         return result;
     }
 }

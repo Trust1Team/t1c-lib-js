@@ -20,9 +20,20 @@ class CertParser {
         // check if data has properties
         if (response && response.data && typeof response.data === "object" && !_.isArray(response.data)) {
             _.forEach(response.data, (value, key) => {
-                if (key.indexOf("certificate") > -1 && typeof value === "string") {
-                    response.data[key] = { base64: value };
-                    if (parseCerts) { response.data[key].parsed = CertParser.processCert(value); }
+                if (key.indexOf("certificate") > -1) {
+                    if (typeof value === "string") {
+                        response.data[ key ] = { base64: value };
+                        if (parseCerts) { response.data[ key ].parsed = CertParser.processCert(value); }
+                    }
+                    if (_.isArray(value)) {
+                        let newData = [];
+                        _.forEach(value, (certificate: string) => {
+                            let cert: Certificate = { base64: certificate };
+                            if (parseCerts) { cert.parsed = CertParser.processCert(certificate); }
+                            newData.push(cert);
+                        });
+                        response.data[ key ] = newData;
+                    }
                 }
             });
         } else {
