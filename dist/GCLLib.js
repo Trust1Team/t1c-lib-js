@@ -57,6 +57,7 @@ var GCLLib =
 	var es6_promise_1 = __webpack_require__(6);
 	var PluginFactory_1 = __webpack_require__(38);
 	var GenericService_1 = __webpack_require__(163);
+	var ResponseHandler_1 = __webpack_require__(151);
 	var GCLClient = (function () {
 	    function GCLClient(cfg, automatic) {
 	        var _this = this;
@@ -169,6 +170,14 @@ var GCLLib =
 	    GCLClient.prototype.containerFor = function (readerId, callback) {
 	        return GenericService_1.GenericService.containerForReader(this, readerId, callback);
 	    };
+	    GCLClient.prototype.download = function (callback) {
+	        var _this = this;
+	        return this.core().infoBrowser().then(function (info) {
+	            return _this.ds().downloadLink(info.data, callback);
+	        }, function (error) {
+	            return ResponseHandler_1.ResponseHandler.error(error, callback);
+	        });
+	    };
 	    GCLClient.prototype.readersCanAuthenticate = function (callback) {
 	        return GenericService_1.GenericService.authenticateCapable(this, callback);
 	    };
@@ -279,7 +288,7 @@ var GCLLib =
 	            if (error) {
 	                var _info = self.core().infoBrowserSync();
 	                console.log("implicit error", JSON.stringify(_info));
-	                self.ds().downloadLink(_info, function (linkError, downloadResponse) {
+	                self.ds().downloadLink(_info.data, function (linkError, downloadResponse) {
 	                    if (linkError) {
 	                        console.error("could not download GCL package:", linkError.description);
 	                    }
@@ -17823,7 +17832,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return "v1.0.6";
+	        return "v1.0.7";
 	    };
 	    return CoreService;
 	}());
@@ -21897,7 +21906,7 @@ var GCLLib =
 	                    }
 	                }
 	                else {
-	                    var returnObject = { url: self.cfg.dsUrlBase + data.path + QP_APIKEY + self.cfg.apiKey };
+	                    var returnObject = { url: self.cfg.dsUrlBase + data.path + QP_APIKEY + self.cfg.apiKey, success: true };
 	                    if (callback) {
 	                        return callback(null, returnObject);
 	                    }

@@ -5,7 +5,7 @@
 
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 
-export { AbstractCore, T1CResponse, DataResponse, DataArrayResponse, DataObjectResponse, InfoResponse, BrowserInfoResponse,
+export { AbstractCore, T1CResponse, DataResponse, DataArrayResponse, DataObjectResponse, InfoResponse, BrowserInfo, BrowserInfoResponse,
     Card, CardReader, CardReadersResponse, Certificate, CertificateResponse, CertificatesResponse,
     SingleReaderResponse, PluginsResponse, PubKeyResponse };
 
@@ -86,19 +86,21 @@ interface InfoResponse extends T1CResponse {
 }
 
 interface BrowserInfoResponse extends T1CResponse {
-    data: {
-        manufacturer: string
-        browser: {
-            name: string
-            version: string
-        }
-        os: {
-            name: string
-            version: string
-            architecture: number
-        }
-        ua: string
+    data: BrowserInfo
+}
+
+interface BrowserInfo {
+    manufacturer: string
+    browser: {
+        name: string
+        version: string
     }
+    os: {
+        name: string
+        version: string
+        architecture: number
+    }
+    ua: string
 }
 
 interface Card {
