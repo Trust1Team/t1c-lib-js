@@ -6,7 +6,7 @@ import { Connection } from "../client/Connection";
 import { GCLConfig } from "../GCLConfig";
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 import * as _ from "lodash";
-import { BrowserInfoResponse } from "../service/CoreModel";
+import { BrowserInfo } from "../service/CoreModel";
 import { AbstractDSClient, DeviceResponse, DownloadLinkResponse,
     DSInfoResponse, DSPlatformInfo, DSPubKeyResponse, JWTResponse } from "./DSClientModel";
 import { Promise } from "es6-promise";
@@ -80,9 +80,9 @@ class DSClient implements AbstractDSClient {
         return this.connection.get(this.url + PUB_KEY, undefined, callback);
     }
 
-    public downloadLink(infoBrowser: BrowserInfoResponse,
+    public downloadLink(infoBrowser: BrowserInfo,
                         callback?: (error: CoreExceptions.RestException,
-                                    data: DownloadLinkResponse) => void): void | Promise<DownloadLinkResponse> {
+                                    data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse> {
         let self = this;
         if (callback) {
             doGetDownloadLink();
@@ -98,7 +98,7 @@ class DSClient implements AbstractDSClient {
                     if (callback) { return callback(err, null); }
                     else { reject(err); }
                 } else {
-                    let returnObject = { url: self.cfg.dsUrlBase + data.path + QP_APIKEY + self.cfg.apiKey };
+                    let returnObject = { url: self.cfg.dsUrlBase + data.path + QP_APIKEY + self.cfg.apiKey, success: true };
                     if (callback) { return callback(null, returnObject); }
                     else { return resolve(returnObject); }
                 }

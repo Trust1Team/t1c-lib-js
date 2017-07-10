@@ -4,7 +4,7 @@
  */
 
 import * as CoreExceptions from "../exceptions/CoreExceptions";
-import { BrowserInfoResponse, T1CResponse } from "../service/CoreModel";
+import { BrowserInfo, T1CResponse } from "../service/CoreModel";
 
 export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse,
     DeviceResponse, DSPlatformInfo };
@@ -17,9 +17,9 @@ interface AbstractDSClient {
     getDevice(uuid: string, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): void | Promise<DeviceResponse>;
     refreshJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse>;
     getPubKey(callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): void | Promise<DSPubKeyResponse>;
-    downloadLink(infoBrowser: BrowserInfoResponse,
+    downloadLink(infoBrowser: BrowserInfo,
                  callback?: (error: CoreExceptions.RestException,
-                             data: DownloadLinkResponse) => void): void | Promise<DownloadLinkResponse>;
+                             data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
     register(info: DSPlatformInfo,
              device_id: string,
              callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse>;
@@ -46,7 +46,7 @@ interface DSInfoResponse {
     securityPrivateKeyAvailable: boolean
 }
 
-interface DownloadLinkResponse {
+interface DownloadLinkResponse extends T1CResponse {
     url: string
 }
 
