@@ -30,6 +30,7 @@ import { AbstractSafeNet } from "../plugins/smartcards/pkcs11/safenet/safenetMod
 import { AuthenticateOrSignData, OptionalPin } from "../plugins/smartcards/Card";
 import { RestException } from "./exceptions/CoreExceptions";
 import { GenericService } from "./generic/GenericService";
+import { ResponseHandler } from "../util/ResponseHandler";
 
 
 class GCLClient {
@@ -163,6 +164,14 @@ class GCLClient {
         return GenericService.containerForReader(this, readerId, callback);
     }
 
+    public download(callback?: (error: RestException, data: DownloadLinkResponse) => void) {
+        return this.core().infoBrowser().then(info => {
+            return this.ds().downloadLink(info.data, callback);
+        }, error => {
+            return ResponseHandler.error(error, callback);
+        });
+    }
+
     public readersCanAuthenticate(callback?: (error: RestException, data: CardReadersResponse) => void) {
         return GenericService.authenticateCapable(this, callback);
     }
@@ -293,7 +302,8 @@ class GCLClient {
                 // no gcl available - start download
                 let _info = self.core().infoBrowserSync();
                 console.log("implicit error", JSON.stringify(_info));
-                self.ds().downloadLink(_info, function(linkError: CoreExceptions.RestException, downloadResponse: DownloadLinkResponse) {
+                self.ds().downloadLink(_info.data,
+                    function(linkError: CoreExceptions.RestException, downloadResponse: DownloadLinkResponse) {
                     if (linkError) { console.error("could not download GCL package:", linkError.description); }
                     window.open(downloadResponse.url); return;
                 });
