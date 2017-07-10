@@ -523,7 +523,7 @@
             var self = this;
             core.infoBrowser(function(error,data){
                 if(error){$("#error").append('Could not retrieve browser info');}
-                connector.ds().downloadLink(data,function(error,data){
+                connector.ds().downloadLink(data.data, function(error,data) {
                     if(error)$("#error").append('Error retrieving download link');
                     $("#error").empty();
                     $("#information").empty();
