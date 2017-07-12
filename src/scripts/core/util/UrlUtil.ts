@@ -16,10 +16,6 @@ class UrlUtil {
 
     public static create(base: string, suffix: string, agentPort?: number) {
         if (agentPort) {
-            // let components = _.split(base, "/v1");
-            // let agentString = AgentClient.urlPrefix(agentPort);
-            // let url = _.join(components, "/v1" + agentString) + suffix;
-            // return url;
             return _.join(_.split(base, "/v1"), "/v1" + AgentClient.urlPrefix(agentPort)) + suffix;
         } else {
             return base + suffix;
