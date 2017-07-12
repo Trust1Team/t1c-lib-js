@@ -51,10 +51,10 @@ var GCLLib =
 	var GCLConfig_1 = __webpack_require__(3);
 	exports.GCLConfig = GCLConfig_1.GCLConfig;
 	var CardFactory_1 = __webpack_require__(4);
-	var CoreService_1 = __webpack_require__(18);
-	var Connection_1 = __webpack_require__(23);
-	var DSClient_1 = __webpack_require__(49);
-	var OCVClient_1 = __webpack_require__(50);
+	var CoreService_1 = __webpack_require__(19);
+	var Connection_1 = __webpack_require__(25);
+	var DSClient_1 = __webpack_require__(51);
+	var OCVClient_1 = __webpack_require__(52);
 	var agent_1 = __webpack_require__(8);
 	var GCLClient = (function () {
 	    function GCLClient(cfg) {
@@ -65,6 +65,7 @@ var GCLLib =
 	        this.ds = function () { return _this.dsClient; };
 	        this.ocv = function () { return _this.ocvClient; };
 	        this.beid = function (reader_id) { return _this.cardFactory.createEidBE(reader_id); };
+	        this.belfius = function (reader_id) { return _this.cardFactory.createBelfius(reader_id); };
 	        this.dni = function (reader_id) { return _this.cardFactory.createDNI(reader_id); };
 	        this.luxeid = function (reader_id, pin) { return _this.cardFactory.createEidLUX(reader_id, pin); };
 	        this.luxtrust = function (reader_id, pin) { return _this.cardFactory.createLuxTrust(reader_id); };
@@ -17500,9 +17501,11 @@ var GCLLib =
 	var Oberthur_1 = __webpack_require__(15);
 	var piv_1 = __webpack_require__(16);
 	var dni_1 = __webpack_require__(17);
+	var Belfius_1 = __webpack_require__(18);
 	var CONTAINER_CONTEXT_PATH = "/plugins/";
 	var CONTAINER_NEW_CONTEXT_PATH = "/containers/";
 	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + "beid";
+	var CONTAINER_BELFIUS = CONTAINER_CONTEXT_PATH + "belfius";
 	var CONTAINER_LUXEID = CONTAINER_CONTEXT_PATH + "luxeid";
 	var CONTAINER_DNI = CONTAINER_NEW_CONTEXT_PATH + "dnie";
 	var CONTAINER_EMV = CONTAINER_CONTEXT_PATH + "emv";
@@ -17517,6 +17520,9 @@ var GCLLib =
 	        this.url = url;
 	        this.connection = connection;
 	    }
+	    CardFactory.prototype.createBelfius = function (reader_id) {
+	        return new Belfius_1.Belfius(this.url + CONTAINER_BELFIUS, this.connection, reader_id);
+	    };
 	    CardFactory.prototype.createDNI = function (reader_id) { return new dni_1.DNI(this.url + CONTAINER_DNI, this.connection, reader_id); };
 	    CardFactory.prototype.createEidBE = function (reader_id) { return new EidBe_1.EidBe(this.url + CONTAINER_BEID, this.connection, reader_id); };
 	    CardFactory.prototype.createEidLUX = function (reader_id, pin) {
@@ -18266,10 +18272,53 @@ var GCLLib =
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Card_1 = __webpack_require__(6);
+	var BELFIUS_OPEN_SESSION = "/open-session";
+	var BELFIUS_COMMAND = "/command";
+	var BELFIUS_STX = "/stx";
+	var BELFIUS_CLOSE_SESSION = "/close-session";
+	var Belfius = (function (_super) {
+	    __extends(Belfius, _super);
+	    function Belfius() {
+	        return _super !== null && _super.apply(this, arguments) || this;
+	    }
+	    Belfius.prototype.openSession = function (callback, agentPort) {
+	        return this.connection.get(this.resolvedReaderURI(agentPort) + BELFIUS_OPEN_SESSION, undefined, callback);
+	    };
+	    Belfius.prototype.command = function (data, callback, agentPort) {
+	        return this.connection.post(this.resolvedReaderURI(agentPort) + BELFIUS_COMMAND, data, undefined, callback);
+	    };
+	    Belfius.prototype.stx = function (data, callback, agentPort) {
+	        return this.connection.post(this.resolvedReaderURI(agentPort) + BELFIUS_STX, data, undefined, callback);
+	    };
+	    Belfius.prototype.closeSession = function (callback, agentPort) {
+	        return this.connection.get(this.resolvedReaderURI(agentPort) + BELFIUS_CLOSE_SESSION, undefined, callback);
+	    };
+	    return Belfius;
+	}(Card_1.GenericPinCard));
+	exports.Belfius = Belfius;
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var _ = __webpack_require__(1);
-	var platform = __webpack_require__(19);
-	var es6_promise_1 = __webpack_require__(20);
+	var platform = __webpack_require__(20);
+	var es6_promise_1 = __webpack_require__(21);
 	var UrlUtil_1 = __webpack_require__(7);
 	var CORE_INFO = "/";
 	var CORE_PLUGINS = "/plugins";
@@ -18518,37 +18567,37 @@ var GCLLib =
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*!
-	 * Platform.js <https://mths.be/platform>
-	 * Copyright 2014-2016 Benjamin Tan <https://demoneaux.github.io/>
+	 * Platform.js v1.3.1 <http://mths.be/platform>
+	 * Copyright 2014-2016 Benjamin Tan <https://d10.github.io/>
 	 * Copyright 2011-2013 John-David Dalton <http://allyoucanleet.com/>
-	 * Available under MIT license <https://mths.be/mit>
+	 * Available under MIT license <http://mths.be/mit>
 	 */
 	;(function() {
 	  'use strict';
 	
-	  /** Used to determine if values are of the language type `Object`. */
+	  /** Used to determine if values are of the language type `Object` */
 	  var objectTypes = {
 	    'function': true,
 	    'object': true
 	  };
 	
-	  /** Used as a reference to the global object. */
+	  /** Used as a reference to the global object */
 	  var root = (objectTypes[typeof window] && window) || this;
 	
-	  /** Backup possible global object. */
+	  /** Backup possible global object */
 	  var oldRoot = root;
 	
-	  /** Detect free variable `exports`. */
+	  /** Detect free variable `exports` */
 	  var freeExports = objectTypes[typeof exports] && exports;
 	
-	  /** Detect free variable `module`. */
+	  /** Detect free variable `module` */
 	  var freeModule = objectTypes[typeof module] && module && !module.nodeType && module;
 	
-	  /** Detect free variable `global` from Node.js or Browserified code and use it as `root`. */
+	  /** Detect free variable `global` from Node.js or Browserified code and use it as `root` */
 	  var freeGlobal = freeExports && freeModule && typeof global == 'object' && global;
 	  if (freeGlobal && (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal || freeGlobal.self === freeGlobal)) {
 	    root = freeGlobal;
@@ -18561,19 +18610,19 @@ var GCLLib =
 	   */
 	  var maxSafeInteger = Math.pow(2, 53) - 1;
 	
-	  /** Regular expression to detect Opera. */
+	  /** Opera regexp */
 	  var reOpera = /\bOpera/;
 	
-	  /** Possible global object. */
+	  /** Possible global object */
 	  var thisBinding = this;
 	
-	  /** Used for native method references. */
+	  /** Used for native method references */
 	  var objectProto = Object.prototype;
 	
-	  /** Used to check for own properties of an object. */
+	  /** Used to check for own properties of an object */
 	  var hasOwnProperty = objectProto.hasOwnProperty;
 	
-	  /** Used to resolve the internal `[[Class]]` of values. */
+	  /** Used to resolve the internal `[[Class]]` of values */
 	  var toString = objectProto.toString;
 	
 	  /*--------------------------------------------------------------------------*/
@@ -18599,12 +18648,11 @@ var GCLLib =
 	   * @param {string} [label] A label for the OS.
 	   */
 	  function cleanupOS(os, pattern, label) {
-	    // Platform tokens are defined at:
+	    // platform tokens defined at
 	    // http://msdn.microsoft.com/en-us/library/ms537503(VS.85).aspx
 	    // http://web.archive.org/web/20081122053950/http://msdn.microsoft.com/en-us/library/ms537503(VS.85).aspx
 	    var data = {
-	      '10.0': '10',
-	      '6.4':  '10 Technical Preview',
+	      '6.4':  '10',
 	      '6.3':  '8.1',
 	      '6.2':  '8',
 	      '6.1':  'Server 2008 R2 / 7',
@@ -18616,12 +18664,12 @@ var GCLLib =
 	      '4.0':  'NT',
 	      '4.90': 'ME'
 	    };
-	    // Detect Windows version from platform tokens.
-	    if (pattern && label && /^Win/i.test(os) && !/^Windows Phone /i.test(os) &&
-	        (data = data[/[\d.]+$/.exec(os)])) {
+	    // detect Windows version from platform tokens
+	    if (pattern && label && /^Win/i.test(os) &&
+	        (data = data[0/*Opera 9.25 fix*/, /[\d.]+$/.exec(os)])) {
 	      os = 'Windows ' + data;
 	    }
-	    // Correct character case and cleanup string.
+	    // correct character case and cleanup
 	    os = String(os);
 	
 	    if (pattern && label) {
@@ -18640,7 +18688,6 @@ var GCLLib =
 	        .replace(/(?: BePC|[ .]*fc[ \d.]+)$/i, '')
 	        .replace(/\bx86\.64\b/gi, 'x86_64')
 	        .replace(/\b(Windows Phone) OS\b/, '$1')
-	        .replace(/\b(Chrome OS \w+) [\d.]+\b/, '$1')
 	        .split(' on ')[0]
 	    );
 	
@@ -18775,94 +18822,93 @@ var GCLLib =
 	   */
 	  function parse(ua) {
 	
-	    /** The environment context object. */
+	    /** The environment context object */
 	    var context = root;
 	
-	    /** Used to flag when a custom context is provided. */
+	    /** Used to flag when a custom context is provided */
 	    var isCustomContext = ua && typeof ua == 'object' && getClassOf(ua) != 'String';
 	
-	    // Juggle arguments.
+	    // juggle arguments
 	    if (isCustomContext) {
 	      context = ua;
 	      ua = null;
 	    }
 	
-	    /** Browser navigator object. */
+	    /** Browser navigator object */
 	    var nav = context.navigator || {};
 	
-	    /** Browser user agent string. */
+	    /** Browser user agent string */
 	    var userAgent = nav.userAgent || '';
 	
 	    ua || (ua = userAgent);
 	
-	    /** Used to flag when `thisBinding` is the [ModuleScope]. */
+	    /** Used to flag when `thisBinding` is the [ModuleScope] */
 	    var isModuleScope = isCustomContext || thisBinding == oldRoot;
 	
-	    /** Used to detect if browser is like Chrome. */
+	    /** Used to detect if browser is like Chrome */
 	    var likeChrome = isCustomContext
 	      ? !!nav.likeChrome
 	      : /\bChrome\b/.test(ua) && !/internal|\n/i.test(toString.toString());
 	
-	    /** Internal `[[Class]]` value shortcuts. */
+	    /** Internal `[[Class]]` value shortcuts */
 	    var objectClass = 'Object',
 	        airRuntimeClass = isCustomContext ? objectClass : 'ScriptBridgingProxyObject',
 	        enviroClass = isCustomContext ? objectClass : 'Environment',
 	        javaClass = (isCustomContext && context.java) ? 'JavaPackage' : getClassOf(context.java),
 	        phantomClass = isCustomContext ? objectClass : 'RuntimeObject';
 	
-	    /** Detect Java environments. */
+	    /** Detect Java environment */
 	    var java = /\bJava/.test(javaClass) && context.java;
 	
-	    /** Detect Rhino. */
+	    /** Detect Rhino */
 	    var rhino = java && getClassOf(context.environment) == enviroClass;
 	
-	    /** A character to represent alpha. */
+	    /** A character to represent alpha */
 	    var alpha = java ? 'a' : '\u03b1';
 	
-	    /** A character to represent beta. */
+	    /** A character to represent beta */
 	    var beta = java ? 'b' : '\u03b2';
 	
-	    /** Browser document object. */
+	    /** Browser document object */
 	    var doc = context.document || {};
 	
 	    /**
-	     * Detect Opera browser (Presto-based).
+	     * Detect Opera browser (Presto-based)
 	     * http://www.howtocreate.co.uk/operaStuff/operaObject.html
 	     * http://dev.opera.com/articles/view/opera-mini-web-content-authoring-guidelines/#operamini
 	     */
 	    var opera = context.operamini || context.opera;
 	
-	    /** Opera `[[Class]]`. */
+	    /** Opera `[[Class]]` */
 	    var operaClass = reOpera.test(operaClass = (isCustomContext && opera) ? opera['[[Class]]'] : getClassOf(opera))
 	      ? operaClass
 	      : (opera = null);
 	
 	    /*------------------------------------------------------------------------*/
 	
-	    /** Temporary variable used over the script's lifetime. */
+	    /** Temporary variable used over the script's lifetime */
 	    var data;
 	
-	    /** The CPU architecture. */
+	    /** The CPU architecture */
 	    var arch = ua;
 	
-	    /** Platform description array. */
+	    /** Platform description array */
 	    var description = [];
 	
-	    /** Platform alpha/beta indicator. */
+	    /** Platform alpha/beta indicator */
 	    var prerelease = null;
 	
-	    /** A flag to indicate that environment features should be used to resolve the platform. */
+	    /** A flag to indicate that environment features should be used to resolve the platform */
 	    var useFeatures = ua == userAgent;
 	
-	    /** The browser/environment version. */
+	    /** The browser/environment version */
 	    var version = useFeatures && opera && typeof opera.version == 'function' && opera.version();
 	
 	    /** A flag to indicate if the OS ends with "/ Version" */
 	    var isSpecialCasedOS;
 	
-	    /* Detectable layout engines (order is important). */
+	    /* Detectable layout engines (order is important) */
 	    var layout = getLayout([
-	      { 'label': 'EdgeHTML', 'pattern': 'Edge' },
 	      'Trident',
 	      { 'label': 'WebKit', 'pattern': 'AppleWebKit' },
 	      'iCab',
@@ -18873,7 +18919,7 @@ var GCLLib =
 	      'Gecko'
 	    ]);
 	
-	    /* Detectable browser names (order is important). */
+	    /* Detectable browser names (order is important) */
 	    var name = getName([
 	      'Adobe AIR',
 	      'Arora',
@@ -18887,14 +18933,13 @@ var GCLLib =
 	      'GreenBrowser',
 	      'iCab',
 	      'Iceweasel',
+	      { 'label': 'SRWare Iron', 'pattern': 'Iron' },
 	      'K-Meleon',
 	      'Konqueror',
 	      'Lunascape',
 	      'Maxthon',
-	      { 'label': 'Microsoft Edge', 'pattern': 'Edge' },
 	      'Midori',
 	      'Nook Browser',
-	      'PaleMoon',
 	      'PhantomJS',
 	      'Raven',
 	      'Rekonq',
@@ -18903,7 +18948,6 @@ var GCLLib =
 	      { 'label': 'Silk', 'pattern': '(?:Cloud9|Silk-Accelerated)' },
 	      'Sleipnir',
 	      'SlimBrowser',
-	      { 'label': 'SRWare Iron', 'pattern': 'Iron' },
 	      'Sunrise',
 	      'Swiftfox',
 	      'WebPositive',
@@ -18914,13 +18958,12 @@ var GCLLib =
 	      'Chrome',
 	      { 'label': 'Chrome Mobile', 'pattern': '(?:CriOS|CrMo)' },
 	      { 'label': 'Firefox', 'pattern': '(?:Firefox|Minefield)' },
-	      { 'label': 'Firefox for iOS', 'pattern': 'FxiOS' },
 	      { 'label': 'IE', 'pattern': 'IEMobile' },
 	      { 'label': 'IE', 'pattern': 'MSIE' },
 	      'Safari'
 	    ]);
 	
-	    /* Detectable products (order is important). */
+	    /* Detectable products (order is important) */
 	    var product = getProduct([
 	      { 'label': 'BlackBerry', 'pattern': 'BB10' },
 	      'BlackBerry',
@@ -18935,11 +18978,10 @@ var GCLLib =
 	      'iPhone',
 	      'Kindle',
 	      { 'label': 'Kindle Fire', 'pattern': '(?:Cloud9|Silk-Accelerated)' },
-	      'Nexus',
 	      'Nook',
 	      'PlayBook',
-	      'PlayStation 3',
 	      'PlayStation 4',
+	      'PlayStation 3',
 	      'PlayStation Vita',
 	      'TouchPad',
 	      'Transformer',
@@ -18950,15 +18992,14 @@ var GCLLib =
 	      'Xoom'
 	    ]);
 	
-	    /* Detectable manufacturers. */
+	    /* Detectable manufacturers */
 	    var manufacturer = getManufacturer({
 	      'Apple': { 'iPad': 1, 'iPhone': 1, 'iPod': 1 },
-	      'Archos': {},
 	      'Amazon': { 'Kindle': 1, 'Kindle Fire': 1 },
 	      'Asus': { 'Transformer': 1 },
 	      'Barnes & Noble': { 'Nook': 1 },
 	      'BlackBerry': { 'PlayBook': 1 },
-	      'Google': { 'Google TV': 1, 'Nexus': 1 },
+	      'Google': { 'Google TV': 1 },
 	      'HP': { 'TouchPad': 1 },
 	      'HTC': {},
 	      'LG': {},
@@ -18970,12 +19011,11 @@ var GCLLib =
 	      'Sony': { 'PlayStation 4': 1, 'PlayStation 3': 1, 'PlayStation Vita': 1 }
 	    });
 	
-	    /* Detectable operating systems (order is important). */
+	    /* Detectable OSes (order is important) */
 	    var os = getOS([
-	      'Windows Phone',
+	      'Windows Phone ',
 	      'Android',
 	      'CentOS',
-	      { 'label': 'Chrome OS', 'pattern': 'CrOS' },
 	      'Debian',
 	      'Fedora',
 	      'FreeBSD',
@@ -18983,7 +19023,6 @@ var GCLLib =
 	      'Haiku',
 	      'Kubuntu',
 	      'Linux Mint',
-	      'OpenBSD',
 	      'Red Hat',
 	      'SuSE',
 	      'Ubuntu',
@@ -19028,10 +19067,10 @@ var GCLLib =
 	     */
 	    function getManufacturer(guesses) {
 	      return reduce(guesses, function(result, value, key) {
-	        // Lookup the manufacturer by product or scan the UA for the manufacturer.
+	        // lookup the manufacturer by product or scan the UA for the manufacturer
 	        return result || (
 	          value[product] ||
-	          value[/^[a-z]+(?: +[a-z]+\b)*/i.exec(product)] ||
+	          value[0/*Opera 9.25 fix*/, /^[a-z]+(?: +[a-z]+\b)*/i.exec(product)] ||
 	          RegExp('\\b' + qualify(key) + '(?:\\b|\\w*\\d)', 'i').exec(ua)
 	        ) && key;
 	      });
@@ -19085,11 +19124,11 @@ var GCLLib =
 	              RegExp('\\b' + pattern + ' *\\d+[.\\w_]*', 'i').exec(ua) ||
 	              RegExp('\\b' + pattern + '(?:; *(?:[a-z]+[_-])?[a-z]+\\d+|[^ ();-]*)', 'i').exec(ua)
 	            )) {
-	          // Split by forward slash and append product version if needed.
+	          // split by forward slash and append product version if needed
 	          if ((result = String((guess.label && !RegExp(pattern, 'i').test(guess.label)) ? guess.label : result).split('/'))[1] && !/[\d.]+/.test(result[0])) {
 	            result[0] += ' ' + result[1];
 	          }
-	          // Correct character case and cleanup string.
+	          // correct character case and cleanup
 	          guess = guess.label || guess;
 	          result = format(result[0]
 	            .replace(RegExp(pattern, 'i'), guess)
@@ -19127,125 +19166,121 @@ var GCLLib =
 	
 	    /*------------------------------------------------------------------------*/
 	
-	    // Convert layout to an array so we can add extra details.
+	    // convert layout to an array so we can add extra details
 	    layout && (layout = [layout]);
 	
-	    // Detect product names that contain their manufacturer's name.
+	    // detect product names that contain their manufacturer's name
 	    if (manufacturer && !product) {
 	      product = getProduct([manufacturer]);
 	    }
-	    // Clean up Google TV.
+	    // clean up Google TV
 	    if ((data = /\bGoogle TV\b/.exec(product))) {
 	      product = data[0];
 	    }
-	    // Detect simulators.
+	    // detect simulators
 	    if (/\bSimulator\b/i.test(ua)) {
 	      product = (product ? product + ' ' : '') + 'Simulator';
 	    }
-	    // Detect Opera Mini 8+ running in Turbo/Uncompressed mode on iOS.
+	    // detect Opera Mini 8+ running in Turbo/Uncompressed mode on iOS
 	    if (name == 'Opera Mini' && /\bOPiOS\b/.test(ua)) {
 	      description.push('running in Turbo/Uncompressed mode');
 	    }
-	    // Detect IE Mobile 11.
-	    if (name == 'IE' && /\blike iPhone OS\b/.test(ua)) {
-	      data = parse(ua.replace(/like iPhone OS/, ''));
-	      manufacturer = data.manufacturer;
-	      product = data.product;
-	    }
-	    // Detect iOS.
-	    else if (/^iP/.test(product)) {
+	    // detect iOS
+	    if (/^iP/.test(product)) {
 	      name || (name = 'Safari');
 	      os = 'iOS' + ((data = / OS ([\d_]+)/i.exec(ua))
 	        ? ' ' + data[1].replace(/_/g, '.')
 	        : '');
 	    }
-	    // Detect Kubuntu.
+	    // detect Kubuntu
 	    else if (name == 'Konqueror' && !/buntu/i.test(os)) {
 	      os = 'Kubuntu';
 	    }
-	    // Detect Android browsers.
-	    else if ((manufacturer && manufacturer != 'Google' &&
-	        ((/Chrome/.test(name) && !/\bMobile Safari\b/i.test(ua)) || /\bVita\b/.test(product))) ||
-	        (/\bAndroid\b/.test(os) && /^Chrome/.test(name) && /\bVersion\//i.test(ua))) {
+	    // detect Android browsers
+	    else if (manufacturer && manufacturer != 'Google' &&
+	        ((/Chrome/.test(name) && !/\bMobile Safari\b/i.test(ua)) || /\bVita\b/.test(product))) {
 	      name = 'Android Browser';
 	      os = /\bAndroid\b/.test(os) ? os : 'Android';
 	    }
-	    // Detect Silk desktop/accelerated modes.
-	    else if (name == 'Silk') {
-	      if (!/\bMobi/i.test(ua)) {
-	        os = 'Android';
-	        description.unshift('desktop mode');
-	      }
-	      if (/Accelerated *= *true/i.test(ua)) {
-	        description.unshift('accelerated');
-	      }
-	    }
-	    // Detect PaleMoon identifying as Firefox.
-	    else if (name == 'PaleMoon' && (data = /\bFirefox\/([\d.]+)\b/.exec(ua))) {
-	      description.push('identifying as Firefox ' + data[1]);
-	    }
-	    // Detect Firefox OS and products running Firefox.
-	    else if (name == 'Firefox' && (data = /\b(Mobile|Tablet|TV)\b/i.exec(ua))) {
-	      os || (os = 'Firefox OS');
-	      product || (product = data[1]);
-	    }
-	    // Detect false positives for Firefox/Safari.
-	    else if (!name || (data = !/\bMinefield\b/i.test(ua) && /\b(?:Firefox|Safari)\b/.exec(name))) {
-	      // Escape the `/` for Firefox 1.
+	    // detect false positives for Firefox/Safari
+	    else if (!name || (data = !/\bMinefield\b|\(Android;/i.test(ua) && /\b(?:Firefox|Safari)\b/.exec(name))) {
+	      // escape the `/` for Firefox 1
 	      if (name && !product && /[\/,]|^[^(]+?\)/.test(ua.slice(ua.indexOf(data + '/') + 8))) {
-	        // Clear name of false positives.
+	        // clear name of false positives
 	        name = null;
 	      }
-	      // Reassign a generic name.
+	      // reassign a generic name
 	      if ((data = product || manufacturer || os) &&
 	          (product || manufacturer || /\b(?:Android|Symbian OS|Tablet OS|webOS)\b/.test(os))) {
 	        name = /[a-z]+(?: Hat)?/i.exec(/\bAndroid\b/.test(os) ? os : data) + ' Browser';
 	      }
 	    }
-	    // Detect non-Opera (Presto-based) versions (order is important).
+	    // detect Firefox OS
+	    if ((data = /\((Mobile|Tablet).*?Firefox\b/i.exec(ua)) && data[1]) {
+	      os = 'Firefox OS';
+	      if (!product) {
+	        product = data[1];
+	      }
+	    }
+	    // detect non-Opera versions (order is important)
 	    if (!version) {
 	      version = getVersion([
-	        '(?:Cloud9|CriOS|CrMo|Edge|FxiOS|IEMobile|Iron|Opera ?Mini|OPiOS|OPR|Raven|Silk(?!/[\\d.]+$))',
+	        '(?:Cloud9|CriOS|CrMo|IEMobile|Iron|Opera ?Mini|OPiOS|OPR|Raven|Silk(?!/[\\d.]+$))',
 	        'Version',
 	        qualify(name),
 	        '(?:Firefox|Minefield|NetFront)'
 	      ]);
 	    }
-	    // Detect stubborn layout engines.
-	    if ((data =
-	          layout == 'iCab' && parseFloat(version) > 3 && 'WebKit' ||
+	    // detect stubborn layout engines
+	    if (layout == 'iCab' && parseFloat(version) > 3) {
+	      layout = ['WebKit'];
+	    } else if (
+	        layout != 'Trident' &&
+	        (data =
 	          /\bOpera\b/.test(name) && (/\bOPR\b/.test(ua) ? 'Blink' : 'Presto') ||
-	          /\b(?:Midori|Nook|Safari)\b/i.test(ua) && !/^(?:Trident|EdgeHTML)$/.test(layout) && 'WebKit' ||
-	          !layout && /\bMSIE\b/i.test(ua) && (os == 'Mac OS' ? 'Tasman' : 'Trident') ||
-	          layout == 'WebKit' && /\bPlayStation\b(?! Vita\b)/i.test(name) && 'NetFront'
-	        )) {
+	          /\b(?:Midori|Nook|Safari)\b/i.test(ua) && 'WebKit' ||
+	          !layout && /\bMSIE\b/i.test(ua) && (os == 'Mac OS' ? 'Tasman' : 'Trident')
+	        )
+	    ) {
 	      layout = [data];
 	    }
-	    // Detect Windows Phone 7 desktop mode.
+	    // detect NetFront on PlayStation
+	    else if (/\bPlayStation\b(?! Vita\b)/i.test(name) && layout == 'WebKit') {
+	      layout = ['NetFront'];
+	    }
+	    // detect Windows Phone 7 desktop mode
 	    if (name == 'IE' && (data = (/; *(?:XBLWP|ZuneWP)(\d+)/i.exec(ua) || 0)[1])) {
 	      name += ' Mobile';
 	      os = 'Windows Phone ' + (/\+$/.test(data) ? data : data + '.x');
 	      description.unshift('desktop mode');
 	    }
-	    // Detect Windows Phone 8.x desktop mode.
+	    // detect Windows Phone 8+ desktop mode
 	    else if (/\bWPDesktop\b/i.test(ua)) {
 	      name = 'IE Mobile';
-	      os = 'Windows Phone 8.x';
+	      os = 'Windows Phone 8+';
 	      description.unshift('desktop mode');
 	      version || (version = (/\brv:([\d.]+)/.exec(ua) || 0)[1]);
 	    }
-	    // Detect IE 11.
+	    // detect IE 11 and above
 	    else if (name != 'IE' && layout == 'Trident' && (data = /\brv:([\d.]+)/.exec(ua))) {
-	      if (name) {
-	        description.push('identifying as ' + name + (version ? ' ' + version : ''));
+	      if (!/\bWPDesktop\b/i.test(ua)) {
+	        if (name) {
+	          description.push('identifying as ' + name + (version ? ' ' + version : ''));
+	        }
+	        name = 'IE';
 	      }
-	      name = 'IE';
 	      version = data[1];
 	    }
-	    // Leverage environment features.
+	    // detect Microsoft Edge
+	    else if ((name == 'Chrome' || name != 'IE') && (data = /\bEdge\/([\d.]+)/.exec(ua))) {
+	      name = 'Microsoft Edge';
+	      version = data[1];
+	      layout = ['Trident'];
+	    }
+	    // leverage environment features
 	    if (useFeatures) {
-	      // Detect server-side environments.
-	      // Rhino has a global function while others have a global object.
+	      // detect server-side environments
+	      // Rhino has a global function while others have a global object
 	      if (isHostType(context, 'global')) {
 	        if (java) {
 	          data = java.lang.System;
@@ -19264,10 +19299,7 @@ var GCLLib =
 	            }
 	          }
 	        }
-	        else if (
-	          typeof context.process == 'object' && !context.process.browser &&
-	          (data = context.process)
-	        ) {
+	        else if (typeof context.process == 'object' && (data = context.process)) {
 	          name = 'Node.js';
 	          arch = data.arch;
 	          os = data.platform;
@@ -19277,20 +19309,20 @@ var GCLLib =
 	          name = 'Rhino';
 	        }
 	      }
-	      // Detect Adobe AIR.
+	      // detect Adobe AIR
 	      else if (getClassOf((data = context.runtime)) == airRuntimeClass) {
 	        name = 'Adobe AIR';
 	        os = data.flash.system.Capabilities.os;
 	      }
-	      // Detect PhantomJS.
+	      // detect PhantomJS
 	      else if (getClassOf((data = context.phantom)) == phantomClass) {
 	        name = 'PhantomJS';
 	        version = (data = data.version || null) && (data.major + '.' + data.minor + '.' + data.patch);
 	      }
-	      // Detect IE compatibility modes.
+	      // detect IE compatibility modes
 	      else if (typeof doc.documentMode == 'number' && (data = /\bTrident\/(\d+)/i.exec(ua))) {
-	        // We're in compatibility mode when the Trident version + 4 doesn't
-	        // equal the document mode.
+	        // we're in compatibility mode when the Trident version + 4 doesn't
+	        // equal the document mode
 	        version = [version, doc.documentMode];
 	        if ((data = +data[1] + 4) != version[1]) {
 	          description.push('IE ' + version[1] + ' mode');
@@ -19301,7 +19333,7 @@ var GCLLib =
 	      }
 	      os = os && format(os);
 	    }
-	    // Detect prerelease phases.
+	    // detect prerelease phases
 	    if (version && (data =
 	          /(?:[ab]|dp|pre|[ab]\d+pre)(?:\d+\+?)?$/i.exec(version) ||
 	          /(?:alpha|beta)(?: ?\d)?/i.exec(ua + ';' + (useFeatures && nav.appMinorVersion)) ||
@@ -19311,31 +19343,41 @@ var GCLLib =
 	      version = version.replace(RegExp(data + '\\+?$'), '') +
 	        (prerelease == 'beta' ? beta : alpha) + (/\d+\+?/.exec(data) || '');
 	    }
-	    // Detect Firefox Mobile.
+	    // detect Firefox Mobile
 	    if (name == 'Fennec' || name == 'Firefox' && /\b(?:Android|Firefox OS)\b/.test(os)) {
 	      name = 'Firefox Mobile';
 	    }
-	    // Obscure Maxthon's unreliable version.
+	    // obscure Maxthon's unreliable version
 	    else if (name == 'Maxthon' && version) {
 	      version = version.replace(/\.[\d.]+/, '.x');
 	    }
-	    // Detect Xbox 360 and Xbox One.
+	    // detect Silk desktop/accelerated modes
+	    else if (name == 'Silk') {
+	      if (!/\bMobi/i.test(ua)) {
+	        os = 'Android';
+	        description.unshift('desktop mode');
+	      }
+	      if (/Accelerated *= *true/i.test(ua)) {
+	        description.unshift('accelerated');
+	      }
+	    }
+	    // detect Xbox 360 and Xbox One
 	    else if (/\bXbox\b/i.test(product)) {
 	      os = null;
 	      if (product == 'Xbox 360' && /\bIEMobile\b/.test(ua)) {
 	        description.unshift('mobile mode');
 	      }
 	    }
-	    // Add mobile postfix.
+	    // add mobile postfix
 	    else if ((/^(?:Chrome|IE|Opera)$/.test(name) || name && !product && !/Browser|Mobi/.test(name)) &&
 	        (os == 'Windows CE' || /Mobi/i.test(ua))) {
 	      name += ' Mobile';
 	    }
-	    // Detect IE platform preview.
+	    // detect IE platform preview
 	    else if (name == 'IE' && useFeatures && context.external === null) {
 	      description.unshift('platform preview');
 	    }
-	    // Detect BlackBerry OS version.
+	    // detect BlackBerry OS version
 	    // http://docs.blackberry.com/en/developers/deliverables/18169/HTTP_headers_sent_by_BB_Browser_1234911_11.jsp
 	    else if ((/\bBlackBerry\b/.test(product) || /\bBB10\b/.test(ua)) && (data =
 	          (RegExp(product.replace(/ +/g, ' *') + '/([.\\d]+)', 'i').exec(ua) || 0)[1] ||
@@ -19345,19 +19387,22 @@ var GCLLib =
 	      os = (data[1] ? (product = null, manufacturer = 'BlackBerry') : 'Device Software') + ' ' + data[0];
 	      version = null;
 	    }
-	    // Detect Opera identifying/masking itself as another browser.
+	    // detect Opera identifying/masking itself as another browser
 	    // http://www.opera.com/support/kb/view/843/
-	    else if (this != forOwn && product != 'Wii' && (
-	          (useFeatures && opera) ||
-	          (/Opera/.test(name) && /\b(?:MSIE|Firefox)\b/i.test(ua)) ||
-	          (name == 'Firefox' && /\bOS X (?:\d+\.){2,}/.test(os)) ||
-	          (name == 'IE' && (
-	            (os && !/^Win/.test(os) && version > 5.5) ||
-	            /\bWindows XP\b/.test(os) && version > 8 ||
-	            version == 8 && !/\bTrident\b/.test(ua)
-	          ))
+	    else if (this != forOwn && (
+	          product != 'Wii' && (
+	            (useFeatures && opera) ||
+	            (/Opera/.test(name) && /\b(?:MSIE|Firefox)\b/i.test(ua)) ||
+	            (name == 'Firefox' && /\bOS X (?:\d+\.){2,}/.test(os)) ||
+	            (name == 'IE' && (
+	              (os && !/^Win/.test(os) && version > 5.5) ||
+	              /\bWindows XP\b/.test(os) && version > 8 ||
+	              version == 8 && !/\bTrident\b/.test(ua)
+	            ))
+	          )
 	        ) && !reOpera.test((data = parse.call(forOwn, ua.replace(reOpera, '') + ';'))) && data.name) {
-	      // When "identifying", the UA contains both Opera and the other browser's name.
+	
+	      // when "indentifying", the UA contains both Opera and the other browser's name
 	      data = 'ing as ' + data.name + ((data = data.version) ? ' ' + data : '');
 	      if (reOpera.test(name)) {
 	        if (/\bIE\b/.test(data) && os == 'Mac OS') {
@@ -19365,7 +19410,7 @@ var GCLLib =
 	        }
 	        data = 'identify' + data;
 	      }
-	      // When "masking", the UA contains only the other browser's name.
+	      // when "masking", the UA contains only the other browser's name
 	      else {
 	        data = 'mask' + data;
 	        if (operaClass) {
@@ -19383,29 +19428,29 @@ var GCLLib =
 	      layout = ['Presto'];
 	      description.push(data);
 	    }
-	    // Detect WebKit Nightly and approximate Chrome/Safari versions.
+	    // detect WebKit Nightly and approximate Chrome/Safari versions
 	    if ((data = (/\bAppleWebKit\/([\d.]+\+?)/i.exec(ua) || 0)[1])) {
-	      // Correct build number for numeric comparison.
+	      // correct build for numeric comparison
 	      // (e.g. "532.5" becomes "532.05")
 	      data = [parseFloat(data.replace(/\.(\d)$/, '.0$1')), data];
-	      // Nightly builds are postfixed with a "+".
+	      // nightly builds are postfixed with a `+`
 	      if (name == 'Safari' && data[1].slice(-1) == '+') {
 	        name = 'WebKit Nightly';
 	        prerelease = 'alpha';
 	        version = data[1].slice(0, -1);
 	      }
-	      // Clear incorrect browser versions.
+	      // clear incorrect browser versions
 	      else if (version == data[1] ||
 	          version == (data[2] = (/\bSafari\/([\d.]+\+?)/i.exec(ua) || 0)[1])) {
 	        version = null;
 	      }
-	      // Use the full Chrome version when available.
+	      // use the full Chrome version when available
 	      data[1] = (/\bChrome\/([\d.]+)/i.exec(ua) || 0)[1];
-	      // Detect Blink layout engine.
-	      if (data[0] == 537.36 && data[2] == 537.36 && parseFloat(data[1]) >= 28 && layout == 'WebKit') {
+	      // detect Blink layout engine
+	      if (data[0] == 537.36 && data[2] == 537.36 && parseFloat(data[1]) >= 28 && name != 'IE' && name != 'Microsoft Edge') {
 	        layout = ['Blink'];
 	      }
-	      // Detect JavaScriptCore.
+	      // detect JavaScriptCore
 	      // http://stackoverflow.com/questions/6768474/how-can-i-detect-which-javascript-engine-v8-or-jsc-is-used-at-runtime-in-androi
 	      if (!useFeatures || (!likeChrome && !data[1])) {
 	        layout && (layout[1] = 'like Safari');
@@ -19414,14 +19459,14 @@ var GCLLib =
 	        layout && (layout[1] = 'like Chrome');
 	        data = data[1] || (data = data[0], data < 530 ? 1 : data < 532 ? 2 : data < 532.05 ? 3 : data < 533 ? 4 : data < 534.03 ? 5 : data < 534.07 ? 6 : data < 534.10 ? 7 : data < 534.13 ? 8 : data < 534.16 ? 9 : data < 534.24 ? 10 : data < 534.30 ? 11 : data < 535.01 ? 12 : data < 535.02 ? '13+' : data < 535.07 ? 15 : data < 535.11 ? 16 : data < 535.19 ? 17 : data < 536.05 ? 18 : data < 536.10 ? 19 : data < 537.01 ? 20 : data < 537.11 ? '21+' : data < 537.13 ? 23 : data < 537.18 ? 24 : data < 537.24 ? 25 : data < 537.36 ? 26 : layout != 'Blink' ? '27' : '28');
 	      }
-	      // Add the postfix of ".x" or "+" for approximate versions.
+	      // add the postfix of ".x" or "+" for approximate versions
 	      layout && (layout[1] += ' ' + (data += typeof data == 'number' ? '.x' : /[.+]/.test(data) ? '' : '+'));
-	      // Obscure version for some Safari 1-2 releases.
+	      // obscure version for some Safari 1-2 releases
 	      if (name == 'Safari' && (!version || parseInt(version) > 45)) {
 	        version = data;
 	      }
 	    }
-	    // Detect Opera desktop modes.
+	    // detect Opera desktop modes
 	    if (name == 'Opera' &&  (data = /\bzbov|zvav$/.exec(os))) {
 	      name += ' ';
 	      description.unshift('desktop mode');
@@ -19433,7 +19478,7 @@ var GCLLib =
 	      }
 	      os = os.replace(RegExp(' *' + data + '$'), '');
 	    }
-	    // Detect Chrome desktop mode.
+	    // detect Chrome desktop mode
 	    else if (name == 'Safari' && /\bChrome\b/.exec(layout && layout[1])) {
 	      description.unshift('desktop mode');
 	      name = 'Chrome Mobile';
@@ -19446,32 +19491,31 @@ var GCLLib =
 	        os = null;
 	      }
 	    }
-	    // Strip incorrect OS versions.
+	    // strip incorrect OS versions
 	    if (version && version.indexOf((data = /[\d.]+$/.exec(os))) == 0 &&
 	        ua.indexOf('/' + data + '-') > -1) {
 	      os = trim(os.replace(data, ''));
 	    }
-	    // Add layout engine.
+	    // add layout engine
 	    if (layout && !/\b(?:Avant|Nook)\b/.test(name) && (
 	        /Browser|Lunascape|Maxthon/.test(name) ||
-	        name != 'Safari' && /^iOS/.test(os) && /\bSafari\b/.test(layout[1]) ||
 	        /^(?:Adobe|Arora|Breach|Midori|Opera|Phantom|Rekonq|Rock|Sleipnir|Web)/.test(name) && layout[1])) {
-	      // Don't add layout details to description if they are falsey.
+	      // don't add layout details to description if they are falsey
 	      (data = layout[layout.length - 1]) && description.push(data);
 	    }
-	    // Combine contextual information.
+	    // combine contextual information
 	    if (description.length) {
 	      description = ['(' + description.join('; ') + ')'];
 	    }
-	    // Append manufacturer to description.
+	    // append manufacturer
 	    if (manufacturer && product && product.indexOf(manufacturer) < 0) {
 	      description.push('on ' + manufacturer);
 	    }
-	    // Append product to description.
+	    // append product
 	    if (product) {
-	      description.push((/^on /.test(description[description.length - 1]) ? '' : 'on ') + product);
+	      description.push((/^on /.test(description[description.length -1]) ? '' : 'on ') + product);
 	    }
-	    // Parse the OS into an object.
+	    // parse OS into an object
 	    if (os) {
 	      data = / ([\d.+]+)$/.exec(os);
 	      isSpecialCasedOS = data && os.charAt(os.length - data[0].length - 1) == '/';
@@ -19485,7 +19529,7 @@ var GCLLib =
 	        }
 	      };
 	    }
-	    // Add browser/OS architecture.
+	    // add browser/OS architecture
 	    if ((data = /\b(?:AMD|IA|Win|WOW|x86_|x)64\b/i.exec(arch)) && !/\bi686\b/i.test(arch)) {
 	      if (os) {
 	        os.architecture = 64;
@@ -19497,13 +19541,6 @@ var GCLLib =
 	      ) {
 	        description.unshift('32-bit');
 	      }
-	    }
-	    // Chrome 39 and above on OS X is always 64-bit.
-	    else if (
-	        os && /^OS X/.test(os.family) &&
-	        name == 'Chrome' && parseFloat(version) >= 39
-	    ) {
-	      os.architecture = 64;
 	    }
 	
 	    ua || (ua = null);
@@ -19648,1198 +19685,997 @@ var GCLLib =
 	
 	  /*--------------------------------------------------------------------------*/
 	
-	  // Export platform.
-	  var platform = parse();
-	
-	  // Some AMD build optimizers, like r.js, check for condition patterns like the following:
+	  // export platform
+	  // some AMD build optimizers, like r.js, check for condition patterns like the following:
 	  if (true) {
-	    // Expose platform on the global object to prevent errors when platform is
-	    // loaded by a script tag in the presence of an AMD loader.
-	    // See http://requirejs.org/docs/errors.html#mismatch for more details.
-	    root.platform = platform;
-	
-	    // Define as an anonymous module so platform can be aliased through path mapping.
+	    // define as an anonymous module so, through path mapping, it can be aliased
 	    !(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
-	      return platform;
+	      return parse();
 	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	  }
-	  // Check for `exports` after `define` in case a build optimizer adds an `exports` object.
+	  // check for `exports` after `define` in case a build optimizer adds an `exports` object
 	  else if (freeExports && freeModule) {
-	    // Export for CommonJS support.
-	    forOwn(platform, function(value, key) {
+	    // in Narwhal, Node.js, Rhino -require, or RingoJS
+	    forOwn(parse(), function(value, key) {
 	      freeExports[key] = value;
 	    });
 	  }
+	  // in a browser or Rhino
 	  else {
-	    // Export to the global object.
-	    root.platform = platform;
+	    root.platform = parse();
 	  }
 	}.call(this));
 	
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)(module), (function() { return this; }())))
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	var require;/* WEBPACK VAR INJECTION */(function(process, global) {/*!
+	var require;var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(process, global, module) {/*!
 	 * @overview es6-promise - a tiny implementation of Promises/A+.
 	 * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
 	 * @license   Licensed under MIT license
-	 *            See https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
-	 * @version   3.3.1
+	 *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
+	 * @version   3.2.1
 	 */
 	
-	(function (global, factory) {
-	     true ? module.exports = factory() :
-	    typeof define === 'function' && define.amd ? define(factory) :
-	    (global.ES6Promise = factory());
-	}(this, (function () { 'use strict';
-	
-	function objectOrFunction(x) {
-	  return typeof x === 'function' || typeof x === 'object' && x !== null;
-	}
-	
-	function isFunction(x) {
-	  return typeof x === 'function';
-	}
-	
-	var _isArray = undefined;
-	if (!Array.isArray) {
-	  _isArray = function (x) {
-	    return Object.prototype.toString.call(x) === '[object Array]';
-	  };
-	} else {
-	  _isArray = Array.isArray;
-	}
-	
-	var isArray = _isArray;
-	
-	var len = 0;
-	var vertxNext = undefined;
-	var customSchedulerFn = undefined;
-	
-	var asap = function asap(callback, arg) {
-	  queue[len] = callback;
-	  queue[len + 1] = arg;
-	  len += 2;
-	  if (len === 2) {
-	    // If len is 2, that means that we need to schedule an async flush.
-	    // If additional callbacks are queued before the queue is flushed, they
-	    // will be processed by this flush that we are scheduling.
-	    if (customSchedulerFn) {
-	      customSchedulerFn(flush);
-	    } else {
-	      scheduleFlush();
-	    }
-	  }
-	};
-	
-	function setScheduler(scheduleFn) {
-	  customSchedulerFn = scheduleFn;
-	}
-	
-	function setAsap(asapFn) {
-	  asap = asapFn;
-	}
-	
-	var browserWindow = typeof window !== 'undefined' ? window : undefined;
-	var browserGlobal = browserWindow || {};
-	var BrowserMutationObserver = browserGlobal.MutationObserver || browserGlobal.WebKitMutationObserver;
-	var isNode = typeof self === 'undefined' && typeof process !== 'undefined' && ({}).toString.call(process) === '[object process]';
-	
-	// test for web worker but not in IE10
-	var isWorker = typeof Uint8ClampedArray !== 'undefined' && typeof importScripts !== 'undefined' && typeof MessageChannel !== 'undefined';
-	
-	// node
-	function useNextTick() {
-	  // node version 0.10.x displays a deprecation warning when nextTick is used recursively
-	  // see https://github.com/cujojs/when/issues/410 for details
-	  return function () {
-	    return process.nextTick(flush);
-	  };
-	}
-	
-	// vertx
-	function useVertxTimer() {
-	  return function () {
-	    vertxNext(flush);
-	  };
-	}
-	
-	function useMutationObserver() {
-	  var iterations = 0;
-	  var observer = new BrowserMutationObserver(flush);
-	  var node = document.createTextNode('');
-	  observer.observe(node, { characterData: true });
-	
-	  return function () {
-	    node.data = iterations = ++iterations % 2;
-	  };
-	}
-	
-	// web worker
-	function useMessageChannel() {
-	  var channel = new MessageChannel();
-	  channel.port1.onmessage = flush;
-	  return function () {
-	    return channel.port2.postMessage(0);
-	  };
-	}
-	
-	function useSetTimeout() {
-	  // Store setTimeout reference so es6-promise will be unaffected by
-	  // other code modifying setTimeout (like sinon.useFakeTimers())
-	  var globalSetTimeout = setTimeout;
-	  return function () {
-	    return globalSetTimeout(flush, 1);
-	  };
-	}
-	
-	var queue = new Array(1000);
-	function flush() {
-	  for (var i = 0; i < len; i += 2) {
-	    var callback = queue[i];
-	    var arg = queue[i + 1];
-	
-	    callback(arg);
-	
-	    queue[i] = undefined;
-	    queue[i + 1] = undefined;
-	  }
-	
-	  len = 0;
-	}
-	
-	function attemptVertx() {
-	  try {
-	    var r = require;
-	    var vertx = __webpack_require__(22);
-	    vertxNext = vertx.runOnLoop || vertx.runOnContext;
-	    return useVertxTimer();
-	  } catch (e) {
-	    return useSetTimeout();
-	  }
-	}
-	
-	var scheduleFlush = undefined;
-	// Decide what async method to use to triggering processing of queued callbacks:
-	if (isNode) {
-	  scheduleFlush = useNextTick();
-	} else if (BrowserMutationObserver) {
-	  scheduleFlush = useMutationObserver();
-	} else if (isWorker) {
-	  scheduleFlush = useMessageChannel();
-	} else if (browserWindow === undefined && "function" === 'function') {
-	  scheduleFlush = attemptVertx();
-	} else {
-	  scheduleFlush = useSetTimeout();
-	}
-	
-	function then(onFulfillment, onRejection) {
-	  var _arguments = arguments;
-	
-	  var parent = this;
-	
-	  var child = new this.constructor(noop);
-	
-	  if (child[PROMISE_ID] === undefined) {
-	    makePromise(child);
-	  }
-	
-	  var _state = parent._state;
-	
-	  if (_state) {
-	    (function () {
-	      var callback = _arguments[_state - 1];
-	      asap(function () {
-	        return invokeCallback(_state, child, callback, parent._result);
-	      });
-	    })();
-	  } else {
-	    subscribe(parent, child, onFulfillment, onRejection);
-	  }
-	
-	  return child;
-	}
-	
-	/**
-	  `Promise.resolve` returns a promise that will become resolved with the
-	  passed `value`. It is shorthand for the following:
-	
-	  ```javascript
-	  let promise = new Promise(function(resolve, reject){
-	    resolve(1);
-	  });
-	
-	  promise.then(function(value){
-	    // value === 1
-	  });
-	  ```
-	
-	  Instead of writing the above, your code now simply becomes the following:
-	
-	  ```javascript
-	  let promise = Promise.resolve(1);
-	
-	  promise.then(function(value){
-	    // value === 1
-	  });
-	  ```
-	
-	  @method resolve
-	  @static
-	  @param {Any} value value that the returned promise will be resolved with
-	  Useful for tooling.
-	  @return {Promise} a promise that will become fulfilled with the given
-	  `value`
-	*/
-	function resolve(object) {
-	  /*jshint validthis:true */
-	  var Constructor = this;
-	
-	  if (object && typeof object === 'object' && object.constructor === Constructor) {
-	    return object;
-	  }
-	
-	  var promise = new Constructor(noop);
-	  _resolve(promise, object);
-	  return promise;
-	}
-	
-	var PROMISE_ID = Math.random().toString(36).substring(16);
-	
-	function noop() {}
-	
-	var PENDING = void 0;
-	var FULFILLED = 1;
-	var REJECTED = 2;
-	
-	var GET_THEN_ERROR = new ErrorObject();
-	
-	function selfFulfillment() {
-	  return new TypeError("You cannot resolve a promise with itself");
-	}
-	
-	function cannotReturnOwn() {
-	  return new TypeError('A promises callback cannot return that same promise.');
-	}
-	
-	function getThen(promise) {
-	  try {
-	    return promise.then;
-	  } catch (error) {
-	    GET_THEN_ERROR.error = error;
-	    return GET_THEN_ERROR;
-	  }
-	}
-	
-	function tryThen(then, value, fulfillmentHandler, rejectionHandler) {
-	  try {
-	    then.call(value, fulfillmentHandler, rejectionHandler);
-	  } catch (e) {
-	    return e;
-	  }
-	}
-	
-	function handleForeignThenable(promise, thenable, then) {
-	  asap(function (promise) {
-	    var sealed = false;
-	    var error = tryThen(then, thenable, function (value) {
-	      if (sealed) {
-	        return;
-	      }
-	      sealed = true;
-	      if (thenable !== value) {
-	        _resolve(promise, value);
-	      } else {
-	        fulfill(promise, value);
-	      }
-	    }, function (reason) {
-	      if (sealed) {
-	        return;
-	      }
-	      sealed = true;
-	
-	      _reject(promise, reason);
-	    }, 'Settle: ' + (promise._label || ' unknown promise'));
-	
-	    if (!sealed && error) {
-	      sealed = true;
-	      _reject(promise, error);
-	    }
-	  }, promise);
-	}
-	
-	function handleOwnThenable(promise, thenable) {
-	  if (thenable._state === FULFILLED) {
-	    fulfill(promise, thenable._result);
-	  } else if (thenable._state === REJECTED) {
-	    _reject(promise, thenable._result);
-	  } else {
-	    subscribe(thenable, undefined, function (value) {
-	      return _resolve(promise, value);
-	    }, function (reason) {
-	      return _reject(promise, reason);
-	    });
-	  }
-	}
-	
-	function handleMaybeThenable(promise, maybeThenable, then$$) {
-	  if (maybeThenable.constructor === promise.constructor && then$$ === then && maybeThenable.constructor.resolve === resolve) {
-	    handleOwnThenable(promise, maybeThenable);
-	  } else {
-	    if (then$$ === GET_THEN_ERROR) {
-	      _reject(promise, GET_THEN_ERROR.error);
-	    } else if (then$$ === undefined) {
-	      fulfill(promise, maybeThenable);
-	    } else if (isFunction(then$$)) {
-	      handleForeignThenable(promise, maybeThenable, then$$);
-	    } else {
-	      fulfill(promise, maybeThenable);
-	    }
-	  }
-	}
-	
-	function _resolve(promise, value) {
-	  if (promise === value) {
-	    _reject(promise, selfFulfillment());
-	  } else if (objectOrFunction(value)) {
-	    handleMaybeThenable(promise, value, getThen(value));
-	  } else {
-	    fulfill(promise, value);
-	  }
-	}
-	
-	function publishRejection(promise) {
-	  if (promise._onerror) {
-	    promise._onerror(promise._result);
-	  }
-	
-	  publish(promise);
-	}
-	
-	function fulfill(promise, value) {
-	  if (promise._state !== PENDING) {
-	    return;
-	  }
-	
-	  promise._result = value;
-	  promise._state = FULFILLED;
-	
-	  if (promise._subscribers.length !== 0) {
-	    asap(publish, promise);
-	  }
-	}
-	
-	function _reject(promise, reason) {
-	  if (promise._state !== PENDING) {
-	    return;
-	  }
-	  promise._state = REJECTED;
-	  promise._result = reason;
-	
-	  asap(publishRejection, promise);
-	}
-	
-	function subscribe(parent, child, onFulfillment, onRejection) {
-	  var _subscribers = parent._subscribers;
-	  var length = _subscribers.length;
-	
-	  parent._onerror = null;
-	
-	  _subscribers[length] = child;
-	  _subscribers[length + FULFILLED] = onFulfillment;
-	  _subscribers[length + REJECTED] = onRejection;
-	
-	  if (length === 0 && parent._state) {
-	    asap(publish, parent);
-	  }
-	}
-	
-	function publish(promise) {
-	  var subscribers = promise._subscribers;
-	  var settled = promise._state;
-	
-	  if (subscribers.length === 0) {
-	    return;
-	  }
-	
-	  var child = undefined,
-	      callback = undefined,
-	      detail = promise._result;
-	
-	  for (var i = 0; i < subscribers.length; i += 3) {
-	    child = subscribers[i];
-	    callback = subscribers[i + settled];
-	
-	    if (child) {
-	      invokeCallback(settled, child, callback, detail);
-	    } else {
-	      callback(detail);
-	    }
-	  }
-	
-	  promise._subscribers.length = 0;
-	}
-	
-	function ErrorObject() {
-	  this.error = null;
-	}
-	
-	var TRY_CATCH_ERROR = new ErrorObject();
-	
-	function tryCatch(callback, detail) {
-	  try {
-	    return callback(detail);
-	  } catch (e) {
-	    TRY_CATCH_ERROR.error = e;
-	    return TRY_CATCH_ERROR;
-	  }
-	}
-	
-	function invokeCallback(settled, promise, callback, detail) {
-	  var hasCallback = isFunction(callback),
-	      value = undefined,
-	      error = undefined,
-	      succeeded = undefined,
-	      failed = undefined;
-	
-	  if (hasCallback) {
-	    value = tryCatch(callback, detail);
-	
-	    if (value === TRY_CATCH_ERROR) {
-	      failed = true;
-	      error = value.error;
-	      value = null;
-	    } else {
-	      succeeded = true;
+	(function() {
+	    "use strict";
+	    function lib$es6$promise$utils$$objectOrFunction(x) {
+	      return typeof x === 'function' || (typeof x === 'object' && x !== null);
 	    }
 	
-	    if (promise === value) {
-	      _reject(promise, cannotReturnOwn());
-	      return;
+	    function lib$es6$promise$utils$$isFunction(x) {
+	      return typeof x === 'function';
 	    }
-	  } else {
-	    value = detail;
-	    succeeded = true;
-	  }
 	
-	  if (promise._state !== PENDING) {
-	    // noop
-	  } else if (hasCallback && succeeded) {
-	      _resolve(promise, value);
-	    } else if (failed) {
-	      _reject(promise, error);
-	    } else if (settled === FULFILLED) {
-	      fulfill(promise, value);
-	    } else if (settled === REJECTED) {
-	      _reject(promise, value);
+	    function lib$es6$promise$utils$$isMaybeThenable(x) {
+	      return typeof x === 'object' && x !== null;
 	    }
-	}
 	
-	function initializePromise(promise, resolver) {
-	  try {
-	    resolver(function resolvePromise(value) {
-	      _resolve(promise, value);
-	    }, function rejectPromise(reason) {
-	      _reject(promise, reason);
-	    });
-	  } catch (e) {
-	    _reject(promise, e);
-	  }
-	}
-	
-	var id = 0;
-	function nextId() {
-	  return id++;
-	}
-	
-	function makePromise(promise) {
-	  promise[PROMISE_ID] = id++;
-	  promise._state = undefined;
-	  promise._result = undefined;
-	  promise._subscribers = [];
-	}
-	
-	function Enumerator(Constructor, input) {
-	  this._instanceConstructor = Constructor;
-	  this.promise = new Constructor(noop);
-	
-	  if (!this.promise[PROMISE_ID]) {
-	    makePromise(this.promise);
-	  }
-	
-	  if (isArray(input)) {
-	    this._input = input;
-	    this.length = input.length;
-	    this._remaining = input.length;
-	
-	    this._result = new Array(this.length);
-	
-	    if (this.length === 0) {
-	      fulfill(this.promise, this._result);
-	    } else {
-	      this.length = this.length || 0;
-	      this._enumerate();
-	      if (this._remaining === 0) {
-	        fulfill(this.promise, this._result);
-	      }
-	    }
-	  } else {
-	    _reject(this.promise, validationError());
-	  }
-	}
-	
-	function validationError() {
-	  return new Error('Array Methods must be provided an Array');
-	};
-	
-	Enumerator.prototype._enumerate = function () {
-	  var length = this.length;
-	  var _input = this._input;
-	
-	  for (var i = 0; this._state === PENDING && i < length; i++) {
-	    this._eachEntry(_input[i], i);
-	  }
-	};
-	
-	Enumerator.prototype._eachEntry = function (entry, i) {
-	  var c = this._instanceConstructor;
-	  var resolve$$ = c.resolve;
-	
-	  if (resolve$$ === resolve) {
-	    var _then = getThen(entry);
-	
-	    if (_then === then && entry._state !== PENDING) {
-	      this._settledAt(entry._state, i, entry._result);
-	    } else if (typeof _then !== 'function') {
-	      this._remaining--;
-	      this._result[i] = entry;
-	    } else if (c === Promise) {
-	      var promise = new c(noop);
-	      handleMaybeThenable(promise, entry, _then);
-	      this._willSettleAt(promise, i);
-	    } else {
-	      this._willSettleAt(new c(function (resolve$$) {
-	        return resolve$$(entry);
-	      }), i);
-	    }
-	  } else {
-	    this._willSettleAt(resolve$$(entry), i);
-	  }
-	};
-	
-	Enumerator.prototype._settledAt = function (state, i, value) {
-	  var promise = this.promise;
-	
-	  if (promise._state === PENDING) {
-	    this._remaining--;
-	
-	    if (state === REJECTED) {
-	      _reject(promise, value);
-	    } else {
-	      this._result[i] = value;
-	    }
-	  }
-	
-	  if (this._remaining === 0) {
-	    fulfill(promise, this._result);
-	  }
-	};
-	
-	Enumerator.prototype._willSettleAt = function (promise, i) {
-	  var enumerator = this;
-	
-	  subscribe(promise, undefined, function (value) {
-	    return enumerator._settledAt(FULFILLED, i, value);
-	  }, function (reason) {
-	    return enumerator._settledAt(REJECTED, i, reason);
-	  });
-	};
-	
-	/**
-	  `Promise.all` accepts an array of promises, and returns a new promise which
-	  is fulfilled with an array of fulfillment values for the passed promises, or
-	  rejected with the reason of the first passed promise to be rejected. It casts all
-	  elements of the passed iterable to promises as it runs this algorithm.
-	
-	  Example:
-	
-	  ```javascript
-	  let promise1 = resolve(1);
-	  let promise2 = resolve(2);
-	  let promise3 = resolve(3);
-	  let promises = [ promise1, promise2, promise3 ];
-	
-	  Promise.all(promises).then(function(array){
-	    // The array here would be [ 1, 2, 3 ];
-	  });
-	  ```
-	
-	  If any of the `promises` given to `all` are rejected, the first promise
-	  that is rejected will be given as an argument to the returned promises's
-	  rejection handler. For example:
-	
-	  Example:
-	
-	  ```javascript
-	  let promise1 = resolve(1);
-	  let promise2 = reject(new Error("2"));
-	  let promise3 = reject(new Error("3"));
-	  let promises = [ promise1, promise2, promise3 ];
-	
-	  Promise.all(promises).then(function(array){
-	    // Code here never runs because there are rejected promises!
-	  }, function(error) {
-	    // error.message === "2"
-	  });
-	  ```
-	
-	  @method all
-	  @static
-	  @param {Array} entries array of promises
-	  @param {String} label optional string for labeling the promise.
-	  Useful for tooling.
-	  @return {Promise} promise that is fulfilled when all `promises` have been
-	  fulfilled, or rejected if any of them become rejected.
-	  @static
-	*/
-	function all(entries) {
-	  return new Enumerator(this, entries).promise;
-	}
-	
-	/**
-	  `Promise.race` returns a new promise which is settled in the same way as the
-	  first passed promise to settle.
-	
-	  Example:
-	
-	  ```javascript
-	  let promise1 = new Promise(function(resolve, reject){
-	    setTimeout(function(){
-	      resolve('promise 1');
-	    }, 200);
-	  });
-	
-	  let promise2 = new Promise(function(resolve, reject){
-	    setTimeout(function(){
-	      resolve('promise 2');
-	    }, 100);
-	  });
-	
-	  Promise.race([promise1, promise2]).then(function(result){
-	    // result === 'promise 2' because it was resolved before promise1
-	    // was resolved.
-	  });
-	  ```
-	
-	  `Promise.race` is deterministic in that only the state of the first
-	  settled promise matters. For example, even if other promises given to the
-	  `promises` array argument are resolved, but the first settled promise has
-	  become rejected before the other promises became fulfilled, the returned
-	  promise will become rejected:
-	
-	  ```javascript
-	  let promise1 = new Promise(function(resolve, reject){
-	    setTimeout(function(){
-	      resolve('promise 1');
-	    }, 200);
-	  });
-	
-	  let promise2 = new Promise(function(resolve, reject){
-	    setTimeout(function(){
-	      reject(new Error('promise 2'));
-	    }, 100);
-	  });
-	
-	  Promise.race([promise1, promise2]).then(function(result){
-	    // Code here never runs
-	  }, function(reason){
-	    // reason.message === 'promise 2' because promise 2 became rejected before
-	    // promise 1 became fulfilled
-	  });
-	  ```
-	
-	  An example real-world use case is implementing timeouts:
-	
-	  ```javascript
-	  Promise.race([ajax('foo.json'), timeout(5000)])
-	  ```
-	
-	  @method race
-	  @static
-	  @param {Array} promises array of promises to observe
-	  Useful for tooling.
-	  @return {Promise} a promise which settles in the same way as the first passed
-	  promise to settle.
-	*/
-	function race(entries) {
-	  /*jshint validthis:true */
-	  var Constructor = this;
-	
-	  if (!isArray(entries)) {
-	    return new Constructor(function (_, reject) {
-	      return reject(new TypeError('You must pass an array to race.'));
-	    });
-	  } else {
-	    return new Constructor(function (resolve, reject) {
-	      var length = entries.length;
-	      for (var i = 0; i < length; i++) {
-	        Constructor.resolve(entries[i]).then(resolve, reject);
-	      }
-	    });
-	  }
-	}
-	
-	/**
-	  `Promise.reject` returns a promise rejected with the passed `reason`.
-	  It is shorthand for the following:
-	
-	  ```javascript
-	  let promise = new Promise(function(resolve, reject){
-	    reject(new Error('WHOOPS'));
-	  });
-	
-	  promise.then(function(value){
-	    // Code here doesn't run because the promise is rejected!
-	  }, function(reason){
-	    // reason.message === 'WHOOPS'
-	  });
-	  ```
-	
-	  Instead of writing the above, your code now simply becomes the following:
-	
-	  ```javascript
-	  let promise = Promise.reject(new Error('WHOOPS'));
-	
-	  promise.then(function(value){
-	    // Code here doesn't run because the promise is rejected!
-	  }, function(reason){
-	    // reason.message === 'WHOOPS'
-	  });
-	  ```
-	
-	  @method reject
-	  @static
-	  @param {Any} reason value that the returned promise will be rejected with.
-	  Useful for tooling.
-	  @return {Promise} a promise rejected with the given `reason`.
-	*/
-	function reject(reason) {
-	  /*jshint validthis:true */
-	  var Constructor = this;
-	  var promise = new Constructor(noop);
-	  _reject(promise, reason);
-	  return promise;
-	}
-	
-	function needsResolver() {
-	  throw new TypeError('You must pass a resolver function as the first argument to the promise constructor');
-	}
-	
-	function needsNew() {
-	  throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
-	}
-	
-	/**
-	  Promise objects represent the eventual result of an asynchronous operation. The
-	  primary way of interacting with a promise is through its `then` method, which
-	  registers callbacks to receive either a promise's eventual value or the reason
-	  why the promise cannot be fulfilled.
-	
-	  Terminology
-	  -----------
-	
-	  - `promise` is an object or function with a `then` method whose behavior conforms to this specification.
-	  - `thenable` is an object or function that defines a `then` method.
-	  - `value` is any legal JavaScript value (including undefined, a thenable, or a promise).
-	  - `exception` is a value that is thrown using the throw statement.
-	  - `reason` is a value that indicates why a promise was rejected.
-	  - `settled` the final resting state of a promise, fulfilled or rejected.
-	
-	  A promise can be in one of three states: pending, fulfilled, or rejected.
-	
-	  Promises that are fulfilled have a fulfillment value and are in the fulfilled
-	  state.  Promises that are rejected have a rejection reason and are in the
-	  rejected state.  A fulfillment value is never a thenable.
-	
-	  Promises can also be said to *resolve* a value.  If this value is also a
-	  promise, then the original promise's settled state will match the value's
-	  settled state.  So a promise that *resolves* a promise that rejects will
-	  itself reject, and a promise that *resolves* a promise that fulfills will
-	  itself fulfill.
-	
-	
-	  Basic Usage:
-	  ------------
-	
-	  ```js
-	  let promise = new Promise(function(resolve, reject) {
-	    // on success
-	    resolve(value);
-	
-	    // on failure
-	    reject(reason);
-	  });
-	
-	  promise.then(function(value) {
-	    // on fulfillment
-	  }, function(reason) {
-	    // on rejection
-	  });
-	  ```
-	
-	  Advanced Usage:
-	  ---------------
-	
-	  Promises shine when abstracting away asynchronous interactions such as
-	  `XMLHttpRequest`s.
-	
-	  ```js
-	  function getJSON(url) {
-	    return new Promise(function(resolve, reject){
-	      let xhr = new XMLHttpRequest();
-	
-	      xhr.open('GET', url);
-	      xhr.onreadystatechange = handler;
-	      xhr.responseType = 'json';
-	      xhr.setRequestHeader('Accept', 'application/json');
-	      xhr.send();
-	
-	      function handler() {
-	        if (this.readyState === this.DONE) {
-	          if (this.status === 200) {
-	            resolve(this.response);
-	          } else {
-	            reject(new Error('getJSON: `' + url + '` failed with status: [' + this.status + ']'));
-	          }
-	        }
+	    var lib$es6$promise$utils$$_isArray;
+	    if (!Array.isArray) {
+	      lib$es6$promise$utils$$_isArray = function (x) {
+	        return Object.prototype.toString.call(x) === '[object Array]';
 	      };
-	    });
-	  }
-	
-	  getJSON('/posts.json').then(function(json) {
-	    // on fulfillment
-	  }, function(reason) {
-	    // on rejection
-	  });
-	  ```
-	
-	  Unlike callbacks, promises are great composable primitives.
-	
-	  ```js
-	  Promise.all([
-	    getJSON('/posts'),
-	    getJSON('/comments')
-	  ]).then(function(values){
-	    values[0] // => postsJSON
-	    values[1] // => commentsJSON
-	
-	    return values;
-	  });
-	  ```
-	
-	  @class Promise
-	  @param {function} resolver
-	  Useful for tooling.
-	  @constructor
-	*/
-	function Promise(resolver) {
-	  this[PROMISE_ID] = nextId();
-	  this._result = this._state = undefined;
-	  this._subscribers = [];
-	
-	  if (noop !== resolver) {
-	    typeof resolver !== 'function' && needsResolver();
-	    this instanceof Promise ? initializePromise(this, resolver) : needsNew();
-	  }
-	}
-	
-	Promise.all = all;
-	Promise.race = race;
-	Promise.resolve = resolve;
-	Promise.reject = reject;
-	Promise._setScheduler = setScheduler;
-	Promise._setAsap = setAsap;
-	Promise._asap = asap;
-	
-	Promise.prototype = {
-	  constructor: Promise,
-	
-	  /**
-	    The primary way of interacting with a promise is through its `then` method,
-	    which registers callbacks to receive either a promise's eventual value or the
-	    reason why the promise cannot be fulfilled.
-	  
-	    ```js
-	    findUser().then(function(user){
-	      // user is available
-	    }, function(reason){
-	      // user is unavailable, and you are given the reason why
-	    });
-	    ```
-	  
-	    Chaining
-	    --------
-	  
-	    The return value of `then` is itself a promise.  This second, 'downstream'
-	    promise is resolved with the return value of the first promise's fulfillment
-	    or rejection handler, or rejected if the handler throws an exception.
-	  
-	    ```js
-	    findUser().then(function (user) {
-	      return user.name;
-	    }, function (reason) {
-	      return 'default name';
-	    }).then(function (userName) {
-	      // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
-	      // will be `'default name'`
-	    });
-	  
-	    findUser().then(function (user) {
-	      throw new Error('Found user, but still unhappy');
-	    }, function (reason) {
-	      throw new Error('`findUser` rejected and we're unhappy');
-	    }).then(function (value) {
-	      // never reached
-	    }, function (reason) {
-	      // if `findUser` fulfilled, `reason` will be 'Found user, but still unhappy'.
-	      // If `findUser` rejected, `reason` will be '`findUser` rejected and we're unhappy'.
-	    });
-	    ```
-	    If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
-	  
-	    ```js
-	    findUser().then(function (user) {
-	      throw new PedagogicalException('Upstream error');
-	    }).then(function (value) {
-	      // never reached
-	    }).then(function (value) {
-	      // never reached
-	    }, function (reason) {
-	      // The `PedgagocialException` is propagated all the way down to here
-	    });
-	    ```
-	  
-	    Assimilation
-	    ------------
-	  
-	    Sometimes the value you want to propagate to a downstream promise can only be
-	    retrieved asynchronously. This can be achieved by returning a promise in the
-	    fulfillment or rejection handler. The downstream promise will then be pending
-	    until the returned promise is settled. This is called *assimilation*.
-	  
-	    ```js
-	    findUser().then(function (user) {
-	      return findCommentsByAuthor(user);
-	    }).then(function (comments) {
-	      // The user's comments are now available
-	    });
-	    ```
-	  
-	    If the assimliated promise rejects, then the downstream promise will also reject.
-	  
-	    ```js
-	    findUser().then(function (user) {
-	      return findCommentsByAuthor(user);
-	    }).then(function (comments) {
-	      // If `findCommentsByAuthor` fulfills, we'll have the value here
-	    }, function (reason) {
-	      // If `findCommentsByAuthor` rejects, we'll have the reason here
-	    });
-	    ```
-	  
-	    Simple Example
-	    --------------
-	  
-	    Synchronous Example
-	  
-	    ```javascript
-	    let result;
-	  
-	    try {
-	      result = findResult();
-	      // success
-	    } catch(reason) {
-	      // failure
+	    } else {
+	      lib$es6$promise$utils$$_isArray = Array.isArray;
 	    }
-	    ```
-	  
-	    Errback Example
-	  
-	    ```js
-	    findResult(function(result, err){
-	      if (err) {
-	        // failure
-	      } else {
-	        // success
+	
+	    var lib$es6$promise$utils$$isArray = lib$es6$promise$utils$$_isArray;
+	    var lib$es6$promise$asap$$len = 0;
+	    var lib$es6$promise$asap$$vertxNext;
+	    var lib$es6$promise$asap$$customSchedulerFn;
+	
+	    var lib$es6$promise$asap$$asap = function asap(callback, arg) {
+	      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len] = callback;
+	      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len + 1] = arg;
+	      lib$es6$promise$asap$$len += 2;
+	      if (lib$es6$promise$asap$$len === 2) {
+	        // If len is 2, that means that we need to schedule an async flush.
+	        // If additional callbacks are queued before the queue is flushed, they
+	        // will be processed by this flush that we are scheduling.
+	        if (lib$es6$promise$asap$$customSchedulerFn) {
+	          lib$es6$promise$asap$$customSchedulerFn(lib$es6$promise$asap$$flush);
+	        } else {
+	          lib$es6$promise$asap$$scheduleFlush();
+	        }
 	      }
-	    });
-	    ```
-	  
-	    Promise Example;
-	  
-	    ```javascript
-	    findResult().then(function(result){
-	      // success
-	    }, function(reason){
-	      // failure
-	    });
-	    ```
-	  
-	    Advanced Example
-	    --------------
-	  
-	    Synchronous Example
-	  
-	    ```javascript
-	    let author, books;
-	  
-	    try {
-	      author = findAuthor();
-	      books  = findBooksByAuthor(author);
-	      // success
-	    } catch(reason) {
-	      // failure
 	    }
-	    ```
-	  
-	    Errback Example
-	  
-	    ```js
-	  
-	    function foundBooks(books) {
-	  
+	
+	    function lib$es6$promise$asap$$setScheduler(scheduleFn) {
+	      lib$es6$promise$asap$$customSchedulerFn = scheduleFn;
 	    }
-	  
-	    function failure(reason) {
-	  
+	
+	    function lib$es6$promise$asap$$setAsap(asapFn) {
+	      lib$es6$promise$asap$$asap = asapFn;
 	    }
-	  
-	    findAuthor(function(author, err){
-	      if (err) {
-	        failure(err);
-	        // failure
+	
+	    var lib$es6$promise$asap$$browserWindow = (typeof window !== 'undefined') ? window : undefined;
+	    var lib$es6$promise$asap$$browserGlobal = lib$es6$promise$asap$$browserWindow || {};
+	    var lib$es6$promise$asap$$BrowserMutationObserver = lib$es6$promise$asap$$browserGlobal.MutationObserver || lib$es6$promise$asap$$browserGlobal.WebKitMutationObserver;
+	    var lib$es6$promise$asap$$isNode = typeof self === 'undefined' && typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
+	
+	    // test for web worker but not in IE10
+	    var lib$es6$promise$asap$$isWorker = typeof Uint8ClampedArray !== 'undefined' &&
+	      typeof importScripts !== 'undefined' &&
+	      typeof MessageChannel !== 'undefined';
+	
+	    // node
+	    function lib$es6$promise$asap$$useNextTick() {
+	      // node version 0.10.x displays a deprecation warning when nextTick is used recursively
+	      // see https://github.com/cujojs/when/issues/410 for details
+	      return function() {
+	        process.nextTick(lib$es6$promise$asap$$flush);
+	      };
+	    }
+	
+	    // vertx
+	    function lib$es6$promise$asap$$useVertxTimer() {
+	      return function() {
+	        lib$es6$promise$asap$$vertxNext(lib$es6$promise$asap$$flush);
+	      };
+	    }
+	
+	    function lib$es6$promise$asap$$useMutationObserver() {
+	      var iterations = 0;
+	      var observer = new lib$es6$promise$asap$$BrowserMutationObserver(lib$es6$promise$asap$$flush);
+	      var node = document.createTextNode('');
+	      observer.observe(node, { characterData: true });
+	
+	      return function() {
+	        node.data = (iterations = ++iterations % 2);
+	      };
+	    }
+	
+	    // web worker
+	    function lib$es6$promise$asap$$useMessageChannel() {
+	      var channel = new MessageChannel();
+	      channel.port1.onmessage = lib$es6$promise$asap$$flush;
+	      return function () {
+	        channel.port2.postMessage(0);
+	      };
+	    }
+	
+	    function lib$es6$promise$asap$$useSetTimeout() {
+	      return function() {
+	        setTimeout(lib$es6$promise$asap$$flush, 1);
+	      };
+	    }
+	
+	    var lib$es6$promise$asap$$queue = new Array(1000);
+	    function lib$es6$promise$asap$$flush() {
+	      for (var i = 0; i < lib$es6$promise$asap$$len; i+=2) {
+	        var callback = lib$es6$promise$asap$$queue[i];
+	        var arg = lib$es6$promise$asap$$queue[i+1];
+	
+	        callback(arg);
+	
+	        lib$es6$promise$asap$$queue[i] = undefined;
+	        lib$es6$promise$asap$$queue[i+1] = undefined;
+	      }
+	
+	      lib$es6$promise$asap$$len = 0;
+	    }
+	
+	    function lib$es6$promise$asap$$attemptVertx() {
+	      try {
+	        var r = require;
+	        var vertx = __webpack_require__(23);
+	        lib$es6$promise$asap$$vertxNext = vertx.runOnLoop || vertx.runOnContext;
+	        return lib$es6$promise$asap$$useVertxTimer();
+	      } catch(e) {
+	        return lib$es6$promise$asap$$useSetTimeout();
+	      }
+	    }
+	
+	    var lib$es6$promise$asap$$scheduleFlush;
+	    // Decide what async method to use to triggering processing of queued callbacks:
+	    if (lib$es6$promise$asap$$isNode) {
+	      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useNextTick();
+	    } else if (lib$es6$promise$asap$$BrowserMutationObserver) {
+	      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMutationObserver();
+	    } else if (lib$es6$promise$asap$$isWorker) {
+	      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useMessageChannel();
+	    } else if (lib$es6$promise$asap$$browserWindow === undefined && "function" === 'function') {
+	      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$attemptVertx();
+	    } else {
+	      lib$es6$promise$asap$$scheduleFlush = lib$es6$promise$asap$$useSetTimeout();
+	    }
+	    function lib$es6$promise$then$$then(onFulfillment, onRejection) {
+	      var parent = this;
+	
+	      var child = new this.constructor(lib$es6$promise$$internal$$noop);
+	
+	      if (child[lib$es6$promise$$internal$$PROMISE_ID] === undefined) {
+	        lib$es6$promise$$internal$$makePromise(child);
+	      }
+	
+	      var state = parent._state;
+	
+	      if (state) {
+	        var callback = arguments[state - 1];
+	        lib$es6$promise$asap$$asap(function(){
+	          lib$es6$promise$$internal$$invokeCallback(state, child, callback, parent._result);
+	        });
 	      } else {
-	        try {
-	          findBoooksByAuthor(author, function(books, err) {
-	            if (err) {
-	              failure(err);
-	            } else {
-	              try {
-	                foundBooks(books);
-	              } catch(reason) {
-	                failure(reason);
+	        lib$es6$promise$$internal$$subscribe(parent, child, onFulfillment, onRejection);
+	      }
+	
+	      return child;
+	    }
+	    var lib$es6$promise$then$$default = lib$es6$promise$then$$then;
+	    function lib$es6$promise$promise$resolve$$resolve(object) {
+	      /*jshint validthis:true */
+	      var Constructor = this;
+	
+	      if (object && typeof object === 'object' && object.constructor === Constructor) {
+	        return object;
+	      }
+	
+	      var promise = new Constructor(lib$es6$promise$$internal$$noop);
+	      lib$es6$promise$$internal$$resolve(promise, object);
+	      return promise;
+	    }
+	    var lib$es6$promise$promise$resolve$$default = lib$es6$promise$promise$resolve$$resolve;
+	    var lib$es6$promise$$internal$$PROMISE_ID = Math.random().toString(36).substring(16);
+	
+	    function lib$es6$promise$$internal$$noop() {}
+	
+	    var lib$es6$promise$$internal$$PENDING   = void 0;
+	    var lib$es6$promise$$internal$$FULFILLED = 1;
+	    var lib$es6$promise$$internal$$REJECTED  = 2;
+	
+	    var lib$es6$promise$$internal$$GET_THEN_ERROR = new lib$es6$promise$$internal$$ErrorObject();
+	
+	    function lib$es6$promise$$internal$$selfFulfillment() {
+	      return new TypeError("You cannot resolve a promise with itself");
+	    }
+	
+	    function lib$es6$promise$$internal$$cannotReturnOwn() {
+	      return new TypeError('A promises callback cannot return that same promise.');
+	    }
+	
+	    function lib$es6$promise$$internal$$getThen(promise) {
+	      try {
+	        return promise.then;
+	      } catch(error) {
+	        lib$es6$promise$$internal$$GET_THEN_ERROR.error = error;
+	        return lib$es6$promise$$internal$$GET_THEN_ERROR;
+	      }
+	    }
+	
+	    function lib$es6$promise$$internal$$tryThen(then, value, fulfillmentHandler, rejectionHandler) {
+	      try {
+	        then.call(value, fulfillmentHandler, rejectionHandler);
+	      } catch(e) {
+	        return e;
+	      }
+	    }
+	
+	    function lib$es6$promise$$internal$$handleForeignThenable(promise, thenable, then) {
+	       lib$es6$promise$asap$$asap(function(promise) {
+	        var sealed = false;
+	        var error = lib$es6$promise$$internal$$tryThen(then, thenable, function(value) {
+	          if (sealed) { return; }
+	          sealed = true;
+	          if (thenable !== value) {
+	            lib$es6$promise$$internal$$resolve(promise, value);
+	          } else {
+	            lib$es6$promise$$internal$$fulfill(promise, value);
+	          }
+	        }, function(reason) {
+	          if (sealed) { return; }
+	          sealed = true;
+	
+	          lib$es6$promise$$internal$$reject(promise, reason);
+	        }, 'Settle: ' + (promise._label || ' unknown promise'));
+	
+	        if (!sealed && error) {
+	          sealed = true;
+	          lib$es6$promise$$internal$$reject(promise, error);
+	        }
+	      }, promise);
+	    }
+	
+	    function lib$es6$promise$$internal$$handleOwnThenable(promise, thenable) {
+	      if (thenable._state === lib$es6$promise$$internal$$FULFILLED) {
+	        lib$es6$promise$$internal$$fulfill(promise, thenable._result);
+	      } else if (thenable._state === lib$es6$promise$$internal$$REJECTED) {
+	        lib$es6$promise$$internal$$reject(promise, thenable._result);
+	      } else {
+	        lib$es6$promise$$internal$$subscribe(thenable, undefined, function(value) {
+	          lib$es6$promise$$internal$$resolve(promise, value);
+	        }, function(reason) {
+	          lib$es6$promise$$internal$$reject(promise, reason);
+	        });
+	      }
+	    }
+	
+	    function lib$es6$promise$$internal$$handleMaybeThenable(promise, maybeThenable, then) {
+	      if (maybeThenable.constructor === promise.constructor &&
+	          then === lib$es6$promise$then$$default &&
+	          constructor.resolve === lib$es6$promise$promise$resolve$$default) {
+	        lib$es6$promise$$internal$$handleOwnThenable(promise, maybeThenable);
+	      } else {
+	        if (then === lib$es6$promise$$internal$$GET_THEN_ERROR) {
+	          lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$GET_THEN_ERROR.error);
+	        } else if (then === undefined) {
+	          lib$es6$promise$$internal$$fulfill(promise, maybeThenable);
+	        } else if (lib$es6$promise$utils$$isFunction(then)) {
+	          lib$es6$promise$$internal$$handleForeignThenable(promise, maybeThenable, then);
+	        } else {
+	          lib$es6$promise$$internal$$fulfill(promise, maybeThenable);
+	        }
+	      }
+	    }
+	
+	    function lib$es6$promise$$internal$$resolve(promise, value) {
+	      if (promise === value) {
+	        lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$selfFulfillment());
+	      } else if (lib$es6$promise$utils$$objectOrFunction(value)) {
+	        lib$es6$promise$$internal$$handleMaybeThenable(promise, value, lib$es6$promise$$internal$$getThen(value));
+	      } else {
+	        lib$es6$promise$$internal$$fulfill(promise, value);
+	      }
+	    }
+	
+	    function lib$es6$promise$$internal$$publishRejection(promise) {
+	      if (promise._onerror) {
+	        promise._onerror(promise._result);
+	      }
+	
+	      lib$es6$promise$$internal$$publish(promise);
+	    }
+	
+	    function lib$es6$promise$$internal$$fulfill(promise, value) {
+	      if (promise._state !== lib$es6$promise$$internal$$PENDING) { return; }
+	
+	      promise._result = value;
+	      promise._state = lib$es6$promise$$internal$$FULFILLED;
+	
+	      if (promise._subscribers.length !== 0) {
+	        lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publish, promise);
+	      }
+	    }
+	
+	    function lib$es6$promise$$internal$$reject(promise, reason) {
+	      if (promise._state !== lib$es6$promise$$internal$$PENDING) { return; }
+	      promise._state = lib$es6$promise$$internal$$REJECTED;
+	      promise._result = reason;
+	
+	      lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publishRejection, promise);
+	    }
+	
+	    function lib$es6$promise$$internal$$subscribe(parent, child, onFulfillment, onRejection) {
+	      var subscribers = parent._subscribers;
+	      var length = subscribers.length;
+	
+	      parent._onerror = null;
+	
+	      subscribers[length] = child;
+	      subscribers[length + lib$es6$promise$$internal$$FULFILLED] = onFulfillment;
+	      subscribers[length + lib$es6$promise$$internal$$REJECTED]  = onRejection;
+	
+	      if (length === 0 && parent._state) {
+	        lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publish, parent);
+	      }
+	    }
+	
+	    function lib$es6$promise$$internal$$publish(promise) {
+	      var subscribers = promise._subscribers;
+	      var settled = promise._state;
+	
+	      if (subscribers.length === 0) { return; }
+	
+	      var child, callback, detail = promise._result;
+	
+	      for (var i = 0; i < subscribers.length; i += 3) {
+	        child = subscribers[i];
+	        callback = subscribers[i + settled];
+	
+	        if (child) {
+	          lib$es6$promise$$internal$$invokeCallback(settled, child, callback, detail);
+	        } else {
+	          callback(detail);
+	        }
+	      }
+	
+	      promise._subscribers.length = 0;
+	    }
+	
+	    function lib$es6$promise$$internal$$ErrorObject() {
+	      this.error = null;
+	    }
+	
+	    var lib$es6$promise$$internal$$TRY_CATCH_ERROR = new lib$es6$promise$$internal$$ErrorObject();
+	
+	    function lib$es6$promise$$internal$$tryCatch(callback, detail) {
+	      try {
+	        return callback(detail);
+	      } catch(e) {
+	        lib$es6$promise$$internal$$TRY_CATCH_ERROR.error = e;
+	        return lib$es6$promise$$internal$$TRY_CATCH_ERROR;
+	      }
+	    }
+	
+	    function lib$es6$promise$$internal$$invokeCallback(settled, promise, callback, detail) {
+	      var hasCallback = lib$es6$promise$utils$$isFunction(callback),
+	          value, error, succeeded, failed;
+	
+	      if (hasCallback) {
+	        value = lib$es6$promise$$internal$$tryCatch(callback, detail);
+	
+	        if (value === lib$es6$promise$$internal$$TRY_CATCH_ERROR) {
+	          failed = true;
+	          error = value.error;
+	          value = null;
+	        } else {
+	          succeeded = true;
+	        }
+	
+	        if (promise === value) {
+	          lib$es6$promise$$internal$$reject(promise, lib$es6$promise$$internal$$cannotReturnOwn());
+	          return;
+	        }
+	
+	      } else {
+	        value = detail;
+	        succeeded = true;
+	      }
+	
+	      if (promise._state !== lib$es6$promise$$internal$$PENDING) {
+	        // noop
+	      } else if (hasCallback && succeeded) {
+	        lib$es6$promise$$internal$$resolve(promise, value);
+	      } else if (failed) {
+	        lib$es6$promise$$internal$$reject(promise, error);
+	      } else if (settled === lib$es6$promise$$internal$$FULFILLED) {
+	        lib$es6$promise$$internal$$fulfill(promise, value);
+	      } else if (settled === lib$es6$promise$$internal$$REJECTED) {
+	        lib$es6$promise$$internal$$reject(promise, value);
+	      }
+	    }
+	
+	    function lib$es6$promise$$internal$$initializePromise(promise, resolver) {
+	      try {
+	        resolver(function resolvePromise(value){
+	          lib$es6$promise$$internal$$resolve(promise, value);
+	        }, function rejectPromise(reason) {
+	          lib$es6$promise$$internal$$reject(promise, reason);
+	        });
+	      } catch(e) {
+	        lib$es6$promise$$internal$$reject(promise, e);
+	      }
+	    }
+	
+	    var lib$es6$promise$$internal$$id = 0;
+	    function lib$es6$promise$$internal$$nextId() {
+	      return lib$es6$promise$$internal$$id++;
+	    }
+	
+	    function lib$es6$promise$$internal$$makePromise(promise) {
+	      promise[lib$es6$promise$$internal$$PROMISE_ID] = lib$es6$promise$$internal$$id++;
+	      promise._state = undefined;
+	      promise._result = undefined;
+	      promise._subscribers = [];
+	    }
+	
+	    function lib$es6$promise$promise$all$$all(entries) {
+	      return new lib$es6$promise$enumerator$$default(this, entries).promise;
+	    }
+	    var lib$es6$promise$promise$all$$default = lib$es6$promise$promise$all$$all;
+	    function lib$es6$promise$promise$race$$race(entries) {
+	      /*jshint validthis:true */
+	      var Constructor = this;
+	
+	      if (!lib$es6$promise$utils$$isArray(entries)) {
+	        return new Constructor(function(resolve, reject) {
+	          reject(new TypeError('You must pass an array to race.'));
+	        });
+	      } else {
+	        return new Constructor(function(resolve, reject) {
+	          var length = entries.length;
+	          for (var i = 0; i < length; i++) {
+	            Constructor.resolve(entries[i]).then(resolve, reject);
+	          }
+	        });
+	      }
+	    }
+	    var lib$es6$promise$promise$race$$default = lib$es6$promise$promise$race$$race;
+	    function lib$es6$promise$promise$reject$$reject(reason) {
+	      /*jshint validthis:true */
+	      var Constructor = this;
+	      var promise = new Constructor(lib$es6$promise$$internal$$noop);
+	      lib$es6$promise$$internal$$reject(promise, reason);
+	      return promise;
+	    }
+	    var lib$es6$promise$promise$reject$$default = lib$es6$promise$promise$reject$$reject;
+	
+	
+	    function lib$es6$promise$promise$$needsResolver() {
+	      throw new TypeError('You must pass a resolver function as the first argument to the promise constructor');
+	    }
+	
+	    function lib$es6$promise$promise$$needsNew() {
+	      throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
+	    }
+	
+	    var lib$es6$promise$promise$$default = lib$es6$promise$promise$$Promise;
+	    /**
+	      Promise objects represent the eventual result of an asynchronous operation. The
+	      primary way of interacting with a promise is through its `then` method, which
+	      registers callbacks to receive either a promise's eventual value or the reason
+	      why the promise cannot be fulfilled.
+	
+	      Terminology
+	      -----------
+	
+	      - `promise` is an object or function with a `then` method whose behavior conforms to this specification.
+	      - `thenable` is an object or function that defines a `then` method.
+	      - `value` is any legal JavaScript value (including undefined, a thenable, or a promise).
+	      - `exception` is a value that is thrown using the throw statement.
+	      - `reason` is a value that indicates why a promise was rejected.
+	      - `settled` the final resting state of a promise, fulfilled or rejected.
+	
+	      A promise can be in one of three states: pending, fulfilled, or rejected.
+	
+	      Promises that are fulfilled have a fulfillment value and are in the fulfilled
+	      state.  Promises that are rejected have a rejection reason and are in the
+	      rejected state.  A fulfillment value is never a thenable.
+	
+	      Promises can also be said to *resolve* a value.  If this value is also a
+	      promise, then the original promise's settled state will match the value's
+	      settled state.  So a promise that *resolves* a promise that rejects will
+	      itself reject, and a promise that *resolves* a promise that fulfills will
+	      itself fulfill.
+	
+	
+	      Basic Usage:
+	      ------------
+	
+	      ```js
+	      var promise = new Promise(function(resolve, reject) {
+	        // on success
+	        resolve(value);
+	
+	        // on failure
+	        reject(reason);
+	      });
+	
+	      promise.then(function(value) {
+	        // on fulfillment
+	      }, function(reason) {
+	        // on rejection
+	      });
+	      ```
+	
+	      Advanced Usage:
+	      ---------------
+	
+	      Promises shine when abstracting away asynchronous interactions such as
+	      `XMLHttpRequest`s.
+	
+	      ```js
+	      function getJSON(url) {
+	        return new Promise(function(resolve, reject){
+	          var xhr = new XMLHttpRequest();
+	
+	          xhr.open('GET', url);
+	          xhr.onreadystatechange = handler;
+	          xhr.responseType = 'json';
+	          xhr.setRequestHeader('Accept', 'application/json');
+	          xhr.send();
+	
+	          function handler() {
+	            if (this.readyState === this.DONE) {
+	              if (this.status === 200) {
+	                resolve(this.response);
+	              } else {
+	                reject(new Error('getJSON: `' + url + '` failed with status: [' + this.status + ']'));
 	              }
 	            }
-	          });
-	        } catch(error) {
-	          failure(err);
-	        }
-	        // success
+	          };
+	        });
 	      }
-	    });
-	    ```
-	  
-	    Promise Example;
-	  
-	    ```javascript
-	    findAuthor().
-	      then(findBooksByAuthor).
-	      then(function(books){
-	        // found books
-	    }).catch(function(reason){
-	      // something went wrong
-	    });
-	    ```
-	  
-	    @method then
-	    @param {Function} onFulfilled
-	    @param {Function} onRejected
-	    Useful for tooling.
-	    @return {Promise}
-	  */
-	  then: then,
 	
-	  /**
-	    `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
-	    as the catch block of a try/catch statement.
-	  
-	    ```js
-	    function findAuthor(){
-	      throw new Error('couldn't find that author');
+	      getJSON('/posts.json').then(function(json) {
+	        // on fulfillment
+	      }, function(reason) {
+	        // on rejection
+	      });
+	      ```
+	
+	      Unlike callbacks, promises are great composable primitives.
+	
+	      ```js
+	      Promise.all([
+	        getJSON('/posts'),
+	        getJSON('/comments')
+	      ]).then(function(values){
+	        values[0] // => postsJSON
+	        values[1] // => commentsJSON
+	
+	        return values;
+	      });
+	      ```
+	
+	      @class Promise
+	      @param {function} resolver
+	      Useful for tooling.
+	      @constructor
+	    */
+	    function lib$es6$promise$promise$$Promise(resolver) {
+	      this[lib$es6$promise$$internal$$PROMISE_ID] = lib$es6$promise$$internal$$nextId();
+	      this._result = this._state = undefined;
+	      this._subscribers = [];
+	
+	      if (lib$es6$promise$$internal$$noop !== resolver) {
+	        typeof resolver !== 'function' && lib$es6$promise$promise$$needsResolver();
+	        this instanceof lib$es6$promise$promise$$Promise ? lib$es6$promise$$internal$$initializePromise(this, resolver) : lib$es6$promise$promise$$needsNew();
+	      }
 	    }
-	  
-	    // synchronous
-	    try {
-	      findAuthor();
-	    } catch(reason) {
-	      // something went wrong
-	    }
-	  
-	    // async with promises
-	    findAuthor().catch(function(reason){
-	      // something went wrong
-	    });
-	    ```
-	  
-	    @method catch
-	    @param {Function} onRejection
-	    Useful for tooling.
-	    @return {Promise}
-	  */
-	  'catch': function _catch(onRejection) {
-	    return this.then(null, onRejection);
-	  }
-	};
 	
-	function polyfill() {
-	    var local = undefined;
+	    lib$es6$promise$promise$$Promise.all = lib$es6$promise$promise$all$$default;
+	    lib$es6$promise$promise$$Promise.race = lib$es6$promise$promise$race$$default;
+	    lib$es6$promise$promise$$Promise.resolve = lib$es6$promise$promise$resolve$$default;
+	    lib$es6$promise$promise$$Promise.reject = lib$es6$promise$promise$reject$$default;
+	    lib$es6$promise$promise$$Promise._setScheduler = lib$es6$promise$asap$$setScheduler;
+	    lib$es6$promise$promise$$Promise._setAsap = lib$es6$promise$asap$$setAsap;
+	    lib$es6$promise$promise$$Promise._asap = lib$es6$promise$asap$$asap;
 	
-	    if (typeof global !== 'undefined') {
-	        local = global;
-	    } else if (typeof self !== 'undefined') {
-	        local = self;
-	    } else {
-	        try {
-	            local = Function('return this')();
-	        } catch (e) {
-	            throw new Error('polyfill failed because global object is unavailable in this environment');
+	    lib$es6$promise$promise$$Promise.prototype = {
+	      constructor: lib$es6$promise$promise$$Promise,
+	
+	    /**
+	      The primary way of interacting with a promise is through its `then` method,
+	      which registers callbacks to receive either a promise's eventual value or the
+	      reason why the promise cannot be fulfilled.
+	
+	      ```js
+	      findUser().then(function(user){
+	        // user is available
+	      }, function(reason){
+	        // user is unavailable, and you are given the reason why
+	      });
+	      ```
+	
+	      Chaining
+	      --------
+	
+	      The return value of `then` is itself a promise.  This second, 'downstream'
+	      promise is resolved with the return value of the first promise's fulfillment
+	      or rejection handler, or rejected if the handler throws an exception.
+	
+	      ```js
+	      findUser().then(function (user) {
+	        return user.name;
+	      }, function (reason) {
+	        return 'default name';
+	      }).then(function (userName) {
+	        // If `findUser` fulfilled, `userName` will be the user's name, otherwise it
+	        // will be `'default name'`
+	      });
+	
+	      findUser().then(function (user) {
+	        throw new Error('Found user, but still unhappy');
+	      }, function (reason) {
+	        throw new Error('`findUser` rejected and we're unhappy');
+	      }).then(function (value) {
+	        // never reached
+	      }, function (reason) {
+	        // if `findUser` fulfilled, `reason` will be 'Found user, but still unhappy'.
+	        // If `findUser` rejected, `reason` will be '`findUser` rejected and we're unhappy'.
+	      });
+	      ```
+	      If the downstream promise does not specify a rejection handler, rejection reasons will be propagated further downstream.
+	
+	      ```js
+	      findUser().then(function (user) {
+	        throw new PedagogicalException('Upstream error');
+	      }).then(function (value) {
+	        // never reached
+	      }).then(function (value) {
+	        // never reached
+	      }, function (reason) {
+	        // The `PedgagocialException` is propagated all the way down to here
+	      });
+	      ```
+	
+	      Assimilation
+	      ------------
+	
+	      Sometimes the value you want to propagate to a downstream promise can only be
+	      retrieved asynchronously. This can be achieved by returning a promise in the
+	      fulfillment or rejection handler. The downstream promise will then be pending
+	      until the returned promise is settled. This is called *assimilation*.
+	
+	      ```js
+	      findUser().then(function (user) {
+	        return findCommentsByAuthor(user);
+	      }).then(function (comments) {
+	        // The user's comments are now available
+	      });
+	      ```
+	
+	      If the assimliated promise rejects, then the downstream promise will also reject.
+	
+	      ```js
+	      findUser().then(function (user) {
+	        return findCommentsByAuthor(user);
+	      }).then(function (comments) {
+	        // If `findCommentsByAuthor` fulfills, we'll have the value here
+	      }, function (reason) {
+	        // If `findCommentsByAuthor` rejects, we'll have the reason here
+	      });
+	      ```
+	
+	      Simple Example
+	      --------------
+	
+	      Synchronous Example
+	
+	      ```javascript
+	      var result;
+	
+	      try {
+	        result = findResult();
+	        // success
+	      } catch(reason) {
+	        // failure
+	      }
+	      ```
+	
+	      Errback Example
+	
+	      ```js
+	      findResult(function(result, err){
+	        if (err) {
+	          // failure
+	        } else {
+	          // success
 	        }
+	      });
+	      ```
+	
+	      Promise Example;
+	
+	      ```javascript
+	      findResult().then(function(result){
+	        // success
+	      }, function(reason){
+	        // failure
+	      });
+	      ```
+	
+	      Advanced Example
+	      --------------
+	
+	      Synchronous Example
+	
+	      ```javascript
+	      var author, books;
+	
+	      try {
+	        author = findAuthor();
+	        books  = findBooksByAuthor(author);
+	        // success
+	      } catch(reason) {
+	        // failure
+	      }
+	      ```
+	
+	      Errback Example
+	
+	      ```js
+	
+	      function foundBooks(books) {
+	
+	      }
+	
+	      function failure(reason) {
+	
+	      }
+	
+	      findAuthor(function(author, err){
+	        if (err) {
+	          failure(err);
+	          // failure
+	        } else {
+	          try {
+	            findBoooksByAuthor(author, function(books, err) {
+	              if (err) {
+	                failure(err);
+	              } else {
+	                try {
+	                  foundBooks(books);
+	                } catch(reason) {
+	                  failure(reason);
+	                }
+	              }
+	            });
+	          } catch(error) {
+	            failure(err);
+	          }
+	          // success
+	        }
+	      });
+	      ```
+	
+	      Promise Example;
+	
+	      ```javascript
+	      findAuthor().
+	        then(findBooksByAuthor).
+	        then(function(books){
+	          // found books
+	      }).catch(function(reason){
+	        // something went wrong
+	      });
+	      ```
+	
+	      @method then
+	      @param {Function} onFulfilled
+	      @param {Function} onRejected
+	      Useful for tooling.
+	      @return {Promise}
+	    */
+	      then: lib$es6$promise$then$$default,
+	
+	    /**
+	      `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
+	      as the catch block of a try/catch statement.
+	
+	      ```js
+	      function findAuthor(){
+	        throw new Error('couldn't find that author');
+	      }
+	
+	      // synchronous
+	      try {
+	        findAuthor();
+	      } catch(reason) {
+	        // something went wrong
+	      }
+	
+	      // async with promises
+	      findAuthor().catch(function(reason){
+	        // something went wrong
+	      });
+	      ```
+	
+	      @method catch
+	      @param {Function} onRejection
+	      Useful for tooling.
+	      @return {Promise}
+	    */
+	      'catch': function(onRejection) {
+	        return this.then(null, onRejection);
+	      }
+	    };
+	    var lib$es6$promise$enumerator$$default = lib$es6$promise$enumerator$$Enumerator;
+	    function lib$es6$promise$enumerator$$Enumerator(Constructor, input) {
+	      this._instanceConstructor = Constructor;
+	      this.promise = new Constructor(lib$es6$promise$$internal$$noop);
+	
+	      if (!this.promise[lib$es6$promise$$internal$$PROMISE_ID]) {
+	        lib$es6$promise$$internal$$makePromise(this.promise);
+	      }
+	
+	      if (lib$es6$promise$utils$$isArray(input)) {
+	        this._input     = input;
+	        this.length     = input.length;
+	        this._remaining = input.length;
+	
+	        this._result = new Array(this.length);
+	
+	        if (this.length === 0) {
+	          lib$es6$promise$$internal$$fulfill(this.promise, this._result);
+	        } else {
+	          this.length = this.length || 0;
+	          this._enumerate();
+	          if (this._remaining === 0) {
+	            lib$es6$promise$$internal$$fulfill(this.promise, this._result);
+	          }
+	        }
+	      } else {
+	        lib$es6$promise$$internal$$reject(this.promise, lib$es6$promise$enumerator$$validationError());
+	      }
 	    }
 	
-	    var P = local.Promise;
-	
-	    if (P) {
-	        var promiseToString = null;
-	        try {
-	            promiseToString = Object.prototype.toString.call(P.resolve());
-	        } catch (e) {
-	            // silently ignored
-	        }
-	
-	        if (promiseToString === '[object Promise]' && !P.cast) {
-	            return;
-	        }
+	    function lib$es6$promise$enumerator$$validationError() {
+	      return new Error('Array Methods must be provided an Array');
 	    }
 	
-	    local.Promise = Promise;
-	}
+	    lib$es6$promise$enumerator$$Enumerator.prototype._enumerate = function() {
+	      var length  = this.length;
+	      var input   = this._input;
 	
-	polyfill();
-	// Strange compat..
-	Promise.polyfill = polyfill;
-	Promise.Promise = Promise;
+	      for (var i = 0; this._state === lib$es6$promise$$internal$$PENDING && i < length; i++) {
+	        this._eachEntry(input[i], i);
+	      }
+	    };
 	
-	return Promise;
+	    lib$es6$promise$enumerator$$Enumerator.prototype._eachEntry = function(entry, i) {
+	      var c = this._instanceConstructor;
+	      var resolve = c.resolve;
 	
-	})));
-	//# sourceMappingURL=es6-promise.map
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(21), (function() { return this; }())))
+	      if (resolve === lib$es6$promise$promise$resolve$$default) {
+	        var then = lib$es6$promise$$internal$$getThen(entry);
+	
+	        if (then === lib$es6$promise$then$$default &&
+	            entry._state !== lib$es6$promise$$internal$$PENDING) {
+	          this._settledAt(entry._state, i, entry._result);
+	        } else if (typeof then !== 'function') {
+	          this._remaining--;
+	          this._result[i] = entry;
+	        } else if (c === lib$es6$promise$promise$$default) {
+	          var promise = new c(lib$es6$promise$$internal$$noop);
+	          lib$es6$promise$$internal$$handleMaybeThenable(promise, entry, then);
+	          this._willSettleAt(promise, i);
+	        } else {
+	          this._willSettleAt(new c(function(resolve) { resolve(entry); }), i);
+	        }
+	      } else {
+	        this._willSettleAt(resolve(entry), i);
+	      }
+	    };
+	
+	    lib$es6$promise$enumerator$$Enumerator.prototype._settledAt = function(state, i, value) {
+	      var promise = this.promise;
+	
+	      if (promise._state === lib$es6$promise$$internal$$PENDING) {
+	        this._remaining--;
+	
+	        if (state === lib$es6$promise$$internal$$REJECTED) {
+	          lib$es6$promise$$internal$$reject(promise, value);
+	        } else {
+	          this._result[i] = value;
+	        }
+	      }
+	
+	      if (this._remaining === 0) {
+	        lib$es6$promise$$internal$$fulfill(promise, this._result);
+	      }
+	    };
+	
+	    lib$es6$promise$enumerator$$Enumerator.prototype._willSettleAt = function(promise, i) {
+	      var enumerator = this;
+	
+	      lib$es6$promise$$internal$$subscribe(promise, undefined, function(value) {
+	        enumerator._settledAt(lib$es6$promise$$internal$$FULFILLED, i, value);
+	      }, function(reason) {
+	        enumerator._settledAt(lib$es6$promise$$internal$$REJECTED, i, reason);
+	      });
+	    };
+	    function lib$es6$promise$polyfill$$polyfill() {
+	      var local;
+	
+	      if (typeof global !== 'undefined') {
+	          local = global;
+	      } else if (typeof self !== 'undefined') {
+	          local = self;
+	      } else {
+	          try {
+	              local = Function('return this')();
+	          } catch (e) {
+	              throw new Error('polyfill failed because global object is unavailable in this environment');
+	          }
+	      }
+	
+	      var P = local.Promise;
+	
+	      if (P && Object.prototype.toString.call(P.resolve()) === '[object Promise]' && !P.cast) {
+	        return;
+	      }
+	
+	      local.Promise = lib$es6$promise$promise$$default;
+	    }
+	    var lib$es6$promise$polyfill$$default = lib$es6$promise$polyfill$$polyfill;
+	
+	    var lib$es6$promise$umd$$ES6Promise = {
+	      'Promise': lib$es6$promise$promise$$default,
+	      'polyfill': lib$es6$promise$polyfill$$default
+	    };
+	
+	    /* global define:true module:true window: true */
+	    if ("function" === 'function' && __webpack_require__(24)['amd']) {
+	      !(__WEBPACK_AMD_DEFINE_RESULT__ = function() { return lib$es6$promise$umd$$ES6Promise; }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	    } else if (typeof module !== 'undefined' && module['exports']) {
+	      module['exports'] = lib$es6$promise$umd$$ES6Promise;
+	    } else if (typeof this !== 'undefined') {
+	      this['ES6Promise'] = lib$es6$promise$umd$$ES6Promise;
+	    }
+	
+	    lib$es6$promise$polyfill$$default();
+	}).call(this);
+	
+	
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22), (function() { return this; }()), __webpack_require__(2)(module)))
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports) {
 
 	// shim for using process in browser
@@ -21012,6 +20848,10 @@ var GCLLib =
 	process.removeListener = noop;
 	process.removeAllListeners = noop;
 	process.emit = noop;
+	process.prependListener = noop;
+	process.prependOnceListener = noop;
+	
+	process.listeners = function (name) { return [] }
 	
 	process.binding = function (name) {
 	    throw new Error('process.binding is not supported');
@@ -21025,13 +20865,20 @@ var GCLLib =
 
 
 /***/ }),
-/* 22 */
+/* 23 */
 /***/ (function(module, exports) {
 
 	/* (ignored) */
 
 /***/ }),
-/* 23 */
+/* 24 */
+/***/ (function(module, exports) {
+
+	module.exports = function() { throw new Error("define cannot be used indirect"); };
+
+
+/***/ }),
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -21046,7 +20893,7 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var axios_1 = __webpack_require__(24);
+	var axios_1 = __webpack_require__(26);
 	var _ = __webpack_require__(1);
 	var GenericConnection = (function () {
 	    function GenericConnection(cfg) {
@@ -21194,21 +21041,21 @@ var GCLLib =
 
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(25);
+	module.exports = __webpack_require__(27);
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(26);
-	var bind = __webpack_require__(27);
-	var Axios = __webpack_require__(28);
-	var defaults = __webpack_require__(29);
+	var utils = __webpack_require__(28);
+	var bind = __webpack_require__(29);
+	var Axios = __webpack_require__(30);
+	var defaults = __webpack_require__(31);
 	
 	/**
 	 * Create an instance of Axios
@@ -21241,15 +21088,15 @@ var GCLLib =
 	};
 	
 	// Expose Cancel & CancelToken
-	axios.Cancel = __webpack_require__(46);
-	axios.CancelToken = __webpack_require__(47);
-	axios.isCancel = __webpack_require__(43);
+	axios.Cancel = __webpack_require__(48);
+	axios.CancelToken = __webpack_require__(49);
+	axios.isCancel = __webpack_require__(45);
 	
 	// Expose all/spread
 	axios.all = function all(promises) {
 	  return Promise.all(promises);
 	};
-	axios.spread = __webpack_require__(48);
+	axios.spread = __webpack_require__(50);
 	
 	module.exports = axios;
 	
@@ -21258,12 +21105,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var bind = __webpack_require__(27);
+	var bind = __webpack_require__(29);
 	
 	/*global toString:true*/
 	
@@ -21563,7 +21410,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -21580,17 +21427,17 @@ var GCLLib =
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var defaults = __webpack_require__(29);
-	var utils = __webpack_require__(26);
-	var InterceptorManager = __webpack_require__(40);
-	var dispatchRequest = __webpack_require__(41);
-	var isAbsoluteURL = __webpack_require__(44);
-	var combineURLs = __webpack_require__(45);
+	var defaults = __webpack_require__(31);
+	var utils = __webpack_require__(28);
+	var InterceptorManager = __webpack_require__(42);
+	var dispatchRequest = __webpack_require__(43);
+	var isAbsoluteURL = __webpack_require__(46);
+	var combineURLs = __webpack_require__(47);
 	
 	/**
 	 * Create a new instance of Axios
@@ -21671,13 +21518,13 @@ var GCLLib =
 
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(26);
-	var normalizeHeaderName = __webpack_require__(30);
+	var utils = __webpack_require__(28);
+	var normalizeHeaderName = __webpack_require__(32);
 	
 	var PROTECTION_PREFIX = /^\)\]\}',?\n/;
 	var DEFAULT_CONTENT_TYPE = {
@@ -21694,10 +21541,10 @@ var GCLLib =
 	  var adapter;
 	  if (typeof XMLHttpRequest !== 'undefined') {
 	    // For browsers use XHR adapter
-	    adapter = __webpack_require__(31);
+	    adapter = __webpack_require__(33);
 	  } else if (typeof process !== 'undefined') {
 	    // For node use HTTP adapter
-	    adapter = __webpack_require__(31);
+	    adapter = __webpack_require__(33);
 	  }
 	  return adapter;
 	}
@@ -21768,15 +21615,15 @@ var GCLLib =
 	
 	module.exports = defaults;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(21)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22)))
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(26);
+	var utils = __webpack_require__(28);
 	
 	module.exports = function normalizeHeaderName(headers, normalizedName) {
 	  utils.forEach(headers, function processHeader(value, name) {
@@ -21789,18 +21636,18 @@ var GCLLib =
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
 	
-	var utils = __webpack_require__(26);
-	var settle = __webpack_require__(32);
-	var buildURL = __webpack_require__(35);
-	var parseHeaders = __webpack_require__(36);
-	var isURLSameOrigin = __webpack_require__(37);
-	var createError = __webpack_require__(33);
-	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(38);
+	var utils = __webpack_require__(28);
+	var settle = __webpack_require__(34);
+	var buildURL = __webpack_require__(37);
+	var parseHeaders = __webpack_require__(38);
+	var isURLSameOrigin = __webpack_require__(39);
+	var createError = __webpack_require__(35);
+	var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(40);
 	
 	module.exports = function xhrAdapter(config) {
 	  return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -21896,7 +21743,7 @@ var GCLLib =
 	    // This is only done if running in a standard browser environment.
 	    // Specifically not if we're in a web worker, or react-native.
 	    if (utils.isStandardBrowserEnv()) {
-	      var cookies = __webpack_require__(39);
+	      var cookies = __webpack_require__(41);
 	
 	      // Add xsrf header
 	      var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -21970,15 +21817,15 @@ var GCLLib =
 	  });
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(21)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(22)))
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var createError = __webpack_require__(33);
+	var createError = __webpack_require__(35);
 	
 	/**
 	 * Resolve or reject a Promise based on response status.
@@ -22004,12 +21851,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var enhanceError = __webpack_require__(34);
+	var enhanceError = __webpack_require__(36);
 	
 	/**
 	 * Create an Error with the specified message, config, error code, and response.
@@ -22027,7 +21874,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -22052,12 +21899,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(26);
+	var utils = __webpack_require__(28);
 	
 	function encode(val) {
 	  return encodeURIComponent(val).
@@ -22126,12 +21973,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(26);
+	var utils = __webpack_require__(28);
 	
 	/**
 	 * Parse headers into an object
@@ -22169,12 +22016,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(26);
+	var utils = __webpack_require__(28);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -22243,7 +22090,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -22285,12 +22132,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(26);
+	var utils = __webpack_require__(28);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -22344,12 +22191,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(26);
+	var utils = __webpack_require__(28);
 	
 	function InterceptorManager() {
 	  this.handlers = [];
@@ -22402,15 +22249,15 @@ var GCLLib =
 
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(26);
-	var transformData = __webpack_require__(42);
-	var isCancel = __webpack_require__(43);
-	var defaults = __webpack_require__(29);
+	var utils = __webpack_require__(28);
+	var transformData = __webpack_require__(44);
+	var isCancel = __webpack_require__(45);
+	var defaults = __webpack_require__(31);
 	
 	/**
 	 * Throws a `Cancel` if cancellation has been requested.
@@ -22487,12 +22334,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(26);
+	var utils = __webpack_require__(28);
 	
 	/**
 	 * Transform the data for a request or a response
@@ -22513,7 +22360,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -22524,7 +22371,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -22544,7 +22391,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -22562,7 +22409,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 46 */
+/* 48 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -22587,12 +22434,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 47 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var Cancel = __webpack_require__(46);
+	var Cancel = __webpack_require__(48);
 	
 	/**
 	 * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -22650,7 +22497,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 48 */
+/* 50 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -22683,13 +22530,13 @@ var GCLLib =
 
 
 /***/ }),
-/* 49 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var _ = __webpack_require__(1);
-	var es6_promise_1 = __webpack_require__(20);
+	var es6_promise_1 = __webpack_require__(21);
 	var SEPARATOR = "/";
 	var QP_APIKEY = "?apikey=";
 	var SECURITY = "/security";
@@ -22810,7 +22657,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 50 */
+/* 52 */
 /***/ (function(module, exports) {
 
 	"use strict";

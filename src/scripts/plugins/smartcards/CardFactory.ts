@@ -24,8 +24,11 @@ import { AbstractMobib } from "./mobib/mobibModel";
 import { AbstractEidLUX } from "./eid/lux/EidLuxModel";
 import { AbstractDNI } from "./eid/esp/dniModel";
 import { DNI } from "./eid/esp/dni";
+import { AbstractBelfius } from "./emv/BelfiusModel";
+import { Belfius } from "./emv/Belfius";
 
 export interface AbstractFactory {
+    createBelfius(reader_id?: string): AbstractBelfius;
     createEidBE(reader_id?: string): AbstractEidBE;
     createEidLUX(reader_id?: string): AbstractEidLUX;
     createEmv(reader_id?: string): AbstractEMV;
@@ -40,6 +43,7 @@ export interface AbstractFactory {
 const CONTAINER_CONTEXT_PATH = "/plugins/";
 const CONTAINER_NEW_CONTEXT_PATH = "/containers/";
 const CONTAINER_BEID = CONTAINER_CONTEXT_PATH + "beid";
+const CONTAINER_BELFIUS = CONTAINER_CONTEXT_PATH + "belfius";
 const CONTAINER_LUXEID = CONTAINER_CONTEXT_PATH + "luxeid";
 const CONTAINER_DNI = CONTAINER_NEW_CONTEXT_PATH + "dnie";
 const CONTAINER_EMV = CONTAINER_CONTEXT_PATH + "emv";
@@ -53,6 +57,10 @@ const CONTAINER_PIV = CONTAINER_CONTEXT_PATH + "piv";
 
 export class CardFactory implements AbstractFactory {
     constructor(private url: string, private connection: LocalConnection) {}
+
+    public createBelfius(reader_id?: string): AbstractBelfius {
+        return new Belfius(this.url + CONTAINER_BELFIUS, this.connection, reader_id);
+    }
 
     public createDNI(reader_id?: string): AbstractDNI { return new DNI(this.url + CONTAINER_DNI, this.connection, reader_id); }
 

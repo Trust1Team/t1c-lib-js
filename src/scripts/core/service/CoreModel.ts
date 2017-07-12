@@ -5,7 +5,7 @@
 
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 
-export { AbstractCore, T1CResponse, DataResponse, DataArrayResponse, DataObjectResponse, InfoResponse, BrowserInfoResponse,
+export { AbstractCore, T1CResponse, DataObject, DataResponse, DataArrayResponse, DataObjectResponse, InfoResponse, BrowserInfoResponse,
     Card, CardReader, CardReadersResponse, SingleReaderResponse, PluginsResponse, PubKeyResponse };
 
 
@@ -61,6 +61,10 @@ interface AbstractCore {
 interface T1CResponse {
     data?: {}
     success: boolean
+}
+
+interface DataObject {
+    data: string
 }
 
 interface DataResponse extends T1CResponse {

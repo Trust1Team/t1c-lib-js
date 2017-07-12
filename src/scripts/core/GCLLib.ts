@@ -27,6 +27,7 @@ import { AbstractEidLUX } from "../plugins/smartcards/eid/lux/EidLuxModel";
 import { AbstractDNI } from "../plugins/smartcards/eid/esp/dniModel";
 import { AgentClient } from "./agent/agent";
 import { AbstractAgent } from "./agent/agentModel";
+import { AbstractBelfius } from "../plugins/smartcards/emv/BelfiusModel";
 
 
 class GCLClient {
@@ -102,6 +103,8 @@ class GCLClient {
     public ocv = (): AbstractOCVClient => { return this.ocvClient; };
     // get instance for belgian eID card
     public beid = (reader_id?: string): AbstractEidBE => { return this.cardFactory.createEidBE(reader_id); };
+    // get instance for belfius
+    public belfius = (reader_id?: string): AbstractBelfius => { return this.cardFactory.createBelfius(reader_id); };
     // get instance for spanish DNI card
     public dni = (reader_id?: string): AbstractDNI => { return this.cardFactory.createDNI(reader_id); };
     // get instance for luxemburg eID card
