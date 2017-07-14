@@ -129,7 +129,7 @@ function handleRequest(url: string,
             return callback(null, response.data);
         }).catch(function (error: AxiosError) {
             if (error.response) { return callback(error.response, null); }
-            else { return callback(error, null); }
+            else { return callback(JSON.stringify(error), null); }
         });
     } else {
         return axios.request(config).then((response: AxiosResponse) => {
