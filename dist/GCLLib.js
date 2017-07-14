@@ -20991,7 +20991,7 @@ var GCLLib =
 	                return callback(error.response, null);
 	            }
 	            else {
-	                return callback(error, null);
+	                return callback(JSON.stringify(error), null);
 	            }
 	        });
 	    }
