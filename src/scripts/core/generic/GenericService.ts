@@ -12,17 +12,39 @@ import { ResponseHandler } from "../../util/ResponseHandler";
 import * as _ from "lodash";
 import { CardUtil } from "../../util/CardUtil";
 import { Aventra } from "../../plugins/smartcards/pki/aventra/Aventra";
+import { Options } from "../../util/RequestHandler";
 
 export { GenericService };
+
+interface Arguments {
+    client: GCLClient,
+    readerId: string,
+    container: string,
+    data: OptionalPin,
+    dumpMethod?: string
+    dumpOptions?: Options
+}
+
 
 class GenericService {
 
     public static containerForReader(client: GCLClient,
-                                   readerId: string,
-                                   callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+                                     readerId: string,
+                                     callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         return this.checkPrerequisites(client, readerId, {}).then(res => {
             return ResponseHandler.response({ data: res.container, success: true }, callback);
         }).catch(err => { return ResponseHandler.error(err, callback); });
+    }
+
+    public static dumpData(client: GCLClient,
+                           readerId: string,
+                           data: OptionalPin,
+                           callback?: (error: ResponseHandler, data: DataResponse) => void): Promise<DataResponse> {
+        return this.checkPrerequisites(client, readerId, data)
+                   .then(this.determineDataDumpMethod)
+                   .then(GenericService.doDataDump)
+                   .then(res => { return ResponseHandler.response(res, callback); })
+                   .catch(err => { return ResponseHandler.error(err, callback); });
     }
 
     public static authenticateCapable(client: GCLClient, callback?: (error: RestException, data: CardReadersResponse) => void) {
@@ -174,7 +196,24 @@ class GenericService {
         });
     }
 
-    private static doSign(args: { client: GCLClient, readerId: string, container: string, data: AuthenticateOrSignData }) {
+    private static determineDataDumpMethod(args: Arguments) {
+        return new Promise((resolve, reject) => {
+            args.dumpMethod = CardUtil.dumpMethod(args.container);
+            args.dumpOptions = CardUtil.dumpOptions(args.container);
+            if (args.dumpMethod) { resolve(args); }
+            else { reject("Cannot determine method to use for data dump"); }
+        });
+    }
+
+    private static doDataDump(args: Arguments) {
+        if (args.container === "luxeid") {
+            return args.client.luxeid(args.readerId, args.data.pin).allData({ filters: [], parseCerts: true}, args.data);
+        }
+        if (args.dumpOptions) { return args.client[args.container](args.readerId)[args.dumpMethod](args.dumpOptions, args.data); }
+        else { return args.client[args.container](args.readerId)[args.dumpMethod](args.data); }
+    }
+
+    private static doSign(args: Arguments) {
         if (args.container === "luxeid") {
             return args.client.luxeid(args.readerId, args.data.pin).signData(args.data);
         } else {
@@ -182,7 +221,7 @@ class GenericService {
         }
     }
 
-    private static doAuthenticate(args: { client: GCLClient, readerId: string, container: string, data: AuthenticateOrSignData }) {
+    private static doAuthenticate(args: Arguments) {
         if (args.container === "luxeid") {
             return args.client.luxeid(args.readerId, args.data.pin).authenticate(args.data);
         } else {
@@ -190,7 +229,7 @@ class GenericService {
         }
     }
 
-    private static doVerifyPin(args: { client: GCLClient, readerId: string, container: string, data: OptionalPin }) {
+    private static doVerifyPin(args: Arguments) {
         if (args.container === "luxeid") {
             return args.client.luxeid(args.readerId, args.data.pin).verifyPin(args.data);
         } else if (args.container === "beid") {

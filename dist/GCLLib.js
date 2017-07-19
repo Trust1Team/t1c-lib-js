@@ -178,6 +178,9 @@ var GCLLib =
 	            return ResponseHandler_1.ResponseHandler.error(error, callback);
 	        });
 	    };
+	    GCLClient.prototype.dumpData = function (readerId, data, callback) {
+	        return GenericService_1.GenericService.dumpData(this, readerId, data, callback);
+	    };
 	    GCLClient.prototype.readersCanAuthenticate = function (callback) {
 	        return GenericService_1.GenericService.authenticateCapable(this, callback);
 	    };
@@ -73895,6 +73898,13 @@ var GCLLib =
 	            return ResponseHandler_1.ResponseHandler.response({ data: res.container, success: true }, callback);
 	        }).catch(function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
 	    };
+	    GenericService.dumpData = function (client, readerId, data, callback) {
+	        return this.checkPrerequisites(client, readerId, data)
+	            .then(this.determineDataDumpMethod)
+	            .then(GenericService.doDataDump)
+	            .then(function (res) { return ResponseHandler_1.ResponseHandler.response(res, callback); })
+	            .catch(function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
+	    };
 	    GenericService.authenticateCapable = function (client, callback) {
 	        return client.core().readersCardAvailable()
 	            .then(this.checkCanAuthenticate)
@@ -74029,6 +74039,29 @@ var GCLLib =
 	            }
 	        });
 	    };
+	    GenericService.determineDataDumpMethod = function (args) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            args.dumpMethod = CardUtil_1.CardUtil.dumpMethod(args.container);
+	            args.dumpOptions = CardUtil_1.CardUtil.dumpOptions(args.container);
+	            if (args.dumpMethod) {
+	                resolve(args);
+	            }
+	            else {
+	                reject("Cannot determine method to use for data dump");
+	            }
+	        });
+	    };
+	    GenericService.doDataDump = function (args) {
+	        if (args.container === "luxeid") {
+	            return args.client.luxeid(args.readerId, args.data.pin).allData({ filters: [], parseCerts: true }, args.data);
+	        }
+	        if (args.dumpOptions) {
+	            return args.client[args.container](args.readerId)[args.dumpMethod](args.dumpOptions, args.data);
+	        }
+	        else {
+	            return args.client[args.container](args.readerId)[args.dumpMethod](args.data);
+	        }
+	    };
 	    GenericService.doSign = function (args) {
 	        if (args.container === "luxeid") {
 	            return args.client.luxeid(args.readerId, args.data.pin).signData(args.data);
@@ -74087,7 +74120,7 @@ var GCLLib =
 	        switch (container) {
 	            case "aventra":
 	            case "beid":
-	            case "dni":
+	            case "dnie":
 	            case "luxeid":
 	            case "luxtrust":
 	            case "oberthur":
@@ -74105,7 +74138,7 @@ var GCLLib =
 	        switch (container) {
 	            case "aventra":
 	            case "beid":
-	            case "dni":
+	            case "dnie":
 	            case "luxeid":
 	            case "luxtrust":
 	            case "oberthur":
@@ -74123,7 +74156,7 @@ var GCLLib =
 	        switch (container) {
 	            case "aventra":
 	            case "beid":
-	            case "dni":
+	            case "dnie":
 	            case "luxeid":
 	            case "luxtrust":
 	            case "oberthur":
@@ -74179,12 +74212,51 @@ var GCLLib =
 	        switch (container) {
 	            case "aventra":
 	            case "beid":
-	            case "dni":
+	            case "dnie":
 	            case "oberthur":
 	            case "piv":
 	            case "luxeid":
 	            case "luxtrust":
 	                return "sha256";
+	            default:
+	                return undefined;
+	        }
+	    };
+	    CardUtil.dumpMethod = function (container) {
+	        switch (container) {
+	            case "aventra":
+	            case "beid":
+	            case "dnie":
+	            case "luxeid":
+	            case "luxtrust":
+	            case "mobib":
+	            case "oberthur":
+	            case "ocra":
+	            case "piv":
+	                return "allData";
+	            case "safenet":
+	                return "slots";
+	            case "emv":
+	                return "pan";
+	            default:
+	                return undefined;
+	        }
+	    };
+	    CardUtil.dumpOptions = function (container) {
+	        switch (container) {
+	            case "aventra":
+	            case "beid":
+	            case "dnie":
+	            case "luxeid":
+	            case "luxtrust":
+	            case "mobib":
+	            case "oberthur":
+	            case "ocra":
+	            case "piv":
+	                return { filters: [], parseCerts: true };
+	            case "safenet":
+	            case "emv":
+	                return undefined;
 	            default:
 	                return undefined;
 	        }
