@@ -3,20 +3,22 @@
  */
 
 import { Promise } from "es6-promise";
-export { CertParser };
+import "babel-polyfill";
 import * as _ from "lodash";
 import * as asn1js from "asn1js";
 import * as Base64 from "Base64";
-import * as pkijs from "pkijs";
+import { Certificate } from "pkijs";
 import { RestException } from "../core/exceptions/CoreExceptions";
-import { Certificate, T1CResponse } from "../core/service/CoreModel";
+import { T1CCertificate, T1CResponse } from "../core/service/CoreModel";
 import { ResponseHandler } from "./ResponseHandler";
+
+export { CertParser };
 
 class CertParser {
 
     public static process(response: any,
                           parseCerts: boolean,
-                          callback?: (error: RestException, data: T1CResponse) => void): void | Promise<any> {
+                          callback?: (error: RestException, data: T1CResponse) => void):  Promise<any> {
         // check if data has properties
         if (response && response.data && typeof response.data === "object" && !_.isArray(response.data)) {
             _.forEach(response.data, (value, key) => {
@@ -28,7 +30,7 @@ class CertParser {
                     if (_.isArray(value)) {
                         let newData = [];
                         _.forEach(value, (certificate: string) => {
-                            let cert: Certificate = { base64: certificate };
+                            let cert: T1CCertificate = { base64: certificate };
                             if (parseCerts) { cert.parsed = CertParser.processCert(certificate); }
                             newData.push(cert);
                         });
@@ -41,13 +43,13 @@ class CertParser {
             if (_.isArray(response.data)) {
                 let newData = [];
                 _.forEach(response.data, (certificate: string) => {
-                    let cert: Certificate = { base64: certificate };
+                    let cert: T1CCertificate = { base64: certificate };
                     if (parseCerts) { cert.parsed = CertParser.processCert(certificate); }
                     newData.push(cert);
                 });
                 response.data = newData;
             } else {
-                let cert: Certificate = { base64: response.data };
+                let cert: T1CCertificate = { base64: response.data };
                 if (parseCerts) { cert.parsed = CertParser.processCert(response.data); }
                 response.data = cert;
             }
@@ -56,11 +58,11 @@ class CertParser {
     }
 
 
-    public static processCert(certificate: string): Certificate {
+    public static processCert(certificate: string): T1CCertificate {
         let rawCert = Base64.atob(certificate);
         let buffer = CertParser.str2ab(rawCert);
         const asn1 = asn1js.fromBER(buffer);
-        return new pkijs.Certificate({ schema: asn1.result });
+        return new Certificate({ schema: asn1.result });
     }
 
     // function to convert string to ArrayBuffer
