@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Trust1Team/t1c-lib-js",
   "devDependencies": {
     "@types/jwt-decode": "1.4.28",
+    "babel-polyfill": "^6.23.0",
     "chai": "3.5.0",
     "del": "2.2.1",
     "gulp": "3.9.1",
