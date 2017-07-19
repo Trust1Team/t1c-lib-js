@@ -449,7 +449,7 @@
         $("#luxidAllCert").on('click', function () {
             $("#information").empty();
             var luxeid = connector.luxeid($("#selected_reader").text(),pin);
-            luxeid.allCerts([],callback);
+            luxeid.allCerts({ filter: [], parseCerts: true }, callback);
         });
         $("#luxidRootCert").on('click', function () {
             $("#information").empty();
