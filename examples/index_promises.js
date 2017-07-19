@@ -165,7 +165,7 @@
         if($("#nonrepcertx").is(":checked"))filter.push($("#nonrepcertx").val());
         if($("#citizencertx").is(":checked"))filter.push($("#citizencertx").val());
         if($("#rrncertx").is(":checked"))filter.push($("#rrncertx").val());
-        beid.allCerts(filter).then(handleSuccess, handleError);
+        beid.allCerts({ filters: filter, parseCerts: true }).then(handleSuccess, handleError);
     });
     $("#beidRn").on('click', function () {
         $("#information").empty();
@@ -185,7 +185,7 @@
     $("#beidAllCert").on('click', function () {
         $("#information").empty();
         var beid = connector.beid($("#selected_reader").text());
-        beid.allCerts([]).then(handleSuccess, handleError);
+        beid.allCerts({ filters: [], parseCerts: true }).then(handleSuccess, handleError);
     });
     $("#beidRootCert").on('click', function () {
         $("#information").empty();
