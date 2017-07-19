@@ -3,7 +3,7 @@
  */
 
 import { Promise } from "es6-promise";
-import 'babel-polyfill';
+import "babel-polyfill";
 import * as _ from "lodash";
 import * as asn1js from "asn1js";
 import * as Base64 from "Base64";
