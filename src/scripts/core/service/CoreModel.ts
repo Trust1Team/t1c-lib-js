@@ -6,7 +6,7 @@
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 
 export { AbstractCore, T1CResponse, DataResponse, DataArrayResponse, DataObjectResponse, InfoResponse, BrowserInfo, BrowserInfoResponse,
-    Card, CardReader, CardReadersResponse, Certificate, CertificateResponse, CertificatesResponse,
+    Card, CardReader, CardReadersResponse, T1CCertificate, CertificateResponse, CertificatesResponse,
     SingleReaderResponse, PluginsResponse, PubKeyResponse };
 
 
@@ -120,14 +120,14 @@ interface CardReadersResponse extends T1CResponse {
 }
 
 interface CertificateResponse extends T1CResponse {
-    data: Certificate
+    data: T1CCertificate
 }
 
 interface CertificatesResponse extends T1CResponse {
-    data: Certificate[]
+    data: T1CCertificate[]
 }
 
-interface Certificate {
+interface T1CCertificate {
     base64: string,
     parsed?: object
 }
@@ -147,4 +147,3 @@ interface PluginsResponse extends T1CResponse {
 interface PubKeyResponse extends T1CResponse {
     data: string
 }
-
