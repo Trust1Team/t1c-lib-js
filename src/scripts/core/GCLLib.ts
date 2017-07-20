@@ -172,6 +172,10 @@ class GCLClient {
         });
     }
 
+    public dumpData(readerId: string, data: OptionalPin, callback?: (error: RestException, data: DataResponse) => void) {
+        return GenericService.dumpData(this, readerId, data, callback);
+    }
+
     public readersCanAuthenticate(callback?: (error: RestException, data: CardReadersResponse) => void) {
         return GenericService.authenticateCapable(this, callback);
     }
@@ -304,9 +308,9 @@ class GCLClient {
                 console.log("implicit error", JSON.stringify(_info));
                 self.ds().downloadLink(_info.data,
                     function(linkError: CoreExceptions.RestException, downloadResponse: DownloadLinkResponse) {
-                    if (linkError) { console.error("could not download GCL package:", linkError.description); }
-                    window.open(downloadResponse.url); return;
-                });
+                        if (linkError) { console.error("could not download GCL package:", linkError.description); }
+                        window.open(downloadResponse.url); return;
+                    });
             } else { return; }
         });
     }

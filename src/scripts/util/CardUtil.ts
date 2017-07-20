@@ -14,7 +14,7 @@ class CardUtil {
         switch (container) {
             case "aventra":
             case "beid":
-            case "dni":
+            case "dnie":
             case "luxeid":
             case "luxtrust":
             case "oberthur":
@@ -34,7 +34,7 @@ class CardUtil {
         switch (container) {
             case "aventra":
             case "beid":
-            case "dni":
+            case "dnie":
             case "luxeid":
             case "luxtrust":
             case "oberthur":
@@ -54,7 +54,7 @@ class CardUtil {
         switch (container) {
             case "aventra":
             case "beid":
-            case "dni":
+            case "dnie":
             case "luxeid":
             case "luxtrust":
             case "oberthur":
@@ -95,12 +95,53 @@ class CardUtil {
         switch (container) {
             case "aventra":
             case "beid":
-            case "dni":
+            case "dnie":
             case "oberthur":
             case "piv":
             case "luxeid":
             case "luxtrust":
                 return "sha256";
+            default:
+                return undefined;
+        }
+    }
+
+    public static dumpMethod(container: string) {
+        switch (container) {
+            case "aventra":
+            case "beid":
+            case "dnie":
+            case "luxeid":
+            case "luxtrust":
+            case "mobib":
+            case "oberthur":
+            case "ocra":
+            case "piv":
+                return "allData";
+            case "safenet":
+                return "slots";
+            case "emv":
+                return "pan";
+            default:
+                return undefined;
+        }
+    }
+
+    public static dumpOptions(container: string) {
+        switch (container) {
+            case "aventra":
+            case "beid":
+            case "dnie":
+            case "luxeid":
+            case "luxtrust":
+            case "mobib":
+            case "oberthur":
+            case "ocra":
+            case "piv":
+                return { filters: [], parseCerts: true };
+            case "safenet":
+            case "emv":
+                return undefined;
             default:
                 return undefined;
         }

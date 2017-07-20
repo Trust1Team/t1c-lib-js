@@ -33,14 +33,14 @@ interface PinCard extends Card {
 }
 
 interface CertCard extends PinCard {
-    allCerts: (filters: string[], callback?: () => void) => Promise<DataObjectResponse>
+    allCerts: (filters: string[] | Options, callback?: () => void) => Promise<DataObjectResponse>
     authenticate: (body: any, callback?: () => void) => Promise<DataResponse>
     signData: (body: any, callback?: () => void) => Promise<DataResponse>
 }
 
 interface SecuredCertCard {
-    allCerts: (filters: string[], body: OptionalPin, callback?: () => void) => Promise<DataObjectResponse>
-    allData: (filters: string[], body: OptionalPin, callback?: () => void) => Promise<DataObjectResponse>
+    allCerts: (filters: string[] | Options, body: OptionalPin, callback?: () => void) => Promise<DataObjectResponse>
+    allData: (filters: string[] | Options, body: OptionalPin, callback?: () => void) => Promise<DataObjectResponse>
     authenticate: (body: any, callback?: () => void) => Promise<DataResponse>
     signData: (body: any, callback?: () => void) => Promise<DataResponse>
     verifyPin: (body: OptionalPin, callback?: () => void) => Promise<T1CResponse>
