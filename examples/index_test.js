@@ -414,6 +414,10 @@
         $("#pinModalPromise").modal('toggle');
     });
 
+    $("#genericDump").on('click', function () {
+        $("#information").empty();
+        connector.dumpData($("#selected_reader").text(), { pin: '123456' }).then(handleSuccess, handleError);
+    });
 
     $("#genericCanAuthenticate").on('click', function () {
         $("#information").empty();
