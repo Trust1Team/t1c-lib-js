@@ -17835,7 +17835,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return "v1.3.6";
+	        return "v1.3.7";
 	    };
 	    return CoreService;
 	}());
@@ -22049,8 +22049,6 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    EMV.prototype.pan = function (callback) {
-	        console.log("pan");
-	        console.log(callback);
 	        return this.connection.get(this.resolvedReaderURI() + EMV_PAN, undefined, callback);
 	    };
 	    return EMV;
