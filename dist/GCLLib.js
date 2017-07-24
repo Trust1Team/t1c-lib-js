@@ -20260,8 +20260,9 @@ var GCLLib =
 	    if (jwt) {
 	        config.headers.Authorization = "Bearer " + jwt;
 	    }
-	    callback = callback || function () {
-	    };
+	    if (!callback || typeof callback !== "function") {
+	        callback = function () { };
+	    }
 	    return new es6_promise_1.Promise(function (resolve, reject) {
 	        axios_1.default.request(config).then(function (response) {
 	            callback(null, response.data);
@@ -22048,6 +22049,8 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    EMV.prototype.pan = function (callback) {
+	        console.log("pan");
+	        console.log(callback);
 	        return this.connection.get(this.resolvedReaderURI() + EMV_PAN, undefined, callback);
 	    };
 	    return EMV;
@@ -74194,6 +74197,12 @@ var GCLLib =
 	            }
 	            else if (findDescription(card.description, "Aventra")) {
 	                return "aventra";
+	            }
+	            else if (findDescription(card.description, "PIV")) {
+	                return "PIV";
+	            }
+	            else if (findDescription(card.description, "CIV")) {
+	                return "PIV";
 	            }
 	            else {
 	                return undefined;
