@@ -144,10 +144,7 @@ function handleRequest(url: string,
     if (params) { config.params = params; }
     if (apikey) { config.headers.apikey = apikey; }
     if (jwt) { config.headers.Authorization = "Bearer " + jwt; }
-
-    callback = callback || function () {
-            // no-op
-        };
+    if (!callback || typeof callback !== "function") { callback = function () { /* no-op */ }; }
 
     return new Promise((resolve, reject) => {
         axios.request(config).then((response: AxiosResponse) => {
