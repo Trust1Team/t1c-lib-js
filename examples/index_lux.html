@@ -82,7 +82,6 @@
         <button id="luxidVerifyPin" type="button" class="btn btn-default btn-lg">LuxID Verify Pin</button>
         <button id="luxidSign" type="button" class="btn btn-default btn-lg">LuxID Sign</button>
         <button id="luxidAuthenticate" type="button" class="btn btn-default btn-lg">LuxID Authenticate</button>
-        <button id="clear" type="button" class="btn btn-default btn-lg">Clear</button>
         <hr />
         <button id="luxidFiltered" type="button" class="btn btn-default btn-lg">LuxID Read Filtered</button>
         <div class="form-group">
@@ -108,6 +107,26 @@
             <label for="authcertx"><span class="glyphicon "></span> authentication certificate</label>
             <input type="checkbox" name="type" value="non-repudiation-certificate" id="nonrepcertx"/>
             <label for="nonrepcertx"><span class="glyphicon "></span> non-repudiation certificate</label>
+        </div>
+        <hr/>
+        <div>
+            <button id="luxtrustAllData" type="button" class="btn btn-default btn-lg">LuxTrust
+                AllData</button>
+            <button id="luxtustAllCerts" type="button" class="btn btn-default btn-lg">LuxTrust
+                AllCerts</button>
+            <button id="luxtrustRootCert" type="button" class="btn btn-default btn-lg">LuxTrust Root
+                Cert</button>
+            <button id="luxtrustAuthCert" type="button" class="btn btn-default btn-lg">LuxTrust
+                Authentication Cert</button>
+            <button id="luxtrustSigningCert" type="button" class="btn btn-default btn-lg">LuxTrust
+                Signing Cert</button>
+            <!--<button id="luxidVerifyPin" type="button" class="btn btn-default btn-lg">LuxID Verify Pin</button>-->
+            <!--<button id="luxidSign" type="button" class="btn btn-default btn-lg">LuxID Sign</button>-->
+            <!--<button id="luxidAuthenticate" type="button" class="btn btn-default btn-lg">LuxID Authenticate</button>-->
+        </div>
+        <hr/>
+        <div>
+            <button id="clear" type="button" class="btn btn-warning btn-lg">Clear</button>
         </div>
     </div>
     <hr />
@@ -459,7 +478,7 @@
         $("#luxidAuthCert").on('click', function () {
             $("#information").empty();
             var luxeid = connector.luxeid($("#selected_reader").text(),pin);
-            luxeid.authenticationCertificate(callback);
+            luxeid.authenticationCertificate({ parseCerts: true }, callback);
         });
         $("#luxidNonRepCert").on('click', function () {
             $("#information").empty();
@@ -474,6 +493,33 @@
             $("#validationError").empty();
             $("#validationError").hide();
             $("#pinModal").modal('toggle');
+        });
+
+        // LuxTrust Methods
+        $("#luxtrustAllData").on('click', function () {
+            $("#information").empty();
+            var luxtrust = connector.luxtrust($("#selected_reader").text());
+            luxtrust.allData({ filters: [], parseCerts: true }, callback);
+        });
+        $("#luxtustAllCerts").on('click', function () {
+            $("#information").empty();
+            var luxtrust = connector.luxtrust($("#selected_reader").text());
+            luxtrust.allCerts({ filters: [], parseCerts: true }, callback);
+        });
+        $("#luxtrustRootCert").on('click', function () {
+            $("#information").empty();
+            var luxtrust = connector.luxtrust($("#selected_reader").text());
+            luxtrust.rootCertificate({ parseCerts: true }, callback);
+        });
+        $("#luxtrustAuthCert").on('click', function () {
+            $("#information").empty();
+            var luxtrust = connector.luxtrust($("#selected_reader").text());
+            luxtrust.authenticationCertificate({ parseCerts: true }, callback);
+        });
+        $("#luxtrustSigningCert").on('click', function () {
+            $("#information").empty();
+            var luxtrust = connector.luxtrust($("#selected_reader").text());
+            luxtrust.signingCertificate({ parseCerts: true }, callback);
         });
 
         $("#buttonValidate").on('click', function () {
