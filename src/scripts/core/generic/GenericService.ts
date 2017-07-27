@@ -167,14 +167,16 @@ class GenericService {
     }
 
     private static checkContainerAvailable(args: { client: GCLClient, container: string }) {
-        return args.client.core().plugins().then(res => {
-            return new Promise((resolve, reject) => {
-                if (_.find(res.data, ct => { return ct.id === args.container; })) {
-                    resolve(args);
-                } else {
-                    reject("Container for this card is not available");
-                }
-            });
+        return new Promise((resolve, reject) => {
+            if (args && args.container) {
+                args.client.core().plugins().then(res => {
+                    if (_.find(res.data, ct => { return ct.id === args.container; })) {
+                        resolve(args);
+                    } else {
+                        reject("Container for this card is not available");
+                    }
+                });
+            } else { reject("Unknown card type"); }
         });
     }
 

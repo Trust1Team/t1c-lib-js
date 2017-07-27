@@ -17835,7 +17835,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return "v1.3.7";
+	        return "v1.3.8";
 	    };
 	    return CoreService;
 	}());
@@ -74006,15 +74006,20 @@ var GCLLib =
 	        });
 	    };
 	    GenericService.checkContainerAvailable = function (args) {
-	        return args.client.core().plugins().then(function (res) {
-	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                if (_.find(res.data, function (ct) { return ct.id === args.container; })) {
-	                    resolve(args);
-	                }
-	                else {
-	                    reject("Container for this card is not available");
-	                }
-	            });
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            if (args && args.container) {
+	                args.client.core().plugins().then(function (res) {
+	                    if (_.find(res.data, function (ct) { return ct.id === args.container; })) {
+	                        resolve(args);
+	                    }
+	                    else {
+	                        reject("Container for this card is not available");
+	                    }
+	                });
+	            }
+	            else {
+	                reject("Unknown card type");
+	            }
 	        });
 	    };
 	    GenericService.determineAlgorithm = function (args) {
@@ -74197,10 +74202,10 @@ var GCLLib =
 	                return "aventra";
 	            }
 	            else if (findDescription(card.description, "PIV")) {
-	                return "PIV";
+	                return "piv";
 	            }
 	            else if (findDescription(card.description, "CIV")) {
-	                return "PIV";
+	                return "piv";
 	            }
 	            else {
 	                return undefined;
