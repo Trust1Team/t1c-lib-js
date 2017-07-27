@@ -79,8 +79,8 @@ class CardUtil {
             else if (findDescription(card.description, "Mastercard")) { return "emv"; }
             else if (findDescription(card.description, "Oberthur")) { return "oberthur"; }
             else if (findDescription(card.description, "Aventra")) { return "aventra"; }
-            else if (findDescription(card.description, "PIV")) { return "PIV"; }
-            else if (findDescription(card.description, "CIV")) { return "PIV"; }
+            else if (findDescription(card.description, "PIV")) { return "piv"; }
+            else if (findDescription(card.description, "CIV")) { return "piv"; }
             else { return undefined; }
         } else {
             return undefined;
