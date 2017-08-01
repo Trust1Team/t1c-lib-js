@@ -278,7 +278,7 @@ class GCLClient {
                                 });
                             });
                         });
-                } else {
+                } else if (!managed) {
                     // we need to synchronize the device
                     // console.log("Sync device:"+uuid);
                     self.dsClient.sync(mergedInfo, uuid,
