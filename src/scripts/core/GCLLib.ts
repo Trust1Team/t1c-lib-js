@@ -120,6 +120,7 @@ class GCLClient {
         resolvedCfg.client_secret = cfg.client_secret;
         resolvedCfg.jwt = cfg.jwt;
         resolvedCfg.gclUrl = cfg.gclUrl;
+        resolvedCfg.ocvUrl = cfg.ocvUrl;
         resolvedCfg.implicitDownload = cfg.implicitDownload;
         resolvedCfg.localTestMode = cfg.localTestMode;
         resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
