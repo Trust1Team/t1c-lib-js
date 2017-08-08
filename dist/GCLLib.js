@@ -115,45 +115,31 @@ var GCLLib =
 	        });
 	    }
 	    GCLClient.initialize = function (cfg, callback) {
-	        if (callback) {
-	            init();
-	        }
-	        else {
-	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                init(resolve, reject);
-	            });
-	        }
-	        function init(resolve, reject) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
 	            var client = new GCLClient(cfg, true);
 	            client.initSecurityContext(function (err) {
 	                if (err) {
 	                    console.log(JSON.stringify(err));
-	                    if (reject) {
-	                        reject(err);
-	                    }
-	                    else {
+	                    if (callback && typeof callback === "function") {
 	                        callback(err, null);
 	                    }
+	                    reject(err);
 	                }
 	                else {
 	                    client.registerAndActivate().then(function () {
-	                        if (resolve) {
-	                            resolve(client);
-	                        }
-	                        else {
+	                        if (callback && typeof callback === "function") {
 	                            callback(null, client);
 	                        }
+	                        resolve(client);
 	                    }, function (error) {
-	                        if (reject) {
-	                            reject(error);
-	                        }
-	                        else {
+	                        if (callback && typeof callback === "function") {
 	                            callback(error, null);
 	                        }
+	                        reject(error);
 	                    });
 	                }
 	            });
-	        }
+	        });
 	    };
 	    GCLClient.resolveConfig = function (cfg) {
 	        var resolvedCfg = new GCLConfig_1.GCLConfig(cfg.dsUrlBase, cfg.apiKey);
@@ -162,6 +148,7 @@ var GCLLib =
 	        resolvedCfg.client_secret = cfg.client_secret;
 	        resolvedCfg.jwt = cfg.jwt;
 	        resolvedCfg.gclUrl = cfg.gclUrl;
+	        resolvedCfg.ocvUrl = cfg.ocvUrl;
 	        resolvedCfg.implicitDownload = cfg.implicitDownload;
 	        resolvedCfg.localTestMode = cfg.localTestMode;
 	        resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
@@ -270,16 +257,22 @@ var GCLLib =
 	                    });
 	                }
 	                else {
-	                    self.dsClient.sync(mergedInfo, uuid, function (syncError, activationResponse) {
-	                        if (syncError) {
-	                            console.log("Error while syncing the device: " + JSON.stringify(syncError));
-	                            reject(syncError);
-	                            return;
-	                        }
-	                        self_cfg.jwt = activationResponse.token;
+	                    if (managed) {
 	                        resolve();
 	                        return;
-	                    });
+	                    }
+	                    else {
+	                        self.dsClient.sync(mergedInfo, uuid, function (syncError, activationResponse) {
+	                            if (syncError) {
+	                                console.log("Error while syncing the device: " + JSON.stringify(syncError));
+	                                reject(syncError);
+	                                return;
+	                            }
+	                            self_cfg.jwt = activationResponse.token;
+	                            resolve();
+	                            return;
+	                        });
+	                    }
 	                }
 	            });
 	        });
@@ -17475,11 +17468,13 @@ var GCLLib =
 	                this._dsUrlBase = _.replace(dsUriValue, defaultDSContextPath, "");
 	                this._dsUrl = dsUriValue;
 	                this._dsFileDownloadUrl = this._dsUrlBase + fileDownloadUrlPostfix;
+	                this._ocvUrl = this._dsUrlBase + defaultOCVContextPath;
 	            }
 	            else {
 	                this._dsUrl = dsUriValue + defaultDSContextPath;
 	                this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
 	                this._dsUrlBase = dsUriValue;
+	                this._ocvUrl = dsUriValue + defaultOCVContextPath;
 	            }
 	        },
 	        enumerable: true,
@@ -17835,7 +17830,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return "v1.3.8";
+	        return "v1.3.9";
 	    };
 	    return CoreService;
 	}());

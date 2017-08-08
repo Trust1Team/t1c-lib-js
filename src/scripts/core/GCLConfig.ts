@@ -74,10 +74,12 @@ class GCLConfig {
             this._dsUrlBase = _.replace(dsUriValue, defaultDSContextPath, "");
             this._dsUrl = dsUriValue;
             this._dsFileDownloadUrl = this._dsUrlBase + fileDownloadUrlPostfix;
+            this._ocvUrl = this._dsUrlBase + defaultOCVContextPath;
         } else {
             this._dsUrl = dsUriValue + defaultDSContextPath;
             this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
             this._dsUrlBase = dsUriValue;
+            this._ocvUrl = dsUriValue + defaultOCVContextPath;
         }
     }
 
