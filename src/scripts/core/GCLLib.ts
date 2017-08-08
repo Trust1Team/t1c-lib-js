@@ -83,33 +83,25 @@ class GCLClient {
 
     public static initialize(cfg: GCLConfig,
                              callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): void | Promise<GCLClient> {
-        if (callback) {
-            init();
-        } else {
-            return new Promise((resolve, reject) => {
-                init(resolve, reject);
-            });
-        }
-
-        function init(resolve?: (data: any) => void, reject?: (error: any) => void) {
+        return new Promise((resolve, reject) => {
             let client = new GCLClient(cfg, true);
 
             client.initSecurityContext(function(err: CoreExceptions.RestException) {
                 if (err) {
                     console.log(JSON.stringify(err));
-                    if (reject) { reject(err); }
-                    else { callback(err, null); }
+                    if (callback && typeof callback === "function") { callback(err, null); }
+                    reject(err);
                 } else {
                     client.registerAndActivate().then(() => {
-                        if (resolve) { resolve(client); }
-                        else { callback(null, client); }
+                        if (callback && typeof callback === "function") { callback(null, client); }
+                        resolve(client);
                     }, error => {
-                        if (reject) { reject(error); }
-                        else { callback(error, null); }
+                        if (callback && typeof callback === "function") { callback(error, null); }
+                        reject(error);
                     });
                 }
             });
-        }
+        });
     }
 
     private static resolveConfig(cfg: GCLConfig) {
@@ -279,20 +271,26 @@ class GCLClient {
                                 });
                             });
                         });
-                } else if (!managed) {
-                    // we need to synchronize the device
-                    // console.log("Sync device:"+uuid);
-                    self.dsClient.sync(mergedInfo, uuid,
-                        function(syncError: CoreExceptions.RestException, activationResponse: JWTResponse) {
-                            if (syncError) {
-                                console.log("Error while syncing the device: " + JSON.stringify(syncError));
-                                reject(syncError);
+                } else {
+                    if (managed) {
+                        // managed install, no need to synchronize
+                        resolve();
+                        return;
+                    } else {
+                        // we need to synchronize the device
+                        // console.log("Sync device:"+uuid);
+                        self.dsClient.sync(mergedInfo, uuid,
+                            function (syncError: CoreExceptions.RestException, activationResponse: JWTResponse) {
+                                if (syncError) {
+                                    console.log("Error while syncing the device: " + JSON.stringify(syncError));
+                                    reject(syncError);
+                                    return;
+                                }
+                                self_cfg.jwt = activationResponse.token;
+                                resolve();
                                 return;
-                            }
-                            self_cfg.jwt = activationResponse.token;
-                            resolve();
-                            return;
-                        });
+                            });
+                    }
                 }
             });
         });
