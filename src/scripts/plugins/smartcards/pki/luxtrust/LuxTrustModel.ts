@@ -10,6 +10,7 @@ export { AbstractLuxTrust, AllCertsResponse, AllDataResponse };
 
 
 interface AbstractLuxTrust extends CertCard {
+    activated(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
     allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
     rootCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
