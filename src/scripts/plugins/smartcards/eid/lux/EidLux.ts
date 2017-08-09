@@ -6,7 +6,7 @@
 import {LocalConnection} from "../../../../core/client/Connection";
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { AuthenticateOrSignData, GenericSecuredCertCard, OptionalPin } from "../../Card";
-import { DataArrayResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import { CertificateResponse, CertificatesResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
 import {
     AbstractEidLUX, AllCertsResponse,
     BiometricResponse, PictureResponse, SignatureImageResponse
@@ -91,19 +91,19 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
     }
 
     public rootCertificate(options?: Options,
-                           callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
+                           callback?: (error: RestException, data: CertificatesResponse) => void): Promise<CertificatesResponse> {
         return this.getCertificateArray(EidLux.CERT_ROOT,
             RequestHandler.determineOptions(options, callback), createPinQueryParam(this.pin));
     }
 
     public authenticationCertificate(options?: Options,
-                                     callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+                                     callback?: (error: RestException, data: CertificateResponse) => void | Promise<CertificateResponse>) {
         return this.getCertificate(EidLux.CERT_AUTHENTICATION,
             RequestHandler.determineOptions(options, callback), createPinQueryParam(this.pin));
     }
 
     public nonRepudiationCertificate(options?: Options,
-                                     callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+                                     callback?: (error: RestException, data: CertificateResponse) => void | Promise<CertificateResponse>) {
         return this.getCertificate(EidLux.CERT_NON_REPUDIATION,
             RequestHandler.determineOptions(options, callback), createPinQueryParam(this.pin));
     }
@@ -133,7 +133,7 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
 
     protected getCertificate(certUrl: string,
                              options: RequestOptions,
-                             params?: { filter?: string, pin?: string }): Promise<DataResponse> {
+                             params?: { filter?: string, pin?: string }): Promise<CertificateResponse> {
         let self = this;
 
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {
@@ -145,7 +145,7 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
 
     protected getCertificateArray(certUrl: string,
                                   options: RequestOptions,
-                                  params?: { filter?: string, pin?: string }): Promise<DataArrayResponse> {
+                                  params?: { filter?: string, pin?: string }): Promise<CertificatesResponse> {
         let self = this;
 
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, params.pin).then(() => {
