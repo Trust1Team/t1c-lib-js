@@ -26,6 +26,8 @@ import { AbstractSafeNet } from "./smartcards/pkcs11/safenet/safenetModel";
 import { SafeNet } from "./smartcards/pkcs11/safenet/safenet";
 import { DNIe } from "./smartcards/eid/esp/dnie";
 import { AbstractDNIe } from "./smartcards/eid/esp/dnieModel";
+import { AbstractEidPT } from "./smartcards/eid/pt/EidPtModel";
+import { EidPt } from "./smartcards/eid/pt/EidPt";
 
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
@@ -52,6 +54,7 @@ const CONTAINER_OCRA = CONTAINER_CONTEXT_PATH + "ocra";
 const CONTAINER_AVENTRA = CONTAINER_CONTEXT_PATH + "aventra";
 const CONTAINER_OBERTHUR = CONTAINER_CONTEXT_PATH + "oberthur";
 const CONTAINER_PIV = CONTAINER_CONTEXT_PATH + "piv";
+const CONTAINER_PTEID = CONTAINER_CONTEXT_PATH + "pteid";
 const CONTAINER_SAFENET = CONTAINER_CONTEXT_PATH + "safenet";
 
 
@@ -65,6 +68,8 @@ export class PluginFactory implements AbstractFactory {
     public createEidLUX(reader_id?: string, pin?: string): AbstractEidLUX {
         return new EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin);
     }
+
+    public createEidPT(reader_id?: string): AbstractEidPT { return new EidPt(this.url, CONTAINER_PTEID, this.connection, reader_id); }
 
     public createEmv(reader_id?: string): EMV { return new EMV(this.url, CONTAINER_EMV, this.connection, reader_id); }
 
