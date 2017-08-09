@@ -110,6 +110,8 @@
         </div>
         <hr/>
         <div>
+            <button id="luxtrustActivated" type="button" class="btn btn-default btn-lg">LuxTrust
+                Activated</button>
             <button id="luxtrustAllData" type="button" class="btn btn-default btn-lg">LuxTrust
                 AllData</button>
             <button id="luxtustAllCerts" type="button" class="btn btn-default btn-lg">LuxTrust
@@ -496,6 +498,11 @@
         });
 
         // LuxTrust Methods
+        $("#luxtrustActivated").on('click', function () {
+            $("#information").empty();
+            var luxtrust = connector.luxtrust($("#selected_reader").text());
+            luxtrust.activated(callback);
+        });
         $("#luxtrustAllData").on('click', function () {
             $("#information").empty();
             var luxtrust = connector.luxtrust($("#selected_reader").text());

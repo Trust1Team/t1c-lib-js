@@ -73424,6 +73424,9 @@ var GCLLib =
 	    function LuxTrust() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
+	    LuxTrust.prototype.activated = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + LuxTrust.ACTIVATED, undefined, callback);
+	    };
 	    LuxTrust.prototype.rootCertificate = function (options, callback) {
 	        return this.getCertificate(LuxTrust.CERT_ROOT, RequestHandler_1.RequestHandler.determineOptions(options, callback));
 	    };
@@ -73435,6 +73438,7 @@ var GCLLib =
 	    };
 	    return LuxTrust;
 	}(Card_1.GenericCertCard));
+	LuxTrust.ACTIVATED = "/activated";
 	exports.LuxTrust = LuxTrust;
 
 
