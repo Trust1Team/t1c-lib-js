@@ -84,7 +84,7 @@ class CardUtil {
             else if (findDescription(card.description, "Aventra")) { return "aventra"; }
             else if (findDescription(card.description, "PIV")) { return "piv"; }
             else if (findDescription(card.description, "CIV")) { return "piv"; }
-            else if (findDescription(card.description, "Portugese eID Card")) { return "pteid"; }
+            else if (findDescription(card.description, "Portuguese identity card")) { return "pteid"; }
             else { return undefined; }
         } else {
             return undefined;

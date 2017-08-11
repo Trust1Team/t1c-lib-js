@@ -74265,7 +74265,7 @@ var GCLLib =
 	            else if (findDescription(card.description, "CIV")) {
 	                return "piv";
 	            }
-	            else if (findDescription(card.description, "Portugese eID Card")) {
+	            else if (findDescription(card.description, "Portuguese identity card")) {
 	                return "pteid";
 	            }
 	            else {
