@@ -4,7 +4,7 @@
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { CertCard } from "../../Card";
-import { DataObjectResponse, DataResponse } from "../../../../core/service/CoreModel";
+import { CertificateResponse, DataObjectResponse, DataResponse } from "../../../../core/service/CoreModel";
 
 export { AbstractEidBE, Address, AddressResponse, AllCertsResponse, AllDataResponse, RnData, RnDataResponse };
 
@@ -15,11 +15,11 @@ interface AbstractEidBE extends CertCard {
     rnData(callback?: (error: RestException, data: RnDataResponse) => void): Promise<RnDataResponse>;
     address(callback?: (error: RestException, data: AddressResponse) => void): Promise<AddressResponse>;
     picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    rootCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    citizenCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    authenticationCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    nonRepudiationCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    rrnCertificate(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    rootCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    citizenCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    authenticationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    nonRepudiationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    rrnCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
 
 interface AddressResponse extends DataObjectResponse {

@@ -56,7 +56,7 @@ var GCLLib =
 	var OCVClient_1 = __webpack_require__(37);
 	var es6_promise_1 = __webpack_require__(6);
 	var PluginFactory_1 = __webpack_require__(38);
-	var GenericService_1 = __webpack_require__(459);
+	var GenericService_1 = __webpack_require__(460);
 	var ResponseHandler_1 = __webpack_require__(447);
 	var GCLClient = (function () {
 	    function GCLClient(cfg, automatic) {
@@ -75,6 +75,7 @@ var GCLLib =
 	        this.aventra = function (reader_id) { return _this.pluginFactory.createAventraNO(reader_id); };
 	        this.oberthur = function (reader_id) { return _this.pluginFactory.createOberthurNO(reader_id); };
 	        this.piv = function (reader_id) { return _this.pluginFactory.createPIV(reader_id); };
+	        this.pteid = function (reader_id) { return _this.pluginFactory.createEidPT(reader_id); };
 	        this.safenet = function (reader_id, moduleConfig) {
 	            return _this.pluginFactory.createSafeNet(moduleConfig);
 	        };
@@ -17830,7 +17831,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return "v1.3.10";
+	        return "v1.3.11";
 	    };
 	    return CoreService;
 	}());
@@ -21982,6 +21983,7 @@ var GCLLib =
 	var piv_1 = __webpack_require__(456);
 	var safenet_1 = __webpack_require__(457);
 	var dnie_1 = __webpack_require__(458);
+	var EidPt_1 = __webpack_require__(459);
 	var CONTAINER_CONTEXT_PATH = "/plugins/";
 	var CONTAINER_NEW_CONTEXT_PATH = "/containers/";
 	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + "beid";
@@ -21994,6 +21996,7 @@ var GCLLib =
 	var CONTAINER_AVENTRA = CONTAINER_CONTEXT_PATH + "aventra";
 	var CONTAINER_OBERTHUR = CONTAINER_CONTEXT_PATH + "oberthur";
 	var CONTAINER_PIV = CONTAINER_CONTEXT_PATH + "piv";
+	var CONTAINER_PTEID = CONTAINER_CONTEXT_PATH + "pteid";
 	var CONTAINER_SAFENET = CONTAINER_CONTEXT_PATH + "safenet";
 	var PluginFactory = (function () {
 	    function PluginFactory(url, connection) {
@@ -22005,6 +22008,7 @@ var GCLLib =
 	    PluginFactory.prototype.createEidLUX = function (reader_id, pin) {
 	        return new EidLux_1.EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin);
 	    };
+	    PluginFactory.prototype.createEidPT = function (reader_id) { return new EidPt_1.EidPt(this.url, CONTAINER_PTEID, this.connection, reader_id); };
 	    PluginFactory.prototype.createEmv = function (reader_id) { return new EMV_1.EMV(this.url, CONTAINER_EMV, this.connection, reader_id); };
 	    PluginFactory.prototype.createLuxTrust = function (reader_id) { return new LuxTrust_1.LuxTrust(this.url, CONTAINER_LUXTRUST, this.connection, reader_id); };
 	    PluginFactory.prototype.createMobib = function (reader_id) { return new mobib_1.Mobib(this.url, CONTAINER_MOBIB, this.connection, reader_id); };
@@ -73883,12 +73887,68 @@ var GCLLib =
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Card_1 = __webpack_require__(40);
+	var RequestHandler_1 = __webpack_require__(448);
+	var EidPt = (function (_super) {
+	    __extends(EidPt, _super);
+	    function EidPt() {
+	        return _super !== null && _super.apply(this, arguments) || this;
+	    }
+	    EidPt.prototype.idData = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + EidPt.ID_DATA, undefined, callback);
+	    };
+	    EidPt.prototype.idDataWithOutPhoto = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + EidPt.ID_DATA, { photo: "false" }, callback);
+	    };
+	    EidPt.prototype.photo = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + EidPt.PHOTO, undefined, callback);
+	    };
+	    EidPt.prototype.rootCertificate = function (options, callback) {
+	        return this.getCertificate(EidPt.CERT_ROOT, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+	    };
+	    EidPt.prototype.rootAuthenticationCertificate = function (options, callback) {
+	        return this.getCertificate(EidPt.CERT_ROOT_AUTH, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+	    };
+	    EidPt.prototype.rootNonRepudiationCertificate = function (options, callback) {
+	        return this.getCertificate(EidPt.CERT_ROOT_NON_REP, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+	    };
+	    EidPt.prototype.authenticationCertificate = function (options, callback) {
+	        return this.getCertificate(EidPt.CERT_AUTHENTICATION, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+	    };
+	    EidPt.prototype.nonRepudiationCertificate = function (options, callback) {
+	        return this.getCertificate(EidPt.CERT_NON_REPUDIATION, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+	    };
+	    return EidPt;
+	}(Card_1.GenericCertCard));
+	EidPt.CERT_ROOT_AUTH = "/root-authentication";
+	EidPt.CERT_ROOT_NON_REP = "/root-non-repudiation";
+	EidPt.ID_DATA = "/id";
+	EidPt.PHOTO = "/photo";
+	exports.EidPt = EidPt;
+
+
+/***/ }),
+/* 460 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(6);
 	var EidBe_1 = __webpack_require__(449);
 	var ResponseHandler_1 = __webpack_require__(447);
 	var _ = __webpack_require__(1);
-	var CardUtil_1 = __webpack_require__(460);
+	var CardUtil_1 = __webpack_require__(461);
 	var Aventra_1 = __webpack_require__(454);
 	var GenericService = (function () {
 	    function GenericService() {
@@ -74111,7 +74171,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 460 */
+/* 461 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -74130,6 +74190,7 @@ var GCLLib =
 	            case "luxtrust":
 	            case "oberthur":
 	            case "piv":
+	            case "pteid":
 	                return true;
 	            case "ocra":
 	            case "emv":
@@ -74148,6 +74209,7 @@ var GCLLib =
 	            case "luxtrust":
 	            case "oberthur":
 	            case "piv":
+	            case "pteid":
 	                return true;
 	            case "ocra":
 	            case "emv":
@@ -74167,6 +74229,7 @@ var GCLLib =
 	            case "oberthur":
 	            case "ocra":
 	            case "piv":
+	            case "pteid":
 	                return true;
 	            case "emv":
 	            case "mobib":
@@ -74206,6 +74269,9 @@ var GCLLib =
 	            else if (findDescription(card.description, "CIV")) {
 	                return "piv";
 	            }
+	            else if (findDescription(card.description, "Portuguese identity card")) {
+	                return "pteid";
+	            }
 	            else {
 	                return undefined;
 	            }
@@ -74228,6 +74294,7 @@ var GCLLib =
 	            case "piv":
 	            case "luxeid":
 	            case "luxtrust":
+	            case "pteid":
 	                return "sha256";
 	            default:
 	                return undefined;
@@ -74244,6 +74311,7 @@ var GCLLib =
 	            case "oberthur":
 	            case "ocra":
 	            case "piv":
+	            case "pteid":
 	                return "allData";
 	            case "safenet":
 	                return "slots";
@@ -74264,6 +74332,7 @@ var GCLLib =
 	            case "oberthur":
 	            case "ocra":
 	            case "piv":
+	            case "pteid":
 	                return { filters: [], parseCerts: true };
 	            case "safenet":
 	            case "emv":
