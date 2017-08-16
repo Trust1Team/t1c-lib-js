@@ -31,6 +31,7 @@ import { AuthenticateOrSignData, OptionalPin } from "../plugins/smartcards/Card"
 import { RestException } from "./exceptions/CoreExceptions";
 import { GenericService } from "./generic/GenericService";
 import { ResponseHandler } from "../util/ResponseHandler";
+import { AbstractEidPT } from "../plugins/smartcards/eid/pt/EidPtModel";
 
 
 class GCLClient {
@@ -147,6 +148,8 @@ class GCLClient {
     public oberthur = (reader_id?: string): AbstractOberthur => { return this.pluginFactory.createOberthurNO(reader_id); };
     // get instance for PIV
     public piv = (reader_id?: string): AbstractPiv => { return this.pluginFactory.createPIV(reader_id); };
+    // get instance for PT Eid
+    public pteid = (reader_id?: string): AbstractEidPT => { return this.pluginFactory.createEidPT(reader_id); };
     // get instance for PKCS11
     public safenet = (reader_id: string, moduleConfig: { linux: string, mac: string, win: string }): AbstractSafeNet => {
         return this.pluginFactory.createSafeNet(moduleConfig);

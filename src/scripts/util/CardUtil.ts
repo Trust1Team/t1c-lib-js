@@ -19,6 +19,7 @@ class CardUtil {
             case "luxtrust":
             case "oberthur":
             case "piv":
+            case "pteid":
                 return true;
             case "ocra":
             case "emv":
@@ -39,6 +40,7 @@ class CardUtil {
             case "luxtrust":
             case "oberthur":
             case "piv":
+            case "pteid":
                 return true;
             case "ocra":
             case "emv":
@@ -60,6 +62,7 @@ class CardUtil {
             case "oberthur":
             case "ocra":
             case "piv":
+            case "pteid":
                 return true;
             case "emv":
             case "mobib":
@@ -81,6 +84,7 @@ class CardUtil {
             else if (findDescription(card.description, "Aventra")) { return "aventra"; }
             else if (findDescription(card.description, "PIV")) { return "piv"; }
             else if (findDescription(card.description, "CIV")) { return "piv"; }
+            else if (findDescription(card.description, "Portuguese identity card")) { return "pteid"; }
             else { return undefined; }
         } else {
             return undefined;
@@ -102,6 +106,7 @@ class CardUtil {
             case "piv":
             case "luxeid":
             case "luxtrust":
+            case "pteid":
                 return "sha256";
             default:
                 return undefined;
@@ -119,6 +124,7 @@ class CardUtil {
             case "oberthur":
             case "ocra":
             case "piv":
+            case "pteid":
                 return "allData";
             case "safenet":
                 return "slots";
@@ -140,6 +146,7 @@ class CardUtil {
             case "oberthur":
             case "ocra":
             case "piv":
+            case "pteid":
                 return { filters: [], parseCerts: true };
             case "safenet":
             case "emv":

@@ -1,5 +1,8 @@
 import { RestException } from "../../core/exceptions/CoreExceptions";
-import { DataArrayResponse, DataObjectResponse, DataResponse, T1CResponse } from "../../core/service/CoreModel";
+import {
+    CertificateResponse, CertificatesResponse, DataArrayResponse, DataObjectResponse, DataResponse,
+    T1CResponse
+} from "../../core/service/CoreModel";
 import { LocalConnection } from "../../core/client/Connection";
 import { Promise } from "es6-promise";
 import { PinEnforcer } from "../../util/PinEnforcer";
@@ -147,7 +150,7 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
         });
     }
 
-    protected getCertificate(certUrl: string, options: RequestOptions): Promise<DataResponse> {
+    protected getCertificate(certUrl: string, options: RequestOptions): Promise<CertificateResponse> {
         let self = this;
         return self.connection.get(self.resolvedReaderURI() + GenericCertCard.ALL_CERTIFICATES + certUrl,
             undefined).then(data => {
@@ -222,7 +225,7 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
     protected getCertificate(certUrl: string,
                              body: OptionalPin,
                              options: RequestOptions,
-                             params?: { filter?: string, pin?: string }): Promise<DataResponse> {
+                             params?: { filter?: string, pin?: string }): Promise<CertificateResponse> {
         let self = this;
 
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin)
@@ -240,7 +243,7 @@ abstract class GenericSecuredCertCard extends GenericCard implements SecuredCert
     protected getCertificateArray(certUrl: string,
                                   body: OptionalPin,
                                   options: RequestOptions,
-                                  params?: { filter?: string, pin?: string }): Promise<DataArrayResponse> {
+                                  params?: { filter?: string, pin?: string }): Promise<CertificatesResponse> {
         let self = this;
 
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin)

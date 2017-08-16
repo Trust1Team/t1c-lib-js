@@ -4,7 +4,7 @@
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { OptionalPin, SecuredCertCard } from "../../Card";
-import { DataObjectResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import { CertificateResponse, DataObjectResponse, T1CResponse } from "../../../../core/service/CoreModel";
 import { Options } from "../../../../util/RequestHandler";
 
 export { AbstractDNIe, AllCertsResponse, AllDataResponse, InfoResponse };
@@ -15,10 +15,12 @@ interface AbstractDNIe extends SecuredCertCard {
             callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
     allCerts(options: Options, callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
     info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>
-    intermediateCertificate(options: Options, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    intermediateCertificate(options: Options,
+                            callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     authenticationCertificate(options: Options,
-                              callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    signingCertificate(options: Options, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    signingCertificate(options: Options,
+                       callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
 
 interface AllCertsResponse extends DataObjectResponse {

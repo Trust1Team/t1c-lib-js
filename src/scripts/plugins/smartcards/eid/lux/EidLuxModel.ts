@@ -4,7 +4,7 @@
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { OptionalPin, SecuredCertCard } from "../../Card";
-import { DataArrayResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import { CertificateResponse, CertificatesResponse, T1CResponse } from "../../../../core/service/CoreModel";
 
 export { AbstractEidLUX, AllCertsResponse, AllDataResponse, Biometric, BiometricResponse,
     Picture, PictureResponse, SignatureImage, SignatureImageResponse };
@@ -16,11 +16,11 @@ interface AbstractEidLUX extends SecuredCertCard {
     biometric(body: OptionalPin, callback?: (error: RestException, data: BiometricResponse) => void): Promise<BiometricResponse>;
     picture(body: OptionalPin, callback?: (error: RestException, data: PictureResponse) => void): Promise<PictureResponse>;
     rootCertificate(body: OptionalPin,
-                    callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
+                    callback?: (error: RestException, data: CertificatesResponse) => void): Promise<CertificatesResponse>;
     authenticationCertificate(body: OptionalPin,
-                              callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     nonRepudiationCertificate(body: OptionalPin,
-                              callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     signatureImage(body: OptionalPin,
                    callback?: (error: RestException, data: SignatureImageResponse) => void): Promise<SignatureImageResponse>;
 }

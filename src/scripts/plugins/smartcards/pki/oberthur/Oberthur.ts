@@ -4,7 +4,7 @@
  * @since 2017
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import { CertificateResponse, T1CResponse } from "../../../../core/service/CoreModel";
 import { GenericCertCard, VerifyPinData } from "../../Card";
 import { AbstractOberthur } from "./OberthurModel";
 import { PinEnforcer } from "../../../../util/PinEnforcer";
@@ -30,24 +30,28 @@ class Oberthur extends GenericCertCard implements AbstractOberthur {
         return [ "authenticate", "sign", "encrypt" ];
     }
 
-    public rootCertificate(options?: Options, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+    public rootCertificate(options?: Options,
+                           callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(Oberthur.CERT_ROOT, RequestHandler.determineOptions(options, callback));
     }
 
-    public issuerCertificate(options?: Options, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+    public issuerCertificate(options?: Options,
+                             callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(Oberthur.CERT_ISSUER, RequestHandler.determineOptions(options, callback));
     }
 
     public authenticationCertificate(options?: Options,
-                                     callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+                                     callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(Oberthur.CERT_AUTHENTICATION, RequestHandler.determineOptions(options, callback));
     }
 
-    public signingCertificate(options?: Options, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+    public signingCertificate(options?: Options,
+                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(Oberthur.CERT_SIGNING, RequestHandler.determineOptions(options, callback));
     }
 
-    public encryptionCertificate(options?: Options, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+    public encryptionCertificate(options?: Options,
+                                 callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(Oberthur.CERT_ENCRYPTION, RequestHandler.determineOptions(options, callback));
     }
 

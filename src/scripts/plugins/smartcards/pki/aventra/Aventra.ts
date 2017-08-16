@@ -4,7 +4,7 @@
  * @since 2017
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import { CertificateResponse, T1CResponse } from "../../../../core/service/CoreModel";
 import { GenericCertCard, ResetPinData, VerifyPinData } from "../../Card";
 import { AbstractAventra} from "./AventraModel";
 import { PinEnforcer } from "../../../../util/PinEnforcer";
@@ -32,24 +32,28 @@ class Aventra extends GenericCertCard implements AbstractAventra {
         return [ "authenticate", "sign", "encrypt" ];
     }
 
-    public rootCertificate(options?: Options, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+    public rootCertificate(options?: Options,
+                           callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(Aventra.CERT_ROOT, RequestHandler.determineOptions(options, callback));
     }
 
-    public issuerCertificate(options?: Options, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+    public issuerCertificate(options?: Options,
+                             callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(Aventra.CERT_ISSUER, RequestHandler.determineOptions(options, callback));
     }
 
     public authenticationCertificate(options?: Options,
-                                     callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+                                     callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(Aventra.CERT_AUTHENTICATION, RequestHandler.determineOptions(options, callback));
     }
 
-    public signingCertificate(options?: Options, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+    public signingCertificate(options?: Options,
+                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(Aventra.CERT_SIGNING, RequestHandler.determineOptions(options, callback));
     }
 
-    public encryptionCertificate(options?: Options, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+    public encryptionCertificate(options?: Options,
+                                 callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(Aventra.CERT_ENCRYPTION, RequestHandler.determineOptions(options, callback));
     }
 
