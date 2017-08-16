@@ -118,6 +118,10 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 ## v1.3.10
+###Other
+*   Add Portuguese eID container
+
+## v1.3.10
 ###Story
 *   [[T1C-756](https://trust1t.atlassian.net/browse/T1C-756)] - Add activated endpoint to LuxTrust
 
