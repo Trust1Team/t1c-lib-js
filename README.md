@@ -5,6 +5,10 @@ The Trust1Connector library (T1C-Lib), is a javascript library to communicate wi
 
 When the Trust1Connector isn’t installed the library will download the file automatically. This check returns a small object with some information.
 
+## Community
+We're present on Gitter in the following room:
+[Trust1Connector-gitter]
+
 ## Installation - OSX Only
 Make sure you have brew installed on your machine
 ```bash
@@ -216,6 +220,7 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 
 [Trust1Team-url]: http://trust1team.com
 [Trust1Connector-url]: http://www.trust1connector.com
+[Trust1Connector-gitter]: https://gitter.im/Trust1Team/Trust1Connector?utm_source=share-link&utm_medium=link&utm_campaign=share-link
 [t1t-logo]: http://imgur.com/lukAaxx.png
 [t1c-logo]: http://i.imgur.com/We0DIvj.png
 [jwt-up-doc]: https://trust1t.atlassian.net/wiki/pages/viewpage.action?pageId=74547210
