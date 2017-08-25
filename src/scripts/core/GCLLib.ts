@@ -32,6 +32,8 @@ import { RestException } from "./exceptions/CoreExceptions";
 import { GenericService } from "./generic/GenericService";
 import { ResponseHandler } from "../util/ResponseHandler";
 import { AbstractEidPT } from "../plugins/smartcards/eid/pt/EidPtModel";
+import { AbstractRemoteLoading } from "../plugins/remote-loading/RemoteLoadingModel";
+import { AbstractBelfius } from "../plugins/remote-loading/belfius/BelfiusModel";
 
 
 class GCLClient {
@@ -152,8 +154,11 @@ class GCLClient {
     public pteid = (reader_id?: string): AbstractEidPT => { return this.pluginFactory.createEidPT(reader_id); };
     // get instance for PKCS11
     public safenet = (reader_id: string, moduleConfig: { linux: string, mac: string, win: string }): AbstractSafeNet => {
-        return this.pluginFactory.createSafeNet(moduleConfig);
-    };
+        return this.pluginFactory.createSafeNet(moduleConfig); };
+    // get instance for Remote Loading
+    public readerapi = (reader_id: string): AbstractRemoteLoading => { return this.pluginFactory.createRemoteLoading(reader_id); };
+    // get instance for Belfius
+    public belfius = (reader_id: string): AbstractBelfius => { return this.pluginFactory.createBelfius(reader_id); };
 
     // generic methods
     public containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void) {
