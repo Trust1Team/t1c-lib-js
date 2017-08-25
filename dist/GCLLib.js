@@ -22075,14 +22075,14 @@ var GCLLib =
 	var CertParser_1 = __webpack_require__(42);
 	var ResponseHandler_1 = __webpack_require__(479);
 	var RequestHandler_1 = __webpack_require__(480);
-	var GenericCard = (function () {
-	    function GenericCard(baseUrl, containerUrl, connection, reader_id) {
+	var GenericContainer = (function () {
+	    function GenericContainer(baseUrl, containerUrl, connection, reader_id) {
 	        this.baseUrl = baseUrl;
 	        this.containerUrl = containerUrl;
 	        this.connection = connection;
 	        this.reader_id = reader_id;
 	    }
-	    GenericCard.createFilterQueryParam = function (filters) {
+	    GenericContainer.createFilterQueryParam = function (filters) {
 	        if (filters && filters.length) {
 	            return { filter: filters.join(",") };
 	        }
@@ -22090,12 +22090,12 @@ var GCLLib =
 	            return undefined;
 	        }
 	    };
-	    GenericCard.prototype.resolvedReaderURI = function () {
+	    GenericContainer.prototype.resolvedReaderURI = function () {
 	        return this.baseUrl + this.containerUrl + "/" + this.reader_id;
 	    };
-	    return GenericCard;
+	    return GenericContainer;
 	}());
-	exports.GenericCard = GenericCard;
+	exports.GenericContainer = GenericContainer;
 	var GenericSmartCard = (function (_super) {
 	    __extends(GenericSmartCard, _super);
 	    function GenericSmartCard() {
@@ -22110,7 +22110,7 @@ var GCLLib =
 	        });
 	    };
 	    return GenericSmartCard;
-	}(GenericCard));
+	}(GenericContainer));
 	exports.GenericSmartCard = GenericSmartCard;
 	var GenericPinCard = (function (_super) {
 	    __extends(GenericPinCard, _super);
@@ -22252,7 +22252,7 @@ var GCLLib =
 	        });
 	    };
 	    return GenericSecuredCertCard;
-	}(GenericCard));
+	}(GenericContainer));
 	GenericSecuredCertCard.ALL_CERTIFICATES = "/certificates";
 	GenericSecuredCertCard.AUTHENTICATE = "/authenticate";
 	GenericSecuredCertCard.CERT_AUTHENTICATION = "/authentication";
