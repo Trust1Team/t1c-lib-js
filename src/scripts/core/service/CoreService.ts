@@ -9,6 +9,7 @@ import * as platform from "platform";
 import * as CoreModel from "./CoreModel";
 import { CardReader } from "./CoreModel";
 import { Promise } from "es6-promise";
+import { UrlUtil } from "../../util/UrlUtil";
 
 export { CoreService };
 
@@ -77,7 +78,8 @@ class CoreService implements CoreModel.AbstractCore {
                             callback?: (error: CoreExceptions.RestException, data: CardReader) => void,
                             connectReaderCb?: () => void,
                             insertCardCb?: () => void,
-                            cardTimeoutCb?: () => void): Promise<CardReader> {
+                            cardTimeoutCb?: () => void,
+                            agentPort?: number): Promise<CardReader> {
         let maxSeconds = secondsToPollCard || 30;
         let self = this;
 
@@ -122,7 +124,7 @@ class CoreService implements CoreModel.AbstractCore {
                             poll(resolve, reject);
                         }
                     }
-                });
+                }, agentPort);
             }, 1000);
         }
     }
@@ -131,7 +133,8 @@ class CoreService implements CoreModel.AbstractCore {
                                 callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
                                 connectReaderCb?: () => void,
                                 insertCardCb?: () => void,
-                                cardTimeoutCb?: () => void): Promise<CoreModel.CardReadersResponse> {
+                                cardTimeoutCb?: () => void,
+                                agentPort?: number): Promise<CoreModel.CardReadersResponse> {
         let maxSeconds = secondsToPollCard || 30;
         let self = this;
 
@@ -179,7 +182,7 @@ class CoreService implements CoreModel.AbstractCore {
                         if (connectReaderCb) { connectReaderCb(); }
                         poll(resolve, reject);
                     }
-                });
+                }, agentPort);
             }, 1000);
         }
     }
@@ -187,7 +190,8 @@ class CoreService implements CoreModel.AbstractCore {
     public pollReaders(secondsToPollReader?: number,
                        callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
                        connectReaderCb?: () => void,
-                       readerTimeoutCb?: () => void): Promise<CoreModel.CardReadersResponse> {
+                       readerTimeoutCb?: () => void,
+                       agentPort?: number): Promise<CoreModel.CardReadersResponse> {
         let maxSeconds = secondsToPollReader || 30;
         let self = this;
 
@@ -225,30 +229,31 @@ class CoreService implements CoreModel.AbstractCore {
                         if (resolve) { resolve(data); }
                         else { return callback(null, data); }
                     }
-                });
+                }, agentPort);
             }, 1000);
         }
     }
 
     public reader(reader_id: string,
                   callback?: (error: CoreExceptions.RestException, data: CoreModel.SingleReaderResponse)
-                      => void): void | Promise<CoreModel.SingleReaderResponse> {
-        return this.connection.get(this.url + CORE_READERS + "/" + reader_id, undefined, callback);
+                      => void,
+                  agentPort?: number): void | Promise<CoreModel.SingleReaderResponse> {
+        return this.connection.get(UrlUtil.create(this.url, CORE_READERS + "/" + reader_id, agentPort), undefined, callback);
     }
 
-    public readers(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
-        => void): Promise<CoreModel.CardReadersResponse> {
-        return this.connection.get(this.url + CORE_READERS, undefined, callback);
+    public readers(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
+                   agentPort?: number): Promise<CoreModel.CardReadersResponse> {
+        return this.connection.get(UrlUtil.create(this.url, CORE_READERS, agentPort), undefined, callback);
     }
 
-    public readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
-        => void): Promise<CoreModel.CardReadersResponse> {
-        return this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(true), callback);
+    public readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
+                                agentPort?: number): Promise<CoreModel.CardReadersResponse> {
+        return this.connection.get(UrlUtil.create(this.url, CORE_READERS, agentPort), CoreService.cardInsertedFilter(true), callback);
     }
 
-    public readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
-        => void): Promise<CoreModel.CardReadersResponse> {
-        return this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(false), callback);
+    public readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
+                                   agentPort?: number): Promise<CoreModel.CardReadersResponse> {
+        return this.connection.get(UrlUtil.create(this.url, CORE_READERS, agentPort), CoreService.cardInsertedFilter(false), callback);
     }
 
     public setPubKey(pubkey: string,
