@@ -33,6 +33,7 @@ class GCLConfig {
     private _implicitDownload: boolean;
     private _localTestMode: boolean;
     private _forceHardwarePinpad: boolean;
+    private _defaultSessionTimeout: number;
 
     // constructor for DTO
     constructor (dsUriValue?: string, apiKey?: string) {
@@ -47,6 +48,7 @@ class GCLConfig {
         this._implicitDownload = defaultImplicitDownload;
         this._localTestMode = defaultLocalTestMode;
         this._forceHardwarePinpad = false;
+        this._defaultSessionTimeout = 5;
     }
 
     get ocvUrl(): string {
@@ -124,7 +126,7 @@ class GCLConfig {
     }
 
     get implicitDownload(): boolean {
-                                     return this._implicitDownload;
+        return this._implicitDownload;
     }
 
     set implicitDownload(value: boolean) {
@@ -154,6 +156,14 @@ class GCLConfig {
 
     set forceHardwarePinpad(value: boolean) {
         this._forceHardwarePinpad = value;
+    }
+
+    get defaultSessionTimeout(): number {
+        return this._defaultSessionTimeout;
+    }
+
+    set defaultSessionTimeout(value: number) {
+        this._defaultSessionTimeout = value;
     }
 }
 

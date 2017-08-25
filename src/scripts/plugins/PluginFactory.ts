@@ -28,6 +28,10 @@ import { DNIe } from "./smartcards/eid/esp/dnie";
 import { AbstractDNIe } from "./smartcards/eid/esp/dnieModel";
 import { AbstractEidPT } from "./smartcards/eid/pt/EidPtModel";
 import { EidPt } from "./smartcards/eid/pt/EidPt";
+import { AbstractRemoteLoading } from "./remote-loading/RemoteLoadingModel";
+import { RemoteLoading } from "./remote-loading/RemoteLoading";
+import { AbstractBelfius } from "./remote-loading/belfius/BelfiusModel";
+import { Belfius } from "./remote-loading/belfius/Belfius";
 
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
@@ -56,6 +60,7 @@ const CONTAINER_OBERTHUR = CONTAINER_CONTEXT_PATH + "oberthur";
 const CONTAINER_PIV = CONTAINER_CONTEXT_PATH + "piv";
 const CONTAINER_PTEID = CONTAINER_CONTEXT_PATH + "pteid";
 const CONTAINER_SAFENET = CONTAINER_CONTEXT_PATH + "safenet";
+const CONTAINER_REMOTE_LOADING = CONTAINER_CONTEXT_PATH + "readerapi";
 
 
 export class PluginFactory implements AbstractFactory {
@@ -87,5 +92,13 @@ export class PluginFactory implements AbstractFactory {
 
     public createSafeNet(config: { linux: string, mac: string, win: string }): AbstractSafeNet {
         return new SafeNet(this.url, CONTAINER_SAFENET, this.connection, config);
+    }
+
+    public createRemoteLoading(reader_id?: string): AbstractRemoteLoading {
+        return new RemoteLoading(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id);
+    }
+
+    public createBelfius(reader_id?: string): AbstractBelfius {
+        return new Belfius(new RemoteLoading(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id), this.connection.config);
     }
 }

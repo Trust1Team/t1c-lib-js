@@ -56,7 +56,7 @@ var GCLLib =
 	var OCVClient_1 = __webpack_require__(37);
 	var es6_promise_1 = __webpack_require__(6);
 	var PluginFactory_1 = __webpack_require__(38);
-	var GenericService_1 = __webpack_require__(492);
+	var GenericService_1 = __webpack_require__(494);
 	var ResponseHandler_1 = __webpack_require__(479);
 	var GCLClient = (function () {
 	    function GCLClient(cfg, automatic) {
@@ -79,6 +79,8 @@ var GCLLib =
 	        this.safenet = function (reader_id, moduleConfig) {
 	            return _this.pluginFactory.createSafeNet(moduleConfig);
 	        };
+	        this.readerapi = function (reader_id) { return _this.pluginFactory.createRemoteLoading(reader_id); };
+	        this.belfius = function (reader_id) { return _this.pluginFactory.createBelfius(reader_id); };
 	        var self = this;
 	        this.cfg = GCLClient.resolveConfig(cfg);
 	        this.connection = new Connection_1.LocalConnection(this.cfg);
@@ -17439,6 +17441,7 @@ var GCLLib =
 	        this._implicitDownload = defaultImplicitDownload;
 	        this._localTestMode = defaultLocalTestMode;
 	        this._forceHardwarePinpad = false;
+	        this._defaultSessionTimeout = 5;
 	    }
 	    Object.defineProperty(GCLConfig.prototype, "ocvUrl", {
 	        get: function () {
@@ -17574,6 +17577,16 @@ var GCLLib =
 	        },
 	        set: function (value) {
 	            this._forceHardwarePinpad = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "defaultSessionTimeout", {
+	        get: function () {
+	            return this._defaultSessionTimeout;
+	        },
+	        set: function (value) {
+	            this._defaultSessionTimeout = value;
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -21984,6 +21997,8 @@ var GCLLib =
 	var safenet_1 = __webpack_require__(489);
 	var dnie_1 = __webpack_require__(490);
 	var EidPt_1 = __webpack_require__(491);
+	var RemoteLoading_1 = __webpack_require__(492);
+	var Belfius_1 = __webpack_require__(493);
 	var CONTAINER_CONTEXT_PATH = "/plugins/";
 	var CONTAINER_NEW_CONTEXT_PATH = "/containers/";
 	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + "beid";
@@ -21998,6 +22013,7 @@ var GCLLib =
 	var CONTAINER_PIV = CONTAINER_CONTEXT_PATH + "piv";
 	var CONTAINER_PTEID = CONTAINER_CONTEXT_PATH + "pteid";
 	var CONTAINER_SAFENET = CONTAINER_CONTEXT_PATH + "safenet";
+	var CONTAINER_REMOTE_LOADING = CONTAINER_CONTEXT_PATH + "readerapi";
 	var PluginFactory = (function () {
 	    function PluginFactory(url, connection) {
 	        this.url = url;
@@ -22018,6 +22034,12 @@ var GCLLib =
 	    PluginFactory.prototype.createPIV = function (reader_id) { return new piv_1.PIV(this.url, CONTAINER_PIV, this.connection, reader_id); };
 	    PluginFactory.prototype.createSafeNet = function (config) {
 	        return new safenet_1.SafeNet(this.url, CONTAINER_SAFENET, this.connection, config);
+	    };
+	    PluginFactory.prototype.createRemoteLoading = function (reader_id) {
+	        return new RemoteLoading_1.RemoteLoading(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id);
+	    };
+	    PluginFactory.prototype.createBelfius = function (reader_id) {
+	        return new Belfius_1.Belfius(new RemoteLoading_1.RemoteLoading(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id), this.connection.config);
 	    };
 	    return PluginFactory;
 	}());
@@ -74819,12 +74841,143 @@ var GCLLib =
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var _ = __webpack_require__(1);
+	var Card_1 = __webpack_require__(40);
+	var RemoteLoading = (function (_super) {
+	    __extends(RemoteLoading, _super);
+	    function RemoteLoading() {
+	        return _super !== null && _super.apply(this, arguments) || this;
+	    }
+	    RemoteLoading.optionalSessionIdParam = function (sessionId) {
+	        if (sessionId && sessionId.length) {
+	            return { "session-id": sessionId };
+	        }
+	        else {
+	            return undefined;
+	        }
+	    };
+	    RemoteLoading.prototype.atr = function (sessionId, callback) {
+	        return this.connection.get(this.resolvedReaderURI() + RemoteLoading.ATR, RemoteLoading.optionalSessionIdParam(sessionId), callback);
+	    };
+	    RemoteLoading.prototype.apdu = function (apdu, sessionId, callback) {
+	        var url = this.resolvedReaderURI() + RemoteLoading.APDU;
+	        if (_.isArray(apdu)) {
+	            url = this.resolvedReaderURI() + RemoteLoading.APDUS;
+	        }
+	        return this.connection.post(url, apdu, RemoteLoading.optionalSessionIdParam(sessionId), callback);
+	    };
+	    RemoteLoading.prototype.ccid = function (feature, apdu, sessionId, callback) {
+	        return this.connection.post(this.resolvedReaderURI() + RemoteLoading.CCID, { feature: feature, apdu: apdu }, RemoteLoading.optionalSessionIdParam(sessionId), callback);
+	    };
+	    RemoteLoading.prototype.ccidFeatures = function (sessionId, callback) {
+	        return this.connection.get(this.resolvedReaderURI() + RemoteLoading.CCID_FEATURES, RemoteLoading.optionalSessionIdParam(sessionId), callback);
+	    };
+	    RemoteLoading.prototype.command = function (tx, sessionId, callback) {
+	        var url = this.resolvedReaderURI() + RemoteLoading.CMD;
+	        if (_.isArray(tx)) {
+	            url = this.resolvedReaderURI() + RemoteLoading.CMDS;
+	        }
+	        return this.connection.post(url, tx, RemoteLoading.optionalSessionIdParam(sessionId), callback);
+	    };
+	    RemoteLoading.prototype.closeSession = function (callback) {
+	        return this.connection.get(this.resolvedReaderURI() + RemoteLoading.CLOSE_SESSION, undefined, callback);
+	    };
+	    RemoteLoading.prototype.isPresent = function (sessionId, callback) {
+	        return this.connection.get(this.resolvedReaderURI() + RemoteLoading.IS_PRESENT, RemoteLoading.optionalSessionIdParam(sessionId), callback);
+	    };
+	    RemoteLoading.prototype.openSession = function (timeout, callback) {
+	        return this.connection.post(this.resolvedReaderURI() + RemoteLoading.OPEN_SESSION, { timeout: timeout }, undefined, callback);
+	    };
+	    return RemoteLoading;
+	}(Card_1.GenericContainer));
+	RemoteLoading.ATR = "/atr";
+	RemoteLoading.APDU = "/apdu";
+	RemoteLoading.APDUS = "/apdus";
+	RemoteLoading.CCID = "/ccid";
+	RemoteLoading.CCID_FEATURES = "/ccid-features";
+	RemoteLoading.CMD = "/command";
+	RemoteLoading.CMDS = "/commands";
+	RemoteLoading.CLOSE_SESSION = "/close-session";
+	RemoteLoading.IS_PRESENT = "/is-present";
+	RemoteLoading.OPEN_SESSION = "/open-session";
+	exports.RemoteLoading = RemoteLoading;
+
+
+/***/ }),
+/* 493 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var ResponseHandler_1 = __webpack_require__(479);
+	var Belfius = (function () {
+	    function Belfius(remoteLoading, config) {
+	        this.remoteLoading = remoteLoading;
+	        this.config = config;
+	    }
+	    Belfius.prototype.closeSession = function (callback) {
+	        return this.remoteLoading.closeSession(callback);
+	    };
+	    Belfius.prototype.nonce = function (sessionId, callback) {
+	        if (sessionId && sessionId.length) {
+	            return this.remoteLoading.apdu(Belfius.NONCE_APDU, sessionId, callback);
+	        }
+	        else {
+	            return ResponseHandler_1.ResponseHandler.error({ status: 400, description: "Session ID is required!", code: "402" }, callback);
+	        }
+	    };
+	    Belfius.prototype.openSession = function (timeout, callback) {
+	        if (timeout && timeout > 0) {
+	            return this.remoteLoading.openSession(timeout, callback);
+	        }
+	        else {
+	            return this.remoteLoading.openSession(this.config.defaultSessionTimeout, callback);
+	        }
+	    };
+	    Belfius.prototype.stx = function (command, sessionId, callback) {
+	        if (sessionId && sessionId.length) {
+	            var stxApdu = Belfius.NONCE_APDU;
+	            stxApdu.data = btoa(command);
+	            return this.remoteLoading.apdu(stxApdu, sessionId, callback);
+	        }
+	        else {
+	            return ResponseHandler_1.ResponseHandler.error({ status: 400, description: "Session ID is required!", code: "402" }, callback);
+	        }
+	    };
+	    return Belfius;
+	}());
+	Belfius.NONCE_APDU = {
+	    cla: "F1",
+	    ins: "95",
+	    p1: "F7",
+	    p2: "E4",
+	    data: "RkUwMDAwMDQwMDAxMzAwMDAw"
+	};
+	exports.Belfius = Belfius;
+
+
+/***/ }),
+/* 494 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(6);
 	var EidBe_1 = __webpack_require__(481);
 	var ResponseHandler_1 = __webpack_require__(479);
 	var _ = __webpack_require__(1);
-	var CardUtil_1 = __webpack_require__(493);
+	var CardUtil_1 = __webpack_require__(495);
 	var Aventra_1 = __webpack_require__(486);
 	var GenericService = (function () {
 	    function GenericService() {
@@ -75047,7 +75200,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 493 */
+/* 495 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
