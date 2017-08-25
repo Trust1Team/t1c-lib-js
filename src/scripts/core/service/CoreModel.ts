@@ -21,28 +21,33 @@ interface AbstractCore {
                      callback?: (error: CoreExceptions.RestException, data: CardReader) => void,
                      connectReader?: () => void,
                      insertCard?: () => void,
-                     cardTimeout?: () => void
+                     cardTimeout?: () => void,
+                     agentPort?: number
 
     ): void | Promise<CardReader>;
     pollReadersWithCards(secondsToPollCard?: number,
                          callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void,
                          connectReader?: () => void,
                          insertCard?: () => void,
-                         cardTimeout?: () => void
+                         cardTimeout?: () => void,
+                         agentPort?: number
 
     ): void | Promise<CardReadersResponse>;
     pollReaders(secondsToPollReader?: number,
                 callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void,
                 connectReader?: () => void,
-                readerTimeout?: () => void
+                readerTimeout?: () => void,
+                agentPort?: number
     ): void | Promise<CardReadersResponse>;
     reader(reader_id: string,
-           callback?: (error: CoreExceptions.RestException, data: SingleReaderResponse) => void): void | Promise<SingleReaderResponse>;
-    readers(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void): void | Promise<CardReadersResponse>;
-    readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse)
-        => void): void | Promise<CardReadersResponse>;
-    readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse)
-        => void): void | Promise<CardReadersResponse>;
+           callback?: (error: CoreExceptions.RestException, data: SingleReaderResponse) => void,
+           agentPort?: number): void | Promise<SingleReaderResponse>;
+    readers(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void,
+            agentPort?: number): void | Promise<CardReadersResponse>;
+    readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void,
+                         agentPort?: number): void | Promise<CardReadersResponse>;
+    readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void,
+                            agentPort?: number): void | Promise<CardReadersResponse>;
     setPubKey(pubkey: string,
               callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): void | Promise<PubKeyResponse>;
 

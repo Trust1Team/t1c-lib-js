@@ -1,9 +1,10 @@
 /**
  * @author Maarten Somers
  */
-
 import { GenericConnection } from "../core/client/Connection";
 import { Promise } from "es6-promise";
+import { UrlUtil } from "./UrlUtil";
+
 export { PinEnforcer };
 
 const CORE_READERS = "/card-readers";
@@ -11,12 +12,16 @@ const CORE_READERS = "/card-readers";
 class PinEnforcer  {
 
     // TODO figure out how to use generics to return a promise with correct type
-    public static check(connection: GenericConnection, baseUrl: string, readerId: string, pinValue: string): Promise<any> {
+    public static check(connection: GenericConnection,
+                        baseUrl: string,
+                        readerId: string,
+                        pinValue: string,
+                        agentPort?: number): Promise<any> {
         // if forceHardwarePinpad enabled,
         return new Promise((resolve, reject) => {
             if (connection.config.forceHardwarePinpad) {
                 // check if reader has pinpad
-                connection.get(baseUrl + CORE_READERS + "/" + readerId, undefined).then(reader => {
+                connection.get(UrlUtil.create(baseUrl, CORE_READERS + "/" + readerId, agentPort), undefined).then(reader => {
                     if (reader.data.pinpad) {
                         // if true, check that no pin was sent
                         if (pinValue) {
