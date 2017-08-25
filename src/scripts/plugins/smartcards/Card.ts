@@ -16,7 +16,7 @@ import { Options, RequestHandler, RequestOptions } from "../../util/RequestHandl
 
 
 export { Card, CertCard, PinCard, SecuredCertCard, AuthenticateOrSignData, ResetPinData, VerifyPinData, OptionalPin,
-    GenericCard, GenericSmartCard, GenericPinCard, GenericCertCard, GenericSecuredCertCard };
+    GenericContainer, GenericSmartCard, GenericPinCard, GenericCertCard, GenericSecuredCertCard };
 
 interface Card {
     allData: (filters: string[], callback?: () => void) => Promise<DataObjectResponse>;
@@ -60,7 +60,7 @@ interface ResetPinData {
     private_key_reference: string
 }
 
-abstract class GenericCard {
+abstract class GenericContainer {
 
     constructor(protected baseUrl: string,
                 protected containerUrl: string,
@@ -79,7 +79,7 @@ abstract class GenericCard {
     }
 }
 
-abstract class GenericSmartCard extends GenericCard implements Card {
+abstract class GenericSmartCard extends GenericContainer implements Card {
     public allData(options: string[] | Options,
                    callback?: (error: RestException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
         const requestOptions = RequestHandler.determineOptionsWithFilter(options);
@@ -161,7 +161,7 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
     }
 }
 
-abstract class GenericSecuredCertCard extends GenericCard implements SecuredCertCard {
+abstract class GenericSecuredCertCard extends GenericContainer implements SecuredCertCard {
     static ALL_CERTIFICATES = "/certificates";
     static AUTHENTICATE = "/authenticate";
     static CERT_AUTHENTICATION = "/authentication";
