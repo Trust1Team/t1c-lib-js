@@ -1,20 +1,18 @@
 /**
  * @author Maarten Somers
  */
+import { GCLConfig } from "../core/GCLConfig";
 import { AgentClient } from "../core/agent/agent";
 
 export { UrlUtil };
 
 class UrlUtil {
-
     // constructor
-    constructor() {
-        // no-op
-    }
+    constructor() {}
 
-    public static create(base: string, suffix: string, agentPort?: number) {
-        if (agentPort) {
-            return base + AgentClient.urlPrefix(agentPort) + suffix;
+    public static create(base: string, suffix: string, config: GCLConfig) {
+        if (config.citrix) {
+            return base + AgentClient.urlPrefix(config.agentPort) + suffix;
         } else {
             return base + suffix;
         }

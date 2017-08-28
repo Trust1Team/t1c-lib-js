@@ -15,7 +15,7 @@ class LuxTrust extends GenericCertCard implements AbstractLuxTrust {
     static ACTIVATED = "/activated";
 
     public activated(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.get(this.resolvedReaderURI() + LuxTrust.ACTIVATED, undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(LuxTrust.ACTIVATED), undefined, callback);
     }
 
     public rootCertificate(options?: Options,

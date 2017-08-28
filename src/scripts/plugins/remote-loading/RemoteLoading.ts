@@ -29,27 +29,29 @@ class RemoteLoading extends GenericContainer implements AbstractRemoteLoading {
     }
 
     public atr(sessionId?: string, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.get(this.resolvedReaderURI() + RemoteLoading.ATR, RemoteLoading.optionalSessionIdParam(sessionId), callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(RemoteLoading.ATR),
+            RemoteLoading.optionalSessionIdParam(sessionId), callback);
     }
 
     public apdu(apdu: APDU, sessionId?: string,
                 callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse>;
     public apdu(apdu: APDU[], sessionId?: string,
                 callback?: (error: RestException, data: CommandsResponse) => void): Promise<CommandsResponse>;
-    public apdu(apdu: APDU | APDU[], sessionId?: string, callback?: (error: RestException, data: any) => void): Promise<any> {
-        let url = this.resolvedReaderURI() + RemoteLoading.APDU;
-        if (_.isArray(apdu)) { url = this.resolvedReaderURI() + RemoteLoading.APDUS; }
-        return this.connection.post(url, apdu, RemoteLoading.optionalSessionIdParam(sessionId), callback);
+    public apdu(apdu: APDU | APDU[], sessionId?: string,
+                callback?: (error: RestException, data: any) => void): Promise<any> {
+        let suffix = this.containerSuffix(RemoteLoading.APDU);
+        if (_.isArray(apdu)) { suffix = this.containerSuffix(RemoteLoading.APDUS); }
+        return this.connection.post(this.baseUrl, suffix, apdu, RemoteLoading.optionalSessionIdParam(sessionId), callback);
     }
 
     public ccid(feature: string, apdu: string, sessionId?: string,
                 callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.post(this.resolvedReaderURI() + RemoteLoading.CCID, { feature, apdu },
+        return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.CCID), { feature, apdu },
             RemoteLoading.optionalSessionIdParam(sessionId), callback);
     }
 
     public ccidFeatures(sessionId?: string, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.get(this.resolvedReaderURI() + RemoteLoading.CCID_FEATURES,
+        return this.connection.get(this.baseUrl, this.containerSuffix(RemoteLoading.CCID_FEATURES),
             RemoteLoading.optionalSessionIdParam(sessionId), callback);
     }
 
@@ -58,22 +60,22 @@ class RemoteLoading extends GenericContainer implements AbstractRemoteLoading {
     public command(tx: string[], sessionId?: string,
                    callback?: (error: RestException, data: CommandsResponse) => void): Promise<CommandsResponse>;
     public command(tx: string | string[], sessionId?: string, callback?: (error: RestException, data: any) => void): Promise<any> {
-        let url = this.resolvedReaderURI() + RemoteLoading.CMD;
-        if (_.isArray(tx)) { url = this.resolvedReaderURI() + RemoteLoading.CMDS; }
-        return this.connection.post(url, tx, RemoteLoading.optionalSessionIdParam(sessionId), callback);
+        let suffix = this.containerSuffix(RemoteLoading.CMD);
+        if (_.isArray(tx)) { suffix = this.containerSuffix(RemoteLoading.CMDS); }
+        return this.connection.post(this.baseUrl, suffix, tx, RemoteLoading.optionalSessionIdParam(sessionId), callback);
     }
 
     public closeSession(callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
-        return this.connection.get(this.resolvedReaderURI() + RemoteLoading.CLOSE_SESSION, undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(RemoteLoading.CLOSE_SESSION), undefined, callback);
     }
 
     public isPresent(sessionId?: string, callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
-        return this.connection.get(this.resolvedReaderURI() + RemoteLoading.IS_PRESENT,
+        return this.connection.get(this.baseUrl, this.containerSuffix(RemoteLoading.IS_PRESENT),
             RemoteLoading.optionalSessionIdParam(sessionId), callback);
     }
 
     public openSession(timeout?: number, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.post(this.resolvedReaderURI() + RemoteLoading.OPEN_SESSION, { timeout }, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.OPEN_SESSION), { timeout }, undefined, callback);
     }
 
 }

@@ -246,6 +246,7 @@ class GCLClient {
                     reject(err);
                     return;
                 }
+                self_cfg.citrix = infoResponse.data.citrix;
                 let activated = infoResponse.data.activated;
                 let managed = infoResponse.data.managed;
                 let core_version = infoResponse.data.version;

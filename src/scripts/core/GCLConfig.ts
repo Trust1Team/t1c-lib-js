@@ -29,6 +29,8 @@ class GCLConfig {
     private _client_id: string;
     private _client_secret: string;
     private _jwt: string;
+    private _citrix: boolean;
+    private _agentPort: number;
     private _allowAutoUpdate: boolean;
     private _implicitDownload: boolean;
     private _localTestMode: boolean;
@@ -44,6 +46,8 @@ class GCLConfig {
         this._dsUrlBase = dsUriValue;
         this._apiKey = apiKey;
         this._jwt = "none";
+        this._citrix = false;
+        this._agentPort = -1;
         this._allowAutoUpdate = defaultAllowAutoUpdate;
         this._implicitDownload = defaultImplicitDownload;
         this._localTestMode = defaultLocalTestMode;
@@ -123,6 +127,22 @@ class GCLConfig {
 
     set jwt(value: string) {
         this._jwt = value;
+    }
+
+    get citrix(): boolean {
+        return this._citrix;
+    }
+
+    set citrix(value: boolean) {
+        this._citrix = value;
+    }
+
+    get agentPort(): number {
+        return this._agentPort;
+    }
+
+    set agentPort(value: number) {
+        this._agentPort = value;
     }
 
     get implicitDownload(): boolean {

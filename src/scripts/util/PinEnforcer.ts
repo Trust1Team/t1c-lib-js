@@ -3,7 +3,6 @@
  */
 import { GenericConnection } from "../core/client/Connection";
 import { Promise } from "es6-promise";
-import { UrlUtil } from "./UrlUtil";
 
 export { PinEnforcer };
 
@@ -15,13 +14,12 @@ class PinEnforcer  {
     public static check(connection: GenericConnection,
                         baseUrl: string,
                         readerId: string,
-                        pinValue: string,
-                        agentPort?: number): Promise<any> {
+                        pinValue: string): Promise<any> {
         // if forceHardwarePinpad enabled,
         return new Promise((resolve, reject) => {
             if (connection.config.forceHardwarePinpad) {
                 // check if reader has pinpad
-                connection.get(UrlUtil.create(baseUrl, CORE_READERS + "/" + readerId, agentPort), undefined).then(reader => {
+                connection.get(baseUrl, CORE_READERS + "/" + readerId, undefined).then(reader => {
                     if (reader.data.pinpad) {
                         // if true, check that no pin was sent
                         if (pinValue) {

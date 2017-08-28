@@ -20,7 +20,7 @@ class Belfius implements AbstractBelfius {
         ins: "95",
         p1: "F7",
         p2: "E4",
-        data: "RkUwMDAwMDQwMDAxMzAwMDAw"
+        data: "FE0000040001300000"
     };
 
     constructor(protected remoteLoading: RemoteLoading, protected config: GCLConfig) {}
@@ -46,7 +46,7 @@ class Belfius implements AbstractBelfius {
                callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse> {
         if (sessionId && sessionId.length) {
             let stxApdu = Belfius.NONCE_APDU;
-            stxApdu.data = btoa(command);
+            stxApdu.data = command;
             return this.remoteLoading.apdu(stxApdu, sessionId, callback);
         } else {
             return ResponseHandler.error({ status: 400, description: "Session ID is required!", code: "402" }, callback);
