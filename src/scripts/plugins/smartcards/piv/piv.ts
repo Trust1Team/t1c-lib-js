@@ -36,14 +36,14 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
                                           data: PrintedInformationResponse) => void): Promise<PrintedInformationResponse> {
         if (callback && typeof callback === "function") {
             PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                return this.connection.post(this.resolvedReaderURI() + PIV.PRINTED_INFORMATION, body, undefined, callback);
+                return this.connection.post(this.baseUrl, this.containerSuffix(PIV.PRINTED_INFORMATION), body, undefined, callback);
             }, error => {
                 return callback(error, null);
             });
         } else {
             return new Promise((resolve, reject) => {
                 PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                    resolve(this.connection.post(this.resolvedReaderURI() + PIV.PRINTED_INFORMATION, body, undefined));
+                    resolve(this.connection.post(this.baseUrl, this.containerSuffix(PIV.PRINTED_INFORMATION), body, undefined));
                 }, error => { reject(error); });
             });
         }
@@ -53,14 +53,14 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
                        callback?: (error: RestException, data: FacialImageResponse) => void): Promise<FacialImageResponse> {
         if (callback && typeof callback === "function") {
             PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                return this.connection.post(this.resolvedReaderURI() + PIV.FACIAL_IMAGE, body, undefined, callback);
+                return this.connection.post(this.baseUrl, this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined, callback);
             }, error => {
                 return callback(error, null);
             });
         } else {
             return new Promise((resolve, reject) => {
                 PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                    resolve(this.connection.post(this.resolvedReaderURI() + PIV.FACIAL_IMAGE, body, undefined));
+                    resolve(this.connection.post(this.baseUrl, this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined));
                 }, error => { reject(error); });
             });
         }

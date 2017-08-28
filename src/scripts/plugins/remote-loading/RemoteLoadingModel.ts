@@ -10,8 +10,10 @@ export { AbstractRemoteLoading, APDU, CommandResponse, CommandsResponse, Command
 
 interface AbstractRemoteLoading {
     atr(sessionId?: string, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    apdu(apdu: APDU, sessionId?: string, callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse>;
-    apdu(apdu: APDU[], sessionId?: string, callback?: (error: RestException, data: CommandsResponse) => void): Promise<CommandsResponse>;
+    apdu(apdu: APDU, sessionId?: string,
+         callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse>;
+    apdu(apdu: APDU[], sessionId?: string,
+         callback?: (error: RestException, data: CommandsResponse) => void): Promise<CommandsResponse>;
     ccid(feature: string, apdu: string, sessionId?: string,
          callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     ccidFeatures(sessionId?: string, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
