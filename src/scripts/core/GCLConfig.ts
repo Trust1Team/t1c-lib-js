@@ -17,7 +17,7 @@ const defaultAllowAutoUpdate = true;
 const defaultImplicitDownload = false;
 const defaultLocalTestMode = false;
 
-class GCLConfig {
+class GCLConfig  implements GCLConfig {
     // singleton pattern
     private static instance: GCLConfig;
     private _dsUrlBase: string;

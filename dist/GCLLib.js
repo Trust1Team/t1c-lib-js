@@ -158,6 +158,8 @@ var GCLLib =
 	        resolvedCfg.implicitDownload = cfg.implicitDownload;
 	        resolvedCfg.localTestMode = cfg.localTestMode;
 	        resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
+	        resolvedCfg.citrix = cfg.citrix;
+	        resolvedCfg.agentPort = cfg.agentPort;
 	        return resolvedCfg;
 	    };
 	    GCLClient.prototype.containerFor = function (readerId, callback) {
@@ -17669,7 +17671,7 @@ var GCLLib =
 	        return this.connection.get(this.url, CORE_PUB_KEY, undefined, callback);
 	    };
 	    CoreService.prototype.info = function (callback) {
-	        return this.connection.get(this.url, CORE_INFO, undefined, callback);
+	        return this.connection.getSkipCitrix(this.url, CORE_INFO, undefined, callback);
 	    };
 	    CoreService.prototype.infoBrowser = function (callback) {
 	        if (callback) {
@@ -17680,7 +17682,7 @@ var GCLLib =
 	        }
 	    };
 	    CoreService.prototype.plugins = function (callback) {
-	        return this.connection.get(this.url, CORE_PLUGINS, undefined, callback);
+	        return this.connection.getSkipCitrix(this.url, CORE_PLUGINS, undefined, callback);
 	    };
 	    CoreService.prototype.pollCardInserted = function (secondsToPollCard, callback, connectReaderCb, insertCardCb, cardTimeoutCb) {
 	        var maxSeconds = secondsToPollCard || 30;
@@ -17856,13 +17858,13 @@ var GCLLib =
 	        return this.connection.get(this.url, CORE_READERS + "/" + reader_id, undefined, callback);
 	    };
 	    CoreService.prototype.readers = function (callback) {
-	        return this.connection.get(this.url, CORE_READERS, undefined, callback);
+	        return this.connection.getSkipCitrix(this.url, CORE_READERS, undefined, callback);
 	    };
 	    CoreService.prototype.readersCardAvailable = function (callback) {
-	        return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(true), callback);
+	        return this.connection.getSkipCitrix(this.url, CORE_READERS, CoreService.cardInsertedFilter(true), callback);
 	    };
 	    CoreService.prototype.readersCardsUnavailable = function (callback) {
-	        return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), callback);
+	        return this.connection.getSkipCitrix(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), callback);
 	    };
 	    CoreService.prototype.setPubKey = function (pubkey, callback) {
 	        return this.connection.put(this.url, CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);
@@ -20210,16 +20212,16 @@ var GCLLib =
 	var UrlUtil_1 = __webpack_require__(36);
 	var GenericConnection = (function () {
 	    function GenericConnection(cfg) {
-	        this.config = cfg;
+	        this.cfg = cfg;
 	    }
 	    GenericConnection.prototype.get = function (basePath, suffix, queryParams, callback) {
-	        return handleRequest(basePath, suffix, "GET", this.config, undefined, queryParams, callback);
+	        return handleRequest(basePath, suffix, "GET", this.cfg, undefined, queryParams, callback);
 	    };
 	    GenericConnection.prototype.post = function (basePath, suffix, body, queryParams, callback) {
-	        return handleRequest(basePath, suffix, "POST", this.config, body, queryParams, callback);
+	        return handleRequest(basePath, suffix, "POST", this.cfg, body, queryParams, callback);
 	    };
 	    GenericConnection.prototype.put = function (basePath, suffix, body, queryParams, callback) {
-	        return handleRequest(basePath, suffix, "PUT", this.config, body, queryParams, callback);
+	        return handleRequest(basePath, suffix, "PUT", this.cfg, body, queryParams, callback);
 	    };
 	    return GenericConnection;
 	}());
@@ -20228,9 +20230,25 @@ var GCLLib =
 	    __extends(LocalAuthConnection, _super);
 	    function LocalAuthConnection(cfg) {
 	        var _this = _super.call(this, cfg) || this;
-	        _this.config = _.omit(_this.config, "apiKey");
+	        _this.cfg = cfg;
 	        return _this;
 	    }
+	    LocalAuthConnection.prototype.get = function (basePath, suffix, queryParams, callback) {
+	        var config = _.omit(this.cfg, "apiKey");
+	        return handleRequest(basePath, suffix, "GET", config, undefined, queryParams, callback);
+	    };
+	    LocalAuthConnection.prototype.getSkipCitrix = function (basePath, suffix, queryParams, callback) {
+	        var config = _.omit(this.cfg, "apiKey");
+	        return handleRequest(basePath, suffix, "GET", config, undefined, queryParams, callback, true);
+	    };
+	    LocalAuthConnection.prototype.post = function (basePath, suffix, body, queryParams, callback) {
+	        var config = _.omit(this.cfg, "apiKey");
+	        return handleRequest(basePath, suffix, "POST", config, body, queryParams, callback);
+	    };
+	    LocalAuthConnection.prototype.put = function (basePath, suffix, body, queryParams, callback) {
+	        var config = _.omit(this.cfg, "apiKey");
+	        return handleRequest(basePath, suffix, "PUT", config, body, queryParams, callback);
+	    };
 	    return LocalAuthConnection;
 	}(GenericConnection));
 	exports.LocalAuthConnection = LocalAuthConnection;
@@ -20239,9 +20257,24 @@ var GCLLib =
 	    function LocalConnection(cfg) {
 	        var _this = _super.call(this, cfg) || this;
 	        _this.cfg = cfg;
-	        _this.config = _.omit(_this.config, ["apiKey", "jwt"]);
 	        return _this;
 	    }
+	    LocalConnection.prototype.get = function (basePath, suffix, queryParams, callback) {
+	        var config = _.omit(this.cfg, ["apiKey", "jwt"]);
+	        return handleRequest(basePath, suffix, "GET", config, undefined, queryParams, callback);
+	    };
+	    LocalConnection.prototype.getSkipCitrix = function (basePath, suffix, queryParams, callback) {
+	        var config = _.omit(this.cfg, ["apiKey", "jwt"]);
+	        return handleRequest(basePath, suffix, "GET", config, undefined, queryParams, callback, true);
+	    };
+	    LocalConnection.prototype.post = function (basePath, suffix, body, queryParams, callback) {
+	        var config = _.omit(this.cfg, ["apiKey", "jwt"]);
+	        return handleRequest(basePath, suffix, "POST", config, body, queryParams, callback);
+	    };
+	    LocalConnection.prototype.put = function (basePath, suffix, body, queryParams, callback) {
+	        var config = _.omit(this.cfg, ["apiKey", "jwt"]);
+	        return handleRequest(basePath, suffix, "PUT", config, body, queryParams, callback);
+	    };
 	    return LocalConnection;
 	}(GenericConnection));
 	exports.LocalConnection = LocalConnection;
@@ -20250,9 +20283,20 @@ var GCLLib =
 	    function RemoteConnection(cfg) {
 	        var _this = _super.call(this, cfg) || this;
 	        _this.cfg = cfg;
-	        _this.config = _.omit(_this.config, "jwt");
 	        return _this;
 	    }
+	    RemoteConnection.prototype.get = function (basePath, suffix, queryParams, callback) {
+	        var config = _.omit(this.cfg, "jwt");
+	        return handleRequest(basePath, suffix, "GET", config, undefined, queryParams, callback, true);
+	    };
+	    RemoteConnection.prototype.post = function (basePath, suffix, body, queryParams, callback) {
+	        var config = _.omit(this.cfg, "jwt");
+	        return handleRequest(basePath, suffix, "POST", config, body, queryParams, callback, true);
+	    };
+	    RemoteConnection.prototype.put = function (basePath, suffix, body, queryParams, callback) {
+	        var config = _.omit(this.cfg, "jwt");
+	        return handleRequest(basePath, suffix, "PUT", config, body, queryParams, callback, true);
+	    };
 	    return RemoteConnection;
 	}(GenericConnection));
 	exports.RemoteConnection = RemoteConnection;
@@ -20275,22 +20319,13 @@ var GCLLib =
 	    return LocalTestConnection;
 	}(GenericConnection));
 	exports.LocalTestConnection = LocalTestConnection;
-	function handleRequest(basePath, suffix, method, gclConfig, body, params, callback) {
+	function handleRequest(basePath, suffix, method, gclConfig, body, params, callback, skipCitrixCheck) {
 	    if (!callback || typeof callback !== "function") {
 	        callback = function () { };
 	    }
-	    if (gclConfig.citrix && gclConfig.agentPort === -1) {
-	        var agentPortError = {
-	            description: "Running in Citrix environment but no Agent port was defined in config.",
-	            status: 400,
-	            code: "801"
-	        };
-	        callback(agentPortError, null);
-	        return es6_promise_1.Promise.reject(agentPortError);
-	    }
-	    else {
+	    if (skipCitrixCheck || !gclConfig.citrix || gclConfig.agentPort !== -1) {
 	        var config_1 = {
-	            url: UrlUtil_1.UrlUtil.create(basePath, suffix, gclConfig),
+	            url: UrlUtil_1.UrlUtil.create(basePath, suffix, gclConfig, skipCitrixCheck),
 	            method: method,
 	            headers: {
 	                "Accept-Language": "en-US"
@@ -20325,6 +20360,15 @@ var GCLLib =
 	            });
 	        });
 	    }
+	    else {
+	        var agentPortError = {
+	            description: "Running in Citrix environment but no Agent port was defined in config.",
+	            status: 400,
+	            code: "801"
+	        };
+	        callback(agentPortError, null);
+	        return es6_promise_1.Promise.reject(agentPortError);
+	    }
 	}
 	function handleTestRequest(basePath, suffix, method, gclConfig, body, params, callback) {
 	    if (!callback || typeof callback !== "function") {
@@ -20341,7 +20385,7 @@ var GCLLib =
 	    }
 	    else {
 	        var config_2 = {
-	            url: UrlUtil_1.UrlUtil.create(basePath, suffix, gclConfig),
+	            url: UrlUtil_1.UrlUtil.create(basePath, suffix, gclConfig, true),
 	            method: method,
 	            headers: {
 	                "Accept-Language": "en-US",
@@ -21876,8 +21920,8 @@ var GCLLib =
 	var UrlUtil = (function () {
 	    function UrlUtil() {
 	    }
-	    UrlUtil.create = function (base, suffix, config) {
-	        if (config.citrix) {
+	    UrlUtil.create = function (base, suffix, config, skipCitrixCheck) {
+	        if (config.citrix && config.agentPort !== -1 && !skipCitrixCheck) {
 	            return base + agent_1.AgentClient.urlPrefix(config.agentPort) + suffix;
 	        }
 	        else {
@@ -21912,7 +21956,7 @@ var GCLLib =
 	        }
 	    };
 	    AgentClient.prototype.get = function (hostName, callback) {
-	        return this.connection.get(this.url, AgentClient.AGENT_PATH, AgentClient.createHostnameFilter(hostName), callback);
+	        return this.connection.getSkipCitrix(this.url, AgentClient.AGENT_PATH, AgentClient.createHostnameFilter(hostName), callback);
 	    };
 	    return AgentClient;
 	}());
@@ -22143,7 +22187,7 @@ var GCLLib =
 	        return new RemoteLoading_1.RemoteLoading(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id);
 	    };
 	    PluginFactory.prototype.createBelfius = function (reader_id) {
-	        return new Belfius_1.Belfius(new RemoteLoading_1.RemoteLoading(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id), this.connection.config);
+	        return new Belfius_1.Belfius(new RemoteLoading_1.RemoteLoading(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id), this.connection.cfg);
 	    };
 	    return PluginFactory;
 	}());
@@ -22209,7 +22253,12 @@ var GCLLib =
 	        this.reader_id = reader_id;
 	    }
 	    GenericContainer.prototype.containerSuffix = function (path) {
-	        return this.containerUrl + "/" + this.reader_id + path;
+	        if (path && path.length) {
+	            return this.containerUrl + "/" + this.reader_id + path;
+	        }
+	        else {
+	            return this.containerUrl + "/" + this.reader_id;
+	        }
 	    };
 	    return GenericContainer;
 	}());
@@ -22398,7 +22447,7 @@ var GCLLib =
 	    }
 	    PinEnforcer.check = function (connection, baseUrl, readerId, pinValue) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            if (connection.config.forceHardwarePinpad) {
+	            if (connection.cfg.forceHardwarePinpad) {
 	                connection.get(baseUrl, CORE_READERS + "/" + readerId, undefined).then(function (reader) {
 	                    if (reader.data.pinpad) {
 	                        if (pinValue) {

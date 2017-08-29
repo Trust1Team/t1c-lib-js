@@ -59,7 +59,7 @@ class CoreService implements CoreModel.AbstractCore {
 
     public info(callback?: (error: CoreExceptions.RestException, data: CoreModel.InfoResponse)
         => void): Promise<CoreModel.InfoResponse> {
-        return this.connection.get(this.url, CORE_INFO, undefined, callback);
+        return this.connection.getSkipCitrix(this.url, CORE_INFO, undefined, callback);
     }
 
     public infoBrowser(callback?: (error: CoreExceptions.RestException, data: CoreModel.BrowserInfoResponse)
@@ -70,7 +70,7 @@ class CoreService implements CoreModel.AbstractCore {
 
     public plugins(callback?: (error: CoreExceptions.RestException, data: CoreModel.PluginsResponse)
         => void): Promise<CoreModel.PluginsResponse> {
-        return this.connection.get(this.url, CORE_PLUGINS, undefined, callback);
+        return this.connection.getSkipCitrix(this.url, CORE_PLUGINS, undefined, callback);
     }
 
     public pollCardInserted(secondsToPollCard?: number,
@@ -238,17 +238,17 @@ class CoreService implements CoreModel.AbstractCore {
 
     public readers(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
         => void): Promise<CoreModel.CardReadersResponse> {
-        return this.connection.get(this.url, CORE_READERS, undefined, callback);
+        return this.connection.getSkipCitrix(this.url, CORE_READERS, undefined, callback);
     }
 
     public readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
         => void): Promise<CoreModel.CardReadersResponse> {
-        return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(true), callback);
+        return this.connection.getSkipCitrix(this.url, CORE_READERS, CoreService.cardInsertedFilter(true), callback);
     }
 
     public readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
         => void): Promise<CoreModel.CardReadersResponse> {
-        return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), callback);
+        return this.connection.getSkipCitrix(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), callback);
     }
 
     public setPubKey(pubkey: string,

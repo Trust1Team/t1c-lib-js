@@ -89,7 +89,7 @@ class GCLClient {
     }
 
     public static initialize(cfg: GCLConfig,
-                             callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): void | Promise<GCLClient> {
+                             callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): Promise<GCLClient> {
         return new Promise((resolve, reject) => {
             let client = new GCLClient(cfg, true);
 
@@ -123,6 +123,8 @@ class GCLClient {
         resolvedCfg.implicitDownload = cfg.implicitDownload;
         resolvedCfg.localTestMode = cfg.localTestMode;
         resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
+        resolvedCfg.citrix = cfg.citrix;
+        resolvedCfg.agentPort = cfg.agentPort;
         return resolvedCfg;
     }
 
