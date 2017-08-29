@@ -23,7 +23,7 @@ class Belfius implements AbstractBelfius {
         data: "FE0000040001300000"
     };
 
-    constructor(protected remoteLoading: RemoteLoading, protected config: GCLConfig) {}
+    constructor(protected remoteLoading: RemoteLoading) {}
 
     public closeSession(callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.remoteLoading.closeSession(callback);
@@ -38,8 +38,7 @@ class Belfius implements AbstractBelfius {
     }
 
     public openSession(timeout?: number, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        if (timeout && timeout > 0) { return this.remoteLoading.openSession(timeout, callback); }
-        else { return this.remoteLoading.openSession(this.config.defaultSessionTimeout, callback); }
+        return this.remoteLoading.openSession(timeout, callback);
     }
 
     public stx(command: string, sessionId: string,
