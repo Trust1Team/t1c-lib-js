@@ -158,6 +158,7 @@ var GCLLib =
 	        resolvedCfg.implicitDownload = cfg.implicitDownload;
 	        resolvedCfg.localTestMode = cfg.localTestMode;
 	        resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
+	        resolvedCfg.defaultSessionTimeout = cfg.defaultSessionTimeout;
 	        resolvedCfg.citrix = cfg.citrix;
 	        resolvedCfg.agentPort = cfg.agentPort;
 	        return resolvedCfg;
