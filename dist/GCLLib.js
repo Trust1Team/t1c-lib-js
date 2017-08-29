@@ -75032,11 +75032,14 @@ var GCLLib =
 	        return this.connection.get(this.baseUrl, this.containerSuffix(RemoteLoading.CCID_FEATURES), RemoteLoading.optionalSessionIdParam(sessionId), callback);
 	    };
 	    RemoteLoading.prototype.command = function (tx, sessionId, callback) {
-	        var suffix = this.containerSuffix(RemoteLoading.CMD);
 	        if (_.isArray(tx)) {
-	            suffix = this.containerSuffix(RemoteLoading.CMDS);
+	            var body_1 = [];
+	            _.forEach(tx, function (txElem) { body_1.push({ tx: txElem }); });
+	            return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.CMDS), body_1, RemoteLoading.optionalSessionIdParam(sessionId), callback);
 	        }
-	        return this.connection.post(this.baseUrl, suffix, tx, RemoteLoading.optionalSessionIdParam(sessionId), callback);
+	        else {
+	            return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.CMD), { tx: tx }, RemoteLoading.optionalSessionIdParam(sessionId), callback);
+	        }
 	    };
 	    RemoteLoading.prototype.closeSession = function (callback) {
 	        return this.connection.get(this.baseUrl, this.containerSuffix(RemoteLoading.CLOSE_SESSION), undefined, callback);
