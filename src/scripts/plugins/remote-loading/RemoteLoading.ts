@@ -75,7 +75,12 @@ class RemoteLoading extends GenericContainer implements AbstractRemoteLoading {
     }
 
     public openSession(timeout?: number, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.OPEN_SESSION), { timeout }, undefined, callback);
+        if (timeout && timeout > 0) {
+            return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.OPEN_SESSION), { timeout }, undefined, callback);
+        } else {
+            return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.OPEN_SESSION),
+                { timeout: this.connection.cfg.defaultSessionTimeout }, undefined, callback);
+        }
     }
 
 }

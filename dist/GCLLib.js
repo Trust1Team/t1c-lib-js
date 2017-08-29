@@ -22187,7 +22187,7 @@ var GCLLib =
 	        return new RemoteLoading_1.RemoteLoading(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id);
 	    };
 	    PluginFactory.prototype.createBelfius = function (reader_id) {
-	        return new Belfius_1.Belfius(new RemoteLoading_1.RemoteLoading(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id), this.connection.cfg);
+	        return new Belfius_1.Belfius(new RemoteLoading_1.RemoteLoading(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id));
 	    };
 	    return PluginFactory;
 	}());
@@ -75044,7 +75044,12 @@ var GCLLib =
 	        return this.connection.get(this.baseUrl, this.containerSuffix(RemoteLoading.IS_PRESENT), RemoteLoading.optionalSessionIdParam(sessionId), callback);
 	    };
 	    RemoteLoading.prototype.openSession = function (timeout, callback) {
-	        return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.OPEN_SESSION), { timeout: timeout }, undefined, callback);
+	        if (timeout && timeout > 0) {
+	            return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.OPEN_SESSION), { timeout: timeout }, undefined, callback);
+	        }
+	        else {
+	            return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.OPEN_SESSION), { timeout: this.connection.cfg.defaultSessionTimeout }, undefined, callback);
+	        }
 	    };
 	    return RemoteLoading;
 	}(Card_1.GenericContainer));
@@ -75069,9 +75074,8 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var ResponseHandler_1 = __webpack_require__(481);
 	var Belfius = (function () {
-	    function Belfius(remoteLoading, config) {
+	    function Belfius(remoteLoading) {
 	        this.remoteLoading = remoteLoading;
-	        this.config = config;
 	    }
 	    Belfius.prototype.closeSession = function (callback) {
 	        return this.remoteLoading.closeSession(callback);
@@ -75085,12 +75089,7 @@ var GCLLib =
 	        }
 	    };
 	    Belfius.prototype.openSession = function (timeout, callback) {
-	        if (timeout && timeout > 0) {
-	            return this.remoteLoading.openSession(timeout, callback);
-	        }
-	        else {
-	            return this.remoteLoading.openSession(this.config.defaultSessionTimeout, callback);
-	        }
+	        return this.remoteLoading.openSession(timeout, callback);
 	    };
 	    Belfius.prototype.stx = function (command, sessionId, callback) {
 	        if (sessionId && sessionId.length) {
