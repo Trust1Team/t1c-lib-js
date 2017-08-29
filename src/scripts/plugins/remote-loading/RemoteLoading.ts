@@ -60,9 +60,15 @@ class RemoteLoading extends GenericContainer implements AbstractRemoteLoading {
     public command(tx: string[], sessionId?: string,
                    callback?: (error: RestException, data: CommandsResponse) => void): Promise<CommandsResponse>;
     public command(tx: string | string[], sessionId?: string, callback?: (error: RestException, data: any) => void): Promise<any> {
-        let suffix = this.containerSuffix(RemoteLoading.CMD);
-        if (_.isArray(tx)) { suffix = this.containerSuffix(RemoteLoading.CMDS); }
-        return this.connection.post(this.baseUrl, suffix, tx, RemoteLoading.optionalSessionIdParam(sessionId), callback);
+        if (_.isArray(tx)) {
+            let body = [];
+            _.forEach(tx, txElem => { body.push({ tx: txElem }); });
+            return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.CMDS), body,
+                RemoteLoading.optionalSessionIdParam(sessionId), callback);
+        } else {
+            return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.CMD), { tx },
+                RemoteLoading.optionalSessionIdParam(sessionId), callback);
+        }
     }
 
     public closeSession(callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
