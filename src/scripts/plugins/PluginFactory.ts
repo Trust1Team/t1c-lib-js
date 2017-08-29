@@ -99,6 +99,6 @@ export class PluginFactory implements AbstractFactory {
     }
 
     public createBelfius(reader_id?: string): AbstractBelfius {
-        return new Belfius(new RemoteLoading(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id), this.connection.config);
+        return new Belfius(new RemoteLoading(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id), this.connection.cfg);
     }
 }

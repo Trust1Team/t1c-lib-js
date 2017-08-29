@@ -10,8 +10,8 @@ class UrlUtil {
     // constructor
     constructor() {}
 
-    public static create(base: string, suffix: string, config: GCLConfig) {
-        if (config.citrix) {
+    public static create(base: string, suffix: string, config: GCLConfig, skipCitrixCheck) {
+        if (config.citrix && config.agentPort !== -1 && !skipCitrixCheck) {
             return base + AgentClient.urlPrefix(config.agentPort) + suffix;
         } else {
             return base + suffix;

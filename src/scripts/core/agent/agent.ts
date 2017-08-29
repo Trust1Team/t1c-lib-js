@@ -3,7 +3,7 @@
  */
 import { RestException } from "../exceptions/CoreExceptions";
 import { AbstractAgent, AgentResponse } from "./agentModel";
-import { Connection } from "../client/Connection";
+import { LocalConnection } from "../client/Connection";
 
 
 export { AgentClient };
@@ -12,7 +12,7 @@ class AgentClient implements AbstractAgent {
     static AGENT_PATH = "/agent";
 
     // constructor
-    constructor(private url: string, private connection: Connection) {}
+    constructor(private url: string, private connection: LocalConnection) {}
 
     public static urlPrefix(port: number) {
         return AgentClient.AGENT_PATH + "/" + port;
@@ -24,7 +24,7 @@ class AgentClient implements AbstractAgent {
     }
 
     public get(hostName?: string, callback?: (error: RestException, data: AgentResponse) => void) {
-        return this.connection.get(this.url, AgentClient.AGENT_PATH, AgentClient.createHostnameFilter(hostName), callback);
+        return this.connection.getSkipCitrix(this.url, AgentClient.AGENT_PATH, AgentClient.createHostnameFilter(hostName), callback);
     }
 
 }

@@ -17,7 +17,7 @@ class PinEnforcer  {
                         pinValue: string): Promise<any> {
         // if forceHardwarePinpad enabled,
         return new Promise((resolve, reject) => {
-            if (connection.config.forceHardwarePinpad) {
+            if (connection.cfg.forceHardwarePinpad) {
                 // check if reader has pinpad
                 connection.get(baseUrl, CORE_READERS + "/" + readerId, undefined).then(reader => {
                     if (reader.data.pinpad) {

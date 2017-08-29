@@ -36,17 +36,13 @@ interface Connection {
 }
 
 abstract class GenericConnection implements Connection {
-    abstract config;
-
-    constructor(cfg: GCLConfig) {
-        this.config = cfg;
-    }
+    constructor(public cfg: GCLConfig) {}
 
     public get(basePath: string,
                suffix: string,
                queryParams: { [key: string]: string },
                callback?: (error: any, data: any) => void): Promise<any> {
-        return handleRequest(basePath, suffix, "GET", this.config, undefined, queryParams, callback);
+        return handleRequest(basePath, suffix, "GET", this.cfg, undefined, queryParams, callback);
     }
 
     public post(basePath: string,
@@ -54,7 +50,7 @@ abstract class GenericConnection implements Connection {
                 body: any,
                 queryParams: { [key: string]: string },
                 callback?: (error: any, data: any) => void): Promise<any> {
-        return handleRequest(basePath, suffix, "POST", this.config, body, queryParams, callback);
+        return handleRequest(basePath, suffix, "POST", this.cfg, body, queryParams, callback);
     }
 
     public put(basePath: string,
@@ -62,31 +58,113 @@ abstract class GenericConnection implements Connection {
                body: any,
                queryParams: { [key: string]: string },
                callback?: (error: any, data: any) => void): Promise<any> {
-        return handleRequest(basePath, suffix, "PUT", this.config, body, queryParams, callback);
+        return handleRequest(basePath, suffix, "PUT", this.cfg, body, queryParams, callback);
     }
 }
 
 class LocalAuthConnection extends GenericConnection implements Connection {
-    config = _.omit(this.config, "apiKey");
+    constructor(public cfg: GCLConfig) { super(cfg); }
 
-    constructor(cfg: GCLConfig) {
-        super(cfg);
+    public get(basePath: string,
+               suffix: string,
+               queryParams: { [key: string]: string },
+               callback?: (error: any, data: any) => void): Promise<any> {
+        let config: any = _.omit(this.cfg, "apiKey");
+        return handleRequest(basePath, suffix, "GET", config, undefined, queryParams, callback);
+    }
+
+    public getSkipCitrix(basePath: string,
+                         suffix: string,
+                         queryParams: { [key: string]: string },
+                         callback?: (error: any, data: any) => void): Promise<any> {
+        let config: any = _.omit(this.cfg, "apiKey");
+        return handleRequest(basePath, suffix, "GET", config, undefined, queryParams, callback, true);
+    }
+
+    public post(basePath: string,
+                suffix: string,
+                body: any,
+                queryParams: { [key: string]: string },
+                callback?: (error: any, data: any) => void): Promise<any> {
+        let config: any = _.omit(this.cfg, "apiKey");
+        return handleRequest(basePath, suffix, "POST", config, body, queryParams, callback);
+    }
+
+    public put(basePath: string,
+               suffix: string,
+               body: any,
+               queryParams: { [key: string]: string },
+               callback?: (error: any, data: any) => void): Promise<any> {
+        let config: any = _.omit(this.cfg, "apiKey");
+        return handleRequest(basePath, suffix, "PUT", config, body, queryParams, callback);
     }
 }
 
 class LocalConnection extends GenericConnection implements Connection {
-    config = _.omit(this.config, ["apiKey", "jwt"]);
+    constructor(public cfg: GCLConfig) { super(cfg); }
 
-    constructor(protected cfg: GCLConfig) {
-        super(cfg);
+    public get(basePath: string,
+               suffix: string,
+               queryParams: { [key: string]: string },
+               callback?: (error: any, data: any) => void): Promise<any> {
+        let config: any = _.omit(this.cfg, ["apiKey", "jwt"]);
+        return handleRequest(basePath, suffix, "GET", config, undefined, queryParams, callback);
+    }
+
+    public getSkipCitrix(basePath: string,
+                         suffix: string,
+                         queryParams: { [key: string]: string },
+                         callback?: (error: any, data: any) => void): Promise<any> {
+        let config: any = _.omit(this.cfg, ["apiKey", "jwt"]);
+        return handleRequest(basePath, suffix, "GET", config, undefined, queryParams, callback, true);
+    }
+
+    public post(basePath: string,
+                suffix: string,
+                body: any,
+                queryParams: { [key: string]: string },
+                callback?: (error: any, data: any) => void): Promise<any> {
+        let config: any = _.omit(this.cfg, ["apiKey", "jwt"]);
+        return handleRequest(basePath, suffix, "POST", config, body, queryParams, callback);
+    }
+
+    public put(basePath: string,
+               suffix: string,
+               body: any,
+               queryParams: { [key: string]: string },
+               callback?: (error: any, data: any) => void): Promise<any> {
+        let config: any = _.omit(this.cfg, ["apiKey", "jwt"]);
+        return handleRequest(basePath, suffix, "PUT", config, body, queryParams, callback);
     }
 }
 
 class RemoteConnection extends GenericConnection implements Connection {
-    config = _.omit(this.config, "jwt");
+    constructor(public cfg: GCLConfig) { super(cfg); }
 
-    constructor(protected cfg: GCLConfig) {
-        super(cfg);
+    public get(basePath: string,
+               suffix: string,
+               queryParams: { [key: string]: string },
+               callback?: (error: any, data: any) => void): Promise<any> {
+        let config: any = _.omit(this.cfg, "jwt");
+        return handleRequest(basePath, suffix, "GET", config, undefined, queryParams, callback, true);
+    }
+
+    public post(basePath: string,
+                suffix: string,
+                body: any,
+                queryParams: { [key: string]: string },
+                callback?: (error: any, data: any) => void): Promise<any> {
+        let config: any = _.omit(this.cfg, "jwt");
+        return handleRequest(basePath, suffix, "POST", config, body, queryParams, callback, true);
+    }
+
+    public put(basePath: string,
+               suffix: string,
+               body: any,
+               queryParams: { [key: string]: string },
+               callback?: (error: any, data: any) => void): Promise<any> {
+        let config: any = _.omit(this.cfg, "jwt");
+        return handleRequest(basePath, suffix, "PUT", config, body, queryParams, callback, true);
     }
 }
 
@@ -96,7 +174,7 @@ class LocalTestConnection extends GenericConnection implements Connection {
     public get(basePath: string, suffix: string,
                queryParams?: { [key: string]: string },
                callback?: (error: any, data: any) => void): Promise<any> {
-        return handleTestRequest(basePath, suffix, "GET", this.config,undefined, queryParams, callback);
+        return handleTestRequest(basePath, suffix, "GET", this.config, undefined, queryParams, callback);
     }
 
     public post(basePath: string, suffix: string,
@@ -121,22 +199,15 @@ function handleRequest(basePath: string,
                        gclConfig: GCLConfig,
                        body?: any,
                        params?: any,
-                       callback?: (error: any, data: any) => void): Promise<any> {
+                       callback?: (error: any, data: any) => void,
+                       skipCitrixCheck?: boolean): Promise<any> {
     // init callback if necessary
     if (!callback || typeof callback !== "function") { callback = function () { /* no-op */ }; }
 
     // if Citrix environment, check that agentPort was defined in config
-    if (gclConfig.citrix && gclConfig.agentPort === -1) {
-        let agentPortError: RestException = {
-            description: "Running in Citrix environment but no Agent port was defined in config.",
-            status: 400,
-            code: "801"
-        };
-        callback(agentPortError, null);
-        return Promise.reject(agentPortError);
-    } else {
+    if (skipCitrixCheck || !gclConfig.citrix || gclConfig.agentPort !== -1) {
         let config: AxiosRequestConfig = {
-            url: UrlUtil.create(basePath, suffix, gclConfig),
+            url: UrlUtil.create(basePath, suffix, gclConfig, skipCitrixCheck),
             method,
             headers:  {
                 "Accept-Language":  "en-US"
@@ -162,6 +233,14 @@ function handleRequest(basePath: string,
                 }
             });
         });
+    } else {
+        let agentPortError: RestException = {
+            description: "Running in Citrix environment but no Agent port was defined in config.",
+            status: 400,
+            code: "801"
+        };
+        callback(agentPortError, null);
+        return Promise.reject(agentPortError);
     }
 }
 
@@ -186,7 +265,7 @@ function handleTestRequest(basePath: string,
         return Promise.reject(agentPortError);
     } else {
         let config: AxiosRequestConfig = {
-            url: UrlUtil.create(basePath, suffix, gclConfig),
+            url: UrlUtil.create(basePath, suffix, gclConfig, true),
             method,
             headers:  {
                 "Accept-Language":  "en-US",
