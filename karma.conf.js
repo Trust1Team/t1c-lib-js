@@ -22,7 +22,7 @@ module.exports = function (config) {
         colors: true,
         logLevel: config.LOG_DEBUG,
         browsers: ['PhantomJS'],
-        singleRun: true,
+        singleRun: false,
         concurrency: Infinity,
 
         // Increase timeouts to prevent the issue with disconnected tests (https://goo.gl/nstA69)
