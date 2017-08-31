@@ -219,6 +219,8 @@ function handleRequest(basePath: string,
         if (gclConfig.apiKey) { config.headers.apikey = gclConfig.apiKey; }
         if (gclConfig.jwt) { config.headers.Authorization = "Bearer " + gclConfig.jwt; }
 
+        console.log(config);
+
         return new Promise((resolve, reject) => {
             axios.request(config).then((response: AxiosResponse) => {
                 callback(null, response.data);
