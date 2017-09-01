@@ -228,29 +228,46 @@ describe("Remote Loading Container", () => {
     // TODO fix once working
     describe("can send a CCID command", function () {
         beforeEach(function () {
-            mock.onPost("plugins/readerapi/123/ccid", { feature: "VERIFY_PIN", apdu: "test" })
+            mock.onPost("plugins/readerapi/123/ccid", { feature: "VERIFY_PIN_DIRECT",
+                apdu: "1E1E8947040C0402010904000000000D000000002000010820FFFFFFFFFFFFFF" })
                 .reply(config => {
                     if (config.params && config.params["session-id"] && config.params["session-id"] === "123") {
-                        return [ 200, { success: true }];
+                        return [ 200, { success: true, data:
+                            { sw: "9000", tx: "1E1E8947040C0402010904000000000D000000002000010820FFFFFFFFFFFFFF" } }];
                     } else {
-                        return [ 200, { success: true }];
+                        return [ 200, { success: true, data:
+                            { sw: "9111", tx: "1E1E8947040C0402010904000000000D000000002000010820FFFFFFFFFFFFFF" } }];
                     }
                 });
         });
 
         it("works without a session id", () => {
-            return relo.ccid("VERIFY_PIN", "test").then((res) => {
+            return relo.ccid("VERIFY_PIN_DIRECT", "1E1E8947040C0402010904000000000D000000002000010820FFFFFFFFFFFFFF").then((res) => {
                 expect(res).to.have.property("success");
                 expect(res.success).to.be.a("boolean");
                 expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data).to.be.a("object");
+
+                expect(res.data).to.have.property("sw");
+                expect(res.data.sw).to.be.a("string");
+                expect(res.data.sw).to.eq("9111");
             });
         });
 
         it("takes the session id into account when provided", () => {
-            return relo.ccid("VERIFY_PIN", "test", "123").then(res => {
+            return relo.ccid("VERIFY_PIN_DIRECT", "1E1E8947040C0402010904000000000D000000002000010820FFFFFFFFFFFFFF", "123").then(res => {
                 expect(res).to.have.property("success");
                 expect(res.success).to.be.a("boolean");
                 expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data).to.be.a("object");
+
+                expect(res.data).to.have.property("sw");
+                expect(res.data.sw).to.be.a("string");
+                expect(res.data.sw).to.eq("9000");
             });
         });
     });
@@ -301,120 +318,114 @@ describe("Remote Loading Container", () => {
         });
     });
 
-    //
-    // describe("can send a hex command", function () {
-    //     beforeEach(function () {
-    //         mock.onPost("plugins/readerapi/123/apdu", { cla: "F1", ins: "95", p1: "F7", p2: "E4", data: "FE0000040001300000" })
-    //             .reply(config => {
-    //                 if (config.params && config.params["session-id"] && config.params["session-id"] === "123") {
-    //                     return [ 200, { success: true, data: {
-    //                         rx:	"FE0000040067B4AD49",
-    //                         sw:	"9000",
-    //                         tx:	"F195F7E409FE0000040001300000"}
-    //                     }];
-    //                 } else { return [ 200, { success: false, data: "Incorrect session-id received" } ]; }
-    //             });
-    //     });
-    //
-    //     it("checks if a sessionId was provided", () => {
-    //         const sessionId: string = undefined as any;
-    //         return belfius.nonce(sessionId).then(() => {
-    //             return Promise.reject(new Error("no sessionId was provided, this should fail!"));
-    //         }, error => {
-    //             expect(error).to.have.property("code");
-    //             expect(error.code).to.be.a("string");
-    //             expect(error.code).to.eq("402");
-    //
-    //             expect(error).to.have.property("status");
-    //             expect(error.status).to.be.a("number");
-    //             expect(error.status).to.eq(400);
-    //
-    //             expect(error).to.have.property("description");
-    //             expect(error.description).to.be.a("string");
-    //             expect(error.description).to.eq("Session ID is required!");
-    //         });
-    //     });
-    //
-    //     it("retrieves a nonce for a session", () => {
-    //         return belfius.nonce("123").then(res => {
-    //             expect(res).to.have.property("success");
-    //             expect(res.success).to.be.a("boolean");
-    //             expect(res.success).to.eq(true);
-    //
-    //             expect(res).to.have.property("data");
-    //             expect(res.data).to.be.a("object");
-    //
-    //             expect(res.data).to.have.property("tx");
-    //             expect(res.data.tx).to.be.a("string");
-    //             expect(res.data.tx).to.eq("F195F7E409FE0000040001300000");
-    //
-    //             expect(res.data).to.have.property("sw");
-    //             expect(res.data.sw).to.be.a("string");
-    //             expect(res.data.sw).to.eq("9000");
-    //
-    //             expect(res.data).to.have.property("rx");
-    //             expect(res.data.rx).to.be.a("string");
-    //             expect(res.data.rx).to.eq("FE0000040067B4AD49");
-    //         });
-    //     });
-    // });
-    //
-    // describe("can send bulk hex commands", function () {
-    //     beforeEach(function () {
-    //         mock.onPost("plugins/readerapi/123/apdu", { cla: "F1", ins: "95", p1: "F7", p2: "E4", data: "FE0000040001300000" })
-    //             .reply(config => {
-    //                 if (config.params && config.params["session-id"] && config.params["session-id"] === "123") {
-    //                     return [ 200, { success: true, data: {
-    //                         rx:	"FE0000040067B4AD49",
-    //                         sw:	"9000",
-    //                         tx:	"F195F7E409FE0000040001300000"}
-    //                     }];
-    //                 } else { return [ 200, { success: false, data: "Incorrect session-id received" } ]; }
-    //             });
-    //     });
-    //
-    //     it("checks if a sessionId was provided", () => {
-    //         const sessionId: string = undefined as any;
-    //         return belfius.nonce(sessionId).then(() => {
-    //             return Promise.reject(new Error("no sessionId was provided, this should fail!"));
-    //         }, error => {
-    //             expect(error).to.have.property("code");
-    //             expect(error.code).to.be.a("string");
-    //             expect(error.code).to.eq("402");
-    //
-    //             expect(error).to.have.property("status");
-    //             expect(error.status).to.be.a("number");
-    //             expect(error.status).to.eq(400);
-    //
-    //             expect(error).to.have.property("description");
-    //             expect(error.description).to.be.a("string");
-    //             expect(error.description).to.eq("Session ID is required!");
-    //         });
-    //     });
-    //
-    //     it("retrieves a nonce for a session", () => {
-    //         return belfius.nonce("123").then(res => {
-    //             expect(res).to.have.property("success");
-    //             expect(res.success).to.be.a("boolean");
-    //             expect(res.success).to.eq(true);
-    //
-    //             expect(res).to.have.property("data");
-    //             expect(res.data).to.be.a("object");
-    //
-    //             expect(res.data).to.have.property("tx");
-    //             expect(res.data.tx).to.be.a("string");
-    //             expect(res.data.tx).to.eq("F195F7E409FE0000040001300000");
-    //
-    //             expect(res.data).to.have.property("sw");
-    //             expect(res.data.sw).to.be.a("string");
-    //             expect(res.data.sw).to.eq("9000");
-    //
-    //             expect(res.data).to.have.property("rx");
-    //             expect(res.data.rx).to.be.a("string");
-    //             expect(res.data.rx).to.eq("FE0000040067B4AD49");
-    //         });
-    //     });
-    // });
+    describe("can send a hex command", function () {
+        beforeEach(function () {
+            mock.onPost("plugins/readerapi/123/command", { tx: "00A4020C023F00" })
+                .reply(config => {
+                    if (config.params && config.params["session-id"] && config.params["session-id"] === "123") {
+                        return [ 200, { success: true, data: { sw: "9000", tx: "00A4020C023F00" } }];
+                    } else { return [ 200, { success: true, data: { sw: "69b3", tx: "00A4020C023F00" } }]; }
+                });
+        });
+
+        it("works without a session id", () => {
+            return relo.command("00A4020C023F00").then((res) => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data).to.be.a("object");
+
+                expect(res.data).to.have.property("sw");
+                expect(res.data.sw).to.be.a("string");
+                expect(res.data.sw).to.eq("69b3");
+            });
+        });
+
+        it("takes session id into account when provided", () => {
+            return relo.command("00A4020C023F00", "123").then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data).to.be.a("object");
+
+                expect(res.data).to.have.property("sw");
+                expect(res.data.sw).to.be.a("string");
+                expect(res.data.sw).to.eq("9000");
+            });
+        });
+    });
+
+    describe("can send bulk hex commands", function () {
+        beforeEach(function () {
+            mock.onPost("plugins/readerapi/123/commands", [{ tx: "00A4020C023F00" }, { tx: "00A4020C02DF01" },
+                { tx: "00A4020C024031" }, { tx: "00B00000B3" } ])
+                .reply(config => {
+                    if (config.params && config.params["session-id"] && config.params["session-id"] === "123") {
+                        return [ 200, { success: true, data: [
+                            { sw: "9000", tx: "00A4020C023F00" },
+                            { sw: "9000", tx: "00A4020C02DF01" },
+                            { sw: "9000", tx: "00A4020C024031" },
+                            { rx: "010C35393232313736343635363002105", sw: "9000", tx : "00B00000B3" }]
+                        }];
+                    } else { return [ 200, { success: true, data: [
+                        { sw: "9000", tx: "00A4020C023F00" },
+                        { sw: "9000", tx: "00A4020C02DF01" },
+                        { sw: "9000", tx: "00A4020C024031" },
+                        { rx: "121DC6404343424847454746474113216", sw: "9000", tx : "00B00000B3" }] }];
+                    }
+                });
+        });
+
+        it("works without a session id", () => {
+            return relo.command([ "00A4020C023F00", "00A4020C02DF01", "00A4020C024031", "00B00000B3" ]).then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data).to.be.an("array").of.length(4);
+
+                expect(res.data[3]).to.have.property("tx");
+                expect(res.data[3].tx).to.be.a("string");
+                expect(res.data[3].tx).to.eq("00B00000B3");
+
+                expect(res.data[3]).to.have.property("sw");
+                expect(res.data[3].sw).to.be.a("string");
+                expect(res.data[3].sw).to.eq("9000");
+
+                expect(res.data[3]).to.have.property("rx");
+                expect(res.data[3].rx).to.be.a("string");
+                expect(res.data[3].rx).to.eq("121DC6404343424847454746474113216");
+            });
+        });
+
+        it("takes session id into account if provided", () => {
+            return relo.command([ "00A4020C023F00", "00A4020C02DF01", "00A4020C024031", "00B00000B3" ], "123").then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data).to.be.an("array").of.length(4);
+
+                expect(res.data[3]).to.have.property("tx");
+                expect(res.data[3].tx).to.be.a("string");
+                expect(res.data[3].tx).to.eq("00B00000B3");
+
+                expect(res.data[3]).to.have.property("sw");
+                expect(res.data[3].sw).to.be.a("string");
+                expect(res.data[3].sw).to.eq("9000");
+
+                expect(res.data[3]).to.have.property("rx");
+                expect(res.data[3].rx).to.be.a("string");
+                expect(res.data[3].rx).to.eq("010C35393232313736343635363002105");
+            });
+        });
+    });
 
     describe("can verify that a card is present", function () {
         beforeEach(function () {
