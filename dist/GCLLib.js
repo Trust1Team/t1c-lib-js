@@ -31080,7 +31080,7 @@ var GCLLib =
 	        return new RemoteLoading_1.RemoteLoading(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id);
 	    };
 	    PluginFactory.prototype.createBelfius = function (reader_id) {
-	        return new Belfius_1.Belfius(new RemoteLoading_1.RemoteLoading(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id));
+	        return new Belfius_1.Belfius(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id);
 	    };
 	    return PluginFactory;
 	}());
@@ -75033,8 +75033,8 @@ var GCLLib =
 	        }
 	        return this.connection.post(this.baseUrl, suffix, apdu, RemoteLoading.optionalSessionIdParam(sessionId), callback);
 	    };
-	    RemoteLoading.prototype.ccid = function (feature, apdu, sessionId, callback) {
-	        return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.CCID), { feature: feature, apdu: apdu }, RemoteLoading.optionalSessionIdParam(sessionId), callback);
+	    RemoteLoading.prototype.ccid = function (feature, command, sessionId, callback) {
+	        return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.CCID), { feature: feature, apdu: command }, RemoteLoading.optionalSessionIdParam(sessionId), callback);
 	    };
 	    RemoteLoading.prototype.ccidFeatures = function (sessionId, callback) {
 	        return this.connection.get(this.baseUrl, this.containerSuffix(RemoteLoading.CCID_FEATURES), RemoteLoading.optionalSessionIdParam(sessionId), callback);
@@ -75083,38 +75083,44 @@ var GCLLib =
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var ResponseHandler_1 = __webpack_require__(482);
-	var Belfius = (function () {
-	    function Belfius(remoteLoading) {
-	        this.remoteLoading = remoteLoading;
-	    }
-	    Belfius.prototype.closeSession = function (callback) {
-	        return this.remoteLoading.closeSession(callback);
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var RemoteLoading_1 = __webpack_require__(495);
+	var ResponseHandler_1 = __webpack_require__(482);
+	var Belfius = (function (_super) {
+	    __extends(Belfius, _super);
+	    function Belfius() {
+	        return _super !== null && _super.apply(this, arguments) || this;
+	    }
 	    Belfius.prototype.nonce = function (sessionId, callback) {
 	        if (sessionId && sessionId.length) {
-	            return this.remoteLoading.apdu(Belfius.NONCE_APDU, sessionId, callback);
+	            return this.apdu(Belfius.NONCE_APDU, sessionId, callback);
 	        }
 	        else {
 	            return ResponseHandler_1.ResponseHandler.error({ status: 400, description: "Session ID is required!", code: "402" }, callback);
 	        }
 	    };
-	    Belfius.prototype.openSession = function (timeout, callback) {
-	        return this.remoteLoading.openSession(timeout, callback);
-	    };
 	    Belfius.prototype.stx = function (command, sessionId, callback) {
 	        if (sessionId && sessionId.length) {
 	            var stxApdu = Belfius.NONCE_APDU;
 	            stxApdu.data = command;
-	            return this.remoteLoading.apdu(stxApdu, sessionId, callback);
+	            return this.apdu(stxApdu, sessionId, callback);
 	        }
 	        else {
 	            return ResponseHandler_1.ResponseHandler.error({ status: 400, description: "Session ID is required!", code: "402" }, callback);
 	        }
 	    };
 	    return Belfius;
-	}());
+	}(RemoteLoading_1.RemoteLoading));
 	Belfius.NONCE_APDU = {
 	    cla: "F1",
 	    ins: "95",

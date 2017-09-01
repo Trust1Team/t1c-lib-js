@@ -14,7 +14,7 @@ import { GCLConfig } from "../../../core/GCLConfig";
 export { Belfius };
 
 
-class Belfius implements AbstractBelfius {
+class Belfius extends RemoteLoading implements AbstractBelfius {
     static NONCE_APDU: APDU = {
         cla: "F1",
         ins: "95",
@@ -23,22 +23,12 @@ class Belfius implements AbstractBelfius {
         data: "FE0000040001300000"
     };
 
-    constructor(protected remoteLoading: RemoteLoading) {}
-
-    public closeSession(callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
-        return this.remoteLoading.closeSession(callback);
-    }
-
     public nonce(sessionId: string, callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse> {
         if (sessionId && sessionId.length) {
-            return this.remoteLoading.apdu(Belfius.NONCE_APDU, sessionId, callback);
+            return this.apdu(Belfius.NONCE_APDU, sessionId, callback);
         } else {
             return ResponseHandler.error({ status: 400, description: "Session ID is required!", code: "402" }, callback);
         }
-    }
-
-    public openSession(timeout?: number, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.remoteLoading.openSession(timeout, callback);
     }
 
     public stx(command: string, sessionId: string,
@@ -46,7 +36,7 @@ class Belfius implements AbstractBelfius {
         if (sessionId && sessionId.length) {
             let stxApdu = Belfius.NONCE_APDU;
             stxApdu.data = command;
-            return this.remoteLoading.apdu(stxApdu, sessionId, callback);
+            return this.apdu(stxApdu, sessionId, callback);
         } else {
             return ResponseHandler.error({ status: 400, description: "Session ID is required!", code: "402" }, callback);
         }
