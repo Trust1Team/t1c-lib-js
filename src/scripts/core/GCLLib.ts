@@ -39,6 +39,7 @@ import { AbstractAgent } from "./agent/agentModel";
 
 
 class GCLClient {
+    public GCLInstalled: boolean;
     private cfg: GCLConfig;
     private pluginFactory: PluginFactory;
     private coreService: CoreService;
@@ -69,6 +70,7 @@ class GCLClient {
         // check if implicit download has been set
         if (this.cfg.implicitDownload && true) { this.implicitDownload(); }
 
+
         if (!automatic) {
             // setup security - fail safe
             this.initSecurityContext(function(err: {}) {
@@ -92,6 +94,9 @@ class GCLClient {
                              callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): Promise<GCLClient> {
         return new Promise((resolve, reject) => {
             let client = new GCLClient(cfg, true);
+
+            // will be set to false if init fails
+            client.GCLInstalled = true;
 
             client.initSecurityContext(function(err: CoreExceptions.RestException) {
                 if (err) {
@@ -245,8 +250,10 @@ class GCLClient {
             // get GCL info
             self.core().info(function(err: CoreExceptions.RestException, infoResponse: InfoResponse) {
                 if (err) {
-                    console.log(JSON.stringify(err));
-                    reject(err);
+                    // failure probably because GCL is not installed
+                    self.GCLInstalled = false;
+                    // resolve with client as-is to allow download
+                    resolve();
                     return;
                 }
                 self_cfg.citrix = infoResponse.data.citrix;
