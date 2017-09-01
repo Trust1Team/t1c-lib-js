@@ -14,8 +14,8 @@ interface AbstractRemoteLoading {
          callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse>;
     apdu(apdu: APDU[], sessionId?: string,
          callback?: (error: RestException, data: CommandsResponse) => void): Promise<CommandsResponse>;
-    ccid(feature: string, apdu: string, sessionId?: string,
-         callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    ccid(feature: string, command: string, sessionId?: string,
+         callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse>;
     ccidFeatures(sessionId?: string, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     command(tx: string, sessionId?: string, callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse>;
     command(tx: string[], sessionId?: string, callback?: (error: RestException, data: CommandsResponse) => void): Promise<CommandsResponse>;

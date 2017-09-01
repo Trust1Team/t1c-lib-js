@@ -44,9 +44,9 @@ class RemoteLoading extends GenericContainer implements AbstractRemoteLoading {
         return this.connection.post(this.baseUrl, suffix, apdu, RemoteLoading.optionalSessionIdParam(sessionId), callback);
     }
 
-    public ccid(feature: string, apdu: string, sessionId?: string,
-                callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.CCID), { feature, apdu },
+    public ccid(feature: string, command: string, sessionId?: string,
+                callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse> {
+        return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.CCID), { feature, apdu: command },
             RemoteLoading.optionalSessionIdParam(sessionId), callback);
     }
 
