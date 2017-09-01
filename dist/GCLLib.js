@@ -9014,6 +9014,7 @@ var GCLLib =
 	    GCLClient.initialize = function (cfg, callback) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
 	            var client = new GCLClient(cfg, true);
+	            client.GCLInstalled = true;
 	            client.initSecurityContext(function (err) {
 	                if (err) {
 	                    console.log(JSON.stringify(err));
@@ -9116,8 +9117,8 @@ var GCLLib =
 	        return new es6_promise_1.Promise(function (resolve, reject) {
 	            self.core().info(function (err, infoResponse) {
 	                if (err) {
-	                    console.log(JSON.stringify(err));
-	                    reject(err);
+	                    self.GCLInstalled = false;
+	                    resolve();
 	                    return;
 	                }
 	                self_cfg.citrix = infoResponse.data.citrix;
@@ -29236,7 +29237,6 @@ var GCLLib =
 	        if (gclConfig.jwt) {
 	            config_1.headers.Authorization = "Bearer " + gclConfig.jwt;
 	        }
-	        console.log(config_1);
 	        return new es6_promise_1.Promise(function (resolve, reject) {
 	            axios_1.default.request(config_1).then(function (response) {
 	                callback(null, response.data);

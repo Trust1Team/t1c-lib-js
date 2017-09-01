@@ -71,7 +71,7 @@ class RemoteLoading extends GenericContainer implements AbstractRemoteLoading {
         }
     }
 
-    public closeSession(callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+    public closeSession(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(RemoteLoading.CLOSE_SESSION), undefined, callback);
     }
 

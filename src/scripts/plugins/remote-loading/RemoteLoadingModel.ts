@@ -19,7 +19,7 @@ interface AbstractRemoteLoading {
     ccidFeatures(sessionId?: string, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     command(tx: string, sessionId?: string, callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse>;
     command(tx: string[], sessionId?: string, callback?: (error: RestException, data: CommandsResponse) => void): Promise<CommandsResponse>;
-    closeSession(callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    closeSession(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     isPresent(sessionId?: string, callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
     openSession(timeout?: number, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
 }
