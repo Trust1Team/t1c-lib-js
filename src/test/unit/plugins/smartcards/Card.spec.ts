@@ -274,8 +274,11 @@ describe("Generic cards and containers", () => {
             mock.onPost("plugins/piv/123/certificates", { pin: "0000" }).reply(config => {
                 return [ 200, { success: true, data: config.params }];
             });
-            mock.onPost("plugins/piv/123/certificates/root", { pin: "0000" }).reply(config => {
-                return [ 200, { success: true, data: "mockrootcert" }];
+            mock.onPost("plugins/piv/123/certificates/authentication", { pin: "0000" }).reply(() => {
+                return [ 200, { success: true, data: "mockauthcert" }];
+            });
+            mock.onPost("plugins/piv/123/certificates/root", { pin: "0000" }).reply(() => {
+                return [ 200, { success: true, data: [ "mockrootcert", "mockrootcert2" ] }];
             });
         });
 
@@ -382,16 +385,34 @@ describe("Generic cards and containers", () => {
         });
 
         it("can retrieve a requested certificate", () => {
-            return (piv as any).getCertificate("/root", { pin: "0000" }, { parseCerts: false }).then(res => {
+            return (piv as any).getCertificate("/authentication", { pin: "0000" }, { parseCerts: false }).then(res => {
                 expect(res).to.have.property("success");
                 expect(res.success).to.be.a("boolean");
                 expect(res.success).to.eq(true);
+                console.log(res.data);
 
                 expect(res).to.have.property("data");
                 let mockData: any = res.data;
                 expect(mockData).to.be.a("object");
                 expect(mockData, "Base64 certificate not found").to.have.property("base64");
-                expect(mockData.base64, "Incorrect cert data returned").to.eq("mockrootcert");
+                expect(mockData.base64, "Incorrect cert data returned").to.eq("mockauthcert");
+            });
+        });
+
+        it("can retrieve a requested certificate array", () => {
+            return (piv as any).getCertificateArray("/root", { pin: "0000" }, { parseCerts: false }).then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+                console.log(res.data);
+
+                expect(res).to.have.property("data");
+                let mockData: any = res.data;
+                expect(mockData).to.be.an("array").of.length(2);
+                expect(mockData[0], "Base64 certificate not found").to.have.property("base64");
+                expect(mockData[1], "Base64 certificate not found").to.have.property("base64");
+                expect(mockData[0].base64, "Incorrect cert data returned").to.eq("mockrootcert");
+                expect(mockData[1].base64, "Incorrect cert data returned").to.eq("mockrootcert2");
             });
         });
     });
