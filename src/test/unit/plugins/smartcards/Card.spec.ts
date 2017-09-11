@@ -238,4 +238,161 @@ describe("Generic cards and containers", () => {
         });
     });
 
+    describe("Generic Secured CertCard", function () {
+        // instantiate a class that implements generic certcard
+        const piv = new PluginFactory("", connection).createPIV("123");
+
+        beforeEach(function () {
+            // all data
+            mock.onPost("plugins/piv/123").reply(config => {
+                return [ 200, { success: true, data: JSON.parse(config.data) }];
+            });
+
+            // authenticate
+            mock.onGet("plugins/piv/123/authenticate").reply(() => {
+                return [ 200, { success: true, data: [ "algo", "refs", "authentication"] }];
+            });
+            mock.onPost("plugins/piv/123/authenticate").reply(config => {
+                return [ 200, { success: true, data: JSON.parse(config.data) }];
+            });
+
+            // sign
+            mock.onGet("plugins/piv/123/sign").reply(() => {
+                return [ 200, { success: true, data: [ "algo", "refs", "signing"] }];
+            });
+            mock.onPost("plugins/piv/123/sign").reply(config => {
+                return [ 200, { success: true, data: JSON.parse(config.data) }];
+            });
+
+            // verify pin
+            mock.onPost("plugins/piv/123/verify-pin")
+                .reply(config => {
+                    return [ 200, { success: true, data: JSON.parse(config.data) } ];
+                });
+
+            // certificates
+            mock.onPost("plugins/piv/123/certificates", { pin: "0000" }).reply(config => {
+                return [ 200, { success: true, data: config.params }];
+            });
+            mock.onPost("plugins/piv/123/certificates/root", { pin: "0000" }).reply(config => {
+                return [ 200, { success: true, data: "mockrootcert" }];
+            });
+        });
+
+        it("can get algo refs for authentication", () => {
+            return piv.allAlgoRefsForAuthentication().then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data).to.be.an("array").of.length(3).contains("algo").contains("refs").contains("authentication");
+            });
+        });
+
+        it("can get algo refs for signing", () => {
+            return piv.allAlgoRefsForSigning().then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data).to.be.an("array").of.length(3).contains("algo").contains("refs").contains("signing");
+            });
+        });
+
+        it("can get all certificates", () => {
+            return piv.allCerts([], { pin: "0000" }).then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data).to.be.a("object");
+                expect(res.data, "Filter property found when not expected").to.not.have.property("filter");
+            });
+        });
+
+        it("makes get a filtered subset of the certificates", () => {
+            return piv.allCerts({ filters: [ "cert1", "cert2" ] }, { pin: "0000" }).then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data).to.be.a("object");
+                expect(res.data, "Filter property not found when expected").to.have.property("filter");
+                expect(res.data.filter, "Incorrect filter parameter").to.eq("cert1,cert2");
+            });
+        });
+
+        it("can authenticate", () => {
+            return piv.authenticate({ algorithm_reference: "SHA256", data: "inputdata" }).then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                let mockData: any = res.data;
+                expect(mockData).to.be.a("object");
+                expect(mockData, "Algorithm reference not passed to GCL").to.have.property("algorithm_reference");
+                expect(mockData, "Data not passed to GCL").to.have.property("data");
+                expect(mockData.data, "Incorrect data passed to GCL").to.eq("inputdata");
+            });
+        });
+
+
+        it("can sign data", () => {
+            return piv.signData({ algorithm_reference: "SHA256", data: "inputdata" }).then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                let mockData: any = res.data;
+                expect(mockData).to.be.a("object");
+                expect(mockData, "Algorithm reference not passed to GCL").to.have.property("algorithm_reference");
+                expect(mockData, "Data not passed to GCL").to.have.property("data");
+                expect(mockData.data, "Incorrect data passed to GCL").to.eq("inputdata");
+            });
+        });
+
+        it("can verify pin", () => {
+            return piv.verifyPin({}).then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data).to.be.a("object");
+                expect(res.data, "PIN property found when not expected").to.not.have.property("pin");
+            });
+        });
+
+        it("can verify pin with provided pincode", () => {
+            return piv.verifyPin({ pin: "0000" }).then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data).to.be.a("object");
+                expect(res.data, "PIN property not found when expected").to.have.property("pin", "0000");
+            });
+        });
+
+        it("can retrieve a requested certificate", () => {
+            return (piv as any).getCertificate("/root", { pin: "0000" }, { parseCerts: false }).then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                let mockData: any = res.data;
+                expect(mockData).to.be.a("object");
+                expect(mockData, "Base64 certificate not found").to.have.property("base64");
+                expect(mockData.base64, "Incorrect cert data returned").to.eq("mockrootcert");
+            });
+        });
+    });
 });
