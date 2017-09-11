@@ -28,7 +28,7 @@ class PinEnforcer  {
                         } else { resolve(); }
                     } else {
                         // if false, check if a pin was sent
-                        if (pinValue) {
+                        if (!pinValue) {
                             reject({ data: { message: "Strict pinpad enforcement is enabled. This request was sent without a PIN, but the" +
                                                 " reader does not have a pinpad."} });
                         } else { resolve(); }
