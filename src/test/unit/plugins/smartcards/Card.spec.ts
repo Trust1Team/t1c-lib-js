@@ -389,7 +389,6 @@ describe("Generic cards and containers", () => {
                 expect(res).to.have.property("success");
                 expect(res.success).to.be.a("boolean");
                 expect(res.success).to.eq(true);
-                console.log(res.data);
 
                 expect(res).to.have.property("data");
                 let mockData: any = res.data;
@@ -404,7 +403,6 @@ describe("Generic cards and containers", () => {
                 expect(res).to.have.property("success");
                 expect(res.success).to.be.a("boolean");
                 expect(res.success).to.eq(true);
-                console.log(res.data);
 
                 expect(res).to.have.property("data");
                 let mockData: any = res.data;
