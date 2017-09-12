@@ -31104,17 +31104,29 @@ var GCLLib =
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(371);
-	var EMV_PAN = "/pan";
 	var EMV = (function (_super) {
 	    __extends(EMV, _super);
 	    function EMV() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
-	    EMV.prototype.pan = function (callback) {
-	        return this.connection.get(this.baseUrl, this.containerSuffix(EMV_PAN), undefined, callback);
+	    EMV.prototype.applicationData = function (callback) {
+	        return this.connection.get(this.baseUrl, this.containerSuffix(EMV.APPLICATION_DATA), undefined, callback);
+	    };
+	    EMV.prototype.applications = function (callback) {
+	        return this.connection.get(this.baseUrl, this.containerSuffix(EMV.APPLICATIONS), undefined, callback);
+	    };
+	    EMV.prototype.iccPublicKeyCertificate = function (aid, callback) {
+	        return this.connection.post(this.baseUrl, this.containerSuffix(EMV.ICC_PUBLIC_KEY_CERT), { aid: aid }, undefined, callback);
+	    };
+	    EMV.prototype.issuerPublicKeyCertificate = function (aid, callback) {
+	        return this.connection.post(this.baseUrl, this.containerSuffix(EMV.ISSUER_PUBLIC_KEY_CERT), { aid: aid }, undefined, callback);
 	    };
 	    return EMV;
 	}(Card_1.GenericPinCard));
+	EMV.APPLICATIONS = "/applications";
+	EMV.APPLICATION_DATA = "/application-data";
+	EMV.ISSUER_PUBLIC_KEY_CERT = "/issuer-public-key-certificate";
+	EMV.ICC_PUBLIC_KEY_CERT = "/icc-public-key-certificate";
 	exports.EMV = EMV;
 
 
