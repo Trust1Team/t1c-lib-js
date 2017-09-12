@@ -31352,7 +31352,7 @@ var GCLLib =
 	                        }
 	                    }
 	                    else {
-	                        if (pinValue) {
+	                        if (!pinValue) {
 	                            reject({ data: { message: "Strict pinpad enforcement is enabled. This request was sent without a PIN, but the" +
 	                                        " reader does not have a pinpad." } });
 	                        }
@@ -75049,8 +75049,8 @@ var GCLLib =
 	            return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.CMD), { tx: tx }, RemoteLoading.optionalSessionIdParam(sessionId), callback);
 	        }
 	    };
-	    RemoteLoading.prototype.closeSession = function (callback) {
-	        return this.connection.get(this.baseUrl, this.containerSuffix(RemoteLoading.CLOSE_SESSION), undefined, callback);
+	    RemoteLoading.prototype.closeSession = function (sessionId, callback) {
+	        return this.connection.get(this.baseUrl, this.containerSuffix(RemoteLoading.CLOSE_SESSION), RemoteLoading.optionalSessionIdParam(sessionId), callback);
 	    };
 	    RemoteLoading.prototype.isPresent = function (sessionId, callback) {
 	        return this.connection.get(this.baseUrl, this.containerSuffix(RemoteLoading.IS_PRESENT), RemoteLoading.optionalSessionIdParam(sessionId), callback);
