@@ -225,8 +225,13 @@ function handleRequest(basePath: string,
                 return resolve(response.data);
             }).catch(function (error: AxiosError) {
                 if (error.response) {
-                    callback(error.response, null);
-                    return reject(error.response);
+                    if (error.response.data) {
+                        callback(error.response.data, null);
+                        return reject(error.response.data);
+                    } else {
+                        callback(error.response, null);
+                        return reject(error.response);
+                    }
                 } else {
                     callback(error, null);
                     return reject(error);
