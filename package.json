@@ -8,7 +8,7 @@
     "prepublish": "npm test && gulp webpack",
     "postinstall": "typings install",
     "localTest": "./node_modules/karma-cli/bin/karma start --single-run",
-    "test": "./node_modules/karma-cli/bin/karma start --reporters teamcity --single-run --colors false",
+    "test": "./node_modules/karma-cli/bin/karma start --reporters teamcity,html --single-run --colors false",
     "build": "gulp webpack"
   },
   "repository": {
@@ -33,9 +33,11 @@
     "gulp-uglify": "1.5.4",
     "gulp-util": "3.0.7",
     "karma": "1.7.1",
+    "karma-chai": "^0.1.0",
     "karma-chrome-launcher": "2.2.0",
     "karma-cli": "1.0.1",
     "karma-firefox-launcher": "1.0.1",
+    "karma-htmlfile-reporter": "^0.3.5",
     "karma-ie-launcher": "1.0.0",
     "karma-mocha": "1.3.0",
     "karma-opera-launcher": "1.0.0",
