@@ -10,7 +10,7 @@ export { AbstractAgent, AgentResponse };
 
 
 interface AbstractAgent {
-    get(hostName?: string,
+    get(filters?: { [filterParam: string]: string },
         callback?: (error: CoreExceptions.RestException, data: AgentResponse) => void): void | Promise<AgentResponse>;
 }
 

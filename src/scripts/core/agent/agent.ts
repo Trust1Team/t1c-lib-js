@@ -18,13 +18,8 @@ class AgentClient implements AbstractAgent {
         return AgentClient.AGENT_PATH + "/" + port;
     }
 
-    private static createHostnameFilter(hostName: string) {
-        if (hostName) { return { hostname: hostName }; }
-        else { return {}; }
-    }
-
-    public get(hostName?: string, callback?: (error: RestException, data: AgentResponse) => void) {
-        return this.connection.getSkipCitrix(this.url, AgentClient.AGENT_PATH, AgentClient.createHostnameFilter(hostName), callback);
+    public get(filters?: { [filterParam: string]: string }, callback?: (error: RestException, data: AgentResponse) => void) {
+        return this.connection.getSkipCitrix(this.url, AgentClient.AGENT_PATH, filters, callback);
     }
 
 }

@@ -30846,16 +30846,8 @@ var GCLLib =
 	    AgentClient.urlPrefix = function (port) {
 	        return AgentClient.AGENT_PATH + "/" + port;
 	    };
-	    AgentClient.createHostnameFilter = function (hostName) {
-	        if (hostName) {
-	            return { hostname: hostName };
-	        }
-	        else {
-	            return {};
-	        }
-	    };
-	    AgentClient.prototype.get = function (hostName, callback) {
-	        return this.connection.getSkipCitrix(this.url, AgentClient.AGENT_PATH, AgentClient.createHostnameFilter(hostName), callback);
+	    AgentClient.prototype.get = function (filters, callback) {
+	        return this.connection.getSkipCitrix(this.url, AgentClient.AGENT_PATH, filters, callback);
 	    };
 	    return AgentClient;
 	}());
