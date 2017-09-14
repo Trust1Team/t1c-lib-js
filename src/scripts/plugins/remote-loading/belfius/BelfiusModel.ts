@@ -11,7 +11,8 @@ export { AbstractBelfius };
 
 
 interface AbstractBelfius {
-    closeSession(sessionId?: string, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    closeSession(sessionId: string, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    isBelfiusReader(sessionId: string, callback?: (error: RestException, data: boolean) => void): Promise<boolean>;
     nonce(sessionId: string, callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse>;
     openSession(timeout?: number, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     stx(command: string, sessionId: string, callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse>;

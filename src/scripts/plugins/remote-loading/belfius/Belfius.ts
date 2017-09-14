@@ -23,22 +23,39 @@ class Belfius extends RemoteLoading implements AbstractBelfius {
         data: "FE0000040001300000"
     };
 
-    public nonce(sessionId: string, callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse> {
+    public isBelfiusReader(sessionId: string,
+                           callback?: (error: RestException, data: boolean) => void): Promise<boolean> {
         if (sessionId && sessionId.length) {
-            return this.apdu(Belfius.NONCE_APDU, sessionId, callback);
+            return this.apdu(Belfius.NONCE_APDU, sessionId).then(res => {
+                return ResponseHandler.response(res.data.sw === "9000", callback);
+            });
         } else {
             return ResponseHandler.error({ status: 400, description: "Session ID is required!", code: "402" }, callback);
         }
     }
 
+    public nonce(sessionId: string, callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse> {
+        return this.isBelfiusReader(sessionId).then(compatibleReader => {
+            if (compatibleReader) {
+                return this.apdu(Belfius.NONCE_APDU, sessionId, callback);
+            } else {
+                return ResponseHandler.error({ status: 400,
+                    description: "Reader is not compatible with this request.", code: "0" }, callback);
+            }
+        });
+    }
+
     public stx(command: string, sessionId: string,
                callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse> {
-        if (sessionId && sessionId.length) {
-            let stxApdu = Belfius.NONCE_APDU;
-            stxApdu.data = command;
-            return this.apdu(stxApdu, sessionId, callback);
-        } else {
-            return ResponseHandler.error({ status: 400, description: "Session ID is required!", code: "402" }, callback);
-        }
+        return this.isBelfiusReader(sessionId).then(compatibleReader => {
+            if (compatibleReader) {
+                let stxApdu = Belfius.NONCE_APDU;
+                stxApdu.data = command;
+                return this.apdu(stxApdu, sessionId, callback);
+            } else {
+                return ResponseHandler.error({ status: 400,
+                    description: "Reader is not compatible with this request.", code: "0" }, callback);
+            }
+        });
     }
 }

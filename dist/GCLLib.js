@@ -75119,23 +75119,41 @@ var GCLLib =
 	    function Belfius() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
-	    Belfius.prototype.nonce = function (sessionId, callback) {
+	    Belfius.prototype.isBelfiusReader = function (sessionId, callback) {
 	        if (sessionId && sessionId.length) {
-	            return this.apdu(Belfius.NONCE_APDU, sessionId, callback);
+	            return this.apdu(Belfius.NONCE_APDU, sessionId).then(function (res) {
+	                return ResponseHandler_1.ResponseHandler.response(res.data.sw === "9000", callback);
+	            });
 	        }
 	        else {
 	            return ResponseHandler_1.ResponseHandler.error({ status: 400, description: "Session ID is required!", code: "402" }, callback);
 	        }
 	    };
+	    Belfius.prototype.nonce = function (sessionId, callback) {
+	        var _this = this;
+	        return this.isBelfiusReader(sessionId).then(function (compatibleReader) {
+	            if (compatibleReader) {
+	                return _this.apdu(Belfius.NONCE_APDU, sessionId, callback);
+	            }
+	            else {
+	                return ResponseHandler_1.ResponseHandler.error({ status: 400,
+	                    description: "Reader is not compatible with this request.", code: "0" }, callback);
+	            }
+	        });
+	    };
 	    Belfius.prototype.stx = function (command, sessionId, callback) {
-	        if (sessionId && sessionId.length) {
-	            var stxApdu = Belfius.NONCE_APDU;
-	            stxApdu.data = command;
-	            return this.apdu(stxApdu, sessionId, callback);
-	        }
-	        else {
-	            return ResponseHandler_1.ResponseHandler.error({ status: 400, description: "Session ID is required!", code: "402" }, callback);
-	        }
+	        var _this = this;
+	        return this.isBelfiusReader(sessionId).then(function (compatibleReader) {
+	            if (compatibleReader) {
+	                var stxApdu = Belfius.NONCE_APDU;
+	                stxApdu.data = command;
+	                return _this.apdu(stxApdu, sessionId, callback);
+	            }
+	            else {
+	                return ResponseHandler_1.ResponseHandler.error({ status: 400,
+	                    description: "Reader is not compatible with this request.", code: "0" }, callback);
+	            }
+	        });
 	    };
 	    return Belfius;
 	}(RemoteLoading_1.RemoteLoading));
@@ -75516,6 +75534,7 @@ var GCLLib =
 	            case "aventra":
 	            case "beid":
 	            case "dnie":
+	            case "emv":
 	            case "luxeid":
 	            case "luxtrust":
 	            case "mobib":
@@ -75526,8 +75545,6 @@ var GCLLib =
 	                return "allData";
 	            case "safenet":
 	                return "slots";
-	            case "emv":
-	                return "pan";
 	            default:
 	                return undefined;
 	        }
@@ -75546,8 +75563,9 @@ var GCLLib =
 	            case "pteid":
 	                return { filters: [], parseCerts: true };
 	            case "safenet":
-	            case "emv":
 	                return undefined;
+	            case "emv":
+	                return [];
 	            default:
 	                return undefined;
 	        }
