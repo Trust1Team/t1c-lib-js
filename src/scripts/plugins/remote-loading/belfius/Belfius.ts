@@ -40,7 +40,7 @@ class Belfius extends RemoteLoading implements AbstractBelfius {
                 return this.apdu(Belfius.NONCE_APDU, sessionId, callback);
             } else {
                 return ResponseHandler.error({ status: 400,
-                    description: "Reader is not compatible with this request.", code: "0" }, callback);
+                    description: "Reader is not compatible with this request.", code: "2" }, callback);
             }
         });
     }
@@ -54,7 +54,7 @@ class Belfius extends RemoteLoading implements AbstractBelfius {
                 return this.apdu(stxApdu, sessionId, callback);
             } else {
                 return ResponseHandler.error({ status: 400,
-                    description: "Reader is not compatible with this request.", code: "0" }, callback);
+                    description: "Reader is not compatible with this request.", code: "2" }, callback);
             }
         });
     }

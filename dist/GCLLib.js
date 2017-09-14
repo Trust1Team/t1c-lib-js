@@ -75129,7 +75129,7 @@ var GCLLib =
 	            }
 	            else {
 	                return ResponseHandler_1.ResponseHandler.error({ status: 400,
-	                    description: "Reader is not compatible with this request.", code: "0" }, callback);
+	                    description: "Reader is not compatible with this request.", code: "2" }, callback);
 	            }
 	        });
 	    };
@@ -75143,7 +75143,7 @@ var GCLLib =
 	            }
 	            else {
 	                return ResponseHandler_1.ResponseHandler.error({ status: 400,
-	                    description: "Reader is not compatible with this request.", code: "0" }, callback);
+	                    description: "Reader is not compatible with this request.", code: "2" }, callback);
 	            }
 	        });
 	    };
