@@ -183,7 +183,7 @@ describe("Belfius Container", () => {
         });
 
         it("closes the session", () => {
-            return belfius.closeSession().then(res => {
+            return belfius.closeSession("123").then(res => {
                 expect(res).to.have.property("success");
                 expect(res.success).to.be.a("boolean");
                 expect(res.success).to.eq(true);

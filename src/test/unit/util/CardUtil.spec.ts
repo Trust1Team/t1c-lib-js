@@ -6,6 +6,7 @@
 import { expect } from "chai";
 import { Card } from "../../../scripts/core/service/CoreModel";
 import { CardUtil } from "../../../scripts/util/CardUtil";
+import {Options} from "../../../scripts/util/RequestHandler";
 
 describe("Card Utility", () => {
     let card: Card;
@@ -127,7 +128,7 @@ describe("Card Utility", () => {
         });
 
         it("can check for a known card", () => {
-            let dumpOptions = CardUtil.dumpOptions(CardUtil.determineContainer(card));
+            let dumpOptions: Options = CardUtil.dumpOptions(CardUtil.determineContainer(card));
             expect(dumpOptions).to.be.an("object");
             expect(dumpOptions, "Expected dump method options to have a filters field").to.have.property("filters");
             expect(dumpOptions.filters).to.be.an("array").of.length(0);
