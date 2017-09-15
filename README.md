@@ -117,6 +117,11 @@ You can be released from the requirements of the Affero General Public License
 Irrespective of your choice of license, the T1T logo as depicted below may not be removed from this file, or from any software or other product or service to which it is applied, without the express prior written permission of Trust1Team sarl. The T1T logo is an EU Registered Trademark (n° 12943131).
 ```
 # Release Notes
+
+## v1.4.0-1
+### Bug
+* [[T1C-783](https://trust1t.atlassian.net/browse/T1C-783)] - As RMC I want to provide a button to verify the reader is a Belfius branded reader
+
 ## v1.4.0
 ### Bug
 * [[T1C-765](https://trust1t.atlassian.net/browse/T1C-765)] - Use non-exising session ID for tx -> should return an error

@@ -5,7 +5,7 @@
 
 import { RemoteLoading } from "../RemoteLoading";
 import { AbstractBelfius } from "./BelfiusModel";
-import { DataResponse, T1CResponse } from "../../../core/service/CoreModel";
+import {BoolDataResponse, DataResponse, T1CResponse} from "../../../core/service/CoreModel";
 import { RestException } from "../../../core/exceptions/CoreExceptions";
 import { APDU, CommandResponse } from "../RemoteLoadingModel";
 import { ResponseHandler } from "../../../util/ResponseHandler";
@@ -24,10 +24,18 @@ class Belfius extends RemoteLoading implements AbstractBelfius {
     };
 
     public isBelfiusReader(sessionId: string,
-                           callback?: (error: RestException, data: boolean) => void): Promise<boolean> {
+                           callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
         if (sessionId && sessionId.length) {
-            return this.apdu(Belfius.NONCE_APDU, sessionId).then(res => {
-                return ResponseHandler.response(res.data.sw === "9000", callback);
+            return this.connection.get(this.baseUrl, "/card-readers/" + this.reader_id, undefined).then(reader => {
+                // check Vasco Digipass 870 Reader
+                if (reader.data.name === "VASCO DIGIPASS 870") {
+                    // check Nonce command works
+                    return this.apdu(Belfius.NONCE_APDU, sessionId).then(res => {
+                        return ResponseHandler.response({ data: res.data.sw === "9000", success: true }, callback);
+                    });
+                } else { return ResponseHandler.response({ data: false, success: true }, callback); }
+            }, err => {
+                return ResponseHandler.error(err, callback);
             });
         } else {
             return ResponseHandler.error({ status: 400, description: "Session ID is required!", code: "402" }, callback);

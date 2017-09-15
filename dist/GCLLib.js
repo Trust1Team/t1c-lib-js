@@ -26751,13 +26751,13 @@ var GCLLib =
 	        return this.connection.get(this.url, CORE_READERS + "/" + reader_id, undefined, callback);
 	    };
 	    CoreService.prototype.readers = function (callback) {
-	        return this.connection.getSkipCitrix(this.url, CORE_READERS, undefined, callback);
+	        return this.connection.get(this.url, CORE_READERS, undefined, callback);
 	    };
 	    CoreService.prototype.readersCardAvailable = function (callback) {
-	        return this.connection.getSkipCitrix(this.url, CORE_READERS, CoreService.cardInsertedFilter(true), callback);
+	        return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(true), callback);
 	    };
 	    CoreService.prototype.readersCardsUnavailable = function (callback) {
-	        return this.connection.getSkipCitrix(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), callback);
+	        return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), callback);
 	    };
 	    CoreService.prototype.setPubKey = function (pubkey, callback) {
 	        return this.connection.put(this.url, CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);
@@ -26765,7 +26765,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return "v1.4.0";
+	        return "v1.4.0-1";
 	    };
 	    return CoreService;
 	}());
@@ -75112,9 +75112,19 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    Belfius.prototype.isBelfiusReader = function (sessionId, callback) {
+	        var _this = this;
 	        if (sessionId && sessionId.length) {
-	            return this.apdu(Belfius.NONCE_APDU, sessionId).then(function (res) {
-	                return ResponseHandler_1.ResponseHandler.response(res.data.sw === "9000", callback);
+	            return this.connection.get(this.baseUrl, "/card-readers/" + this.reader_id, undefined).then(function (reader) {
+	                if (reader.data.name === "VASCO DIGIPASS 870") {
+	                    return _this.apdu(Belfius.NONCE_APDU, sessionId).then(function (res) {
+	                        return ResponseHandler_1.ResponseHandler.response({ data: res.data.sw === "9000", success: true }, callback);
+	                    });
+	                }
+	                else {
+	                    return ResponseHandler_1.ResponseHandler.response({ data: false, success: true }, callback);
+	                }
+	            }, function (err) {
+	                return ResponseHandler_1.ResponseHandler.error(err, callback);
 	            });
 	        }
 	        else {
