@@ -2,7 +2,7 @@
  * @author Michallis Pashidis
  * @author Maarten Somers
  */
-import { Connection } from "../client/Connection";
+import { LocalAuthConnection } from "../client/Connection";
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 import * as _ from "lodash";
 import * as platform from "platform";
@@ -21,7 +21,7 @@ const CORE_PUB_KEY = "/admin/certificate";
 
 class CoreService implements CoreModel.AbstractCore {
     // constructor
-    constructor(private url: string, private connection: Connection) {}
+    constructor(private url: string, private connection: LocalAuthConnection) {}
 
     private static cardInsertedFilter(inserted: boolean): {} {
         return { "card-inserted": inserted };
@@ -49,17 +49,17 @@ class CoreService implements CoreModel.AbstractCore {
     // async
     public activate(callback?: (error: CoreExceptions.RestException, data: CoreModel.T1CResponse)
         => void): Promise<CoreModel.T1CResponse> {
-        return this.connection.post(this.url + CORE_ACTIVATE, {}, undefined, callback);
+        return this.connection.post(this.url, CORE_ACTIVATE, {}, undefined, callback);
     }
 
     public getPubKey(callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse)
         => void): Promise<CoreModel.PubKeyResponse> {
-        return this.connection.get(this.url + CORE_PUB_KEY, undefined, callback);
+        return this.connection.get(this.url, CORE_PUB_KEY, undefined, callback);
     }
 
     public info(callback?: (error: CoreExceptions.RestException, data: CoreModel.InfoResponse)
         => void): Promise<CoreModel.InfoResponse> {
-        return this.connection.get(this.url + CORE_INFO, undefined, callback);
+        return this.connection.getSkipCitrix(this.url, CORE_INFO, undefined, callback);
     }
 
     public infoBrowser(callback?: (error: CoreExceptions.RestException, data: CoreModel.BrowserInfoResponse)
@@ -70,7 +70,7 @@ class CoreService implements CoreModel.AbstractCore {
 
     public plugins(callback?: (error: CoreExceptions.RestException, data: CoreModel.PluginsResponse)
         => void): Promise<CoreModel.PluginsResponse> {
-        return this.connection.get(this.url + CORE_PLUGINS, undefined, callback);
+        return this.connection.getSkipCitrix(this.url, CORE_PLUGINS, undefined, callback);
     }
 
     public pollCardInserted(secondsToPollCard?: number,
@@ -233,28 +233,28 @@ class CoreService implements CoreModel.AbstractCore {
     public reader(reader_id: string,
                   callback?: (error: CoreExceptions.RestException, data: CoreModel.SingleReaderResponse)
                       => void): void | Promise<CoreModel.SingleReaderResponse> {
-        return this.connection.get(this.url + CORE_READERS + "/" + reader_id, undefined, callback);
+        return this.connection.get(this.url, CORE_READERS + "/" + reader_id, undefined, callback);
     }
 
     public readers(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
         => void): Promise<CoreModel.CardReadersResponse> {
-        return this.connection.get(this.url + CORE_READERS, undefined, callback);
+        return this.connection.getSkipCitrix(this.url, CORE_READERS, undefined, callback);
     }
 
     public readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
         => void): Promise<CoreModel.CardReadersResponse> {
-        return this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(true), callback);
+        return this.connection.getSkipCitrix(this.url, CORE_READERS, CoreService.cardInsertedFilter(true), callback);
     }
 
     public readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
         => void): Promise<CoreModel.CardReadersResponse> {
-        return this.connection.get(this.url + CORE_READERS, CoreService.cardInsertedFilter(false), callback);
+        return this.connection.getSkipCitrix(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), callback);
     }
 
     public setPubKey(pubkey: string,
                      callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse)
                          => void): Promise<CoreModel.PubKeyResponse> {
-        return this.connection.put(this.url + CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);
+        return this.connection.put(this.url, CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);
     }
 
     // sync

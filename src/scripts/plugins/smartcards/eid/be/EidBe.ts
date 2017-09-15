@@ -22,15 +22,15 @@ class EidBe extends GenericCertCard implements AbstractEidBE {
 
 
     public rnData(callback?: (error: RestException, data: RnDataResponse) => void): Promise<RnDataResponse> {
-        return this.connection.get(this.resolvedReaderURI() + EidBe.RN_DATA, undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.RN_DATA), undefined, callback);
     }
 
     public address(callback?: (error: RestException, data: AddressResponse) => void): Promise<AddressResponse> {
-        return this.connection.get(this.resolvedReaderURI() + EidBe.ADDRESS, undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.ADDRESS), undefined, callback);
     }
 
     public picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.get(this.resolvedReaderURI() + EidBe.PHOTO, undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.PHOTO), undefined, callback);
     }
 
     public rootCertificate(options: Options,
@@ -58,12 +58,12 @@ class EidBe extends GenericCertCard implements AbstractEidBE {
         return this.getCertificate(EidBe.CERT_RRN, RequestHandler.determineOptions(options, callback));
     }
 
-
-    public verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+    public verifyPin(body: OptionalPin,
+                     callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         let _req: VerifyPinData = { private_key_reference: EidBe.VERIFY_PRIV_KEY_REF };
         if (body.pin) { _req.pin = body.pin; }
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-            return this.connection.post(this.resolvedReaderURI() + GenericCertCard.VERIFY_PIN, _req, undefined, callback);
+            return this.connection.post(this.baseUrl, this.containerSuffix(GenericCertCard.VERIFY_PIN), _req, undefined, callback);
         });
     }
 }

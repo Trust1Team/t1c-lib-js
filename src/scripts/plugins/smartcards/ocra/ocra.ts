@@ -19,14 +19,14 @@ class Ocra extends GenericPinCard implements AbstractOcra {
     public challenge(body: ChallengeData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         if (callback && typeof callback === "function") {
             PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                return this.connection.post(this.resolvedReaderURI() + Ocra.CHALLENGE, body, undefined, callback);
+                return this.connection.post(this.baseUrl, this.containerSuffix(Ocra.CHALLENGE), body, undefined, callback);
             }, error => {
                 return callback(error, null);
             });
         } else {
             return new Promise((resolve, reject) => {
                 PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                    resolve(this.connection.post(this.resolvedReaderURI() + Ocra.CHALLENGE, body, undefined));
+                    resolve(this.connection.post(this.baseUrl, this.containerSuffix(Ocra.CHALLENGE), body, undefined));
                 }, error => { reject(error); });
             });
         }
@@ -36,14 +36,14 @@ class Ocra extends GenericPinCard implements AbstractOcra {
                        callback?: (error: RestException, data: ReadCounterResponse) => void): Promise<ReadCounterResponse> {
         if (callback && typeof callback === "function") {
             PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                return this.connection.post(this.resolvedReaderURI() + Ocra.READ_COUNTER, body, undefined, callback);
+                return this.connection.post(this.baseUrl, this.containerSuffix(Ocra.READ_COUNTER), body, undefined, callback);
             }, error => {
                 return callback(error, null);
             });
         } else {
             return new Promise((resolve, reject) => {
                 PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-                    resolve(this.connection.post(this.resolvedReaderURI() + Ocra.READ_COUNTER, body, undefined));
+                    resolve(this.connection.post(this.baseUrl, this.containerSuffix(Ocra.READ_COUNTER), body, undefined));
                 }, error => { reject(error); });
             });
         }
