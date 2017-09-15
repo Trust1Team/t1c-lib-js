@@ -36,52 +36,52 @@ describe("Generic Service", () => {
 
 
     describe("containerForReader", () => {
-        it("returns the expected url for a given agent port", () => {
+        // it("returns the expected url for a given agent port", () => {
             // return core.containerFor.containerForReader(client, "34").then(res => {
             //     console.log(res);
             // });
-        });
+        // });
     });
 
     describe("dumpData", () => {
-        it("returns the expected url for a given agent port", () => {
-
-        });
+        // it("returns the expected url for a given agent port", () => {
+        //
+        // });
     });
 
     describe("authenticateCapable", () => {
-        it("returns the expected url for a given agent port", () => {
-
-        });
+        // it("returns the expected url for a given agent port", () => {
+        //
+        // });
     });
 
     describe("signCapable", () => {
-        it("returns the expected url for a given agent port", () => {
-
-        });
+        // it("returns the expected url for a given agent port", () => {
+        //
+        // });
     });
 
     describe("verifyPinCapable", () => {
-        it("returns the expected url for a given agent port", () => {
-
-        });
+        // it("returns the expected url for a given agent port", () => {
+        //
+        // });
     });
 
     describe("authenticate", () => {
-        it("returns the expected url for a given agent port", () => {
-
-        });
+        // it("returns the expected url for a given agent port", () => {
+        //
+        // });
     });
 
     describe("sign", () => {
-        it("returns the expected url for a given agent port", () => {
-
-        });
+        // it("returns the expected url for a given agent port", () => {
+        //
+        // });
     });
 
     describe("verifyPin", () => {
-        it("returns the expected url for a given agent port", () => {
-
-        });
+        // it("returns the expected url for a given agent port", () => {
+        //
+        // });
     });
 });
