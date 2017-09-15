@@ -26751,13 +26751,13 @@ var GCLLib =
 	        return this.connection.get(this.url, CORE_READERS + "/" + reader_id, undefined, callback);
 	    };
 	    CoreService.prototype.readers = function (callback) {
-	        return this.connection.getSkipCitrix(this.url, CORE_READERS, undefined, callback);
+	        return this.connection.get(this.url, CORE_READERS, undefined, callback);
 	    };
 	    CoreService.prototype.readersCardAvailable = function (callback) {
-	        return this.connection.getSkipCitrix(this.url, CORE_READERS, CoreService.cardInsertedFilter(true), callback);
+	        return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(true), callback);
 	    };
 	    CoreService.prototype.readersCardsUnavailable = function (callback) {
-	        return this.connection.getSkipCitrix(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), callback);
+	        return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), callback);
 	    };
 	    CoreService.prototype.setPubKey = function (pubkey, callback) {
 	        return this.connection.put(this.url, CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);

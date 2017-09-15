@@ -238,17 +238,17 @@ class CoreService implements CoreModel.AbstractCore {
 
     public readers(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
         => void): Promise<CoreModel.CardReadersResponse> {
-        return this.connection.getSkipCitrix(this.url, CORE_READERS, undefined, callback);
+        return this.connection.get(this.url, CORE_READERS, undefined, callback);
     }
 
     public readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
         => void): Promise<CoreModel.CardReadersResponse> {
-        return this.connection.getSkipCitrix(this.url, CORE_READERS, CoreService.cardInsertedFilter(true), callback);
+        return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(true), callback);
     }
 
     public readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
         => void): Promise<CoreModel.CardReadersResponse> {
-        return this.connection.getSkipCitrix(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), callback);
+        return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), callback);
     }
 
     public setPubKey(pubkey: string,
