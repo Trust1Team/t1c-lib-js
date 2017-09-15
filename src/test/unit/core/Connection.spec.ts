@@ -2,13 +2,12 @@
  * @author Maarten Somers
  * @since 2017
  */
-///<reference path="../../../typings/index.d.ts"/>
 
 import { expect } from "chai";
-import { LocalConnection } from "../../scripts/core/client/Connection";
-import { GCLConfig } from "../../scripts/core/GCLConfig";
 import * as axios from "axios";
 import * as MockAdapter from "axios-mock-adapter";
+import { GCLConfig } from "../../../scripts/core/GCLConfig";
+import { LocalConnection } from "../../../scripts/core/client/Connection";
 
 describe("Connection", () => {
     const gclConfig = new GCLConfig();
