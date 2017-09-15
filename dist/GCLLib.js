@@ -75112,9 +75112,19 @@ var GCLLib =
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
 	    Belfius.prototype.isBelfiusReader = function (sessionId, callback) {
+	        var _this = this;
 	        if (sessionId && sessionId.length) {
-	            return this.apdu(Belfius.NONCE_APDU, sessionId).then(function (res) {
-	                return ResponseHandler_1.ResponseHandler.response(res.data.sw === "9000", callback);
+	            return this.connection.get(this.baseUrl, "/card-readers/" + this.reader_id, undefined).then(function (reader) {
+	                if (reader.data.name === "VASCO DIGIPASS 870") {
+	                    return _this.apdu(Belfius.NONCE_APDU, sessionId).then(function (res) {
+	                        return ResponseHandler_1.ResponseHandler.response({ data: res.data.sw === "9000", success: true }, callback);
+	                    });
+	                }
+	                else {
+	                    return ResponseHandler_1.ResponseHandler.response({ data: false, success: true }, callback);
+	                }
+	            }, function (err) {
+	                return ResponseHandler_1.ResponseHandler.error(err, callback);
 	            });
 	        }
 	        else {
