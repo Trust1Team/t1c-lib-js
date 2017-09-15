@@ -20,15 +20,15 @@ class EidPt extends GenericCertCard implements AbstractEidPT {
 
 
     public idData(callback?: (error: RestException, data: IdDataResponse) => void): Promise<IdDataResponse> {
-        return this.connection.get(this.resolvedReaderURI() + EidPt.ID_DATA, undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(EidPt.ID_DATA), undefined, callback);
     }
 
     public idDataWithOutPhoto(callback?: (error: RestException, data: IdDataResponse) => void): Promise<IdDataResponse> {
-        return this.connection.get(this.resolvedReaderURI() + EidPt.ID_DATA, { photo: "false" }, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(EidPt.ID_DATA), { photo: "false" }, callback);
     }
 
     public photo(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.get(this.resolvedReaderURI() + EidPt.PHOTO, undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(EidPt.PHOTO), undefined, callback);
     }
 
     public rootCertificate(options: Options,

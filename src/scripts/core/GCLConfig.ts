@@ -17,7 +17,7 @@ const defaultAllowAutoUpdate = true;
 const defaultImplicitDownload = false;
 const defaultLocalTestMode = false;
 
-class GCLConfig {
+class GCLConfig  implements GCLConfig {
     // singleton pattern
     private static instance: GCLConfig;
     private _dsUrlBase: string;
@@ -29,10 +29,13 @@ class GCLConfig {
     private _client_id: string;
     private _client_secret: string;
     private _jwt: string;
+    private _citrix: boolean;
+    private _agentPort: number;
     private _allowAutoUpdate: boolean;
     private _implicitDownload: boolean;
     private _localTestMode: boolean;
     private _forceHardwarePinpad: boolean;
+    private _defaultSessionTimeout: number;
 
     // constructor for DTO
     constructor (dsUriValue?: string, apiKey?: string) {
@@ -43,10 +46,13 @@ class GCLConfig {
         this._dsUrlBase = dsUriValue;
         this._apiKey = apiKey;
         this._jwt = "none";
+        this._citrix = false;
+        this._agentPort = -1;
         this._allowAutoUpdate = defaultAllowAutoUpdate;
         this._implicitDownload = defaultImplicitDownload;
         this._localTestMode = defaultLocalTestMode;
         this._forceHardwarePinpad = false;
+        this._defaultSessionTimeout = 5;
     }
 
     get ocvUrl(): string {
@@ -123,8 +129,24 @@ class GCLConfig {
         this._jwt = value;
     }
 
+    get citrix(): boolean {
+        return this._citrix;
+    }
+
+    set citrix(value: boolean) {
+        this._citrix = value;
+    }
+
+    get agentPort(): number {
+        return this._agentPort;
+    }
+
+    set agentPort(value: number) {
+        this._agentPort = value;
+    }
+
     get implicitDownload(): boolean {
-                                     return this._implicitDownload;
+        return this._implicitDownload;
     }
 
     set implicitDownload(value: boolean) {
@@ -154,6 +176,14 @@ class GCLConfig {
 
     set forceHardwarePinpad(value: boolean) {
         this._forceHardwarePinpad = value;
+    }
+
+    get defaultSessionTimeout(): number {
+        return this._defaultSessionTimeout;
+    }
+
+    set defaultSessionTimeout(value: number) {
+        this._defaultSessionTimeout = value;
     }
 }
 
