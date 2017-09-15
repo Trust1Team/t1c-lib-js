@@ -2,9 +2,8 @@
  * @author Maarten Casteels
  * @since 2016
  */
-///<reference path="../../../typings/index.d.ts"/>
 import { expect } from "chai";
-import {GCLConfig} from "../../scripts/core/GCLConfig";
+import { GCLConfig } from "../../../scripts/core/GCLConfig";
 
 describe("Config", () => {
     let config: GCLConfig;
