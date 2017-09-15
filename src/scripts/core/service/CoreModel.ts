@@ -5,9 +5,9 @@
 
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 
-export { AbstractCore, T1CResponse, DataResponse, DataArrayResponse, DataObjectResponse, InfoResponse, BrowserInfo, BrowserInfoResponse,
-    Card, CardReader, CardReadersResponse, T1CCertificate, CertificateResponse, CertificatesResponse,
-    SingleReaderResponse, PluginsResponse, PubKeyResponse };
+export { AbstractCore, T1CResponse, BoolDataResponse, DataResponse, DataArrayResponse, DataObjectResponse,
+    InfoResponse, BrowserInfo, BrowserInfoResponse, Card, CardReader, CardReadersResponse, T1CCertificate,
+    CertificateResponse, CertificatesResponse, SingleReaderResponse, PluginsResponse, PubKeyResponse };
 
 
 interface AbstractCore {
@@ -21,21 +21,16 @@ interface AbstractCore {
                      callback?: (error: CoreExceptions.RestException, data: CardReader) => void,
                      connectReader?: () => void,
                      insertCard?: () => void,
-                     cardTimeout?: () => void
-
-    ): void | Promise<CardReader>;
+                     cardTimeout?: () => void): void | Promise<CardReader>;
     pollReadersWithCards(secondsToPollCard?: number,
                          callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void,
                          connectReader?: () => void,
                          insertCard?: () => void,
-                         cardTimeout?: () => void
-
-    ): void | Promise<CardReadersResponse>;
+                         cardTimeout?: () => void): void | Promise<CardReadersResponse>;
     pollReaders(secondsToPollReader?: number,
                 callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void,
                 connectReader?: () => void,
-                readerTimeout?: () => void
-    ): void | Promise<CardReadersResponse>;
+                readerTimeout?: () => void): void | Promise<CardReadersResponse>;
     reader(reader_id: string,
            callback?: (error: CoreExceptions.RestException, data: SingleReaderResponse) => void): void | Promise<SingleReaderResponse>;
     readers(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void): void | Promise<CardReadersResponse>;
@@ -59,6 +54,10 @@ interface T1CResponse {
     success: boolean
 }
 
+interface BoolDataResponse extends T1CResponse {
+    data: boolean
+}
+
 interface DataResponse extends T1CResponse {
     data: string
 }
@@ -77,6 +76,7 @@ interface DataObjectResponse extends T1CResponse {
 interface InfoResponse extends T1CResponse {
     data: {
         activated: boolean
+        citrix: boolean
         managed: boolean
         arch: string
         os: string

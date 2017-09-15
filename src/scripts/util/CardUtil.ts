@@ -118,6 +118,7 @@ class CardUtil {
             case "aventra":
             case "beid":
             case "dnie":
+            case "emv":
             case "luxeid":
             case "luxtrust":
             case "mobib":
@@ -128,8 +129,6 @@ class CardUtil {
                 return "allData";
             case "safenet":
                 return "slots";
-            case "emv":
-                return "pan";
             default:
                 return undefined;
         }
@@ -149,8 +148,9 @@ class CardUtil {
             case "pteid":
                 return { filters: [], parseCerts: true };
             case "safenet":
-            case "emv":
                 return undefined;
+            case "emv":
+                return [];
             default:
                 return undefined;
         }
