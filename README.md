@@ -117,7 +117,29 @@ You can be released from the requirements of the Affero General Public License
 Irrespective of your choice of license, the T1T logo as depicted below may not be removed from this file, or from any software or other product or service to which it is applied, without the express prior written permission of Trust1Team sarl. The T1T logo is an EU Registered Trademark (n° 12943131).
 ```
 # Release Notes
-## v1.3.10
+## v1.4.0
+### Bug
+* [[T1C-765](https://trust1t.atlassian.net/browse/T1C-765)] - Use non-exising session ID for tx -> should return an error
+* [[T1C-767](https://trust1t.atlassian.net/browse/T1C-767)] - Consent doesn't mention the correct application URI ('*' instead)
+* [[T1C-768](https://trust1t.atlassian.net/browse/T1C-768)] - Test application should clear the username when acting as new user
+* [[T1C-769](https://trust1t.atlassian.net/browse/T1C-769)] - Remove Open/Close session in Belfius container
+* [[T1C-770](https://trust1t.atlassian.net/browse/T1C-770)] - Close session -> should contain the session ID
+* [[T1C-772](https://trust1t.atlassian.net/browse/T1C-772)] - Verify CCID Feature -> verify test case
+### Story
+* [[T1C-700](https://trust1t.atlassian.net/browse/T1C-700)] - As GCL I want to provide an APDU execution endpoint
+* [[T1C-703](https://trust1t.atlassian.net/browse/T1C-703)] - As a Belfius container I need to implement an STX wrapper
+* [[T1C-704](https://trust1t.atlassian.net/browse/T1C-704)] - As GCL include a CCID fallback scenario for EMV and eID
+* [[T1C-705](https://trust1t.atlassian.net/browse/T1C-705)] - As GCL I want to pre-configure service startup/restart and recovery settings
+* [[T1C-707](https://trust1t.atlassian.net/browse/T1C-707)] - Test Report
+* [[T1C-709](https://trust1t.atlassian.net/browse/T1C-709)] - As EMV container I want to expose an authentication service
+* [[T1C-710](https://trust1t.atlassian.net/browse/T1C-710)] - As EMV container I want to expose digital signature service
+* [[T1C-711](https://trust1t.atlassian.net/browse/T1C-711)] - As EMV container I want to retrieve basic data (certificates, card holder, ...)
+* [[T1C-712](https://trust1t.atlassian.net/browse/T1C-712)] - As GCL host registration of agents can be done with additional metadata
+* [[T1C-716](https://trust1t.atlassian.net/browse/T1C-716)] - As GCL I want to provide consent functionality
+* [[T1C-751](https://trust1t.atlassian.net/browse/T1C-751)] - Documentation JS Interface
+* [[T1C-778](https://trust1t.atlassian.net/browse/T1C-778)] - As a GCL it should detect a Belfius branded card-reader
+
+## v1.3.11
 ###Other
 *   Add Portuguese eID container
 
