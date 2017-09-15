@@ -39,7 +39,7 @@ describe("PinEnforcer Utility", () => {
             return PinEnforcer.check(connection, "", "123", "1234");
         });
 
-        it("will intervene if a request is sent with pin that should not have one", () => {
+        it("will intervene if pin checking is enabled in the config", () => {
             return PinEnforcer.check(enforcingConnection, "", "123", "1234").catch(err => {
                 expect(err).to.be.an("object");
                 expect(err).to.have.property("data");
