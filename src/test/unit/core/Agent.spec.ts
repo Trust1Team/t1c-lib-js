@@ -1,6 +1,6 @@
 /**
- * @author Maarten Casteels
- * @since 2016
+ * @author Maarten Somers
+ * @since 2017
  */
 import { expect } from "chai";
 import * as axios from "axios";
