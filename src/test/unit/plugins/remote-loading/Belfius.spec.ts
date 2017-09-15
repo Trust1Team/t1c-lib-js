@@ -16,6 +16,8 @@ describe("Belfius Container", () => {
     const gclConfig = new GCLConfig();
     const connection: LocalConnection = new LocalConnection(gclConfig);
     const belfius = new PluginFactory("", connection).createBelfius("123");
+    const nonBelfiusReader = new PluginFactory("", connection).createBelfius("321");
+
     let mock: MockAdapter;
 
     beforeEach(() => {
@@ -61,8 +63,92 @@ describe("Belfius Container", () => {
         });
     });
 
+    describe("can check if a reader is a Belfius reader", function () {
+        beforeEach(function () {
+            mock.onGet("card-readers/123").reply(() => {
+                return [ 200, { success: true, data: { name: "VASCO DIGIPASS 870"} }];
+            });
+            mock.onGet("card-readers/321").reply(() => {
+                return [ 200, { success: true, data: { name: "Some Other Reader"} }];
+            });
+            mock.onPost("plugins/readerapi/123/apdu", { cla: "F1", ins: "95", p1: "F7", p2: "E4", data: "FE0000040001300000" })
+                .reply(config => {
+                    if (config.params && config.params["session-id"] && config.params["session-id"] === "123") {
+                        return [ 200, { success: true, data: {
+                            rx:	"FE0000040067B4AD49",
+                            sw:	"9000",
+                            tx:	"F195F7E409FE0000040001300000"}
+                        }];
+                    } else { return [ 200, { success: false, data: "Incorrect session-id received" } ]; }
+                });
+        });
+
+        it("checks if a sessionId was provided (Belfius Reader)", () => {
+            const sessionId: string = undefined as any;
+            return belfius.isBelfiusReader(sessionId).then(() => {
+                return Promise.reject(new Error("no sessionId was provided, this should fail!"));
+            }, error => {
+                expect(error).to.have.property("code");
+                expect(error.code).to.be.a("string");
+                expect(error.code).to.eq("402");
+
+                expect(error).to.have.property("status");
+                expect(error.status).to.be.a("number");
+                expect(error.status).to.eq(400);
+
+                expect(error).to.have.property("description");
+                expect(error.description).to.be.a("string");
+                expect(error.description).to.eq("Session ID is required!");
+            });
+        });
+
+        it("checks if a sessionId was provided (Non-Belfius Reader)", () => {
+            const sessionId: string = undefined as any;
+            return nonBelfiusReader.isBelfiusReader(sessionId).then(() => {
+                return Promise.reject(new Error("no sessionId was provided, this should fail!"));
+            }, error => {
+                expect(error).to.have.property("code");
+                expect(error.code).to.be.a("string");
+                expect(error.code).to.eq("402");
+
+                expect(error).to.have.property("status");
+                expect(error.status).to.be.a("number");
+                expect(error.status).to.eq(400);
+
+                expect(error).to.have.property("description");
+                expect(error.description).to.be.a("string");
+                expect(error.description).to.eq("Session ID is required!");
+            });
+        });
+
+        it("correctly identifies a Belfius reader", () => {
+            return belfius.isBelfiusReader("123").then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data, "Belfius reader not recognized").to.be.a("boolean").eq(true);
+            });
+        });
+
+        it("correctly identifies a non-Belfius reader", () => {
+            return nonBelfiusReader.isBelfiusReader("123").then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data, "Non-Belfius reader incorrectly identified!").to.be.a("boolean").eq(false);
+            });
+        });
+    });
+
     describe("can retrieve a nonce", function () {
         beforeEach(function () {
+            mock.onGet("card-readers/123").reply(() => {
+                return [ 200, { success: true, data: { name: "VASCO DIGIPASS 870"} }];
+            });
             mock.onPost("plugins/readerapi/123/apdu", { cla: "F1", ins: "95", p1: "F7", p2: "E4", data: "FE0000040001300000" })
                 .reply(config => {
                     if (config.params && config.params["session-id"] && config.params["session-id"] === "123") {
@@ -120,6 +206,9 @@ describe("Belfius Container", () => {
 
     describe("can send an STX command", function () {
         beforeEach(function () {
+            mock.onGet("card-readers/123").reply(() => {
+                return [ 200, { success: true, data: { name: "VASCO DIGIPASS 870"} }];
+            });
             mock.onPost("plugins/readerapi/123/apdu", { cla: "F1", ins: "95", p1: "F7", p2: "E4", data: "FE0000040001300000" })
                 .reply(config => {
                     if (config.params && config.params["session-id"] && config.params["session-id"] === "123") {
