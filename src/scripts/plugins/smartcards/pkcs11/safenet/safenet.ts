@@ -49,13 +49,14 @@ class SafeNet implements AbstractSafeNet {
                         callback?: (error: RestException, data: CertificatesResponse) => void): Promise<CertificatesResponse> {
         let req = _.extend(body, { module: this.modulePath });
         const reqOptions = RequestHandler.determineOptions(options, callback);
-        return this.connection.post(this.resolvedURI() + SafeNet.ALL_CERTIFICATES, req, undefined).then(data => {
+        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.ALL_CERTIFICATES), req, undefined).then(data => {
             return CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
         }, err => {
             // if we encounter error try again with default (if possible)
             if (this.moduleConfig) {
                 let defaultReq = _.extend(body, { module: SafeNet.DEFAULT_CONFIG[this.os] });
-                return this.connection.post(this.resolvedURI() + SafeNet.ALL_CERTIFICATES, defaultReq, undefined).then(data => {
+                return this.connection.post(this.baseUrl,
+                    this.containerSuffix(SafeNet.ALL_CERTIFICATES), defaultReq, undefined).then(data => {
                     return CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
                 }, defaultErr => {
                     return ResponseHandler.error(defaultErr, reqOptions.callback);
@@ -66,44 +67,45 @@ class SafeNet implements AbstractSafeNet {
 
     public info(callback: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse> {
         let req = { module: this.modulePath };
-        return this.connection.post(this.resolvedURI() + SafeNet.INFO, req, undefined).then(data => {
+        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.INFO), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
         }, err => {
             if (this.moduleConfig) {
                 let defaultReq = { module: SafeNet.DEFAULT_CONFIG[this.os] };
-                return this.connection.post(this.resolvedURI() + SafeNet.INFO, defaultReq, undefined, callback);
+                return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.INFO), defaultReq, undefined, callback);
             } else { return ResponseHandler.error(err, callback); }
         });
     }
 
     public slots(callback: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse> {
         let req = { module: this.modulePath };
-        return this.connection.post(this.resolvedURI() + SafeNet.SLOTS, req, undefined).then(data => {
+        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SLOTS), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
         }, err => {
             if (this.moduleConfig) {
                 let defaultReq = { module: SafeNet.DEFAULT_CONFIG[this.os] };
-                return this.connection.post(this.resolvedURI() + SafeNet.SLOTS, defaultReq, undefined, callback);
+                return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SLOTS), defaultReq, undefined, callback);
             } else { return ResponseHandler.error(err, callback); }
         });
     }
 
     public slotsWithTokenPresent(callback: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse> {
         let req = { module: this.modulePath };
-        return this.connection.post(this.resolvedURI() + SafeNet.SLOTS, req, { "token-present": "true" }).then(data => {
+        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SLOTS), req, { "token-present": "true" }).then(data => {
             return ResponseHandler.response(data, callback);
         }, err => {
             if (this.moduleConfig) {
                 let defaultReq = { module: SafeNet.DEFAULT_CONFIG[this.os] };
-                return this.connection.post(this.resolvedURI() + SafeNet.SLOTS, defaultReq, { "token-present": "true" }, callback);
+                return this.connection.post(this.baseUrl,
+                    this.containerSuffix(SafeNet.SLOTS), defaultReq, { "token-present": "true" }, callback);
             } else { return ResponseHandler.error(err, callback); }
         });
     }
 
 
     // resolves the reader_id in the base URL
-    protected resolvedURI(): string {
-        return this.baseUrl + this.containerUrl;
+    protected containerSuffix(path?: string): string {
+        return this.containerUrl + path;
     }
 }
 

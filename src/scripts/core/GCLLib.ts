@@ -32,9 +32,14 @@ import { RestException } from "./exceptions/CoreExceptions";
 import { GenericService } from "./generic/GenericService";
 import { ResponseHandler } from "../util/ResponseHandler";
 import { AbstractEidPT } from "../plugins/smartcards/eid/pt/EidPtModel";
+import { AbstractRemoteLoading } from "../plugins/remote-loading/RemoteLoadingModel";
+import { AbstractBelfius } from "../plugins/remote-loading/belfius/BelfiusModel";
+import { AgentClient } from "./agent/agent";
+import { AbstractAgent } from "./agent/agentModel";
 
 
 class GCLClient {
+    public GCLInstalled: boolean;
     private cfg: GCLConfig;
     private pluginFactory: PluginFactory;
     private coreService: CoreService;
@@ -42,6 +47,7 @@ class GCLClient {
     private authConnection: LocalAuthConnection;
     private remoteConnection: RemoteConnection;
     private localTestConnection: LocalTestConnection;
+    private agentClient: AgentClient;
     private dsClient: DSClient;
     private ocvClient: OCVClient;
 
@@ -56,12 +62,14 @@ class GCLClient {
         this.localTestConnection = new LocalTestConnection(this.cfg);
         this.pluginFactory = new PluginFactory(this.cfg.gclUrl, this.connection);
         this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
+        this.agentClient = new AgentClient(this.cfg.gclUrl, this.connection);
         if (this.cfg.localTestMode) { this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg); }
         else { this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg); }
         this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteConnection);
 
         // check if implicit download has been set
         if (this.cfg.implicitDownload && true) { this.implicitDownload(); }
+
 
         if (!automatic) {
             // setup security - fail safe
@@ -83,9 +91,12 @@ class GCLClient {
     }
 
     public static initialize(cfg: GCLConfig,
-                             callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): void | Promise<GCLClient> {
+                             callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): Promise<GCLClient> {
         return new Promise((resolve, reject) => {
             let client = new GCLClient(cfg, true);
+
+            // will be set to false if init fails
+            client.GCLInstalled = true;
 
             client.initSecurityContext(function(err: CoreExceptions.RestException) {
                 if (err) {
@@ -117,6 +128,9 @@ class GCLClient {
         resolvedCfg.implicitDownload = cfg.implicitDownload;
         resolvedCfg.localTestMode = cfg.localTestMode;
         resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
+        resolvedCfg.defaultSessionTimeout = cfg.defaultSessionTimeout;
+        resolvedCfg.citrix = cfg.citrix;
+        resolvedCfg.agentPort = cfg.agentPort;
         return resolvedCfg;
     }
 
@@ -124,6 +138,8 @@ class GCLClient {
     public core = (): CoreService => { return this.coreService; };
     // get core config
     public config = (): GCLConfig => { return this.cfg; };
+    // get agent client services
+    public agent = (): AbstractAgent => { return this.agentClient; };
     // get ds client services
     public ds = (): AbstractDSClient => { return this.dsClient; };
     // get ocv client services
@@ -152,8 +168,11 @@ class GCLClient {
     public pteid = (reader_id?: string): AbstractEidPT => { return this.pluginFactory.createEidPT(reader_id); };
     // get instance for PKCS11
     public safenet = (reader_id: string, moduleConfig: { linux: string, mac: string, win: string }): AbstractSafeNet => {
-        return this.pluginFactory.createSafeNet(moduleConfig);
-    };
+        return this.pluginFactory.createSafeNet(moduleConfig); };
+    // get instance for Remote Loading
+    public readerapi = (reader_id: string): AbstractRemoteLoading => { return this.pluginFactory.createRemoteLoading(reader_id); };
+    // get instance for Belfius
+    public belfius = (reader_id: string): AbstractBelfius => { return this.pluginFactory.createBelfius(reader_id); };
 
     // generic methods
     public containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void) {
@@ -231,10 +250,13 @@ class GCLClient {
             // get GCL info
             self.core().info(function(err: CoreExceptions.RestException, infoResponse: InfoResponse) {
                 if (err) {
-                    console.log(JSON.stringify(err));
-                    reject(err);
+                    // failure probably because GCL is not installed
+                    self.GCLInstalled = false;
+                    // resolve with client as-is to allow download
+                    resolve();
                     return;
                 }
+                self_cfg.citrix = infoResponse.data.citrix;
                 let activated = infoResponse.data.activated;
                 let managed = infoResponse.data.managed;
                 let core_version = infoResponse.data.version;
