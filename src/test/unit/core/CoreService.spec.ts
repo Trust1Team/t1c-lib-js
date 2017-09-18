@@ -127,7 +127,6 @@ describe("Core Services", () => {
     describe("readers", () => {
         beforeEach(function () {
             mock.onGet("/card-readers").reply((config) => {
-                console.log(config.params);
                 if (config.params && config.params["card-inserted"] === true) {
                     return [ 200, { data: "Readers Data Card Inserted", success: true }];
                 } else if (config.params && config.params["card-inserted"] === false) {
