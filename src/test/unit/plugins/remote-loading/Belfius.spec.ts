@@ -66,7 +66,7 @@ describe("Belfius Container", () => {
     describe("can check if a reader is a Belfius reader", function () {
         beforeEach(function () {
             mock.onGet("card-readers/123").reply(() => {
-                return [ 200, { success: true, data: { name: "VASCO DIGIPASS 870"} }];
+                return [ 200, { success: true, data: { name: "A string that includes the phrase VASCO DIGIPASS 870 somewhere"} }];
             });
             mock.onGet("card-readers/321").reply(() => {
                 return [ 200, { success: true, data: { name: "Some Other Reader"} }];
