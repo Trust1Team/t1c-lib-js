@@ -26765,7 +26765,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return "v1.4.0-1";
+	        return "v1.4.0-2";
 	    };
 	    return CoreService;
 	}());
@@ -75106,6 +75106,7 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var RemoteLoading_1 = __webpack_require__(495);
 	var ResponseHandler_1 = __webpack_require__(482);
+	var _ = __webpack_require__(330);
 	var Belfius = (function (_super) {
 	    __extends(Belfius, _super);
 	    function Belfius() {
@@ -75115,7 +75116,7 @@ var GCLLib =
 	        var _this = this;
 	        if (sessionId && sessionId.length) {
 	            return this.connection.get(this.baseUrl, "/card-readers/" + this.reader_id, undefined).then(function (reader) {
-	                if (reader.data.name === "VASCO DIGIPASS 870") {
+	                if (_.includes(reader.data.name, "VASCO DIGIPASS 870")) {
 	                    return _this.apdu(Belfius.NONCE_APDU, sessionId).then(function (res) {
 	                        return ResponseHandler_1.ResponseHandler.response({ data: res.data.sw === "9000", success: true }, callback);
 	                    });

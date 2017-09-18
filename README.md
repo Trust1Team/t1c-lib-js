@@ -118,13 +118,17 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
+## v1.4.0-2
+### Bug
+* Correctly identify a VASCO DIGIPASS 870 on all OS platforms
+
 ## v1.4.0-1
 ### Bug
 * [[T1C-783](https://trust1t.atlassian.net/browse/T1C-783)] - As RMC I want to provide a button to verify the reader is a Belfius branded reader
 
 ## v1.4.0
 ### Bug
-* [[T1C-765](https://trust1t.atlassian.net/browse/T1C-765)] - Use non-exising session ID for tx -> should return an error
+* [[T1C-765](https://trust1t.atlassian.net/browse/T1C-765)] - Use non-existing session ID for tx -> should return an error
 * [[T1C-767](https://trust1t.atlassian.net/browse/T1C-767)] - Consent doesn't mention the correct application URI ('*' instead)
 * [[T1C-768](https://trust1t.atlassian.net/browse/T1C-768)] - Test application should clear the username when acting as new user
 * [[T1C-769](https://trust1t.atlassian.net/browse/T1C-769)] - Remove Open/Close session in Belfius container

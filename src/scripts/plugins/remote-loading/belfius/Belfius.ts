@@ -5,11 +5,11 @@
 
 import { RemoteLoading } from "../RemoteLoading";
 import { AbstractBelfius } from "./BelfiusModel";
-import {BoolDataResponse, DataResponse, T1CResponse} from "../../../core/service/CoreModel";
+import { BoolDataResponse } from "../../../core/service/CoreModel";
 import { RestException } from "../../../core/exceptions/CoreExceptions";
 import { APDU, CommandResponse } from "../RemoteLoadingModel";
 import { ResponseHandler } from "../../../util/ResponseHandler";
-import { GCLConfig } from "../../../core/GCLConfig";
+import * as _ from "lodash";
 
 export { Belfius };
 
@@ -28,7 +28,7 @@ class Belfius extends RemoteLoading implements AbstractBelfius {
         if (sessionId && sessionId.length) {
             return this.connection.get(this.baseUrl, "/card-readers/" + this.reader_id, undefined).then(reader => {
                 // check Vasco Digipass 870 Reader
-                if (reader.data.name === "VASCO DIGIPASS 870") {
+                if (_.includes(reader.data.name, "VASCO DIGIPASS 870")) {
                     // check Nonce command works
                     return this.apdu(Belfius.NONCE_APDU, sessionId).then(res => {
                         return ResponseHandler.response({ data: res.data.sw === "9000", success: true }, callback);
