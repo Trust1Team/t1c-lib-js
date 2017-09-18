@@ -3,8 +3,11 @@
  * @since 2017
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { CertCard } from "../../Card";
-import { CertificateResponse, DataObjectResponse, DataResponse } from "../../../../core/service/CoreModel";
+import { CertCard, OptionalPin } from "../../Card";
+import {
+    CertificateResponse, DataObjectResponse, DataResponse,
+    T1CResponse
+} from "../../../../core/service/CoreModel";
 import { Options } from "../../../../util/RequestHandler";
 
 export { AbstractEidBE, Address, AddressResponse, AllCertsResponse, AllDataResponse, RnData, RnDataResponse };
@@ -26,6 +29,7 @@ interface AbstractEidBE extends CertCard {
     nonRepudiationCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse)
         => void): Promise<CertificateResponse>;
     rrnCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
 }
 
 interface AddressResponse extends DataObjectResponse {

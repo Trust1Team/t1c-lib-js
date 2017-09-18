@@ -6,9 +6,9 @@
 import { expect } from "chai";
 import * as axios from "axios";
 import * as MockAdapter from "axios-mock-adapter";
-import { GCLConfig } from "../../../../scripts/core/GCLConfig";
-import { LocalConnection } from "../../../../scripts/core/client/Connection";
-import { PluginFactory } from "../../../../scripts/plugins/PluginFactory";
+import { GCLConfig } from "../../../../../scripts/core/GCLConfig";
+import { LocalConnection } from "../../../../../scripts/core/client/Connection";
+import { PluginFactory } from "../../../../../scripts/plugins/PluginFactory";
 
 describe("EMV Container", () => {
     const gclConfig = new GCLConfig();
