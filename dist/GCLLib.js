@@ -75350,7 +75350,7 @@ var GCLLib =
 	    };
 	    GenericService.doDataDump = function (args) {
 	        if (args.container === "luxeid") {
-	            return args.client.luxeid(args.readerId, args.data.pin).allData({ filters: [], parseCerts: true }, args.data);
+	            return args.client.luxeid(args.readerId, args.data.pin).allData({ filters: [], parseCerts: true });
 	        }
 	        if (args.dumpOptions) {
 	            return args.client[args.container](args.readerId)[args.dumpMethod](args.dumpOptions, args.data);
