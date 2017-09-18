@@ -65,7 +65,7 @@ class SafeNet implements AbstractSafeNet {
         });
     }
 
-    public info(callback: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse> {
+    public info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse> {
         let req = { module: this.modulePath };
         return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.INFO), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
@@ -77,7 +77,7 @@ class SafeNet implements AbstractSafeNet {
         });
     }
 
-    public slots(callback: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse> {
+    public slots(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse> {
         let req = { module: this.modulePath };
         return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SLOTS), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);

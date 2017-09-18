@@ -8,10 +8,9 @@ import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { AuthenticateOrSignData, GenericSecuredCertCard, OptionalPin } from "../../Card";
 import { CertificateResponse, CertificatesResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
 import {
-    AbstractEidLUX, AllCertsResponse,
+    AbstractEidLUX, AllCertsResponse, AllDataResponse,
     BiometricResponse, PictureResponse, SignatureImageResponse
 } from "./EidLuxModel";
-import { AllDataResponse } from "../../pki/luxtrust/LuxTrustModel";
 import { Promise } from "es6-promise";
 import { Certificate } from "pkijs";
 import { PinEnforcer } from "../../../../util/PinEnforcer";

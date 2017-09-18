@@ -4,15 +4,17 @@
 
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { CertificatesResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import { Options } from "../../../../util/RequestHandler";
 
 export { AbstractSafeNet, SlotAndPin, InfoResponse, Slot, SlotsResponse };
 
 interface AbstractSafeNet {
     certificates(body: SlotAndPin,
+                 options?: Options,
                  callback?: (error: RestException, data: CertificatesResponse) => void): Promise<CertificatesResponse>;
-    info(callback: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>;
-    slots(callback: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
-    slotsWithTokenPresent(callback:(error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
+    info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>;
+    slots(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
+    slotsWithTokenPresent(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
 }
 
 interface SlotAndPin {
