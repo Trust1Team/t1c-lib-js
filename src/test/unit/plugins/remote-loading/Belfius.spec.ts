@@ -219,6 +219,37 @@ describe("Belfius Container", () => {
                         }];
                     } else { return [ 200, { success: false, data: "Incorrect session-id received" } ]; }
                 });
+            mock.onPost("plugins/readerapi/123/apdu")
+                .reply(config => {
+                    if (config.params && config.params["session-id"] && config.params["session-id"] === "123") {
+                        return [ 200, { success: true, data: {
+                            rx:	JSON.parse(config.data).data,
+                            sw:	"9000",
+                            tx:	"F195F7E409FE0000040001300000"}
+                        }];
+                    } else { return [ 200, { success: false, data: "Incorrect session-id received" } ]; }
+                });
+            mock.onPost("plugins/readerapi/123/apdus")
+                .reply(config => {
+                    if (config.params && config.params["session-id"] && config.params["session-id"] === "123") {
+                        const data = JSON.parse(config.data);
+                        console.log(data);
+                        return [ 200, { success: true, data: [{
+                            rx:	data[0].data,
+                            sw:	"9000",
+                            tx:	"F195F7E409FE0000040001300000"
+                        }, {
+                            rx:	data[1].data,
+                            sw:	"9000",
+                            tx:	"F195F7E409FE0000040001300000"
+                        }, {
+                            rx:	data[2].data,
+                            sw:	"9000",
+                            tx:	"F195F7E409FE0000040001300000"
+                        }]
+                        }];
+                    } else { return [ 200, { success: false, data: "Incorrect session-id received" } ]; }
+                });
         });
 
         it("checks if a sessionId was provided", () => {
@@ -259,7 +290,116 @@ describe("Belfius Container", () => {
 
                 expect(res.data).to.have.property("rx");
                 expect(res.data.rx).to.be.a("string");
-                expect(res.data.rx).to.eq("FE0000040067B4AD49");
+                expect(res.data.rx).to.eq("00FE0000040001300000");
+            });
+        });
+
+        it("correctly sets length byte for a request < 250 bytes", () => {
+            return belfius.stx("1234567890ABCDEF", "123").then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data).to.be.a("object");
+
+                expect(res.data).to.have.property("rx");
+                expect(res.data.rx).to.be.a("string");
+                expect(res.data.rx).to.eq("001234567890ABCDEF");
+            });
+        });
+
+        it("correctly sets length byte for a request == 250 bytes", () => {
+            let command = "336924d5efdb326ee6e7d3eeb43b4f22" +
+                          "da0e256e515695a539e5f1eb32d377ec" +
+                          "5c454ca07b020ba60d8938aab27dc4ee" +
+                          "1e26996580dc86b3cfd4bd5c87d1d74a" +
+                          "9355e3c92bc5b5cf89cb4b3f5b35b65f" +
+                          "aa09ba2824bb7fe7352260721aa209f4" +
+                          "81111670c194d4e3e322aab4dc30ff69" +
+                          "7885b79f308d358ae5cf539dddfda325" +
+                          "25dda3c0e22192b7bdf4a66ebe4d952f" +
+                          "423fc6c971741e05b1a3e9eb719663e5" +
+                          "fc07996049d7abffcf46ef1f2e09359e" +
+                          "67dd4c030f34d9037f0f867bfcd99824" +
+                          "a22dac304b482358d081dcf517f2502d" +
+                          "eccc49b83632f386e0055300981ce956" +
+                          "17129a4e975eecee62d2fb21f1ee3374" +
+                          "686936a4a906e8fc0735";
+            return belfius.stx(command, "123").then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data).to.be.a("object");
+
+                expect(res.data).to.have.property("rx");
+                expect(res.data.rx).to.be.a("string");
+                expect(res.data.rx).to.eq("00" + command);
+            });
+        });
+
+        it("correctly sets length bytes for a request > 250 bytes", () => {
+            let command1 = "116924d5efdb326ee6e7d3eeb43b4f22" +
+                          "da0e256e515695a539e5f1eb32d377ec" +
+                          "5c454ca07b020ba60d8938aab27dc4ee" +
+                          "1e26996580dc86b3cfd4bd5c87d1d74a" +
+                          "9355e3c92bc5b5cf89cb4b3f5b35b65f" +
+                          "aa09ba2824bb7fe7352260721aa209f4" +
+                          "81111670c194d4e3e322aab4dc30ff69" +
+                          "7885b79f308d358ae5cf539dddfda325" +
+                          "25dda3c0e22192b7bdf4a66ebe4d952f" +
+                          "423fc6c971741e05b1a3e9eb719663e5" +
+                          "fc07996049d7abffcf46ef1f2e09359e" +
+                          "67dd4c030f34d9037f0f867bfcd99824" +
+                          "a22dac304b482358d081dcf517f2502d" +
+                          "eccc49b83632f386e0055300981ce956" +
+                          "17129a4e975eecee62d2fb21f1ee3374" +
+                          "686936a4a906e8fc0735";
+            let command2 = "226924d5efdb326ee6e7d3eeb43b4f22" +
+                          "da0e256e515695a539e5f1eb32d377ec" +
+                          "5c454ca07b020ba60d8938aab27dc4ee" +
+                          "1e26996580dc86b3cfd4bd5c87d1d74a" +
+                          "9355e3c92bc5b5cf89cb4b3f5b35b65f" +
+                          "aa09ba2824bb7fe7352260721aa209f4" +
+                          "81111670c194d4e3e322aab4dc30ff69" +
+                          "7885b79f308d358ae5cf539dddfda325" +
+                          "25dda3c0e22192b7bdf4a66ebe4d952f" +
+                          "423fc6c971741e05b1a3e9eb719663e5" +
+                          "fc07996049d7abffcf46ef1f2e09359e" +
+                          "67dd4c030f34d9037f0f867bfcd99824" +
+                          "a22dac304b482358d081dcf517f2502d" +
+                          "eccc49b83632f386e0055300981ce956" +
+                          "17129a4e975eecee62d2fb21f1ee3374" +
+                          "686936a4a906e8fc0735";
+            let command3 = "336924d5efdb326ee6e7d3eeb43b4f22" +
+                          "da0e256e515695a539e5f1eb32d377ec" +
+                          "5c454ca07b020ba60d8938aab27dc4ee" +
+                          "1e26996580dc86b3cfd4bd5c87d1d74a" +
+                          "9355e3c92bc5b5cf89cb4b3f5b35b65f" +
+                          "aa09ba2824bb7fe7352260721aa209f4" +
+                          "81111670c194d4e3e322aab4dc30ff69" +
+                          "7885b79f308d358ae5cf539dddfda325" +
+                          "25dda3c0e22192b7bdf4a66ebe4d952f" +
+                          "423fc6c971741e05b1a3e9eb719663e5" +
+                          "fc07996049d7abffcf46ef1f2e09359e" +
+                          "67dd4c030f34d9037f0f867bfcd99824" +
+                          "a22dac304b482358d081dcf517f2502d" +
+                          "eccc49b83632f386e0055300981ce956" +
+                          "17129a4e975eecee62d2fb21f1ee3374" +
+                          "686936a4a906e8fc0735";
+            return belfius.stx(command1 + command2 + command3, "123").then(res => {
+                expect(res).to.have.property("success");
+                expect(res.success).to.be.a("boolean");
+                expect(res.success).to.eq(true);
+
+                expect(res).to.have.property("data");
+                expect(res.data).to.be.a("object");
+
+                expect(res.data).to.have.property("rx");
+                expect(res.data.rx).to.be.a("string");
+                expect(res.data.rx).to.eq("01" + command1 + "03" + command2 + "02" + command3);
             });
         });
     });
