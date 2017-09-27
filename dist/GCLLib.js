@@ -26765,7 +26765,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return "v1.4.0-2";
+	        return "v1.4.1";
 	    };
 	    return CoreService;
 	}());
@@ -75112,6 +75112,26 @@ var GCLLib =
 	    function Belfius() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
+	    Belfius.generateStxApdu = function (data, prefix) {
+	        if (prefix && prefix.length) {
+	            return {
+	                cla: "F1",
+	                ins: "95",
+	                p1: "F7",
+	                p2: "E4",
+	                data: prefix + data
+	            };
+	        }
+	        else {
+	            return {
+	                cla: "F1",
+	                ins: "95",
+	                p1: "F7",
+	                p2: "E4",
+	                data: "00" + data
+	            };
+	        }
+	    };
 	    Belfius.prototype.isBelfiusReader = function (sessionId, callback) {
 	        var _this = this;
 	        if (sessionId && sessionId.length) {
@@ -75135,7 +75155,7 @@ var GCLLib =
 	    Belfius.prototype.nonce = function (sessionId, callback) {
 	        var _this = this;
 	        return this.isBelfiusReader(sessionId).then(function (compatibleReader) {
-	            if (compatibleReader) {
+	            if (compatibleReader.data) {
 	                return _this.apdu(Belfius.NONCE_APDU, sessionId, callback);
 	            }
 	            else {
@@ -75147,16 +75167,54 @@ var GCLLib =
 	    Belfius.prototype.stx = function (command, sessionId, callback) {
 	        var _this = this;
 	        return this.isBelfiusReader(sessionId).then(function (compatibleReader) {
-	            if (compatibleReader) {
-	                var stxApdu = Belfius.NONCE_APDU;
-	                stxApdu.data = command;
-	                return _this.apdu(stxApdu, sessionId, callback);
+	            if (compatibleReader.data) {
+	                if (command.length <= 500) {
+	                    return _this.apdu(Belfius.generateStxApdu(command), sessionId, callback);
+	                }
+	                else {
+	                    var commandStringArray = [];
+	                    for (var i = 0; i < Math.ceil(command.length / 500); i++) {
+	                        commandStringArray.push(command.substr(i * 500, 500));
+	                    }
+	                    return _this.apdu(_this.generateStxApdus(commandStringArray), sessionId).then(function (res) {
+	                        var totalRx = "";
+	                        _.forEach(res.data, function (partialRes) {
+	                            if (partialRes.rx) {
+	                                totalRx += partialRes.rx;
+	                            }
+	                        });
+	                        var finalResponse = {
+	                            data: { tx: res.data[res.data.length - 1].tx, sw: res.data[res.data.length - 1].sw },
+	                            success: res.success
+	                        };
+	                        if (finalResponse.data.sw === "9000" && totalRx.length > 0) {
+	                            finalResponse.data.rx = totalRx;
+	                        }
+	                        return ResponseHandler_1.ResponseHandler.response(finalResponse, callback);
+	                    });
+	                }
 	            }
 	            else {
 	                return ResponseHandler_1.ResponseHandler.error({ status: 400,
 	                    description: "Reader is not compatible with this request.", code: "2" }, callback);
 	            }
 	        });
+	    };
+	    Belfius.prototype.generateStxApdus = function (commands) {
+	        var apduArray = [];
+	        var totalCommands = commands.length - 1;
+	        _.forEach(commands, function (cmd, idx) {
+	            if (idx === 0) {
+	                apduArray.push(Belfius.generateStxApdu(cmd, "01"));
+	            }
+	            else if (idx === totalCommands) {
+	                apduArray.push(Belfius.generateStxApdu(cmd, "02"));
+	            }
+	            else {
+	                apduArray.push(Belfius.generateStxApdu(cmd, "03"));
+	            }
+	        });
+	        return apduArray;
 	    };
 	    return Belfius;
 	}(RemoteLoading_1.RemoteLoading));
@@ -75350,7 +75408,7 @@ var GCLLib =
 	    };
 	    GenericService.doDataDump = function (args) {
 	        if (args.container === "luxeid") {
-	            return args.client.luxeid(args.readerId, args.data.pin).allData({ filters: [], parseCerts: true }, args.data);
+	            return args.client.luxeid(args.readerId, args.data.pin).allData({ filters: [], parseCerts: true });
 	        }
 	        if (args.dumpOptions) {
 	            return args.client[args.container](args.readerId)[args.dumpMethod](args.dumpOptions, args.data);
