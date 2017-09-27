@@ -118,6 +118,13 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
+## v1.4.1
+
+### Bug
+* [[T1C-789](https://trust1t.atlassian.net/browse/T1C-789)] - Belfius STX command --> needs extra byte to indicate length
+* [[T1C-790](https://trust1t.atlassian.net/browse/T1C-790)] - Add support to split a STX command in multiple commands
+* [[T1C-791](https://trust1t.atlassian.net/browse/T1C-791)] - GetNonce fails after a 6927 response for stx
+
 ## v1.4.0-2
 ### Bug
 * Correctly identify a VASCO DIGIPASS 870 on all OS platforms
