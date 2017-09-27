@@ -233,7 +233,6 @@ describe("Belfius Container", () => {
                 .reply(config => {
                     if (config.params && config.params["session-id"] && config.params["session-id"] === "123") {
                         const data = JSON.parse(config.data);
-                        console.log(data);
                         return [ 200, { success: true, data: [{
                             rx:	data[0].data,
                             sw:	"9000",
