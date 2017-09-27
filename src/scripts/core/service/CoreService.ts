@@ -232,7 +232,7 @@ class CoreService implements CoreModel.AbstractCore {
 
     public reader(reader_id: string,
                   callback?: (error: CoreExceptions.RestException, data: CoreModel.SingleReaderResponse)
-                      => void): void | Promise<CoreModel.SingleReaderResponse> {
+                      => void): Promise<CoreModel.SingleReaderResponse> {
         return this.connection.get(this.url, CORE_READERS + "/" + reader_id, undefined, callback);
     }
 

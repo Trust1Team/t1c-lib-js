@@ -4,7 +4,11 @@
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { OptionalPin, SecuredCertCard } from "../../Card";
-import { CertificateResponse, CertificatesResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import {
+    CertificateResponse, CertificatesResponse, T1CCertificate,
+    T1CResponse
+} from "../../../../core/service/CoreModel";
+import { Options } from "../../../../util/RequestHandler";
 
 export { AbstractEidLUX, AllCertsResponse, AllDataResponse, Biometric, BiometricResponse,
     Picture, PictureResponse, SignatureImage, SignatureImageResponse };
@@ -13,31 +17,32 @@ export { AbstractEidLUX, AllCertsResponse, AllDataResponse, Biometric, Biometric
 interface AbstractEidLUX extends SecuredCertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
-    biometric(body: OptionalPin, callback?: (error: RestException, data: BiometricResponse) => void): Promise<BiometricResponse>;
-    picture(body: OptionalPin, callback?: (error: RestException, data: PictureResponse) => void): Promise<PictureResponse>;
-    rootCertificate(body: OptionalPin,
+    allData(options?: string[] | Options, callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+    allCerts(options?: string[] | Options, callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>
+    biometric(callback?: (error: RestException, data: BiometricResponse) => void): Promise<BiometricResponse>;
+    picture(callback?: (error: RestException, data: PictureResponse) => void): Promise<PictureResponse>;
+    rootCertificate(options?: Options,
                     callback?: (error: RestException, data: CertificatesResponse) => void): Promise<CertificatesResponse>;
-    authenticationCertificate(body: OptionalPin,
+    authenticationCertificate(options?: Options,
                               callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    nonRepudiationCertificate(body: OptionalPin,
+    nonRepudiationCertificate(options?: Options,
                               callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    signatureImage(body: OptionalPin,
-                   callback?: (error: RestException, data: SignatureImageResponse) => void): Promise<SignatureImageResponse>;
+    signatureImage(callback?: (error: RestException, data: SignatureImageResponse) => void): Promise<SignatureImageResponse>;
 }
 
 interface AllCertsResponse extends T1CResponse {
     data: {
-        authentication_certificate: string
-        non_repudiation_certificate: string
-        root_certificates: string[]
+        authentication_certificate: T1CCertificate
+        non_repudiation_certificate: T1CCertificate
+        root_certificates: T1CCertificate[]
     }
 }
 
 interface AllDataResponse extends AllCertsResponse {
     data: {
-        authentication_certificate: string
-        non_repudiation_certificate: string
-        root_certificates: string[]
+        authentication_certificate: T1CCertificate
+        non_repudiation_certificate: T1CCertificate
+        root_certificates: T1CCertificate[]
         biometric: Biometric,
         picture: Picture
         signature_image: SignatureImage
