@@ -5,11 +5,16 @@
  * @since 2016
  */
 import * as CoreExceptions from "./exceptions/CoreExceptions";
+import * as cuid from "cuid";
+import * as ls from "local-storage";
 import * as _ from "lodash";
 
 import { GCLConfig } from "./GCLConfig";
 import { CoreService } from "./service/CoreService";
-import { LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection } from "./client/Connection";
+import {
+    LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection,
+    GenericConnection
+} from './client/Connection';
 import { AbstractDSClient, DownloadLinkResponse, JWTResponse } from "./ds/DSClientModel";
 import { DSClient } from "./ds/DSClient";
 import { AbstractOCVClient, OCVClient } from "./ocv/OCVClient";
@@ -225,6 +230,10 @@ class GCLClient {
     private initSecurityContext(cb: (error: CoreExceptions.RestException, data: {}) => void) {
         let self = this;
         let clientCb = cb;
+
+        // check if there is an authentication token in localStorage, if not, set it
+        if (!ls.get(GenericConnection.BROWSER_AUTH_TOKEN)) { ls.set(GenericConnection.BROWSER_AUTH_TOKEN, cuid()); }
+
         this.core().getPubKey(function(err: any) {
             if (err && err.data && !err.data.success) {
                 // console.log('no certificate set - retrieve cert from DS');
