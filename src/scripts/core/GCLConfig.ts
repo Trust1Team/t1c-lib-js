@@ -5,14 +5,14 @@
  * @since 2016
  */
 
-import * as _ from "lodash";
+import * as _ from 'lodash';
 
-const defaultGclUrl = "https://localhost:10443/v1";
-const defaultDSUrl = "https://accapim.t1t.be:443";
-const defaultDSContextPath = "/trust1team/gclds/v1";
-const defaultOCVContextPath = "/trust1team/ocv-api/v1";
-const defaultDSContextPathTestMode = "/gcl-ds-web/v1";
-const fileDownloadUrlPostfix = "/trust1team/gclds-file/v1";
+const defaultGclUrl = 'https://localhost:10443/v1';
+const defaultDSUrl = 'https://accapim.t1t.be:443';
+const defaultDSContextPath = '/trust1team/gclds/v1';
+const defaultOCVContextPath = '/trust1team/ocv-api/v1';
+const defaultDSContextPathTestMode = '/gcl-ds-web/v1';
+const fileDownloadUrlPostfix = '/trust1team/gclds-file/v1';
 const defaultAllowAutoUpdate = true;
 const defaultImplicitDownload = false;
 const defaultLocalTestMode = false;
@@ -36,6 +36,7 @@ class GCLConfig  implements GCLConfig {
     private _localTestMode: boolean;
     private _forceHardwarePinpad: boolean;
     private _defaultSessionTimeout: number;
+    private _tokenCompatible: boolean;
 
     // constructor for DTO
     constructor (dsUriValue?: string, apiKey?: string) {
@@ -45,7 +46,7 @@ class GCLConfig  implements GCLConfig {
         this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
         this._dsUrlBase = dsUriValue;
         this._apiKey = apiKey;
-        this._jwt = "none";
+        this._jwt = 'none';
         this._citrix = false;
         this._agentPort = -1;
         this._allowAutoUpdate = defaultAllowAutoUpdate;
@@ -77,7 +78,7 @@ class GCLConfig  implements GCLConfig {
 
     set dsUrl(dsUriValue: string) {
         if (_.endsWith(dsUriValue, defaultDSContextPath)) {
-            this._dsUrlBase = _.replace(dsUriValue, defaultDSContextPath, "");
+            this._dsUrlBase = _.replace(dsUriValue, defaultDSContextPath, '');
             this._dsUrl = dsUriValue;
             this._dsFileDownloadUrl = this._dsUrlBase + fileDownloadUrlPostfix;
             this._ocvUrl = this._dsUrlBase + defaultOCVContextPath;
@@ -184,6 +185,14 @@ class GCLConfig  implements GCLConfig {
 
     set defaultSessionTimeout(value: number) {
         this._defaultSessionTimeout = value;
+    }
+
+    get tokenCompatible(): boolean {
+        return this._tokenCompatible;
+    }
+
+    set tokenCompatible(value: boolean) {
+        this._tokenCompatible = value;
     }
 }
 

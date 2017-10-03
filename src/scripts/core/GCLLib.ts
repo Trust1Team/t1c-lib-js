@@ -4,38 +4,44 @@
  * @author Maarten Somers
  * @since 2016
  */
-import * as CoreExceptions from "./exceptions/CoreExceptions";
-import * as _ from "lodash";
+import * as CoreExceptions from './exceptions/CoreExceptions';
+import * as cuid from 'cuid';
+import * as ls from 'local-storage';
+import * as _ from 'lodash';
+import * as semver from 'semver';
 
-import { GCLConfig } from "./GCLConfig";
-import { CoreService } from "./service/CoreService";
-import { LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection } from "./client/Connection";
-import { AbstractDSClient, DownloadLinkResponse, JWTResponse } from "./ds/DSClientModel";
-import { DSClient } from "./ds/DSClient";
-import { AbstractOCVClient, OCVClient } from "./ocv/OCVClient";
-import { CardReadersResponse, DataResponse, InfoResponse } from "./service/CoreModel";
-import { AbstractEidBE } from "../plugins/smartcards/eid/be/EidBeModel";
-import { AbstractEMV } from "../plugins/smartcards/emv/EMVModel";
-import { AbstractOcra } from "../plugins/smartcards/ocra/ocraModel";
-import { AbstractAventra } from "../plugins/smartcards/pki/aventra/AventraModel";
-import { AbstractLuxTrust } from "../plugins/smartcards/pki/luxtrust/LuxTrustModel";
-import { AbstractOberthur } from "../plugins/smartcards/pki/oberthur/OberthurModel";
-import { AbstractPiv } from "../plugins/smartcards/piv/pivModel";
-import { AbstractMobib } from "../plugins/smartcards/mobib/mobibModel";
-import { AbstractEidLUX } from "../plugins/smartcards/eid/lux/EidLuxModel";
-import { AbstractDNIe } from "../plugins/smartcards/eid/esp/dnieModel";
-import { Promise } from "es6-promise";
-import { PluginFactory } from "../plugins/PluginFactory";
-import { AbstractSafeNet } from "../plugins/smartcards/pkcs11/safenet/safenetModel";
-import { AuthenticateOrSignData, OptionalPin } from "../plugins/smartcards/Card";
-import { RestException } from "./exceptions/CoreExceptions";
-import { GenericService } from "./generic/GenericService";
-import { ResponseHandler } from "../util/ResponseHandler";
-import { AbstractEidPT } from "../plugins/smartcards/eid/pt/EidPtModel";
-import { AbstractRemoteLoading } from "../plugins/remote-loading/RemoteLoadingModel";
-import { AbstractBelfius } from "../plugins/remote-loading/belfius/BelfiusModel";
-import { AgentClient } from "./agent/agent";
-import { AbstractAgent } from "./agent/agentModel";
+import { GCLConfig } from './GCLConfig';
+import { CoreService } from './service/CoreService';
+import {
+    LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection,
+    GenericConnection
+} from './client/Connection';
+import { AbstractDSClient, DownloadLinkResponse, JWTResponse } from './ds/DSClientModel';
+import { DSClient } from './ds/DSClient';
+import { AbstractOCVClient, OCVClient } from './ocv/OCVClient';
+import { CardReadersResponse, DataResponse, InfoResponse } from './service/CoreModel';
+import { AbstractEidBE } from '../plugins/smartcards/eid/be/EidBeModel';
+import { AbstractEMV } from '../plugins/smartcards/emv/EMVModel';
+import { AbstractOcra } from '../plugins/smartcards/ocra/ocraModel';
+import { AbstractAventra } from '../plugins/smartcards/pki/aventra/AventraModel';
+import { AbstractLuxTrust } from '../plugins/smartcards/pki/luxtrust/LuxTrustModel';
+import { AbstractOberthur } from '../plugins/smartcards/pki/oberthur/OberthurModel';
+import { AbstractPiv } from '../plugins/smartcards/piv/pivModel';
+import { AbstractMobib } from '../plugins/smartcards/mobib/mobibModel';
+import { AbstractEidLUX } from '../plugins/smartcards/eid/lux/EidLuxModel';
+import { AbstractDNIe } from '../plugins/smartcards/eid/esp/dnieModel';
+import { Promise } from 'es6-promise';
+import { PluginFactory } from '../plugins/PluginFactory';
+import { AbstractSafeNet } from '../plugins/smartcards/pkcs11/safenet/safenetModel';
+import { AuthenticateOrSignData, OptionalPin } from '../plugins/smartcards/Card';
+import { RestException } from './exceptions/CoreExceptions';
+import { GenericService } from './generic/GenericService';
+import { ResponseHandler } from '../util/ResponseHandler';
+import { AbstractEidPT } from '../plugins/smartcards/eid/pt/EidPtModel';
+import { AbstractRemoteLoading } from '../plugins/remote-loading/RemoteLoadingModel';
+import { AbstractBelfius } from '../plugins/remote-loading/belfius/BelfiusModel';
+import { AgentClient } from './agent/agent';
+import { AbstractAgent } from './agent/agentModel';
 
 
 class GCLClient {
@@ -85,8 +91,8 @@ class GCLClient {
         // verify OCV accessibility
         this.initOCVContext(function(err: {}) {
             if (err) {
-                console.warn("OCV not available for apikey, contact support@trust1team.com to add this capability");
-            } else { console.log("OCV available for apikey"); }
+                console.warn('OCV not available for apikey, contact support@trust1team.com to add this capability');
+            } else { console.log('OCV available for apikey'); }
         });
     }
 
@@ -101,19 +107,25 @@ class GCLClient {
             client.initSecurityContext(function(err: CoreExceptions.RestException) {
                 if (err) {
                     console.log(JSON.stringify(err));
-                    if (callback && typeof callback === "function") { callback(err, null); }
+                    if (callback && typeof callback === 'function') { callback(err, null); }
                     reject(err);
                 } else {
                     client.registerAndActivate().then(() => {
-                        if (callback && typeof callback === "function") { callback(null, client); }
+                        if (callback && typeof callback === 'function') { callback(null, client); }
                         resolve(client);
                     }, error => {
-                        if (callback && typeof callback === "function") { callback(error, null); }
+                        if (callback && typeof callback === 'function') { callback(error, null); }
                         reject(error);
                     });
                 }
             });
         });
+    }
+
+    private static checkTokenCompatible(version: string): boolean {
+        // sanitize version string
+        let sanitized = _.split(version, '-')[0];
+        return semver.satisfies(sanitized, '>=1.4.0');
     }
 
     private static resolveConfig(cfg: GCLConfig) {
@@ -225,6 +237,10 @@ class GCLClient {
     private initSecurityContext(cb: (error: CoreExceptions.RestException, data: {}) => void) {
         let self = this;
         let clientCb = cb;
+
+        // check if there is an authentication token in localStorage, if not, set it
+        if (!ls.get(GenericConnection.BROWSER_AUTH_TOKEN)) { ls.set(GenericConnection.BROWSER_AUTH_TOKEN, cuid()); }
+
         this.core().getPubKey(function(err: any) {
             if (err && err.data && !err.data.success) {
                 // console.log('no certificate set - retrieve cert from DS');
@@ -257,6 +273,7 @@ class GCLClient {
                     return;
                 }
                 self_cfg.citrix = infoResponse.data.citrix;
+                self_cfg.tokenCompatible = GCLClient.checkTokenCompatible(infoResponse.data.version);
                 let activated = infoResponse.data.activated;
                 let managed = infoResponse.data.managed;
                 let core_version = infoResponse.data.version;
@@ -266,11 +283,11 @@ class GCLClient {
                 let mergedInfo = _.merge({ managed, core_version, activated }, info.data);
                 if (!activated) {
                     // we need to register the device
-                    // console.log("Register device:"+uuid);
+                    // console.log('Register device:'+uuid);
                     self.dsClient.register(mergedInfo, uuid,
                         function(error: CoreExceptions.RestException, activationResponse: JWTResponse) {
                             if (err) {
-                                console.log("Error while registering the device: " + JSON.stringify(err));
+                                console.log('Error while registering the device: ' + JSON.stringify(err));
                                 reject(err);
                                 return;
                             }
@@ -279,7 +296,7 @@ class GCLClient {
                             self.coreService = new CoreService(self.cfg.gclUrl, self.authConnection);
                             self.core().activate(function(activationError: CoreExceptions.RestException) {
                                 if (activationError) {
-                                    console.log("Error while activating the device: " + JSON.stringify(activationError));
+                                    console.log('Error while activating the device: ' + JSON.stringify(activationError));
                                     reject(err);
                                     return;
                                 }
@@ -287,7 +304,7 @@ class GCLClient {
                                 mergedInfo.activated = true;
                                 self.dsClient.sync(mergedInfo, uuid, function(syncError: CoreExceptions.RestException) {
                                     if (syncError) {
-                                        console.log("Error while syncing the device: " + JSON.stringify(syncError));
+                                        console.log('Error while syncing the device: ' + JSON.stringify(syncError));
                                         reject(syncError);
                                         return;
                                     } else {
@@ -303,11 +320,11 @@ class GCLClient {
                         return;
                     } else {
                         // we need to synchronize the device
-                        // console.log("Sync device:"+uuid);
+                        // console.log('Sync device:'+uuid);
                         self.dsClient.sync(mergedInfo, uuid,
                             function (syncError: CoreExceptions.RestException, activationResponse: JWTResponse) {
                                 if (syncError) {
-                                    console.log("Error while syncing the device: " + JSON.stringify(syncError));
+                                    console.log('Error while syncing the device: ' + JSON.stringify(syncError));
                                     reject(syncError);
                                     return;
                                 }
@@ -325,14 +342,14 @@ class GCLClient {
     private implicitDownload() {
         let self = this;
         this.core().info(function(error: CoreExceptions.RestException) {
-            console.log("implicit error", JSON.stringify(error));
+            console.log('implicit error', JSON.stringify(error));
             if (error) {
                 // no gcl available - start download
                 let _info = self.core().infoBrowserSync();
-                console.log("implicit error", JSON.stringify(_info));
+                console.log('implicit error', JSON.stringify(_info));
                 self.ds().downloadLink(_info.data,
                     function(linkError: CoreExceptions.RestException, downloadResponse: DownloadLinkResponse) {
-                        if (linkError) { console.error("could not download GCL package:", linkError.description); }
+                        if (linkError) { console.error('could not download GCL package:', linkError.description); }
                         window.open(downloadResponse.url); return;
                     });
             } else { return; }
