@@ -12,7 +12,10 @@ import * as ls from 'local-storage';
 
 describe('Connection', () => {
     const gclConfig = new GCLConfig();
+    const tokenConfig = new GCLConfig();
+    tokenConfig.tokenCompatible = true;
     const connection: LocalConnection = new LocalConnection(gclConfig);
+    const tokenConnection: LocalConnection = new LocalConnection(tokenConfig);
     let mock: MockAdapter;
 
     beforeEach(() => {
@@ -38,8 +41,15 @@ describe('Connection', () => {
             });
         });
 
-        it('sends the correct headers', () => {
+        it('sends the correct headers for regular connections', () => {
             return connection.get('', '/hello', undefined).then(res => {
+                expect(res.headers).to.be.an('object');
+                expect(res.headers).to.not.have.property(GenericConnection.AUTH_TOKEN_HEADER);
+            });
+        });
+
+        it('sends the X-Authentication-Token header for compatible connections', () => {
+            return tokenConnection.get('', '/hello', undefined).then(res => {
                 expect(res.headers).to.be.an('object');
                 expect(res.headers).to.have.property(GenericConnection.AUTH_TOKEN_HEADER).eq('test-id');
             });
@@ -60,8 +70,15 @@ describe('Connection', () => {
             });
         });
 
-        it('sends the correct headers', () => {
+        it('sends the correct headers for regular connections', () => {
             return connection.post('', '/hello', { payload: 'some string' }, undefined).then(res => {
+                expect(res.headers).to.be.an('object');
+                expect(res.headers).to.not.have.property(GenericConnection.AUTH_TOKEN_HEADER);
+            });
+        });
+
+        it('sends the X-Authentication-Token header for compatible connections', () => {
+            return tokenConnection.post('', '/hello', { payload: 'some string' }, undefined).then(res => {
                 expect(res.headers).to.be.an('object');
                 expect(res.headers).to.have.property(GenericConnection.AUTH_TOKEN_HEADER).eq('test-id');
             });
@@ -82,8 +99,15 @@ describe('Connection', () => {
             });
         });
 
-        it('sends the correct headers', () => {
+        it('sends the correct headers for regular connections', () => {
             return connection.put('', '/hello', { payload: 'some string' }, undefined).then(res => {
+                expect(res.headers).to.be.an('object');
+                expect(res.headers).to.not.have.property(GenericConnection.AUTH_TOKEN_HEADER);
+            });
+        });
+
+        it('sends the X-Authentication-Token header for compatible connections', () => {
+            return tokenConnection.put('', '/hello', { payload: 'some string' }, undefined).then(res => {
                 expect(res.headers).to.be.an('object');
                 expect(res.headers).to.have.property(GenericConnection.AUTH_TOKEN_HEADER).eq('test-id');
             });
