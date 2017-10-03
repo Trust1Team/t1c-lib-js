@@ -68,7 +68,7 @@
       "check-whitespace"
     ],
     "promise-function-async": true,
-    "quotemark": [ true, "double" ],
+    "quotemark": [ true, "single" ],
     "radix": true,
     "semicolon": [ true, "always", "ignore-interfaces" ],
     "strict-type-predicates": true,
