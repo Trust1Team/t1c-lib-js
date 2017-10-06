@@ -76736,14 +76736,9 @@ var GCLLib =
 	        var _this = this;
 	        if (sessionId && sessionId.length) {
 	            return this.connection.get(this.baseUrl, "/card-readers/" + this.reader_id, undefined).then(function (reader) {
-	                if (_.includes(reader.data.name, "VASCO DIGIPASS 870")) {
-	                    return _this.apdu(Belfius.NONCE_APDU, sessionId).then(function (res) {
-	                        return ResponseHandler_1.ResponseHandler.response({ data: res.data.sw === "9000", success: true }, callback);
-	                    });
-	                }
-	                else {
-	                    return ResponseHandler_1.ResponseHandler.response({ data: false, success: true }, callback);
-	                }
+	                return _this.apdu(Belfius.NONCE_APDU, sessionId).then(function (res) {
+	                    return ResponseHandler_1.ResponseHandler.response({ data: res.data.sw === "9000", success: true }, callback);
+	                });
 	            }, function (err) {
 	                return ResponseHandler_1.ResponseHandler.error(err, callback);
 	            });
