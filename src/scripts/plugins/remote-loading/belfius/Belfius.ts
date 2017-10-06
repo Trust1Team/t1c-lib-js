@@ -47,13 +47,10 @@ class Belfius extends RemoteLoading implements AbstractBelfius {
                            callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
         if (sessionId && sessionId.length) {
             return this.connection.get(this.baseUrl, "/card-readers/" + this.reader_id, undefined).then(reader => {
-                // check Vasco Digipass 870 Reader
-                if (_.includes(reader.data.name, "VASCO DIGIPASS 870")) {
-                    // check Nonce command works
-                    return this.apdu(Belfius.NONCE_APDU, sessionId).then(res => {
-                        return ResponseHandler.response({ data: res.data.sw === "9000", success: true }, callback);
-                    });
-                } else { return ResponseHandler.response({ data: false, success: true }, callback); }
+                // check Nonce command works
+                return this.apdu(Belfius.NONCE_APDU, sessionId).then(res => {
+                    return ResponseHandler.response({ data: res.data.sw === "9000", success: true }, callback);
+                });
             }, err => {
                 return ResponseHandler.error(err, callback);
             });
