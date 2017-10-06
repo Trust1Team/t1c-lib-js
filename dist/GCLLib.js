@@ -32823,7 +32823,9 @@ var GCLLib =
 	    };
 	    GenericCertCard.prototype.signData = function (body, callback) {
 	        var _this = this;
-	        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
+	        if (body.algorithm_reference) {
+	            body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
+	        }
 	        return PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
 	            return _this.connection.post(_this.baseUrl, _this.containerSuffix(GenericCertCard.SIGN_DATA), body, undefined, callback);
 	        });
@@ -76734,14 +76736,9 @@ var GCLLib =
 	        var _this = this;
 	        if (sessionId && sessionId.length) {
 	            return this.connection.get(this.baseUrl, "/card-readers/" + this.reader_id, undefined).then(function (reader) {
-	                if (_.includes(reader.data.name, "VASCO DIGIPASS 870")) {
-	                    return _this.apdu(Belfius.NONCE_APDU, sessionId).then(function (res) {
-	                        return ResponseHandler_1.ResponseHandler.response({ data: res.data.sw === "9000", success: true }, callback);
-	                    });
-	                }
-	                else {
-	                    return ResponseHandler_1.ResponseHandler.response({ data: false, success: true }, callback);
-	                }
+	                return _this.apdu(Belfius.NONCE_APDU, sessionId).then(function (res) {
+	                    return ResponseHandler_1.ResponseHandler.response({ data: res.data.sw === "9000", success: true }, callback);
+	                });
 	            }, function (err) {
 	                return ResponseHandler_1.ResponseHandler.error(err, callback);
 	            });
