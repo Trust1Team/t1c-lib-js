@@ -32823,7 +32823,9 @@ var GCLLib =
 	    };
 	    GenericCertCard.prototype.signData = function (body, callback) {
 	        var _this = this;
-	        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
+	        if (body.algorithm_reference) {
+	            body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
+	        }
 	        return PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
 	            return _this.connection.post(_this.baseUrl, _this.containerSuffix(GenericCertCard.SIGN_DATA), body, undefined, callback);
 	        });
