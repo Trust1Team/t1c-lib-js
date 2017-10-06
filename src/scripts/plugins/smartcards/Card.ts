@@ -140,7 +140,7 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
 
     public signData(body: AuthenticateOrSignData,
                     callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
+        if (body.algorithm_reference) { body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase(); }
         return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericCertCard.SIGN_DATA), body, undefined, callback);
         });
