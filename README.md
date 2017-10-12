@@ -118,6 +118,10 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
+## v1.4.2-2
+### Bug
+* [[T1C-810](https://trust1t.atlassian.net/browse/T1C-810)] - Fix bug where T1C would fail to activate
+
 ## v1.4.2-1
 ### Bug
 * [[T1C-807](https://trust1t.atlassian.net/browse/T1C-807)] - isBelfiusReader behaves inconsistently when used with non-Belfius reader and session has timed out
