@@ -9104,7 +9104,7 @@ var GCLLib =
 	            ls.set(Connection_1.GenericConnection.BROWSER_AUTH_TOKEN, cuid());
 	        }
 	        this.core().getPubKey(function (err) {
-	            if (err && err.data && !err.data.success) {
+	            if (err && !err.success && err.code === 201) {
 	                self.dsClient.getPubKey(function (error, dsResponse) {
 	                    if (error) {
 	                        return clientCb(err, null);
@@ -9118,7 +9118,9 @@ var GCLLib =
 	                    });
 	                });
 	            }
-	            return cb(null, {});
+	            else {
+	                return cb(null, {});
+	            }
 	        });
 	    };
 	    GCLClient.prototype.registerAndActivate = function () {
