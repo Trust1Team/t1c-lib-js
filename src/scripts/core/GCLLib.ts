@@ -242,7 +242,7 @@ class GCLClient {
         if (!ls.get(GenericConnection.BROWSER_AUTH_TOKEN)) { ls.set(GenericConnection.BROWSER_AUTH_TOKEN, cuid()); }
 
         this.core().getPubKey(function(err: any) {
-            if (err && err.data && !err.data.success) {
+            if (err && !err.success && err.code === 201) {
                 // console.log('no certificate set - retrieve cert from DS');
                 self.dsClient.getPubKey(function(error: any, dsResponse: any) {
                     if (error) { return clientCb(err, null); }
@@ -253,9 +253,11 @@ class GCLClient {
                         return innerCb(null, {});
                     });
                 });
+            } else {
+                // certificate loaded
+                // console.log('certificate present, no need to retrieve from DS');
+                return cb(null, {});
             }
-            // certificate loaded
-            return cb(null, {});
         });
     }
 
@@ -283,7 +285,7 @@ class GCLClient {
                 let mergedInfo = _.merge({ managed, core_version, activated }, info.data);
                 if (!activated) {
                     // we need to register the device
-                    // console.log('Register device:'+uuid);
+                    // console.log('Register device:' + uuid);
                     self.dsClient.register(mergedInfo, uuid,
                         function(error: CoreExceptions.RestException, activationResponse: JWTResponse) {
                             if (err) {
