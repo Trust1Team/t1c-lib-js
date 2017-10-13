@@ -9,6 +9,7 @@ import * as cuid from 'cuid';
 import * as ls from 'local-storage';
 import * as _ from 'lodash';
 import * as semver from 'semver';
+import * as bases from 'bases';
 
 import { GCLConfig } from './GCLConfig';
 import { CoreService } from './service/CoreService';
@@ -42,7 +43,6 @@ import { AbstractRemoteLoading } from '../plugins/remote-loading/RemoteLoadingMo
 import { AbstractBelfius } from '../plugins/remote-loading/belfius/BelfiusModel';
 import { AgentClient } from './agent/agent';
 import { AbstractAgent } from './agent/agentModel';
-
 
 class GCLClient {
     public GCLInstalled: boolean;
@@ -239,7 +239,11 @@ class GCLClient {
         let clientCb = cb;
 
         // check if there is an authentication token in localStorage, if not, set it
-        if (!ls.get(GenericConnection.BROWSER_AUTH_TOKEN)) { ls.set(GenericConnection.BROWSER_AUTH_TOKEN, cuid()); }
+        if (!ls.get(GenericConnection.BROWSER_AUTH_TOKEN)) {
+            const browserCuid = cuid();
+            const base36 = browserCuid.substr(1, 8);
+            ls.set(GenericConnection.BROWSER_AUTH_TOKEN, browserCuid + (bases.fromBase36(base36) % 97));
+        }
 
         this.core().getPubKey(function(err: any) {
             if (err && !err.success && err.code === 201) {
