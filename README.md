@@ -118,6 +118,10 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
+## v1.4.3
+### Story
+* [[T1C-812](https://trust1t.atlassian.net/browse/T1C-812)] - Add validation to the X-Authentication-Header token used for the consent
+
 ## v1.4.2-2
 ### Bug
 * [[T1C-810](https://trust1t.atlassian.net/browse/T1C-810)] - Fix bug where T1C would fail to activate
