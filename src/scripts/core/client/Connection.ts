@@ -38,7 +38,7 @@ interface Connection {
 
 abstract class GenericConnection implements Connection {
     static readonly AUTH_TOKEN_HEADER = 'X-Authentication-Token';
-    static readonly BROWSER_AUTH_TOKEN = 't1c-js-browser-auth-token';
+    static readonly BROWSER_AUTH_TOKEN = 't1c-js-browser-id-token';
     static readonly SHOULD_SEND_TOKEN = false;
 
     constructor(public cfg: GCLConfig) {}
