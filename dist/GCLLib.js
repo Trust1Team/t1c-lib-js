@@ -9103,7 +9103,7 @@ var GCLLib =
 	        var clientCb = cb;
 	        if (!ls.get(Connection_1.GenericConnection.BROWSER_AUTH_TOKEN)) {
 	            var browserCuid = cuid();
-	            var base36 = browserCuid.substr(1);
+	            var base36 = browserCuid.substr(1, 8);
 	            ls.set(Connection_1.GenericConnection.BROWSER_AUTH_TOKEN, browserCuid + (bases.fromBase36(base36) % 97));
 	        }
 	        this.core().getPubKey(function (err) {
