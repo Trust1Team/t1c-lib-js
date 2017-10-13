@@ -2,14 +2,14 @@
  * @author Maarten Somers
  */
 
-import { Promise } from "es6-promise";
-import * as _ from "lodash";
-import * as asn1js from "asn1js";
-import * as Base64 from "Base64";
-import { Certificate } from "pkijs";
-import { RestException } from "../core/exceptions/CoreExceptions";
-import { T1CCertificate, T1CResponse } from "../core/service/CoreModel";
-import { ResponseHandler } from "./ResponseHandler";
+import { Promise } from 'es6-promise';
+import * as _ from 'lodash';
+import * as asn1js from 'asn1js';
+import * as Base64 from 'Base64';
+import { Certificate } from 'pkijs';
+import { RestException } from '../core/exceptions/CoreExceptions';
+import { T1CCertificate, T1CResponse } from '../core/service/CoreModel';
+import { ResponseHandler } from './ResponseHandler';
 
 export { CertParser };
 
@@ -19,10 +19,10 @@ class CertParser {
                           parseCerts: boolean,
                           callback?: (error: RestException, data: T1CResponse) => void):  Promise<any> {
         // check if data has properties
-        if (response && response.data && typeof response.data === "object" && !_.isArray(response.data)) {
+        if (response && response.data && typeof response.data === 'object' && !_.isArray(response.data)) {
             _.forEach(response.data, (value, key) => {
-                if (key.indexOf("certificate") > -1) {
-                    if (typeof value === "string") {
+                if (key.indexOf('certificate') > -1) {
+                    if (typeof value === 'string') {
                         response.data[ key ] = { base64: value };
                         if (parseCerts) { response.data[ key ].parsed = CertParser.processCert(value); }
                     }
