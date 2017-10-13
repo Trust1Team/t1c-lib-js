@@ -241,7 +241,7 @@ class GCLClient {
         // check if there is an authentication token in localStorage, if not, set it
         if (!ls.get(GenericConnection.BROWSER_AUTH_TOKEN)) {
             const browserCuid = cuid();
-            const base36 = browserCuid.substr(1);
+            const base36 = browserCuid.substr(1, 8);
             ls.set(GenericConnection.BROWSER_AUTH_TOKEN, browserCuid + (bases.fromBase36(base36) % 97));
         }
 
