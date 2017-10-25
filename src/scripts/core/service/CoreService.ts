@@ -55,8 +55,8 @@ class CoreService implements CoreModel.AbstractCore {
     }
 
     public getConsent(title: string, codeWord: string, durationInDays?: number,
-                      callback?: (error: CoreExceptions.RestException, data: CoreModel.T1CResponse)
-                          => void): Promise<CoreModel.T1CResponse> {
+                      callback?: (error: CoreExceptions.RestException, data: CoreModel.BoolDataResponse)
+                          => void): Promise<CoreModel.BoolDataResponse> {
         if (!title || !title.length) {
             return ResponseHandler.error({ status: 400, description: 'Title is required!', code: '801' }, callback);
         }
