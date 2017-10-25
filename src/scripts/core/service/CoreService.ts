@@ -2,35 +2,36 @@
  * @author Michallis Pashidis
  * @author Maarten Somers
  */
-import { LocalAuthConnection } from "../client/Connection";
-import * as CoreExceptions from "../exceptions/CoreExceptions";
-import * as _ from "lodash";
-import * as platform from "platform";
-import * as CoreModel from "./CoreModel";
-import { CardReader } from "./CoreModel";
-import { Promise } from "es6-promise";
+import { LocalAuthConnection } from '../client/Connection';
+import * as CoreExceptions from '../exceptions/CoreExceptions';
+import * as _ from 'lodash';
+import * as platform from 'platform';
+import * as CoreModel from './CoreModel';
+import { CardReader } from './CoreModel';
+import { Promise } from 'es6-promise';
 
 export { CoreService };
 
 
-const CORE_INFO = "/";
-const CORE_PLUGINS = "/plugins";
-const CORE_READERS = "/card-readers";
-const CORE_ACTIVATE = "/admin/activate";
-const CORE_PUB_KEY = "/admin/certificate";
+const CORE_CONSENT = '/consent';
+const CORE_INFO = '/';
+const CORE_PLUGINS = '/plugins';
+const CORE_READERS = '/card-readers';
+const CORE_ACTIVATE = '/admin/activate';
+const CORE_PUB_KEY = '/admin/certificate';
 
 class CoreService implements CoreModel.AbstractCore {
     // constructor
     constructor(private url: string, private connection: LocalAuthConnection) {}
 
     private static cardInsertedFilter(inserted: boolean): {} {
-        return { "card-inserted": inserted };
+        return { 'card-inserted': inserted };
     }
 
     private static platformInfo(): CoreModel.BrowserInfoResponse {
         return {
             data: {
-                manufacturer: platform.manufacturer || "",
+                manufacturer: platform.manufacturer || '',
                 browser: {
                     name: platform.name,
                     version: platform.version
@@ -50,6 +51,14 @@ class CoreService implements CoreModel.AbstractCore {
     public activate(callback?: (error: CoreExceptions.RestException, data: CoreModel.T1CResponse)
         => void): Promise<CoreModel.T1CResponse> {
         return this.connection.post(this.url, CORE_ACTIVATE, {}, undefined, callback);
+    }
+
+    public getConsent(title: string, codeWord: string, durationInDays?: number,
+                      callback?: (error: CoreExceptions.RestException, data: CoreModel.T1CResponse)
+                          => void): Promise<CoreModel.T1CResponse> {
+        let days = 1;
+        if (durationInDays) { days = durationInDays; }
+        return this.connection.post(this.url, CORE_CONSENT, { title, text: codeWord, days }, undefined, callback);
     }
 
     public getPubKey(callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse)
@@ -92,7 +101,7 @@ class CoreService implements CoreModel.AbstractCore {
 
         function poll(resolve?: (data: any) => void, reject?: (error: any) => void) {
             _.delay(() => {
-                // console.debug("seconds left:", maxSeconds);
+                // console.debug('seconds left:', maxSeconds);
                 --maxSeconds;
                 self.readers((error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => {
                     if (error) {
@@ -104,7 +113,7 @@ class CoreService implements CoreModel.AbstractCore {
                         if (cardTimeoutCb) { return cardTimeoutCb(); }
                         else {
                             // TODO improve handling of timeout in combination with promises
-                            if (reject) { reject({ success: false, message: "Timed out" }); }
+                            if (reject) { reject({ success: false, message: 'Timed out' }); }
                         }
                     } // reader timeout
                     else if (data.data.length === 0) {
@@ -112,7 +121,7 @@ class CoreService implements CoreModel.AbstractCore {
                         poll(resolve, reject);
                     } else {
                         let readerWithCard = _.find(data.data, (reader: CoreModel.CardReader) => {
-                            return _.has(reader, "card");
+                            return _.has(reader, 'card');
                         });
                         if (readerWithCard != null) {
                             if (resolve) { resolve(readerWithCard); }
@@ -156,13 +165,13 @@ class CoreService implements CoreModel.AbstractCore {
                         if (cardTimeoutCb) { return cardTimeoutCb(); }
                         else {
                             // TODO improve handling of timeout in combination with promises
-                            if (reject) { reject({ success: false, message: "Timed out" }); }
+                            if (reject) { reject({ success: false, message: 'Timed out' }); }
                         }
                     } // reader timeout
                     else if (!_.isEmpty(data) && !_.isEmpty(data.data)) {
                         // there are some readers, check if one of them has a card
                         let readersWithCards = _.filter(data.data, (reader: CoreModel.CardReader) => {
-                            return _.has(reader, "card");
+                            return _.has(reader, 'card');
                         });
                         if (readersWithCards.length) {
                             // reader with card found (at least one), return data
@@ -214,7 +223,7 @@ class CoreService implements CoreModel.AbstractCore {
                         if (readerTimeoutCb) { return readerTimeoutCb(); } // reader timeout
                         else {
                             // TODO improve handling of timeout in combination with promises
-                            if (reject) { reject({ success: false, message: "Timed out" }); }
+                            if (reject) { reject({ success: false, message: 'Timed out' }); }
                         }
                     }
                     else if (_.isEmpty(data) || _.isEmpty(data.data)) {
@@ -233,7 +242,7 @@ class CoreService implements CoreModel.AbstractCore {
     public reader(reader_id: string,
                   callback?: (error: CoreExceptions.RestException, data: CoreModel.SingleReaderResponse)
                       => void): Promise<CoreModel.SingleReaderResponse> {
-        return this.connection.get(this.url, CORE_READERS + "/" + reader_id, undefined, callback);
+        return this.connection.get(this.url, CORE_READERS + '/' + reader_id, undefined, callback);
     }
 
     public readers(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
@@ -263,6 +272,6 @@ class CoreService implements CoreModel.AbstractCore {
 
     // get Lib version
     public version(): string {
-        return "%%GULP_INJECT_VERSION%%";
+        return '%%GULP_INJECT_VERSION%%';
     }
 }
