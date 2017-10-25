@@ -63,7 +63,7 @@ class CoreService implements CoreModel.AbstractCore {
         if (!codeWord || !codeWord.length) {
             return ResponseHandler.error({ status: 400, description: 'Code word is required!', code: '801' }, callback);
         }
-        let days = 1;
+        let days: number = this.connection.cfg.defaultConsentDuration;
         if (durationInDays) { days = durationInDays; }
         return this.connection.post(this.url, CORE_CONSENT, { title, text: codeWord, days }, undefined, callback);
     }
