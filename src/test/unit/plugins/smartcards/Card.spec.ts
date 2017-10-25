@@ -178,7 +178,7 @@ describe("Generic cards and containers", () => {
             });
         });
 
-        it("makes get a filtered subset of the certificates", () => {
+        it("can get a filtered subset of the certificates", () => {
             return aventra.allCerts({ filters: [ "cert1", "cert2" ] }).then(res => {
                 expect(res).to.have.property("success");
                 expect(res.success).to.be.a("boolean");
