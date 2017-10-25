@@ -9,6 +9,7 @@ import * as platform from 'platform';
 import * as CoreModel from './CoreModel';
 import { CardReader } from './CoreModel';
 import { Promise } from 'es6-promise';
+import { ResponseHandler } from '../../util/ResponseHandler';
 
 export { CoreService };
 
@@ -56,6 +57,12 @@ class CoreService implements CoreModel.AbstractCore {
     public getConsent(title: string, codeWord: string, durationInDays?: number,
                       callback?: (error: CoreExceptions.RestException, data: CoreModel.T1CResponse)
                           => void): Promise<CoreModel.T1CResponse> {
+        if (!title || !title.length) {
+            return ResponseHandler.error({ status: 400, description: 'Title is required!', code: '801' }, callback);
+        }
+        if (!codeWord || !codeWord.length) {
+            return ResponseHandler.error({ status: 400, description: 'Code word is required!', code: '801' }, callback);
+        }
         let days = 1;
         if (durationInDays) { days = durationInDays; }
         return this.connection.post(this.url, CORE_CONSENT, { title, text: codeWord, days }, undefined, callback);
