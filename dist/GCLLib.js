@@ -28428,23 +28428,24 @@ var GCLLib =
 	var _ = __webpack_require__(334);
 	var platform = __webpack_require__(341);
 	var es6_promise_1 = __webpack_require__(342);
-	var CORE_INFO = "/";
-	var CORE_PLUGINS = "/plugins";
-	var CORE_READERS = "/card-readers";
-	var CORE_ACTIVATE = "/admin/activate";
-	var CORE_PUB_KEY = "/admin/certificate";
+	var CORE_CONSENT = '/consent';
+	var CORE_INFO = '/';
+	var CORE_PLUGINS = '/plugins';
+	var CORE_READERS = '/card-readers';
+	var CORE_ACTIVATE = '/admin/activate';
+	var CORE_PUB_KEY = '/admin/certificate';
 	var CoreService = (function () {
 	    function CoreService(url, connection) {
 	        this.url = url;
 	        this.connection = connection;
 	    }
 	    CoreService.cardInsertedFilter = function (inserted) {
-	        return { "card-inserted": inserted };
+	        return { 'card-inserted': inserted };
 	    };
 	    CoreService.platformInfo = function () {
 	        return {
 	            data: {
-	                manufacturer: platform.manufacturer || "",
+	                manufacturer: platform.manufacturer || '',
 	                browser: {
 	                    name: platform.name,
 	                    version: platform.version
@@ -28461,6 +28462,13 @@ var GCLLib =
 	    };
 	    CoreService.prototype.activate = function (callback) {
 	        return this.connection.post(this.url, CORE_ACTIVATE, {}, undefined, callback);
+	    };
+	    CoreService.prototype.getConsent = function (title, codeWord, durationInDays, callback) {
+	        var days = 1;
+	        if (durationInDays) {
+	            days = durationInDays;
+	        }
+	        return this.connection.post(this.url, CORE_CONSENT, { title: title, text: codeWord, days: days }, undefined, callback);
 	    };
 	    CoreService.prototype.getPubKey = function (callback) {
 	        return this.connection.get(this.url, CORE_PUB_KEY, undefined, callback);
@@ -28506,7 +28514,7 @@ var GCLLib =
 	                        }
 	                        else {
 	                            if (reject) {
-	                                reject({ success: false, message: "Timed out" });
+	                                reject({ success: false, message: 'Timed out' });
 	                            }
 	                        }
 	                    }
@@ -28518,7 +28526,7 @@ var GCLLib =
 	                    }
 	                    else {
 	                        var readerWithCard = _.find(data.data, function (reader) {
-	                            return _.has(reader, "card");
+	                            return _.has(reader, 'card');
 	                        });
 	                        if (readerWithCard != null) {
 	                            if (resolve) {
@@ -28566,13 +28574,13 @@ var GCLLib =
 	                        }
 	                        else {
 	                            if (reject) {
-	                                reject({ success: false, message: "Timed out" });
+	                                reject({ success: false, message: 'Timed out' });
 	                            }
 	                        }
 	                    }
 	                    else if (!_.isEmpty(data) && !_.isEmpty(data.data)) {
 	                        var readersWithCards = _.filter(data.data, function (reader) {
-	                            return _.has(reader, "card");
+	                            return _.has(reader, 'card');
 	                        });
 	                        if (readersWithCards.length) {
 	                            var response = { data: readersWithCards, success: true };
@@ -28627,7 +28635,7 @@ var GCLLib =
 	                        }
 	                        else {
 	                            if (reject) {
-	                                reject({ success: false, message: "Timed out" });
+	                                reject({ success: false, message: 'Timed out' });
 	                            }
 	                        }
 	                    }
@@ -28650,7 +28658,7 @@ var GCLLib =
 	        }
 	    };
 	    CoreService.prototype.reader = function (reader_id, callback) {
-	        return this.connection.get(this.url, CORE_READERS + "/" + reader_id, undefined, callback);
+	        return this.connection.get(this.url, CORE_READERS + '/' + reader_id, undefined, callback);
 	    };
 	    CoreService.prototype.readers = function (callback) {
 	        return this.connection.get(this.url, CORE_READERS, undefined, callback);
@@ -28667,7 +28675,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return "v1.4.3";
+	        return 'v1.4.3';
 	    };
 	    return CoreService;
 	}());
