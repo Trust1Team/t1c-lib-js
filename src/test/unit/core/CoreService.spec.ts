@@ -14,7 +14,11 @@ import { Promise } from 'es6-promise';
 describe('Core Services', () => {
     let gclConfig = new GCLConfig();
     const connection: LocalConnection = new LocalConnection(gclConfig);
+    let gclConfigModified = new GCLConfig();
+    gclConfigModified.defaultConsentDuration = 5;
+    const connectionModified: LocalConnection = new LocalConnection(gclConfigModified);
     let core = new CoreService('', connection);
+    let coreModified = new CoreService('', connectionModified);
     let mock: MockAdapter;
 
     beforeEach(() => {
@@ -91,6 +95,27 @@ describe('Core Services', () => {
 
                 expect(result.data).to.have.property('days');
                 expect(result.data.days).to.be.a('number').eq(1);
+            });
+        });
+
+        it('allows the default duration to be changed via the config file', () => {
+            return coreModified.getConsent('test2', 'code2').then(res => {
+                const result = res as any;
+                expect(result).to.have.property('success');
+                expect(result.success).to.be.a('boolean');
+                expect(result.success).to.eq(true);
+
+                expect(result).to.have.property('data');
+                expect(result.data).to.be.an('object');
+
+                expect(result.data).to.have.property('title');
+                expect(result.data.title).to.be.a('string').eq('test2');
+
+                expect(result.data).to.have.property('text');
+                expect(result.data.text).to.be.a('string').eq('code2');
+
+                expect(result.data).to.have.property('days');
+                expect(result.data.days).to.be.a('number').eq(5);
             });
         });
 
