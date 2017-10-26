@@ -48,7 +48,7 @@ interface AbstractCore {
     infoBrowserSync(): BrowserInfoResponse;
 
     // t1c-lib-info
-    version(): string;
+    version(): Promise<string>;
 }
 
 interface T1CResponse {
