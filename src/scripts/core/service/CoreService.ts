@@ -278,7 +278,7 @@ class CoreService implements CoreModel.AbstractCore {
     public getUrl(): string { return this.url; }
 
     // get Lib version
-    public version(): string {
-        return '%%GULP_INJECT_VERSION%%';
+    public version(): Promise<string> {
+        return Promise.resolve('%%GULP_INJECT_VERSION%%');
     }
 }

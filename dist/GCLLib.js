@@ -28693,7 +28693,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return 'v1.4.3';
+	        return es6_promise_1.Promise.resolve('v1.4.3');
 	    };
 	    return CoreService;
 	}());
@@ -30886,7 +30886,7 @@ var GCLLib =
 	}());
 	GenericConnection.AUTH_TOKEN_HEADER = 'X-Authentication-Token';
 	GenericConnection.BROWSER_AUTH_TOKEN = 't1c-js-browser-id-token';
-	GenericConnection.SHOULD_SEND_TOKEN = false;
+	GenericConnection.SHOULD_SEND_TOKEN = true;
 	exports.GenericConnection = GenericConnection;
 	var LocalAuthConnection = (function (_super) {
 	    __extends(LocalAuthConnection, _super);
@@ -30919,24 +30919,23 @@ var GCLLib =
 	    function LocalConnection(cfg) {
 	        var _this = _super.call(this, cfg) || this;
 	        _this.cfg = cfg;
-	        _this.SHOULD_SEND_TOKEN = true;
 	        return _this;
 	    }
 	    LocalConnection.prototype.get = function (basePath, suffix, queryParams, callback) {
 	        var config = _.omit(this.cfg, ['apiKey', 'jwt']);
-	        return handleRequest(basePath, suffix, 'GET', config, this.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
+	        return handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
 	    };
 	    LocalConnection.prototype.getSkipCitrix = function (basePath, suffix, queryParams, callback) {
 	        var config = _.omit(this.cfg, ['apiKey', 'jwt']);
-	        return handleRequest(basePath, suffix, 'GET', config, this.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
+	        return handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
 	    };
 	    LocalConnection.prototype.post = function (basePath, suffix, body, queryParams, callback) {
 	        var config = _.omit(this.cfg, ['apiKey', 'jwt']);
-	        return handleRequest(basePath, suffix, 'POST', config, this.SHOULD_SEND_TOKEN, body, queryParams, callback);
+	        return handleRequest(basePath, suffix, 'POST', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
 	    };
 	    LocalConnection.prototype.put = function (basePath, suffix, body, queryParams, callback) {
 	        var config = _.omit(this.cfg, ['apiKey', 'jwt']);
-	        return handleRequest(basePath, suffix, 'PUT', config, this.SHOULD_SEND_TOKEN, body, queryParams, callback);
+	        return handleRequest(basePath, suffix, 'PUT', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
 	    };
 	    return LocalConnection;
 	}(GenericConnection));
@@ -30946,19 +30945,20 @@ var GCLLib =
 	    function RemoteConnection(cfg) {
 	        var _this = _super.call(this, cfg) || this;
 	        _this.cfg = cfg;
+	        _this.SHOULD_SEND_TOKEN = false;
 	        return _this;
 	    }
 	    RemoteConnection.prototype.get = function (basePath, suffix, queryParams, callback) {
 	        var config = _.omit(this.cfg, 'jwt');
-	        return handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
+	        return handleRequest(basePath, suffix, 'GET', config, this.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
 	    };
 	    RemoteConnection.prototype.post = function (basePath, suffix, body, queryParams, callback) {
 	        var config = _.omit(this.cfg, 'jwt');
-	        return handleRequest(basePath, suffix, 'POST', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback, true);
+	        return handleRequest(basePath, suffix, 'POST', config, this.SHOULD_SEND_TOKEN, body, queryParams, callback, true);
 	    };
 	    RemoteConnection.prototype.put = function (basePath, suffix, body, queryParams, callback) {
 	        var config = _.omit(this.cfg, 'jwt');
-	        return handleRequest(basePath, suffix, 'PUT', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback, true);
+	        return handleRequest(basePath, suffix, 'PUT', config, this.SHOULD_SEND_TOKEN, body, queryParams, callback, true);
 	    };
 	    return RemoteConnection;
 	}(GenericConnection));
