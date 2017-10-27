@@ -118,6 +118,12 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
+## v1.5.0
+### Story
+* [[T1C-817](https://trust1t.atlassian.net/browse/T1C-817)] - A02-Explicit Consent API request
+* [[T1C-819](https://trust1t.atlassian.net/browse/T1C-819)] - A03-02-Listing card-readers-card available etc behind consent file
+* [[T1C-825](https://trust1t.atlassian.net/browse/T1C-825)] - Add consent enabled information to v1 endpoint
+
 ## v1.4.3
 ### Story
 * [[T1C-812](https://trust1t.atlassian.net/browse/T1C-812)] - Add validation to the X-Authentication-Header token used for the consent
