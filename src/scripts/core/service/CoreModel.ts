@@ -3,7 +3,7 @@
  * @since 2017
  */
 
-import * as CoreExceptions from "../exceptions/CoreExceptions";
+import * as CoreExceptions from '../exceptions/CoreExceptions';
 
 export { AbstractCore, T1CResponse, BoolDataResponse, DataResponse, DataArrayResponse, DataObjectResponse,
     InfoResponse, BrowserInfo, BrowserInfoResponse, Card, CardReader, CardReadersResponse, T1CCertificate,
@@ -12,11 +12,13 @@ export { AbstractCore, T1CResponse, BoolDataResponse, DataResponse, DataArrayRes
 
 interface AbstractCore {
     // async
-    activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): void | Promise<T1CResponse>;
-    getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): void | Promise<PubKeyResponse>;
+    activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    getConsent(title: string, codeWord: string, durationInDays?: number,
+               callback?: (error: CoreExceptions.RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>
+    getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     info(callback?: (error: CoreExceptions.RestException, data: InfoResponse) => void): void | Promise<InfoResponse>;
-    infoBrowser(callback?: (error: CoreExceptions.RestException, data: BrowserInfoResponse) => void): void | Promise<BrowserInfoResponse>;
-    plugins(callback?: (error: CoreExceptions.RestException, data: PluginsResponse) => void): void | Promise<PluginsResponse>;
+    infoBrowser(callback?: (error: CoreExceptions.RestException, data: BrowserInfoResponse) => void): Promise<BrowserInfoResponse>;
+    plugins(callback?: (error: CoreExceptions.RestException, data: PluginsResponse) => void): Promise<PluginsResponse>;
     pollCardInserted(secondsToPollCard?: number,
                      callback?: (error: CoreExceptions.RestException, data: CardReader) => void,
                      connectReader?: () => void,
@@ -46,7 +48,7 @@ interface AbstractCore {
     infoBrowserSync(): BrowserInfoResponse;
 
     // t1c-lib-info
-    version(): string;
+    version(): Promise<string>;
 }
 
 interface T1CResponse {

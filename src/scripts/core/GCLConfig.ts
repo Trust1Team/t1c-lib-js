@@ -37,6 +37,7 @@ class GCLConfig  implements GCLConfig {
     private _forceHardwarePinpad: boolean;
     private _defaultSessionTimeout: number;
     private _tokenCompatible: boolean;
+    private _defaultConsentDuration: number;
 
     // constructor for DTO
     constructor (dsUriValue?: string, apiKey?: string) {
@@ -54,6 +55,7 @@ class GCLConfig  implements GCLConfig {
         this._localTestMode = defaultLocalTestMode;
         this._forceHardwarePinpad = false;
         this._defaultSessionTimeout = 5;
+        this._defaultConsentDuration = 1;
     }
 
     get ocvUrl(): string {
@@ -193,6 +195,14 @@ class GCLConfig  implements GCLConfig {
 
     set tokenCompatible(value: boolean) {
         this._tokenCompatible = value;
+    }
+
+    get defaultConsentDuration(): number {
+        return this._defaultConsentDuration;
+    }
+
+    set defaultConsentDuration(value: number) {
+        this._defaultConsentDuration = value;
     }
 }
 
