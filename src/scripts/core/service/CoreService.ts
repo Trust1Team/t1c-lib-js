@@ -97,14 +97,13 @@ class CoreService implements CoreModel.AbstractCore {
         let maxSeconds = secondsToPollCard || 30;
         let self = this;
 
-        if (callback) {
-            poll();
-        } else {
-            // promise
-            return new Promise((resolve, reject) => {
-                poll(resolve, reject);
-            });
-        }
+        // init callback if necessary
+        if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
+
+        // promise
+        return new Promise((resolve, reject) => {
+            poll(resolve, reject);
+        });
 
         function poll(resolve?: (data: any) => void, reject?: (error: any) => void) {
             _.delay(() => {
@@ -131,8 +130,8 @@ class CoreService implements CoreModel.AbstractCore {
                             return _.has(reader, 'card');
                         });
                         if (readerWithCard != null) {
-                            if (resolve) { resolve(readerWithCard); }
-                            else { return callback(null, readerWithCard); }
+                            callback(null, readerWithCard);
+                            resolve(readerWithCard);
                         } else {
                             if (insertCardCb) { insertCardCb(); }
                             poll(resolve, reject);
@@ -151,14 +150,13 @@ class CoreService implements CoreModel.AbstractCore {
         let maxSeconds = secondsToPollCard || 30;
         let self = this;
 
-        if (callback) {
-            poll();
-        } else {
-            // promise
-            return new Promise((resolve, reject) => {
-                poll(resolve, reject);
-            });
-        }
+        // init callback if necessary
+        if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
+
+        // promise
+        return new Promise((resolve, reject) => {
+            poll(resolve, reject);
+        });
 
         function poll(resolve?: (data: any) => void, reject?: (error: any) => void) {
             _.delay(() => {
@@ -183,8 +181,8 @@ class CoreService implements CoreModel.AbstractCore {
                         if (readersWithCards.length) {
                             // reader with card found (at least one), return data
                             let response = { data: readersWithCards, success: true };
-                            if (resolve) { resolve(response); }
-                            else { return callback(null, response); }
+                            callback(null, response);
+                            resolve(response);
                         } else {
                             // no readers with card found, continue polling
                             if (insertCardCb) { insertCardCb(); }
@@ -207,15 +205,13 @@ class CoreService implements CoreModel.AbstractCore {
         let maxSeconds = secondsToPollReader || 30;
         let self = this;
 
-        if (callback) {
-            poll();
-        } else {
-            // promise
-            return new Promise((resolve, reject) => {
-                poll(resolve, reject);
-            });
-        }
+        // init callback if necessary
+        if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
 
+        // promise
+        return new Promise((resolve, reject) => {
+            poll(resolve, reject);
+        });
 
         function poll(resolve?: (data: any) => void, reject?: (error: any) => void) {
             _.delay(function () {
@@ -238,8 +234,8 @@ class CoreService implements CoreModel.AbstractCore {
                         poll(resolve, reject);
                     }
                     else {
-                        if (resolve) { resolve(data); }
-                        else { return callback(null, data); }
+                        callback(null, data);
+                        resolve(data);
                     }
                 });
             }, 1000);
