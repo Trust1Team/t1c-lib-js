@@ -30607,6 +30607,7 @@ var GCLLib =
 	                callback(null, response.data);
 	                return resolve(response.data);
 	            }).catch(function (error) {
+	                console.log(error);
 	                if (error.response) {
 	                    if (error.response.data) {
 	                        callback(error.response.data, null);
