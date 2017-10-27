@@ -28508,14 +28508,12 @@ var GCLLib =
 	    CoreService.prototype.pollCardInserted = function (secondsToPollCard, callback, connectReaderCb, insertCardCb, cardTimeoutCb) {
 	        var maxSeconds = secondsToPollCard || 30;
 	        var self = this;
-	        if (callback) {
-	            poll();
+	        if (!callback || typeof callback !== 'function') {
+	            callback = function () { };
 	        }
-	        else {
-	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                poll(resolve, reject);
-	            });
-	        }
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            poll(resolve, reject);
+	        });
 	        function poll(resolve, reject) {
 	            _.delay(function () {
 	                --maxSeconds;
@@ -28547,12 +28545,8 @@ var GCLLib =
 	                            return _.has(reader, 'card');
 	                        });
 	                        if (readerWithCard != null) {
-	                            if (resolve) {
-	                                resolve(readerWithCard);
-	                            }
-	                            else {
-	                                return callback(null, readerWithCard);
-	                            }
+	                            callback(null, readerWithCard);
+	                            resolve(readerWithCard);
 	                        }
 	                        else {
 	                            if (insertCardCb) {
@@ -28568,14 +28562,12 @@ var GCLLib =
 	    CoreService.prototype.pollReadersWithCards = function (secondsToPollCard, callback, connectReaderCb, insertCardCb, cardTimeoutCb) {
 	        var maxSeconds = secondsToPollCard || 30;
 	        var self = this;
-	        if (callback) {
-	            poll();
+	        if (!callback || typeof callback !== 'function') {
+	            callback = function () { };
 	        }
-	        else {
-	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                poll(resolve, reject);
-	            });
-	        }
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            poll(resolve, reject);
+	        });
 	        function poll(resolve, reject) {
 	            _.delay(function () {
 	                --maxSeconds;
@@ -28602,12 +28594,8 @@ var GCLLib =
 	                        });
 	                        if (readersWithCards.length) {
 	                            var response = { data: readersWithCards, success: true };
-	                            if (resolve) {
-	                                resolve(response);
-	                            }
-	                            else {
-	                                return callback(null, response);
-	                            }
+	                            callback(null, response);
+	                            resolve(response);
 	                        }
 	                        else {
 	                            if (insertCardCb) {
@@ -28629,14 +28617,12 @@ var GCLLib =
 	    CoreService.prototype.pollReaders = function (secondsToPollReader, callback, connectReaderCb, readerTimeoutCb) {
 	        var maxSeconds = secondsToPollReader || 30;
 	        var self = this;
-	        if (callback) {
-	            poll();
+	        if (!callback || typeof callback !== 'function') {
+	            callback = function () { };
 	        }
-	        else {
-	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                poll(resolve, reject);
-	            });
-	        }
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            poll(resolve, reject);
+	        });
 	        function poll(resolve, reject) {
 	            _.delay(function () {
 	                --maxSeconds;
@@ -28664,12 +28650,8 @@ var GCLLib =
 	                        poll(resolve, reject);
 	                    }
 	                    else {
-	                        if (resolve) {
-	                            resolve(data);
-	                        }
-	                        else {
-	                            return callback(null, data);
-	                        }
+	                        callback(null, data);
+	                        resolve(data);
 	                    }
 	                });
 	            }, 1000);
