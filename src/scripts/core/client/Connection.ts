@@ -13,6 +13,7 @@ import { Promise } from 'es6-promise';
 import { RestException } from '../exceptions/CoreExceptions';
 import { UrlUtil } from '../../util/UrlUtil';
 import * as ls from 'local-storage';
+import { BrowserFingerprint } from '../../util/BrowserFingerprint';
 
 export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteConnection, Connection, LocalTestConnection };
 
@@ -226,7 +227,7 @@ function handleRequest(basePath: string,
         if (gclConfig.apiKey) { config.headers.apikey = gclConfig.apiKey; }
         if (gclConfig.jwt) { config.headers.Authorization = 'Bearer ' + gclConfig.jwt; }
         if (gclConfig.tokenCompatible && sendToken) {
-            config.headers[GenericConnection.AUTH_TOKEN_HEADER] = ls.get(GenericConnection.BROWSER_AUTH_TOKEN);
+            config.headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
         }
 
         return new Promise((resolve, reject) => {

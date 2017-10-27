@@ -5,18 +5,12 @@
  * @since 2016
  */
 import * as CoreExceptions from './exceptions/CoreExceptions';
-import * as cuid from 'cuid';
-import * as ls from 'local-storage';
 import * as _ from 'lodash';
 import * as semver from 'semver';
-import * as bases from 'bases';
 
 import { GCLConfig } from './GCLConfig';
 import { CoreService } from './service/CoreService';
-import {
-    LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection,
-    GenericConnection
-} from './client/Connection';
+import { LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection } from './client/Connection';
 import { AbstractDSClient, DownloadLinkResponse, JWTResponse } from './ds/DSClientModel';
 import { DSClient } from './ds/DSClient';
 import { AbstractOCVClient, OCVClient } from './ocv/OCVClient';
@@ -237,13 +231,6 @@ class GCLClient {
     private initSecurityContext(cb: (error: CoreExceptions.RestException, data: {}) => void) {
         let self = this;
         let clientCb = cb;
-
-        // check if there is an authentication token in localStorage, if not, set it
-        if (!ls.get(GenericConnection.BROWSER_AUTH_TOKEN)) {
-            const browserCuid = cuid();
-            const base36 = browserCuid.substr(1, 8);
-            ls.set(GenericConnection.BROWSER_AUTH_TOKEN, browserCuid + (bases.fromBase36(base36) % 97));
-        }
 
         this.core().getPubKey(function(err: any) {
             if (err && !err.success && err.code === 201) {
