@@ -8939,10 +8939,10 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var _ = __webpack_require__(330);
-	var semver = __webpack_require__(332);
-	var GCLConfig_1 = __webpack_require__(334);
+	var semver = __webpack_require__(331);
+	var GCLConfig_1 = __webpack_require__(333);
 	exports.GCLConfig = GCLConfig_1.GCLConfig;
-	var CoreService_1 = __webpack_require__(335);
+	var CoreService_1 = __webpack_require__(334);
 	var Connection_1 = __webpack_require__(341);
 	var DSClient_1 = __webpack_require__(375);
 	var OCVClient_1 = __webpack_require__(376);
@@ -9214,9 +9214,9 @@ var GCLLib =
 
 /***/ }),
 /* 330 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global, module) {/**
+	/**
 	 * @license
 	 * Lodash <https://lodash.com/>
 	 * Copyright JS Foundation and other contributors <https://js.foundation/>
@@ -26275,7 +26275,7 @@ var GCLLib =
 	  var _ = runInContext();
 	
 	  // Some AMD build optimizers, like r.js, check for condition patterns like:
-	  if (true) {
+	  if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
 	    // Expose Lodash on the global object to prevent errors when Lodash is
 	    // loaded by a script tag in the presence of an AMD loader.
 	    // See http://requirejs.org/docs/errors.html#mismatch for more details.
@@ -26284,9 +26284,9 @@ var GCLLib =
 	
 	    // Define as an anonymous module so, through path mapping, it can be
 	    // referenced as the "underscore" module.
-	    !(__WEBPACK_AMD_DEFINE_RESULT__ = function() {
+	    define(function() {
 	      return _;
-	    }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	    });
 	  }
 	  // Check for `exports` after `define` in case a build optimizer adds it.
 	  else if (freeModule) {
@@ -26300,27 +26300,10 @@ var GCLLib =
 	    root._ = _;
 	  }
 	}.call(this));
-	
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }()), __webpack_require__(331)(module)))
+
 
 /***/ }),
 /* 331 */
-/***/ (function(module, exports) {
-
-	module.exports = function(module) {
-		if(!module.webpackPolyfill) {
-			module.deprecate = function() {};
-			module.paths = [];
-			// module.parent = undefined by default
-			module.children = [];
-			module.webpackPolyfill = 1;
-		}
-		return module;
-	}
-
-
-/***/ }),
-/* 332 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {exports = module.exports = SemVer;
@@ -27620,10 +27603,10 @@ var GCLLib =
 	  return r1.intersects(r2)
 	}
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(333)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(332)))
 
 /***/ }),
-/* 333 */
+/* 332 */
 /***/ (function(module, exports) {
 
 	// shim for using process in browser
@@ -27813,7 +27796,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 334 */
+/* 333 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -28040,13 +28023,13 @@ var GCLLib =
 
 
 /***/ }),
-/* 335 */
+/* 334 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var _ = __webpack_require__(330);
-	var platform = __webpack_require__(336);
+	var platform = __webpack_require__(335);
 	var es6_promise_1 = __webpack_require__(337);
 	var ResponseHandler_1 = __webpack_require__(340);
 	var CORE_CONSENT = '/consent';
@@ -28292,7 +28275,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 336 */
+/* 335 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*!
@@ -29431,7 +29414,23 @@ var GCLLib =
 	  }
 	}.call(this));
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(331)(module), (function() { return this; }())))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(336)(module), (function() { return this; }())))
+
+/***/ }),
+/* 336 */
+/***/ (function(module, exports) {
+
+	module.exports = function(module) {
+		if(!module.webpackPolyfill) {
+			module.deprecate = function() {};
+			module.paths = [];
+			// module.parent = undefined by default
+			module.children = [];
+			module.webpackPolyfill = 1;
+		}
+		return module;
+	}
+
 
 /***/ }),
 /* 337 */
@@ -30397,7 +30396,7 @@ var GCLLib =
 	}).call(this);
 	
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(333), (function() { return this; }()), __webpack_require__(331)(module)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(332), (function() { return this; }()), __webpack_require__(336)(module)))
 
 /***/ }),
 /* 338 */
@@ -31263,7 +31262,7 @@ var GCLLib =
 	
 	module.exports = defaults;
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(333)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(332)))
 
 /***/ }),
 /* 348 */
@@ -31465,7 +31464,7 @@ var GCLLib =
 	  });
 	};
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(333)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(332)))
 
 /***/ }),
 /* 350 */
@@ -76543,7 +76542,7 @@ var GCLLib =
 	var _ = __webpack_require__(330);
 	var CertParser_1 = __webpack_require__(381);
 	var ResponseHandler_1 = __webpack_require__(340);
-	var platform = __webpack_require__(336);
+	var platform = __webpack_require__(335);
 	var RequestHandler_1 = __webpack_require__(490);
 	var SafeNet = (function () {
 	    function SafeNet(baseUrl, containerUrl, connection, moduleConfig) {
