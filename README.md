@@ -118,6 +118,10 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
+## v1.5.0-1
+### Story
+* [[T1C-829](https://trust1t.atlassian.net/browse/T1C-829)] - Lodash library leaks from T1C-JS and takes over global '_' binding
+
 ## v1.5.0
 ### Story
 * [[T1C-817](https://trust1t.atlassian.net/browse/T1C-817)] - A02-Explicit Consent API request

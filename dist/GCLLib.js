@@ -28267,7 +28267,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return es6_promise_1.Promise.resolve('v1.5.0');
+	        return es6_promise_1.Promise.resolve('v1.5.0-1');
 	    };
 	    return CoreService;
 	}());
