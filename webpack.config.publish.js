@@ -32,7 +32,8 @@ var config = {
                 exclude: /node_modules/,
                 loader: "ts-loader"
             }
-        ]
+        ],
+        noParse: /jquery|lodash/
     },
     resolve: {
         extensions: [".ts", ".js", ".tsx", ".jsx", ""]
