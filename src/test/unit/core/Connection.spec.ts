@@ -19,7 +19,7 @@ describe('Connection', () => {
     let mock: MockAdapter;
 
     beforeEach(() => {
-        ls.set(GenericConnection.BROWSER_AUTH_TOKEN, 'test-id');
+        ls.set(GenericConnection.BROWSER_AUTH_TOKEN, 'cj9sgjq9t00022y609276dfxp90');
         mock = new MockAdapter(axios);
     });
 
@@ -51,7 +51,7 @@ describe('Connection', () => {
         it('sends the X-Authentication-Token header for compatible connections', () => {
             return tokenConnection.get('', '/hello', undefined).then(res => {
                 expect(res.headers).to.be.an('object');
-                expect(res.headers).to.have.property(GenericConnection.AUTH_TOKEN_HEADER).eq('test-id');
+                expect(res.headers).to.have.property(GenericConnection.AUTH_TOKEN_HEADER).eq('cj9sgjq9t00022y609276dfxp90');
             });
         });
     });
@@ -80,7 +80,7 @@ describe('Connection', () => {
         it('sends the X-Authentication-Token header for compatible connections', () => {
             return tokenConnection.post('', '/hello', { payload: 'some string' }, undefined).then(res => {
                 expect(res.headers).to.be.an('object');
-                expect(res.headers).to.have.property(GenericConnection.AUTH_TOKEN_HEADER).eq('test-id');
+                expect(res.headers).to.have.property(GenericConnection.AUTH_TOKEN_HEADER).eq('cj9sgjq9t00022y609276dfxp90');
             });
         });
     });
@@ -109,7 +109,7 @@ describe('Connection', () => {
         it('sends the X-Authentication-Token header for compatible connections', () => {
             return tokenConnection.put('', '/hello', { payload: 'some string' }, undefined).then(res => {
                 expect(res.headers).to.be.an('object');
-                expect(res.headers).to.have.property(GenericConnection.AUTH_TOKEN_HEADER).eq('test-id');
+                expect(res.headers).to.have.property(GenericConnection.AUTH_TOKEN_HEADER).eq('cj9sgjq9t00022y609276dfxp90');
             });
         });
     });
