@@ -32378,16 +32378,37 @@ var GCLLib =
 	var cuid = __webpack_require__(373);
 	var ls = __webpack_require__(369);
 	var bases = __webpack_require__(374);
+	var _ = __webpack_require__(330);
 	var BrowserFingerprint = (function () {
 	    function BrowserFingerprint() {
 	    }
 	    BrowserFingerprint.get = function () {
-	        if (!ls.get(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION)) {
-	            var browserCuid = cuid();
-	            var base36 = browserCuid.substr(1, 8);
-	            ls.set(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION, browserCuid + (bases.fromBase36(base36) % 97));
+	        return BrowserFingerprint.checkValidFingerprint();
+	    };
+	    BrowserFingerprint.checkValidFingerprint = function () {
+	        var fingerPrint = ls.get(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION);
+	        if (!fingerPrint) {
+	            fingerPrint = BrowserFingerprint.generateFingerprint();
 	        }
-	        return ls.get(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION);
+	        if (BrowserFingerprint.validateFingerprint(fingerPrint)) {
+	            return fingerPrint;
+	        }
+	        else {
+	            return BrowserFingerprint.generateFingerprint();
+	        }
+	    };
+	    BrowserFingerprint.validateFingerprint = function (print) {
+	        var printBase = _.join(_.dropRight(_.split(print, ''), 2), '');
+	        var base36 = printBase.substr(1, 8);
+	        var token = printBase + (bases.fromBase36(base36) % 97);
+	        return token === print;
+	    };
+	    BrowserFingerprint.generateFingerprint = function () {
+	        var browserCuid = cuid();
+	        var base36 = browserCuid.substr(1, 8);
+	        var token = browserCuid + (bases.fromBase36(base36) % 97);
+	        ls.set(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION, token);
+	        return token;
 	    };
 	    return BrowserFingerprint;
 	}());
