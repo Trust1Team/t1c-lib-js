@@ -118,6 +118,11 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
+## v1.5.0-2
+### Story
+* [[T1C-840](https://trust1t.atlassian.net/browse/T1C-840)] - T1C-JS should clean up old/invalid authentication token if an error is returned by GCL
+
+
 ## v1.5.0-1
 ### Story
 * [[T1C-829](https://trust1t.atlassian.net/browse/T1C-829)] - Lodash library leaks from T1C-JS and takes over global '_' binding
