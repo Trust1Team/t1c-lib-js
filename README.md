@@ -118,6 +118,10 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
+## v1.5.1
+### Story
+* [[T1C-838](https://trust1t.atlassian.net/browse/T1C-838)] - Position the consent popup at the right lower corner of the screen
+
 ## v1.5.0-2
 ### Story
 * [[T1C-840](https://trust1t.atlassian.net/browse/T1C-840)] - T1C-JS should clean up old/invalid authentication token if an error is returned by GCL
