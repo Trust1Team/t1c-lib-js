@@ -57,7 +57,7 @@ describe('Core Services', () => {
         });
 
         it('makes the correct call to get consent', () => {
-            return core.getConsent('test', 'code', 5).then(res => {
+            return core.getConsent('test', 'code', 5, 'warning', 'center').then(res => {
                 const result = res as any;
                 expect(result).to.have.property('success');
                 expect(result.success).to.be.a('boolean');
@@ -74,6 +74,12 @@ describe('Core Services', () => {
 
                 expect(result.data).to.have.property('days');
                 expect(result.data.days).to.be.a('number').eq(5);
+
+                expect(result.data).to.have.property('alert_level');
+                expect(result.data.alert_level).to.be.a('string').eq('warning');
+
+                expect(result.data).to.have.property('alert_position');
+                expect(result.data.alert_position).to.be.a('string').eq('center');
             });
         });
 
