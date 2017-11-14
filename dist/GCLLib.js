@@ -28067,7 +28067,7 @@ var GCLLib =
 	    CoreService.prototype.activate = function (callback) {
 	        return this.connection.post(this.url, CORE_ACTIVATE, {}, undefined, callback);
 	    };
-	    CoreService.prototype.getConsent = function (title, codeWord, durationInDays, callback) {
+	    CoreService.prototype.getConsent = function (title, codeWord, durationInDays, alertLevel, alertPosition, callback) {
 	        if (!title || !title.length) {
 	            return ResponseHandler_1.ResponseHandler.error({ status: 400, description: 'Title is required!', code: '801' }, callback);
 	        }
@@ -28078,7 +28078,7 @@ var GCLLib =
 	        if (durationInDays) {
 	            days = durationInDays;
 	        }
-	        return this.connection.post(this.url, CORE_CONSENT, { title: title, text: codeWord, days: days }, undefined, callback);
+	        return this.connection.post(this.url, CORE_CONSENT, { title: title, text: codeWord, days: days, alert_level: alertLevel, alert_position: alertPosition }, undefined, callback);
 	    };
 	    CoreService.prototype.getPubKey = function (callback) {
 	        return this.connection.get(this.url, CORE_PUB_KEY, undefined, callback);
@@ -28267,7 +28267,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return es6_promise_1.Promise.resolve('v1.5.0-2');
+	        return es6_promise_1.Promise.resolve('v1.5.1');
 	    };
 	    return CoreService;
 	}());
@@ -32386,7 +32386,11 @@ var GCLLib =
 	        return BrowserFingerprint.checkValidFingerprint();
 	    };
 	    BrowserFingerprint.checkValidFingerprint = function () {
-	        var fingerPrint = ls.get(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION);
+	        var fingerPrint;
+	        try {
+	            fingerPrint = ls.get(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION);
+	        }
+	        catch (e) { }
 	        if (!fingerPrint) {
 	            fingerPrint = BrowserFingerprint.generateFingerprint();
 	        }

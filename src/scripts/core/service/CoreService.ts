@@ -54,8 +54,8 @@ class CoreService implements CoreModel.AbstractCore {
         return this.connection.post(this.url, CORE_ACTIVATE, {}, undefined, callback);
     }
 
-    public getConsent(title: string, codeWord: string, durationInDays?: number,
-                      callback?: (error: CoreExceptions.RestException, data: CoreModel.BoolDataResponse)
+    public getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string,
+                      alertPosition?: string, callback?: (error: CoreExceptions.RestException, data: CoreModel.BoolDataResponse)
                           => void): Promise<CoreModel.BoolDataResponse> {
         if (!title || !title.length) {
             return ResponseHandler.error({ status: 400, description: 'Title is required!', code: '801' }, callback);
@@ -65,7 +65,8 @@ class CoreService implements CoreModel.AbstractCore {
         }
         let days: number = this.connection.cfg.defaultConsentDuration;
         if (durationInDays) { days = durationInDays; }
-        return this.connection.post(this.url, CORE_CONSENT, { title, text: codeWord, days }, undefined, callback);
+        return this.connection.post(this.url, CORE_CONSENT,
+            { title, text: codeWord, days, alert_level: alertLevel, alert_position: alertPosition }, undefined, callback);
     }
 
     public getPubKey(callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse)
