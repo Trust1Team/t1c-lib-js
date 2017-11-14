@@ -18,7 +18,10 @@ class BrowserFingerprint {
 
     private static checkValidFingerprint(): string {
         // try to retrieve fingerprint
-        let fingerPrint = ls.get(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION);
+        let fingerPrint;
+        try {
+            fingerPrint = ls.get(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION);
+        } catch (e) { /* will fail if the property exists but is null or undefined, after catching the error nothing needs to be done */ }
         // check if there is an authentication token in localStorage, if not, set it
         if (!fingerPrint) { fingerPrint = BrowserFingerprint.generateFingerprint(); }
         // check if the fingerprint is valid

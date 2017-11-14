@@ -13,7 +13,7 @@ export { AbstractCore, T1CResponse, BoolDataResponse, DataResponse, DataArrayRes
 interface AbstractCore {
     // async
     activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
-    getConsent(title: string, codeWord: string, durationInDays?: number,
+    getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string, alertPosition?: string,
                callback?: (error: CoreExceptions.RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>
     getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     info(callback?: (error: CoreExceptions.RestException, data: InfoResponse) => void): void | Promise<InfoResponse>;
