@@ -8995,48 +8995,24 @@ var GCLLib =
 	            this.implicitDownload();
 	        }
 	        if (!automatic) {
-	            this.initSecurityContext(function (err) {
-	                if (err) {
-	                    console.log(JSON.stringify(err));
-	                    return;
-	                }
-	                self.registerAndActivate();
-	            });
+	            this.initLibrary();
 	        }
-	        this.initOCVContext(function (err) {
-	            if (err) {
-	                console.warn('OCV not available for apikey, contact support@trust1team.com to add this capability');
-	            }
-	            else {
-	                console.log('OCV available for apikey');
-	            }
-	        });
+	        this.initOCVContext();
 	    }
 	    GCLClient.initialize = function (cfg, callback) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
 	            var client = new GCLClient(cfg, true);
 	            client.GCLInstalled = true;
-	            client.initSecurityContext(function (err) {
-	                if (err) {
-	                    console.log(JSON.stringify(err));
-	                    if (callback && typeof callback === 'function') {
-	                        callback(err, null);
-	                    }
-	                    reject(err);
+	            client.initLibrary().then(function () {
+	                if (callback && typeof callback === 'function') {
+	                    callback(null, client);
 	                }
-	                else {
-	                    client.registerAndActivate().then(function () {
-	                        if (callback && typeof callback === 'function') {
-	                            callback(null, client);
-	                        }
-	                        resolve(client);
-	                    }, function (error) {
-	                        if (callback && typeof callback === 'function') {
-	                            callback(error, null);
-	                        }
-	                        reject(error);
-	                    });
+	                resolve(client);
+	            }, function (error) {
+	                if (callback && typeof callback === 'function') {
+	                    callback(error, null);
 	                }
+	                reject(error);
 	            });
 	        });
 	    };
@@ -9056,8 +9032,10 @@ var GCLLib =
 	        resolvedCfg.localTestMode = cfg.localTestMode;
 	        resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
 	        resolvedCfg.defaultSessionTimeout = cfg.defaultSessionTimeout;
+	        resolvedCfg.defaultConsentDuration = cfg.defaultConsentDuration;
 	        resolvedCfg.citrix = cfg.citrix;
 	        resolvedCfg.agentPort = cfg.agentPort;
+	        resolvedCfg.syncManaged = cfg.syncManaged;
 	        return resolvedCfg;
 	    };
 	    GCLClient.prototype.containerFor = function (readerId, callback) {
@@ -9095,39 +9073,12 @@ var GCLLib =
 	    GCLClient.prototype.initOCVContext = function (cb) {
 	        return this.ocvClient.getInfo(cb);
 	    };
-	    GCLClient.prototype.initSecurityContext = function (cb) {
-	        var self = this;
-	        var clientCb = cb;
-	        this.core().getPubKey(function (err) {
-	            if (err && !err.success && err.code === 201) {
-	                self.dsClient.getPubKey(function (error, dsResponse) {
-	                    if (error) {
-	                        return clientCb(err, null);
-	                    }
-	                    var innerCb = clientCb;
-	                    self.core().setPubKey(dsResponse.pubkey, function (pubKeyError) {
-	                        if (pubKeyError) {
-	                            return innerCb(err, null);
-	                        }
-	                        return innerCb(null, {});
-	                    });
-	                });
-	            }
-	            else {
-	                return cb(null, {});
-	            }
-	        });
-	    };
-	    GCLClient.prototype.registerAndActivate = function () {
+	    GCLClient.prototype.initLibrary = function () {
+	        var _this = this;
 	        var self = this;
 	        var self_cfg = this.cfg;
 	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            self.core().info(function (err, infoResponse) {
-	                if (err) {
-	                    self.GCLInstalled = false;
-	                    resolve();
-	                    return;
-	                }
+	            self.core().info().then(function (infoResponse) {
 	                self_cfg.citrix = infoResponse.data.citrix;
 	                self_cfg.tokenCompatible = GCLClient.checkTokenCompatible(infoResponse.data.version);
 	                var activated = infoResponse.data.activated;
@@ -9136,55 +9087,57 @@ var GCLLib =
 	                var uuid = infoResponse.data.uid;
 	                var info = self.core().infoBrowserSync();
 	                var mergedInfo = _.merge({ managed: managed, core_version: core_version, activated: activated }, info.data);
-	                if (!activated) {
-	                    self.dsClient.register(mergedInfo, uuid, function (error, activationResponse) {
-	                        if (err) {
-	                            console.log('Error while registering the device: ' + JSON.stringify(err));
-	                            reject(err);
-	                            return;
-	                        }
-	                        self_cfg.jwt = activationResponse.token;
-	                        self.authConnection = new Connection_1.LocalAuthConnection(self.cfg);
-	                        self.coreService = new CoreService_1.CoreService(self.cfg.gclUrl, self.authConnection);
-	                        self.core().activate(function (activationError) {
-	                            if (activationError) {
-	                                console.log('Error while activating the device: ' + JSON.stringify(activationError));
-	                                reject(err);
-	                                return;
-	                            }
-	                            mergedInfo.activated = true;
-	                            self.dsClient.sync(mergedInfo, uuid, function (syncError) {
-	                                if (syncError) {
-	                                    console.log('Error while syncing the device: ' + JSON.stringify(syncError));
-	                                    reject(syncError);
-	                                    return;
-	                                }
-	                                else {
-	                                    resolve();
-	                                }
-	                            });
-	                        });
-	                    });
-	                }
-	                else {
-	                    if (managed) {
-	                        resolve();
-	                        return;
+	                if (managed) {
+	                    if (self_cfg.syncManaged) {
+	                        self.syncDevice(self, self_cfg, mergedInfo, uuid).then(function () { resolve(); }, function () { resolve(); });
 	                    }
 	                    else {
-	                        self.dsClient.sync(mergedInfo, uuid, function (syncError, activationResponse) {
-	                            if (syncError) {
-	                                console.log('Error while syncing the device: ' + JSON.stringify(syncError));
-	                                reject(syncError);
-	                                return;
-	                            }
-	                            self_cfg.jwt = activationResponse.token;
-	                            resolve();
-	                            return;
-	                        });
+	                        resolve();
 	                    }
 	                }
+	                else {
+	                    _this.core().getPubKey().then(function () {
+	                    }, function (err) {
+	                        if (err && !err.success && err.code === 201) {
+	                            self.dsClient.getPubKey().then(function (dsResponse) {
+	                                return self.core().setPubKey(dsResponse.pubkey).then(function () {
+	                                    if (!activated) {
+	                                        return self.registerDevice(self, self_cfg, mergedInfo, uuid).then(function () {
+	                                            return self.core().activate().then(function () {
+	                                                mergedInfo.activated = true;
+	                                                self.syncDevice(self, self_cfg, mergedInfo, uuid).then(function () { resolve(); });
+	                                            });
+	                                        });
+	                                    }
+	                                    else {
+	                                        return self.syncDevice(self, self_cfg, mergedInfo, uuid).then(function () { resolve(); });
+	                                    }
+	                                });
+	                            }).catch(function (error) {
+	                                reject(error);
+	                                return;
+	                            });
+	                        }
+	                    });
+	                }
+	            }, function () {
+	                self.GCLInstalled = false;
+	                resolve();
 	            });
+	        });
+	    };
+	    GCLClient.prototype.registerDevice = function (client, config, info, deviceId) {
+	        return client.dsClient.register(info, deviceId).then(function (activationResponse) {
+	            config.jwt = activationResponse.token;
+	            client.authConnection = new Connection_1.LocalAuthConnection(client.cfg);
+	            client.coreService = new CoreService_1.CoreService(client.cfg.gclUrl, client.authConnection);
+	            return activationResponse;
+	        });
+	    };
+	    GCLClient.prototype.syncDevice = function (client, config, info, deviceId) {
+	        return client.dsClient.sync(info, deviceId).then(function (activationResponse) {
+	            config.jwt = activationResponse.token;
+	            return activationResponse;
 	        });
 	    };
 	    GCLClient.prototype.implicitDownload = function () {
@@ -27828,6 +27781,7 @@ var GCLLib =
 	        this._forceHardwarePinpad = false;
 	        this._defaultSessionTimeout = 5;
 	        this._defaultConsentDuration = 1;
+	        this._syncManaged = true;
 	    }
 	    Object.defineProperty(GCLConfig.prototype, "ocvUrl", {
 	        get: function () {
@@ -28013,6 +27967,16 @@ var GCLLib =
 	        },
 	        set: function (value) {
 	            this._defaultConsentDuration = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "syncManaged", {
+	        get: function () {
+	            return this._syncManaged;
+	        },
+	        set: function (value) {
+	            this._syncManaged = value;
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -28267,7 +28231,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return es6_promise_1.Promise.resolve('v1.5.1');
+	        return es6_promise_1.Promise.resolve('v1.5.1-1');
 	    };
 	    return CoreService;
 	}());
@@ -32664,15 +32628,15 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var _ = __webpack_require__(330);
 	var es6_promise_1 = __webpack_require__(337);
-	var SEPARATOR = "/";
-	var QP_APIKEY = "?apikey=";
-	var SECURITY = "/security";
-	var SYS_INFO = "/system/status";
-	var SECURITY_JWT_ISSUE = SECURITY + "/jwt/issue";
-	var SECURITY_JWT_REFRESH = SECURITY + "/jwt/refresh";
-	var DOWNLOAD = "/download/gcl";
-	var PUB_KEY = SECURITY + "/keys/public";
-	var DEVICE = "/devices";
+	var SEPARATOR = '/';
+	var QP_APIKEY = '?apikey=';
+	var SECURITY = '/security';
+	var SYS_INFO = '/system/status';
+	var SECURITY_JWT_ISSUE = SECURITY + '/jwt/issue';
+	var SECURITY_JWT_REFRESH = SECURITY + '/jwt/refresh';
+	var DOWNLOAD = '/download/gcl';
+	var PUB_KEY = SECURITY + '/keys/public';
+	var DEVICE = '/devices';
 	var DSClient = (function () {
 	    function DSClient(url, connection, cfg) {
 	        this.url = url;
@@ -32726,7 +32690,7 @@ var GCLLib =
 	            return this.connection.post(this.url, SECURITY_JWT_REFRESH, { originalJWT: actualJWT }, undefined, callback);
 	        }
 	        else {
-	            var error = { code: "500", description: "No JWT available", status: 412 };
+	            var error = { code: '500', description: 'No JWT available', status: 412 };
 	            if (callback) {
 	                return callback(error, null);
 	            }
@@ -32771,11 +32735,11 @@ var GCLLib =
 	        }
 	    };
 	    DSClient.prototype.register = function (info, device_id, callback) {
-	        var req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, "core_version"));
+	        var req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, 'core_version'));
 	        return this.connection.put(this.url, DEVICE + SEPARATOR + device_id, req, undefined, callback);
 	    };
 	    DSClient.prototype.sync = function (info, device_id, callback) {
-	        var req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, "core_version"));
+	        var req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, 'core_version'));
 	        return this.connection.post(this.url, DEVICE + SEPARATOR + device_id, req, undefined, callback);
 	    };
 	    return DSClient;
@@ -77244,18 +77208,18 @@ var GCLLib =
 	    CardUtil.canAuthenticate = function (card) {
 	        var container = this.determineContainer(card);
 	        switch (container) {
-	            case "aventra":
-	            case "beid":
-	            case "dnie":
-	            case "luxeid":
-	            case "luxtrust":
-	            case "oberthur":
-	            case "piv":
-	            case "pteid":
+	            case 'aventra':
+	            case 'beid':
+	            case 'dnie':
+	            case 'luxeid':
+	            case 'luxtrust':
+	            case 'oberthur':
+	            case 'piv':
+	            case 'pteid':
 	                return true;
-	            case "ocra":
-	            case "emv":
-	            case "mobib":
+	            case 'ocra':
+	            case 'emv':
+	            case 'mobib':
 	            default:
 	                return false;
 	        }
@@ -77263,18 +77227,18 @@ var GCLLib =
 	    CardUtil.canSign = function (card) {
 	        var container = this.determineContainer(card);
 	        switch (container) {
-	            case "aventra":
-	            case "beid":
-	            case "dnie":
-	            case "luxeid":
-	            case "luxtrust":
-	            case "oberthur":
-	            case "piv":
-	            case "pteid":
+	            case 'aventra':
+	            case 'beid':
+	            case 'dnie':
+	            case 'luxeid':
+	            case 'luxtrust':
+	            case 'oberthur':
+	            case 'piv':
+	            case 'pteid':
 	                return true;
-	            case "ocra":
-	            case "emv":
-	            case "mobib":
+	            case 'ocra':
+	            case 'emv':
+	            case 'mobib':
 	            default:
 	                return false;
 	        }
@@ -77282,56 +77246,56 @@ var GCLLib =
 	    CardUtil.canVerifyPin = function (card) {
 	        var container = this.determineContainer(card);
 	        switch (container) {
-	            case "aventra":
-	            case "beid":
-	            case "dnie":
-	            case "luxeid":
-	            case "luxtrust":
-	            case "oberthur":
-	            case "ocra":
-	            case "piv":
-	            case "pteid":
+	            case 'aventra':
+	            case 'beid':
+	            case 'dnie':
+	            case 'luxeid':
+	            case 'luxtrust':
+	            case 'oberthur':
+	            case 'ocra':
+	            case 'piv':
+	            case 'pteid':
+	            case 'emv':
 	                return true;
-	            case "emv":
-	            case "mobib":
+	            case 'mobib':
 	            default:
 	                return false;
 	        }
 	    };
 	    CardUtil.determineContainer = function (card) {
 	        if (!_.isEmpty(card) && !_.isEmpty(card.description)) {
-	            if (findDescription(card.description, "Belgium Electronic ID card")) {
-	                return "beid";
+	            if (findDescription(card.description, 'Belgium Electronic ID card')) {
+	                return 'beid';
 	            }
-	            else if (findDescription(card.description, "Grand Duchy of Luxembourg / Identity card with LuxTrust certificate (eID)")) {
-	                return "luxeid";
+	            else if (findDescription(card.description, 'Grand Duchy of Luxembourg / Identity card with LuxTrust certificate (eID)')) {
+	                return 'luxeid';
 	            }
-	            else if (findDescription(card.description, "LuxTrust card")) {
-	                return "luxtrust";
+	            else if (findDescription(card.description, 'LuxTrust card')) {
+	                return 'luxtrust';
 	            }
-	            else if (findDescription(card.description, "Juridic Person's Token (PKI)")) {
-	                return "ocra";
+	            else if (findDescription(card.description, 'Juridic Person\'s Token (PKI)')) {
+	                return 'ocra';
 	            }
-	            else if (findDescription(card.description, "MOBIB")) {
-	                return "mobib";
+	            else if (findDescription(card.description, 'MOBIB')) {
+	                return 'mobib';
 	            }
-	            else if (findDescription(card.description, "Mastercard")) {
-	                return "emv";
+	            else if (findDescription(card.description, 'Mastercard')) {
+	                return 'emv';
 	            }
-	            else if (findDescription(card.description, "Oberthur")) {
-	                return "oberthur";
+	            else if (findDescription(card.description, 'Oberthur')) {
+	                return 'oberthur';
 	            }
-	            else if (findDescription(card.description, "Aventra")) {
-	                return "aventra";
+	            else if (findDescription(card.description, 'Aventra')) {
+	                return 'aventra';
 	            }
-	            else if (findDescription(card.description, "PIV")) {
-	                return "piv";
+	            else if (findDescription(card.description, 'PIV')) {
+	                return 'piv';
 	            }
-	            else if (findDescription(card.description, "CIV")) {
-	                return "piv";
+	            else if (findDescription(card.description, 'CIV')) {
+	                return 'piv';
 	            }
-	            else if (findDescription(card.description, "Portuguese")) {
-	                return "pteid";
+	            else if (findDescription(card.description, 'Portuguese')) {
+	                return 'pteid';
 	            }
 	            else {
 	                return undefined;
@@ -77348,55 +77312,55 @@ var GCLLib =
 	    };
 	    CardUtil.defaultAlgo = function (container) {
 	        switch (container) {
-	            case "aventra":
-	            case "beid":
-	            case "dnie":
-	            case "oberthur":
-	            case "piv":
-	            case "luxeid":
-	            case "luxtrust":
-	            case "pteid":
-	                return "sha256";
+	            case 'aventra':
+	            case 'beid':
+	            case 'dnie':
+	            case 'oberthur':
+	            case 'piv':
+	            case 'luxeid':
+	            case 'luxtrust':
+	            case 'pteid':
+	                return 'sha256';
 	            default:
 	                return undefined;
 	        }
 	    };
 	    CardUtil.dumpMethod = function (container) {
 	        switch (container) {
-	            case "aventra":
-	            case "beid":
-	            case "dnie":
-	            case "emv":
-	            case "luxeid":
-	            case "luxtrust":
-	            case "mobib":
-	            case "oberthur":
-	            case "ocra":
-	            case "piv":
-	            case "pteid":
-	                return "allData";
-	            case "safenet":
-	                return "slots";
+	            case 'aventra':
+	            case 'beid':
+	            case 'dnie':
+	            case 'emv':
+	            case 'luxeid':
+	            case 'luxtrust':
+	            case 'mobib':
+	            case 'oberthur':
+	            case 'ocra':
+	            case 'piv':
+	            case 'pteid':
+	                return 'allData';
+	            case 'safenet':
+	                return 'slots';
 	            default:
 	                return undefined;
 	        }
 	    };
 	    CardUtil.dumpOptions = function (container) {
 	        switch (container) {
-	            case "aventra":
-	            case "beid":
-	            case "dnie":
-	            case "luxeid":
-	            case "luxtrust":
-	            case "mobib":
-	            case "oberthur":
-	            case "ocra":
-	            case "piv":
-	            case "pteid":
+	            case 'aventra':
+	            case 'beid':
+	            case 'dnie':
+	            case 'luxeid':
+	            case 'luxtrust':
+	            case 'mobib':
+	            case 'oberthur':
+	            case 'ocra':
+	            case 'piv':
+	            case 'pteid':
 	                return { filters: [], parseCerts: true };
-	            case "safenet":
+	            case 'safenet':
 	                return undefined;
-	            case "emv":
+	            case 'emv':
 	                return [];
 	            default:
 	                return undefined;
