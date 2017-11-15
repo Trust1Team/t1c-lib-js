@@ -118,6 +118,10 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
+## v1.5.1-1
+### Story
+* [[T1C-862](https://trust1t.atlassian.net/browse/T1C-862)] - Avoid calls to the admin endpoints in a managed context
+
 ## v1.5.1
 ### Story
 * [[T1C-838](https://trust1t.atlassian.net/browse/T1C-838)] - Position the consent popup at the right lower corner of the screen
