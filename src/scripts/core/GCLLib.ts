@@ -245,6 +245,7 @@ class GCLClient {
                     this.core().getPubKey().then(() => {
                         // certificate loaded
                         // console.log('certificate present, no need to retrieve from DS');
+                        resolve();
                     }, err => {
                         if (err && !err.success && err.code === 201) {
                             // console.log('no certificate set - retrieve cert from DS');
