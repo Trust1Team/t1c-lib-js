@@ -118,6 +118,10 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
+## v1.5.1-3
+### Bug
+* [[T1C-884](https://trust1t.atlassian.net/browse/T1C-884)] - T1C-JS should not attempt to sync if no API key is available
+
 ## v1.5.1-2
 ### Story
 * [[T1C-862](https://trust1t.atlassian.net/browse/T1C-862)] - Avoid calls to the admin endpoints in a managed context
