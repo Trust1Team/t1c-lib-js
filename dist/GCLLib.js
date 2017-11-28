@@ -76713,7 +76713,10 @@ var GCLLib =
 	        return this.connection.get(this.baseUrl, this.containerSuffix(EidPt.ID_DATA), undefined, callback);
 	    };
 	    EidPt.prototype.idDataWithOutPhoto = function (callback) {
-	        return this.connection.get(this.baseUrl, this.containerSuffix(EidPt.ID_DATA), { photo: "false" }, callback);
+	        return this.connection.get(this.baseUrl, this.containerSuffix(EidPt.ID_DATA), { photo: 'false' }, callback);
+	    };
+	    EidPt.prototype.address = function (data, callback) {
+	        return this.connection.post(this.baseUrl, this.containerSuffix(EidPt.ADDRESS), data, undefined, callback);
 	    };
 	    EidPt.prototype.photo = function (callback) {
 	        return this.connection.get(this.baseUrl, this.containerSuffix(EidPt.PHOTO), undefined, callback);
@@ -76735,10 +76738,11 @@ var GCLLib =
 	    };
 	    return EidPt;
 	}(Card_1.GenericCertCard));
-	EidPt.CERT_ROOT_AUTH = "/root-authentication";
-	EidPt.CERT_ROOT_NON_REP = "/root-non-repudiation";
-	EidPt.ID_DATA = "/id";
-	EidPt.PHOTO = "/photo";
+	EidPt.ADDRESS = '/address';
+	EidPt.CERT_ROOT_AUTH = '/root-authentication';
+	EidPt.CERT_ROOT_NON_REP = '/root-non-repudiation';
+	EidPt.ID_DATA = '/id';
+	EidPt.PHOTO = '/photo';
 	exports.EidPt = EidPt;
 
 
