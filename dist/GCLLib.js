@@ -8997,7 +8997,6 @@ var GCLLib =
 	        if (!automatic) {
 	            this.initLibrary();
 	        }
-	        this.initOCVContext();
 	    }
 	    GCLClient.initialize = function (cfg, callback) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
@@ -9088,7 +9087,7 @@ var GCLLib =
 	                var info = self.core().infoBrowserSync();
 	                var mergedInfo = _.merge({ managed: managed, core_version: core_version, activated: activated }, info.data);
 	                if (managed) {
-	                    if (self_cfg.syncManaged) {
+	                    if (self_cfg.apiKey && self_cfg.dsUrlBase && self_cfg.syncManaged) {
 	                        self.syncDevice(self, self_cfg, mergedInfo, uuid).then(function () { resolve(); }, function () { resolve(); });
 	                    }
 	                    else {

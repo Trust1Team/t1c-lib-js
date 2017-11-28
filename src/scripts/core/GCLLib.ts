@@ -80,7 +80,7 @@ class GCLClient {
         }
 
         // verify OCV accessibility
-        this.initOCVContext();
+        // this.initOCVContext();
     }
 
     public static initialize(cfg: GCLConfig,
@@ -232,7 +232,9 @@ class GCLClient {
                 let mergedInfo = _.merge({ managed, core_version, activated }, info.data);
 
                 if (managed) {
-                    if (self_cfg.syncManaged) {
+                    // only attempt to sync if API key and DS URL are available,
+                    // and if syncing for managed devices is turned on
+                    if (self_cfg.apiKey && self_cfg.dsUrlBase && self_cfg.syncManaged) {
                         // attempt to sync
                         self.syncDevice(self, self_cfg, mergedInfo, uuid).then(() => { resolve(); },
                             () => { resolve(); });
