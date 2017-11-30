@@ -77271,6 +77271,9 @@ var GCLLib =
 	            if (findDescription(card.description, 'Belgium Electronic ID card')) {
 	                return 'beid';
 	            }
+	            else if (findDescription(card.description, 'DNI electronico')) {
+	                return 'dnie';
+	            }
 	            else if (findDescription(card.description, 'Grand Duchy of Luxembourg / Identity card with LuxTrust certificate (eID)')) {
 	                return 'luxeid';
 	            }
