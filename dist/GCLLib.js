@@ -8948,7 +8948,7 @@ var GCLLib =
 	var OCVClient_1 = __webpack_require__(376);
 	var es6_promise_1 = __webpack_require__(337);
 	var PluginFactory_1 = __webpack_require__(377);
-	var GenericService_1 = __webpack_require__(504);
+	var GenericService_1 = __webpack_require__(505);
 	var ResponseHandler_1 = __webpack_require__(340);
 	var agent_1 = __webpack_require__(368);
 	var GCLClient = (function () {
@@ -8975,6 +8975,7 @@ var GCLLib =
 	        };
 	        this.readerapi = function (reader_id) { return _this.pluginFactory.createRemoteLoading(reader_id); };
 	        this.belfius = function (reader_id) { return _this.pluginFactory.createBelfius(reader_id); };
+	        this.fileExchange = function () { return _this.pluginFactory.createFileExchange(); };
 	        var self = this;
 	        this.cfg = GCLClient.resolveConfig(cfg);
 	        this.connection = new Connection_1.LocalConnection(this.cfg);
@@ -32803,21 +32804,23 @@ var GCLLib =
 	var EidPt_1 = __webpack_require__(501);
 	var RemoteLoading_1 = __webpack_require__(502);
 	var Belfius_1 = __webpack_require__(503);
-	var CONTAINER_CONTEXT_PATH = "/plugins/";
-	var CONTAINER_NEW_CONTEXT_PATH = "/containers/";
-	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + "beid";
-	var CONTAINER_LUXEID = CONTAINER_CONTEXT_PATH + "luxeid";
-	var CONTAINER_DNIE = CONTAINER_CONTEXT_PATH + "dnie";
-	var CONTAINER_EMV = CONTAINER_CONTEXT_PATH + "emv";
-	var CONTAINER_LUXTRUST = CONTAINER_CONTEXT_PATH + "luxtrust";
-	var CONTAINER_MOBIB = CONTAINER_CONTEXT_PATH + "mobib";
-	var CONTAINER_OCRA = CONTAINER_CONTEXT_PATH + "ocra";
-	var CONTAINER_AVENTRA = CONTAINER_CONTEXT_PATH + "aventra";
-	var CONTAINER_OBERTHUR = CONTAINER_CONTEXT_PATH + "oberthur";
-	var CONTAINER_PIV = CONTAINER_CONTEXT_PATH + "piv";
-	var CONTAINER_PTEID = CONTAINER_CONTEXT_PATH + "pteid";
-	var CONTAINER_SAFENET = CONTAINER_CONTEXT_PATH + "safenet";
-	var CONTAINER_REMOTE_LOADING = CONTAINER_CONTEXT_PATH + "readerapi";
+	var FileExchange_1 = __webpack_require__(504);
+	var CONTAINER_CONTEXT_PATH = '/plugins/';
+	var CONTAINER_NEW_CONTEXT_PATH = '/containers/';
+	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + 'beid';
+	var CONTAINER_LUXEID = CONTAINER_CONTEXT_PATH + 'luxeid';
+	var CONTAINER_DNIE = CONTAINER_CONTEXT_PATH + 'dnie';
+	var CONTAINER_EMV = CONTAINER_CONTEXT_PATH + 'emv';
+	var CONTAINER_FILE_EXCHANGE = CONTAINER_CONTEXT_PATH + 'file';
+	var CONTAINER_LUXTRUST = CONTAINER_CONTEXT_PATH + 'luxtrust';
+	var CONTAINER_MOBIB = CONTAINER_CONTEXT_PATH + 'mobib';
+	var CONTAINER_OCRA = CONTAINER_CONTEXT_PATH + 'ocra';
+	var CONTAINER_AVENTRA = CONTAINER_CONTEXT_PATH + 'aventra';
+	var CONTAINER_OBERTHUR = CONTAINER_CONTEXT_PATH + 'oberthur';
+	var CONTAINER_PIV = CONTAINER_CONTEXT_PATH + 'piv';
+	var CONTAINER_PTEID = CONTAINER_CONTEXT_PATH + 'pteid';
+	var CONTAINER_SAFENET = CONTAINER_CONTEXT_PATH + 'safenet';
+	var CONTAINER_REMOTE_LOADING = CONTAINER_CONTEXT_PATH + 'readerapi';
 	var PluginFactory = (function () {
 	    function PluginFactory(url, connection) {
 	        this.url = url;
@@ -32844,6 +32847,9 @@ var GCLLib =
 	    };
 	    PluginFactory.prototype.createBelfius = function (reader_id) {
 	        return new Belfius_1.Belfius(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id);
+	    };
+	    PluginFactory.prototype.createFileExchange = function () {
+	        return new FileExchange_1.FileExchange(this.url, CONTAINER_FILE_EXCHANGE, this.connection);
 	    };
 	    return PluginFactory;
 	}());
@@ -32914,23 +32920,43 @@ var GCLLib =
 	var ResponseHandler_1 = __webpack_require__(340);
 	var RequestHandler_1 = __webpack_require__(490);
 	var GenericContainer = (function () {
-	    function GenericContainer(baseUrl, containerUrl, connection, reader_id) {
+	    function GenericContainer(baseUrl, containerUrl, connection) {
 	        this.baseUrl = baseUrl;
 	        this.containerUrl = containerUrl;
 	        this.connection = connection;
-	        this.reader_id = reader_id;
 	    }
 	    GenericContainer.prototype.containerSuffix = function (path) {
 	        if (path && path.length) {
-	            return this.containerUrl + "/" + this.reader_id + path;
+	            return this.containerUrl + '/' + path;
 	        }
 	        else {
-	            return this.containerUrl + "/" + this.reader_id;
+	            return this.containerUrl + '/';
 	        }
 	    };
 	    return GenericContainer;
 	}());
 	exports.GenericContainer = GenericContainer;
+	var GenericReaderContainer = (function (_super) {
+	    __extends(GenericReaderContainer, _super);
+	    function GenericReaderContainer(baseUrl, containerUrl, connection, reader_id) {
+	        var _this = _super.call(this, baseUrl, containerUrl, connection) || this;
+	        _this.baseUrl = baseUrl;
+	        _this.containerUrl = containerUrl;
+	        _this.connection = connection;
+	        _this.reader_id = reader_id;
+	        return _this;
+	    }
+	    GenericReaderContainer.prototype.containerSuffix = function (path) {
+	        if (path && path.length) {
+	            return this.containerUrl + '/' + this.reader_id + path;
+	        }
+	        else {
+	            return this.containerUrl + '/' + this.reader_id;
+	        }
+	    };
+	    return GenericReaderContainer;
+	}(GenericContainer));
+	exports.GenericReaderContainer = GenericReaderContainer;
 	var GenericSmartCard = (function (_super) {
 	    __extends(GenericSmartCard, _super);
 	    function GenericSmartCard() {
@@ -32945,7 +32971,7 @@ var GCLLib =
 	        });
 	    };
 	    return GenericSmartCard;
-	}(GenericContainer));
+	}(GenericReaderContainer));
 	exports.GenericSmartCard = GenericSmartCard;
 	var GenericPinCard = (function (_super) {
 	    __extends(GenericPinCard, _super);
@@ -32960,7 +32986,7 @@ var GCLLib =
 	    };
 	    return GenericPinCard;
 	}(GenericSmartCard));
-	GenericPinCard.VERIFY_PIN = "/verify-pin";
+	GenericPinCard.VERIFY_PIN = '/verify-pin';
 	exports.GenericPinCard = GenericPinCard;
 	var GenericCertCard = (function (_super) {
 	    __extends(GenericCertCard, _super);
@@ -33007,17 +33033,17 @@ var GCLLib =
 	    };
 	    return GenericCertCard;
 	}(GenericPinCard));
-	GenericCertCard.ALL_CERTIFICATES = "/certificates";
-	GenericCertCard.AUTHENTICATE = "/authenticate";
-	GenericCertCard.CERT_ROOT = "/root";
-	GenericCertCard.CERT_AUTHENTICATION = "/authentication";
-	GenericCertCard.CERT_NON_REPUDIATION = "/non-repudiation";
-	GenericCertCard.CERT_ISSUER = "/issuer";
-	GenericCertCard.CERT_SIGNING = "/signing";
-	GenericCertCard.CERT_ENCRYPTION = "/encryption";
-	GenericCertCard.CERT_CITIZEN = "/citizen";
-	GenericCertCard.CERT_RRN = "/rrn";
-	GenericCertCard.SIGN_DATA = "/sign";
+	GenericCertCard.ALL_CERTIFICATES = '/certificates';
+	GenericCertCard.AUTHENTICATE = '/authenticate';
+	GenericCertCard.CERT_ROOT = '/root';
+	GenericCertCard.CERT_AUTHENTICATION = '/authentication';
+	GenericCertCard.CERT_NON_REPUDIATION = '/non-repudiation';
+	GenericCertCard.CERT_ISSUER = '/issuer';
+	GenericCertCard.CERT_SIGNING = '/signing';
+	GenericCertCard.CERT_ENCRYPTION = '/encryption';
+	GenericCertCard.CERT_CITIZEN = '/citizen';
+	GenericCertCard.CERT_RRN = '/rrn';
+	GenericCertCard.SIGN_DATA = '/sign';
 	exports.GenericCertCard = GenericCertCard;
 	var GenericSecuredCertCard = (function (_super) {
 	    __extends(GenericSecuredCertCard, _super);
@@ -33091,16 +33117,16 @@ var GCLLib =
 	        });
 	    };
 	    return GenericSecuredCertCard;
-	}(GenericContainer));
-	GenericSecuredCertCard.ALL_CERTIFICATES = "/certificates";
-	GenericSecuredCertCard.AUTHENTICATE = "/authenticate";
-	GenericSecuredCertCard.CERT_AUTHENTICATION = "/authentication";
-	GenericSecuredCertCard.CERT_NON_REPUDIATION = "/non-repudiation";
-	GenericSecuredCertCard.CERT_INTERMEDIATE = "/intermediate";
-	GenericSecuredCertCard.CERT_ROOT = "/root";
-	GenericSecuredCertCard.CERT_SIGNING = "/signing";
-	GenericSecuredCertCard.SIGN_DATA = "/sign";
-	GenericSecuredCertCard.VERIFY_PIN = "/verify-pin";
+	}(GenericReaderContainer));
+	GenericSecuredCertCard.ALL_CERTIFICATES = '/certificates';
+	GenericSecuredCertCard.AUTHENTICATE = '/authenticate';
+	GenericSecuredCertCard.CERT_AUTHENTICATION = '/authentication';
+	GenericSecuredCertCard.CERT_NON_REPUDIATION = '/non-repudiation';
+	GenericSecuredCertCard.CERT_INTERMEDIATE = '/intermediate';
+	GenericSecuredCertCard.CERT_ROOT = '/root';
+	GenericSecuredCertCard.CERT_SIGNING = '/signing';
+	GenericSecuredCertCard.SIGN_DATA = '/sign';
+	GenericSecuredCertCard.VERIFY_PIN = '/verify-pin';
 	exports.GenericSecuredCertCard = GenericSecuredCertCard;
 
 
@@ -76771,7 +76797,7 @@ var GCLLib =
 	    }
 	    RemoteLoading.optionalSessionIdParam = function (sessionId) {
 	        if (sessionId && sessionId.length) {
-	            return { "session-id": sessionId };
+	            return { 'session-id': sessionId };
 	        }
 	        else {
 	            return undefined;
@@ -76818,17 +76844,17 @@ var GCLLib =
 	        }
 	    };
 	    return RemoteLoading;
-	}(Card_1.GenericContainer));
-	RemoteLoading.ATR = "/atr";
-	RemoteLoading.APDU = "/apdu";
-	RemoteLoading.APDUS = "/apdus";
-	RemoteLoading.CCID = "/ccid";
-	RemoteLoading.CCID_FEATURES = "/ccid-features";
-	RemoteLoading.CMD = "/command";
-	RemoteLoading.CMDS = "/commands";
-	RemoteLoading.CLOSE_SESSION = "/close-session";
-	RemoteLoading.IS_PRESENT = "/is-present";
-	RemoteLoading.OPEN_SESSION = "/open-session";
+	}(Card_1.GenericReaderContainer));
+	RemoteLoading.ATR = '/atr';
+	RemoteLoading.APDU = '/apdu';
+	RemoteLoading.APDUS = '/apdus';
+	RemoteLoading.CCID = '/ccid';
+	RemoteLoading.CCID_FEATURES = '/ccid-features';
+	RemoteLoading.CMD = '/command';
+	RemoteLoading.CMDS = '/commands';
+	RemoteLoading.CLOSE_SESSION = '/close-session';
+	RemoteLoading.IS_PRESENT = '/is-present';
+	RemoteLoading.OPEN_SESSION = '/open-session';
 	exports.RemoteLoading = RemoteLoading;
 
 
@@ -76972,12 +76998,47 @@ var GCLLib =
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Card_1 = __webpack_require__(379);
+	var FileExchange = (function (_super) {
+	    __extends(FileExchange, _super);
+	    function FileExchange() {
+	        return _super !== null && _super.apply(this, arguments) || this;
+	    }
+	    FileExchange.prototype.listFiles = function (data, callback) {
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.LIST), data, undefined, callback);
+	    };
+	    FileExchange.prototype.setFolder = function (callback) {
+	        return this.connection.get(this.baseUrl, this.containerSuffix(FileExchange.FOLDER), undefined, callback);
+	    };
+	    return FileExchange;
+	}(Card_1.GenericContainer));
+	FileExchange.FOLDER = '/folder';
+	FileExchange.LIST = '/list';
+	exports.FileExchange = FileExchange;
+
+
+/***/ }),
+/* 505 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(337);
 	var EidBe_1 = __webpack_require__(491);
 	var ResponseHandler_1 = __webpack_require__(340);
 	var _ = __webpack_require__(330);
-	var CardUtil_1 = __webpack_require__(505);
+	var CardUtil_1 = __webpack_require__(506);
 	var Aventra_1 = __webpack_require__(496);
 	var GenericService = (function () {
 	    function GenericService() {
@@ -77200,7 +77261,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 505 */
+/* 506 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";

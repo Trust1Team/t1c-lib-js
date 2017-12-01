@@ -40,6 +40,7 @@ import { AbstractRemoteLoading } from '../plugins/remote-loading/RemoteLoadingMo
 import { AbstractBelfius } from '../plugins/remote-loading/belfius/BelfiusModel';
 import { AgentClient } from './agent/agent';
 import { AbstractAgent } from './agent/agentModel';
+import { AbstractFileExchange } from '../plugins/file/FileExchangeModel';
 
 class GCLClient {
     public GCLInstalled: boolean;
@@ -166,6 +167,8 @@ class GCLClient {
     public readerapi = (reader_id: string): AbstractRemoteLoading => { return this.pluginFactory.createRemoteLoading(reader_id); };
     // get instance for Belfius
     public belfius = (reader_id: string): AbstractBelfius => { return this.pluginFactory.createBelfius(reader_id); };
+    // get instance for File Exchange
+    public fileExchange = (): AbstractFileExchange => { return this.pluginFactory.createFileExchange(); };
 
     // generic methods
     public containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void) {
