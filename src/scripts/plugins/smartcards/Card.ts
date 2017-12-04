@@ -68,8 +68,8 @@ abstract class GenericContainer {
 
     // resolves the reader_id in the base URL
     protected containerSuffix(path?: string): string {
-        if (path && path.length) { return this.containerUrl + '/' + path; }
-        else { return this.containerUrl + '/'; }
+        if (path && path.length) { return this.containerUrl + path; }
+        else { return this.containerUrl; }
     }
 }
 
