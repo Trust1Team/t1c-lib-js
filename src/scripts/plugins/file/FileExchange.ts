@@ -11,16 +11,27 @@ export { FileExchange };
 
 
 class FileExchange extends GenericContainer implements AbstractFileExchange {
+    static DOWNLOAD = '/download';
     static FOLDER = '/folder';
-    static LIST = '/list';
+    static UPLOAD = '/upload';
+
+
+    public downloadFile(path: string, file: ArrayBuffer, fileName: string): Promise<DataResponse> {
+        return this.connection.putFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), { path, file, fileName }, undefined);
+    }
 
 
     public listFiles(data: ListFilesRequest, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.LIST), data, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FOLDER), data, undefined, callback);
     }
 
 
     public setFolder(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(FileExchange.FOLDER), undefined, callback);
+    }
+
+
+    public uploadFile(path: string): Promise<string> {
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.UPLOAD), { path }, undefined);
     }
 }
