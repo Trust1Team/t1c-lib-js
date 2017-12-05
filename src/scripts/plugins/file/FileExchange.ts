@@ -32,6 +32,6 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
 
 
     public uploadFile(path: string): Promise<string> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.UPLOAD), { path }, undefined);
+        return this.connection.requestFile(this.baseUrl, this.containerSuffix(FileExchange.UPLOAD), { path });
     }
 }

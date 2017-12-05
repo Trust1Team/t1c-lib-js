@@ -28032,7 +28032,7 @@ var GCLLib =
 	    CoreService.prototype.activate = function (callback) {
 	        return this.connection.post(this.url, CORE_ACTIVATE, {}, undefined, callback);
 	    };
-	    CoreService.prototype.getConsent = function (title, codeWord, durationInDays, alertLevel, alertPosition, callback) {
+	    CoreService.prototype.getConsent = function (title, codeWord, durationInDays, alertLevel, alertPosition, type, callback) {
 	        if (!title || !title.length) {
 	            return ResponseHandler_1.ResponseHandler.error({ status: 400, description: 'Title is required!', code: '801' }, callback);
 	        }
@@ -28043,7 +28043,7 @@ var GCLLib =
 	        if (durationInDays) {
 	            days = durationInDays;
 	        }
-	        return this.connection.post(this.url, CORE_CONSENT, { title: title, text: codeWord, days: days, alert_level: alertLevel, alert_position: alertPosition }, undefined, callback);
+	        return this.connection.post(this.url, CORE_CONSENT, { title: title, text: codeWord, days: days, alert_level: alertLevel, alert_position: alertPosition, type: type }, undefined, callback);
 	    };
 	    CoreService.prototype.getPubKey = function (callback) {
 	        return this.connection.get(this.url, CORE_PUB_KEY, undefined, callback);
@@ -30493,6 +30493,36 @@ var GCLLib =
 	    LocalConnection.prototype.put = function (basePath, suffix, body, queryParams, callback) {
 	        var config = _.omit(this.cfg, ['apiKey', 'jwt']);
 	        return handleRequest(basePath, suffix, 'PUT', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
+	    };
+	    LocalConnection.prototype.requestFile = function (basePath, suffix, body, callback) {
+	        var config = _.omit(this.cfg, ['apiKey', 'jwt']);
+	        if (!callback || typeof callback !== 'function') {
+	            callback = function () { };
+	        }
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            axios_1.default.post(UrlUtil_1.UrlUtil.create(basePath, suffix, config, false), body, {
+	                responseType: 'blob'
+	            }).then(function (response) {
+	                console.log(response);
+	                callback(null, response);
+	                return resolve(response);
+	            }, function (error) {
+	                if (error.response) {
+	                    if (error.response.data) {
+	                        callback(error.response.data, null);
+	                        return reject(error.response.data);
+	                    }
+	                    else {
+	                        callback(error.response, null);
+	                        return reject(error.response);
+	                    }
+	                }
+	                else {
+	                    callback(error, null);
+	                    return reject(error);
+	                }
+	            });
+	        });
 	    };
 	    LocalConnection.prototype.putFile = function (basePath, suffix, body, queryParams, callback) {
 	        var config = _.omit(this.cfg, ['apiKey', 'jwt']);
@@ -77070,7 +77100,7 @@ var GCLLib =
 	        return this.connection.get(this.baseUrl, this.containerSuffix(FileExchange.FOLDER), undefined, callback);
 	    };
 	    FileExchange.prototype.uploadFile = function (path) {
-	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.UPLOAD), { path: path }, undefined);
+	        return this.connection.requestFile(this.baseUrl, this.containerSuffix(FileExchange.UPLOAD), { path: path });
 	    };
 	    return FileExchange;
 	}(Card_1.GenericContainer));
