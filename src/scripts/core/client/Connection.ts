@@ -144,6 +144,35 @@ class LocalConnection extends GenericConnection implements Connection {
         return handleRequest(basePath, suffix, 'PUT', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
     }
 
+    public requestFile(basePath: string, suffix: string, body: { path: string }, callback?: (error: any, data: any) => void): Promise<any> {
+        let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
+        // init callback if necessary
+        if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
+
+        return new Promise((resolve, reject) => {
+            axios.post(UrlUtil.create(basePath, suffix, config, false), body,{
+                responseType: 'blob'
+            }).then(response => {
+                console.log(response);
+                callback(null, response);
+                return resolve(response);
+            }, error => {
+                if (error.response) {
+                    if (error.response.data) {
+                        callback(error.response.data, null);
+                        return reject(error.response.data);
+                    } else {
+                        callback(error.response, null);
+                        return reject(error.response);
+                    }
+                } else {
+                    callback(error, null);
+                    return reject(error);
+                }
+            });
+        });
+    }
+
     public putFile(basePath: string, suffix: string, body: any,
                    queryParams: { [key: string]: string }, callback?: (error: any, data: any) => void): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
