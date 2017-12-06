@@ -14,7 +14,6 @@ import { RestException } from '../exceptions/CoreExceptions';
 import { UrlUtil } from '../../util/UrlUtil';
 import * as ls from 'local-storage';
 import { BrowserFingerprint } from '../../util/BrowserFingerprint';
-import { FormData } from 'form-data';
 
 export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteConnection, Connection, LocalTestConnection };
 
@@ -150,10 +149,13 @@ class LocalConnection extends GenericConnection implements Connection {
         if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
 
         return new Promise((resolve, reject) => {
-            axios.post(UrlUtil.create(basePath, suffix, config, false), body,{
-                responseType: 'blob'
+            let headers = {};
+            if (config.tokenCompatible && GenericConnection.SHOULD_SEND_TOKEN) {
+                headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
+            }
+            axios.post(UrlUtil.create(basePath, suffix, config, false), body, {
+                responseType: 'blob', headers
             }).then(response => {
-                console.log(response);
                 callback(null, response);
                 return resolve(response);
             }, error => {
@@ -184,7 +186,7 @@ class LocalConnection extends GenericConnection implements Connection {
         // third argument is filename if you want to simulate a file upload. Otherwise omit.
         form.append('path', body.path);
         form.append('file', body.file, body.fileName);
-        let headers = form.getHeaders();
+        let headers = { 'Content-Type': 'multipart/form-data' };
         if (config.tokenCompatible && GenericConnection.SHOULD_SEND_TOKEN) {
             headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
         }
