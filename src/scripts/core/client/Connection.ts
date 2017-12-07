@@ -142,6 +142,77 @@ class LocalConnection extends GenericConnection implements Connection {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         return handleRequest(basePath, suffix, 'PUT', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
     }
+
+    public requestFile(basePath: string, suffix: string, body: { path: string }, callback?: (error: any, data: any) => void): Promise<any> {
+        let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
+        // init callback if necessary
+        if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
+
+        return new Promise((resolve, reject) => {
+            let headers = {};
+            if (config.tokenCompatible && GenericConnection.SHOULD_SEND_TOKEN) {
+                headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
+            }
+            axios.post(UrlUtil.create(basePath, suffix, config, false), body, {
+                responseType: 'blob', headers
+            }).then(response => {
+                callback(null, response);
+                return resolve(response);
+            }, error => {
+                if (error.response) {
+                    if (error.response.data) {
+                        callback(error.response.data, null);
+                        return reject(error.response.data);
+                    } else {
+                        callback(error.response, null);
+                        return reject(error.response);
+                    }
+                } else {
+                    callback(error, null);
+                    return reject(error);
+                }
+            });
+        });
+    }
+
+    public putFile(basePath: string, suffix: string, body: any,
+                   queryParams: { [key: string]: string }, callback?: (error: any, data: any) => void): Promise<any> {
+        let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
+        // init callback if necessary
+        if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
+
+        const form = new FormData();
+        // second argument  can take Buffer or Stream (lazily read during the request) too.
+        // third argument is filename if you want to simulate a file upload. Otherwise omit.
+        form.append('path', body.path);
+        form.append('file', body.file, body.fileName);
+        let headers = { 'Content-Type': 'multipart/form-data' };
+        if (config.tokenCompatible && GenericConnection.SHOULD_SEND_TOKEN) {
+            headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
+        }
+
+        return new Promise((resolve, reject) => {
+            axios.put(UrlUtil.create(basePath, suffix, config, false), form, {
+                headers
+            }).then(response => {
+                callback(null, response.data);
+                return resolve(response.data);
+            }, error => {
+                if (error.response) {
+                    if (error.response.data) {
+                        callback(error.response.data, null);
+                        return reject(error.response.data);
+                    } else {
+                        callback(error.response, null);
+                        return reject(error.response);
+                    }
+                } else {
+                    callback(error, null);
+                    return reject(error);
+                }
+            });
+        });
+    }
 }
 
 class RemoteConnection extends GenericConnection implements Connection {

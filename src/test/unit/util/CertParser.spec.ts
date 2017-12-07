@@ -5,7 +5,6 @@
 
 import { expect } from "chai";
 import { CertParser } from "../../../scripts/util/CertParser";
-import "babel-polyfill";
 
 describe("CertParser Utility", () => {
     let cert: string;
