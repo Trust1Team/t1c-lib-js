@@ -1,14 +1,14 @@
-import { RestException } from "../../core/exceptions/CoreExceptions";
+import { RestException } from '../../core/exceptions/CoreExceptions';
 import {
     CertificateResponse, CertificatesResponse, DataArrayResponse, DataObjectResponse, DataResponse,
     T1CResponse
-} from "../../core/service/CoreModel";
-import { LocalConnection } from "../../core/client/Connection";
-import { Promise } from "es6-promise";
-import { PinEnforcer } from "../../util/PinEnforcer";
-import { CertParser } from "../../util/CertParser";
-import { ResponseHandler } from "../../util/ResponseHandler";
-import { Options, RequestHandler, RequestOptions } from "../../util/RequestHandler";
+} from '../../core/service/CoreModel';
+import { LocalConnection } from '../../core/client/Connection';
+import { Promise } from 'es6-promise';
+import { PinEnforcer } from '../../util/PinEnforcer';
+import { CertParser } from '../../util/CertParser';
+import { ResponseHandler } from '../../util/ResponseHandler';
+import { Options, RequestHandler, RequestOptions } from '../../util/RequestHandler';
 /**
  * @author Michallis Pashidis
  * @author Maarten Somers
@@ -16,7 +16,7 @@ import { Options, RequestHandler, RequestOptions } from "../../util/RequestHandl
 
 
 export { Card, CertCard, PinCard, SecuredCertCard, AuthenticateOrSignData, ResetPinData, VerifyPinData, OptionalPin,
-    GenericContainer, GenericSmartCard, GenericPinCard, GenericCertCard, GenericSecuredCertCard };
+    GenericContainer, GenericReaderContainer, GenericSmartCard, GenericPinCard, GenericCertCard, GenericSecuredCertCard };
 
 interface Card {
     allData: (filters: string[], callback?: () => void) => Promise<DataObjectResponse>;
@@ -64,17 +64,32 @@ abstract class GenericContainer {
 
     constructor(protected baseUrl: string,
                 protected containerUrl: string,
-                protected connection: LocalConnection,
-                protected reader_id: string) {}
+                protected connection: LocalConnection) {}
 
     // resolves the reader_id in the base URL
     protected containerSuffix(path?: string): string {
-        if (path && path.length) { return this.containerUrl + "/" + this.reader_id + path; }
-        else { return this.containerUrl + "/" + this.reader_id; }
+        if (path && path.length) { return this.containerUrl + path; }
+        else { return this.containerUrl; }
     }
 }
 
-abstract class GenericSmartCard extends GenericContainer implements Card {
+abstract class GenericReaderContainer extends GenericContainer {
+
+    constructor(protected baseUrl: string,
+                protected containerUrl: string,
+                protected connection: LocalConnection,
+                protected reader_id: string) {
+        super(baseUrl, containerUrl, connection);
+    }
+
+    // resolves the reader_id in the base URL
+    protected containerSuffix(path?: string): string {
+        if (path && path.length) { return this.containerUrl + '/' + this.reader_id + path; }
+        else { return this.containerUrl + '/' + this.reader_id; }
+    }
+}
+
+abstract class GenericSmartCard extends GenericReaderContainer implements Card {
     public allData(options: string[] | Options,
                    callback?: (error: RestException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
         const requestOptions = RequestHandler.determineOptionsWithFilter(options);
@@ -87,7 +102,7 @@ abstract class GenericSmartCard extends GenericContainer implements Card {
 }
 
 abstract class GenericPinCard extends GenericSmartCard implements PinCard {
-    static VERIFY_PIN = "/verify-pin";
+    static VERIFY_PIN = '/verify-pin';
 
     public verifyPin(body: OptionalPin,
                      callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
@@ -98,17 +113,17 @@ abstract class GenericPinCard extends GenericSmartCard implements PinCard {
 }
 
 abstract class GenericCertCard extends GenericPinCard implements CertCard {
-    static ALL_CERTIFICATES = "/certificates";
-    static AUTHENTICATE = "/authenticate";
-    static CERT_ROOT = "/root";
-    static CERT_AUTHENTICATION = "/authentication";
-    static CERT_NON_REPUDIATION = "/non-repudiation";
-    static CERT_ISSUER = "/issuer";
-    static CERT_SIGNING = "/signing";
-    static CERT_ENCRYPTION = "/encryption";
-    static CERT_CITIZEN = "/citizen";
-    static CERT_RRN = "/rrn";
-    static SIGN_DATA = "/sign";
+    static ALL_CERTIFICATES = '/certificates';
+    static AUTHENTICATE = '/authenticate';
+    static CERT_ROOT = '/root';
+    static CERT_AUTHENTICATION = '/authentication';
+    static CERT_NON_REPUDIATION = '/non-repudiation';
+    static CERT_ISSUER = '/issuer';
+    static CERT_SIGNING = '/signing';
+    static CERT_ENCRYPTION = '/encryption';
+    static CERT_CITIZEN = '/citizen';
+    static CERT_RRN = '/rrn';
+    static SIGN_DATA = '/sign';
 
 
     public allAlgoRefsForAuthentication(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
@@ -157,16 +172,16 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
     }
 }
 
-abstract class GenericSecuredCertCard extends GenericContainer implements SecuredCertCard {
-    static ALL_CERTIFICATES = "/certificates";
-    static AUTHENTICATE = "/authenticate";
-    static CERT_AUTHENTICATION = "/authentication";
-    static CERT_NON_REPUDIATION = "/non-repudiation";
-    static CERT_INTERMEDIATE = "/intermediate";
-    static CERT_ROOT = "/root";
-    static CERT_SIGNING = "/signing";
-    static SIGN_DATA = "/sign";
-    static VERIFY_PIN = "/verify-pin";
+abstract class GenericSecuredCertCard extends GenericReaderContainer implements SecuredCertCard {
+    static ALL_CERTIFICATES = '/certificates';
+    static AUTHENTICATE = '/authenticate';
+    static CERT_AUTHENTICATION = '/authentication';
+    static CERT_NON_REPUDIATION = '/non-repudiation';
+    static CERT_INTERMEDIATE = '/intermediate';
+    static CERT_ROOT = '/root';
+    static CERT_SIGNING = '/signing';
+    static SIGN_DATA = '/sign';
+    static VERIFY_PIN = '/verify-pin';
 
 
     public allAlgoRefsForAuthentication(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
