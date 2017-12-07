@@ -46,8 +46,12 @@ describe("OCRA Container", () => {
 
     describe("readCounter", function () {
         beforeEach(function () {
-            mock.onPost("plugins/ocra/123/read-counter", { pin: "1234" }).reply(() => {
-                return [ 200, { data: "Read Counter Data", success: true }];
+            mock.onGet("plugins/ocra/123/counter").reply((config) => {
+                if (config.params.pin === "1234") {
+                    return [ 200, { data: "Read Counter Data", success: true }];
+                } else {
+                    return [ 404 ];
+                }
             });
         });
 
