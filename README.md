@@ -118,6 +118,15 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
+## v1.7.0
+### Story
+* [[T1C-886](https://trust1t.atlassian.net/browse/T1C-886)] - RMC-citrix provide an button with non-editable input field for an upload folder
+* [[T1C-887](https://trust1t.atlassian.net/browse/T1C-887)] - RMC-citrix provide an button with non-editable input field for a download folder
+* [[T1C-888](https://trust1t.atlassian.net/browse/T1C-888)] - RMC-citrix provide a tab (or other) to show the file info from the upload folder
+* [[T1C-889](https://trust1t.atlassian.net/browse/T1C-889)] - RMC-citrix provide a tab (or other) to show the file info from the download folder
+* [[T1C-896](https://trust1t.atlassian.net/browse/T1C-896)] - RMC-citrix Upload file + show in viewer
+* [[T1C-897](https://trust1t.atlassian.net/browse/T1C-897)] - RMC-citrix sign selected file
+
 ## v1.5.1-3
 ### Bug
 * [[T1C-884](https://trust1t.atlassian.net/browse/T1C-884)] - T1C-JS should not attempt to sync if no API key is available

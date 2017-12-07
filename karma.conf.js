@@ -9,6 +9,7 @@ module.exports = function (config) {
                   require('karma-teamcity-reporter'), require('karma-webpack')],
         files: [
             'node_modules/es6-promise/dist/es6-promise.js',
+            'node_modules/babel-polyfill/dist/polyfill.js',
             'src/test/**/*.ts'
         ],
         exclude: [

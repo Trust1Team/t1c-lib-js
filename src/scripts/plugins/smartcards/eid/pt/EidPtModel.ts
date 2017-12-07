@@ -3,10 +3,10 @@
  * @since 2017
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { CertCard } from "../../Card";
+import { CertCard, OptionalPin } from '../../Card';
 import { CertificateResponse, DataObjectResponse, DataResponse, T1CCertificate } from "../../../../core/service/CoreModel";
 
-export { AbstractEidPT, AllCertsResponse, AllDataResponse, IdDataResponse };
+export { AbstractEidPT, AllCertsResponse, AllDataResponse, IdDataResponse, PtAddressResponse };
 
 
 interface AbstractEidPT extends CertCard {
@@ -14,6 +14,7 @@ interface AbstractEidPT extends CertCard {
     allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
     idData(callback?: (error: RestException, data: IdDataResponse) => void): Promise<IdDataResponse>;
     idDataWithOutPhoto(callback?: (error: RestException, data: IdDataResponse) => void): Promise<IdDataResponse>;
+    address(data: OptionalPin, callback?: (error: RestException, data: PtAddressResponse) => void): Promise<PtAddressResponse>;
     photo(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     rootCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     rootAuthenticationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
@@ -77,5 +78,35 @@ interface IdData {
 
 interface IdDataResponse extends DataObjectResponse {
     data: IdData
+}
+
+interface PtAddressData{
+    abbr_building_type: string,
+    abbr_street_type: string,
+    building_type: string,
+    civil_parish: string,
+    civil_parish_description: string,
+    district: string,
+    district_description: string,
+    door_no: string,
+    floor: string,
+    gen_address_num: string,
+    is_national: boolean,
+    locality: string,
+    municipality: string,
+    municipality_description: string,
+    place: string,
+    postal_locality: string,
+    raw_data: string,
+    side: string,
+    street_name: string,
+    street_type: string,
+    type: string,
+    zip3: string,
+    zip4: string
+}
+
+interface PtAddressResponse extends DataObjectResponse {
+    data: PtAddressData
 }
 
