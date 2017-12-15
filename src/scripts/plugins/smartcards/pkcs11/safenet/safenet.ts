@@ -4,7 +4,7 @@ import { LocalConnection } from '../../../../core/client/Connection';
 import * as _ from 'lodash';
 import { CertParser } from '../../../../util/CertParser';
 import { ResponseHandler } from '../../../../util/ResponseHandler';
-import { AbstractSafeNet, InfoResponse, SlotsResponse } from './safenetModel';
+import { AbstractSafeNet, InfoResponse, SlotsResponse, TokenInfoResponse } from './safenetModel';
 import * as platform from 'platform';
 import { Options, RequestHandler } from '../../../../util/RequestHandler';
 
@@ -20,6 +20,7 @@ class SafeNet implements AbstractSafeNet {
     static ALL_CERTIFICATES = '/certificates';
     static INFO = '/info';
     static SLOTS = '/slots';
+    static TOKEN = '/token';
     static DEFAULT_CONFIG = {
         linux: '/usr/local/lib/libeTPkcs11.so',
         mac: '/usr/local/lib/libeTPkcs11.dylib',
@@ -98,6 +99,18 @@ class SafeNet implements AbstractSafeNet {
                 let defaultReq = { module: SafeNet.DEFAULT_CONFIG[this.os] };
                 return this.connection.post(this.baseUrl,
                     this.containerSuffix(SafeNet.SLOTS), defaultReq, { 'token-present': 'true' }, callback);
+            } else { return ResponseHandler.error(err, callback); }
+        });
+    }
+
+    public tokenInfo(slotId: number, callback: (error: RestException, data: TokenInfoResponse) => void): Promise<TokenInfoResponse> {
+        let req = _.extend({ slot_id: slotId }, { module: this.modulePath });
+        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.TOKEN), req, undefined).then(data => {
+            return ResponseHandler.response(data, callback);
+        }, err => {
+            if (this.moduleConfig) {
+                let defaultReq = _.extend({ slot_id: slotId }, { module: SafeNet.DEFAULT_CONFIG[this.os] });
+                return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.TOKEN), defaultReq, undefined, callback);
             } else { return ResponseHandler.error(err, callback); }
         });
     }

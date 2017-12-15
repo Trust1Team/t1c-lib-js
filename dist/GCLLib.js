@@ -76715,6 +76715,21 @@ var GCLLib =
 	            }
 	        });
 	    };
+	    SafeNet.prototype.tokenInfo = function (slotId, callback) {
+	        var _this = this;
+	        var req = _.extend({ slot_id: slotId }, { module: this.modulePath });
+	        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.TOKEN), req, undefined).then(function (data) {
+	            return ResponseHandler_1.ResponseHandler.response(data, callback);
+	        }, function (err) {
+	            if (_this.moduleConfig) {
+	                var defaultReq = _.extend({ slot_id: slotId }, { module: SafeNet.DEFAULT_CONFIG[_this.os] });
+	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(SafeNet.TOKEN), defaultReq, undefined, callback);
+	            }
+	            else {
+	                return ResponseHandler_1.ResponseHandler.error(err, callback);
+	            }
+	        });
+	    };
 	    SafeNet.prototype.containerSuffix = function (path) {
 	        return this.containerUrl + path;
 	    };
@@ -76723,6 +76738,7 @@ var GCLLib =
 	SafeNet.ALL_CERTIFICATES = '/certificates';
 	SafeNet.INFO = '/info';
 	SafeNet.SLOTS = '/slots';
+	SafeNet.TOKEN = '/token';
 	SafeNet.DEFAULT_CONFIG = {
 	    linux: '/usr/local/lib/libeTPkcs11.so',
 	    mac: '/usr/local/lib/libeTPkcs11.dylib',
