@@ -76029,18 +76029,18 @@ var GCLLib =
 	    RequestHandler.determineOptions = function (firstParam, secondParam) {
 	        var result = { parseCerts: false };
 	        if (firstParam) {
-	            if (typeof firstParam === "function") {
+	            if (typeof firstParam === 'function') {
 	                result.callback = firstParam;
 	            }
 	            else {
 	                result.callback = secondParam;
-	                if (_.has(firstParam, "parseCerts")) {
+	                if (_.has(firstParam, 'parseCerts')) {
 	                    result.parseCerts = firstParam.parseCerts;
 	                }
 	            }
 	        }
 	        else {
-	            if (typeof secondParam === "function") {
+	            if (typeof secondParam === 'function') {
 	                result.callback = secondParam;
 	            }
 	        }
@@ -76050,16 +76050,16 @@ var GCLLib =
 	        var result = { parseCerts: false, params: {} };
 	        if (_.isArray(firstParam)) {
 	            if (firstParam.length) {
-	                result.params.filter = firstParam.join(",");
+	                result.params.filter = firstParam.join(',');
 	            }
 	        }
 	        else if (_.isObject(firstParam)) {
-	            if (_.has(firstParam, "filters") && _.isArray(firstParam.filters)) {
+	            if (_.has(firstParam, 'filters') && _.isArray(firstParam.filters)) {
 	                if (firstParam.filters.length) {
-	                    result.params.filter = firstParam.filters.join(",");
+	                    result.params.filter = firstParam.filters.join(',');
 	                }
 	            }
-	            if (_.has(firstParam, "parseCerts")) {
+	            if (_.has(firstParam, 'parseCerts')) {
 	                result.parseCerts = firstParam.parseCerts;
 	            }
 	        }
@@ -76371,7 +76371,7 @@ var GCLLib =
 	    }
 	    Ocra.prototype.challenge = function (body, callback) {
 	        var _this = this;
-	        if (callback && typeof callback === "function") {
+	        if (callback && typeof callback === 'function') {
 	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
 	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(Ocra.CHALLENGE), body, undefined, callback);
 	            }, function (error) {
@@ -76388,9 +76388,9 @@ var GCLLib =
 	    };
 	    Ocra.prototype.readCounter = function (body, callback) {
 	        var _this = this;
-	        if (callback && typeof callback === "function") {
+	        if (callback && typeof callback === 'function') {
 	            PinEnforcer_1.PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(function () {
-	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(Ocra.READ_COUNTER), body, undefined, callback);
+	                return _this.connection.get(_this.baseUrl, _this.containerSuffix(Ocra.READ_COUNTER), { pin: body.pin }, callback);
 	            }, function (error) {
 	                return callback(error, null);
 	            });
@@ -76398,15 +76398,15 @@ var GCLLib =
 	        else {
 	            return new es6_promise_1.Promise(function (resolve, reject) {
 	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.baseUrl, _this.reader_id, body.pin).then(function () {
-	                    resolve(_this.connection.post(_this.baseUrl, _this.containerSuffix(Ocra.READ_COUNTER), body, undefined));
+	                    resolve(_this.connection.get(_this.baseUrl, _this.containerSuffix(Ocra.READ_COUNTER), { pin: body.pin }, undefined));
 	                }, function (error) { reject(error); });
 	            });
 	        }
 	    };
 	    return Ocra;
 	}(Card_1.GenericPinCard));
-	Ocra.CHALLENGE = "/challenge";
-	Ocra.READ_COUNTER = "/read-counter";
+	Ocra.CHALLENGE = '/challenge';
+	Ocra.READ_COUNTER = '/counter';
 	exports.Ocra = Ocra;
 
 
@@ -76634,14 +76634,14 @@ var GCLLib =
 	        this.containerUrl = containerUrl;
 	        this.connection = connection;
 	        this.moduleConfig = moduleConfig;
-	        if (platform.os.family.indexOf("Win") > -1) {
-	            this.os = "win";
+	        if (platform.os.family.indexOf('Win') > -1) {
+	            this.os = 'win';
 	        }
-	        if (platform.os.family.indexOf("OS X") > -1) {
-	            this.os = "mac";
+	        if (platform.os.family.indexOf('OS X') > -1) {
+	            this.os = 'mac';
 	        }
 	        if (!this.os) {
-	            this.os = "linux";
+	            this.os = 'linux';
 	        }
 	        if (moduleConfig && moduleConfig[this.os]) {
 	            this.modulePath = moduleConfig[this.os];
@@ -76650,15 +76650,15 @@ var GCLLib =
 	            this.modulePath = SafeNet.DEFAULT_CONFIG[this.os];
 	        }
 	    }
-	    SafeNet.prototype.certificates = function (body, options, callback) {
+	    SafeNet.prototype.certificates = function (slotId, options, callback) {
 	        var _this = this;
-	        var req = _.extend(body, { module: this.modulePath });
+	        var req = _.extend({ slot_id: slotId }, { module: this.modulePath });
 	        var reqOptions = RequestHandler_1.RequestHandler.determineOptions(options, callback);
 	        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.ALL_CERTIFICATES), req, undefined).then(function (data) {
 	            return CertParser_1.CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
 	        }, function (err) {
 	            if (_this.moduleConfig) {
-	                var defaultReq = _.extend(body, { module: SafeNet.DEFAULT_CONFIG[_this.os] });
+	                var defaultReq = _.extend({ slot_id: slotId }, { module: SafeNet.DEFAULT_CONFIG[_this.os] });
 	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(SafeNet.ALL_CERTIFICATES), defaultReq, undefined).then(function (data) {
 	                    return CertParser_1.CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
 	                }, function (defaultErr) {
@@ -76703,12 +76703,12 @@ var GCLLib =
 	    SafeNet.prototype.slotsWithTokenPresent = function (callback) {
 	        var _this = this;
 	        var req = { module: this.modulePath };
-	        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SLOTS), req, { "token-present": "true" }).then(function (data) {
+	        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SLOTS), req, { 'token-present': 'true' }).then(function (data) {
 	            return ResponseHandler_1.ResponseHandler.response(data, callback);
 	        }, function (err) {
 	            if (_this.moduleConfig) {
 	                var defaultReq = { module: SafeNet.DEFAULT_CONFIG[_this.os] };
-	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(SafeNet.SLOTS), defaultReq, { "token-present": "true" }, callback);
+	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(SafeNet.SLOTS), defaultReq, { 'token-present': 'true' }, callback);
 	            }
 	            else {
 	                return ResponseHandler_1.ResponseHandler.error(err, callback);
@@ -76720,13 +76720,13 @@ var GCLLib =
 	    };
 	    return SafeNet;
 	}());
-	SafeNet.ALL_CERTIFICATES = "/certificates";
-	SafeNet.INFO = "/info";
-	SafeNet.SLOTS = "/slots";
+	SafeNet.ALL_CERTIFICATES = '/certificates';
+	SafeNet.INFO = '/info';
+	SafeNet.SLOTS = '/slots';
 	SafeNet.DEFAULT_CONFIG = {
-	    linux: "/usr/local/lib/libeTPkcs11.so",
-	    mac: "/usr/local/lib/libeTPkcs11.dylib",
-	    win: "C:\\Windows\\System32\\eTPKCS11.dll"
+	    linux: '/usr/local/lib/libeTPkcs11.so',
+	    mac: '/usr/local/lib/libeTPkcs11.dylib',
+	    win: 'C:\\Windows\\System32\\eTPKCS11.dll'
 	};
 	exports.SafeNet = SafeNet;
 

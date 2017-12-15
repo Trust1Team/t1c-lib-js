@@ -1,7 +1,7 @@
 /**
  * @author Maarten Somers
  */
-import * as _ from "lodash";
+import * as _ from 'lodash';
 
 export { RequestHandler, Options, RequestOptions };
 
@@ -24,14 +24,14 @@ class RequestHandler {
     public static determineOptions(firstParam: any, secondParam: any): RequestOptions {
         let result: RequestOptions = { parseCerts: false };
         if (firstParam) {
-            if (typeof firstParam === "function") { result.callback = firstParam; }
+            if (typeof firstParam === 'function') { result.callback = firstParam; }
             else {
                 result.callback = secondParam;
-                if (_.has(firstParam, "parseCerts")) { result.parseCerts = firstParam.parseCerts; }
+                if (_.has(firstParam, 'parseCerts')) { result.parseCerts = firstParam.parseCerts; }
             }
         } else {
             // no first param, check second
-            if (typeof secondParam === "function") { result.callback = secondParam; }
+            if (typeof secondParam === 'function') { result.callback = secondParam; }
         }
         return result;
     }
@@ -40,13 +40,13 @@ class RequestHandler {
         let result: RequestOptions = { parseCerts: false, params: {} };
         if (_.isArray(firstParam)) {
             // array of strings; assume parse boolean is false
-            if (firstParam.length) { result.params.filter = firstParam.join(","); }
+            if (firstParam.length) { result.params.filter = firstParam.join(','); }
         } else if (_.isObject(firstParam)) {
             // not an array, but object
-            if (_.has(firstParam, "filters") && _.isArray(firstParam.filters)) {
-                if (firstParam.filters.length) { result.params.filter = firstParam.filters.join(","); }
+            if (_.has(firstParam, 'filters') && _.isArray(firstParam.filters)) {
+                if (firstParam.filters.length) { result.params.filter = firstParam.filters.join(','); }
             }
-            if (_.has(firstParam, "parseCerts")) { result.parseCerts = firstParam.parseCerts; }
+            if (_.has(firstParam, 'parseCerts')) { result.parseCerts = firstParam.parseCerts; }
         }
         return result;
     }
