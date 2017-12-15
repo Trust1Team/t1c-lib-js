@@ -2,20 +2,26 @@
  * @author Maarten Somers
  */
 
-import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { CertificatesResponse, T1CResponse } from "../../../../core/service/CoreModel";
-import { Options } from "../../../../util/RequestHandler";
+import { RestException } from '../../../../core/exceptions/CoreExceptions';
+import {
+    CertificatesResponse, DataResponse, T1CCertificate,
+    T1CResponse
+} from '../../../../core/service/CoreModel';
+import { Options } from '../../../../util/RequestHandler';
+import { AuthenticateOrSignData } from '../../Card';
 
-export { AbstractSafeNet, InfoResponse, Slot, SlotsResponse, TokenInfo, TokenInfoResponse };
+export { AbstractSafeNet, InfoResponse, SafeNetCertificate, SafeNetCertificatesResponse,
+    SafeNetSignData, Slot, SlotsResponse, TokenInfo, TokensResponse };
 
 interface AbstractSafeNet {
     certificates(slotId: number,
                  options?: Options,
-                 callback?: (error: RestException, data: CertificatesResponse) => void): Promise<CertificatesResponse>;
+                 callback?: (error: RestException, data: SafeNetCertificatesResponse) => void): Promise<SafeNetCertificatesResponse>;
     info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>;
+    signData(data: SafeNetSignData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     slots(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
     slotsWithTokenPresent(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
-    tokenInfo(slotId: number, callback?: (error: RestException, data: TokenInfoResponse) => void): Promise<TokenInfoResponse>;
+    tokens(callback?: (error: RestException, data: TokensResponse) => void): Promise<TokensResponse>;
 }
 
 
@@ -41,6 +47,19 @@ interface SlotsResponse extends T1CResponse {
     data: Slot[]
 }
 
+interface SafeNetCertificate extends T1CCertificate {
+    id: string
+}
+
+interface SafeNetCertificatesResponse extends CertificatesResponse {
+    data: SafeNetCertificate[]
+}
+
+interface SafeNetSignData extends AuthenticateOrSignData {
+    slot_id: number
+    cert_id: string
+}
+
 interface TokenInfo {
     slot_id: string;
     label: string;
@@ -62,6 +81,6 @@ interface TokenInfo {
     firmware_version: string;
 }
 
-interface TokenInfoResponse extends T1CResponse {
-    data: TokenInfo
+interface TokensResponse extends T1CResponse {
+    data: TokenInfo[]
 }
