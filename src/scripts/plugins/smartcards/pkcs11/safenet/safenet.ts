@@ -1,12 +1,16 @@
 import { RestException } from '../../../../core/exceptions/CoreExceptions';
-import { CertificatesResponse } from '../../../../core/service/CoreModel';
+import { DataResponse } from '../../../../core/service/CoreModel';
 import { LocalConnection } from '../../../../core/client/Connection';
 import * as _ from 'lodash';
 import { CertParser } from '../../../../util/CertParser';
 import { ResponseHandler } from '../../../../util/ResponseHandler';
-import { AbstractSafeNet, InfoResponse, SlotsResponse, TokenInfoResponse } from './safenetModel';
+import {
+    AbstractSafeNet, InfoResponse, SafeNetCertificatesResponse, SafeNetSignData, SlotsResponse,
+    TokensResponse
+} from './safenetModel';
 import * as platform from 'platform';
 import { Options, RequestHandler } from '../../../../util/RequestHandler';
+import { Promise } from 'es6-promise';
 
 
 /**
@@ -19,8 +23,9 @@ export { SafeNet };
 class SafeNet implements AbstractSafeNet {
     static ALL_CERTIFICATES = '/certificates';
     static INFO = '/info';
+    static SIGN = '/sign';
     static SLOTS = '/slots';
-    static TOKEN = '/token';
+    static TOKENS = '/tokens';
     static DEFAULT_CONFIG = {
         linux: '/usr/local/lib/libeTPkcs11.so',
         mac: '/usr/local/lib/libeTPkcs11.dylib',
@@ -47,7 +52,9 @@ class SafeNet implements AbstractSafeNet {
 
     public certificates(slotId: number,
                         options?: Options,
-                        callback?: (error: RestException, data: CertificatesResponse) => void): Promise<CertificatesResponse> {
+                        callback?: (error: RestException, data: SafeNetCertificatesResponse)
+                            => void): Promise<SafeNetCertificatesResponse> {
+
         let req = _.extend({ slot_id: slotId }, { module: this.modulePath });
         const reqOptions = RequestHandler.determineOptions(options, callback);
         return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.ALL_CERTIFICATES), req, undefined).then(data => {
@@ -78,6 +85,18 @@ class SafeNet implements AbstractSafeNet {
         });
     }
 
+    public signData(signData: SafeNetSignData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+        let req = _.extend(signData, { module: this.modulePath });
+        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SIGN), req, undefined).then(data => {
+            return ResponseHandler.response(data, callback);
+        }, err => {
+            if (this.moduleConfig) {
+                let defaultReq = _.extend(signData, { module: SafeNet.DEFAULT_CONFIG[this.os] });
+                return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SIGN), defaultReq, undefined, callback);
+            } else { return ResponseHandler.error(err, callback); }
+        });
+    }
+
     public slots(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse> {
         let req = { module: this.modulePath };
         return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SLOTS), req, undefined).then(data => {
@@ -103,14 +122,14 @@ class SafeNet implements AbstractSafeNet {
         });
     }
 
-    public tokenInfo(slotId: number, callback: (error: RestException, data: TokenInfoResponse) => void): Promise<TokenInfoResponse> {
-        let req = _.extend({ slot_id: slotId }, { module: this.modulePath });
-        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.TOKEN), req, undefined).then(data => {
+    public tokens(callback: (error: RestException, data: TokensResponse) => void): Promise<TokensResponse> {
+        let req = { module: this.modulePath };
+        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.TOKENS), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
         }, err => {
             if (this.moduleConfig) {
-                let defaultReq = _.extend({ slot_id: slotId }, { module: SafeNet.DEFAULT_CONFIG[this.os] });
-                return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.TOKEN), defaultReq, undefined, callback);
+                let defaultReq = { module: SafeNet.DEFAULT_CONFIG[this.os] };
+                return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.TOKENS), defaultReq, undefined, callback);
             } else { return ResponseHandler.error(err, callback); }
         });
     }
