@@ -54,7 +54,6 @@ class SafeNet implements AbstractSafeNet {
                         options?: Options,
                         callback?: (error: RestException, data: SafeNetCertificatesResponse)
                             => void): Promise<SafeNetCertificatesResponse> {
-
         let req = _.extend({ slot_id: slotId }, { module: this.modulePath });
         const reqOptions = RequestHandler.determineOptions(options, callback);
         return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.ALL_CERTIFICATES), req, undefined).then(data => {
@@ -86,12 +85,26 @@ class SafeNet implements AbstractSafeNet {
     }
 
     public signData(signData: SafeNetSignData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        let req = _.extend(signData, { module: this.modulePath });
+        let req = {
+            module: this.modulePath,
+            id: signData.cert_id,
+            slot_id: signData.slot_id,
+            pin: signData.pin,
+            data: signData.data,
+            digest: signData.algorithm_reference
+        };
         return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SIGN), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
         }, err => {
             if (this.moduleConfig) {
-                let defaultReq = _.extend(signData, { module: SafeNet.DEFAULT_CONFIG[this.os] });
+                let defaultReq = {
+                    module: SafeNet.DEFAULT_CONFIG[this.os],
+                    id: signData.cert_id,
+                    slot_id: signData.slot_id,
+                    pin: signData.pin,
+                    data: signData.data,
+                    digest: signData.algorithm_reference
+                };
                 return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SIGN), defaultReq, undefined, callback);
             } else { return ResponseHandler.error(err, callback); }
         });
