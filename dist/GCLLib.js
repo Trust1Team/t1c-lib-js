@@ -30387,13 +30387,13 @@ var GCLLib =
 	    function ResponseHandler() {
 	    }
 	    ResponseHandler.error = function (err, callback) {
-	        if (callback && typeof callback === "function") {
+	        if (callback && typeof callback === 'function') {
 	            callback(err, null);
 	        }
 	        return es6_promise_1.Promise.reject(err);
 	    };
 	    ResponseHandler.response = function (data, callback) {
-	        if (callback && typeof callback === "function") {
+	        if (callback && typeof callback === 'function') {
 	            callback(null, data);
 	        }
 	        return es6_promise_1.Promise.resolve(data);
@@ -33288,11 +33288,20 @@ var GCLLib =
 	            if (_.isArray(response.data)) {
 	                var newData_2 = [];
 	                _.forEach(response.data, function (certificate) {
-	                    var cert = { base64: certificate };
-	                    if (parseCerts) {
-	                        cert.parsed = CertParser.processCert(certificate);
+	                    if (typeof certificate === 'string') {
+	                        var cert = { base64: certificate };
+	                        if (parseCerts) {
+	                            cert.parsed = CertParser.processCert(certificate);
+	                        }
+	                        newData_2.push(cert);
 	                    }
-	                    newData_2.push(cert);
+	                    else {
+	                        var cert = certificate;
+	                        if (parseCerts) {
+	                            cert.parsed = CertParser.processCert(certificate.base64);
+	                        }
+	                        newData_2.push(cert);
+	                    }
 	                });
 	                response.data = newData_2;
 	            }
@@ -76685,6 +76694,35 @@ var GCLLib =
 	            }
 	        });
 	    };
+	    SafeNet.prototype.signData = function (signData, callback) {
+	        var _this = this;
+	        var req = {
+	            module: this.modulePath,
+	            id: signData.cert_id,
+	            slot_id: signData.slot_id,
+	            pin: signData.pin,
+	            data: signData.data,
+	            digest: signData.algorithm_reference
+	        };
+	        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SIGN), req, undefined).then(function (data) {
+	            return ResponseHandler_1.ResponseHandler.response(data, callback);
+	        }, function (err) {
+	            if (_this.moduleConfig) {
+	                var defaultReq = {
+	                    module: SafeNet.DEFAULT_CONFIG[_this.os],
+	                    id: signData.cert_id,
+	                    slot_id: signData.slot_id,
+	                    pin: signData.pin,
+	                    data: signData.data,
+	                    digest: signData.algorithm_reference
+	                };
+	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(SafeNet.SIGN), defaultReq, undefined, callback);
+	            }
+	            else {
+	                return ResponseHandler_1.ResponseHandler.error(err, callback);
+	            }
+	        });
+	    };
 	    SafeNet.prototype.slots = function (callback) {
 	        var _this = this;
 	        var req = { module: this.modulePath };
@@ -76715,15 +76753,15 @@ var GCLLib =
 	            }
 	        });
 	    };
-	    SafeNet.prototype.tokenInfo = function (slotId, callback) {
+	    SafeNet.prototype.tokens = function (callback) {
 	        var _this = this;
-	        var req = _.extend({ slot_id: slotId }, { module: this.modulePath });
-	        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.TOKEN), req, undefined).then(function (data) {
+	        var req = { module: this.modulePath };
+	        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.TOKENS), req, undefined).then(function (data) {
 	            return ResponseHandler_1.ResponseHandler.response(data, callback);
 	        }, function (err) {
 	            if (_this.moduleConfig) {
-	                var defaultReq = _.extend({ slot_id: slotId }, { module: SafeNet.DEFAULT_CONFIG[_this.os] });
-	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(SafeNet.TOKEN), defaultReq, undefined, callback);
+	                var defaultReq = { module: SafeNet.DEFAULT_CONFIG[_this.os] };
+	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(SafeNet.TOKENS), defaultReq, undefined, callback);
 	            }
 	            else {
 	                return ResponseHandler_1.ResponseHandler.error(err, callback);
@@ -76737,8 +76775,9 @@ var GCLLib =
 	}());
 	SafeNet.ALL_CERTIFICATES = '/certificates';
 	SafeNet.INFO = '/info';
+	SafeNet.SIGN = '/sign';
 	SafeNet.SLOTS = '/slots';
-	SafeNet.TOKEN = '/token';
+	SafeNet.TOKENS = '/tokens';
 	SafeNet.DEFAULT_CONFIG = {
 	    linux: '/usr/local/lib/libeTPkcs11.so',
 	    mac: '/usr/local/lib/libeTPkcs11.dylib',
