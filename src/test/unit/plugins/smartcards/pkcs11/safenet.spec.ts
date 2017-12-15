@@ -28,35 +28,35 @@ describe("SafeNet Container", () => {
     describe("certificates", function () {
         beforeEach(function () {
             mock.onPost("plugins/safenet/certificates",
-                { module: "mac", slot_id: 1, pin: "1234" }).reply(() => {
+                { module: "mac", slot_id: 1 }).reply(() => {
                 return [ 200, { data: ["Cert 1", "Cert 2"], success: true }];
             });
             mock.onPost("plugins/safenet/certificates",
-                { module: "linux", slot_id: 1, pin: "1234" }).reply(() => {
+                { module: "linux", slot_id: 1 }).reply(() => {
                 return [ 200, { data: ["Cert 1", "Cert 2"], success: true }];
             });
             mock.onPost("plugins/safenet/certificates",
-                { module: "win", slot_id: 1, pin: "1234" }).reply(() => {
+                { module: "win", slot_id: 1 }).reply(() => {
                 return [ 200, { data: ["Cert 1", "Cert 2"], success: true }];
             });
 
             // defaults
             mock.onPost("plugins/safenet/certificates",
-                { module: "/usr/local/lib/libeTPkcs11.dylib", slot_id: 1, pin: "1234" }).reply(() => {
+                { module: "/usr/local/lib/libeTPkcs11.dylib", slot_id: 1 }).reply(() => {
                 return [ 200, { data: ["Cert 1", "Cert 2"], success: true }];
             });
             mock.onPost("plugins/safenet/certificates",
-                { module: "/usr/local/lib/libeTPkcs11.so", slot_id: 1, pin: "1234" }).reply(() => {
+                { module: "/usr/local/lib/libeTPkcs11.so", slot_id: 1 }).reply(() => {
                 return [ 200, { data: ["Cert 1", "Cert 2"], success: true }];
             });
             mock.onPost("plugins/safenet/certificates",
-                { module: "C:\\Windows\\System32\\eTPKCS11.dll", slot_id: 1, pin: "1234" }).reply(() => {
+                { module: "C:\\Windows\\System32\\eTPKCS11.dll", slot_id: 1 }).reply(() => {
                 return [ 200, { data: ["Cert 1", "Cert 2"], success: true }];
             });
         });
 
         it("makes the correct call for certificates data", () => {
-            return safenet.certificates({ slot_id: 1, pin: "1234" }, { parseCerts: false }).then(res => {
+            return safenet.certificates( 1, { parseCerts: false }).then(res => {
                 expect(res).to.have.property("success");
                 expect(res.success).to.be.a("boolean");
                 expect(res.success).to.eq(true);
@@ -69,7 +69,7 @@ describe("SafeNet Container", () => {
         });
 
         it("falls back to defaults when no config is found", () => {
-            return defaultSafenet.certificates({ slot_id: 1, pin: "1234" }, { parseCerts: false }).then(res => {
+            return defaultSafenet.certificates(1, { parseCerts: false }).then(res => {
                 expect(res).to.have.property("success");
                 expect(res.success).to.be.a("boolean");
                 expect(res.success).to.eq(true);
