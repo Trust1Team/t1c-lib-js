@@ -181,11 +181,11 @@ describe('SafeNet Container', () => {
 
                 expect(res).to.have.property('data');
                 expect(res.data).to.be.a('object');
-                expect(res.data).to.have.property('cert_id').eq(certId);
+                expect(res.data).to.have.property('id').eq(certId);
                 expect(res.data).to.have.property('slot_id').eq(slotId);
                 expect(res.data).to.have.property('pin').eq(pin);
                 expect(res.data).to.have.property('data').eq(data);
-                expect(res.data).to.have.property('algorithm_reference').eq(algo);
+                expect(res.data).to.have.property('digest').eq(algo);
             });
         });
 
@@ -205,11 +205,11 @@ describe('SafeNet Container', () => {
 
                 expect(res).to.have.property('data');
                 expect(res.data).to.be.a('object');
-                expect(res.data).to.have.property('cert_id').eq(certId);
+                expect(res.data).to.have.property('id').eq(certId);
                 expect(res.data).to.have.property('slot_id').eq(slotId);
                 expect(res.data).to.have.property('pin').eq(pin);
                 expect(res.data).to.have.property('data').eq(data);
-                expect(res.data).to.have.property('algorithm_reference').eq(algo);
+                expect(res.data).to.have.property('digest').eq(algo);
             });
         });
     });

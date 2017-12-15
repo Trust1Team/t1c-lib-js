@@ -22,11 +22,12 @@ describe('Browser Fingerprint Utility', () => {
 
         it('returns the same token for each call after generating one', () => {
             let token = BrowserFingerprint.get();
-            let newToken = BrowserFingerprint.get();
-
-            expect(token).to.be.a('string');
-            expect(newToken).to.be.a('string');
-            expect(token).to.eq(newToken);
+            setTimeout(function () {
+                let newToken = BrowserFingerprint.get();
+                expect(token).to.be.a('string');
+                expect(newToken).to.be.a('string');
+                expect(token).to.eq(newToken);
+            }, 1000);
         });
 
         it('adds a new token if the previous one disappears for whatever reason', () => {
@@ -37,7 +38,7 @@ describe('Browser Fingerprint Utility', () => {
             expect(token).to.be.a('string');
             expect(newToken).to.be.a('string');
             expect(token).to.not.eq(newToken);
-        })
+        });
     });
 
 });
