@@ -336,11 +336,7 @@
     $("#safenetCerts").on('click', function () {
         $("#information").empty();
         var safenet = connector.safenet();
-        var body = {
-            slot_id: parseInt($("#safenetSlot").val()),
-            pin: $("#safenetPin").val()
-        };
-        safenet.certificates(body).then(handleSuccess, handleError);
+        safenet.certificates(parseInt($("#safenetSlot").val())).then(handleSuccess, handleError);
     });
     $("#safenetInfo").on('click', function () {
         $("#information").empty();
@@ -350,21 +346,32 @@
         };
         safenet.info(body).then(handleSuccess, handleError);
     });
+    $("#safenetSign").on('click', function () {
+        $("#information").empty();
+        var safenet = connector.safenet();
+        var data = {
+            slot_id: parseInt($("#safenetSlot").val()),
+            cert_id: $("#safenetCertId").val(),
+            data: $("#safenetData").val(),
+            pin: $("#safenetPin").val(),
+            algorithm_reference: $("#safenetAlgo").val()
+        };
+        safenet.signData(data).then(handleSuccess, handleError);
+    });
     $("#safenetSlots").on('click', function () {
         $("#information").empty();
         var safenet = connector.safenet();
-        var body = {
-            pin: $("#safenetPin").val()
-        };
-        safenet.slots(body).then(handleSuccess, handleError);
+        safenet.slots().then(handleSuccess, handleError);
     });
     $("#safenetSlotsWithToken").on('click', function () {
         $("#information").empty();
         var safenet = connector.safenet();
-        var body = {
-            pin: $("#safenetPin").val()
-        };
-        safenet.slotsWithTokenPresent(body).then(handleSuccess, handleError);
+        safenet.slotsWithTokenPresent().then(handleSuccess, handleError);
+    });
+    $("#safenetTokens").on('click', function () {
+        $("#information").empty();
+        var safenet = connector.safenet();
+        safenet.tokens().then(handleSuccess, handleError);
     });
 
     $("#buttonValidateEMV").on('click', function () {
