@@ -28232,7 +28232,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return es6_promise_1.Promise.resolve('v1.7.0');
+	        return es6_promise_1.Promise.resolve('v1.8.0');
 	    };
 	    return CoreService;
 	}());
