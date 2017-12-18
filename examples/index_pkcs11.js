@@ -371,7 +371,7 @@
     $("#safenetTokens").on('click', function () {
         $("#information").empty();
         var safenet = connector.safenet();
-        safenet.slotsWithTokenPresent().then(handleSuccess, handleError);
+        safenet.tokens().then(handleSuccess, handleError);
     });
 
     $("#buttonValidateEMV").on('click', function () {
