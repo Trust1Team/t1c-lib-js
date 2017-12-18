@@ -1,6 +1,6 @@
 {
   "name": "trust1connector",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "The Trust1Connector library (T1C-Lib), is a javascript library to communicate with the Trust1Connector. The library simplifies the execution to the connector and works asynchronously.",
   "main": "dist/GCLLib.min.js",
   "types": "src/scripts/core/GCLLib.d.ts",

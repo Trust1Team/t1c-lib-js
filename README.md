@@ -118,6 +118,12 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
+## v1.8.0
+### Story
+* [[NBB-2](https://trust1t.atlassian.net/browse/NBB-2)] - Implement signing for Safenet tokens
+* [[NBB-3](https://trust1t.atlassian.net/browse/NBB-3)] - Retrieve certificates without requiring PIN code
+* [[NBB-4](https://trust1t.atlassian.net/browse/NBB-4)] - Investigate possibility of adding token name to output of the /slots endpoint
+
 ## v1.7.0
 ### Story
 * [[T1C-886](https://trust1t.atlassian.net/browse/T1C-886)] - RMC-citrix provide an button with non-editable input field for an upload folder
