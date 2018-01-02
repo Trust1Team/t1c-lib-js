@@ -6,8 +6,8 @@
   "types": "src/scripts/core/GCLLib.d.ts",
   "scripts": {
     "prepublish": "npm test && gulp webpack",
-    "localTest": "./node_modules/karma-cli/bin/karma start --single-run",
-    "test": "./node_modules/karma-cli/bin/karma start --reporters teamcity,html --single-run --colors false",
+    "localTest": "typings install && ./node_modules/karma-cli/bin/karma start --single-run",
+    "test": "typings install && ./node_modules/karma-cli/bin/karma start --reporters teamcity,html --single-run --colors false",
     "build": "gulp webpack"
   },
   "repository": {
