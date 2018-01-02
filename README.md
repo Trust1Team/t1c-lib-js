@@ -118,6 +118,10 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
+## v1.8.0-1
+### Task
+* Remove `typings install` postinstall step
+
 ## v1.8.0
 ### Story
 * [[NBB-2](https://trust1t.atlassian.net/browse/NBB-2)] - Implement signing for Safenet tokens
