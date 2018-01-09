@@ -9033,6 +9033,7 @@ var GCLLib =
 	        resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
 	        resolvedCfg.defaultSessionTimeout = cfg.defaultSessionTimeout;
 	        resolvedCfg.defaultConsentDuration = cfg.defaultConsentDuration;
+	        resolvedCfg.defaultConsentTimeout = cfg.defaultConsentTimeout;
 	        resolvedCfg.citrix = cfg.citrix;
 	        resolvedCfg.agentPort = cfg.agentPort;
 	        resolvedCfg.syncManaged = cfg.syncManaged;
@@ -27782,6 +27783,7 @@ var GCLLib =
 	        this._forceHardwarePinpad = false;
 	        this._defaultSessionTimeout = 5;
 	        this._defaultConsentDuration = 1;
+	        this._defaultConsentTimeout = 10;
 	        this._syncManaged = true;
 	    }
 	    Object.defineProperty(GCLConfig.prototype, "ocvUrl", {
@@ -27972,6 +27974,16 @@ var GCLLib =
 	        enumerable: true,
 	        configurable: true
 	    });
+	    Object.defineProperty(GCLConfig.prototype, "defaultConsentTimeout", {
+	        get: function () {
+	            return this._defaultConsentTimeout;
+	        },
+	        set: function (value) {
+	            this._defaultConsentTimeout = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
 	    Object.defineProperty(GCLConfig.prototype, "syncManaged", {
 	        get: function () {
 	            return this._syncManaged;
@@ -28032,7 +28044,7 @@ var GCLLib =
 	    CoreService.prototype.activate = function (callback) {
 	        return this.connection.post(this.url, CORE_ACTIVATE, {}, undefined, callback);
 	    };
-	    CoreService.prototype.getConsent = function (title, codeWord, durationInDays, alertLevel, alertPosition, type, callback) {
+	    CoreService.prototype.getConsent = function (title, codeWord, durationInDays, alertLevel, alertPosition, type, timeoutInSeconds, callback) {
 	        if (!title || !title.length) {
 	            return ResponseHandler_1.ResponseHandler.error({ status: 400, description: 'Title is required!', code: '801' }, callback);
 	        }
@@ -28043,7 +28055,11 @@ var GCLLib =
 	        if (durationInDays) {
 	            days = durationInDays;
 	        }
-	        return this.connection.post(this.url, CORE_CONSENT, { title: title, text: codeWord, days: days, alert_level: alertLevel, alert_position: alertPosition, type: type }, undefined, callback);
+	        var timeout = this.connection.cfg.defaultConsentTimeout;
+	        if (timeoutInSeconds) {
+	            timeout = timeoutInSeconds;
+	        }
+	        return this.connection.post(this.url, CORE_CONSENT, { title: title, text: codeWord, days: days, alert_level: alertLevel, alert_position: alertPosition, type: type, timeout: timeout }, undefined, callback);
 	    };
 	    CoreService.prototype.getPubKey = function (callback) {
 	        return this.connection.get(this.url, CORE_PUB_KEY, undefined, callback);
