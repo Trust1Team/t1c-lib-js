@@ -38,6 +38,7 @@ class GCLConfig  implements GCLConfig {
     private _defaultSessionTimeout: number;
     private _tokenCompatible: boolean;
     private _defaultConsentDuration: number;
+    private _defaultConsentTimeout: number;
     private _syncManaged: boolean;
 
     // constructor for DTO
@@ -57,6 +58,7 @@ class GCLConfig  implements GCLConfig {
         this._forceHardwarePinpad = false;
         this._defaultSessionTimeout = 5;
         this._defaultConsentDuration = 1;
+        this._defaultConsentTimeout = 10;
         this._syncManaged = true;
     }
 
@@ -205,6 +207,14 @@ class GCLConfig  implements GCLConfig {
 
     set defaultConsentDuration(value: number) {
         this._defaultConsentDuration = value;
+    }
+
+    get defaultConsentTimeout(): number {
+        return this._defaultConsentTimeout;
+    }
+
+    set defaultConsentTimeout(value: number) {
+        this._defaultConsentTimeout = value;
     }
 
     get syncManaged(): boolean {
