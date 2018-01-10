@@ -55,7 +55,7 @@ class CoreService implements CoreModel.AbstractCore {
     }
 
     public getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string,
-                      alertPosition?: string, type?: string,
+                      alertPosition?: string, type?: string, timeoutInSeconds?: number,
                       callback?: (error: CoreExceptions.RestException, data: CoreModel.BoolDataResponse)
                           => void): Promise<CoreModel.BoolDataResponse> {
         if (!title || !title.length) {
@@ -66,8 +66,11 @@ class CoreService implements CoreModel.AbstractCore {
         }
         let days: number = this.connection.cfg.defaultConsentDuration;
         if (durationInDays) { days = durationInDays; }
+
+        let timeout: number = this.connection.cfg.defaultConsentTimeout;
+        if (timeoutInSeconds) { timeout = timeoutInSeconds; }
         return this.connection.post(this.url, CORE_CONSENT,
-            { title, text: codeWord, days, alert_level: alertLevel, alert_position: alertPosition, type }, undefined, callback);
+            { title, text: codeWord, days, alert_level: alertLevel, alert_position: alertPosition, type, timeout }, undefined, callback);
     }
 
     public getPubKey(callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse)
