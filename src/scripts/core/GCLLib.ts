@@ -122,6 +122,7 @@ class GCLClient {
         resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
         resolvedCfg.defaultSessionTimeout = cfg.defaultSessionTimeout;
         resolvedCfg.defaultConsentDuration = cfg.defaultConsentDuration;
+        resolvedCfg.defaultConsentTimeout = cfg.defaultConsentTimeout;
         resolvedCfg.citrix = cfg.citrix;
         resolvedCfg.agentPort = cfg.agentPort;
         resolvedCfg.syncManaged = cfg.syncManaged;
