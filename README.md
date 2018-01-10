@@ -118,6 +118,11 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
+## v1.8.1
+### Story
+* [[T1C-928](https://trust1t.atlassian.net/browse/T1C-928)] - Add request timeout in configuration, and when time out has reached the os.consent dialog should dissapear
+* [[T1C-931](https://trust1t.atlassian.net/browse/T1C-931)] - Set request time-out to 20 seconds
+
 ## v1.8.0-1
 ### Task
 * Remove `typings install` postinstall step
