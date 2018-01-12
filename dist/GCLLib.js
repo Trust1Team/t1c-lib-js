@@ -8948,7 +8948,7 @@ var GCLLib =
 	var OCVClient_1 = __webpack_require__(376);
 	var es6_promise_1 = __webpack_require__(337);
 	var PluginFactory_1 = __webpack_require__(377);
-	var GenericService_1 = __webpack_require__(505);
+	var GenericService_1 = __webpack_require__(504);
 	var ResponseHandler_1 = __webpack_require__(340);
 	var agent_1 = __webpack_require__(368);
 	var GCLClient = (function () {
@@ -8975,7 +8975,6 @@ var GCLLib =
 	        };
 	        this.readerapi = function (reader_id) { return _this.pluginFactory.createRemoteLoading(reader_id); };
 	        this.belfius = function (reader_id) { return _this.pluginFactory.createBelfius(reader_id); };
-	        this.fileExchange = function () { return _this.pluginFactory.createFileExchange(); };
 	        var self = this;
 	        this.cfg = GCLClient.resolveConfig(cfg);
 	        this.connection = new Connection_1.LocalConnection(this.cfg);
@@ -28248,7 +28247,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return es6_promise_1.Promise.resolve('v1.8.1');
+	        return es6_promise_1.Promise.resolve('v1.5.2');
 	    };
 	    return CoreService;
 	}());
@@ -32889,7 +32888,6 @@ var GCLLib =
 	var EidPt_1 = __webpack_require__(501);
 	var RemoteLoading_1 = __webpack_require__(502);
 	var Belfius_1 = __webpack_require__(503);
-	var FileExchange_1 = __webpack_require__(504);
 	var CONTAINER_CONTEXT_PATH = '/plugins/';
 	var CONTAINER_NEW_CONTEXT_PATH = '/containers/';
 	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + 'beid';
@@ -32932,9 +32930,6 @@ var GCLLib =
 	    };
 	    PluginFactory.prototype.createBelfius = function (reader_id) {
 	        return new Belfius_1.Belfius(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id);
-	    };
-	    PluginFactory.prototype.createFileExchange = function () {
-	        return new FileExchange_1.FileExchange(this.url, CONTAINER_FILE_EXCHANGE, this.connection);
 	    };
 	    return PluginFactory;
 	}());
@@ -77138,54 +77133,12 @@ var GCLLib =
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var __extends = (this && this.__extends) || (function () {
-	    var extendStatics = Object.setPrototypeOf ||
-	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-	    return function (d, b) {
-	        extendStatics(d, b);
-	        function __() { this.constructor = d; }
-	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	    };
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(379);
-	var FileExchange = (function (_super) {
-	    __extends(FileExchange, _super);
-	    function FileExchange() {
-	        return _super !== null && _super.apply(this, arguments) || this;
-	    }
-	    FileExchange.prototype.downloadFile = function (path, file, fileName) {
-	        return this.connection.putFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), { path: path, file: file, fileName: fileName }, undefined);
-	    };
-	    FileExchange.prototype.listFiles = function (data, callback) {
-	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FOLDER), data, undefined, callback);
-	    };
-	    FileExchange.prototype.setFolder = function (callback) {
-	        return this.connection.get(this.baseUrl, this.containerSuffix(FileExchange.FOLDER), undefined, callback);
-	    };
-	    FileExchange.prototype.uploadFile = function (path) {
-	        return this.connection.requestFile(this.baseUrl, this.containerSuffix(FileExchange.UPLOAD), { path: path });
-	    };
-	    return FileExchange;
-	}(Card_1.GenericContainer));
-	FileExchange.DOWNLOAD = '/download';
-	FileExchange.FOLDER = '/folder';
-	FileExchange.UPLOAD = '/upload';
-	exports.FileExchange = FileExchange;
-
-
-/***/ }),
-/* 505 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(337);
 	var EidBe_1 = __webpack_require__(491);
 	var ResponseHandler_1 = __webpack_require__(340);
 	var _ = __webpack_require__(330);
-	var CardUtil_1 = __webpack_require__(506);
+	var CardUtil_1 = __webpack_require__(505);
 	var Aventra_1 = __webpack_require__(496);
 	var GenericService = (function () {
 	    function GenericService() {
@@ -77408,7 +77361,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 506 */
+/* 505 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";

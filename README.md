@@ -118,29 +118,10 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
-## v1.8.1
+## v1.5.2
 ### Story
 * [[T1C-928](https://trust1t.atlassian.net/browse/T1C-928)] - Add request timeout in configuration, and when time out has reached the os.consent dialog should dissapear
 * [[T1C-931](https://trust1t.atlassian.net/browse/T1C-931)] - Set request time-out to 20 seconds
-
-## v1.8.0-1
-### Task
-* Remove `typings install` postinstall step
-
-## v1.8.0
-### Story
-* [[NBB-2](https://trust1t.atlassian.net/browse/NBB-2)] - Implement signing for Safenet tokens
-* [[NBB-3](https://trust1t.atlassian.net/browse/NBB-3)] - Retrieve certificates without requiring PIN code
-* [[NBB-4](https://trust1t.atlassian.net/browse/NBB-4)] - Investigate possibility of adding token name to output of the /slots endpoint
-
-## v1.7.0
-### Story
-* [[T1C-886](https://trust1t.atlassian.net/browse/T1C-886)] - RMC-citrix provide an button with non-editable input field for an upload folder
-* [[T1C-887](https://trust1t.atlassian.net/browse/T1C-887)] - RMC-citrix provide an button with non-editable input field for a download folder
-* [[T1C-888](https://trust1t.atlassian.net/browse/T1C-888)] - RMC-citrix provide a tab (or other) to show the file info from the upload folder
-* [[T1C-889](https://trust1t.atlassian.net/browse/T1C-889)] - RMC-citrix provide a tab (or other) to show the file info from the download folder
-* [[T1C-896](https://trust1t.atlassian.net/browse/T1C-896)] - RMC-citrix Upload file + show in viewer
-* [[T1C-897](https://trust1t.atlassian.net/browse/T1C-897)] - RMC-citrix sign selected file
 
 ## v1.5.1-3
 ### Bug
