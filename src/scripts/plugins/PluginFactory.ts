@@ -22,8 +22,6 @@ import { AbstractOberthur } from './smartcards/pki/oberthur/OberthurModel';
 import { AbstractPiv } from './smartcards/piv/pivModel';
 import { AbstractMobib } from './smartcards/mobib/mobibModel';
 import { AbstractEidLUX } from './smartcards/eid/lux/EidLuxModel';
-import { AbstractSafeNet } from './smartcards/pkcs11/safenet/safenetModel';
-import { SafeNet } from './smartcards/pkcs11/safenet/safenet';
 import { DNIe } from './smartcards/eid/esp/dnie';
 import { AbstractDNIe } from './smartcards/eid/esp/dnieModel';
 import { AbstractEidPT } from './smartcards/eid/pt/EidPtModel';
@@ -34,6 +32,8 @@ import { AbstractBelfius } from './remote-loading/belfius/BelfiusModel';
 import { Belfius } from './remote-loading/belfius/Belfius';
 import { AbstractFileExchange } from './file/FileExchangeModel';
 import { FileExchange } from './file/FileExchange';
+import { AbstractPkcs11 } from './smartcards/pkcs11/pkcs11Model';
+import { PKCS11 } from './smartcards/pkcs11/pkcs11';
 
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
@@ -45,7 +45,7 @@ export interface AbstractFactory {
     createAventraNO(reader_id?: string): AbstractAventra;
     createOberthurNO(reader_id?: string): AbstractOberthur;
     createPIV(reader_id?: string): AbstractPiv;
-    createSafeNet(config?: { linux: string, mac: string, win: string }): AbstractSafeNet;
+    createPKCS11(config?: { linux: string, mac: string, win: string }): AbstractPkcs11;
 }
 
 const CONTAINER_CONTEXT_PATH = '/plugins/';
@@ -62,7 +62,7 @@ const CONTAINER_AVENTRA = CONTAINER_CONTEXT_PATH + 'aventra';
 const CONTAINER_OBERTHUR = CONTAINER_CONTEXT_PATH + 'oberthur';
 const CONTAINER_PIV = CONTAINER_CONTEXT_PATH + 'piv';
 const CONTAINER_PTEID = CONTAINER_CONTEXT_PATH + 'pteid';
-const CONTAINER_SAFENET = CONTAINER_CONTEXT_PATH + 'safenet';
+const CONTAINER_PKCS11 = CONTAINER_CONTEXT_PATH + 'pkcs11';
 const CONTAINER_REMOTE_LOADING = CONTAINER_CONTEXT_PATH + 'readerapi';
 
 
@@ -93,8 +93,8 @@ export class PluginFactory implements AbstractFactory {
 
     public createPIV(reader_id?: string): PIV { return new PIV(this.url, CONTAINER_PIV, this.connection, reader_id); }
 
-    public createSafeNet(config?: { linux: string, mac: string, win: string }): AbstractSafeNet {
-        return new SafeNet(this.url, CONTAINER_SAFENET, this.connection, config);
+    public createPKCS11(config?: { linux: string, mac: string, win: string }): AbstractPkcs11 {
+        return new PKCS11(this.url, CONTAINER_PKCS11, this.connection, config);
     }
 
     public createRemoteLoading(reader_id?: string): AbstractRemoteLoading {
