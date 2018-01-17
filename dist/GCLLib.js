@@ -8970,7 +8970,7 @@ var GCLLib =
 	        this.oberthur = function (reader_id) { return _this.pluginFactory.createOberthurNO(reader_id); };
 	        this.piv = function (reader_id) { return _this.pluginFactory.createPIV(reader_id); };
 	        this.pteid = function (reader_id) { return _this.pluginFactory.createEidPT(reader_id); };
-	        this.pkcs11 = function (reader_id, moduleConfig) {
+	        this.pkcs11 = function (moduleConfig) {
 	            return _this.pluginFactory.createPKCS11(moduleConfig);
 	        };
 	        this.readerapi = function (reader_id) { return _this.pluginFactory.createRemoteLoading(reader_id); };
@@ -77201,7 +77201,7 @@ var GCLLib =
 	PKCS11.VERIFY = '/verify';
 	PKCS11.DEFAULT_CONFIG = {
 	    linux: '/usr/local/lib/libeTPkcs11.so',
-	    mac: '/usr/local/lib/libeTPkcs11.dylib',
+	    mac: '/Library/cv cryptovision/libcvP11.dylib',
 	    win: 'C:\\Windows\\System32\\eTPKCS11.dll'
 	};
 	exports.PKCS11 = PKCS11;
@@ -77278,6 +77278,24 @@ var GCLLib =
 	            .then(function (res) { return ResponseHandler_1.ResponseHandler.response(res, callback); })
 	            .catch(function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
 	    };
+	    GenericService.checkPKCS11 = function (client) {
+	        var _this = this;
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            client.pkcs11().slotsWithTokenPresent().then(function (slots) {
+	                if (slots && slots.data && slots.data.length) {
+	                    var validToken = _.find(slots.data, function (slot) {
+	                        return _.includes(_this.PKCS11_FLAGS, slot.flags);
+	                    });
+	                    resolve(!!validToken);
+	                }
+	                else {
+	                    resolve(false);
+	                }
+	            }, function (err) {
+	                reject(err);
+	            });
+	        });
+	    };
 	    GenericService.checkCanAuthenticate = function (data) {
 	        return new es6_promise_1.Promise(function (resolve) {
 	            data.data = _.filter(data.data, function (reader) { return CardUtil_1.CardUtil.canAuthenticate(reader.card); });
@@ -77310,6 +77328,7 @@ var GCLLib =
 	        return client.core().readersCardAvailable()
 	            .then(function (readers) { return { readerId: readerId, readers: readers }; })
 	            .then(this.checkReaderPresent)
+	            .then(function (reader) { return { reader: reader, client: client }; })
 	            .then(this.determineContainerForCard)
 	            .then(function (container) { return { client: client, container: container }; })
 	            .then(this.checkContainerAvailable)
@@ -77325,10 +77344,10 @@ var GCLLib =
 	            }
 	            else {
 	                if (args.readerId && args.readerId.length) {
-	                    reject("No card found for this ID");
+	                    reject('No card found for this ID');
 	                }
 	                else {
-	                    reject("Reader ID is required.");
+	                    reject('Reader ID is required.');
 	                }
 	            }
 	        });
@@ -77341,12 +77360,12 @@ var GCLLib =
 	                        resolve(args);
 	                    }
 	                    else {
-	                        reject("Container for this card is not available");
+	                        reject('Container for this card is not available');
 	                    }
 	                });
 	            }
 	            else {
-	                reject("Unknown card type");
+	                reject('Unknown card type');
 	            }
 	        });
 	    };
@@ -77356,20 +77375,30 @@ var GCLLib =
 	                args.data.algorithm_reference = CardUtil_1.CardUtil.defaultAlgo(args.container);
 	            }
 	            if (!args.data.algorithm_reference) {
-	                reject("No algorithm reference provided and cannot determine default algorithm");
+	                reject('No algorithm reference provided and cannot determine default algorithm');
 	            }
 	            else {
 	                resolve(args);
 	            }
 	        });
 	    };
-	    GenericService.determineContainerForCard = function (reader) {
+	    GenericService.determineContainerForCard = function (args) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            if (reader && reader.card) {
-	                resolve(CardUtil_1.CardUtil.determineContainer(reader.card));
+	            if (args.reader && args.reader.card) {
+	                var container = CardUtil_1.CardUtil.determineContainer(args.reader.card);
+	                if (!container) {
+	                    GenericService.checkPKCS11(args.client).then(function (pkcs11) {
+	                        pkcs11 ? resolve('pkcs11') : resolve(undefined);
+	                    }, function () {
+	                        resolve(undefined);
+	                    });
+	                }
+	                else {
+	                    resolve(container);
+	                }
 	            }
 	            else {
-	                reject("No card present in reader");
+	                reject('No card present in reader');
 	            }
 	        });
 	    };
@@ -77381,12 +77410,12 @@ var GCLLib =
 	                resolve(args);
 	            }
 	            else {
-	                reject("Cannot determine method to use for data dump");
+	                reject('Cannot determine method to use for data dump');
 	            }
 	        });
 	    };
 	    GenericService.doDataDump = function (args) {
-	        if (args.container === "luxeid") {
+	        if (args.container === 'luxeid') {
 	            return args.client.luxeid(args.readerId, args.data.pin).allData({ filters: [], parseCerts: true });
 	        }
 	        if (args.dumpOptions) {
@@ -77397,7 +77426,7 @@ var GCLLib =
 	        }
 	    };
 	    GenericService.doSign = function (args) {
-	        if (args.container === "luxeid") {
+	        if (args.container === 'luxeid') {
 	            return args.client.luxeid(args.readerId, args.data.pin).signData(args.data);
 	        }
 	        else {
@@ -77405,7 +77434,7 @@ var GCLLib =
 	        }
 	    };
 	    GenericService.doAuthenticate = function (args) {
-	        if (args.container === "luxeid") {
+	        if (args.container === 'luxeid') {
 	            return args.client.luxeid(args.readerId, args.data.pin).authenticate(args.data);
 	        }
 	        else {
@@ -77413,17 +77442,17 @@ var GCLLib =
 	        }
 	    };
 	    GenericService.doVerifyPin = function (args) {
-	        if (args.container === "luxeid") {
+	        if (args.container === 'luxeid') {
 	            return args.client.luxeid(args.readerId, args.data.pin).verifyPin(args.data);
 	        }
-	        else if (args.container === "beid") {
+	        else if (args.container === 'beid') {
 	            var verifyPinData = {
 	                pin: args.data.pin,
 	                private_key_reference: EidBe_1.EidBe.VERIFY_PRIV_KEY_REF
 	            };
 	            return args.client.beid(args.readerId).verifyPin(verifyPinData);
 	        }
-	        else if (args.container === "aventra") {
+	        else if (args.container === 'aventra') {
 	            var verifyPinData = {
 	                pin: args.data.pin,
 	                private_key_reference: Aventra_1.Aventra.DEFAULT_VERIFY_PIN
@@ -77436,6 +77465,7 @@ var GCLLib =
 	    };
 	    return GenericService;
 	}());
+	GenericService.PKCS11_FLAGS = [1, 3, 5, 7];
 	exports.GenericService = GenericService;
 
 
@@ -77479,6 +77509,7 @@ var GCLLib =
 	            case 'oberthur':
 	            case 'piv':
 	            case 'pteid':
+	            case 'pkcs11':
 	                return true;
 	            case 'ocra':
 	            case 'emv':
@@ -77529,9 +77560,6 @@ var GCLLib =
 	            else if (findDescription(card.description, 'Mastercard')) {
 	                return 'emv';
 	            }
-	            else if (findDescription(card.description, 'Oberthur')) {
-	                return 'oberthur';
-	            }
 	            else if (findDescription(card.description, 'Aventra')) {
 	                return 'aventra';
 	            }
@@ -77567,6 +77595,7 @@ var GCLLib =
 	            case 'luxeid':
 	            case 'luxtrust':
 	            case 'pteid':
+	            case 'pkcs11':
 	                return 'sha256';
 	            default:
 	                return undefined;
@@ -77586,7 +77615,7 @@ var GCLLib =
 	            case 'piv':
 	            case 'pteid':
 	                return 'allData';
-	            case 'safenet':
+	            case 'pkcs11':
 	                return 'slots';
 	            default:
 	                return undefined;
@@ -77605,7 +77634,7 @@ var GCLLib =
 	            case 'piv':
 	            case 'pteid':
 	                return { filters: [], parseCerts: true };
-	            case 'safenet':
+	            case 'pkcs11':
 	                return undefined;
 	            case 'emv':
 	                return [];

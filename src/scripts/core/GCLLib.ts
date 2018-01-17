@@ -162,7 +162,7 @@ class GCLClient {
     // get instance for PT Eid
     public pteid = (reader_id?: string): AbstractEidPT => { return this.pluginFactory.createEidPT(reader_id); };
     // get instance for PKCS11
-    public pkcs11 = (reader_id: string, moduleConfig: { linux: string, mac: string, win: string }): AbstractPkcs11 => {
+    public pkcs11 = (moduleConfig?: { linux: string, mac: string, win: string }): AbstractPkcs11 => {
         return this.pluginFactory.createPKCS11(moduleConfig); };
     // get instance for Remote Loading
     public readerapi = (reader_id: string): AbstractRemoteLoading => { return this.pluginFactory.createRemoteLoading(reader_id); };
