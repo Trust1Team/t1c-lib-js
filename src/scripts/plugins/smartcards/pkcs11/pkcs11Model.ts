@@ -41,7 +41,7 @@ interface InfoResponse extends T1CResponse {
 interface Slot {
     slot_id: string
     description: string
-    flags: string
+    flags: number
     hardware_version: string
     firmware_version: string
 }

@@ -29,7 +29,7 @@ class PKCS11 implements AbstractPkcs11 {
     static VERIFY = '/verify';
     static DEFAULT_CONFIG = {
         linux: '/usr/local/lib/libeTPkcs11.so',
-        mac: '/usr/local/lib/libeTPkcs11.dylib',
+        mac: '/Library/cv cryptovision/libcvP11.dylib',
         win: 'C:\\Windows\\System32\\eTPKCS11.dll'
     };
 
