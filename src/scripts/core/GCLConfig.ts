@@ -37,6 +37,7 @@ class GCLConfig  implements GCLConfig {
     private _forceHardwarePinpad: boolean;
     private _defaultSessionTimeout: number;
     private _tokenCompatible: boolean;
+    private _v2Compatible: boolean;
     private _defaultConsentDuration: number;
     private _defaultConsentTimeout: number;
     private _syncManaged: boolean;
@@ -199,6 +200,14 @@ class GCLConfig  implements GCLConfig {
 
     set tokenCompatible(value: boolean) {
         this._tokenCompatible = value;
+    }
+
+    get v2Compatible(): boolean {
+        return this._v2Compatible;
+    }
+
+    set v2Compatible(value: boolean) {
+        this._v2Compatible = value;
     }
 
     get defaultConsentDuration(): number {

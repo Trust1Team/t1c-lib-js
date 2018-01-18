@@ -234,8 +234,11 @@ class GCLClient {
 
         return new Promise((resolve, reject) => {
             self.core().info().then(infoResponse => {
+                // update config values
                 self_cfg.citrix = infoResponse.data.citrix;
                 self_cfg.tokenCompatible = GCLClient.checkTokenCompatible(infoResponse.data.version);
+                self_cfg.v2Compatible = GCLClient.coreV2Compatible(infoResponse.data.version);
+
                 let activated = infoResponse.data.activated;
                 let managed = infoResponse.data.managed;
                 let core_version = infoResponse.data.version;
@@ -263,16 +266,11 @@ class GCLClient {
                         activationPromise = Promise.resolve();
                     } else {
                         // not yet activated, do this now
-                        activationPromise = this.unmanagedInitialization(self, self_cfg, mergedInfo, uuid, infoResponse);
+                        activationPromise = this.unManagedInitialization(self, self_cfg, mergedInfo, uuid);
                     }
                     activationPromise.then(() => {
                         // device is activated, sync it
-                        self.syncDevice(self, self_cfg, mergedInfo, uuid).then(() => { resolve(); },
-                            () => {
-                                // ignore sync errors, will retry on next use
-                                mergedInfo.activated = true;
-                                resolve();
-                            });
+                        resolve(this.unManagedSynchronization(self, self_cfg, mergedInfo, uuid));
                     }, err => {
                         reject(err);
                     });
@@ -286,25 +284,72 @@ class GCLClient {
         });
     }
 
-    private unmanagedInitialization(self: GCLClient, self_cfg: GCLConfig,
-                                    mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo,
-                                    uuid: string, info: InfoResponse): Promise<{}> {
-        // check if we can use core v2 initialization
-        if (GCLClient.coreV2Compatible(mergedInfo.core_version)) {
-            // do core v2 initialization flow
-            return self.coreV2Init(self);
+    private unManagedSynchronization(self: GCLClient,
+                                     self_cfg: GCLConfig,
+                                     mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo,
+                                     uuid: string) {
+        // check if we can use core v2 sync
+        if (self_cfg.v2Compatible) {
+            // do core v2 sync flow
+            return self.coreV2Sync(self, self_cfg, mergedInfo, uuid);
         } else {
-            // do existing initialization
+            // do v1 sync
+            return self.syncDevice(self, self_cfg, mergedInfo, uuid).then(() => {
+                mergedInfo.activated = true;
+            });
+        }
+    }
+
+    private coreV2Sync(self: GCLClient,
+                       self_cfg: GCLConfig,
+                       mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo,
+                       uuid: string) {
+        return new Promise((resolve, reject) => {
+            // get GCL Pubkey
+            self.admin().getPubKey().then(pubKey => {
+                return self.dsClient.synchronizationRequest(pubKey.data, mergedInfo, self_cfg.dsUrlBase).then(containerConfig => {
+                    // forward container config to GCL
+                    return self.admin().updateContainerConfig(containerConfig.data).then(containerState => {
+                        // TODO poll for container download completion?
+                        // sync device
+                        return self.syncDevice(self, self_cfg, mergedInfo, uuid).then(() => {
+                            mergedInfo.activated = true;
+                            resolve();
+                        });
+                    });
+                });
+            }).catch(err => {
+                reject(err);
+            });
+        });
+    }
+
+    private unManagedInitialization(self: GCLClient, self_cfg: GCLConfig,
+                                    mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo,
+                                    uuid: string): Promise<{}> {
+        // check if we can use core v2 initialization
+        if (self_cfg.v2Compatible) {
+            // do core v2 initialization flow
+            return self.coreV2Init(self, mergedInfo, uuid);
+        } else {
+            // do v1 initialization
             return self.coreV1Init(self, self_cfg, mergedInfo, uuid);
         }
     }
 
-    private coreV2Init(self: GCLClient) {
+    private coreV2Init(self: GCLClient,
+                       mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo, uuid: string) {
         return new Promise((resolve, reject) => {
-            self.preRegister(self).then(self.register).then(self.postRegister).then(() => {
-                // activation sequence complete, resolve promise
-                resolve();
-            }).catch(err => {
+            self.preRegister(self)
+                .then(pubKey => {
+                    return Promise.resolve({ self, uuid, pubKey, mergedInfo});
+                })
+                .then(self.register)
+                .then(self.postRegister)
+                .then(() => {
+                    // activation sequence complete, resolve promise
+                    resolve();
+                }).catch(err => {
                 reject(err);
             });
 
@@ -315,9 +360,7 @@ class GCLClient {
         // get GCL pubkey and registration info
         return new Promise((resolve, reject) => {
             self.admin().getPubKey().then(pubKey => {
-                return self.core().infoBrowser().then(browserInfo => {
-                    resolve({ self, pubKey, browserInfo });
-                });
+                resolve(pubKey);
             }).catch(err => {
                 reject(err);
             });
@@ -325,10 +368,11 @@ class GCLClient {
 
     }
 
-    private register(args: { self: GCLClient, pubKey: string, infoBrowser: BrowserInfo }) {
+    private register(args: { self: GCLClient, uuid: string, pubKey: string,
+        mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo }) {
         // register with DS
         return new Promise((resolve, reject) => {
-            args.self.dsClient.activationRequest(args.pubKey, args.infoBrowser).then(res => {
+            args.self.dsClient.activationRequest(args.pubKey, args.mergedInfo).then(res => {
                 resolve({ self, activationResponse: res.data });
             }, err => {
                 reject(err);
