@@ -8952,6 +8952,8 @@ var GCLLib =
 	var ResponseHandler_1 = __webpack_require__(340);
 	var agent_1 = __webpack_require__(368);
 	var admin_1 = __webpack_require__(507);
+	var SyncUtil_1 = __webpack_require__(508);
+	var ActivationUtil_1 = __webpack_require__(509);
 	var GCLClient = (function () {
 	    function GCLClient(cfg, automatic) {
 	        var _this = this;
@@ -9081,7 +9083,6 @@ var GCLLib =
 	        return this.ocvClient.getInfo(cb);
 	    };
 	    GCLClient.prototype.initLibrary = function () {
-	        var _this = this;
 	        var self = this;
 	        var self_cfg = this.cfg;
 	        return new es6_promise_1.Promise(function (resolve, reject) {
@@ -9097,7 +9098,7 @@ var GCLLib =
 	                var mergedInfo = _.merge({ managed: managed, core_version: core_version, activated: activated }, info.data);
 	                if (managed) {
 	                    if (self_cfg.apiKey && self_cfg.dsUrlBase && self_cfg.syncManaged) {
-	                        self.syncDevice(self, self_cfg, mergedInfo, uuid).then(function () { resolve(); }, function () { resolve(); });
+	                        SyncUtil_1.SyncUtil.syncDevice(self.dsClient, self_cfg, mergedInfo, uuid).then(function () { resolve(); }, function () { resolve(); });
 	                    }
 	                    else {
 	                        resolve();
@@ -9109,10 +9110,12 @@ var GCLLib =
 	                        activationPromise = es6_promise_1.Promise.resolve();
 	                    }
 	                    else {
-	                        activationPromise = _this.unManagedInitialization(self, self_cfg, mergedInfo, uuid);
+	                        activationPromise = ActivationUtil_1.ActivationUtil.unManagedInitialization(self.adminService, self.coreService, self.dsClient, self_cfg, mergedInfo, uuid);
 	                    }
 	                    activationPromise.then(function () {
-	                        resolve(_this.unManagedSynchronization(self, self_cfg, mergedInfo, uuid));
+	                        self.authConnection = new Connection_1.LocalAuthConnection(self_cfg);
+	                        self.coreService = new CoreService_1.CoreService(self.cfg.gclUrl, self.authConnection);
+	                        resolve(SyncUtil_1.SyncUtil.unManagedSynchronization(self.adminService, self.dsClient, self_cfg, mergedInfo, uuid));
 	                    }, function (err) {
 	                        reject(err);
 	                    });
@@ -9121,107 +9124,6 @@ var GCLLib =
 	                self.GCLInstalled = false;
 	                resolve();
 	            });
-	        });
-	    };
-	    GCLClient.prototype.unManagedSynchronization = function (self, self_cfg, mergedInfo, uuid) {
-	        if (self_cfg.v2Compatible) {
-	            return self.coreV2Sync(self, self_cfg, mergedInfo, uuid);
-	        }
-	        else {
-	            return self.syncDevice(self, self_cfg, mergedInfo, uuid).then(function () {
-	                mergedInfo.activated = true;
-	            });
-	        }
-	    };
-	    GCLClient.prototype.coreV2Sync = function (self, self_cfg, mergedInfo, uuid) {
-	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            self.admin().getPubKey().then(function (pubKey) {
-	                return self.dsClient.synchronizationRequest(pubKey.data, mergedInfo, self_cfg.dsUrlBase).then(function (containerConfig) {
-	                    return self.admin().updateContainerConfig(containerConfig.data).then(function (containerState) {
-	                        return self.syncDevice(self, self_cfg, mergedInfo, uuid).then(function () {
-	                            mergedInfo.activated = true;
-	                            resolve();
-	                        });
-	                    });
-	                });
-	            }).catch(function (err) {
-	                reject(err);
-	            });
-	        });
-	    };
-	    GCLClient.prototype.unManagedInitialization = function (self, self_cfg, mergedInfo, uuid) {
-	        if (self_cfg.v2Compatible) {
-	            return self.coreV2Init(self, mergedInfo, uuid);
-	        }
-	        else {
-	            return self.coreV1Init(self, self_cfg, mergedInfo, uuid);
-	        }
-	    };
-	    GCLClient.prototype.coreV2Init = function (self, mergedInfo, uuid) {
-	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            self.preRegister(self)
-	                .then(function (pubKey) {
-	                return es6_promise_1.Promise.resolve({ self: self, uuid: uuid, pubKey: pubKey, mergedInfo: mergedInfo });
-	            })
-	                .then(self.register)
-	                .then(self.postRegister)
-	                .then(function () {
-	                resolve();
-	            }).catch(function (err) {
-	                reject(err);
-	            });
-	        });
-	    };
-	    GCLClient.prototype.preRegister = function (self) {
-	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            self.admin().getPubKey().then(function (pubKey) {
-	                resolve(pubKey);
-	            }).catch(function (err) {
-	                reject(err);
-	            });
-	        });
-	    };
-	    GCLClient.prototype.register = function (args) {
-	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            args.self.dsClient.activationRequest(args.pubKey, args.mergedInfo).then(function (res) {
-	                resolve({ self: self, activationResponse: res.data });
-	            }, function (err) {
-	                reject(err);
-	            });
-	        });
-	    };
-	    GCLClient.prototype.postRegister = function (args) {
-	        return args.self.admin().activateGcl(args.activationResponse);
-	    };
-	    GCLClient.prototype.coreV1Init = function (self, self_cfg, mergedInfo, uuid) {
-	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            self.core().getPubKey().then(function () {
-	                resolve();
-	            }, function (err) {
-	                if (err && !err.success && err.code === 201) {
-	                    self.dsClient.getPubKey().then(function (dsResponse) {
-	                        return self.core().setPubKey(dsResponse.pubkey).then(function () {
-	                            return self.registerDevice(self, self_cfg, mergedInfo, uuid).then(function () { resolve(); });
-	                        });
-	                    }).catch(function (error) {
-	                        reject(error);
-	                    });
-	                }
-	            });
-	        });
-	    };
-	    GCLClient.prototype.registerDevice = function (client, config, info, deviceId) {
-	        return client.dsClient.register(info, deviceId).then(function (activationResponse) {
-	            config.jwt = activationResponse.token;
-	            client.authConnection = new Connection_1.LocalAuthConnection(client.cfg);
-	            client.coreService = new CoreService_1.CoreService(client.cfg.gclUrl, client.authConnection);
-	            return activationResponse;
-	        });
-	    };
-	    GCLClient.prototype.syncDevice = function (client, config, info, deviceId) {
-	        return client.dsClient.sync(info, deviceId).then(function (activationResponse) {
-	            config.jwt = activationResponse.token;
-	            return activationResponse;
 	        });
 	    };
 	    GCLClient.prototype.implicitDownload = function () {
@@ -33320,18 +33222,18 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(337);
-	var CORE_READERS = "/card-readers";
+	var CORE_READERS = '/card-readers';
 	var PinEnforcer = (function () {
 	    function PinEnforcer() {
 	    }
 	    PinEnforcer.check = function (connection, baseUrl, readerId, pinValue) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
 	            if (connection.cfg.forceHardwarePinpad) {
-	                connection.get(baseUrl, CORE_READERS + "/" + readerId, undefined).then(function (reader) {
+	                connection.get(baseUrl, CORE_READERS + '/' + readerId, undefined).then(function (reader) {
 	                    if (reader.data.pinpad) {
 	                        if (pinValue) {
-	                            reject({ data: { message: "Strict pinpad enforcement is enabled. This request was sent with a PIN, but the" +
-	                                        " reader has a pinpad." } });
+	                            reject({ data: { message: 'Strict pinpad enforcement is enabled. This request was sent with a PIN, but the' +
+	                                        ' reader has a pinpad.' } });
 	                        }
 	                        else {
 	                            resolve();
@@ -33339,8 +33241,8 @@ var GCLLib =
 	                    }
 	                    else {
 	                        if (!pinValue) {
-	                            reject({ data: { message: "Strict pinpad enforcement is enabled. This request was sent without a PIN, but the" +
-	                                        " reader does not have a pinpad." } });
+	                            reject({ data: { message: 'Strict pinpad enforcement is enabled. This request was sent without a PIN, but the' +
+	                                        ' reader does not have a pinpad.' } });
 	                        }
 	                        else {
 	                            resolve();
@@ -77716,6 +77618,138 @@ var GCLLib =
 	    return AdminService;
 	}());
 	exports.AdminService = AdminService;
+
+
+/***/ }),
+/* 508 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var es6_promise_1 = __webpack_require__(337);
+	var SyncUtil = (function () {
+	    function SyncUtil() {
+	    }
+	    SyncUtil.unManagedSynchronization = function (admin, ds, config, mergedInfo, uuid) {
+	        if (config.v2Compatible) {
+	            return SyncUtil.coreV2Sync(admin, ds, config, mergedInfo, uuid);
+	        }
+	        else {
+	            return SyncUtil.syncDevice(ds, config, mergedInfo, uuid).then(function () {
+	                mergedInfo.activated = true;
+	            });
+	        }
+	    };
+	    SyncUtil.syncDevice = function (client, config, info, deviceId) {
+	        return client.sync(info, deviceId).then(function (activationResponse) {
+	            config.jwt = activationResponse.token;
+	            return activationResponse;
+	        });
+	    };
+	    SyncUtil.coreV2Sync = function (admin, ds, self_cfg, mergedInfo, uuid) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            admin.getPubKey().then(function (pubKey) {
+	                return ds.synchronizationRequest(pubKey.data, mergedInfo, self_cfg.dsUrlBase).then(function (containerConfig) {
+	                    return admin.updateContainerConfig(containerConfig.data).then(function (containerState) {
+	                        return SyncUtil.syncDevice(ds, self_cfg, mergedInfo, uuid).then(function () {
+	                            mergedInfo.activated = true;
+	                            resolve();
+	                        });
+	                    });
+	                });
+	            }).catch(function (err) {
+	                reject(err);
+	            });
+	        });
+	    };
+	    return SyncUtil;
+	}());
+	exports.SyncUtil = SyncUtil;
+
+
+/***/ }),
+/* 509 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var es6_promise_1 = __webpack_require__(337);
+	var ActivationUtil = (function () {
+	    function ActivationUtil() {
+	    }
+	    ActivationUtil.unManagedInitialization = function (admin, core, ds, self_cfg, mergedInfo, uuid) {
+	        if (self_cfg.v2Compatible) {
+	            return ActivationUtil.coreV2Init(admin, ds, mergedInfo, uuid);
+	        }
+	        else {
+	            return ActivationUtil.coreV1Init(core, ds, self_cfg, mergedInfo, uuid);
+	        }
+	    };
+	    ActivationUtil.coreV1Init = function (core, ds, self_cfg, mergedInfo, uuid) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            core.getPubKey().then(function () {
+	                resolve();
+	            }, function (err) {
+	                if (err && !err.success && err.code === 201) {
+	                    ds.getPubKey().then(function (dsResponse) {
+	                        return core.setPubKey(dsResponse.pubkey).then(function () {
+	                            return ActivationUtil.registerDevice(ds, self_cfg, mergedInfo, uuid).then(function () { resolve(); });
+	                        });
+	                    }).catch(function (error) {
+	                        reject(error);
+	                    });
+	                }
+	            });
+	        });
+	    };
+	    ActivationUtil.coreV2Init = function (admin, ds, mergedInfo, uuid) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            ActivationUtil.preRegister(admin)
+	                .then(function (pubKey) {
+	                return es6_promise_1.Promise.resolve({ ds: ds, uuid: uuid, pubKey: pubKey, mergedInfo: mergedInfo });
+	            })
+	                .then(ActivationUtil.register)
+	                .then(function (activationResponse) {
+	                return es6_promise_1.Promise.resolve({ admin: admin, activationResponse: activationResponse });
+	            })
+	                .then(ActivationUtil.postRegister)
+	                .then(function () {
+	                resolve();
+	            }).catch(function (err) {
+	                reject(err);
+	            });
+	        });
+	    };
+	    ActivationUtil.preRegister = function (admin) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            admin.getPubKey().then(function (pubKey) {
+	                resolve(pubKey);
+	            }).catch(function (err) {
+	                reject(err);
+	            });
+	        });
+	    };
+	    ActivationUtil.register = function (args) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            args.ds.activationRequest(args.pubKey, args.mergedInfo).then(function (res) {
+	                resolve(res.data);
+	            }, function (err) {
+	                reject(err);
+	            });
+	        });
+	    };
+	    ActivationUtil.postRegister = function (args) {
+	        return args.admin.activateGcl(args.activationResponse);
+	    };
+	    ActivationUtil.registerDevice = function (ds, config, info, deviceId) {
+	        return ds.register(info, deviceId).then(function (activationResponse) {
+	            config.jwt = activationResponse.token;
+	            return activationResponse;
+	        });
+	    };
+	    return ActivationUtil;
+	}());
+	exports.ActivationUtil = ActivationUtil;
 
 
 /***/ })

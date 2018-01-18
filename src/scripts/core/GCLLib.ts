@@ -42,6 +42,8 @@ import { AgentClient } from './agent/agent';
 import { AbstractAgent } from './agent/agentModel';
 import { AbstractFileExchange } from '../plugins/file/FileExchangeModel';
 import { AdminService } from './admin/admin';
+import { SyncUtil } from '../util/SyncUtil';
+import { ActivationUtil } from '../util/ActivationUtil';
 
 class GCLClient {
     public GCLInstalled: boolean;
@@ -253,7 +255,7 @@ class GCLClient {
                     // and if syncing for managed devices is turned on
                     if (self_cfg.apiKey && self_cfg.dsUrlBase && self_cfg.syncManaged) {
                         // attempt to sync
-                        self.syncDevice(self, self_cfg, mergedInfo, uuid).then(() => { resolve(); },
+                        SyncUtil.syncDevice(self.dsClient, self_cfg, mergedInfo, uuid).then(() => { resolve(); },
                             () => { resolve(); });
                     } else {
                         // nothing to do here *jetpack*
@@ -266,11 +268,15 @@ class GCLClient {
                         activationPromise = Promise.resolve();
                     } else {
                         // not yet activated, do this now
-                        activationPromise = this.unManagedInitialization(self, self_cfg, mergedInfo, uuid);
+                        activationPromise = ActivationUtil.unManagedInitialization(self.adminService,
+                            self.coreService, self.dsClient, self_cfg, mergedInfo, uuid);
                     }
                     activationPromise.then(() => {
+                        // update core service
+                        self.authConnection = new LocalAuthConnection(self_cfg);
+                        self.coreService = new CoreService(self.cfg.gclUrl, self.authConnection);
                         // device is activated, sync it
-                        resolve(this.unManagedSynchronization(self, self_cfg, mergedInfo, uuid));
+                        resolve(SyncUtil.unManagedSynchronization(self.adminService, self.dsClient, self_cfg, mergedInfo, uuid));
                     }, err => {
                         reject(err);
                     });
@@ -281,150 +287,6 @@ class GCLClient {
                 // resolve with client as-is to allow download
                 resolve();
             });
-        });
-    }
-
-    private unManagedSynchronization(self: GCLClient,
-                                     self_cfg: GCLConfig,
-                                     mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo,
-                                     uuid: string) {
-        // check if we can use core v2 sync
-        if (self_cfg.v2Compatible) {
-            // do core v2 sync flow
-            return self.coreV2Sync(self, self_cfg, mergedInfo, uuid);
-        } else {
-            // do v1 sync
-            return self.syncDevice(self, self_cfg, mergedInfo, uuid).then(() => {
-                mergedInfo.activated = true;
-            });
-        }
-    }
-
-    private coreV2Sync(self: GCLClient,
-                       self_cfg: GCLConfig,
-                       mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo,
-                       uuid: string) {
-        return new Promise((resolve, reject) => {
-            // get GCL Pubkey
-            self.admin().getPubKey().then(pubKey => {
-                return self.dsClient.synchronizationRequest(pubKey.data, mergedInfo, self_cfg.dsUrlBase).then(containerConfig => {
-                    // forward container config to GCL
-                    return self.admin().updateContainerConfig(containerConfig.data).then(containerState => {
-                        // TODO poll for container download completion?
-                        // sync device
-                        return self.syncDevice(self, self_cfg, mergedInfo, uuid).then(() => {
-                            mergedInfo.activated = true;
-                            resolve();
-                        });
-                    });
-                });
-            }).catch(err => {
-                reject(err);
-            });
-        });
-    }
-
-    private unManagedInitialization(self: GCLClient, self_cfg: GCLConfig,
-                                    mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo,
-                                    uuid: string): Promise<{}> {
-        // check if we can use core v2 initialization
-        if (self_cfg.v2Compatible) {
-            // do core v2 initialization flow
-            return self.coreV2Init(self, mergedInfo, uuid);
-        } else {
-            // do v1 initialization
-            return self.coreV1Init(self, self_cfg, mergedInfo, uuid);
-        }
-    }
-
-    private coreV2Init(self: GCLClient,
-                       mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo, uuid: string) {
-        return new Promise((resolve, reject) => {
-            self.preRegister(self)
-                .then(pubKey => {
-                    return Promise.resolve({ self, uuid, pubKey, mergedInfo});
-                })
-                .then(self.register)
-                .then(self.postRegister)
-                .then(() => {
-                    // activation sequence complete, resolve promise
-                    resolve();
-                }).catch(err => {
-                reject(err);
-            });
-
-        });
-    }
-
-    private preRegister(self: GCLClient) {
-        // get GCL pubkey and registration info
-        return new Promise((resolve, reject) => {
-            self.admin().getPubKey().then(pubKey => {
-                resolve(pubKey);
-            }).catch(err => {
-                reject(err);
-            });
-        });
-
-    }
-
-    private register(args: { self: GCLClient, uuid: string, pubKey: string,
-        mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo }) {
-        // register with DS
-        return new Promise((resolve, reject) => {
-            args.self.dsClient.activationRequest(args.pubKey, args.mergedInfo).then(res => {
-                resolve({ self, activationResponse: res.data });
-            }, err => {
-                reject(err);
-            });
-        });
-    }
-
-    private postRegister(args: { self: GCLClient, activationResponse: any }) {
-        // activate GCL
-        return args.self.admin().activateGcl(args.activationResponse);
-    }
-
-    private coreV1Init(self: GCLClient, self_cfg: GCLConfig,
-                       mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo, uuid: string) {
-        return new Promise((resolve, reject) => {
-            // make sure pub key is set
-            self.core().getPubKey().then(() => {
-                // certificate loaded
-                // console.log('certificate present, no need to retrieve from DS');
-                resolve();
-            }, err => {
-                if (err && !err.success && err.code === 201) {
-                    // no certificate loaded, retrieve it from DS
-                    // console.log('no certificate set - retrieve cert from DS');
-                    self.dsClient.getPubKey().then(dsResponse => {
-                        return self.core().setPubKey(dsResponse.pubkey).then(() => {
-                            // activate & register
-                            // we need to register the device
-                            // console.log('Register device:' + uuid);
-                            return self.registerDevice(self, self_cfg, mergedInfo, uuid).then(() => { resolve(); });
-                        });
-                    }).catch(error => {
-                        reject(error);
-                    });
-                }
-            });
-        });
-    }
-
-    private registerDevice(client: GCLClient, config: GCLConfig, info: DSPlatformInfo, deviceId: string): Promise<JWTResponse> {
-        return client.dsClient.register(info, deviceId).then(activationResponse => {
-            config.jwt = activationResponse.token;
-            client.authConnection = new LocalAuthConnection(client.cfg);
-            client.coreService = new CoreService(client.cfg.gclUrl, client.authConnection);
-            return activationResponse;
-        });
-    }
-
-    private syncDevice(client: GCLClient, config: GCLConfig, info: DSPlatformInfo, deviceId: string): Promise<JWTResponse> {
-        return client.dsClient.sync(info, deviceId).then(activationResponse => {
-            config.jwt = activationResponse.token;
-            return activationResponse;
         });
     }
 
