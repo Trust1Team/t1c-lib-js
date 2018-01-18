@@ -9088,6 +9088,7 @@ var GCLLib =
 	            self.core().info().then(function (infoResponse) {
 	                self_cfg.citrix = infoResponse.data.citrix;
 	                self_cfg.tokenCompatible = GCLClient.checkTokenCompatible(infoResponse.data.version);
+	                self_cfg.v2Compatible = GCLClient.coreV2Compatible(infoResponse.data.version);
 	                var activated = infoResponse.data.activated;
 	                var managed = infoResponse.data.managed;
 	                var core_version = infoResponse.data.version;
@@ -9108,13 +9109,10 @@ var GCLLib =
 	                        activationPromise = es6_promise_1.Promise.resolve();
 	                    }
 	                    else {
-	                        activationPromise = _this.unmanagedInitialization(self, self_cfg, mergedInfo, uuid, infoResponse);
+	                        activationPromise = _this.unManagedInitialization(self, self_cfg, mergedInfo, uuid);
 	                    }
 	                    activationPromise.then(function () {
-	                        self.syncDevice(self, self_cfg, mergedInfo, uuid).then(function () { resolve(); }, function () {
-	                            mergedInfo.activated = true;
-	                            resolve();
-	                        });
+	                        resolve(_this.unManagedSynchronization(self, self_cfg, mergedInfo, uuid));
 	                    }, function (err) {
 	                        reject(err);
 	                    });
@@ -9125,17 +9123,49 @@ var GCLLib =
 	            });
 	        });
 	    };
-	    GCLClient.prototype.unmanagedInitialization = function (self, self_cfg, mergedInfo, uuid, info) {
-	        if (GCLClient.coreV2Compatible(mergedInfo.core_version)) {
-	            return self.coreV2Init(self);
+	    GCLClient.prototype.unManagedSynchronization = function (self, self_cfg, mergedInfo, uuid) {
+	        if (self_cfg.v2Compatible) {
+	            return self.coreV2Sync(self, self_cfg, mergedInfo, uuid);
+	        }
+	        else {
+	            return self.syncDevice(self, self_cfg, mergedInfo, uuid).then(function () {
+	                mergedInfo.activated = true;
+	            });
+	        }
+	    };
+	    GCLClient.prototype.coreV2Sync = function (self, self_cfg, mergedInfo, uuid) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            self.admin().getPubKey().then(function (pubKey) {
+	                return self.dsClient.synchronizationRequest(pubKey.data, mergedInfo, self_cfg.dsUrlBase).then(function (containerConfig) {
+	                    return self.admin().updateContainerConfig(containerConfig.data).then(function (containerState) {
+	                        return self.syncDevice(self, self_cfg, mergedInfo, uuid).then(function () {
+	                            mergedInfo.activated = true;
+	                            resolve();
+	                        });
+	                    });
+	                });
+	            }).catch(function (err) {
+	                reject(err);
+	            });
+	        });
+	    };
+	    GCLClient.prototype.unManagedInitialization = function (self, self_cfg, mergedInfo, uuid) {
+	        if (self_cfg.v2Compatible) {
+	            return self.coreV2Init(self, mergedInfo, uuid);
 	        }
 	        else {
 	            return self.coreV1Init(self, self_cfg, mergedInfo, uuid);
 	        }
 	    };
-	    GCLClient.prototype.coreV2Init = function (self) {
+	    GCLClient.prototype.coreV2Init = function (self, mergedInfo, uuid) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            self.preRegister(self).then(self.register).then(self.postRegister).then(function () {
+	            self.preRegister(self)
+	                .then(function (pubKey) {
+	                return es6_promise_1.Promise.resolve({ self: self, uuid: uuid, pubKey: pubKey, mergedInfo: mergedInfo });
+	            })
+	                .then(self.register)
+	                .then(self.postRegister)
+	                .then(function () {
 	                resolve();
 	            }).catch(function (err) {
 	                reject(err);
@@ -9145,9 +9175,7 @@ var GCLLib =
 	    GCLClient.prototype.preRegister = function (self) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
 	            self.admin().getPubKey().then(function (pubKey) {
-	                return self.core().infoBrowser().then(function (browserInfo) {
-	                    resolve({ self: self, pubKey: pubKey, browserInfo: browserInfo });
-	                });
+	                resolve(pubKey);
 	            }).catch(function (err) {
 	                reject(err);
 	            });
@@ -9155,7 +9183,7 @@ var GCLLib =
 	    };
 	    GCLClient.prototype.register = function (args) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            args.self.dsClient.activationRequest(args.pubKey, args.infoBrowser).then(function (res) {
+	            args.self.dsClient.activationRequest(args.pubKey, args.mergedInfo).then(function (res) {
 	                resolve({ self: self, activationResponse: res.data });
 	            }, function (err) {
 	                reject(err);
@@ -28018,6 +28046,16 @@ var GCLLib =
 	        enumerable: true,
 	        configurable: true
 	    });
+	    Object.defineProperty(GCLConfig.prototype, "v2Compatible", {
+	        get: function () {
+	            return this._v2Compatible;
+	        },
+	        set: function (value) {
+	            this._v2Compatible = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
 	    Object.defineProperty(GCLConfig.prototype, "defaultConsentDuration", {
 	        get: function () {
 	            return this._defaultConsentDuration;
@@ -32769,6 +32807,7 @@ var GCLLib =
 	var _ = __webpack_require__(330);
 	var es6_promise_1 = __webpack_require__(337);
 	var ACTIVATION = '/activate';
+	var SYNC = '/sync';
 	var SEPARATOR = '/';
 	var QP_APIKEY = '?apikey=';
 	var SECURITY = '/security';
@@ -32786,6 +32825,9 @@ var GCLLib =
 	    }
 	    DSClient.prototype.activationRequest = function (pubKey, info, callback) {
 	        return this.connection.post(this.url, ACTIVATION, { pubKey: pubKey, info: info }, undefined, callback);
+	    };
+	    DSClient.prototype.synchronizationRequest = function (pubKey, info, proxy, callback) {
+	        return this.connection.post(this.url, SYNC, { pubKey: pubKey, info: info, proxy: proxy }, undefined, callback);
 	    };
 	    DSClient.prototype.getUrl = function () { return this.url; };
 	    DSClient.prototype.getInfo = function (callback) {

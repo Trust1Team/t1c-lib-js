@@ -14,7 +14,10 @@ import { Promise } from 'es6-promise';
 export { DSClient };
 
 
+// TODO check correct activation & sync endpoints
 const ACTIVATION = '/activate';
+const SYNC = '/sync';
+// ======
 const SEPARATOR = '/';
 const QP_APIKEY = '?apikey=';
 const SECURITY = '/security';
@@ -32,6 +35,11 @@ class DSClient implements AbstractDSClient {
     public activationRequest(pubKey: string, info: any,
                              callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse> {
         return this.connection.post(this.url, ACTIVATION, { pubKey, info }, undefined, callback);
+    }
+
+    public synchronizationRequest(pubKey: string, info: any, proxy: string,
+                                  callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.connection.post(this.url, SYNC, { pubKey, info, proxy }, undefined, callback);
     }
 
     public getUrl() { return this.url; }
