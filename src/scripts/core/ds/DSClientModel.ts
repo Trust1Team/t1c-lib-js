@@ -4,28 +4,30 @@
  */
 
 import * as CoreExceptions from "../exceptions/CoreExceptions";
-import { BrowserInfo, T1CResponse } from "../service/CoreModel";
+import { BrowserInfo, DataResponse, T1CResponse } from '../service/CoreModel';
 
 export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse,
     DeviceResponse, DSPlatformInfo };
 
 
 interface AbstractDSClient {
+    activationRequest(pubKey: string, info: any,
+                      callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
     getUrl(): string;
-    getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): void | Promise<DSInfoResponse>;
-    getJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse>;
-    getDevice(uuid: string, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): void | Promise<DeviceResponse>;
-    refreshJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse>;
-    getPubKey(callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): void | Promise<DSPubKeyResponse>;
+    getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
+    getJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
+    getDevice(uuid: string, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
+    refreshJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
+    getPubKey(callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse>;
     downloadLink(infoBrowser: BrowserInfo,
                  callback?: (error: CoreExceptions.RestException,
                              data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
     register(info: DSPlatformInfo,
              device_id: string,
-             callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse>;
+             callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
     sync(info: DSPlatformInfo,
          device_id: string,
-         callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse>;
+         callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
 }
 
 interface DSInfoResponse {

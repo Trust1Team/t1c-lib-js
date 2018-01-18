@@ -6,7 +6,7 @@ import { Connection } from '../client/Connection';
 import { GCLConfig } from '../GCLConfig';
 import * as CoreExceptions from '../exceptions/CoreExceptions';
 import * as _ from 'lodash';
-import { BrowserInfo } from '../service/CoreModel';
+import { BrowserInfo, DataResponse } from '../service/CoreModel';
 import { AbstractDSClient, DeviceResponse, DownloadLinkResponse,
     DSInfoResponse, DSPlatformInfo, DSPubKeyResponse, JWTResponse } from './DSClientModel';
 import { Promise } from 'es6-promise';
@@ -14,6 +14,7 @@ import { Promise } from 'es6-promise';
 export { DSClient };
 
 
+const ACTIVATION = '/activate';
 const SEPARATOR = '/';
 const QP_APIKEY = '?apikey=';
 const SECURITY = '/security';
@@ -28,18 +29,23 @@ const DEVICE = '/devices';
 class DSClient implements AbstractDSClient {
     constructor(private url: string, private connection: Connection, private cfg: GCLConfig) {}
 
+    public activationRequest(pubKey: string, info: any,
+                             callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.connection.post(this.url, ACTIVATION, { pubKey, info }, undefined, callback);
+    }
+
     public getUrl() { return this.url; }
 
-    public getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): void | Promise<DSInfoResponse> {
+    public getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse> {
         return this.connection.get(this.url, SYS_INFO, undefined, callback);
     }
 
     public getDevice(uuid: string,
-                     callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): void | Promise<DeviceResponse> {
+                     callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse> {
         return this.connection.get(this.url, DEVICE + SEPARATOR + uuid, undefined, callback);
     }
 
-    public getJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse> {
+    public getJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse> {
         let self = this;
 
         if (callback) {
@@ -65,14 +71,14 @@ class DSClient implements AbstractDSClient {
         }
     }
 
-    public refreshJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse> {
+    public refreshJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse> {
         let actualJWT = this.cfg.jwt;
         if (actualJWT) {
             return this.connection.post(this.url, SECURITY_JWT_REFRESH, { originalJWT: actualJWT }, undefined, callback);
         } else {
             let error = { code: '500', description: 'No JWT available', status: 412 };
-            if (callback) { return callback(error, null); }
-            else { return Promise.reject(error); }
+            if (callback) { callback(error, null); }
+            return Promise.reject(error);
         }
     }
 
