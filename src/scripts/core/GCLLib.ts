@@ -17,7 +17,7 @@ import {
 } from './ds/DSClientModel';
 import { DSClient } from './ds/DSClient';
 import { AbstractOCVClient, OCVClient } from './ocv/OCVClient';
-import { CardReadersResponse, DataResponse, InfoResponse } from './service/CoreModel';
+import { BrowserInfo, CardReadersResponse, DataResponse, InfoResponse } from './service/CoreModel';
 import { AbstractEidBE } from '../plugins/smartcards/eid/be/EidBeModel';
 import { AbstractEMV } from '../plugins/smartcards/emv/EMVModel';
 import { AbstractOcra } from '../plugins/smartcards/ocra/ocraModel';
@@ -41,11 +41,13 @@ import { AbstractBelfius } from '../plugins/remote-loading/belfius/BelfiusModel'
 import { AgentClient } from './agent/agent';
 import { AbstractAgent } from './agent/agentModel';
 import { AbstractFileExchange } from '../plugins/file/FileExchangeModel';
+import { AdminService } from './admin/admin';
 
 class GCLClient {
     public GCLInstalled: boolean;
     private cfg: GCLConfig;
     private pluginFactory: PluginFactory;
+    private adminService: AdminService;
     private coreService: CoreService;
     private connection: LocalConnection;
     private authConnection: LocalAuthConnection;
@@ -65,6 +67,7 @@ class GCLClient {
         this.remoteConnection = new RemoteConnection(this.cfg);
         this.localTestConnection = new LocalTestConnection(this.cfg);
         this.pluginFactory = new PluginFactory(this.cfg.gclUrl, this.connection);
+        this.adminService = new AdminService(this.cfg.gclUrl, this.authConnection);
         this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
         this.agentClient = new AgentClient(this.cfg.gclUrl, this.connection);
         if (this.cfg.localTestMode) { this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg); }
@@ -79,9 +82,6 @@ class GCLClient {
             // setup security - fail safe
             this.initLibrary();
         }
-
-        // verify OCV accessibility
-        // this.initOCVContext();
     }
 
     public static initialize(cfg: GCLConfig,
@@ -100,6 +100,12 @@ class GCLClient {
                 reject(error);
             });
         });
+    }
+
+    private static coreV2Compatible(version: string): boolean {
+        // sanitize version string
+        let sanitized = _.split(version, '-')[0];
+        return semver.satisfies(sanitized, '>=2.0.0');
     }
 
     private static checkTokenCompatible(version: string): boolean {
@@ -129,6 +135,8 @@ class GCLClient {
         return resolvedCfg;
     }
 
+    // get admin services
+    public admin = (): AdminService => { return this.adminService; };
     // get core services
     public core = (): CoreService => { return this.coreService; };
     // get core config
@@ -169,7 +177,8 @@ class GCLClient {
     // get instance for Belfius
     public belfius = (reader_id: string): AbstractBelfius => { return this.pluginFactory.createBelfius(reader_id); };
     // get instance for File Exchange
-    public fileExchange = (): AbstractFileExchange => { return this.pluginFactory.createFileExchange(); };
+    // created for POC only, disabled
+    // public fileExchange = (): AbstractFileExchange => { return this.pluginFactory.createFileExchange(); };
 
     // generic methods
     public containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void) {
@@ -235,6 +244,7 @@ class GCLClient {
                 let info = self.core().infoBrowserSync();
                 let mergedInfo = _.merge({ managed, core_version, activated }, info.data);
 
+
                 if (managed) {
                     // only attempt to sync if API key and DS URL are available,
                     // and if syncing for managed devices is turned on
@@ -247,38 +257,24 @@ class GCLClient {
                         resolve();
                     }
                 } else {
-                    // make sure pub key is set
-                    this.core().getPubKey().then(() => {
-                        // certificate loaded
-                        // console.log('certificate present, no need to retrieve from DS');
-                        resolve();
-                    }, err => {
-                        if (err && !err.success && err.code === 201) {
-                            // console.log('no certificate set - retrieve cert from DS');
-                            self.dsClient.getPubKey().then(dsResponse => {
-                                return self.core().setPubKey(dsResponse.pubkey).then(() => {
-                                    // activate and sync
-                                    if (!activated) {
-                                        // we need to register the device
-                                        // console.log('Register device:' + uuid);
-                                        return self.registerDevice(self, self_cfg, mergedInfo, uuid).then(() => {
-                                            return self.core().activate().then(() => {
-                                                // sync
-                                                mergedInfo.activated = true;
-                                                self.syncDevice(self, self_cfg, mergedInfo, uuid).then(() => { resolve(); });
-                                            });
-                                        });
-                                    } else {
-                                        // we need to synchronize the device
-                                        // console.log('Sync device:'+uuid);
-                                        return self.syncDevice(self, self_cfg, mergedInfo, uuid).then(() => { resolve(); });
-                                    }
-                                });
-                            }).catch(error => {
-                                reject(error);
-                                return;
+                    let activationPromise;
+                    if (activated) {
+                        // already activated, only need to sync device
+                        activationPromise = Promise.resolve();
+                    } else {
+                        // not yet activated, do this now
+                        activationPromise = this.unmanagedInitialization(self, self_cfg, mergedInfo, uuid, infoResponse);
+                    }
+                    activationPromise.then(() => {
+                        // device is activated, sync it
+                        self.syncDevice(self, self_cfg, mergedInfo, uuid).then(() => { resolve(); },
+                            () => {
+                                // ignore sync errors, will retry on next use
+                                mergedInfo.activated = true;
+                                resolve();
                             });
-                        }
+                    }, err => {
+                        reject(err);
                     });
                 }
             }, () => {
@@ -286,6 +282,88 @@ class GCLClient {
                 self.GCLInstalled = false;
                 // resolve with client as-is to allow download
                 resolve();
+            });
+        });
+    }
+
+    private unmanagedInitialization(self: GCLClient, self_cfg: GCLConfig,
+                                    mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo,
+                                    uuid: string, info: InfoResponse): Promise<{}> {
+        // check if we can use core v2 initialization
+        if (GCLClient.coreV2Compatible(mergedInfo.core_version)) {
+            // do core v2 initialization flow
+            return self.coreV2Init(self);
+        } else {
+            // do existing initialization
+            return self.coreV1Init(self, self_cfg, mergedInfo, uuid);
+        }
+    }
+
+    private coreV2Init(self: GCLClient) {
+        return new Promise((resolve, reject) => {
+            self.preRegister(self).then(self.register).then(self.postRegister).then(() => {
+                // activation sequence complete, resolve promise
+                resolve();
+            }).catch(err => {
+                reject(err);
+            });
+
+        });
+    }
+
+    private preRegister(self: GCLClient) {
+        // get GCL pubkey and registration info
+        return new Promise((resolve, reject) => {
+            self.admin().getPubKey().then(pubKey => {
+                return self.core().infoBrowser().then(browserInfo => {
+                    resolve({ self, pubKey, browserInfo });
+                });
+            }).catch(err => {
+                reject(err);
+            });
+        });
+
+    }
+
+    private register(args: { self: GCLClient, pubKey: string, infoBrowser: BrowserInfo }) {
+        // register with DS
+        return new Promise((resolve, reject) => {
+            args.self.dsClient.activationRequest(args.pubKey, args.infoBrowser).then(res => {
+                resolve({ self, activationResponse: res.data });
+            }, err => {
+                reject(err);
+            });
+        });
+    }
+
+    private postRegister(args: { self: GCLClient, activationResponse: any }) {
+        // activate GCL
+        return args.self.admin().activateGcl(args.activationResponse);
+    }
+
+    private coreV1Init(self: GCLClient, self_cfg: GCLConfig,
+                       mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo, uuid: string) {
+        return new Promise((resolve, reject) => {
+            // make sure pub key is set
+            self.core().getPubKey().then(() => {
+                // certificate loaded
+                // console.log('certificate present, no need to retrieve from DS');
+                resolve();
+            }, err => {
+                if (err && !err.success && err.code === 201) {
+                    // no certificate loaded, retrieve it from DS
+                    // console.log('no certificate set - retrieve cert from DS');
+                    self.dsClient.getPubKey().then(dsResponse => {
+                        return self.core().setPubKey(dsResponse.pubkey).then(() => {
+                            // activate & register
+                            // we need to register the device
+                            // console.log('Register device:' + uuid);
+                            return self.registerDevice(self, self_cfg, mergedInfo, uuid).then(() => { resolve(); });
+                        });
+                    }).catch(error => {
+                        reject(error);
+                    });
+                }
             });
         });
     }

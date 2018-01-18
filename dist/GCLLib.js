@@ -8951,9 +8951,11 @@ var GCLLib =
 	var GenericService_1 = __webpack_require__(505);
 	var ResponseHandler_1 = __webpack_require__(340);
 	var agent_1 = __webpack_require__(368);
+	var admin_1 = __webpack_require__(507);
 	var GCLClient = (function () {
 	    function GCLClient(cfg, automatic) {
 	        var _this = this;
+	        this.admin = function () { return _this.adminService; };
 	        this.core = function () { return _this.coreService; };
 	        this.config = function () { return _this.cfg; };
 	        this.agent = function () { return _this.agentClient; };
@@ -8975,7 +8977,6 @@ var GCLLib =
 	        };
 	        this.readerapi = function (reader_id) { return _this.pluginFactory.createRemoteLoading(reader_id); };
 	        this.belfius = function (reader_id) { return _this.pluginFactory.createBelfius(reader_id); };
-	        this.fileExchange = function () { return _this.pluginFactory.createFileExchange(); };
 	        var self = this;
 	        this.cfg = GCLClient.resolveConfig(cfg);
 	        this.connection = new Connection_1.LocalConnection(this.cfg);
@@ -8983,6 +8984,7 @@ var GCLLib =
 	        this.remoteConnection = new Connection_1.RemoteConnection(this.cfg);
 	        this.localTestConnection = new Connection_1.LocalTestConnection(this.cfg);
 	        this.pluginFactory = new PluginFactory_1.PluginFactory(this.cfg.gclUrl, this.connection);
+	        this.adminService = new admin_1.AdminService(this.cfg.gclUrl, this.authConnection);
 	        this.coreService = new CoreService_1.CoreService(this.cfg.gclUrl, this.authConnection);
 	        this.agentClient = new agent_1.AgentClient(this.cfg.gclUrl, this.connection);
 	        if (this.cfg.localTestMode) {
@@ -9015,6 +9017,10 @@ var GCLLib =
 	                reject(error);
 	            });
 	        });
+	    };
+	    GCLClient.coreV2Compatible = function (version) {
+	        var sanitized = _.split(version, '-')[0];
+	        return semver.satisfies(sanitized, '>=2.0.0');
 	    };
 	    GCLClient.checkTokenCompatible = function (version) {
 	        var sanitized = _.split(version, '-')[0];
@@ -9097,34 +9103,82 @@ var GCLLib =
 	                    }
 	                }
 	                else {
-	                    _this.core().getPubKey().then(function () {
-	                        resolve();
+	                    var activationPromise = void 0;
+	                    if (activated) {
+	                        activationPromise = es6_promise_1.Promise.resolve();
+	                    }
+	                    else {
+	                        activationPromise = _this.unmanagedInitialization(self, self_cfg, mergedInfo, uuid, infoResponse);
+	                    }
+	                    activationPromise.then(function () {
+	                        self.syncDevice(self, self_cfg, mergedInfo, uuid).then(function () { resolve(); }, function () {
+	                            mergedInfo.activated = true;
+	                            resolve();
+	                        });
 	                    }, function (err) {
-	                        if (err && !err.success && err.code === 201) {
-	                            self.dsClient.getPubKey().then(function (dsResponse) {
-	                                return self.core().setPubKey(dsResponse.pubkey).then(function () {
-	                                    if (!activated) {
-	                                        return self.registerDevice(self, self_cfg, mergedInfo, uuid).then(function () {
-	                                            return self.core().activate().then(function () {
-	                                                mergedInfo.activated = true;
-	                                                self.syncDevice(self, self_cfg, mergedInfo, uuid).then(function () { resolve(); });
-	                                            });
-	                                        });
-	                                    }
-	                                    else {
-	                                        return self.syncDevice(self, self_cfg, mergedInfo, uuid).then(function () { resolve(); });
-	                                    }
-	                                });
-	                            }).catch(function (error) {
-	                                reject(error);
-	                                return;
-	                            });
-	                        }
+	                        reject(err);
 	                    });
 	                }
 	            }, function () {
 	                self.GCLInstalled = false;
 	                resolve();
+	            });
+	        });
+	    };
+	    GCLClient.prototype.unmanagedInitialization = function (self, self_cfg, mergedInfo, uuid, info) {
+	        if (GCLClient.coreV2Compatible(mergedInfo.core_version)) {
+	            return self.coreV2Init(self);
+	        }
+	        else {
+	            return self.coreV1Init(self, self_cfg, mergedInfo, uuid);
+	        }
+	    };
+	    GCLClient.prototype.coreV2Init = function (self) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            self.preRegister(self).then(self.register).then(self.postRegister).then(function () {
+	                resolve();
+	            }).catch(function (err) {
+	                reject(err);
+	            });
+	        });
+	    };
+	    GCLClient.prototype.preRegister = function (self) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            self.admin().getPubKey().then(function (pubKey) {
+	                return self.core().infoBrowser().then(function (browserInfo) {
+	                    resolve({ self: self, pubKey: pubKey, browserInfo: browserInfo });
+	                });
+	            }).catch(function (err) {
+	                reject(err);
+	            });
+	        });
+	    };
+	    GCLClient.prototype.register = function (args) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            args.self.dsClient.activationRequest(args.pubKey, args.infoBrowser).then(function (res) {
+	                resolve({ self: self, activationResponse: res.data });
+	            }, function (err) {
+	                reject(err);
+	            });
+	        });
+	    };
+	    GCLClient.prototype.postRegister = function (args) {
+	        return args.self.admin().activateGcl(args.activationResponse);
+	    };
+	    GCLClient.prototype.coreV1Init = function (self, self_cfg, mergedInfo, uuid) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            self.core().getPubKey().then(function () {
+	                resolve();
+	            }, function (err) {
+	                if (err && !err.success && err.code === 201) {
+	                    self.dsClient.getPubKey().then(function (dsResponse) {
+	                        return self.core().setPubKey(dsResponse.pubkey).then(function () {
+	                            return self.registerDevice(self, self_cfg, mergedInfo, uuid).then(function () { resolve(); });
+	                        });
+	                    }).catch(function (error) {
+	                        reject(error);
+	                    });
+	                }
 	            });
 	        });
 	    };
@@ -32714,6 +32768,7 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var _ = __webpack_require__(330);
 	var es6_promise_1 = __webpack_require__(337);
+	var ACTIVATION = '/activate';
 	var SEPARATOR = '/';
 	var QP_APIKEY = '?apikey=';
 	var SECURITY = '/security';
@@ -32729,6 +32784,9 @@ var GCLLib =
 	        this.connection = connection;
 	        this.cfg = cfg;
 	    }
+	    DSClient.prototype.activationRequest = function (pubKey, info, callback) {
+	        return this.connection.post(this.url, ACTIVATION, { pubKey: pubKey, info: info }, undefined, callback);
+	    };
 	    DSClient.prototype.getUrl = function () { return this.url; };
 	    DSClient.prototype.getInfo = function (callback) {
 	        return this.connection.get(this.url, SYS_INFO, undefined, callback);
@@ -32778,11 +32836,9 @@ var GCLLib =
 	        else {
 	            var error = { code: '500', description: 'No JWT available', status: 412 };
 	            if (callback) {
-	                return callback(error, null);
+	                callback(error, null);
 	            }
-	            else {
-	                return es6_promise_1.Promise.reject(error);
-	            }
+	            return es6_promise_1.Promise.reject(error);
 	        }
 	    };
 	    DSClient.prototype.getPubKey = function (callback) {
@@ -77584,6 +77640,40 @@ var GCLLib =
 	    return CardUtil;
 	}());
 	exports.CardUtil = CardUtil;
+
+
+/***/ }),
+/* 507 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var CORE_ACTIVATE = '/admin/activate';
+	var CORE_PUB_KEY = '/admin/certificate';
+	var CORE_CONTAINERS = '/admin/containers';
+	var AdminService = (function () {
+	    function AdminService(url, connection) {
+	        this.url = url;
+	        this.connection = connection;
+	    }
+	    AdminService.prototype.activate = function (callback) {
+	        return this.connection.post(this.url, CORE_ACTIVATE, {}, undefined, callback);
+	    };
+	    AdminService.prototype.activateGcl = function (data, callback) {
+	        return this.connection.post(this.url, CORE_ACTIVATE, data, undefined, callback);
+	    };
+	    AdminService.prototype.getPubKey = function (callback) {
+	        return this.connection.get(this.url, CORE_PUB_KEY, undefined, callback);
+	    };
+	    AdminService.prototype.setPubKey = function (pubkey, callback) {
+	        return this.connection.put(this.url, CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);
+	    };
+	    AdminService.prototype.updateContainerConfig = function (config, callback) {
+	        return this.connection.post(this.url, CORE_CONTAINERS, config, undefined, callback);
+	    };
+	    return AdminService;
+	}());
+	exports.AdminService = AdminService;
 
 
 /***/ })
