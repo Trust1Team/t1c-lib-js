@@ -6,7 +6,6 @@
  */
 import * as CoreExceptions from './exceptions/CoreExceptions';
 import * as _ from 'lodash';
-import * as semver from 'semver';
 
 import { GCLConfig } from './GCLConfig';
 import { CoreService } from './service/CoreService';
@@ -42,8 +41,7 @@ import { AgentClient } from './agent/agent';
 import { AbstractAgent } from './agent/agentModel';
 import { AbstractFileExchange } from '../plugins/file/FileExchangeModel';
 import { AdminService } from './admin/admin';
-import { SyncUtil } from '../util/SyncUtil';
-import { ActivationUtil } from '../util/ActivationUtil';
+import { InitUtil } from '../util/InitUtil';
 
 class GCLClient {
     public GCLInstalled: boolean;
@@ -69,7 +67,7 @@ class GCLClient {
         this.remoteConnection = new RemoteConnection(this.cfg);
         this.localTestConnection = new LocalTestConnection(this.cfg);
         this.pluginFactory = new PluginFactory(this.cfg.gclUrl, this.connection);
-        this.adminService = new AdminService(this.cfg.gclUrl, this.authConnection);
+        this.adminService = new AdminService(this.cfg.gclUrl, this.authConnection, this);
         this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
         this.agentClient = new AgentClient(this.cfg.gclUrl, this.connection);
         if (this.cfg.localTestMode) { this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg); }
@@ -104,18 +102,6 @@ class GCLClient {
         });
     }
 
-    private static coreV2Compatible(version: string): boolean {
-        // sanitize version string
-        let sanitized = _.split(version, '-')[0];
-        return semver.satisfies(sanitized, '>=2.0.0');
-    }
-
-    private static checkTokenCompatible(version: string): boolean {
-        // sanitize version string
-        let sanitized = _.split(version, '-')[0];
-        return semver.satisfies(sanitized, '>=1.4.0');
-    }
-
     private static resolveConfig(cfg: GCLConfig) {
         // must be the base url because the GCLConfig object adds the context path and keeps the base url intact
         let resolvedCfg: GCLConfig = new GCLConfig(cfg.dsUrlBase, cfg.apiKey);
@@ -146,7 +132,7 @@ class GCLClient {
     // get agent client services
     public agent = (): AbstractAgent => { return this.agentClient; };
     // get ds client services
-    public ds = (): AbstractDSClient => { return this.dsClient; };
+    public ds = (): DSClient => { return this.dsClient; };
     // get ocv client services
     public ocv = (): AbstractOCVClient => { return this.ocvClient; };
     // get instance for belgian eID card
@@ -221,6 +207,14 @@ class GCLClient {
     }
 
     /**
+     * Utility methods
+     */
+    public updateAuthConnection(cfg: GCLConfig) {
+        this.authConnection = new LocalAuthConnection(cfg);
+        this.coreService = new CoreService(cfg.gclUrl, this.authConnection);
+    }
+
+    /**
      * Init OCV - verify if OCV is available
      */
     private initOCVContext(cb?: (error: any) => any) {
@@ -232,62 +226,7 @@ class GCLClient {
      */
     private initLibrary(): Promise<{}> {
         let self = this;
-        let self_cfg = this.cfg;
-
-        return new Promise((resolve, reject) => {
-            self.core().info().then(infoResponse => {
-                // update config values
-                self_cfg.citrix = infoResponse.data.citrix;
-                self_cfg.tokenCompatible = GCLClient.checkTokenCompatible(infoResponse.data.version);
-                self_cfg.v2Compatible = GCLClient.coreV2Compatible(infoResponse.data.version);
-
-                let activated = infoResponse.data.activated;
-                let managed = infoResponse.data.managed;
-                let core_version = infoResponse.data.version;
-                let uuid = infoResponse.data.uid;
-                // compose info
-                let info = self.core().infoBrowserSync();
-                let mergedInfo = _.merge({ managed, core_version, activated }, info.data);
-
-
-                if (managed) {
-                    // only attempt to sync if API key and DS URL are available,
-                    // and if syncing for managed devices is turned on
-                    if (self_cfg.apiKey && self_cfg.dsUrlBase && self_cfg.syncManaged) {
-                        // attempt to sync
-                        SyncUtil.syncDevice(self.dsClient, self_cfg, mergedInfo, uuid).then(() => { resolve(); },
-                            () => { resolve(); });
-                    } else {
-                        // nothing to do here *jetpack*
-                        resolve();
-                    }
-                } else {
-                    let activationPromise;
-                    if (activated) {
-                        // already activated, only need to sync device
-                        activationPromise = Promise.resolve();
-                    } else {
-                        // not yet activated, do this now
-                        activationPromise = ActivationUtil.unManagedInitialization(self.adminService,
-                            self.coreService, self.dsClient, self_cfg, mergedInfo, uuid);
-                    }
-                    activationPromise.then(() => {
-                        // update core service
-                        self.authConnection = new LocalAuthConnection(self_cfg);
-                        self.coreService = new CoreService(self.cfg.gclUrl, self.authConnection);
-                        // device is activated, sync it
-                        resolve(SyncUtil.unManagedSynchronization(self.adminService, self.dsClient, self_cfg, mergedInfo, uuid));
-                    }, err => {
-                        reject(err);
-                    });
-                }
-            }, () => {
-                // failure probably because GCL is not installed
-                self.GCLInstalled = false;
-                // resolve with client as-is to allow download
-                resolve();
-            });
-        });
+        return InitUtil.initializeLibrary(self);
     }
 
     // implicit download GCL instance when not found
