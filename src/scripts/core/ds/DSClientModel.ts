@@ -5,6 +5,9 @@
 
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 import { BrowserInfo, DataResponse, T1CResponse } from '../service/CoreModel';
+import { GCLConfig } from '../GCLConfig';
+import { Connection } from '../client/Connection';
+import { DSClient } from './DSClient';
 
 export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse,
     DeviceResponse, DSPlatformInfo };
