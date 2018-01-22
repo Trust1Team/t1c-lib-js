@@ -3,20 +3,20 @@
  * @author Maarten Somers
  * @since 2017
  */
-import {LocalConnection} from "../../../../core/client/Connection";
-import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { AuthenticateOrSignData, GenericSecuredCertCard, OptionalPin } from "../../Card";
-import { CertificateResponse, CertificatesResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import {LocalConnection} from '../../../../core/client/Connection';
+import { RestException } from '../../../../core/exceptions/CoreExceptions';
+import { AuthenticateOrSignData, GenericSecuredCertCard, OptionalPin } from '../../Card';
+import { CertificateResponse, CertificatesResponse, DataResponse, T1CResponse } from '../../../../core/service/CoreModel';
 import {
     AbstractEidLUX, AllCertsResponse, AllDataResponse,
     BiometricResponse, PictureResponse, SignatureImageResponse
-} from "./EidLuxModel";
-import { Promise } from "es6-promise";
-import { Certificate } from "pkijs";
-import { PinEnforcer } from "../../../../util/PinEnforcer";
-import { CertParser } from "../../../../util/CertParser";
-import { ResponseHandler } from "../../../../util/ResponseHandler";
-import { Options, RequestHandler, RequestOptions } from "../../../../util/RequestHandler";
+} from './EidLuxModel';
+import { Promise } from 'es6-promise';
+import { Certificate } from 'pkijs';
+import { PinEnforcer } from '../../../../util/PinEnforcer';
+import { CertParser } from '../../../../util/CertParser';
+import { ResponseHandler } from '../../../../util/ResponseHandler';
+import { Options, RequestHandler, RequestOptions } from '../../../../util/RequestHandler';
 
 export { EidLux };
 
@@ -33,10 +33,10 @@ function createPinQueryParam(pin: string): { pin: string } {
 
 
 class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
-    static BIOMETRIC = "/biometric";
-    static ADDRESS = "/address";
-    static PHOTO = "/picture";
-    static SIGNATURE_IMAGE = "/signature-image";
+    static BIOMETRIC = '/biometric';
+    static ADDRESS = '/address';
+    static PHOTO = '/picture';
+    static SIGNATURE_IMAGE = '/signature-image';
 
 
     // constructor
@@ -50,11 +50,11 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
 
     // filters
     public allDataFilters() {
-        return [ "authentication-certificate", "biometric", "non-repudiation-certificate", "picture", "root-certificates" ];
+        return [ 'authentication-certificate', 'biometric', 'non-repudiation-certificate', 'picture', 'root-certificates' ];
     }
 
     public allCertFilters() {
-        return [ "authentication-certificate", "non-repudiation-certificate", "root-certificates" ];
+        return [ 'authentication-certificate', 'non-repudiation-certificate', 'root-certificates' ];
     }
 
     public allData(options?: string[] | Options,

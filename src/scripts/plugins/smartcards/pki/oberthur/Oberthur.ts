@@ -3,13 +3,13 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { CertificateResponse, T1CResponse } from "../../../../core/service/CoreModel";
-import { GenericCertCard, VerifyPinData } from "../../Card";
-import { AbstractOberthur } from "./OberthurModel";
-import { PinEnforcer } from "../../../../util/PinEnforcer";
-import { Promise } from "es6-promise";
-import { Options, RequestHandler } from "../../../../util/RequestHandler";
+import { RestException } from '../../../../core/exceptions/CoreExceptions';
+import { CertificateResponse, T1CResponse } from '../../../../core/service/CoreModel';
+import { GenericCertCard, VerifyPinData } from '../../Card';
+import { AbstractOberthur } from './OberthurModel';
+import { PinEnforcer } from '../../../../util/PinEnforcer';
+import { Promise } from 'es6-promise';
+import { Options, RequestHandler } from '../../../../util/RequestHandler';
 
 export { Oberthur };
 
@@ -18,16 +18,16 @@ class Oberthur extends GenericCertCard implements AbstractOberthur {
 
     // filters
     public allDataFilters() {
-        return [ "root_certificate", "authentication-certificate",
-                 "encryption_certificate", "issuer_certificate", "signing_certificate" ];
+        return [ 'root_certificate', 'authentication-certificate',
+                 'encryption_certificate', 'issuer_certificate', 'signing_certificate' ];
     }
 
     public allCertFilters() {
-        return [ "root_certificate", "authentication-certificate", "encryption_certificate", "issuer_certificate", "signing_certificate" ];
+        return [ 'root_certificate', 'authentication-certificate', 'encryption_certificate', 'issuer_certificate', 'signing_certificate' ];
     }
 
     public allKeyRefs() {
-        return [ "authenticate", "sign", "encrypt" ];
+        return [ 'authenticate', 'sign', 'encrypt' ];
     }
 
     public rootCertificate(options?: Options,

@@ -16,19 +16,20 @@ interface AbstractFileExchange {
 }
 
 
-interface ListFilesRequest {
-    path: string,
-    extensions: string[]
+class ListFilesRequest {
+    constructor(public path: string, public extensions: string[]) {}
 }
 
-interface File {
-    extension: string,
-    last_modification_time: string,
-    name: string,
-    path: string,
-    size: number
+class File {
+    constructor(public extension: string,
+                public name: string,
+                public path: string,
+                public size: number,
+                public last_modification_time: string) {}
 }
 
-interface FileListResponse extends T1CResponse {
-    data: File[]
+class FileListResponse extends T1CResponse {
+    constructor(public data: File[], public success: boolean) {
+        super(success, data);
+    }
 }

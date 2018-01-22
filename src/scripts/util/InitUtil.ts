@@ -8,6 +8,7 @@ import * as _ from 'lodash';
 import * as semver from 'semver';
 import { SyncUtil } from './SyncUtil';
 import { ActivationUtil } from './ActivationUtil';
+import { DSPlatformInfo } from '../core/ds/DSClientModel';
 
 export { InitUtil };
 
@@ -31,7 +32,7 @@ class InitUtil {
                 let uuid = infoResponse.data.uid;
                 // compose info
                 let info = client.core().infoBrowserSync();
-                let mergedInfo = _.merge({ managed, core_version, activated }, info.data);
+                let mergedInfo = new DSPlatformInfo(activated, info.data, core_version);
 
 
                 if (managed) {

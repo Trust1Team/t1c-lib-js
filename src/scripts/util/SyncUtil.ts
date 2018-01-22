@@ -18,7 +18,7 @@ class SyncUtil {
     public static unManagedSynchronization(admin: AdminService,
                                            ds: DSClient,
                                            config: GCLConfig,
-                                           mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo,
+                                           mergedInfo: DSPlatformInfo,
                                            uuid: string) {
         // do core v2 sync flow
         return new Promise((resolve, reject) => {

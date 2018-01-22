@@ -7,6 +7,7 @@ import { BrowserInfo } from '../core/service/CoreModel';
 import { Promise } from 'es6-promise';
 import { DSClient } from '../core/ds/DSClient';
 import { AdminService } from '../core/admin/admin';
+import { DSPlatformInfo } from '../core/ds/DSClientModel';
 
 export { ActivationUtil };
 
@@ -17,7 +18,7 @@ class ActivationUtil {
     public static unManagedInitialization(admin: AdminService,
                                           ds: DSClient,
                                           self_cfg: GCLConfig,
-                                          mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo,
+                                          mergedInfo: DSPlatformInfo,
                                           uuid: string): Promise<{}> {
         // do core v2 initialization flow
         return new Promise((resolve, reject) => {
@@ -52,7 +53,7 @@ class ActivationUtil {
     }
 
     private static register(args: { ds: DSClient, uuid: string, pubKey: string,
-        mergedInfo: { managed: boolean, core_version: string, activated: boolean } & BrowserInfo }) {
+        mergedInfo: DSPlatformInfo }) {
         // register with DS
         return new Promise((resolve, reject) => {
             args.ds.activationRequest(args.pubKey, args.mergedInfo).then(res => {

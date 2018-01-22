@@ -5,6 +5,7 @@
 import { RestException } from "../../../core/exceptions/CoreExceptions";
 import { GenericSecuredCertCard, OptionalPin } from "../Card";
 import { CertificateResponse, DataObjectResponse } from "../../../core/service/CoreModel";
+import { Options } from '../../../util/RequestHandler';
 
 export { AbstractPiv, AllCertsResponse, AllDataResponse, PrintedInformation, PrintedInformationResponse, FacialImage, FacialImageResponse };
 
@@ -28,9 +29,11 @@ interface AbstractPiv extends GenericSecuredCertCard {
              callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
 
     authenticationCertificate(body: OptionalPin,
+                              options?: Options,
                               callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
     signingCertificate(body: OptionalPin,
+                       options?: Options,
                        callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
 

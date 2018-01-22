@@ -3,6 +3,7 @@
  */
 import { Card } from '../core/service/CoreModel';
 import * as _ from 'lodash';
+import { Options } from './RequestHandler';
 
 export { CardUtil };
 
@@ -135,7 +136,7 @@ class CardUtil {
         }
     }
 
-    public static dumpOptions(container: string) {
+    public static dumpOptions(container: string): Options {
         switch (container) {
             case 'aventra':
             case 'beid':
@@ -147,11 +148,11 @@ class CardUtil {
             case 'ocra':
             case 'piv':
             case 'pteid':
-                return { filters: [], parseCerts: true };
+                return new Options(true, []);
             case 'safenet':
                 return undefined;
             case 'emv':
-                return [];
+                return new Options(false, []);
             default:
                 return undefined;
         }

@@ -29,7 +29,7 @@ class CertParser {
                     if (_.isArray(value)) {
                         let newData = [];
                         _.forEach(value, (certificate: string) => {
-                            let cert: T1CCertificate = { base64: certificate };
+                            let cert: T1CCertificate = new T1CCertificate(certificate);
                             if (parseCerts) { cert.parsed = CertParser.processCert(certificate); }
                             newData.push(cert);
                         });
@@ -43,19 +43,19 @@ class CertParser {
                 let newData = [];
                 _.forEach(response.data, (certificate: string | { base64: string, id: string }) => {
                     if (typeof certificate === 'string') {
-                        let cert: T1CCertificate = { base64: certificate };
+                        let cert: T1CCertificate = new T1CCertificate(certificate);
                         if (parseCerts) { cert.parsed = CertParser.processCert(certificate); }
                         newData.push(cert);
                     } else {
                         // assume object
-                        let cert: T1CCertificate = certificate;
+                        let cert: T1CCertificate = new T1CCertificate(certificate.base64);
                         if (parseCerts) { cert.parsed = CertParser.processCert(certificate.base64); }
                         newData.push(cert);
                     }
                 });
                 response.data = newData;
             } else {
-                let cert: T1CCertificate = { base64: response.data };
+                let cert: T1CCertificate = new T1CCertificate(response.data);
                 if (parseCerts) { cert.parsed = CertParser.processCert(response.data); }
                 response.data = cert;
             }

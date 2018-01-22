@@ -2,9 +2,9 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from "../../../core/exceptions/CoreExceptions";
-import { DataObjectResponse, DataResponse, T1CResponse } from "../../../core/service/CoreModel";
-import { Card } from "../Card";
+import { RestException } from '../../../core/exceptions/CoreExceptions';
+import { DataObjectResponse, DataResponse, T1CResponse } from '../../../core/service/CoreModel';
+import { Card } from '../Card';
 
 export { AbstractMobib, AllDataResponse, StatusResponse, CardIssuing, CardIssuingResponse, Contract, ContractsResponse };
 
@@ -20,7 +20,7 @@ interface AbstractMobib extends Card {
 interface AllDataResponse extends DataObjectResponse {
     data: {
         active: boolean
-        "card-issuing": CardIssuing
+        'card-issuing': CardIssuing
         contracts: Contract[]
         picture: string
     }

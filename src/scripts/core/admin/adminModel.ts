@@ -21,6 +21,6 @@ interface AbstractAdmin {
     updateContainerConfig(config: any, callback?: (error: CoreExceptions.RestException, data: any) => void): Promise<any>
 }
 
-interface PubKeyResponse extends T1CResponse {
-    data: string
+class PubKeyResponse implements T1CResponse {
+    constructor(public data: string, public success: boolean) {}
 }

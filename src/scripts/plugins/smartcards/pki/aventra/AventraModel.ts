@@ -5,6 +5,7 @@
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { CertificateResponse, DataArrayResponse, DataObjectResponse, T1CResponse } from "../../../../core/service/CoreModel";
 import { CertCard, ResetPinData, VerifyPinData } from "../../Card";
+import { Options } from '../../../../util/RequestHandler';
 
 export { AbstractAventra, AllCertsResponse, AllDataResponse };
 
@@ -17,11 +18,15 @@ interface AbstractAventra extends CertCard {
     allAlgoRefsForSigning(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
     allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
     allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
-    rootCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    issuerCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    authenticationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    signingCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    encryptionCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    rootCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    issuerCertificate(options?: Options,
+                      callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    authenticationCertificate(options?: Options,
+                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    signingCertificate(options?: Options,
+                       callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    encryptionCertificate(options?: Options,
+                          callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     resetPin(body: ResetPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
 }

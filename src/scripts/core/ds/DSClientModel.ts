@@ -35,56 +35,45 @@ interface AbstractDSClient {
          callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
 }
 
-interface DSInfoResponse {
-    configFile: string
-    build: string
-    version: string
-    environemnt: string // TODO fix typo in DS
-    storageAppName: string
-    storageServiceAccount: string
-    storageCertPath: string
-    storageBucket: string
-    storageDownloadPrefix: string
-    fileOsx: string
-    fileWin32: string
-    fileWin64: string
-    fileDefaultVersion: string
-    securityEnabled: string // TODO should really be a boolean, needs fix in DS!
-    securityPrivateKeyAvailable: boolean
+class DSInfoResponse {
+    constructor(public configFile: string,
+                public build: string,
+                public version: string,
+                public environemnt: string, // TODO fix typo in DS
+                public storageAppName: string,
+                public storageServiceAccount: string,
+                public storageCertPath: string,
+                public storageBucket: string,
+                public storageDownloadPrefix: string,
+                public fileOsx: string,
+                public fileWin32: string,
+                public fileWin64: string,
+                public fileDefaultVersion: string,
+                public securityEnabled: string, // TODO should really be a boolean, needs fix in DS!
+                public securityPrivateKeyAvailable: boolean) {}
 }
 
-interface DownloadLinkResponse extends T1CResponse {
-    url: string
+class DownloadLinkResponse implements T1CResponse {
+    constructor(public url: string, public success: boolean) {}
 }
 
-interface JWTResponse {
-    token: string
+class JWTResponse {
+    constructor(public token: string) {}
 }
 
-interface DSPubKeyResponse extends T1CResponse {
-    pubkey: string
+class DSPubKeyResponse implements T1CResponse {
+    constructor(public pubkey: string, public success: boolean) {}
 }
 
-interface DeviceResponse {
-    uuid: string,
-    activated: boolean,
-    managed: boolean,
-    coreVersion: string
+class DeviceResponse {
+    constructor(public activated: boolean, public coreVersion: string, public managed: boolean, public uuid: string) {}
 }
 
-interface DSPlatformInfo {
-    activated: boolean
-    browser: {
-        name: string
-        version: string
+class DSPlatformInfo extends BrowserInfo {
+    constructor(public activated: boolean,
+                public bi: BrowserInfo,
+                public core_version: string) {
+        super(bi.browser, bi.manufacturer, bi.os, bi.ua);
     }
-    core_version: string
-    manufacturer: string
-    os: {
-        architecture: number
-        name: string
-        version: string
-    }
-    ua: string
 }
 

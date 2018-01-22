@@ -1,12 +1,8 @@
 /**
  * @author Michallis Pashidis
  */
-interface RestException {
-    description: string;
-    status: number;
-    code: string;
+class RestException {
+    constructor(public status: number, public code: string, public description: string) {}
 }
 
-interface DataException {}
-
-export { RestException, DataException };
+export { RestException };
