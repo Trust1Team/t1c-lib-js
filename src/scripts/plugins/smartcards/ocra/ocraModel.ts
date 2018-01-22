@@ -22,8 +22,10 @@ interface AllDataResponse extends DataObjectResponse {
     }
 }
 
-interface ChallengeData extends OptionalPin {
-    challenge: string
+class ChallengeData extends OptionalPin {
+    constructor(public challenge: string, public pin?: string, public pace?: string) {
+        super(pin, pace);
+    }
 }
 
 interface ReadCounterResponse extends T1CResponse {

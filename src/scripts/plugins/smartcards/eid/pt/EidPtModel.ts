@@ -5,6 +5,7 @@
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { CertCard, OptionalPin } from '../../Card';
 import { CertificateResponse, DataObjectResponse, DataResponse, T1CCertificate } from "../../../../core/service/CoreModel";
+import { Options } from '../../../../util/RequestHandler';
 
 export { AbstractEidPT, AllCertsResponse, AllDataResponse, IdDataResponse, PtAddressResponse };
 
@@ -16,11 +17,15 @@ interface AbstractEidPT extends CertCard {
     idDataWithOutPhoto(callback?: (error: RestException, data: IdDataResponse) => void): Promise<IdDataResponse>;
     address(data: OptionalPin, callback?: (error: RestException, data: PtAddressResponse) => void): Promise<PtAddressResponse>;
     photo(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    rootCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    rootAuthenticationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    rootNonRepudiationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    authenticationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    nonRepudiationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    rootCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    rootAuthenticationCertificate(options: Options,
+                                  callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    rootNonRepudiationCertificate(options: Options,
+                                  callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    authenticationCertificate(options: Options,
+                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    nonRepudiationCertificate(options: Options,
+                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
 
 interface AllCertsResponse extends DataObjectResponse {

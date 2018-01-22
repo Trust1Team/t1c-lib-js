@@ -2,27 +2,27 @@
  * @author Maarten Somers
  */
 
-import { Promise } from "es6-promise";
-import { GCLClient } from "../GCLLib";
-import { AuthenticateOrSignData, OptionalPin, VerifyPinData } from "../../plugins/smartcards/Card";
-import { EidBe } from "../../plugins/smartcards/eid/be/EidBe";
-import { RestException } from "../exceptions/CoreExceptions";
-import { CardReader, CardReadersResponse, DataResponse } from "../service/CoreModel";
-import { ResponseHandler } from "../../util/ResponseHandler";
-import * as _ from "lodash";
-import { CardUtil } from "../../util/CardUtil";
-import { Aventra } from "../../plugins/smartcards/pki/aventra/Aventra";
-import { Options } from "../../util/RequestHandler";
+import { Promise } from 'es6-promise';
+import { GCLClient } from '../GCLLib';
+import { AuthenticateOrSignData, OptionalPin, VerifyPinData } from '../../plugins/smartcards/Card';
+import { EidBe } from '../../plugins/smartcards/eid/be/EidBe';
+import { RestException } from '../exceptions/CoreExceptions';
+import { CardReader, CardReadersResponse, DataResponse } from '../service/CoreModel';
+import { ResponseHandler } from '../../util/ResponseHandler';
+import * as _ from 'lodash';
+import { CardUtil } from '../../util/CardUtil';
+import { Aventra } from '../../plugins/smartcards/pki/aventra/Aventra';
+import { Options } from '../../util/RequestHandler';
 
 export { GenericService };
 
-interface Arguments {
-    client: GCLClient,
-    readerId: string,
-    container: string,
-    data: OptionalPin,
-    dumpMethod?: string
-    dumpOptions?: Options
+class Arguments {
+    constructor(public client: GCLClient,
+                public readerId: string,
+                public container: string,
+                public data: OptionalPin,
+                public dumpMethod?: string,
+                public dumpOptions?: Options) {}
 }
 
 
@@ -150,7 +150,7 @@ class GenericService {
                      .then(container => { return { client, container }; })
                      .then(this.checkContainerAvailable)
                      .then((args: { client: GCLClient, container: string }) => {
-                         return { client: args.client, readerId, container: args.container, data };
+                         return new Arguments(args.client, readerId, args.container, data);
                      });
     }
 
@@ -160,8 +160,8 @@ class GenericService {
             if (reader) {
                 resolve(reader);
             } else {
-                if (args.readerId && args.readerId.length) { reject("No card found for this ID"); }
-                else { reject("Reader ID is required."); }
+                if (args.readerId && args.readerId.length) { reject('No card found for this ID'); }
+                else { reject('Reader ID is required.'); }
             }
         });
     }
@@ -173,10 +173,10 @@ class GenericService {
                     if (_.find(res.data, ct => { return ct.id === args.container; })) {
                         resolve(args);
                     } else {
-                        reject("Container for this card is not available");
+                        reject('Container for this card is not available');
                     }
                 });
-            } else { reject("Unknown card type"); }
+            } else { reject('Unknown card type'); }
         });
     }
 
@@ -185,7 +185,7 @@ class GenericService {
             if (!args.data.algorithm_reference || !args.data.algorithm_reference.length) {
                 args.data.algorithm_reference = CardUtil.defaultAlgo(args.container);
             }
-            if (!args.data.algorithm_reference) { reject("No algorithm reference provided and cannot determine default algorithm"); }
+            if (!args.data.algorithm_reference) { reject('No algorithm reference provided and cannot determine default algorithm'); }
             else { resolve(args); }
         });
     }
@@ -194,7 +194,7 @@ class GenericService {
         return new Promise((resolve, reject) => {
             if (reader && reader.card) {
                 resolve(CardUtil.determineContainer(reader.card));
-            } else { reject("No card present in reader"); }
+            } else { reject('No card present in reader'); }
         });
     }
 
@@ -203,12 +203,12 @@ class GenericService {
             args.dumpMethod = CardUtil.dumpMethod(args.container);
             args.dumpOptions = CardUtil.dumpOptions(args.container);
             if (args.dumpMethod) { resolve(args); }
-            else { reject("Cannot determine method to use for data dump"); }
+            else { reject('Cannot determine method to use for data dump'); }
         });
     }
 
     private static doDataDump(args: Arguments) {
-        if (args.container === "luxeid") {
+        if (args.container === 'luxeid') {
             return args.client.luxeid(args.readerId, args.data.pin).allData({ filters: [], parseCerts: true});
         }
         if (args.dumpOptions) { return args.client[args.container](args.readerId)[args.dumpMethod](args.dumpOptions, args.data); }
@@ -216,7 +216,7 @@ class GenericService {
     }
 
     private static doSign(args: Arguments) {
-        if (args.container === "luxeid") {
+        if (args.container === 'luxeid') {
             return args.client.luxeid(args.readerId, args.data.pin).signData(args.data);
         } else {
             return args.client[args.container](args.readerId).signData(args.data);
@@ -224,7 +224,7 @@ class GenericService {
     }
 
     private static doAuthenticate(args: Arguments) {
-        if (args.container === "luxeid") {
+        if (args.container === 'luxeid') {
             return args.client.luxeid(args.readerId, args.data.pin).authenticate(args.data);
         } else {
             return args.client[args.container](args.readerId).authenticate(args.data);
@@ -232,15 +232,15 @@ class GenericService {
     }
 
     private static doVerifyPin(args: Arguments) {
-        if (args.container === "luxeid") {
+        if (args.container === 'luxeid') {
             return args.client.luxeid(args.readerId, args.data.pin).verifyPin(args.data);
-        } else if (args.container === "beid") {
+        } else if (args.container === 'beid') {
             let verifyPinData: VerifyPinData = {
                 pin: args.data.pin,
                 private_key_reference: EidBe.VERIFY_PRIV_KEY_REF
             };
             return args.client.beid(args.readerId).verifyPin(verifyPinData);
-        } else if (args.container === "aventra") {
+        } else if (args.container === 'aventra') {
             let verifyPinData: VerifyPinData = {
                 pin: args.data.pin,
                 private_key_reference: Aventra.DEFAULT_VERIFY_PIN

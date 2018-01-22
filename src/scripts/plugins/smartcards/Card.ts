@@ -18,17 +18,10 @@ import { Options, RequestHandler, RequestOptions } from '../../util/RequestHandl
 export { Card, CertCard, PinCard, SecuredCertCard, AuthenticateOrSignData, ResetPinData, VerifyPinData, OptionalPin,
     GenericContainer, GenericReaderContainer, GenericSmartCard, GenericPinCard, GenericCertCard, GenericSecuredCertCard };
 
+
+// interfaces
 interface Card {
     allData: (filters: string[], callback?: () => void) => Promise<DataObjectResponse>;
-}
-
-interface OptionalPin {
-    pin?: string
-    pace?: string
-}
-
-interface VerifyPinData extends OptionalPin {
-    private_key_reference: string
 }
 
 interface PinCard extends Card {
@@ -49,15 +42,26 @@ interface SecuredCertCard {
     verifyPin: (body: OptionalPin, callback?: () => void) => Promise<T1CResponse>
 }
 
-interface AuthenticateOrSignData extends OptionalPin {
-    algorithm_reference: string
-    data: string
+
+// classes
+class OptionalPin {
+    constructor(public pin?: string, public pace?: string) {}
 }
 
-interface ResetPinData {
-    puk: string,
-    new_pin: string
-    private_key_reference: string
+class AuthenticateOrSignData extends OptionalPin {
+    constructor(public algorithm_reference: string, public data: string, public pin?: string, public pace?: string) {
+        super(pin, pace);
+    }
+}
+
+class VerifyPinData extends OptionalPin {
+    constructor(public private_key_reference: string, public pin: string, public pace?: string) {
+        super(pin, pace);
+    }
+}
+
+class ResetPinData {
+    constructor(public puk: string, public new_pin: string, public private_key_reference: string) {}
 }
 
 abstract class GenericContainer {

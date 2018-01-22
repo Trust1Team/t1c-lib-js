@@ -18,8 +18,6 @@ interface AgentResponse extends T1CResponse {
     data: Agent[]
 }
 
-interface Agent {
-    port: number,
-    hostname: string
-    last_update: string
+class Agent {
+    constructor(public hostname: string, public port: number, public last_update: string) {}
 }

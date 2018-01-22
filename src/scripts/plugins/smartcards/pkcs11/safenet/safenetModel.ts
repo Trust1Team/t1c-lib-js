@@ -55,9 +55,15 @@ interface SafeNetCertificatesResponse extends CertificatesResponse {
     data: SafeNetCertificate[]
 }
 
-interface SafeNetSignData extends AuthenticateOrSignData {
-    slot_id: number
-    cert_id: string
+class SafeNetSignData extends AuthenticateOrSignData {
+    constructor(public slot_id: number,
+                public cert_id: string,
+                public algorithm_reference: string,
+                public data: string,
+                public pin?: string,
+                public pace?: string) {
+        super(pin, pace);
+    }
 }
 
 interface TokenInfo {

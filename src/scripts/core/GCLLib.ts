@@ -5,18 +5,14 @@
  * @since 2016
  */
 import * as CoreExceptions from './exceptions/CoreExceptions';
-import * as _ from 'lodash';
 
 import { GCLConfig } from './GCLConfig';
 import { CoreService } from './service/CoreService';
 import { LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection } from './client/Connection';
-import {
-    AbstractDSClient, DownloadLinkResponse, DSPlatformInfo,
-    JWTResponse
-} from './ds/DSClientModel';
+import { DownloadLinkResponse } from './ds/DSClientModel';
 import { DSClient } from './ds/DSClient';
 import { AbstractOCVClient, OCVClient } from './ocv/OCVClient';
-import { BrowserInfo, CardReadersResponse, DataResponse, InfoResponse } from './service/CoreModel';
+import { CardReadersResponse, DataResponse } from './service/CoreModel';
 import { AbstractEidBE } from '../plugins/smartcards/eid/be/EidBeModel';
 import { AbstractEMV } from '../plugins/smartcards/emv/EMVModel';
 import { AbstractOcra } from '../plugins/smartcards/ocra/ocraModel';
