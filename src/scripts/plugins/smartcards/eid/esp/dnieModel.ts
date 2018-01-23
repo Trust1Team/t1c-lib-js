@@ -4,7 +4,10 @@
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { OptionalPin, SecuredCertCard } from "../../Card";
-import { CertificateResponse, DataObjectResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import {
+    CertificateResponse, DataObjectResponse, T1CCertificate,
+    T1CResponse
+} from '../../../../core/service/CoreModel';
 import { Options } from "../../../../util/RequestHandler";
 
 export { AbstractDNIe, AllCertsResponse, AllDataResponse, InfoResponse };
@@ -23,32 +26,42 @@ interface AbstractDNIe extends SecuredCertCard {
                        callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
 
-interface AllCertsResponse extends DataObjectResponse {
-    data: {
-        authentication_certificate?: string
-        intermediate_certificate?: string
-        signing_certificate?: string
+class AllCertsResponse extends DataObjectResponse {
+    constructor(public data: AllDNIeCerts, public success: boolean) {
+        super(data, success);
     }
 }
 
-interface AllDataResponse extends AllCertsResponse {
-    data: {
-        authentication_certificate?: string
-        intermediate_certificate?: string
-        signing_certificate?: string
-        info: Info
+class AllDNIeCerts {
+    constructor(public authentication_certificate?: T1CCertificate,
+                public intermediate_certificate?: T1CCertificate,
+                public signing_certificate?: T1CCertificate) {}
+}
+
+class AllDataResponse extends AllCertsResponse {
+    constructor(public data: AllDNIeData, public success: boolean) {
+        super(data, success);
     }
 }
 
-interface InfoResponse extends T1CResponse {
-    data: Info
+class AllDNIeData {
+    constructor(public info: Info,
+                public authentication_certificate?: T1CCertificate,
+                public intermediate_certificate?: T1CCertificate,
+                public signing_certificate?: T1CCertificate) {}
 }
 
-interface Info {
-    first_name: string
-    last_names: string
-    national_number: string
-    card_number: string
-    serial: string
+class InfoResponse extends DataObjectResponse {
+    constructor(public data: Info, public success: boolean) {
+        super(data, success);
+    }
+}
+
+class Info {
+    constructor(public first_name: string,
+                public last_names: string,
+                public national_number: string,
+                public card_number: string,
+                public serial: string) {}
 }
 

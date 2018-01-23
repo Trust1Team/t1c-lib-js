@@ -5,9 +5,9 @@
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { OptionalPin, SecuredCertCard } from "../../Card";
 import {
-    CertificateResponse, CertificatesResponse, T1CCertificate,
+    CertificateResponse, CertificatesResponse, DataObjectResponse, T1CCertificate,
     T1CResponse
-} from "../../../../core/service/CoreModel";
+} from '../../../../core/service/CoreModel';
 import { Options } from "../../../../util/RequestHandler";
 
 export { AbstractEidLUX, AllCertsResponse, AllDataResponse, Biometric, BiometricResponse,
@@ -30,59 +30,74 @@ interface AbstractEidLUX extends SecuredCertCard {
     signatureImage(callback?: (error: RestException, data: SignatureImageResponse) => void): Promise<SignatureImageResponse>;
 }
 
-interface AllCertsResponse extends T1CResponse {
-    data: {
-        authentication_certificate: T1CCertificate
-        non_repudiation_certificate: T1CCertificate
-        root_certificates: T1CCertificate[]
+class AllCertsResponse extends DataObjectResponse {
+    constructor(public data: AllLuxCerts, public success: boolean) {
+        super(data, success);
     }
 }
 
-interface AllDataResponse extends AllCertsResponse {
-    data: {
-        authentication_certificate: T1CCertificate
-        non_repudiation_certificate: T1CCertificate
-        root_certificates: T1CCertificate[]
-        biometric: Biometric,
-        picture: Picture
-        signature_image: SignatureImage
-        signature_object: string
+class AllLuxCerts {
+    constructor(public authentication_certificate: T1CCertificate,
+                public non_repudiation_certificate: T1CCertificate,
+                public root_certificates: T1CCertificate[]) {}
+}
+
+class AllDataResponse extends AllCertsResponse {
+    constructor(public data: AllLuxData, public success: boolean) {
+        super(data, success);
     }
 }
 
-interface Biometric {
-    "birthDate": string
-    "documentNumber": string
-    "documentType": string
-    "firstName": string
-    "gender": string
-    "issuingState": string
-    "lastName": string
-    "nationality": string
-    "validityEndDate": string
-    "validityStartDate": string
+class AllLuxData extends AllLuxCerts {
+    constructor(public authentication_certificate: T1CCertificate,
+                public non_repudiation_certificate: T1CCertificate,
+                public root_certificates: T1CCertificate[],
+                public biometric: Biometric,
+                public picture: Picture,
+                public signature_image: SignatureImage,
+                public signature_object: string) {
+        super(authentication_certificate, non_repudiation_certificate, root_certificates);
+    }
 }
 
-interface BiometricResponse extends T1CResponse {
-    data: Biometric
+class Biometric {
+    constructor(public birthData: string,
+                public documentNumber: string,
+                public documentType: string,
+                public firstName: string,
+                public gender: string,
+                public issuingState: string,
+                public lastName: string,
+                public nationality: string,
+                public validityEndData: string,
+                public validityStartData: string) {}
 }
 
-interface Picture {
-    height: number
-    image: string
-    raw_data: string
-    width: number
+class BiometricResponse extends DataObjectResponse {
+    constructor(public data: Biometric, public success: boolean) {
+        super(data, success);
+    }
 }
 
-interface PictureResponse extends T1CResponse {
-    data: Picture
+class Picture {
+    constructor(public height: number,
+                public width: number,
+                public image: string,
+                public raw_data: string) {}
 }
 
-interface SignatureImage {
-    image: string
-    raw_data: string
+class PictureResponse extends DataObjectResponse {
+    constructor(public data: Picture, public success: boolean) {
+        super(data, success);
+    }
 }
 
-interface SignatureImageResponse extends T1CResponse {
-    data: SignatureImage
+class SignatureImage {
+    constructor(public image: string, public raw_data: string) {}
+}
+
+class SignatureImageResponse extends DataObjectResponse {
+    constructor(public data: SignatureImage, public success: boolean) {
+        super(data, success);
+    }
 }
