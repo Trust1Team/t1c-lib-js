@@ -8946,11 +8946,11 @@ var GCLLib =
 	var OCVClient_1 = __webpack_require__(375);
 	var es6_promise_1 = __webpack_require__(335);
 	var PluginFactory_1 = __webpack_require__(376);
-	var GenericService_1 = __webpack_require__(505);
+	var GenericService_1 = __webpack_require__(506);
 	var ResponseHandler_1 = __webpack_require__(339);
 	var agent_1 = __webpack_require__(367);
-	var admin_1 = __webpack_require__(507);
-	var InitUtil_1 = __webpack_require__(508);
+	var admin_1 = __webpack_require__(508);
+	var InitUtil_1 = __webpack_require__(509);
 	var GCLClient = (function () {
 	    function GCLClient(cfg, automatic) {
 	        var _this = this;
@@ -31526,20 +31526,20 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var EMV_1 = __webpack_require__(377);
-	var EidBe_1 = __webpack_require__(490);
-	var EidLux_1 = __webpack_require__(491);
-	var mobib_1 = __webpack_require__(492);
-	var LuxTrust_1 = __webpack_require__(493);
-	var ocra_1 = __webpack_require__(494);
-	var Aventra_1 = __webpack_require__(495);
-	var Oberthur_1 = __webpack_require__(496);
-	var piv_1 = __webpack_require__(497);
-	var safenet_1 = __webpack_require__(498);
-	var dnie_1 = __webpack_require__(499);
-	var EidPt_1 = __webpack_require__(500);
-	var RemoteLoading_1 = __webpack_require__(501);
-	var Belfius_1 = __webpack_require__(502);
-	var FileExchange_1 = __webpack_require__(504);
+	var EidBe_1 = __webpack_require__(491);
+	var EidLux_1 = __webpack_require__(492);
+	var mobib_1 = __webpack_require__(493);
+	var LuxTrust_1 = __webpack_require__(494);
+	var ocra_1 = __webpack_require__(495);
+	var Aventra_1 = __webpack_require__(496);
+	var Oberthur_1 = __webpack_require__(497);
+	var piv_1 = __webpack_require__(498);
+	var safenet_1 = __webpack_require__(499);
+	var dnie_1 = __webpack_require__(500);
+	var EidPt_1 = __webpack_require__(501);
+	var RemoteLoading_1 = __webpack_require__(502);
+	var Belfius_1 = __webpack_require__(503);
+	var FileExchange_1 = __webpack_require__(505);
 	var CONTAINER_CONTEXT_PATH = '/plugins/';
 	var CONTAINER_NEW_CONTEXT_PATH = '/containers/';
 	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + 'beid';
@@ -31653,7 +31653,7 @@ var GCLLib =
 	var PinEnforcer_1 = __webpack_require__(379);
 	var CertParser_1 = __webpack_require__(380);
 	var ResponseHandler_1 = __webpack_require__(339);
-	var RequestHandler_1 = __webpack_require__(489);
+	var RequestHandler_1 = __webpack_require__(490);
 	var OptionalPin = (function () {
 	    function OptionalPin(pin, pace) {
 	        this.pin = pin;
@@ -31964,6 +31964,7 @@ var GCLLib =
 	var asn1js = __webpack_require__(381);
 	var Base64 = __webpack_require__(383);
 	var pkijs_1 = __webpack_require__(384);
+	var CoreModel_1 = __webpack_require__(489);
 	var ResponseHandler_1 = __webpack_require__(339);
 	var CertParser = (function () {
 	    function CertParser() {
@@ -31981,7 +31982,7 @@ var GCLLib =
 	                    if (_.isArray(value)) {
 	                        var newData_1 = [];
 	                        _.forEach(value, function (certificate) {
-	                            var cert = { base64: certificate };
+	                            var cert = new CoreModel_1.T1CCertificate(certificate);
 	                            if (parseCerts) {
 	                                cert.parsed = CertParser.processCert(certificate);
 	                            }
@@ -31997,14 +31998,14 @@ var GCLLib =
 	                var newData_2 = [];
 	                _.forEach(response.data, function (certificate) {
 	                    if (typeof certificate === 'string') {
-	                        var cert = { base64: certificate };
+	                        var cert = new CoreModel_1.T1CCertificate(certificate);
 	                        if (parseCerts) {
 	                            cert.parsed = CertParser.processCert(certificate);
 	                        }
 	                        newData_2.push(cert);
 	                    }
 	                    else {
-	                        var cert = certificate;
+	                        var cert = new CoreModel_1.T1CCertificate(certificate.base64);
 	                        if (parseCerts) {
 	                            cert.parsed = CertParser.processCert(certificate.base64);
 	                        }
@@ -32014,7 +32015,7 @@ var GCLLib =
 	                response.data = newData_2;
 	            }
 	            else {
-	                var cert = { base64: response.data };
+	                var cert = new CoreModel_1.T1CCertificate(response.data);
 	                if (parseCerts) {
 	                    cert.parsed = CertParser.processCert(response.data);
 	                }
@@ -74735,6 +74736,220 @@ var GCLLib =
 
 /***/ }),
 /* 489 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var T1CResponse = (function () {
+	    function T1CResponse(success, data) {
+	        this.success = success;
+	        this.data = data;
+	    }
+	    return T1CResponse;
+	}());
+	exports.T1CResponse = T1CResponse;
+	var BoolDataResponse = (function (_super) {
+	    __extends(BoolDataResponse, _super);
+	    function BoolDataResponse(data, success) {
+	        var _this = _super.call(this, success, data) || this;
+	        _this.data = data;
+	        _this.success = success;
+	        return _this;
+	    }
+	    return BoolDataResponse;
+	}(T1CResponse));
+	exports.BoolDataResponse = BoolDataResponse;
+	var DataResponse = (function (_super) {
+	    __extends(DataResponse, _super);
+	    function DataResponse(data, success) {
+	        var _this = _super.call(this, success, data) || this;
+	        _this.data = data;
+	        _this.success = success;
+	        return _this;
+	    }
+	    return DataResponse;
+	}(T1CResponse));
+	exports.DataResponse = DataResponse;
+	var DataArrayResponse = (function (_super) {
+	    __extends(DataArrayResponse, _super);
+	    function DataArrayResponse(data, success) {
+	        var _this = _super.call(this, success, data) || this;
+	        _this.data = data;
+	        _this.success = success;
+	        return _this;
+	    }
+	    return DataArrayResponse;
+	}(T1CResponse));
+	exports.DataArrayResponse = DataArrayResponse;
+	var DataObjectResponse = (function (_super) {
+	    __extends(DataObjectResponse, _super);
+	    function DataObjectResponse(data, success) {
+	        var _this = _super.call(this, success, data) || this;
+	        _this.data = data;
+	        _this.success = success;
+	        return _this;
+	    }
+	    return DataObjectResponse;
+	}(T1CResponse));
+	exports.DataObjectResponse = DataObjectResponse;
+	var InfoResponse = (function (_super) {
+	    __extends(InfoResponse, _super);
+	    function InfoResponse(data, success) {
+	        var _this = _super.call(this, success, data) || this;
+	        _this.data = data;
+	        _this.success = success;
+	        return _this;
+	    }
+	    return InfoResponse;
+	}(T1CResponse));
+	exports.InfoResponse = InfoResponse;
+	var T1CInfo = (function () {
+	    function T1CInfo(activated, citrix, managed, arch, os, uid, version) {
+	        this.activated = activated;
+	        this.citrix = citrix;
+	        this.managed = managed;
+	        this.arch = arch;
+	        this.os = os;
+	        this.uid = uid;
+	        this.version = version;
+	    }
+	    return T1CInfo;
+	}());
+	var BrowserInfoResponse = (function (_super) {
+	    __extends(BrowserInfoResponse, _super);
+	    function BrowserInfoResponse(data, success) {
+	        var _this = _super.call(this, success, data) || this;
+	        _this.data = data;
+	        _this.success = success;
+	        return _this;
+	    }
+	    return BrowserInfoResponse;
+	}(T1CResponse));
+	exports.BrowserInfoResponse = BrowserInfoResponse;
+	var BrowserInfo = (function () {
+	    function BrowserInfo(browser, manufacturer, os, ua) {
+	        this.browser = browser;
+	        this.manufacturer = manufacturer;
+	        this.os = os;
+	        this.ua = ua;
+	    }
+	    return BrowserInfo;
+	}());
+	exports.BrowserInfo = BrowserInfo;
+	var Card = (function () {
+	    function Card(atr, description) {
+	        this.atr = atr;
+	        this.description = description;
+	    }
+	    return Card;
+	}());
+	exports.Card = Card;
+	var CardReader = (function () {
+	    function CardReader(id, name, pinpad, card) {
+	        this.id = id;
+	        this.name = name;
+	        this.pinpad = pinpad;
+	        this.card = card;
+	    }
+	    return CardReader;
+	}());
+	exports.CardReader = CardReader;
+	var CardReadersResponse = (function (_super) {
+	    __extends(CardReadersResponse, _super);
+	    function CardReadersResponse(data, success) {
+	        var _this = _super.call(this, success, data) || this;
+	        _this.data = data;
+	        _this.success = success;
+	        return _this;
+	    }
+	    return CardReadersResponse;
+	}(T1CResponse));
+	exports.CardReadersResponse = CardReadersResponse;
+	var CertificateResponse = (function (_super) {
+	    __extends(CertificateResponse, _super);
+	    function CertificateResponse(data, success) {
+	        var _this = _super.call(this, success, data) || this;
+	        _this.data = data;
+	        _this.success = success;
+	        return _this;
+	    }
+	    return CertificateResponse;
+	}(T1CResponse));
+	exports.CertificateResponse = CertificateResponse;
+	var CertificatesResponse = (function (_super) {
+	    __extends(CertificatesResponse, _super);
+	    function CertificatesResponse(data, success) {
+	        var _this = _super.call(this, success, data) || this;
+	        _this.data = data;
+	        _this.success = success;
+	        return _this;
+	    }
+	    return CertificatesResponse;
+	}(T1CResponse));
+	exports.CertificatesResponse = CertificatesResponse;
+	var T1CCertificate = (function () {
+	    function T1CCertificate(base64, parsed) {
+	        this.base64 = base64;
+	        this.parsed = parsed;
+	    }
+	    return T1CCertificate;
+	}());
+	exports.T1CCertificate = T1CCertificate;
+	var SingleReaderResponse = (function (_super) {
+	    __extends(SingleReaderResponse, _super);
+	    function SingleReaderResponse(data, success) {
+	        var _this = _super.call(this, success, data) || this;
+	        _this.data = data;
+	        _this.success = success;
+	        return _this;
+	    }
+	    return SingleReaderResponse;
+	}(T1CResponse));
+	exports.SingleReaderResponse = SingleReaderResponse;
+	var PluginsResponse = (function (_super) {
+	    __extends(PluginsResponse, _super);
+	    function PluginsResponse(data, success) {
+	        var _this = _super.call(this, success, data) || this;
+	        _this.data = data;
+	        _this.success = success;
+	        return _this;
+	    }
+	    return PluginsResponse;
+	}(T1CResponse));
+	exports.PluginsResponse = PluginsResponse;
+	var Plugin = (function () {
+	    function Plugin(id, name, version) {
+	        this.id = id;
+	        this.name = name;
+	        this.version = version;
+	    }
+	    return Plugin;
+	}());
+	var PubKeyResponse = (function (_super) {
+	    __extends(PubKeyResponse, _super);
+	    function PubKeyResponse(data, success) {
+	        var _this = _super.call(this, success, data) || this;
+	        _this.data = data;
+	        _this.success = success;
+	        return _this;
+	    }
+	    return PubKeyResponse;
+	}(T1CResponse));
+	exports.PubKeyResponse = PubKeyResponse;
+
+
+/***/ }),
+/* 490 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -74805,7 +75020,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 490 */
+/* 491 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -74822,7 +75037,7 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(378);
 	var PinEnforcer_1 = __webpack_require__(379);
-	var RequestHandler_1 = __webpack_require__(489);
+	var RequestHandler_1 = __webpack_require__(490);
 	var EidBe = (function (_super) {
 	    __extends(EidBe, _super);
 	    function EidBe() {
@@ -74869,7 +75084,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 491 */
+/* 492 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -74888,7 +75103,7 @@ var GCLLib =
 	var PinEnforcer_1 = __webpack_require__(379);
 	var CertParser_1 = __webpack_require__(380);
 	var ResponseHandler_1 = __webpack_require__(339);
-	var RequestHandler_1 = __webpack_require__(489);
+	var RequestHandler_1 = __webpack_require__(490);
 	function createFilterQueryParam(filterParams, pin) {
 	    return {
 	        filter: filterParams.filter,
@@ -74993,7 +75208,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 492 */
+/* 493 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75036,7 +75251,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 493 */
+/* 494 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75052,7 +75267,7 @@ var GCLLib =
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(378);
-	var RequestHandler_1 = __webpack_require__(489);
+	var RequestHandler_1 = __webpack_require__(490);
 	var LuxTrust = (function (_super) {
 	    __extends(LuxTrust, _super);
 	    function LuxTrust() {
@@ -75077,7 +75292,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 494 */
+/* 495 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75142,7 +75357,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 495 */
+/* 496 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75159,7 +75374,7 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(378);
 	var PinEnforcer_1 = __webpack_require__(379);
-	var RequestHandler_1 = __webpack_require__(489);
+	var RequestHandler_1 = __webpack_require__(490);
 	var Aventra = (function (_super) {
 	    __extends(Aventra, _super);
 	    function Aventra() {
@@ -75207,7 +75422,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 496 */
+/* 497 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75224,7 +75439,7 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(378);
 	var PinEnforcer_1 = __webpack_require__(379);
-	var RequestHandler_1 = __webpack_require__(489);
+	var RequestHandler_1 = __webpack_require__(490);
 	var Oberthur = (function (_super) {
 	    __extends(Oberthur, _super);
 	    function Oberthur() {
@@ -75267,7 +75482,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 497 */
+/* 498 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75285,7 +75500,7 @@ var GCLLib =
 	var Card_1 = __webpack_require__(378);
 	var PinEnforcer_1 = __webpack_require__(379);
 	var es6_promise_1 = __webpack_require__(335);
-	var RequestHandler_1 = __webpack_require__(489);
+	var RequestHandler_1 = __webpack_require__(490);
 	var PIV = (function (_super) {
 	    __extends(PIV, _super);
 	    function PIV() {
@@ -75349,7 +75564,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 498 */
+/* 499 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75358,7 +75573,7 @@ var GCLLib =
 	var CertParser_1 = __webpack_require__(380);
 	var ResponseHandler_1 = __webpack_require__(339);
 	var platform = __webpack_require__(333);
-	var RequestHandler_1 = __webpack_require__(489);
+	var RequestHandler_1 = __webpack_require__(490);
 	var SafeNet = (function () {
 	    function SafeNet(baseUrl, containerUrl, connection, moduleConfig) {
 	        this.baseUrl = baseUrl;
@@ -75509,7 +75724,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 499 */
+/* 500 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75525,7 +75740,7 @@ var GCLLib =
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(378);
-	var RequestHandler_1 = __webpack_require__(489);
+	var RequestHandler_1 = __webpack_require__(490);
 	var CertParser_1 = __webpack_require__(380);
 	var ResponseHandler_1 = __webpack_require__(339);
 	var DNIe = (function (_super) {
@@ -75559,7 +75774,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 500 */
+/* 501 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75575,7 +75790,7 @@ var GCLLib =
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var Card_1 = __webpack_require__(378);
-	var RequestHandler_1 = __webpack_require__(489);
+	var RequestHandler_1 = __webpack_require__(490);
 	var EidPt = (function (_super) {
 	    __extends(EidPt, _super);
 	    function EidPt() {
@@ -75619,7 +75834,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 501 */
+/* 502 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75705,7 +75920,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 502 */
+/* 503 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75720,8 +75935,8 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var RemoteLoading_1 = __webpack_require__(501);
-	var RemoteLoadingModel_1 = __webpack_require__(503);
+	var RemoteLoading_1 = __webpack_require__(502);
+	var RemoteLoadingModel_1 = __webpack_require__(504);
 	var ResponseHandler_1 = __webpack_require__(339);
 	var _ = __webpack_require__(331);
 	var Belfius = (function (_super) {
@@ -75823,11 +76038,22 @@ var GCLLib =
 
 
 /***/ }),
-/* 503 */
-/***/ (function(module, exports) {
+/* 504 */
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
+	var CoreModel_1 = __webpack_require__(489);
 	var APDU = (function () {
 	    function APDU(cla, ins, p1, p2, data, le) {
 	        this.cla = cla;
@@ -75840,6 +76066,28 @@ var GCLLib =
 	    return APDU;
 	}());
 	exports.APDU = APDU;
+	var CommandResponse = (function (_super) {
+	    __extends(CommandResponse, _super);
+	    function CommandResponse(data, success) {
+	        var _this = _super.call(this, success, data) || this;
+	        _this.data = data;
+	        _this.success = success;
+	        return _this;
+	    }
+	    return CommandResponse;
+	}(CoreModel_1.T1CResponse));
+	exports.CommandResponse = CommandResponse;
+	var CommandsResponse = (function (_super) {
+	    __extends(CommandsResponse, _super);
+	    function CommandsResponse(data, success) {
+	        var _this = _super.call(this, success, data) || this;
+	        _this.data = data;
+	        _this.success = success;
+	        return _this;
+	    }
+	    return CommandsResponse;
+	}(CoreModel_1.T1CResponse));
+	exports.CommandsResponse = CommandsResponse;
 	var Command = (function () {
 	    function Command(sw, tx, rx) {
 	        this.sw = sw;
@@ -75852,7 +76100,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 504 */
+/* 505 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75894,17 +76142,28 @@ var GCLLib =
 
 
 /***/ }),
-/* 505 */
+/* 506 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(335);
-	var EidBe_1 = __webpack_require__(490);
+	var EidBe_1 = __webpack_require__(491);
 	var ResponseHandler_1 = __webpack_require__(339);
 	var _ = __webpack_require__(331);
-	var CardUtil_1 = __webpack_require__(506);
-	var Aventra_1 = __webpack_require__(495);
+	var CardUtil_1 = __webpack_require__(507);
+	var Aventra_1 = __webpack_require__(496);
+	var Arguments = (function () {
+	    function Arguments(client, readerId, container, data, dumpMethod, dumpOptions) {
+	        this.client = client;
+	        this.readerId = readerId;
+	        this.container = container;
+	        this.data = data;
+	        this.dumpMethod = dumpMethod;
+	        this.dumpOptions = dumpOptions;
+	    }
+	    return Arguments;
+	}());
 	var GenericService = (function () {
 	    function GenericService() {
 	    }
@@ -76000,7 +76259,7 @@ var GCLLib =
 	            .then(function (container) { return { client: client, container: container }; })
 	            .then(this.checkContainerAvailable)
 	            .then(function (args) {
-	            return { client: args.client, readerId: readerId, container: args.container, data: data };
+	            return new Arguments(args.client, readerId, args.container, data);
 	        });
 	    };
 	    GenericService.checkReaderPresent = function (args) {
@@ -76126,13 +76385,13 @@ var GCLLib =
 
 
 /***/ }),
-/* 506 */
+/* 507 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var _ = __webpack_require__(331);
-	var RequestHandler_1 = __webpack_require__(489);
+	var RequestHandler_1 = __webpack_require__(490);
 	var CardUtil = (function () {
 	    function CardUtil() {
 	    }
@@ -76306,7 +76565,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 507 */
+/* 508 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -76314,7 +76573,7 @@ var GCLLib =
 	var es6_promise_1 = __webpack_require__(335);
 	var ResponseHandler_1 = __webpack_require__(339);
 	var _ = __webpack_require__(331);
-	var InitUtil_1 = __webpack_require__(508);
+	var InitUtil_1 = __webpack_require__(509);
 	var CORE_ACTIVATE = '/admin/activate';
 	var CORE_PUB_KEY = '/admin/certificate';
 	var CORE_CONTAINERS = '/admin/containers';
@@ -76408,17 +76667,17 @@ var GCLLib =
 
 
 /***/ }),
-/* 508 */
+/* 509 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(335);
 	var _ = __webpack_require__(331);
-	var semver = __webpack_require__(509);
-	var SyncUtil_1 = __webpack_require__(510);
-	var ActivationUtil_1 = __webpack_require__(511);
-	var DSClientModel_1 = __webpack_require__(512);
+	var semver = __webpack_require__(510);
+	var SyncUtil_1 = __webpack_require__(511);
+	var ActivationUtil_1 = __webpack_require__(512);
+	var DSClientModel_1 = __webpack_require__(513);
 	var InitUtil = (function () {
 	    function InitUtil() {
 	    }
@@ -76478,7 +76737,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 509 */
+/* 510 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {exports = module.exports = SemVer;
@@ -77781,7 +78040,7 @@ var GCLLib =
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(336)))
 
 /***/ }),
-/* 510 */
+/* 511 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -77818,7 +78077,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 511 */
+/* 512 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -77872,7 +78131,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 512 */
+/* 513 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -77887,7 +78146,61 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var CoreModel_1 = __webpack_require__(513);
+	var CoreModel_1 = __webpack_require__(489);
+	var DSInfoResponse = (function () {
+	    function DSInfoResponse(configFile, build, version, environemnt, storageAppName, storageServiceAccount, storageCertPath, storageBucket, storageDownloadPrefix, fileOsx, fileWin32, fileWin64, fileDefaultVersion, securityEnabled, securityPrivateKeyAvailable) {
+	        this.configFile = configFile;
+	        this.build = build;
+	        this.version = version;
+	        this.environemnt = environemnt;
+	        this.storageAppName = storageAppName;
+	        this.storageServiceAccount = storageServiceAccount;
+	        this.storageCertPath = storageCertPath;
+	        this.storageBucket = storageBucket;
+	        this.storageDownloadPrefix = storageDownloadPrefix;
+	        this.fileOsx = fileOsx;
+	        this.fileWin32 = fileWin32;
+	        this.fileWin64 = fileWin64;
+	        this.fileDefaultVersion = fileDefaultVersion;
+	        this.securityEnabled = securityEnabled;
+	        this.securityPrivateKeyAvailable = securityPrivateKeyAvailable;
+	    }
+	    return DSInfoResponse;
+	}());
+	exports.DSInfoResponse = DSInfoResponse;
+	var DownloadLinkResponse = (function () {
+	    function DownloadLinkResponse(url, success) {
+	        this.url = url;
+	        this.success = success;
+	    }
+	    return DownloadLinkResponse;
+	}());
+	exports.DownloadLinkResponse = DownloadLinkResponse;
+	var JWTResponse = (function () {
+	    function JWTResponse(token) {
+	        this.token = token;
+	    }
+	    return JWTResponse;
+	}());
+	exports.JWTResponse = JWTResponse;
+	var DSPubKeyResponse = (function () {
+	    function DSPubKeyResponse(pubkey, success) {
+	        this.pubkey = pubkey;
+	        this.success = success;
+	    }
+	    return DSPubKeyResponse;
+	}());
+	exports.DSPubKeyResponse = DSPubKeyResponse;
+	var DeviceResponse = (function () {
+	    function DeviceResponse(activated, coreVersion, managed, uuid) {
+	        this.activated = activated;
+	        this.coreVersion = coreVersion;
+	        this.managed = managed;
+	        this.uuid = uuid;
+	    }
+	    return DeviceResponse;
+	}());
+	exports.DeviceResponse = DeviceResponse;
 	var DSPlatformInfo = (function (_super) {
 	    __extends(DSPlatformInfo, _super);
 	    function DSPlatformInfo(activated, bi, core_version) {
@@ -77900,24 +78213,6 @@ var GCLLib =
 	    return DSPlatformInfo;
 	}(CoreModel_1.BrowserInfo));
 	exports.DSPlatformInfo = DSPlatformInfo;
-
-
-/***/ }),
-/* 513 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var BrowserInfo = (function () {
-	    function BrowserInfo(browser, manufacturer, os, ua) {
-	        this.browser = browser;
-	        this.manufacturer = manufacturer;
-	        this.os = os;
-	        this.ua = ua;
-	    }
-	    return BrowserInfo;
-	}());
-	exports.BrowserInfo = BrowserInfo;
 
 
 /***/ })

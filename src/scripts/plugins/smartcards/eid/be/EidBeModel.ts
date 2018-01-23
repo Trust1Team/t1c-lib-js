@@ -2,13 +2,13 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { CertCard, OptionalPin } from "../../Card";
+import { RestException } from '../../../../core/exceptions/CoreExceptions';
+import { CertCard, OptionalPin } from '../../Card';
 import {
-    CertificateResponse, DataObjectResponse, DataResponse,
+    CertificateResponse, DataObjectResponse, DataResponse, T1CCertificate,
     T1CResponse
-} from "../../../../core/service/CoreModel";
-import { Options } from "../../../../util/RequestHandler";
+} from '../../../../core/service/CoreModel';
+import { Options } from '../../../../util/RequestHandler';
 
 export { AbstractEidBE, Address, AddressResponse, AllCertsResponse, AllDataResponse, RnData, RnDataResponse };
 
@@ -32,66 +32,78 @@ interface AbstractEidBE extends CertCard {
     verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
 }
 
-interface AddressResponse extends DataObjectResponse {
-    data: Address
-}
-
-interface Address {
-    municipality: string
-    raw_data: string
-    signature: string
-    street_and_number: string
-    version: number
-    zipcode: string
-}
-
-interface AllCertsResponse extends DataObjectResponse {
-    data: {
-        authentication_certificate?: string
-        citizen_certificate?: string
-        non_repudiation_certificate?: string
-        root_certificate?: string
-        rrn_certificate?: string
+class AddressResponse extends DataObjectResponse {
+    constructor(public data: Address, public success: boolean) {
+        super(data, success);
     }
 }
 
-interface AllDataResponse extends AllCertsResponse {
-    data: {
-        address?: Address
-        authentication_certificate?: string
-        citizen_certificate?: string
-        non_repudiation_certificate?: string
-        picture?: string
-        rn?: RnData
-        root_certificate?: string
-        rrn_certificate?: string
+class Address {
+    constructor(public municipality: string,
+                public raw_data: string,
+                public signature: string,
+                public street_and_number: string,
+                public version: number,
+                public zipcode: string) {}
+}
+
+class AllCertsResponse extends DataObjectResponse {
+    constructor(public data: AllBeIDCerts, public success: boolean) {
+        super(data, success);
     }
 }
 
-interface RnData {
-    birth_date: string
-    birth_location: string
-    card_delivery_municipality: string
-    card_number: string
-    card_validity_date_begin: string
-    card_validity_date_end: string
-    chip_number: string
-    document_type: string
-    first_names: string
-    name: string
-    national_number: string
-    nationality: string
-    noble_condition: string
-    picture_hash: string
-    raw_data: string
-    sex: string
-    signature: string
-    special_status: string
-    third_name: string
-    version: number
+class AllBeIDCerts {
+    constructor(public authentication_certificate?: T1CCertificate,
+                public citizen_certificate?: T1CCertificate,
+                public non_repudiation_certificate?: T1CCertificate,
+                public root_certificate?: T1CCertificate,
+                public rrn_certificate?: T1CCertificate) {}
 }
 
-interface RnDataResponse extends DataObjectResponse {
-    data: RnData
+class AllDataResponse extends AllCertsResponse {
+    constructor(public data: AllBeIDData, public success: boolean) {
+        super(data, success);
+    }
+}
+
+class AllBeIDData {
+    constructor(public address?: Address,
+                public authentication_certificate?: T1CCertificate,
+                public citizen_certificate?: T1CCertificate,
+                public non_repudiation_certificate?: T1CCertificate,
+                public picture?: string,
+                public rn?: RnData,
+                public root_certificate?: T1CCertificate,
+                public rrn_certificate?: T1CCertificate) {}
+}
+
+class RnData {
+    constructor(public birth_date: string,
+                public birth_location: string,
+                public card_delivery_municipality: string,
+                public card_number: string,
+                public card_validity_date_begin: string,
+                public card_validity_date_end: string,
+                public chip_number: string,
+                public document_type: string,
+                public first_names: string,
+                public name: string,
+                public national_number: string,
+                public nationality: string,
+                public noble_condition: string,
+                public picture_hash: string,
+                public raw_data: string,
+                public sex: string,
+                public signature: string,
+                public special_status: string,
+                public third_name: string,
+                public version: number) {}
+}
+
+class RnDataResponse extends DataObjectResponse {
+    constructor(public data: RnData, public success: boolean) {
+        super(data, success);
+    }
 }
 

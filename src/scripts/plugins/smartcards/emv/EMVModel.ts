@@ -26,24 +26,22 @@ interface AllDataResponse extends T1CResponse {
     }
 }
 
-interface Application {
-    aid: string,
-    name: string,
-    priority: number
+class Application {
+    constructor(public aid: string, public name: string, public priority: number) {}
 }
 
 interface ApplicationsResponse extends T1CResponse {
     data: Application[]
 }
 
-interface ApplicationData {
-    country: string,
-    country_code: string,
-    effective_date: string,
-    expiration_date: string,
-    language: string,
-    name?: string,
-    pan: string
+class ApplicationData {
+    constructor(public country: string,
+                public country_code: string,
+                public effective_data: string,
+                public expiration_date: string,
+                public language: string,
+                public pan: string,
+                public name?: string) {}
 }
 
 interface ApplicationDataResponse extends T1CResponse {
