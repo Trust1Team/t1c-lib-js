@@ -2,9 +2,12 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { CertificateResponse, DataArrayResponse, DataObjectResponse, T1CResponse } from "../../../../core/service/CoreModel";
-import { CertCard, VerifyPinData } from "../../Card";
+import { RestException } from '../../../../core/exceptions/CoreExceptions';
+import {
+    CertificateResponse, DataArrayResponse, DataObjectResponse, T1CCertificate,
+    T1CResponse
+} from '../../../../core/service/CoreModel';
+import { CertCard, VerifyPinData } from '../../Card';
 import { Options } from '../../../../util/RequestHandler';
 
 export { AbstractOberthur, AllCertsResponse, AllDataResponse };
@@ -31,22 +34,23 @@ interface AbstractOberthur extends CertCard {
     verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
 }
 
-interface AllDataResponse extends AllCertsResponse {
-    data: {
-        root_certificate: string
-        issuer_certificate: string
-        authentication_certificate: string
-        signing_certificate: string
-        encryption_certificate: string
+
+class AllCertsResponse extends DataObjectResponse {
+    constructor(public data: AllOberthurCerts, public success: boolean) {
+        super(data, success);
     }
 }
 
-interface AllCertsResponse extends DataObjectResponse {
-    data: {
-        root_certificate: string
-        issuer_certificate: string
-        authentication_certificate: string
-        signing_certificate: string
-        encryption_certificate: string
+class AllOberthurCerts {
+    constructor(public root_certificate: T1CCertificate,
+                public issuer_certificate: T1CCertificate,
+                public authentication_certificate: T1CCertificate,
+                public signing_certificate: T1CCertificate,
+                public encryption_certificate: T1CCertificate) {}
+}
+
+class AllDataResponse extends AllCertsResponse {
+    constructor(public data: AllOberthurCerts, public success: boolean) {
+        super(data, success);
     }
 }

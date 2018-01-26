@@ -4,8 +4,7 @@
 
 import { RestException } from '../../../../core/exceptions/CoreExceptions';
 import {
-    CertificatesResponse, DataResponse, T1CCertificate,
-    T1CResponse
+    CertificatesResponse, DataObjectResponse, DataResponse, T1CCertificate
 } from '../../../../core/service/CoreModel';
 import { Options } from '../../../../util/RequestHandler';
 import { AuthenticateOrSignData } from '../../Card';
@@ -25,34 +24,44 @@ interface AbstractSafeNet {
 }
 
 
-interface InfoResponse extends T1CResponse {
-    data: {
-        cryptoki_version: string
-        manufacturer_id: string
-        flags: string
-        library_description: string
-        library_version: string
+class InfoResponse extends DataObjectResponse {
+    constructor(public data: SafeNetInfo, public success: boolean) {
+        super(data, success);
     }
 }
 
-interface Slot {
-    slot_id: string
-    description: string
-    flags: string
-    hardware_version: string
-    firmware_version: string
+class SafeNetInfo {
+    constructor(public cryptoki_version: string,
+                public manufacturer_id: string,
+                public flags: string,
+                public library_description: string,
+                public library_version: string) {}
 }
 
-interface SlotsResponse extends T1CResponse {
-    data: Slot[]
+class Slot {
+    constructor(public slot_id: string,
+                public description: string,
+                public flags: string,
+                public hardware_version: string,
+                public firmware_version: string) {}
 }
 
-interface SafeNetCertificate extends T1CCertificate {
-    id: string
+class SlotsResponse extends DataObjectResponse {
+    constructor(public data: Slot[], public success: boolean) {
+        super(data, success);
+    }
 }
 
-interface SafeNetCertificatesResponse extends CertificatesResponse {
-    data: SafeNetCertificate[]
+class SafeNetCertificate extends T1CCertificate {
+    constructor(public id: string, public base64: string, public parsed?: object) {
+        super(base64, parsed);
+    }
+}
+
+class SafeNetCertificatesResponse extends CertificatesResponse {
+    constructor(public data: SafeNetCertificate[], public success: boolean) {
+        super(data, success);
+    }
 }
 
 class SafeNetSignData extends AuthenticateOrSignData {
@@ -66,27 +75,29 @@ class SafeNetSignData extends AuthenticateOrSignData {
     }
 }
 
-interface TokenInfo {
-    slot_id: string;
-    label: string;
-    manufacturer_id: string;
-    model: string;
-    serial_number: string;
-    flags: string;
-    max_session_count: number;
-    session_count: number;
-    max_rw_session_count: number;
-    rw_session_count: number;
-    max_pin_length: number;
-    min_pin_length: number;
-    total_public_memory: number;
-    free_public_memory: number;
-    total_private_memory: number;
-    free_private_memory: number;
-    hardware_version: string;
-    firmware_version: string;
+class TokenInfo {
+    constructor(public slot_id: string,
+                public label: string,
+                public manufacturer_id: string,
+                public model: string,
+                public serial_number: string,
+                public flags: string,
+                public max_session_count: number,
+                public session_count: number,
+                public max_rw_session_count: number,
+                public rw_session_count: number,
+                public max_pin_length: number,
+                public min_pin_length: number,
+                public total_public_memory: number,
+                public free_public_memory: number,
+                public total_private_memory: number,
+                public free_private_memory: number,
+                public hardware_version: string,
+                public firmware_version: string) {}
 }
 
-interface TokensResponse extends T1CResponse {
-    data: TokenInfo[]
+class TokensResponse extends DataObjectResponse {
+    constructor(public data: TokenInfo[], public success: boolean) {
+        super(data, success);
+    }
 }

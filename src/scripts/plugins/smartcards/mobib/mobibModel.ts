@@ -3,7 +3,7 @@
  * @since 2017
  */
 import { RestException } from '../../../core/exceptions/CoreExceptions';
-import { DataObjectResponse, DataResponse, T1CResponse } from '../../../core/service/CoreModel';
+import { DataObjectResponse, DataResponse } from '../../../core/service/CoreModel';
 import { Card } from '../Card';
 
 export { AbstractMobib, AllDataResponse, StatusResponse, CardIssuing, CardIssuingResponse, Contract, ContractsResponse };
@@ -17,74 +17,76 @@ interface AbstractMobib extends Card {
     status(callback?: (error: RestException, data: StatusResponse) => void): Promise<StatusResponse>;
 }
 
-interface AllDataResponse extends DataObjectResponse {
-    data: {
-        active: boolean
-        'card-issuing': CardIssuing
-        contracts: Contract[]
-        picture: string
+class AllDataResponse extends DataObjectResponse {
+    constructor(public data: { active: boolean, 'card-issuing': CardIssuing, contracts: Contract[], picture: string },
+                public success: boolean) {
+        super(data, success);
     }
 }
 
-interface StatusResponse extends DataObjectResponse {
-    data: {
-        active: boolean
+class StatusResponse extends DataObjectResponse {
+    constructor(public data: { active: boolean }, public success: boolean) {
+        super(data, success);
     }
 }
 
-interface CardIssuing {
-    card_expiration_date: string
-    card_holder_birth_date: string
-    card_holder_end_date: string
-    card_holder_id: string
-    card_holder_name: string
-    card_holder_start_date:  string
-    card_revalidation_date: string
-    card_type: number
-    company_id: number
-    gender: number
-    language: number
-    version: number
+class CardIssuing {
+    constructor(public card_expiration_date: string,
+                public card_holder_birth_date: string,
+                public card_holder_end_date: string,
+                public card_holder_id: string,
+                public card_holder_name: string,
+                public card_holder_start_date:  string,
+                public card_revalidation_date: string,
+                public card_type: number,
+                public company_id: number,
+                public gender: number,
+                public language: number,
+                public version: number) {}
 }
 
-interface CardIssuingResponse extends DataObjectResponse {
-    data: CardIssuing
+class CardIssuingResponse extends DataObjectResponse {
+    constructor(public data: CardIssuing, public success: boolean) {
+        super(data, success);
+    }
 }
 
-interface Contract {
-    authenticator_kvc: number
-    authenticator_value: number
-    journey_interchanges_allowed: boolean
-    passengers_max: number
-    period_journeys: {
-        max_number_of_trips: number
-        period: number
-    },
-    price_amount: number
-    provider: number
-    restrict_code: number
-    restrict_time: number
-    sale_date: string
-    sale_sam_count: number
-    sale_sam_id: number
-    spatials: { type: number }[]
-    tariff: {
-        counter: {
-            time: string
-            type: number
-        },
-        multimodal: boolean
-        nameref: number
-    },
-    validity_duration: {
-        unit: number
-        value: number
-    },
-    validity_start_date: string
-    vehicle_class_allowed: number
-    version: number
+class Contract {
+    constructor(public authenticator_kvc: number,
+                public authenticator_value: number,
+                public journey_interchanges_allowed: boolean,
+                public passengers_max: number,
+                public period_journeys: {
+                    max_number_of_trips: number
+                    period: number
+                },
+                public price_amount: number,
+                public provider: number,
+                public restrict_code: number,
+                public restrict_time: number,
+                public sale_date: string,
+                public sale_sam_count: number,
+                public sale_sam_id: number,
+                public spatials: { type: number }[],
+                public tariff: {
+                    counter: {
+                        time: string
+                        type: number
+                    },
+                    multimodal: boolean
+                    nameref: number
+                },
+                public validity_duration: {
+                    unit: number
+                    value: number
+                },
+                public validity_start_date: string,
+                public vehicle_class_allowed: number,
+                public version: number) {}
 }
 
-interface ContractsResponse extends T1CResponse {
-    data: Contract[]
+class ContractsResponse extends DataObjectResponse {
+    constructor(public data: Contract[], public success: boolean) {
+        super(data, success);
+    }
 }

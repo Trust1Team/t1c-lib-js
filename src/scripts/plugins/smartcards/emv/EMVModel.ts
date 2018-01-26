@@ -2,9 +2,9 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from "../../../core/exceptions/CoreExceptions";
-import { PinCard } from "../Card";
-import { DataObjectResponse, DataResponse, T1CResponse } from "../../../core/service/CoreModel";
+import { RestException } from '../../../core/exceptions/CoreExceptions';
+import { PinCard } from '../Card';
+import { DataObjectResponse } from '../../../core/service/CoreModel';
 
 export { AbstractEMV, AllDataResponse, ApplicationDataResponse, ApplicationsResponse, EmvCertificateResponse };
 
@@ -19,10 +19,9 @@ interface AbstractEMV extends PinCard {
                                callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
 }
 
-interface AllDataResponse extends T1CResponse {
-    data: {
-        applications: Application[]
-        application_data: ApplicationData
+class AllDataResponse extends DataObjectResponse {
+    constructor(public data: { applications: Application[], application_data: ApplicationData }, public success: boolean) {
+        super(data, success);
     }
 }
 
@@ -30,8 +29,10 @@ class Application {
     constructor(public aid: string, public name: string, public priority: number) {}
 }
 
-interface ApplicationsResponse extends T1CResponse {
-    data: Application[]
+class ApplicationsResponse extends DataObjectResponse {
+    constructor(public data: Application[], public success: boolean) {
+        super(data, success);
+    }
 }
 
 class ApplicationData {
@@ -44,16 +45,18 @@ class ApplicationData {
                 public name?: string) {}
 }
 
-interface ApplicationDataResponse extends T1CResponse {
-    data: ApplicationData
+class ApplicationDataResponse extends DataObjectResponse {
+    constructor(public data: ApplicationData, public success: boolean) {
+        super(data, success);
+    }
 }
 
-interface EmvCertificate {
-    data: string,
-    exponent: string,
-    remainder: string
+class EmvCertificate {
+    constructor(public data: string, public exponent: string, public remainder: string) {}
 }
 
-interface EmvCertificateResponse extends T1CResponse {
-    data: EmvCertificate
+class EmvCertificateResponse extends DataObjectResponse {
+    constructor(public data: EmvCertificate, public success: boolean) {
+        super(data, success);
+    }
 }
