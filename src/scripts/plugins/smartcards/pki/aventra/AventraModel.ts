@@ -3,7 +3,10 @@
  * @since 2017
  */
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { CertificateResponse, DataArrayResponse, DataObjectResponse, T1CResponse } from "../../../../core/service/CoreModel";
+import {
+    CertificateResponse, DataArrayResponse, DataObjectResponse, T1CCertificate,
+    T1CResponse
+} from '../../../../core/service/CoreModel';
 import { CertCard, ResetPinData, VerifyPinData } from "../../Card";
 import { Options } from '../../../../util/RequestHandler';
 
@@ -31,28 +34,34 @@ interface AbstractAventra extends CertCard {
     resetPin(body: ResetPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
 }
 
-interface AllDataResponse extends AllCertsResponse {
-    data: {
-        applet_info: {
-            change_counter: number
-            name: string
-            serial: string
-            version: string
-        }
-        authentication_certificate: string
-        encryption_certificate: string
-        issuer_certificate: string
-        signing_certificate: string
-        root_certificate: string
+class AllCertsResponse extends DataObjectResponse {
+    constructor(public data: AllAventraCerts, public success: boolean) {
+        super(data, success);
     }
 }
 
-interface AllCertsResponse extends DataObjectResponse {
-    data: {
-        authentication_certificate: string
-        encryption_certificate: string
-        issuer_certificate: string
-        signing_certificate: string
-        root_certificate: string
+class AllAventraCerts {
+    constructor(public authentication_certificate: T1CCertificate,
+                public encryption_certificate: T1CCertificate,
+                public issuer_certificate: T1CCertificate,
+                public signing_certificate: T1CCertificate,
+                public root_certificate: T1CCertificate) {}
+}
+
+class AllDataResponse extends AllCertsResponse {
+    constructor(public data: AllAventraData, public success: boolean) {
+        super(data, success);
     }
+}
+
+class AllAventraData {
+    constructor(public applet_info: AppletInfo,
+                public authentication_certificate: T1CCertificate,
+                public encryption_certificate: T1CCertificate,
+                public issuer_certificate: T1CCertificate,
+                public signing_certificate: T1CCertificate, public root_certificate: T1CCertificate) {}
+}
+
+class AppletInfo {
+    constructor(public change_counter: number, public name: string, public serial: string, public version: string) {}
 }
