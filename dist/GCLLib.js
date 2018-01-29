@@ -74825,6 +74825,7 @@ var GCLLib =
 	    }
 	    return T1CInfo;
 	}());
+	exports.T1CInfo = T1CInfo;
 	var BrowserInfoResponse = (function (_super) {
 	    __extends(BrowserInfoResponse, _super);
 	    function BrowserInfoResponse(data, success) {
@@ -74935,6 +74936,7 @@ var GCLLib =
 	    }
 	    return Plugin;
 	}());
+	exports.Plugin = Plugin;
 	var PubKeyResponse = (function (_super) {
 	    __extends(PubKeyResponse, _super);
 	    function PubKeyResponse(data, success) {

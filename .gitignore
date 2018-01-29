@@ -1,4 +1,8 @@
+### Node Modules
 /node_modules
+
+### Generated d.ts files
+/src/**/*.d.ts
 
 typings
 

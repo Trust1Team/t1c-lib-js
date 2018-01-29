@@ -10,7 +10,8 @@ import {
 } from '../../../core/service/CoreModel';
 import { Options } from '../../../util/RequestHandler';
 
-export { AbstractPiv, AllCertsResponse, AllDataResponse, PrintedInformation, PrintedInformationResponse, FacialImage, FacialImageResponse };
+export { AbstractPiv, AllCertsResponse, AllDataResponse, PrintedInformation,
+    PrintedInformationResponse, FacialImage, FacialImageResponse, AllPivCerts, AllPivData };
 
 
 interface AbstractPiv extends GenericSecuredCertCard {

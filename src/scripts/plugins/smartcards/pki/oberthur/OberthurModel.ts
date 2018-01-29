@@ -10,7 +10,7 @@ import {
 import { CertCard, VerifyPinData } from '../../Card';
 import { Options } from '../../../../util/RequestHandler';
 
-export { AbstractOberthur, AllCertsResponse, AllDataResponse };
+export { AbstractOberthur, AllCertsResponse, AllDataResponse, AllOberthurCerts };
 
 
 interface AbstractOberthur extends CertCard {

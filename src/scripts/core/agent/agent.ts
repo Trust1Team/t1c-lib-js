@@ -18,7 +18,7 @@ class AgentClient implements AbstractAgent {
         return AgentClient.AGENT_PATH + '/' + port;
     }
 
-    public get(filters?: { [filterParam: string]: string }, callback?: (error: RestException, data: AgentResponse) => void) {
+    public get(filters?: { [filterParam: string]: string }, callback?: (error: RestException, data: AgentResponse) => void): Promise<any> {
         return this.connection.getSkipCitrix(this.url, AgentClient.AGENT_PATH, filters, callback);
     }
 

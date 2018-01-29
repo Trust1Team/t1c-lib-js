@@ -7,7 +7,8 @@ import { CertCard, OptionalPin } from '../../Card';
 import { CertificateResponse, DataObjectResponse, DataResponse, T1CCertificate } from '../../../../core/service/CoreModel';
 import { Options } from '../../../../util/RequestHandler';
 
-export { AbstractEidPT, AllCertsResponse, AllDataResponse, IdDataResponse, PtAddressResponse };
+export { AbstractEidPT, AllCertsResponse,
+    AllDataResponse, IdDataResponse, PtAddressResponse, AllPtData, AllPtCerts, IdData, PtAddressData };
 
 
 interface AbstractEidPT extends CertCard {

@@ -6,7 +6,8 @@ import { RestException } from '../../../core/exceptions/CoreExceptions';
 import { PinCard } from '../Card';
 import { DataObjectResponse } from '../../../core/service/CoreModel';
 
-export { AbstractEMV, AllDataResponse, ApplicationDataResponse, ApplicationsResponse, EmvCertificateResponse };
+export { AbstractEMV, AllDataResponse, ApplicationDataResponse, ApplicationsResponse,
+    EmvCertificateResponse, ApplicationData, Application, EmvCertificate };
 
 
 interface AbstractEMV extends PinCard {

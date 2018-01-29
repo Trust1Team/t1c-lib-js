@@ -10,7 +10,7 @@ import {
 } from '../../../../core/service/CoreModel';
 import { Options } from "../../../../util/RequestHandler";
 
-export { AbstractDNIe, AllCertsResponse, AllDataResponse, InfoResponse };
+export { AbstractDNIe, AllCertsResponse, AllDataResponse, InfoResponse, AllDNIeData, AllDNIeCerts, Info };
 
 
 interface AbstractDNIe extends SecuredCertCard {
