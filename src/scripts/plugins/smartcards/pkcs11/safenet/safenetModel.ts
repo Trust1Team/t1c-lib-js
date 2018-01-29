@@ -10,7 +10,7 @@ import { Options } from '../../../../util/RequestHandler';
 import { AuthenticateOrSignData } from '../../Card';
 
 export { AbstractSafeNet, InfoResponse, SafeNetCertificate, SafeNetCertificatesResponse,
-    SafeNetSignData, Slot, SlotsResponse, TokenInfo, TokensResponse };
+    SafeNetSignData, Slot, SlotsResponse, TokenInfo, TokensResponse, SafeNetInfo };
 
 interface AbstractSafeNet {
     certificates(slotId: number,

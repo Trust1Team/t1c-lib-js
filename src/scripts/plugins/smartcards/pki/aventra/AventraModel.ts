@@ -2,15 +2,15 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from "../../../../core/exceptions/CoreExceptions";
+import { RestException } from '../../../../core/exceptions/CoreExceptions';
 import {
     CertificateResponse, DataArrayResponse, DataObjectResponse, T1CCertificate,
     T1CResponse
 } from '../../../../core/service/CoreModel';
-import { CertCard, ResetPinData, VerifyPinData } from "../../Card";
+import { CertCard, ResetPinData, VerifyPinData } from '../../Card';
 import { Options } from '../../../../util/RequestHandler';
 
-export { AbstractAventra, AllCertsResponse, AllDataResponse };
+export { AbstractAventra, AllCertsResponse, AllDataResponse, AllAventraCerts, AllAventraData, AppletInfo};
 
 
 interface AbstractAventra extends CertCard {

@@ -6,7 +6,7 @@ import { OptionalPin, PinCard } from '../Card';
 import { DataObjectResponse, DataResponse } from '../../../core/service/CoreModel';
 import { RestException } from '../../../core/exceptions/CoreExceptions';
 
-export { AbstractOcra, AllDataResponse, ChallengeData, ReadCounterResponse };
+export { AbstractOcra, AllDataResponse, ChallengeData, ReadCounterResponse, AllOcraData };
 
 
 interface AbstractOcra extends PinCard {

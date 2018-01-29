@@ -11,7 +11,7 @@ import {
 import { Options } from "../../../../util/RequestHandler";
 
 export { AbstractEidLUX, AllCertsResponse, AllDataResponse, Biometric, BiometricResponse,
-    Picture, PictureResponse, SignatureImage, SignatureImageResponse };
+    Picture, PictureResponse, SignatureImage, SignatureImageResponse, AllLuxData, AllLuxCerts };
 
 
 interface AbstractEidLUX extends SecuredCertCard {

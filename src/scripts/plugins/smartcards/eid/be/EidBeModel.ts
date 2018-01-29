@@ -10,7 +10,8 @@ import {
 } from '../../../../core/service/CoreModel';
 import { Options } from '../../../../util/RequestHandler';
 
-export { AbstractEidBE, Address, AddressResponse, AllCertsResponse, AllDataResponse, RnData, RnDataResponse };
+export { AbstractEidBE, Address, AddressResponse, AllCertsResponse,
+    AllDataResponse, RnData, RnDataResponse, AllBeIDData, AllBeIDCerts };
 
 
 interface AbstractEidBE extends CertCard {

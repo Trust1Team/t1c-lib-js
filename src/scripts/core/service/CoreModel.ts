@@ -7,7 +7,7 @@ import * as CoreExceptions from '../exceptions/CoreExceptions';
 
 export { AbstractCore, T1CResponse, BoolDataResponse, DataResponse, DataArrayResponse, DataObjectResponse,
     InfoResponse, BrowserInfo, BrowserInfoResponse, Card, CardReader, CardReadersResponse, T1CCertificate,
-    CertificateResponse, CertificatesResponse, SingleReaderResponse, PluginsResponse, PubKeyResponse };
+    CertificateResponse, CertificatesResponse, SingleReaderResponse, PluginsResponse, PubKeyResponse, T1CInfo, Plugin };
 
 
 interface AbstractCore {

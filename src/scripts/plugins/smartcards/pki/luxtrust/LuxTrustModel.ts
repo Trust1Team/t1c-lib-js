@@ -10,7 +10,7 @@ import {
 import { CertCard } from '../../Card';
 import { Options } from '../../../../util/RequestHandler';
 
-export { AbstractLuxTrust, AllCertsResponse, AllDataResponse };
+export { AbstractLuxTrust, AllCertsResponse, AllDataResponse, AllLuxTrustCerts };
 
 
 interface AbstractLuxTrust extends CertCard {
