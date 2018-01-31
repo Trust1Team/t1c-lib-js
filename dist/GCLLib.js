@@ -77168,7 +77168,7 @@ var GCLLib =
 	            digest: verifyData.algorithm_reference,
 	            signature: verifyData.signature
 	        };
-	        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.TOKEN), req, undefined).then(function (data) {
+	        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.VERIFY), req, undefined).then(function (data) {
 	            return ResponseHandler_1.ResponseHandler.response(data, callback);
 	        }, function (err) {
 	            if (_this.moduleConfig) {
@@ -77181,7 +77181,7 @@ var GCLLib =
 	                    digest: verifyData.algorithm_reference,
 	                    signature: verifyData.signature
 	                };
-	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(PKCS11.TOKEN), defaultReq, undefined, callback);
+	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(PKCS11.VERIFY), defaultReq, undefined, callback);
 	            }
 	            else {
 	                return ResponseHandler_1.ResponseHandler.error(err, callback);
