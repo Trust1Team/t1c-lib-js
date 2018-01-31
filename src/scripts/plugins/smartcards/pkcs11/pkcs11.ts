@@ -159,7 +159,7 @@ class PKCS11 implements AbstractPkcs11 {
             digest: verifyData.algorithm_reference,
             signature: verifyData.signature
         };
-        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.TOKEN), req, undefined).then(data => {
+        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.VERIFY), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
         }, err => {
             if (this.moduleConfig) {
@@ -172,7 +172,7 @@ class PKCS11 implements AbstractPkcs11 {
                     digest: verifyData.algorithm_reference,
                     signature: verifyData.signature
                 };
-                return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.TOKEN), defaultReq, undefined, callback);
+                return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.VERIFY), defaultReq, undefined, callback);
             } else { return ResponseHandler.error(err, callback); }
         });
     }
