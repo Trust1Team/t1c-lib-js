@@ -4,13 +4,14 @@
 
 import { RestException } from '../../../../core/exceptions/CoreExceptions';
 import {
+    BoolDataResponse,
     CertificatesResponse, DataObjectResponse, DataResponse, T1CCertificate
 } from '../../../../core/service/CoreModel';
 import { Options } from '../../../../util/RequestHandler';
 import { AuthenticateOrSignData } from '../../Card';
 
 export { AbstractSafeNet, InfoResponse, SafeNetCertificate, SafeNetCertificatesResponse,
-    SafeNetSignData, Slot, SlotsResponse, TokenInfo, TokensResponse, SafeNetInfo };
+    SafeNetSignData, Slot, SlotsResponse, TokenInfo, TokenResponse, SafeNetInfo, Pkcs11VerifySignedData };
 
 interface AbstractSafeNet {
     certificates(slotId: number,
@@ -20,9 +21,10 @@ interface AbstractSafeNet {
     signData(data: SafeNetSignData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     slots(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
     slotsWithTokenPresent(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
-    tokens(callback?: (error: RestException, data: TokensResponse) => void): Promise<TokensResponse>;
+    token(slotId: number, callback?: (error: RestException, data: TokenResponse) => void): Promise<TokenResponse>;
+    verifySignedData(data: Pkcs11VerifySignedData,
+                     callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
 }
-
 
 class InfoResponse extends DataObjectResponse {
     constructor(public data: SafeNetInfo, public success: boolean) {
@@ -75,6 +77,18 @@ class SafeNetSignData extends AuthenticateOrSignData {
     }
 }
 
+class Pkcs11VerifySignedData extends SafeNetSignData {
+    constructor(public slot_id: number,
+                public cert_id: string,
+                public algorithm_reference: string,
+                public data: string,
+                public signature: string,
+                public pin?: string,
+                public pace?: string) {
+        super(slot_id, cert_id, algorithm_reference, data, pin, pace);
+    }
+}
+
 class TokenInfo {
     constructor(public slot_id: string,
                 public label: string,
@@ -96,8 +110,8 @@ class TokenInfo {
                 public firmware_version: string) {}
 }
 
-class TokensResponse extends DataObjectResponse {
-    constructor(public data: TokenInfo[], public success: boolean) {
+class TokenResponse extends DataObjectResponse {
+    constructor(public data: TokenInfo, public success: boolean) {
         super(data, success);
     }
 }
