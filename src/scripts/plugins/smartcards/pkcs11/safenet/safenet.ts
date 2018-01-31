@@ -1,11 +1,13 @@
 import { RestException } from '../../../../core/exceptions/CoreExceptions';
-import { DataResponse } from '../../../../core/service/CoreModel';
+import { BoolDataResponse, DataResponse } from '../../../../core/service/CoreModel';
 import { LocalConnection } from '../../../../core/client/Connection';
 import * as _ from 'lodash';
 import { CertParser } from '../../../../util/CertParser';
 import { ResponseHandler } from '../../../../util/ResponseHandler';
 import {
-    AbstractSafeNet, InfoResponse, SafeNetCertificatesResponse, SafeNetSignData, SlotsResponse,
+    AbstractSafeNet, InfoResponse,
+    Pkcs11VerifySignedData, SafeNetCertificatesResponse, SafeNetSignData, SlotsResponse,
+    TokenResponse,
     TokensResponse
 } from './safenetModel';
 import * as platform from 'platform';
@@ -25,7 +27,8 @@ class SafeNet implements AbstractSafeNet {
     static INFO = '/info';
     static SIGN = '/sign';
     static SLOTS = '/slots';
-    static TOKENS = '/tokens';
+    static TOKEN = '/token';
+    static VERIFY = '/verify';
     static DEFAULT_CONFIG = {
         linux: '/usr/local/lib/libeTPkcs11.so',
         mac: '/usr/local/lib/libeTPkcs11.dylib',
@@ -135,14 +138,43 @@ class SafeNet implements AbstractSafeNet {
         });
     }
 
-    public tokens(callback: (error: RestException, data: TokensResponse) => void): Promise<TokensResponse> {
-        let req = { module: this.modulePath };
-        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.TOKENS), req, undefined).then(data => {
+    public token(slotId: number, callback: (error: RestException, data: TokenResponse) => void): Promise<TokenResponse> {
+        let req = _.extend({ slot_id: slotId }, { module: this.modulePath });
+        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.TOKEN), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
         }, err => {
             if (this.moduleConfig) {
-                let defaultReq = { module: SafeNet.DEFAULT_CONFIG[this.os] };
-                return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.TOKENS), defaultReq, undefined, callback);
+                let defaultReq = _.extend({ slot_id: slotId }, { module: SafeNet.DEFAULT_CONFIG[this.os] });
+                return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.TOKEN), defaultReq, undefined, callback);
+            } else { return ResponseHandler.error(err, callback); }
+        });
+    }
+
+    public verifySignedData(verifyData: Pkcs11VerifySignedData,
+                            callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
+        let req = {
+            module: this.modulePath,
+            id: verifyData.cert_id,
+            slot_id: verifyData.slot_id,
+            pin: verifyData.pin,
+            data: verifyData.data,
+            digest: verifyData.algorithm_reference,
+            signature: verifyData.signature
+        };
+        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.VERIFY), req, undefined).then(data => {
+            return ResponseHandler.response(data, callback);
+        }, err => {
+            if (this.moduleConfig) {
+                let defaultReq = {
+                    module: SafeNet.DEFAULT_CONFIG[this.os],
+                    id: verifyData.cert_id,
+                    slot_id: verifyData.slot_id,
+                    pin: verifyData.pin,
+                    data: verifyData.data,
+                    digest: verifyData.algorithm_reference,
+                    signature: verifyData.signature
+                };
+                return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.VERIFY), defaultReq, undefined, callback);
             } else { return ResponseHandler.error(err, callback); }
         });
     }
