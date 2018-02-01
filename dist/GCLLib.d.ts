@@ -186,11 +186,7 @@ class GCLClient {
     oberthur: (reader_id?: string) => AbstractOberthur;
     piv: (reader_id?: string) => AbstractPiv;
     pteid: (reader_id?: string) => AbstractEidPT;
-    pkcs11: (moduleConfig?: {
-        linux: string;
-        mac: string;
-        win: string;
-    }) => AbstractPkcs11;
+    pkcs11: () => AbstractPkcs11;
     readerapi: (reader_id: string) => AbstractRemoteLoading;
     belfius: (reader_id: string) => AbstractBelfius;
     containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
@@ -215,7 +211,7 @@ class RestException {
 export { RestException };
 
 class GCLConfig implements GCLConfig {
-    constructor(dsUriValue?: string, apiKey?: string);
+    constructor(dsUriValue?: string, apiKey?: string, pkcs11Config?: ModuleConfig);
     ocvUrl: string;
     gclUrl: string;
     dsUrl: string;
@@ -237,6 +233,7 @@ class GCLConfig implements GCLConfig {
     defaultConsentDuration: number;
     defaultConsentTimeout: number;
     syncManaged: boolean;
+    pkcs11Config: ModuleConfig;
 }
 export { GCLConfig };
 
@@ -1366,7 +1363,7 @@ class AdminService implements AbstractAdmin {
     updateContainerConfig(config: any, callback?: (error: CoreExceptions.RestException, data: any) => void): Promise<any>;
 }
 
-export { AbstractPkcs11, InfoResponse, Pkcs11Certificate, Pkcs11CertificatesResponse, Pkcs11Info, Pkcs11SignData, Pkcs11VerifySignedData, Slot, SlotsResponse, TokenInfo, TokenResponse };
+export { AbstractPkcs11, InfoResponse, Pkcs11Certificate, Pkcs11CertificatesResponse, Pkcs11Info, Pkcs11SignData, Pkcs11VerifySignedData, Slot, SlotsResponse, TokenInfo, TokenResponse, ModuleConfig };
 interface AbstractPkcs11 {
     certificates(slotId: number, options?: Options, callback?: (error: RestException, data: Pkcs11CertificatesResponse) => void): Promise<Pkcs11CertificatesResponse>;
     info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>;
@@ -1457,6 +1454,12 @@ declare class TokenResponse extends DataObjectResponse {
     data: TokenInfo;
     success: boolean;
     constructor(data: TokenInfo, success: boolean);
+}
+declare class ModuleConfig {
+    linux: string;
+    mac: string;
+    win: string;
+    constructor(linux: string, mac: string, win: string);
 }
 
 export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteConnection, Connection, LocalTestConnection };

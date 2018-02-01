@@ -13,6 +13,7 @@ import * as _ from 'lodash';
 import { CardUtil } from '../../util/CardUtil';
 import { Aventra } from '../../plugins/smartcards/pki/aventra/Aventra';
 import { Options } from '../../util/RequestHandler';
+import { ModuleConfig } from '../../plugins/smartcards/pkcs11/pkcs11Model';
 
 export { GenericService };
 

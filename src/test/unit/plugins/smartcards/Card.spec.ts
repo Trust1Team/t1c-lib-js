@@ -10,6 +10,7 @@ import * as MockAdapter from 'axios-mock-adapter';
 import { GCLConfig } from '../../../../scripts/core/GCLConfig';
 import { LocalConnection } from '../../../../scripts/core/client/Connection';
 import { PluginFactory } from '../../../../scripts/plugins/PluginFactory';
+import { PubKeyService } from '../../../../scripts/util/PubKeyService';
 
 describe('Generic cards and containers', () => {
     const gclConfig = new GCLConfig();
@@ -18,6 +19,10 @@ describe('Generic cards and containers', () => {
 
     beforeEach(() => {
         mock = new MockAdapter(axios);
+        PubKeyService.setPubKey('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlOJu6TyygqxfWT7eLtGDwajtN\n' +
+                                'FOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76\n' +
+                                'xFxdU6jE0NQ+Z+zEdhUTooNRaY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4\n' +
+                                'gwQco1KRMDSmXSMkDwIDAQAB\n');
     });
 
     afterEach(() => {
@@ -65,7 +70,7 @@ describe('Generic cards and containers', () => {
         });
 
         it('makes the correct call with filters', () => {
-            return mobib.allData({ filters: [ 'test1', 'test2' ] }).then(res => {
+            return mobib.allData({ filters: [ 'test1', 'test2' ], parseCerts: false }).then(res => {
                 expect(res).to.have.property('success');
                 expect(res.success).to.be.a('boolean');
                 expect(res.success).to.eq(true);
@@ -109,7 +114,7 @@ describe('Generic cards and containers', () => {
 
                 expect(res).to.have.property('data');
                 expect(res.data).to.be.a('object');
-                expect(res.data, 'PIN property not found when expected').to.have.property('pin', '1234');
+                expect(res.data, 'PIN property not found when expected').to.have.property('pin');
             });
         });
     });
@@ -179,7 +184,7 @@ describe('Generic cards and containers', () => {
         });
 
         it('can get a filtered subset of the certificates', () => {
-            return aventra.allCerts({ filters: [ 'cert1', 'cert2' ] }).then(res => {
+            return aventra.allCerts({ filters: [ 'cert1', 'cert2' ], parseCerts: false }).then(res => {
                 expect(res).to.have.property('success');
                 expect(res.success).to.be.a('boolean');
                 expect(res.success).to.eq(true);
@@ -271,14 +276,23 @@ describe('Generic cards and containers', () => {
                 });
 
             // certificates
-            mock.onPost('plugins/piv/123/certificates', { pin: '0000' }).reply(config => {
-                return [ 200, { success: true, data: config.params }];
+            mock.onPost('plugins/piv/123/certificates').reply(config => {
+                let data = JSON.parse(config.data);
+                if (data && data.pin && data.pin.length) {
+                    return [ 200, { success: true, data: config.params }];
+                } else { return [ 404 ]; }
             });
-            mock.onPost('plugins/piv/123/certificates/authentication', { pin: '0000' }).reply(() => {
-                return [ 200, { success: true, data: 'mockauthcert' }];
+            mock.onPost('plugins/piv/123/certificates/authentication').reply((config) => {
+                let data = JSON.parse(config.data);
+                if (data && data.pin && data.pin.length) {
+                    return [ 200, { success: true, data: 'mockauthcert' }];
+                } else { return [ 404 ]; }
             });
-            mock.onPost('plugins/piv/123/certificates/root', { pin: '0000' }).reply(() => {
-                return [ 200, { success: true, data: [ 'mockrootcert', 'mockrootcert2' ] }];
+            mock.onPost('plugins/piv/123/certificates/root').reply((config) => {
+                let data = JSON.parse(config.data);
+                if (data && data.pin && data.pin.length) {
+                    return [ 200, { success: true, data: [ 'mockrootcert', 'mockrootcert2' ] }];
+                } else { return [ 404 ]; }
             });
         });
 
@@ -317,7 +331,7 @@ describe('Generic cards and containers', () => {
         });
 
         it('makes get a filtered subset of the certificates', () => {
-            return piv.allCerts({ filters: [ 'cert1', 'cert2' ] }, { pin: '0000' }).then(res => {
+            return piv.allCerts({ filters: [ 'cert1', 'cert2' ], parseCerts: false }, { pin: '0000' }).then(res => {
                 expect(res).to.have.property('success');
                 expect(res.success).to.be.a('boolean');
                 expect(res.success).to.eq(true);
@@ -380,7 +394,7 @@ describe('Generic cards and containers', () => {
 
                 expect(res).to.have.property('data');
                 expect(res.data).to.be.a('object');
-                expect(res.data, 'PIN property not found when expected').to.have.property('pin', '0000');
+                expect(res.data, 'PIN property not found when expected').to.have.property('pin');
             });
         });
 

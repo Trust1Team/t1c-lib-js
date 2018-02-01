@@ -11,6 +11,7 @@ import {
     AbstractPkcs11, InfoResponse, Pkcs11CertificatesResponse,
     Pkcs11SignData, Pkcs11VerifySignedData, SlotsResponse, TokenResponse
 } from './pkcs11Model';
+import { PinEnforcer } from '../../../util/PinEnforcer';
 
 
 /**
@@ -39,14 +40,14 @@ class PKCS11 implements AbstractPkcs11 {
 
     constructor(protected baseUrl: string,
                 protected containerUrl: string,
-                protected connection: LocalConnection,
-                protected moduleConfig: { linux: string, mac: string, win: string}) {
+                protected connection: LocalConnection) {
         // determine os
         if (platform.os.family.indexOf('Win') > -1) { this.os = 'win'; }
         if (platform.os.family.indexOf('OS X') > -1) { this.os = 'mac'; }
         // assume we are dealing with linux ==> will not always be correct!
         if (!this.os) { this.os = 'linux'; }
 
+        const moduleConfig = connection.cfg.pkcs11Config;
         if (moduleConfig && moduleConfig[this.os]) { this.modulePath = moduleConfig[this.os]; }
     }
 
@@ -77,7 +78,7 @@ class PKCS11 implements AbstractPkcs11 {
             module: this.modulePath,
             id: signData.cert_id,
             slot_id: signData.slot_id,
-            pin: signData.pin,
+            pin: PinEnforcer.encryptPin(signData.pin),
             data: signData.data,
             digest: signData.algorithm_reference
         };
@@ -121,7 +122,7 @@ class PKCS11 implements AbstractPkcs11 {
             module: this.modulePath,
             id: verifyData.cert_id,
             slot_id: verifyData.slot_id,
-            pin: verifyData.pin,
+            pin: PinEnforcer.encryptPin(verifyData.pin),
             data: verifyData.data,
             digest: verifyData.algorithm_reference,
             signature: verifyData.signature
