@@ -25,7 +25,6 @@ import { AbstractEidLUX } from '../plugins/smartcards/eid/lux/EidLuxModel';
 import { AbstractDNIe } from '../plugins/smartcards/eid/esp/dnieModel';
 import { Promise } from 'es6-promise';
 import { PluginFactory } from '../plugins/PluginFactory';
-import { AbstractSafeNet } from '../plugins/smartcards/pkcs11/safenet/safenetModel';
 import { AuthenticateOrSignData, OptionalPin } from '../plugins/smartcards/Card';
 import { RestException } from './exceptions/CoreExceptions';
 import { GenericService } from './generic/GenericService';
@@ -38,6 +37,7 @@ import { AbstractAgent } from './agent/agentModel';
 import { AbstractFileExchange } from '../plugins/file/FileExchangeModel';
 import { AdminService } from './admin/admin';
 import { InitUtil } from '../util/InitUtil';
+import { AbstractPkcs11 } from '../plugins/smartcards/pkcs11/pkcs11Model';
 
 class GCLClient {
     public GCLInstalled: boolean;
@@ -154,8 +154,9 @@ class GCLClient {
     // get instance for PT Eid
     public pteid = (reader_id?: string): AbstractEidPT => { return this.pluginFactory.createEidPT(reader_id); };
     // get instance for PKCS11
-    public safenet = (reader_id: string, moduleConfig: { linux: string, mac: string, win: string }): AbstractSafeNet => {
-        return this.pluginFactory.createSafeNet(moduleConfig); };
+    public pkcs11 = (moduleConfig?: { linux: string, mac: string, win: string }): AbstractPkcs11 => {
+        return this.pluginFactory.createPKCS11(moduleConfig);
+    }
     // get instance for Remote Loading
     public readerapi = (reader_id: string): AbstractRemoteLoading => { return this.pluginFactory.createRemoteLoading(reader_id); };
     // get instance for Belfius

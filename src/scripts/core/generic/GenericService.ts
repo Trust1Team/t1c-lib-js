@@ -22,11 +22,13 @@ class Arguments {
                 public container: string,
                 public data: OptionalPin,
                 public dumpMethod?: string,
-                public dumpOptions?: Options) {}
+                public dumpOptions?: Options,
+                public reader?: CardReader) {}
 }
 
 
 class GenericService {
+    static PKCS11_FLAGS = [ 1, 3, 5, 7];
 
     public static containerForReader(client: GCLClient,
                                      readerId: string,
@@ -109,6 +111,23 @@ class GenericService {
                    .catch(err => { return ResponseHandler.error(err, callback); });
     }
 
+    public static checkPKCS11(client: GCLClient) {
+        return new Promise((resolve, reject) => {
+            // try a PKCS11 call, if success, it's PKCS11 :)
+            client.pkcs11().slotsWithTokenPresent().then(slots => {
+                if (slots && slots.data && slots.data.length) {
+                    // check if valid token present
+                    let validToken = _.find(slots.data, slot => {
+                        return _.includes(this.PKCS11_FLAGS, slot.flags);
+                    });
+                    resolve(!!validToken);
+                } else { resolve(false); }
+            }, err => {
+                reject(err);
+            });
+        });
+    }
+
     private static checkCanAuthenticate(data: CardReadersResponse) {
         return new Promise((resolve) => {
             data.data = _.filter(data.data, reader => { return CardUtil.canAuthenticate(reader.card); });
@@ -146,6 +165,7 @@ class GenericService {
         return client.core().readersCardAvailable()
                      .then(readers => { return { readerId, readers }; })
                      .then(this.checkReaderPresent)
+                     .then(reader => { return { reader, client }; })
                      .then(this.determineContainerForCard)
                      .then(container => { return { client, container }; })
                      .then(this.checkContainerAvailable)
@@ -190,10 +210,17 @@ class GenericService {
         });
     }
 
-    private static determineContainerForCard(reader: CardReader) {
+    private static determineContainerForCard(args: { reader: CardReader, client: GCLClient }) {
         return new Promise((resolve, reject) => {
-            if (reader && reader.card) {
-                resolve(CardUtil.determineContainer(reader.card));
+            if (args.reader && args.reader.card) {
+                let container = CardUtil.determineContainer(args.reader.card);
+                if (!container) {
+                    GenericService.checkPKCS11(args.client).then(pkcs11 => {
+                        pkcs11 ? resolve('pkcs11') : resolve(undefined);
+                    }, () => {
+                        resolve(undefined);
+                    });
+                } else { resolve(container); }
             } else { reject('No card present in reader'); }
         });
     }
