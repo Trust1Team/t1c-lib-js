@@ -8971,8 +8971,8 @@ var GCLLib =
 	        this.oberthur = function (reader_id) { return _this.pluginFactory.createOberthurNO(reader_id); };
 	        this.piv = function (reader_id) { return _this.pluginFactory.createPIV(reader_id); };
 	        this.pteid = function (reader_id) { return _this.pluginFactory.createEidPT(reader_id); };
-	        this.safenet = function (reader_id, moduleConfig) {
-	            return _this.pluginFactory.createSafeNet(moduleConfig);
+	        this.pkcs11 = function (moduleConfig) {
+	            return _this.pluginFactory.createPKCS11(moduleConfig);
 	        };
 	        this.readerapi = function (reader_id) { return _this.pluginFactory.createRemoteLoading(reader_id); };
 	        this.belfius = function (reader_id) { return _this.pluginFactory.createBelfius(reader_id); };
@@ -31534,12 +31534,12 @@ var GCLLib =
 	var Aventra_1 = __webpack_require__(496);
 	var Oberthur_1 = __webpack_require__(497);
 	var piv_1 = __webpack_require__(498);
-	var safenet_1 = __webpack_require__(499);
-	var dnie_1 = __webpack_require__(500);
-	var EidPt_1 = __webpack_require__(501);
-	var RemoteLoading_1 = __webpack_require__(502);
-	var Belfius_1 = __webpack_require__(503);
-	var FileExchange_1 = __webpack_require__(505);
+	var dnie_1 = __webpack_require__(499);
+	var EidPt_1 = __webpack_require__(500);
+	var RemoteLoading_1 = __webpack_require__(501);
+	var Belfius_1 = __webpack_require__(502);
+	var FileExchange_1 = __webpack_require__(504);
+	var pkcs11_1 = __webpack_require__(505);
 	var CONTAINER_CONTEXT_PATH = '/plugins/';
 	var CONTAINER_NEW_CONTEXT_PATH = '/containers/';
 	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + 'beid';
@@ -31554,7 +31554,7 @@ var GCLLib =
 	var CONTAINER_OBERTHUR = CONTAINER_CONTEXT_PATH + 'oberthur';
 	var CONTAINER_PIV = CONTAINER_CONTEXT_PATH + 'piv';
 	var CONTAINER_PTEID = CONTAINER_CONTEXT_PATH + 'pteid';
-	var CONTAINER_SAFENET = CONTAINER_CONTEXT_PATH + 'safenet';
+	var CONTAINER_PKCS11 = CONTAINER_CONTEXT_PATH + 'pkcs11';
 	var CONTAINER_REMOTE_LOADING = CONTAINER_CONTEXT_PATH + 'readerapi';
 	var PluginFactory = (function () {
 	    function PluginFactory(url, connection) {
@@ -31574,8 +31574,8 @@ var GCLLib =
 	    PluginFactory.prototype.createAventraNO = function (reader_id) { return new Aventra_1.Aventra(this.url, CONTAINER_AVENTRA, this.connection, reader_id); };
 	    PluginFactory.prototype.createOberthurNO = function (reader_id) { return new Oberthur_1.Oberthur(this.url, CONTAINER_OBERTHUR, this.connection, reader_id); };
 	    PluginFactory.prototype.createPIV = function (reader_id) { return new piv_1.PIV(this.url, CONTAINER_PIV, this.connection, reader_id); };
-	    PluginFactory.prototype.createSafeNet = function (config) {
-	        return new safenet_1.SafeNet(this.url, CONTAINER_SAFENET, this.connection, config);
+	    PluginFactory.prototype.createPKCS11 = function (config) {
+	        return new pkcs11_1.PKCS11(this.url, CONTAINER_PKCS11, this.connection, config);
 	    };
 	    PluginFactory.prototype.createRemoteLoading = function (reader_id) {
 	        return new RemoteLoading_1.RemoteLoading(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id);
@@ -75570,166 +75570,6 @@ var GCLLib =
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var _ = __webpack_require__(331);
-	var CertParser_1 = __webpack_require__(380);
-	var ResponseHandler_1 = __webpack_require__(339);
-	var platform = __webpack_require__(333);
-	var RequestHandler_1 = __webpack_require__(490);
-	var SafeNet = (function () {
-	    function SafeNet(baseUrl, containerUrl, connection, moduleConfig) {
-	        this.baseUrl = baseUrl;
-	        this.containerUrl = containerUrl;
-	        this.connection = connection;
-	        this.moduleConfig = moduleConfig;
-	        if (platform.os.family.indexOf('Win') > -1) {
-	            this.os = 'win';
-	        }
-	        if (platform.os.family.indexOf('OS X') > -1) {
-	            this.os = 'mac';
-	        }
-	        if (!this.os) {
-	            this.os = 'linux';
-	        }
-	        if (moduleConfig && moduleConfig[this.os]) {
-	            this.modulePath = moduleConfig[this.os];
-	        }
-	        else {
-	            this.modulePath = SafeNet.DEFAULT_CONFIG[this.os];
-	        }
-	    }
-	    SafeNet.prototype.certificates = function (slotId, options, callback) {
-	        var _this = this;
-	        var req = _.extend({ slot_id: slotId }, { module: this.modulePath });
-	        var reqOptions = RequestHandler_1.RequestHandler.determineOptions(options, callback);
-	        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.ALL_CERTIFICATES), req, undefined).then(function (data) {
-	            return CertParser_1.CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
-	        }, function (err) {
-	            if (_this.moduleConfig) {
-	                var defaultReq = _.extend({ slot_id: slotId }, { module: SafeNet.DEFAULT_CONFIG[_this.os] });
-	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(SafeNet.ALL_CERTIFICATES), defaultReq, undefined).then(function (data) {
-	                    return CertParser_1.CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
-	                }, function (defaultErr) {
-	                    return ResponseHandler_1.ResponseHandler.error(defaultErr, reqOptions.callback);
-	                });
-	            }
-	            else {
-	                return ResponseHandler_1.ResponseHandler.error(err, reqOptions.callback);
-	            }
-	        });
-	    };
-	    SafeNet.prototype.info = function (callback) {
-	        var _this = this;
-	        var req = { module: this.modulePath };
-	        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.INFO), req, undefined).then(function (data) {
-	            return ResponseHandler_1.ResponseHandler.response(data, callback);
-	        }, function (err) {
-	            if (_this.moduleConfig) {
-	                var defaultReq = { module: SafeNet.DEFAULT_CONFIG[_this.os] };
-	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(SafeNet.INFO), defaultReq, undefined, callback);
-	            }
-	            else {
-	                return ResponseHandler_1.ResponseHandler.error(err, callback);
-	            }
-	        });
-	    };
-	    SafeNet.prototype.signData = function (signData, callback) {
-	        var _this = this;
-	        var req = {
-	            module: this.modulePath,
-	            id: signData.cert_id,
-	            slot_id: signData.slot_id,
-	            pin: signData.pin,
-	            data: signData.data,
-	            digest: signData.algorithm_reference
-	        };
-	        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SIGN), req, undefined).then(function (data) {
-	            return ResponseHandler_1.ResponseHandler.response(data, callback);
-	        }, function (err) {
-	            if (_this.moduleConfig) {
-	                var defaultReq = {
-	                    module: SafeNet.DEFAULT_CONFIG[_this.os],
-	                    id: signData.cert_id,
-	                    slot_id: signData.slot_id,
-	                    pin: signData.pin,
-	                    data: signData.data,
-	                    digest: signData.algorithm_reference
-	                };
-	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(SafeNet.SIGN), defaultReq, undefined, callback);
-	            }
-	            else {
-	                return ResponseHandler_1.ResponseHandler.error(err, callback);
-	            }
-	        });
-	    };
-	    SafeNet.prototype.slots = function (callback) {
-	        var _this = this;
-	        var req = { module: this.modulePath };
-	        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SLOTS), req, undefined).then(function (data) {
-	            return ResponseHandler_1.ResponseHandler.response(data, callback);
-	        }, function (err) {
-	            if (_this.moduleConfig) {
-	                var defaultReq = { module: SafeNet.DEFAULT_CONFIG[_this.os] };
-	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(SafeNet.SLOTS), defaultReq, undefined, callback);
-	            }
-	            else {
-	                return ResponseHandler_1.ResponseHandler.error(err, callback);
-	            }
-	        });
-	    };
-	    SafeNet.prototype.slotsWithTokenPresent = function (callback) {
-	        var _this = this;
-	        var req = { module: this.modulePath };
-	        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SLOTS), req, { 'token-present': 'true' }).then(function (data) {
-	            return ResponseHandler_1.ResponseHandler.response(data, callback);
-	        }, function (err) {
-	            if (_this.moduleConfig) {
-	                var defaultReq = { module: SafeNet.DEFAULT_CONFIG[_this.os] };
-	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(SafeNet.SLOTS), defaultReq, { 'token-present': 'true' }, callback);
-	            }
-	            else {
-	                return ResponseHandler_1.ResponseHandler.error(err, callback);
-	            }
-	        });
-	    };
-	    SafeNet.prototype.tokens = function (callback) {
-	        var _this = this;
-	        var req = { module: this.modulePath };
-	        return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.TOKENS), req, undefined).then(function (data) {
-	            return ResponseHandler_1.ResponseHandler.response(data, callback);
-	        }, function (err) {
-	            if (_this.moduleConfig) {
-	                var defaultReq = { module: SafeNet.DEFAULT_CONFIG[_this.os] };
-	                return _this.connection.post(_this.baseUrl, _this.containerSuffix(SafeNet.TOKENS), defaultReq, undefined, callback);
-	            }
-	            else {
-	                return ResponseHandler_1.ResponseHandler.error(err, callback);
-	            }
-	        });
-	    };
-	    SafeNet.prototype.containerSuffix = function (path) {
-	        return this.containerUrl + path;
-	    };
-	    return SafeNet;
-	}());
-	SafeNet.ALL_CERTIFICATES = '/certificates';
-	SafeNet.INFO = '/info';
-	SafeNet.SIGN = '/sign';
-	SafeNet.SLOTS = '/slots';
-	SafeNet.TOKENS = '/tokens';
-	SafeNet.DEFAULT_CONFIG = {
-	    linux: '/usr/local/lib/libeTPkcs11.so',
-	    mac: '/usr/local/lib/libeTPkcs11.dylib',
-	    win: 'C:\\Windows\\System32\\eTPKCS11.dll'
-	};
-	exports.SafeNet = SafeNet;
-
-
-/***/ }),
-/* 500 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
 	var __extends = (this && this.__extends) || (function () {
 	    var extendStatics = Object.setPrototypeOf ||
 	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -75776,7 +75616,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 501 */
+/* 500 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75836,7 +75676,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 502 */
+/* 501 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75922,7 +75762,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 503 */
+/* 502 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -75937,8 +75777,8 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var RemoteLoading_1 = __webpack_require__(502);
-	var RemoteLoadingModel_1 = __webpack_require__(504);
+	var RemoteLoading_1 = __webpack_require__(501);
+	var RemoteLoadingModel_1 = __webpack_require__(503);
 	var ResponseHandler_1 = __webpack_require__(339);
 	var _ = __webpack_require__(331);
 	var Belfius = (function (_super) {
@@ -76040,7 +75880,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 504 */
+/* 503 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -76102,7 +75942,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 505 */
+/* 504 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -76144,6 +75984,122 @@ var GCLLib =
 
 
 /***/ }),
+/* 505 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var _ = __webpack_require__(331);
+	var CertParser_1 = __webpack_require__(380);
+	var ResponseHandler_1 = __webpack_require__(339);
+	var platform = __webpack_require__(333);
+	var RequestHandler_1 = __webpack_require__(490);
+	var PKCS11 = (function () {
+	    function PKCS11(baseUrl, containerUrl, connection, moduleConfig) {
+	        this.baseUrl = baseUrl;
+	        this.containerUrl = containerUrl;
+	        this.connection = connection;
+	        this.moduleConfig = moduleConfig;
+	        if (platform.os.family.indexOf('Win') > -1) {
+	            this.os = 'win';
+	        }
+	        if (platform.os.family.indexOf('OS X') > -1) {
+	            this.os = 'mac';
+	        }
+	        if (!this.os) {
+	            this.os = 'linux';
+	        }
+	        if (moduleConfig && moduleConfig[this.os]) {
+	            this.modulePath = moduleConfig[this.os];
+	        }
+	    }
+	    PKCS11.prototype.certificates = function (slotId, options, callback) {
+	        var req = _.extend({ slot_id: slotId }, { module: this.modulePath });
+	        var reqOptions = RequestHandler_1.RequestHandler.determineOptions(options, callback);
+	        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.ALL_CERTIFICATES), req, undefined).then(function (data) {
+	            return CertParser_1.CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
+	        }, function (err) {
+	            return ResponseHandler_1.ResponseHandler.error(err, reqOptions.callback);
+	        });
+	    };
+	    PKCS11.prototype.info = function (callback) {
+	        var req = { module: this.modulePath };
+	        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.INFO), req, undefined).then(function (data) {
+	            return ResponseHandler_1.ResponseHandler.response(data, callback);
+	        }, function (err) {
+	            return ResponseHandler_1.ResponseHandler.error(err, callback);
+	        });
+	    };
+	    PKCS11.prototype.signData = function (signData, callback) {
+	        var req = {
+	            module: this.modulePath,
+	            id: signData.cert_id,
+	            slot_id: signData.slot_id,
+	            pin: signData.pin,
+	            data: signData.data,
+	            digest: signData.algorithm_reference
+	        };
+	        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.SIGN), req, undefined).then(function (data) {
+	            return ResponseHandler_1.ResponseHandler.response(data, callback);
+	        }, function (err) {
+	            return ResponseHandler_1.ResponseHandler.error(err, callback);
+	        });
+	    };
+	    PKCS11.prototype.slots = function (callback) {
+	        var req = { module: this.modulePath };
+	        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.SLOTS), req, undefined).then(function (data) {
+	            return ResponseHandler_1.ResponseHandler.response(data, callback);
+	        }, function (err) {
+	            return ResponseHandler_1.ResponseHandler.error(err, callback);
+	        });
+	    };
+	    PKCS11.prototype.slotsWithTokenPresent = function (callback) {
+	        var req = { module: this.modulePath };
+	        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.SLOTS), req, { 'token-present': 'true' }).then(function (data) {
+	            return ResponseHandler_1.ResponseHandler.response(data, callback);
+	        }, function (err) {
+	            return ResponseHandler_1.ResponseHandler.error(err, callback);
+	        });
+	    };
+	    PKCS11.prototype.token = function (slotId, callback) {
+	        var req = _.extend({ slot_id: slotId }, { module: this.modulePath });
+	        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.TOKEN), req, undefined).then(function (data) {
+	            return ResponseHandler_1.ResponseHandler.response(data, callback);
+	        }, function (err) {
+	            return ResponseHandler_1.ResponseHandler.error(err, callback);
+	        });
+	    };
+	    PKCS11.prototype.verifySignedData = function (verifyData, callback) {
+	        var req = {
+	            module: this.modulePath,
+	            id: verifyData.cert_id,
+	            slot_id: verifyData.slot_id,
+	            pin: verifyData.pin,
+	            data: verifyData.data,
+	            digest: verifyData.algorithm_reference,
+	            signature: verifyData.signature
+	        };
+	        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.VERIFY), req, undefined).then(function (data) {
+	            return ResponseHandler_1.ResponseHandler.response(data, callback);
+	        }, function (err) {
+	            return ResponseHandler_1.ResponseHandler.error(err, callback);
+	        });
+	    };
+	    PKCS11.prototype.containerSuffix = function (path) {
+	        return this.containerUrl + path;
+	    };
+	    return PKCS11;
+	}());
+	PKCS11.ALL_CERTIFICATES = '/certificates';
+	PKCS11.INFO = '/info';
+	PKCS11.SIGN = '/sign';
+	PKCS11.SLOTS = '/slots';
+	PKCS11.TOKEN = '/token';
+	PKCS11.VERIFY = '/verify';
+	exports.PKCS11 = PKCS11;
+
+
+/***/ }),
 /* 506 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -76156,13 +76112,14 @@ var GCLLib =
 	var CardUtil_1 = __webpack_require__(507);
 	var Aventra_1 = __webpack_require__(496);
 	var Arguments = (function () {
-	    function Arguments(client, readerId, container, data, dumpMethod, dumpOptions) {
+	    function Arguments(client, readerId, container, data, dumpMethod, dumpOptions, reader) {
 	        this.client = client;
 	        this.readerId = readerId;
 	        this.container = container;
 	        this.data = data;
 	        this.dumpMethod = dumpMethod;
 	        this.dumpOptions = dumpOptions;
+	        this.reader = reader;
 	    }
 	    return Arguments;
 	}());
@@ -76225,6 +76182,24 @@ var GCLLib =
 	            .then(function (res) { return ResponseHandler_1.ResponseHandler.response(res, callback); })
 	            .catch(function (err) { return ResponseHandler_1.ResponseHandler.error(err, callback); });
 	    };
+	    GenericService.checkPKCS11 = function (client) {
+	        var _this = this;
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            client.pkcs11().slotsWithTokenPresent().then(function (slots) {
+	                if (slots && slots.data && slots.data.length) {
+	                    var validToken = _.find(slots.data, function (slot) {
+	                        return _.includes(_this.PKCS11_FLAGS, slot.flags);
+	                    });
+	                    resolve(!!validToken);
+	                }
+	                else {
+	                    resolve(false);
+	                }
+	            }, function (err) {
+	                reject(err);
+	            });
+	        });
+	    };
 	    GenericService.checkCanAuthenticate = function (data) {
 	        return new es6_promise_1.Promise(function (resolve) {
 	            data.data = _.filter(data.data, function (reader) { return CardUtil_1.CardUtil.canAuthenticate(reader.card); });
@@ -76257,6 +76232,7 @@ var GCLLib =
 	        return client.core().readersCardAvailable()
 	            .then(function (readers) { return { readerId: readerId, readers: readers }; })
 	            .then(this.checkReaderPresent)
+	            .then(function (reader) { return { reader: reader, client: client }; })
 	            .then(this.determineContainerForCard)
 	            .then(function (container) { return { client: client, container: container }; })
 	            .then(this.checkContainerAvailable)
@@ -76310,10 +76286,20 @@ var GCLLib =
 	            }
 	        });
 	    };
-	    GenericService.determineContainerForCard = function (reader) {
+	    GenericService.determineContainerForCard = function (args) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            if (reader && reader.card) {
-	                resolve(CardUtil_1.CardUtil.determineContainer(reader.card));
+	            if (args.reader && args.reader.card) {
+	                var container = CardUtil_1.CardUtil.determineContainer(args.reader.card);
+	                if (!container) {
+	                    GenericService.checkPKCS11(args.client).then(function (pkcs11) {
+	                        pkcs11 ? resolve('pkcs11') : resolve(undefined);
+	                    }, function () {
+	                        resolve(undefined);
+	                    });
+	                }
+	                else {
+	                    resolve(container);
+	                }
 	            }
 	            else {
 	                reject('No card present in reader');
@@ -76383,6 +76369,7 @@ var GCLLib =
 	    };
 	    return GenericService;
 	}());
+	GenericService.PKCS11_FLAGS = [1, 3, 5, 7];
 	exports.GenericService = GenericService;
 
 
@@ -76427,6 +76414,7 @@ var GCLLib =
 	            case 'oberthur':
 	            case 'piv':
 	            case 'pteid':
+	            case 'pkcs11':
 	                return true;
 	            case 'ocra':
 	            case 'emv':
@@ -76477,9 +76465,6 @@ var GCLLib =
 	            else if (findDescription(card.description, 'Mastercard')) {
 	                return 'emv';
 	            }
-	            else if (findDescription(card.description, 'Oberthur')) {
-	                return 'oberthur';
-	            }
 	            else if (findDescription(card.description, 'Aventra')) {
 	                return 'aventra';
 	            }
@@ -76515,6 +76500,7 @@ var GCLLib =
 	            case 'luxeid':
 	            case 'luxtrust':
 	            case 'pteid':
+	            case 'pkcs11':
 	                return 'sha256';
 	            default:
 	                return undefined;
@@ -76534,7 +76520,7 @@ var GCLLib =
 	            case 'piv':
 	            case 'pteid':
 	                return 'allData';
-	            case 'safenet':
+	            case 'pkcs11':
 	                return 'slots';
 	            default:
 	                return undefined;
@@ -76553,7 +76539,7 @@ var GCLLib =
 	            case 'piv':
 	            case 'pteid':
 	                return new RequestHandler_1.Options(true, []);
-	            case 'safenet':
+	            case 'pkcs11':
 	                return undefined;
 	            case 'emv':
 	                return new RequestHandler_1.Options(false, []);

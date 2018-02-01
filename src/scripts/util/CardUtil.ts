@@ -42,6 +42,7 @@ class CardUtil {
             case 'oberthur':
             case 'piv':
             case 'pteid':
+            case 'pkcs11':
                 return true;
             case 'ocra':
             case 'emv':
@@ -82,7 +83,7 @@ class CardUtil {
             else if (findDescription(card.description, 'Juridic Person\'s Token (PKI)')) { return 'ocra'; }
             else if (findDescription(card.description, 'MOBIB')) { return 'mobib'; }
             else if (findDescription(card.description, 'Mastercard')) { return 'emv'; }
-            else if (findDescription(card.description, 'Oberthur')) { return 'oberthur'; }
+            // else if (findDescription(card.description, 'Oberthur')) { return 'oberthur'; }
             else if (findDescription(card.description, 'Aventra')) { return 'aventra'; }
             else if (findDescription(card.description, 'PIV')) { return 'piv'; }
             else if (findDescription(card.description, 'CIV')) { return 'piv'; }
@@ -109,6 +110,7 @@ class CardUtil {
             case 'luxeid':
             case 'luxtrust':
             case 'pteid':
+            case 'pkcs11':
                 return 'sha256';
             default:
                 return undefined;
@@ -129,7 +131,7 @@ class CardUtil {
             case 'piv':
             case 'pteid':
                 return 'allData';
-            case 'safenet':
+            case 'pkcs11':
                 return 'slots';
             default:
                 return undefined;
@@ -149,7 +151,7 @@ class CardUtil {
             case 'piv':
             case 'pteid':
                 return new Options(true, []);
-            case 'safenet':
+            case 'pkcs11':
                 return undefined;
             case 'emv':
                 return new Options(false, []);

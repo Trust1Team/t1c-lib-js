@@ -186,11 +186,11 @@ class GCLClient {
     oberthur: (reader_id?: string) => AbstractOberthur;
     piv: (reader_id?: string) => AbstractPiv;
     pteid: (reader_id?: string) => AbstractEidPT;
-    safenet: (reader_id: string, moduleConfig: {
+    pkcs11: (moduleConfig?: {
         linux: string;
         mac: string;
         win: string;
-    }) => AbstractSafeNet;
+    }) => AbstractPkcs11;
     readerapi: (reader_id: string) => AbstractRemoteLoading;
     belfius: (reader_id: string) => AbstractBelfius;
     containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
@@ -1070,88 +1070,6 @@ declare class Info {
     constructor(first_name: string, last_names: string, national_number: string, card_number: string, serial: string);
 }
 
-export { AbstractSafeNet, InfoResponse, SafeNetCertificate, SafeNetCertificatesResponse, SafeNetSignData, Slot, SlotsResponse, TokenInfo, TokensResponse, SafeNetInfo };
-interface AbstractSafeNet {
-    certificates(slotId: number, options?: Options, callback?: (error: RestException, data: SafeNetCertificatesResponse) => void): Promise<SafeNetCertificatesResponse>;
-    info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>;
-    signData(data: SafeNetSignData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    slots(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
-    slotsWithTokenPresent(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
-    tokens(callback?: (error: RestException, data: TokensResponse) => void): Promise<TokensResponse>;
-}
-declare class InfoResponse extends DataObjectResponse {
-    data: SafeNetInfo;
-    success: boolean;
-    constructor(data: SafeNetInfo, success: boolean);
-}
-declare class SafeNetInfo {
-    cryptoki_version: string;
-    manufacturer_id: string;
-    flags: string;
-    library_description: string;
-    library_version: string;
-    constructor(cryptoki_version: string, manufacturer_id: string, flags: string, library_description: string, library_version: string);
-}
-declare class Slot {
-    slot_id: string;
-    description: string;
-    flags: string;
-    hardware_version: string;
-    firmware_version: string;
-    constructor(slot_id: string, description: string, flags: string, hardware_version: string, firmware_version: string);
-}
-declare class SlotsResponse extends DataObjectResponse {
-    data: Slot[];
-    success: boolean;
-    constructor(data: Slot[], success: boolean);
-}
-declare class SafeNetCertificate extends T1CCertificate {
-    id: string;
-    base64: string;
-    parsed: object;
-    constructor(id: string, base64: string, parsed?: object);
-}
-declare class SafeNetCertificatesResponse extends CertificatesResponse {
-    data: SafeNetCertificate[];
-    success: boolean;
-    constructor(data: SafeNetCertificate[], success: boolean);
-}
-declare class SafeNetSignData extends AuthenticateOrSignData {
-    slot_id: number;
-    cert_id: string;
-    algorithm_reference: string;
-    data: string;
-    pin: string;
-    pace: string;
-    constructor(slot_id: number, cert_id: string, algorithm_reference: string, data: string, pin?: string, pace?: string);
-}
-declare class TokenInfo {
-    slot_id: string;
-    label: string;
-    manufacturer_id: string;
-    model: string;
-    serial_number: string;
-    flags: string;
-    max_session_count: number;
-    session_count: number;
-    max_rw_session_count: number;
-    rw_session_count: number;
-    max_pin_length: number;
-    min_pin_length: number;
-    total_public_memory: number;
-    free_public_memory: number;
-    total_private_memory: number;
-    free_private_memory: number;
-    hardware_version: string;
-    firmware_version: string;
-    constructor(slot_id: string, label: string, manufacturer_id: string, model: string, serial_number: string, flags: string, max_session_count: number, session_count: number, max_rw_session_count: number, rw_session_count: number, max_pin_length: number, min_pin_length: number, total_public_memory: number, free_public_memory: number, total_private_memory: number, free_private_memory: number, hardware_version: string, firmware_version: string);
-}
-declare class TokensResponse extends DataObjectResponse {
-    data: TokenInfo[];
-    success: boolean;
-    constructor(data: TokenInfo[], success: boolean);
-}
-
 export { Card, CertCard, PinCard, SecuredCertCard, AuthenticateOrSignData, ResetPinData, VerifyPinData, OptionalPin, GenericContainer, GenericReaderContainer, GenericSmartCard, GenericPinCard, GenericCertCard, GenericSecuredCertCard };
 interface Card {
     allData: (filters: string[], callback?: () => void) => Promise<DataObjectResponse>;
@@ -1446,6 +1364,99 @@ class AdminService implements AbstractAdmin {
     getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     setPubKey(pubkey: string, callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     updateContainerConfig(config: any, callback?: (error: CoreExceptions.RestException, data: any) => void): Promise<any>;
+}
+
+export { AbstractPkcs11, InfoResponse, Pkcs11Certificate, Pkcs11CertificatesResponse, Pkcs11Info, Pkcs11SignData, Pkcs11VerifySignedData, Slot, SlotsResponse, TokenInfo, TokenResponse };
+interface AbstractPkcs11 {
+    certificates(slotId: number, options?: Options, callback?: (error: RestException, data: Pkcs11CertificatesResponse) => void): Promise<Pkcs11CertificatesResponse>;
+    info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>;
+    signData(data: Pkcs11SignData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    slots(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
+    slotsWithTokenPresent(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
+    token(slotId: number, callback?: (error: RestException, data: TokenResponse) => void): Promise<TokenResponse>;
+    verifySignedData(data: Pkcs11VerifySignedData, callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
+}
+declare class InfoResponse extends DataObjectResponse {
+    data: Pkcs11Info;
+    success: boolean;
+    constructor(data: Pkcs11Info, success: boolean);
+}
+declare class Pkcs11Info {
+    cryptoki_version: string;
+    manufacturer_id: string;
+    flags: string;
+    library_description: string;
+    library_version: string;
+    constructor(cryptoki_version: string, manufacturer_id: string, flags: string, library_description: string, library_version: string);
+}
+declare class Slot {
+    slot_id: string;
+    description: string;
+    flags: number;
+    hardware_version: string;
+    firmware_version: string;
+    constructor(slot_id: string, description: string, flags: number, hardware_version: string, firmware_version: string);
+}
+declare class SlotsResponse extends DataObjectResponse {
+    data: Slot[];
+    success: boolean;
+    constructor(data: Slot[], success: boolean);
+}
+declare class Pkcs11Certificate extends T1CCertificate {
+    id: string;
+    base64: string;
+    parsed: object;
+    constructor(id: string, base64: string, parsed?: object);
+}
+declare class Pkcs11CertificatesResponse extends CertificatesResponse {
+    data: Pkcs11Certificate[];
+    success: boolean;
+    constructor(data: Pkcs11Certificate[], success: boolean);
+}
+declare class Pkcs11SignData extends AuthenticateOrSignData {
+    slot_id: number;
+    cert_id: string;
+    algorithm_reference: string;
+    data: string;
+    pin: string;
+    pace: string;
+    constructor(slot_id: number, cert_id: string, algorithm_reference: string, data: string, pin?: string, pace?: string);
+}
+declare class Pkcs11VerifySignedData extends Pkcs11SignData {
+    slot_id: number;
+    cert_id: string;
+    algorithm_reference: string;
+    data: string;
+    signature: string;
+    pin: string;
+    pace: string;
+    constructor(slot_id: number, cert_id: string, algorithm_reference: string, data: string, signature: string, pin?: string, pace?: string);
+}
+declare class TokenInfo {
+    slot_id: string;
+    label: string;
+    manufacturer_id: string;
+    model: string;
+    serial_number: string;
+    flags: string;
+    max_session_count: number;
+    session_count: number;
+    max_rw_session_count: number;
+    rw_session_count: number;
+    max_pin_length: number;
+    min_pin_length: number;
+    total_public_memory: number;
+    free_public_memory: number;
+    total_private_memory: number;
+    free_private_memory: number;
+    hardware_version: string;
+    firmware_version: string;
+    constructor(slot_id: string, label: string, manufacturer_id: string, model: string, serial_number: string, flags: string, max_session_count: number, session_count: number, max_rw_session_count: number, rw_session_count: number, max_pin_length: number, min_pin_length: number, total_public_memory: number, free_public_memory: number, total_private_memory: number, free_private_memory: number, hardware_version: string, firmware_version: string);
+}
+declare class TokenResponse extends DataObjectResponse {
+    data: TokenInfo;
+    success: boolean;
+    constructor(data: TokenInfo, success: boolean);
 }
 
 export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteConnection, Connection, LocalTestConnection };
