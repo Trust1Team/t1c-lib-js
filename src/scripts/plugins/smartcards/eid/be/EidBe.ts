@@ -60,8 +60,8 @@ class EidBe extends GenericCertCard implements AbstractEidBE {
 
     public verifyPin(body: OptionalPin,
                      callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
-        let _req = new VerifyPinData(EidBe.VERIFY_PRIV_KEY_REF, body.pin);
-        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
+            let _req = new VerifyPinData(EidBe.VERIFY_PRIV_KEY_REF, body.pin);
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericCertCard.VERIFY_PIN), _req, undefined, callback);
         });
     }

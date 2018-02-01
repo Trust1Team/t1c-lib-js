@@ -5,14 +5,14 @@
 import { RestException } from '../../../core/exceptions/CoreExceptions';
 import {
     BoolDataResponse,
-    CertificatesResponse, DataObjectResponse, DataResponse, T1CCertificate,
-    T1CResponse
+    CertificatesResponse, DataObjectResponse, DataResponse, T1CCertificate
 } from '../../../core/service/CoreModel';
 import { Options } from '../../../util/RequestHandler';
 import { AuthenticateOrSignData } from '../Card';
 
 export { AbstractPkcs11, InfoResponse, Pkcs11Certificate, Pkcs11CertificatesResponse, Pkcs11Info,
-    Pkcs11SignData, Pkcs11VerifySignedData, Slot, SlotsResponse, TokenInfo, TokenResponse };
+    Pkcs11SignData, Pkcs11VerifySignedData, Slot, SlotsResponse, TokenInfo, TokenResponse, ModuleConfig };
+
 
 interface AbstractPkcs11 {
     certificates(slotId: number,
@@ -115,4 +115,8 @@ class TokenResponse extends DataObjectResponse {
     constructor(public data: TokenInfo, public success: boolean) {
         super(data, success);
     }
+}
+
+class ModuleConfig {
+    constructor(public linux: string, public mac: string, public win: string) {}
 }

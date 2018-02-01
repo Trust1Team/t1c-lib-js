@@ -100,7 +100,7 @@ class GCLClient {
 
     private static resolveConfig(cfg: GCLConfig) {
         // must be the base url because the GCLConfig object adds the context path and keeps the base url intact
-        let resolvedCfg: GCLConfig = new GCLConfig(cfg.dsUrlBase, cfg.apiKey);
+        let resolvedCfg: GCLConfig = new GCLConfig(cfg.dsUrlBase, cfg.apiKey, cfg.pkcs11Config);
         resolvedCfg.allowAutoUpdate = cfg.allowAutoUpdate;
         resolvedCfg.client_id = cfg.client_id;
         resolvedCfg.client_secret = cfg.client_secret;
@@ -154,8 +154,8 @@ class GCLClient {
     // get instance for PT Eid
     public pteid = (reader_id?: string): AbstractEidPT => { return this.pluginFactory.createEidPT(reader_id); };
     // get instance for PKCS11
-    public pkcs11 = (moduleConfig?: { linux: string, mac: string, win: string }): AbstractPkcs11 => {
-        return this.pluginFactory.createPKCS11(moduleConfig);
+    public pkcs11 = (): AbstractPkcs11 => {
+        return this.pluginFactory.createPKCS11();
     }
     // get instance for Remote Loading
     public readerapi = (reader_id: string): AbstractRemoteLoading => { return this.pluginFactory.createRemoteLoading(reader_id); };
@@ -209,13 +209,6 @@ class GCLClient {
     public updateAuthConnection(cfg: GCLConfig) {
         this.authConnection = new LocalAuthConnection(cfg);
         this.coreService = new CoreService(cfg.gclUrl, this.authConnection);
-    }
-
-    /**
-     * Init OCV - verify if OCV is available
-     */
-    private initOCVContext(cb?: (error: any) => any) {
-        return this.ocvClient.getInfo(cb);
     }
 
     /**

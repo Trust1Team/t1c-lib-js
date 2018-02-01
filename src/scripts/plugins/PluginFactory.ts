@@ -32,7 +32,7 @@ import { AbstractBelfius } from './remote-loading/belfius/BelfiusModel';
 import { Belfius } from './remote-loading/belfius/Belfius';
 import { AbstractFileExchange } from './file/FileExchangeModel';
 import { FileExchange } from './file/FileExchange';
-import { AbstractPkcs11 } from './smartcards/pkcs11/pkcs11Model';
+import { AbstractPkcs11, ModuleConfig } from './smartcards/pkcs11/pkcs11Model';
 import { PKCS11 } from './smartcards/pkcs11/pkcs11';
 
 export interface AbstractFactory {
@@ -45,7 +45,7 @@ export interface AbstractFactory {
     createAventraNO(reader_id?: string): AbstractAventra;
     createOberthurNO(reader_id?: string): AbstractOberthur;
     createPIV(reader_id?: string): AbstractPiv;
-    createPKCS11(config?: { linux: string, mac: string, win: string }): AbstractPkcs11;
+    createPKCS11(): AbstractPkcs11;
 }
 
 const CONTAINER_CONTEXT_PATH = '/plugins/';
@@ -93,8 +93,8 @@ export class PluginFactory implements AbstractFactory {
 
     public createPIV(reader_id?: string): PIV { return new PIV(this.url, CONTAINER_PIV, this.connection, reader_id); }
 
-    public createPKCS11(config?: { linux: string, mac: string, win: string }): AbstractPkcs11 {
-        return new PKCS11(this.url, CONTAINER_PKCS11, this.connection, config);
+    public createPKCS11(): AbstractPkcs11 {
+        return new PKCS11(this.url, CONTAINER_PKCS11, this.connection);
     }
 
     public createRemoteLoading(reader_id?: string): AbstractRemoteLoading {

@@ -6,6 +6,7 @@
  */
 
 import * as _ from 'lodash';
+import { ModuleConfig } from '../plugins/smartcards/pkcs11/pkcs11Model';
 
 const defaultGclUrl = 'https://localhost:10443/v1';
 const defaultDSUrl = 'https://accapim.t1t.be:443';
@@ -41,9 +42,10 @@ class GCLConfig  implements GCLConfig {
     private _defaultConsentDuration: number;
     private _defaultConsentTimeout: number;
     private _syncManaged: boolean;
+    private _pkcs11Config: ModuleConfig;
 
     // constructor for DTO
-    constructor (dsUriValue?: string, apiKey?: string) {
+    constructor (dsUriValue?: string, apiKey?: string, pkcs11Config?: ModuleConfig) {
         this._gclUrl = defaultGclUrl;
         this._dsUrl = dsUriValue + defaultDSContextPath;
         this._ocvUrl = dsUriValue + defaultOCVContextPath;
@@ -61,6 +63,7 @@ class GCLConfig  implements GCLConfig {
         this._defaultConsentDuration = 1;
         this._defaultConsentTimeout = 10;
         this._syncManaged = true;
+        this._pkcs11Config = pkcs11Config;
     }
 
     get ocvUrl(): string {
@@ -232,6 +235,14 @@ class GCLConfig  implements GCLConfig {
 
     set syncManaged(value: boolean) {
         this._syncManaged = value;
+    }
+
+    get pkcs11Config(): ModuleConfig {
+        return this._pkcs11Config;
+    }
+
+    set pkcs11Config(value: ModuleConfig) {
+        this._pkcs11Config = value;
     }
 }
 

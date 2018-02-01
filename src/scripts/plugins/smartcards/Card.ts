@@ -110,7 +110,7 @@ abstract class GenericPinCard extends GenericSmartCard implements PinCard {
 
     public verifyPin(body: OptionalPin,
                      callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
-        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericPinCard.VERIFY_PIN), body, undefined, callback);
         });
     }
@@ -152,7 +152,7 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
     public authenticate(body: AuthenticateOrSignData,
                         callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
-        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericCertCard.AUTHENTICATE), body, undefined, callback);
         });
     }
@@ -160,7 +160,7 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
     public signData(body: AuthenticateOrSignData,
                     callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         if (body.algorithm_reference) { body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase(); }
-        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericCertCard.SIGN_DATA), body, undefined, callback);
         });
     }
@@ -220,21 +220,21 @@ abstract class GenericSecuredCertCard extends GenericReaderContainer implements 
 
     public verifyPin(body: OptionalPin,
                      callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
-        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericSecuredCertCard.VERIFY_PIN), body, undefined, callback);
         });
     }
 
     public signData(body: AuthenticateOrSignData,
                     callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericSecuredCertCard.SIGN_DATA), body, undefined, callback);
         });
     }
 
     public authenticate(body: AuthenticateOrSignData,
                         callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericSecuredCertCard.AUTHENTICATE), body, undefined, callback);
         });
     }
@@ -245,7 +245,7 @@ abstract class GenericSecuredCertCard extends GenericReaderContainer implements 
                              params?: { filter?: string, pin?: string }): Promise<CertificateResponse> {
         let self = this;
 
-        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin)
+        return PinEnforcer.check(this.connection, this.reader_id, body)
                           .then(() => {
                               return self.connection.post(this.baseUrl,
                                   self.containerSuffix(GenericSecuredCertCard.ALL_CERTIFICATES + certUrl), body, params);
@@ -263,7 +263,7 @@ abstract class GenericSecuredCertCard extends GenericReaderContainer implements 
                                   params?: { filter?: string, pin?: string }): Promise<CertificatesResponse> {
         let self = this;
 
-        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin)
+        return PinEnforcer.check(this.connection, this.reader_id, body)
                           .then(() => {
                               return self.connection.post(this.baseUrl,
                                   self.containerSuffix(GenericSecuredCertCard.ALL_CERTIFICATES + certUrl), body, params);
