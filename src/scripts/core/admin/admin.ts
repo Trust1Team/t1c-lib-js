@@ -18,6 +18,7 @@ export { AdminService };
 
 const CORE_ACTIVATE = '/admin/activate';
 const CORE_PUB_KEY = '/admin/certificate';
+const CORE_DEVICE_PUB_KEY = '/admin/ssl/certificate';
 const CORE_CONTAINERS = '/admin/containers';
 
 class AdminService implements AbstractAdmin {
@@ -35,9 +36,10 @@ class AdminService implements AbstractAdmin {
         return this.post(this.url, CORE_ACTIVATE, data, callback);
     }
 
+    // TODO use correct endpoint
     public getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse)
         => void): Promise<PubKeyResponse> {
-        return this.get(this.url, CORE_PUB_KEY, callback);
+        return this.get(this.url, CORE_DEVICE_PUB_KEY, callback);
     }
 
     public setPubKey(pubkey: string,

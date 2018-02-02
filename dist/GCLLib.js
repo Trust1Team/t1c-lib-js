@@ -80972,6 +80972,7 @@ var GCLLib =
 	var InitUtil_1 = __webpack_require__(511);
 	var CORE_ACTIVATE = '/admin/activate';
 	var CORE_PUB_KEY = '/admin/certificate';
+	var CORE_DEVICE_PUB_KEY = '/admin/ssl/certificate';
 	var CORE_CONTAINERS = '/admin/containers';
 	var AdminService = (function () {
 	    function AdminService(url, connection, client) {
@@ -80986,7 +80987,7 @@ var GCLLib =
 	        return this.post(this.url, CORE_ACTIVATE, data, callback);
 	    };
 	    AdminService.prototype.getPubKey = function (callback) {
-	        return this.get(this.url, CORE_PUB_KEY, callback);
+	        return this.get(this.url, CORE_DEVICE_PUB_KEY, callback);
 	    };
 	    AdminService.prototype.setPubKey = function (pubkey, callback) {
 	        return this.put(this.url, CORE_PUB_KEY, { certificate: pubkey }, callback);
