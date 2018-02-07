@@ -17,7 +17,7 @@ class PinEnforcer {
                         readerId: string,
                         body: { pin?: string }): Promise<any> {
         return PinEnforcer.doPinCheck(connection, readerId, body.pin).then(() => {
-            // return PinEnforcer.updateBodyWithEncryptedPin(body);
+            return PinEnforcer.updateBodyWithEncryptedPin(body);
         });
     }
 
