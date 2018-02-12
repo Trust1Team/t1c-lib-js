@@ -78,8 +78,8 @@ describe('PinEnforcer Utility', () => {
             return PinEnforcer.check(enforcingConnection, '123',  { pin: '1234' }).then(() => {
                 expect.fail(0, 1, 'PinEnforcer should block execution of this call');
             }, err => {
-                console.log(err);
-                console.log(err.data);
+                // console.log(err);
+                // console.log(err.data);
                 expect(err).to.be.an('object');
                 expect(err).to.have.property('data');
                 expect(err.data).to.have.property('message');

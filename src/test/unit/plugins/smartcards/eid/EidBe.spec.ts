@@ -94,6 +94,8 @@ describe('Belgian eID Container', () => {
         beforeEach(function () {
             mock.onPost('plugins/beid/123/verify-pin').reply((config) => {
                 let data = JSON.parse(config.data);
+                // console.log('pin verify beid');
+                // console.log(data);
                 if (data && data.private_key_reference === 'non-repudiation' && data.pin && data.pin.length) {
                     return [ 200, { data: 'Verify Pin Data', success: true }];
                 } else { return [ 404 ]; }

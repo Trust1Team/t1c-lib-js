@@ -18,8 +18,6 @@ const CORE_CONSENT = '/consent';
 const CORE_INFO = '/';
 const CORE_PLUGINS = '/plugins';
 const CORE_READERS = '/card-readers';
-const CORE_ACTIVATE = '/admin/activate';
-const CORE_PUB_KEY = '/admin/certificate';
 
 class CoreService implements CoreModel.AbstractCore {
     // constructor
@@ -48,12 +46,6 @@ class CoreService implements CoreModel.AbstractCore {
         };
     }
 
-    // async
-    public activate(callback?: (error: CoreExceptions.RestException, data: CoreModel.T1CResponse)
-        => void): Promise<CoreModel.T1CResponse> {
-        return this.connection.post(this.url, CORE_ACTIVATE, {}, undefined, callback);
-    }
-
     public getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string,
                       alertPosition?: string, type?: string, timeoutInSeconds?: number,
                       callback?: (error: CoreExceptions.RestException, data: CoreModel.BoolDataResponse)
@@ -71,11 +63,6 @@ class CoreService implements CoreModel.AbstractCore {
         if (timeoutInSeconds) { timeout = timeoutInSeconds; }
         return this.connection.post(this.url, CORE_CONSENT,
             { title, text: codeWord, days, alert_level: alertLevel, alert_position: alertPosition, type, timeout }, undefined, callback);
-    }
-
-    public getPubKey(callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse)
-        => void): Promise<CoreModel.PubKeyResponse> {
-        return this.connection.get(this.url, CORE_PUB_KEY, undefined, callback);
     }
 
     public info(callback?: (error: CoreExceptions.RestException, data: CoreModel.InfoResponse)
@@ -266,12 +253,6 @@ class CoreService implements CoreModel.AbstractCore {
     public readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
         => void): Promise<CoreModel.CardReadersResponse> {
         return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), callback);
-    }
-
-    public setPubKey(pubkey: string,
-                     callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse)
-                         => void): Promise<CoreModel.PubKeyResponse> {
-        return this.connection.put(this.url, CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);
     }
 
     // sync

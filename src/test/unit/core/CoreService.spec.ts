@@ -29,26 +29,6 @@ describe('Core Services', () => {
         mock.restore();
     });
 
-    describe('activate', () => {
-        beforeEach(function () {
-            mock.onPost('admin/activate').reply(() => {
-                return [ 200, { data: 'Activation Data', success: true }];
-            });
-        });
-
-        it('makes the correct call to activate', () => {
-            return core.activate().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
-
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Activation Data');
-            });
-        });
-    });
-
     describe('getConsent', () => {
         beforeEach(function () {
             mock.onPost('/consent').reply((config) => {
@@ -168,26 +148,6 @@ describe('Core Services', () => {
         });
     });
 
-    describe('getPubKey', () => {
-        beforeEach(function () {
-            mock.onGet('admin/certificate').reply(() => {
-                return [ 200, { data: 'Get Pub Key Data', success: true }];
-            });
-        });
-
-        it('makes the correct call to get pub key', () => {
-            return core.getPubKey().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
-
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Get Pub Key Data');
-            });
-        });
-    });
-
     describe('info', () => {
         beforeEach(function () {
             mock.onGet('/').reply(() => {
@@ -294,26 +254,6 @@ describe('Core Services', () => {
                 expect(res).to.have.property('data');
                 expect(res.data).to.be.a('string');
                 expect(res.data).to.eq('Readers Data No Card Inserted');
-            });
-        });
-    });
-
-    describe('setPubKey', () => {
-        beforeEach(function () {
-            mock.onPut('/admin/certificate', { certificate: 'pubkey' }).reply(() => {
-                return [ 200, { data: 'Set Pub Key Data', success: true }];
-            });
-        });
-
-        it('makes the correct call to set pub key', () => {
-            return core.setPubKey('pubkey').then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
-
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Set Pub Key Data');
             });
         });
     });
