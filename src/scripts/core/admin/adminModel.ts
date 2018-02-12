@@ -6,14 +6,13 @@
 import * as CoreExceptions from '../exceptions/CoreExceptions';
 import { T1CResponse } from '../service/CoreModel';
 
-export { AbstractAdmin, PubKeyResponse };
+export { AbstractAdmin, PubKeys, PubKeyResponse };
 
 
 interface AbstractAdmin {
     // async
-    activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     // TODO improve data typing
-    activateGcl(data: any, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    activate(data: any, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     setPubKey(pubkey: string,
               callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
@@ -22,5 +21,9 @@ interface AbstractAdmin {
 }
 
 class PubKeyResponse implements T1CResponse {
-    constructor(public data: string, public success: boolean) {}
+    constructor(public data: PubKeys, public success: boolean) {}
+}
+
+class PubKeys {
+    constructor(public device: string, public ssl: string) {}
 }

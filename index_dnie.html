@@ -496,7 +496,7 @@
         $("#getPubKeyGCL").on('click', function () {
             $("#information").empty();
             $("#error").empty();
-            connector.core().getPubKey(callback);
+            connector.admin().getPubKey(callback);
         });
         $("#getJWT").on('click', function () {
             $("#information").empty();

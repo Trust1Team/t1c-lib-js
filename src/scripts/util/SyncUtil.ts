@@ -24,7 +24,7 @@ class SyncUtil {
         return new Promise((resolve, reject) => {
             // get GCL Pubkey
             admin.getPubKey().then(pubKey => {
-                return ds.synchronizationRequest(pubKey.data, mergedInfo, config.dsUrlBase).then(containerConfig => {
+                return ds.synchronizationRequest(pubKey.data.device, mergedInfo, config.dsUrlBase).then(containerConfig => {
                     // forward container config to GCL
                     return admin.updateContainerConfig(containerConfig.data).then(containerState => {
                         // TODO poll for container download completion?

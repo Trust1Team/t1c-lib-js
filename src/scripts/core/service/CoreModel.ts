@@ -12,7 +12,6 @@ export { AbstractCore, T1CResponse, BoolDataResponse, DataResponse, DataArrayRes
 
 interface AbstractCore {
     // async
-    activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     getConsent(title: string,
                codeWord: string,
                durationInDays?: number,
@@ -21,7 +20,6 @@ interface AbstractCore {
                type?: string,
                timeoutInSeconds?: number,
                callback?: (error: CoreExceptions.RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>
-    getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     info(callback?: (error: CoreExceptions.RestException, data: InfoResponse) => void): void | Promise<InfoResponse>;
     infoBrowser(callback?: (error: CoreExceptions.RestException, data: BrowserInfoResponse) => void): Promise<BrowserInfoResponse>;
     plugins(callback?: (error: CoreExceptions.RestException, data: PluginsResponse) => void): Promise<PluginsResponse>;
@@ -46,8 +44,6 @@ interface AbstractCore {
         => void): Promise<CardReadersResponse>;
     readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse)
         => void): Promise<CardReadersResponse>;
-    setPubKey(pubkey: string,
-              callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
 
     // sync
     getUrl(): string;

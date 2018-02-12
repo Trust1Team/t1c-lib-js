@@ -8,6 +8,7 @@ import { Promise } from 'es6-promise';
 import { DSClient } from '../core/ds/DSClient';
 import { AdminService } from '../core/admin/admin';
 import { DSPlatformInfo } from '../core/ds/DSClientModel';
+import { PubKeyResponse } from '../core/admin/adminModel';
 
 export { ActivationUtil };
 
@@ -24,7 +25,7 @@ class ActivationUtil {
         return new Promise((resolve, reject) => {
             ActivationUtil.preRegister(admin)
                           .then(pubKey => {
-                              return Promise.resolve({ ds, uuid, pubKey, mergedInfo});
+                              return Promise.resolve({ ds, uuid, pubKey: pubKey.data.device, mergedInfo});
                           })
                           .then(ActivationUtil.register)
                           .then(activationResponse => {
@@ -40,7 +41,7 @@ class ActivationUtil {
         });
     }
 
-    private static preRegister(admin: AdminService) {
+    private static preRegister(admin: AdminService): Promise<PubKeyResponse> {
         // get GCL pubkey and registration info
         return new Promise((resolve, reject) => {
             admin.getPubKey().then(pubKey => {
@@ -66,6 +67,6 @@ class ActivationUtil {
 
     private static postRegister(args: { admin: AdminService, activationResponse: any }) {
         // activate GCL
-        return args.admin.activateGcl(args.activationResponse);
+        return args.admin.activate(args.activationResponse);
     }
 }

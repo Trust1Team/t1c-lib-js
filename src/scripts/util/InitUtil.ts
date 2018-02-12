@@ -10,6 +10,7 @@ import { SyncUtil } from './SyncUtil';
 import { ActivationUtil } from './ActivationUtil';
 import { DSPlatformInfo } from '../core/ds/DSClientModel';
 import { PubKeyService } from './PubKeyService';
+import { ClientService } from './ClientService';
 
 export { InitUtil };
 
@@ -77,7 +78,7 @@ class InitUtil {
             initPromise.then(() => {
                 // store device PubKey
                 client.admin().getPubKey().then(pubKey => {
-                    PubKeyService.setPubKey(pubKey.data);
+                    PubKeyService.setPubKey(pubKey.data.device);
                     finalResolve();
                 });
             }, err => {

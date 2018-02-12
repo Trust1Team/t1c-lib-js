@@ -38,6 +38,7 @@ import { AbstractFileExchange } from '../plugins/file/FileExchangeModel';
 import { AdminService } from './admin/admin';
 import { InitUtil } from '../util/InitUtil';
 import { AbstractPkcs11 } from '../plugins/smartcards/pkcs11/pkcs11Model';
+import { ClientService } from '../util/ClientService';
 
 class GCLClient {
     public GCLInstalled: boolean;
@@ -54,7 +55,6 @@ class GCLClient {
     private ocvClient: OCVClient;
 
     constructor(cfg: GCLConfig, automatic: boolean) {
-        let self = this;
         // resolve config to singleton
         this.cfg = GCLClient.resolveConfig(cfg);
         // init communication
@@ -63,12 +63,14 @@ class GCLClient {
         this.remoteConnection = new RemoteConnection(this.cfg);
         this.localTestConnection = new LocalTestConnection(this.cfg);
         this.pluginFactory = new PluginFactory(this.cfg.gclUrl, this.connection);
-        this.adminService = new AdminService(this.cfg.gclUrl, this.authConnection, this);
+        this.adminService = new AdminService(this.cfg.gclUrl, this.authConnection);
         this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
         this.agentClient = new AgentClient(this.cfg.gclUrl, this.connection);
         if (this.cfg.localTestMode) { this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg); }
         else { this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg); }
         this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteConnection);
+        // keep reference to client in ClientService
+        ClientService.setClient(this);
 
         // check if implicit download has been set
         if (this.cfg.implicitDownload && true) { this.implicitDownload(); }
@@ -76,7 +78,7 @@ class GCLClient {
 
         if (!automatic) {
             // setup security - fail safe
-            this.initLibrary();
+            GCLClient.initLibrary();
         }
     }
 
@@ -88,7 +90,7 @@ class GCLClient {
             // will be set to false if init fails
             client.GCLInstalled = true;
 
-            client.initLibrary().then(() => {
+            GCLClient.initLibrary().then(() => {
                 if (callback && typeof callback === 'function') { callback(null, client); }
                 resolve(client);
             }, error => {
@@ -96,6 +98,13 @@ class GCLClient {
                 reject(error);
             });
         });
+    }
+
+    /**
+     * Init security context
+     */
+    private static initLibrary(): Promise<{}> {
+        return InitUtil.initializeLibrary(ClientService.getClient());
     }
 
     private static resolveConfig(cfg: GCLConfig) {
@@ -209,14 +218,6 @@ class GCLClient {
     public updateAuthConnection(cfg: GCLConfig) {
         this.authConnection = new LocalAuthConnection(cfg);
         this.coreService = new CoreService(cfg.gclUrl, this.authConnection);
-    }
-
-    /**
-     * Init security context
-     */
-    private initLibrary(): Promise<{}> {
-        let self = this;
-        return InitUtil.initializeLibrary(self);
     }
 
     // implicit download GCL instance when not found
