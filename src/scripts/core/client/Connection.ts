@@ -15,26 +15,44 @@ import { UrlUtil } from '../../util/UrlUtil';
 import * as ls from 'local-storage';
 import { BrowserFingerprint } from '../../util/BrowserFingerprint';
 
-export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteConnection, Connection, LocalTestConnection };
+export { GenericConnection, LocalConnection, LocalAuthConnection,
+    RemoteConnection, Connection, LocalTestConnection, RequestBody, RequestCallback, QueryParams };
 
 
 interface Connection {
     get(basePath: string,
         suffix: string,
-        queryParams: { [key: string]: string },
-        callback?: (error: any, data: any) => void): Promise<any>;
+        queryParams: QueryParams,
+        callback?: RequestCallback): Promise<any>;
 
     post(basePath: string,
          suffix: string,
-         body: { [key: string]: any },
-         queryParams?: { [key: string]: string },
-         callback?: (error: any, data: any) => void): Promise<any>;
+         body: RequestBody,
+         queryParams?: QueryParams,
+         callback?: RequestCallback): Promise<any>;
 
     put(basePath: string,
         suffix: string,
-        body: { [key: string]: any },
-        queryParams?: { [key: string]: string },
-        callback?: (error: any, data: any) => void): Promise<any>;
+        body: RequestBody,
+        queryParams?: QueryParams,
+        callback?: RequestCallback): Promise<any>;
+
+    delete(basePath: string,
+           suffix: string,
+           queryParams: QueryParams,
+           callback?: RequestCallback): Promise<any>;
+}
+
+interface RequestBody {
+    [key: string]: any
+}
+
+interface QueryParams {
+    [key: string]: any
+}
+
+interface RequestCallback {
+    (error: any, data: any): void
 }
 
 abstract class GenericConnection implements Connection {
@@ -46,25 +64,32 @@ abstract class GenericConnection implements Connection {
 
     public get(basePath: string,
                suffix: string,
-               queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Promise<any> {
+               queryParams: QueryParams,
+               callback?: RequestCallback): Promise<any> {
         return handleRequest(basePath, suffix, 'GET', this.cfg, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
     }
 
     public post(basePath: string,
                 suffix: string,
-                body: any,
-                queryParams: { [key: string]: string },
-                callback?: (error: any, data: any) => void): Promise<any> {
+                body: RequestBody,
+                queryParams: QueryParams,
+                callback?: RequestCallback): Promise<any> {
         return handleRequest(basePath, suffix, 'POST', this.cfg, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
     }
 
     public put(basePath: string,
                suffix: string,
-               body: any,
-               queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Promise<any> {
+               body: RequestBody,
+               queryParams: QueryParams,
+               callback?: RequestCallback): Promise<any> {
         return handleRequest(basePath, suffix, 'PUT', this.cfg, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
+    }
+
+    public delete(basePath: string,
+                  suffix: string,
+                  queryParams: QueryParams,
+                  callback?: RequestCallback): Promise<any> {
+        return handleRequest(basePath, suffix, 'DELETE', this.cfg, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
     }
 }
 
@@ -73,36 +98,44 @@ class LocalAuthConnection extends GenericConnection implements Connection {
 
     public get(basePath: string,
                suffix: string,
-               queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Promise<any> {
+               queryParams: QueryParams,
+               callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'apiKey');
         return handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
     }
 
     public getSkipCitrix(basePath: string,
                          suffix: string,
-                         queryParams: { [key: string]: string },
-                         callback?: (error: any, data: any) => void): Promise<any> {
+                         queryParams: QueryParams,
+                         callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'apiKey');
         return handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
     }
 
     public post(basePath: string,
                 suffix: string,
-                body: any,
-                queryParams: { [key: string]: string },
-                callback?: (error: any, data: any) => void): Promise<any> {
+                body: RequestBody,
+                queryParams: QueryParams,
+                callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'apiKey');
         return handleRequest(basePath, suffix, 'POST', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
     }
 
     public put(basePath: string,
                suffix: string,
-               body: any,
-               queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Promise<any> {
+               body: RequestBody,
+               queryParams: QueryParams,
+               callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'apiKey');
         return handleRequest(basePath, suffix, 'PUT', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
+    }
+
+    public delete(basePath: string,
+                  suffix: string,
+                  queryParams: QueryParams,
+                  callback?: RequestCallback): Promise<any> {
+        let config: any = _.omit(this.cfg, 'apiKey');
+        return handleRequest(basePath, suffix, 'DELETE', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
     }
 }
 
@@ -111,39 +144,39 @@ class LocalConnection extends GenericConnection implements Connection {
 
     public get(basePath: string,
                suffix: string,
-               queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Promise<any> {
+               queryParams: QueryParams,
+               callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         return handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
     }
 
     public getSkipCitrix(basePath: string,
                          suffix: string,
-                         queryParams: { [key: string]: string },
-                         callback?: (error: any, data: any) => void): Promise<any> {
+                         queryParams: QueryParams,
+                         callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         return handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
     }
 
     public post(basePath: string,
                 suffix: string,
-                body: any,
-                queryParams: { [key: string]: string },
-                callback?: (error: any, data: any) => void): Promise<any> {
+                body: RequestBody,
+                queryParams: QueryParams,
+                callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         return handleRequest(basePath, suffix, 'POST', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
     }
 
     public put(basePath: string,
                suffix: string,
-               body: any,
-               queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Promise<any> {
+               body: RequestBody,
+               queryParams: QueryParams,
+               callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         return handleRequest(basePath, suffix, 'PUT', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
     }
 
-    public requestFile(basePath: string, suffix: string, body: { path: string }, callback?: (error: any, data: any) => void): Promise<any> {
+    public requestFile(basePath: string, suffix: string, body: { path: string }, callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         // init callback if necessary
         if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
@@ -175,8 +208,8 @@ class LocalConnection extends GenericConnection implements Connection {
         });
     }
 
-    public putFile(basePath: string, suffix: string, body: any,
-                   queryParams: { [key: string]: string }, callback?: (error: any, data: any) => void): Promise<any> {
+    public putFile(basePath: string, suffix: string, body: RequestBody,
+                   queryParams: QueryParams, callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         // init callback if necessary
         if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
@@ -213,6 +246,14 @@ class LocalConnection extends GenericConnection implements Connection {
             });
         });
     }
+
+    public delete(basePath: string,
+                  suffix: string,
+                  queryParams: QueryParams,
+                  callback?: RequestCallback): Promise<any> {
+        let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
+        return handleRequest(basePath, suffix, 'DELETE', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
+    }
 }
 
 class RemoteConnection extends GenericConnection implements Connection {
@@ -221,53 +262,70 @@ class RemoteConnection extends GenericConnection implements Connection {
 
     public get(basePath: string,
                suffix: string,
-               queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Promise<any> {
+               queryParams: QueryParams,
+               callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'jwt');
         return handleRequest(basePath, suffix, 'GET', config, this.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
     }
 
     public post(basePath: string,
                 suffix: string,
-                body: any,
-                queryParams: { [key: string]: string },
-                callback?: (error: any, data: any) => void): Promise<any> {
+                body: RequestBody,
+                queryParams: QueryParams,
+                callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'jwt');
         return handleRequest(basePath, suffix, 'POST', config, this.SHOULD_SEND_TOKEN, body, queryParams, callback, true);
     }
 
     public put(basePath: string,
                suffix: string,
-               body: any,
-               queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Promise<any> {
+               body: RequestBody,
+               queryParams: QueryParams,
+               callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'jwt');
         return handleRequest(basePath, suffix, 'PUT', config, this.SHOULD_SEND_TOKEN, body, queryParams, callback, true);
+    }
+
+    public delete(basePath: string,
+                  suffix: string,
+                  queryParams: QueryParams,
+                  callback?: RequestCallback): Promise<any> {
+        let config: any = _.omit(this.cfg, 'jwt');
+        return handleRequest(basePath, suffix, 'DELETE', config, this.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
     }
 }
 
 class LocalTestConnection extends GenericConnection implements Connection {
     config = undefined;
 
-    public get(basePath: string, suffix: string,
-               queryParams?: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Promise<any> {
+    public get(basePath: string,
+               suffix: string,
+               queryParams?: QueryParams,
+               callback?: RequestCallback): Promise<any> {
         return handleTestRequest(basePath, suffix, 'GET', this.config, undefined, queryParams, callback);
     }
 
-    public post(basePath: string, suffix: string,
-                body: any,
-                queryParams?: { [key: string]: string },
-                callback?: (error: any, data: any) => void): Promise<any> {
+    public post(basePath: string,
+                suffix: string,
+                body: RequestBody,
+                queryParams?: QueryParams,
+                callback?: RequestCallback): Promise<any> {
         return handleTestRequest(basePath, suffix, 'POST', this.config, body, queryParams, callback);
     }
 
     public put(basePath: string,
                suffix: string,
-               body: any,
-               queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Promise<any> {
+               body: RequestBody,
+               queryParams?: QueryParams,
+               callback?: RequestCallback): Promise<any> {
         return handleTestRequest(basePath, suffix, 'PUT', this.config, body, queryParams, callback);
+    }
+
+    public delete(basePath: string,
+                  suffix: string,
+                  queryParams: QueryParams,
+                  callback?: RequestCallback): Promise<any> {
+        return handleTestRequest(basePath, suffix, 'DELETE', this.config, undefined, queryParams, callback);
     }
 }
 
@@ -276,9 +334,9 @@ function handleRequest(basePath: string,
                        method: string,
                        gclConfig: GCLConfig,
                        sendToken: boolean,
-                       body?: any,
-                       params?: any,
-                       callback?: (error: any, data: any) => void,
+                       body?: RequestBody,
+                       params?: QueryParams,
+                       callback?: RequestCallback,
                        skipCitrixCheck?: boolean): Promise<any> {
     // init callback if necessary
     if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }

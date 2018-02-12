@@ -34,6 +34,8 @@ import { AbstractFileExchange } from './file/FileExchangeModel';
 import { FileExchange } from './file/FileExchange';
 import { AbstractPkcs11, ModuleConfig } from './smartcards/pkcs11/pkcs11Model';
 import { PKCS11 } from './smartcards/pkcs11/pkcs11';
+import { AbstractDataContainer } from './data-container/DataContainerModel';
+import { DataContainer } from './data-container/DataContainer';
 
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
@@ -107,5 +109,11 @@ export class PluginFactory implements AbstractFactory {
 
     public createFileExchange(): AbstractFileExchange {
         return new FileExchange(this.url, CONTAINER_FILE_EXCHANGE, this.connection);
+    }
+
+    public createDataContainer(containerPath: string): () => AbstractDataContainer {
+        return (): AbstractDataContainer => {
+            return new DataContainer(this.url, containerPath, this.connection, undefined);
+        };
     }
 }

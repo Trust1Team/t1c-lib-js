@@ -8946,11 +8946,12 @@ var GCLLib =
 	var OCVClient_1 = __webpack_require__(375);
 	var es6_promise_1 = __webpack_require__(335);
 	var PluginFactory_1 = __webpack_require__(376);
-	var GenericService_1 = __webpack_require__(508);
+	var GenericService_1 = __webpack_require__(509);
 	var ResponseHandler_1 = __webpack_require__(339);
 	var agent_1 = __webpack_require__(367);
-	var admin_1 = __webpack_require__(510);
-	var InitUtil_1 = __webpack_require__(511);
+	var admin_1 = __webpack_require__(511);
+	var InitUtil_1 = __webpack_require__(512);
+	var ClientService_1 = __webpack_require__(516);
 	var GCLClient = (function () {
 	    function GCLClient(cfg, automatic) {
 	        var _this = this;
@@ -8960,6 +8961,7 @@ var GCLLib =
 	        this.agent = function () { return _this.agentClient; };
 	        this.ds = function () { return _this.dsClient; };
 	        this.ocv = function () { return _this.ocvClient; };
+	        this.pf = function () { return _this.pluginFactory; };
 	        this.beid = function (reader_id) { return _this.pluginFactory.createEidBE(reader_id); };
 	        this.dnie = function (reader_id) { return _this.pluginFactory.createDNIe(reader_id); };
 	        this.luxeid = function (reader_id, pin) { return _this.pluginFactory.createEidLUX(reader_id, pin); };
@@ -8976,14 +8978,13 @@ var GCLLib =
 	        };
 	        this.readerapi = function (reader_id) { return _this.pluginFactory.createRemoteLoading(reader_id); };
 	        this.belfius = function (reader_id) { return _this.pluginFactory.createBelfius(reader_id); };
-	        var self = this;
 	        this.cfg = GCLClient.resolveConfig(cfg);
 	        this.connection = new Connection_1.LocalConnection(this.cfg);
 	        this.authConnection = new Connection_1.LocalAuthConnection(this.cfg);
 	        this.remoteConnection = new Connection_1.RemoteConnection(this.cfg);
 	        this.localTestConnection = new Connection_1.LocalTestConnection(this.cfg);
 	        this.pluginFactory = new PluginFactory_1.PluginFactory(this.cfg.gclUrl, this.connection);
-	        this.adminService = new admin_1.AdminService(this.cfg.gclUrl, this.authConnection, this);
+	        this.adminService = new admin_1.AdminService(this.cfg.gclUrl, this.authConnection);
 	        this.coreService = new CoreService_1.CoreService(this.cfg.gclUrl, this.authConnection);
 	        this.agentClient = new agent_1.AgentClient(this.cfg.gclUrl, this.connection);
 	        if (this.cfg.localTestMode) {
@@ -8993,18 +8994,20 @@ var GCLLib =
 	            this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg);
 	        }
 	        this.ocvClient = new OCVClient_1.OCVClient(this.cfg.ocvUrl, this.remoteConnection);
+	        ClientService_1.ClientService.setClient(this);
 	        if (this.cfg.implicitDownload && true) {
 	            this.implicitDownload();
 	        }
 	        if (!automatic) {
-	            this.initLibrary();
+	            GCLClient.initLibrary();
 	        }
 	    }
 	    GCLClient.initialize = function (cfg, callback) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
 	            var client = new GCLClient(cfg, true);
+	            ClientService_1.ClientService.setClient(client);
 	            client.GCLInstalled = true;
-	            client.initLibrary().then(function () {
+	            GCLClient.initLibrary().then(function () {
 	                if (callback && typeof callback === 'function') {
 	                    callback(null, client);
 	                }
@@ -9016,6 +9019,9 @@ var GCLLib =
 	                reject(error);
 	            });
 	        });
+	    };
+	    GCLClient.initLibrary = function () {
+	        return InitUtil_1.InitUtil.initializeLibrary(ClientService_1.ClientService.getClient());
 	    };
 	    GCLClient.resolveConfig = function (cfg) {
 	        var resolvedCfg = new GCLConfig_1.GCLConfig(cfg.dsUrlBase, cfg.apiKey, cfg.pkcs11Config);
@@ -9071,10 +9077,6 @@ var GCLLib =
 	    GCLClient.prototype.updateAuthConnection = function (cfg) {
 	        this.authConnection = new Connection_1.LocalAuthConnection(cfg);
 	        this.coreService = new CoreService_1.CoreService(cfg.gclUrl, this.authConnection);
-	    };
-	    GCLClient.prototype.initLibrary = function () {
-	        var self = this;
-	        return InitUtil_1.InitUtil.initializeLibrary(self);
 	    };
 	    GCLClient.prototype.implicitDownload = function () {
 	        var self = this;
@@ -26475,8 +26477,6 @@ var GCLLib =
 	var CORE_INFO = '/';
 	var CORE_PLUGINS = '/plugins';
 	var CORE_READERS = '/card-readers';
-	var CORE_ACTIVATE = '/admin/activate';
-	var CORE_PUB_KEY = '/admin/certificate';
 	var CoreService = (function () {
 	    function CoreService(url, connection) {
 	        this.url = url;
@@ -26503,9 +26503,6 @@ var GCLLib =
 	            success: true
 	        };
 	    };
-	    CoreService.prototype.activate = function (callback) {
-	        return this.connection.post(this.url, CORE_ACTIVATE, {}, undefined, callback);
-	    };
 	    CoreService.prototype.getConsent = function (title, codeWord, durationInDays, alertLevel, alertPosition, type, timeoutInSeconds, callback) {
 	        if (!title || !title.length) {
 	            return ResponseHandler_1.ResponseHandler.error({ status: 400, description: 'Title is required!', code: '801' }, callback);
@@ -26522,9 +26519,6 @@ var GCLLib =
 	            timeout = timeoutInSeconds;
 	        }
 	        return this.connection.post(this.url, CORE_CONSENT, { title: title, text: codeWord, days: days, alert_level: alertLevel, alert_position: alertPosition, type: type, timeout: timeout }, undefined, callback);
-	    };
-	    CoreService.prototype.getPubKey = function (callback) {
-	        return this.connection.get(this.url, CORE_PUB_KEY, undefined, callback);
 	    };
 	    CoreService.prototype.info = function (callback) {
 	        return this.connection.getSkipCitrix(this.url, CORE_INFO, undefined, callback);
@@ -26703,9 +26697,6 @@ var GCLLib =
 	    };
 	    CoreService.prototype.readersCardsUnavailable = function (callback) {
 	        return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), callback);
-	    };
-	    CoreService.prototype.setPubKey = function (pubkey, callback) {
-	        return this.connection.put(this.url, CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);
 	    };
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
@@ -29106,6 +29097,9 @@ var GCLLib =
 	    GenericConnection.prototype.put = function (basePath, suffix, body, queryParams, callback) {
 	        return handleRequest(basePath, suffix, 'PUT', this.cfg, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
 	    };
+	    GenericConnection.prototype.delete = function (basePath, suffix, queryParams, callback) {
+	        return handleRequest(basePath, suffix, 'DELETE', this.cfg, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
+	    };
 	    return GenericConnection;
 	}());
 	GenericConnection.AUTH_TOKEN_HEADER = 'X-Authentication-Token';
@@ -29134,6 +29128,10 @@ var GCLLib =
 	    LocalAuthConnection.prototype.put = function (basePath, suffix, body, queryParams, callback) {
 	        var config = _.omit(this.cfg, 'apiKey');
 	        return handleRequest(basePath, suffix, 'PUT', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
+	    };
+	    LocalAuthConnection.prototype.delete = function (basePath, suffix, queryParams, callback) {
+	        var config = _.omit(this.cfg, 'apiKey');
+	        return handleRequest(basePath, suffix, 'DELETE', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
 	    };
 	    return LocalAuthConnection;
 	}(GenericConnection));
@@ -29230,6 +29228,10 @@ var GCLLib =
 	            });
 	        });
 	    };
+	    LocalConnection.prototype.delete = function (basePath, suffix, queryParams, callback) {
+	        var config = _.omit(this.cfg, ['apiKey', 'jwt']);
+	        return handleRequest(basePath, suffix, 'DELETE', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
+	    };
 	    return LocalConnection;
 	}(GenericConnection));
 	exports.LocalConnection = LocalConnection;
@@ -29253,6 +29255,10 @@ var GCLLib =
 	        var config = _.omit(this.cfg, 'jwt');
 	        return handleRequest(basePath, suffix, 'PUT', config, this.SHOULD_SEND_TOKEN, body, queryParams, callback, true);
 	    };
+	    RemoteConnection.prototype.delete = function (basePath, suffix, queryParams, callback) {
+	        var config = _.omit(this.cfg, 'jwt');
+	        return handleRequest(basePath, suffix, 'DELETE', config, this.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
+	    };
 	    return RemoteConnection;
 	}(GenericConnection));
 	exports.RemoteConnection = RemoteConnection;
@@ -29271,6 +29277,9 @@ var GCLLib =
 	    };
 	    LocalTestConnection.prototype.put = function (basePath, suffix, body, queryParams, callback) {
 	        return handleTestRequest(basePath, suffix, 'PUT', this.config, body, queryParams, callback);
+	    };
+	    LocalTestConnection.prototype.delete = function (basePath, suffix, queryParams, callback) {
+	        return handleTestRequest(basePath, suffix, 'DELETE', this.config, undefined, queryParams, callback);
 	    };
 	    return LocalTestConnection;
 	}(GenericConnection));
@@ -31548,6 +31557,7 @@ var GCLLib =
 	var Belfius_1 = __webpack_require__(504);
 	var FileExchange_1 = __webpack_require__(506);
 	var pkcs11_1 = __webpack_require__(507);
+	var DataContainer_1 = __webpack_require__(508);
 	var CONTAINER_CONTEXT_PATH = '/plugins/';
 	var CONTAINER_NEW_CONTEXT_PATH = '/containers/';
 	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + 'beid';
@@ -31593,6 +31603,12 @@ var GCLLib =
 	    };
 	    PluginFactory.prototype.createFileExchange = function () {
 	        return new FileExchange_1.FileExchange(this.url, CONTAINER_FILE_EXCHANGE, this.connection);
+	    };
+	    PluginFactory.prototype.createDataContainer = function (containerPath) {
+	        var _this = this;
+	        return function () {
+	            return new DataContainer_1.DataContainer(_this.url, containerPath, _this.connection, undefined);
+	        };
 	    };
 	    return PluginFactory;
 	}());
@@ -31662,6 +31678,7 @@ var GCLLib =
 	var CertParser_1 = __webpack_require__(382);
 	var ResponseHandler_1 = __webpack_require__(339);
 	var RequestHandler_1 = __webpack_require__(492);
+	var _ = __webpack_require__(331);
 	var OptionalPin = (function () {
 	    function OptionalPin(pin, pace) {
 	        this.pin = pin;
@@ -31732,12 +31749,14 @@ var GCLLib =
 	        return _this;
 	    }
 	    GenericReaderContainer.prototype.containerSuffix = function (path) {
+	        var suffix = this.containerUrl;
+	        if (this.reader_id && this.reader_id.length) {
+	            suffix += '/' + this.reader_id;
+	        }
 	        if (path && path.length) {
-	            return this.containerUrl + '/' + this.reader_id + path;
+	            suffix += _.startsWith(path, '/') ? path : '/' + path;
 	        }
-	        else {
-	            return this.containerUrl + '/' + this.reader_id;
-	        }
+	        return suffix;
 	    };
 	    return GenericReaderContainer;
 	}(GenericContainer));
@@ -31930,6 +31949,7 @@ var GCLLib =
 	    }
 	    PinEnforcer.check = function (connection, readerId, body) {
 	        return PinEnforcer.doPinCheck(connection, readerId, body.pin).then(function () {
+	            return PinEnforcer.updateBodyWithEncryptedPin(body);
 	        });
 	    };
 	    PinEnforcer.checkEncryptedPin = function (connection, readerId, pin) {
@@ -80512,12 +80532,51 @@ var GCLLib =
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var Card_1 = __webpack_require__(378);
+	var DataContainer = (function (_super) {
+	    __extends(DataContainer, _super);
+	    function DataContainer() {
+	        return _super !== null && _super.apply(this, arguments) || this;
+	    }
+	    DataContainer.prototype.create = function (data, callback) {
+	        return this.connection.put(this.baseUrl, this.containerSuffix(), data, undefined, callback);
+	    };
+	    DataContainer.prototype.read = function (id, callback) {
+	        return this.connection.get(this.baseUrl, this.containerSuffix(id), undefined, callback);
+	    };
+	    DataContainer.prototype.update = function (id, data, callback) {
+	        return this.connection.post(this.baseUrl, this.containerSuffix(), data, undefined, callback);
+	    };
+	    DataContainer.prototype.delete = function (id, callback) {
+	        return this.connection.delete(this.baseUrl, this.containerSuffix(id), undefined, callback);
+	    };
+	    return DataContainer;
+	}(Card_1.GenericReaderContainer));
+	exports.DataContainer = DataContainer;
+
+
+/***/ }),
+/* 509 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(335);
 	var EidBe_1 = __webpack_require__(493);
 	var ResponseHandler_1 = __webpack_require__(339);
 	var _ = __webpack_require__(331);
-	var CardUtil_1 = __webpack_require__(509);
+	var CardUtil_1 = __webpack_require__(510);
 	var Aventra_1 = __webpack_require__(498);
 	var Arguments = (function () {
 	    function Arguments(client, readerId, container, data, dumpMethod, dumpOptions, reader) {
@@ -80782,7 +80841,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 509 */
+/* 510 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -80961,7 +81020,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 510 */
+/* 511 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -80969,25 +81028,29 @@ var GCLLib =
 	var es6_promise_1 = __webpack_require__(335);
 	var ResponseHandler_1 = __webpack_require__(339);
 	var _ = __webpack_require__(331);
-	var InitUtil_1 = __webpack_require__(511);
+	var InitUtil_1 = __webpack_require__(512);
+	var ClientService_1 = __webpack_require__(516);
 	var CORE_ACTIVATE = '/admin/activate';
 	var CORE_PUB_KEY = '/admin/certificate';
-	var CORE_DEVICE_PUB_KEY = '/admin/ssl/certificate';
 	var CORE_CONTAINERS = '/admin/containers';
 	var AdminService = (function () {
-	    function AdminService(url, connection, client) {
+	    function AdminService(url, connection) {
 	        this.url = url;
 	        this.connection = connection;
-	        this.client = client;
 	    }
-	    AdminService.prototype.activate = function (callback) {
-	        return this.post(this.url, CORE_ACTIVATE, {}, callback);
+	    AdminService.errorHandler = function (error) {
+	        if (error && error.status === 401 && _.includes(AdminService.JWT_ERROR_CODES, error.code)) {
+	            return InitUtil_1.InitUtil.initializeLibrary(ClientService_1.ClientService.getClient());
+	        }
+	        else {
+	            return es6_promise_1.Promise.reject(error);
+	        }
 	    };
-	    AdminService.prototype.activateGcl = function (data, callback) {
+	    AdminService.prototype.activate = function (data, callback) {
 	        return this.post(this.url, CORE_ACTIVATE, data, callback);
 	    };
 	    AdminService.prototype.getPubKey = function (callback) {
-	        return this.get(this.url, CORE_DEVICE_PUB_KEY, callback);
+	        return this.get(this.url, CORE_PUB_KEY, callback);
 	    };
 	    AdminService.prototype.setPubKey = function (pubkey, callback) {
 	        return this.put(this.url, CORE_PUB_KEY, { certificate: pubkey }, callback);
@@ -81001,7 +81064,7 @@ var GCLLib =
 	            self.connection.get(url, suffix, undefined).then(function (result) {
 	                resolve(ResponseHandler_1.ResponseHandler.response(result, callback));
 	            }, function (err) {
-	                self.errorHandler(err).then(function () {
+	                AdminService.errorHandler(err).then(function () {
 	                    self.connection.get(url, suffix, undefined).then(function (retryResult) {
 	                        resolve(ResponseHandler_1.ResponseHandler.response(retryResult, callback));
 	                    }, function (retryError) {
@@ -81019,7 +81082,7 @@ var GCLLib =
 	            self.connection.post(url, suffix, body, undefined).then(function (result) {
 	                resolve(ResponseHandler_1.ResponseHandler.response(result, callback));
 	            }, function (err) {
-	                self.errorHandler(err).then(function () {
+	                AdminService.errorHandler(err).then(function () {
 	                    self.connection.post(url, suffix, body, undefined).then(function (retryResult) {
 	                        resolve(ResponseHandler_1.ResponseHandler.response(retryResult, callback));
 	                    }, function (retryError) {
@@ -81037,7 +81100,7 @@ var GCLLib =
 	            self.connection.put(url, suffix, body, undefined).then(function (result) {
 	                resolve(ResponseHandler_1.ResponseHandler.response(result, callback));
 	            }, function (err) {
-	                self.errorHandler(err).then(function () {
+	                AdminService.errorHandler(err).then(function () {
 	                    self.connection.put(url, suffix, body, undefined).then(function (retryResult) {
 	                        resolve(ResponseHandler_1.ResponseHandler.response(retryResult, callback));
 	                    }, function (retryError) {
@@ -81049,14 +81112,6 @@ var GCLLib =
 	            });
 	        });
 	    };
-	    AdminService.prototype.errorHandler = function (error) {
-	        if (error && error.status === 401 && _.includes(AdminService.JWT_ERROR_CODES, error.code)) {
-	            return InitUtil_1.InitUtil.initializeLibrary(this.client);
-	        }
-	        else {
-	            return es6_promise_1.Promise.reject(error);
-	        }
-	    };
 	    return AdminService;
 	}());
 	AdminService.JWT_ERROR_CODES = ['200', '201', '202', '203', '204', '205'];
@@ -81064,17 +81119,17 @@ var GCLLib =
 
 
 /***/ }),
-/* 511 */
+/* 512 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(335);
 	var _ = __webpack_require__(331);
-	var semver = __webpack_require__(512);
-	var SyncUtil_1 = __webpack_require__(513);
-	var ActivationUtil_1 = __webpack_require__(514);
-	var DSClientModel_1 = __webpack_require__(515);
+	var semver = __webpack_require__(513);
+	var SyncUtil_1 = __webpack_require__(514);
+	var ActivationUtil_1 = __webpack_require__(517);
+	var DSClientModel_1 = __webpack_require__(518);
 	var PubKeyService_1 = __webpack_require__(381);
 	var InitUtil = (function () {
 	    function InitUtil() {
@@ -81123,7 +81178,7 @@ var GCLLib =
 	            });
 	            initPromise.then(function () {
 	                client.admin().getPubKey().then(function (pubKey) {
-	                    PubKeyService_1.PubKeyService.setPubKey(pubKey.data);
+	                    PubKeyService_1.PubKeyService.setPubKey(pubKey.data.device);
 	                    finalResolve();
 	                });
 	            }, function (err) {
@@ -81145,7 +81200,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 512 */
+/* 513 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {exports = module.exports = SemVer;
@@ -82448,20 +82503,22 @@ var GCLLib =
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(336)))
 
 /***/ }),
-/* 513 */
+/* 514 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(335);
+	var DataContainerUtil_1 = __webpack_require__(515);
 	var SyncUtil = (function () {
 	    function SyncUtil() {
 	    }
 	    SyncUtil.unManagedSynchronization = function (admin, ds, config, mergedInfo, uuid) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
 	            admin.getPubKey().then(function (pubKey) {
-	                return ds.synchronizationRequest(pubKey.data, mergedInfo, config.dsUrlBase).then(function (containerConfig) {
+	                return ds.synchronizationRequest(pubKey.data.device, mergedInfo, config.dsUrlBase).then(function (containerConfig) {
 	                    return admin.updateContainerConfig(containerConfig.data).then(function (containerState) {
+	                        DataContainerUtil_1.DataContainerUtil.setupDataContainers([{ path: 'atr', type: 'data' }, { path: 'btr', type: 'data' }]);
 	                        return SyncUtil.syncDevice(ds, config, mergedInfo, uuid).then(function () {
 	                            mergedInfo.activated = true;
 	                            resolve();
@@ -82485,7 +82542,55 @@ var GCLLib =
 
 
 /***/ }),
-/* 514 */
+/* 515 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var ClientService_1 = __webpack_require__(516);
+	var _ = __webpack_require__(331);
+	var DataContainerUtil = (function () {
+	    function DataContainerUtil() {
+	    }
+	    DataContainerUtil.setupDataContainers = function (containers) {
+	        var client = ClientService_1.ClientService.getClient();
+	        containers.forEach(function (ct) {
+	            if (ct.type === 'data') {
+	                if (!_.startsWith(ct.path, '/')) {
+	                    ct.path = '/' + ct.path;
+	                }
+	                ct.property = 'data' + _.capitalize(_.join(_.drop(ct.path, 1), ''));
+	                client[ct.property] = client.pf().createDataContainer(ct.path);
+	            }
+	        });
+	    };
+	    return DataContainerUtil;
+	}());
+	exports.DataContainerUtil = DataContainerUtil;
+
+
+/***/ }),
+/* 516 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var ClientService = (function () {
+	    function ClientService() {
+	    }
+	    ClientService.getClient = function () {
+	        return ClientService.client;
+	    };
+	    ClientService.setClient = function (newClient) {
+	        ClientService.client = newClient;
+	    };
+	    return ClientService;
+	}());
+	exports.ClientService = ClientService;
+
+
+/***/ }),
+/* 517 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -82498,7 +82603,7 @@ var GCLLib =
 	        return new es6_promise_1.Promise(function (resolve, reject) {
 	            ActivationUtil.preRegister(admin)
 	                .then(function (pubKey) {
-	                return es6_promise_1.Promise.resolve({ ds: ds, uuid: uuid, pubKey: pubKey, mergedInfo: mergedInfo });
+	                return es6_promise_1.Promise.resolve({ ds: ds, uuid: uuid, pubKey: pubKey.data.device, mergedInfo: mergedInfo });
 	            })
 	                .then(ActivationUtil.register)
 	                .then(function (activationResponse) {
@@ -82531,7 +82636,7 @@ var GCLLib =
 	        });
 	    };
 	    ActivationUtil.postRegister = function (args) {
-	        return args.admin.activateGcl(args.activationResponse);
+	        return args.admin.activate(args.activationResponse);
 	    };
 	    return ActivationUtil;
 	}());
@@ -82539,7 +82644,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 515 */
+/* 518 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";

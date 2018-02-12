@@ -86,6 +86,8 @@ class GCLClient {
                              callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): Promise<GCLClient> {
         return new Promise((resolve, reject) => {
             let client = new GCLClient(cfg, true);
+            // keep reference to client in ClientService
+            ClientService.setClient(client);
 
             // will be set to false if init fails
             client.GCLInstalled = true;
@@ -140,6 +142,8 @@ class GCLClient {
     public ds = (): DSClient => { return this.dsClient; };
     // get ocv client services
     public ocv = (): AbstractOCVClient => { return this.ocvClient; };
+    // get plugin factory
+    public pf = (): PluginFactory => { return this.pluginFactory; };
     // get instance for belgian eID card
     public beid = (reader_id?: string): AbstractEidBE => { return this.pluginFactory.createEidBE(reader_id); };
     // get instance for spanish DNIe card

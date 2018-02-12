@@ -8,6 +8,8 @@ import { DSPlatformInfo, JWTResponse } from '../core/ds/DSClientModel';
 import { Promise } from 'es6-promise';
 import { DSClient } from '../core/ds/DSClient';
 import { AdminService } from '../core/admin/admin';
+import { DataContainerUtil } from './DataContainerUtil';
+import { ClientService } from './ClientService';
 
 export { SyncUtil };
 
@@ -20,6 +22,12 @@ class SyncUtil {
                                            config: GCLConfig,
                                            mergedInfo: DSPlatformInfo,
                                            uuid: string) {
+        // TODO remove
+        // DataContainerUtil.setupDataContainers([ { path: 'atr', type: 'data' }, { path: '/btr', type: 'data' } ]);
+        // let client = ClientService.getClient() as any;
+        // client.dataAtr('1234').read('6789');
+        // client.dataBtr('1234').delete('6789');
+
         // do core v2 sync flow
         return new Promise((resolve, reject) => {
             // get GCL Pubkey
@@ -28,6 +36,8 @@ class SyncUtil {
                     // forward container config to GCL
                     return admin.updateContainerConfig(containerConfig.data).then(containerState => {
                         // TODO poll for container download completion?
+                        // TODO setup data container paths
+                        DataContainerUtil.setupDataContainers([ { path: 'atr', type: 'data' }, { path: 'btr', type: 'data' } ]);
                         // sync device
                         return SyncUtil.syncDevice(ds, config, mergedInfo, uuid).then(() => {
                             mergedInfo.activated = true;

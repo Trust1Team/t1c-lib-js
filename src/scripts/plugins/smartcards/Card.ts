@@ -9,6 +9,7 @@ import { PinEnforcer } from '../../util/PinEnforcer';
 import { CertParser } from '../../util/CertParser';
 import { ResponseHandler } from '../../util/ResponseHandler';
 import { Options, RequestHandler, RequestOptions } from '../../util/RequestHandler';
+import * as _ from 'lodash';
 /**
  * @author Michallis Pashidis
  * @author Maarten Somers
@@ -88,8 +89,10 @@ abstract class GenericReaderContainer extends GenericContainer {
 
     // resolves the reader_id in the base URL
     protected containerSuffix(path?: string): string {
-        if (path && path.length) { return this.containerUrl + '/' + this.reader_id + path; }
-        else { return this.containerUrl + '/' + this.reader_id; }
+        let suffix = this.containerUrl;
+        if (this.reader_id && this.reader_id.length) { suffix += '/' + this.reader_id; }
+        if (path && path.length) { suffix += _.startsWith(path, '/') ? path : '/' + path; }
+        return suffix;
     }
 }
 
