@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>GCL Javascript Test Page</title>
+    <!--Add bootstrap and dependencies-->
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <style media="screen">
+        pre {
+            background-color: #ddd;
+            border: 2px solid #333;
+            padding: .3em .5em;
+        }
+
+        pre#error,pre#validationError {
+            border-color: #900;
+        }
+        .modal-header, h4, .close {
+            background-color: #5cb85c;
+            color:white !important;
+            text-align: center;
+            font-size: 30px;
+        }
+        .modal-footer {
+            background-color: #f9f9f9;
+        }
+        .dropdown-menu {
+            width: 400px !important;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-inverse">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">T1C-JS</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">Select Reader <span class="caret"></span></a>
+                        <ul id="readerlist" class="dropdown-menu" role="menu">
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <hr />
+    <div><span id='selected_reader' class="label label-default">No card reader selected</span></div>
+    <hr />
+    <div>
+        <button id="info" type="button" class="btn btn-default btn-lg">Info</button>
+        <button id="infoBrowser" type="button" class="btn btn-default btn-lg">Browser Info</button>
+        <button id="downloadgcl" type="button" class="btn btn-default btn-lg">Download GCL</button>
+        <button id="getReaders" type="button" class="btn btn-default btn-lg">Readers</button>
+        <button id="pollReaders" type="button" class="btn btn-default btn-lg">Poll Readers</button>
+        <button id="pollCard" type="button" class="btn btn-default btn-lg">Poll Cards</button>
+        <button id="getReadersAvailable" type="button" class="btn btn-default btn-lg">Readers (card available)</button>
+        <button id="getReadersUnavailable" type="button" class="btn btn-default btn-lg">Readers (card unavailable)</button>
+        <button id="getKey" type="button" class="btn btn-default btn-lg">Get API key</button>
+        <button id="getPubKeyDS" type="button" class="btn btn-default btn-lg">Get Public Key (DS)</button>
+        <button id="getPubKeyGCL" type="button" class="btn btn-default btn-lg">Get Public Key (GCL)</button>
+        <button id="getJWT" type="button" class="btn btn-default btn-lg">Get JWT</button>
+        <button id="getJWTRefresh" type="button" class="btn btn-default btn-lg">Refresh JWT</button>
+        <button id="getPlugins" type="button" class="btn btn-default btn-lg">Get Plugins</button>
+        <hr />
+        <button id="dnieRn" type="button" class="btn btn-default btn-lg">Spanish DNIe Rn Data</button>
+        <button id="dnieAllCert" type="button" class="btn btn-default btn-lg">Spanish DNIe All Cert</button>
+        <button id="dnieRootCert" type="button" class="btn btn-default btn-lg">Spanish DNIe Intermediate Cert</button>
+        <button id="dnieAuthCert" type="button" class="btn btn-default btn-lg">Spanish DNIe Authentication Cert</button>
+        <button id="dnieSignCert" type="button" class="btn btn-default btn-lg">Spanish DNIe Signature Cert</button>
+        <button id="dnieVerifyPin" type="button" class="btn btn-default btn-lg">Spanish DNIe Verify Pin</button>
+        <button id="dnieSign" type="button" class="btn btn-default btn-lg">Spanish DNIe Sign</button>
+        <button id="dnieAuthenticate" type="button" class="btn btn-default btn-lg">Spanish DNIe Authenticate</button>
+        <button id="clear" type="button" class="btn btn-default btn-lg">Clear</button>
+        <hr />
+        <button id="dnieFiltered" type="button" class="btn btn-default btn-lg">Spanish DNIe Read Filtered</button>
+        <div class="form-group">
+            <input type="checkbox" name="type" value="info" id="rndata" />
+            <label for="rndata"><span class="glyphicon"></span> data</label>
+            <input type="checkbox" name="type" value="intermediate-certificate" id="rootcert"/>
+            <label for="rootcert"><span class="glyphicon"></span> intermediate certificate</label>
+            <input type="checkbox" name="type" value="authentication-certificate" id="authcert"/>
+            <label for="authcert"><span class="glyphicon "></span> authentication certificate</label>
+            <input type="checkbox" name="type" value="signing-certificate" id="signcert"/>
+            <label for="signcert"><span class="glyphicon "></span> signing certificate</label>
+        </div>
+        <hr />
+        <button id="dnieCertsFiltered" type="button" class="btn btn-default btn-lg">Spanish DNIe Certs Filtered</button>
+        <div class="form-group">
+            <input type="checkbox" name="type" value="intermediate-certificate" id="rootcertx"/>
+            <label for="rootcertx"><span class="glyphicon"></span> intermediate certificate</label>
+            <input type="checkbox" name="type" value="authentication-certificate" id="authcertx"/>
+            <label for="authcertx"><span class="glyphicon "></span> authentication certificate</label>
+            <input type="checkbox" name="type" value="signing-certificate" id="signcertx"/>
+            <label for="signcertx"><span class="glyphicon "></span> signing certificate</label>
+        </div>
+    </div>
+    <hr />
+    <h3>Open Certificate Validation API</h3>
+    <div>
+        <div><button id="ocvGetInfo" type="button" class="btn btn-default btn-lg">OCV - Get Service Info</button></div>
+        <div><button id="ocvGetChallenge" type="button" class="btn btn-default btn-lg">OCV - Get Challenge</button></div>
+        <div><button id="ocvBeIDAuthenticate" type="button" class="btn btn-default btn-lg">OCV - Authenticate Server Challenge</button></div>
+        <div><button id="ocvValidateCertChain" type="button" class="btn btn-default btn-lg">OCV - Validate Certificate Chain</button></div>
+        <div><button id="ocvValidateSignature" type="button" class="btn btn-default btn-lg">OCV - Validate Signature</button></div>
+        <hr />
+    </div>
+    <pre id="information"></pre>
+    <pre id="error"></pre>
+    <!-- PIN verify Modal -->
+    <div class="modal fade" id="pinModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Validate PIN</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="psw" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <pre id="validationInfo" hidden="true"></pre>
+                        <pre id="validationError" hidden="true"></pre>
+                    </div>
+                    <button id="buttonValidate" type="button" class="btn btn-default btn-lg">Validate</button>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="pinModalEMV" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Validate PIN</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="pswEMV" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <pre id="validationInfoEMV" hidden="true"></pre>
+                        <pre id="validationErrorEMV" hidden="true"></pre>
+                    </div>
+                    <button id="buttonValidateEMV" type="button" class="btn btn-default btn-lg">Validate</button>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sign Modal -->
+    <div class="modal fade" id="signModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Sign example data</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <label for="psw">Base64-encoded data to be signed: E1uHACbPvhLew0gGmBH83lvtKIAKxU2/RezfBOsT6Vs=</label>
+                        <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="signpsw" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <pre id="signInfo" hidden="true"></pre>
+                        <pre id="signError" hidden="true"></pre>
+                    </div>
+                    <button id="buttonSign" type="button" class="btn btn-default btn-lg">Sign</button>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authenticate Modal -->
+    <div class="modal fade" id="authModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Authentication</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <label for="psw">Base64-encoded challenge: I2e+u/sgy7fYgh+DWA0p2jzXQ7E=</label>
+                        <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
+                        <input type="password" class="form-control" id="authpsw" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <pre id="authInfo" hidden="true"></pre>
+                        <pre id="authError" hidden="true"></pre>
+                    </div>
+                    <button id="buttonAuth" type="button" class="btn btn-default btn-lg">Authenticate</button>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OCV Authenticate Modal -->
+    <div class="modal fade" id="ocvAuthModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Authentication</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div class="form-group">
+                        <input class="form-control" id="ocvtempvalue" placeholder="Challenge should appear here">
+                        <input type="password" class="form-control" id="ocvAuthpsw" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <pre id="ocvAuthInfo" hidden="true"></pre>
+                        <pre id="ocvAuthError" hidden="true"></pre>
+                    </div>
+                    <button id="ocvButtonAuth" type="button" class="btn btn-default btn-lg">OCV Authenticate</button>
+                </div>
+                <div class="modal-footer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Modal -->
+    <div class="modal fade" id="downloadModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" style="padding:35px 50px;">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4><span class="glyphicon glyphicon-lock"></span> Download Instructions</h4>
+                </div>
+                <div class="modal-body" style="padding:40px 50px;">
+                    <div id="modalDownloadLink" class="form-group">
+                        <label for="psw">Click the download link to start downloading</label>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    Download provided by Trust1Team.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/platform/1.3.1/platform.min.js"></script>
+<script src="../dist/GCLLib.js" charset="utf-8"></script>
+<script type="text/javascript">
+    (function ($) {
+        var gclConfig = new GCLLib.GCLConfig();
+        gclConfig.apiKey = "2cc27598-2af7-48af-a2df-c7352e5368ff"; //test apikey rate limited
+        gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
+        gclConfig.ocvUrl = "https://accapim.t1t.be:443/trust1team/ocv-api/v1";
+        //gclConfig.ocvUrl = "http://localhost:8080/ocv-api-web/v1";
+        gclConfig.localTestMode=false;
+        gclConfig.allowAutoUpdate = true;
+        gclConfig.implicitDownload = false;
+
+        if(gclConfig.localTestMode){
+            gclConfig.dsUrl = "http://localhost:8080";
+        }else {
+            gclConfig.dsUrl = "https://accapim.t1t.be:443";
+            //gclConfig.dsUrl = "https://accapim.t1t.be:443";
+            //gclConfig.dsUrl = "https://prodapim.t1t.be:443";
+            //gclConfig.dsUrl = "https://t1c.t1t.be:443";
+
+        }
+
+        var connector = new GCLLib.GCLClient(gclConfig);
+
+        connector.core().info(function(err,data) {
+            $("#error").empty();
+            $("#error").append(data.data.version);
+            if(data && data.data.activated==true){
+                //check card readers upon refresh and provide the info
+                var core = connector.core();
+                core.readers(function(err,data){
+                    if(err) {
+                        console.log(JSON.stringify(err));
+                        return;
+                    }
+                    if(data && data.data){
+                        for(var i=0; i < data.data.length ; i ++){
+                            if(data.data[i].card){
+                                $("#readerlist").append( '<li id="liid"><a href="#" ><h5><span class="label label-success" >' + data.data[i].id + '</span></h5></a></li>' );
+                            }else{
+                                $("#readerlist").append( '<li><a href="#"><h5><span class="label label-warning">' + data.data[i].id + '</span></h5></a></li>' );
+                            }
+                        }
+                    }else $("#readerlist").append( '<li> No readers connected </li>' );
+                });
+            }
+        });
+
+        function callback(err,data) {
+            if(err){$("#error").empty();$("#error").append("ERROR:\n", JSON.stringify(err, null, '  '));}
+            else {
+                $("#information").append(JSON.stringify(data, null, '  '));
+            }
+        }
+
+        function validationCallback(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#validationError").empty();
+            $("#validationInfo").empty();
+            $("#validationError").hide();
+            $("#validationInfo").hide();
+
+            if(err){
+                $("#validationError").append(JSON.stringify(err, null, '  '));
+                $("#validationError").show();
+            }
+            else{
+                $("#validationInfo").append(JSON.stringify(data, null, '  '));
+                $("#validationInfo").show();
+            }
+        }
+
+        function validationCallbackEMV(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#validationErrorEMV").empty();
+            $("#validationInfoEMV").empty();
+            $("#validationErrorEMV").hide();
+            $("#validationInfoEMV").hide();
+
+            if(err){
+                $("#validationErrorEMV").append(JSON.stringify(err, null, '  '));
+                $("#validationErrorEMV").show();
+            }
+            else{
+                $("#validationInfoEMV").append(JSON.stringify(data, null, '  '));
+                $("#validationInfoEMV").show();
+            }
+        }
+
+        function signCallback(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#signError").empty();
+            $("#signInfo").empty();
+            $("#signError").hide();
+            $("#signInfo").hide();
+
+            if(err){
+                $("#signError").append(JSON.stringify(err, null, '  '));
+                $("#signError").show();
+            }
+            else{
+                $("#signInfo").append(JSON.stringify(data, null, '  '));
+                $("#signInfo").show();
+            }
+        }
+
+        function authCallback(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#authError").empty();
+            $("#authInfo").empty();
+            $("#authError").hide();
+            $("#authInfo").hide();
+
+            if(err){
+                $("#authError").append(JSON.stringify(err, null, '  '));
+                $("#authError").show();
+            }
+            else{
+                $("#authInfo").append(JSON.stringify(data, null, '  '));
+                $("#authInfo").show();
+            }
+        }
+
+        function ocvAuthCallback(err, data) {
+            console.log("error:"+JSON.stringify(err));
+            console.log("data:"+JSON.stringify(data));
+            $("#ocvAuthError").empty();
+            $("#ocvAuthInfo").empty();
+            $("#ocvAuthError").hide();
+            $("#ocvAuthInfo").hide();
+
+            if(err){
+                $("#ocvAuthError").append(JSON.stringify(err, null, '  '));
+                $("#ocvAuthError").show();
+            }
+            else{
+                $("#ocvAuthInfo").append(JSON.stringify(data, null, '  '));
+                $("#ocvAuthInfo").show();
+            }
+            var signature = data.data;
+            // verify challenge against backend
+            connector.dnie($("#selected_reader").text()).authenticationCertificate(function(err,data){
+                var _req = {};
+                _req.hash = $("#ocvtempvalue").val();
+                _req.digestAlgorithm = "SHA256";
+                _req.base64Signature = signature;
+                _req.base64Certificate = data.data;
+                connector.ocv().validateChallengeSignedHash(_req,function(err,data){
+                    if(err){$("#error").empty();$("#error").append("ERROR:\n", JSON.stringify(err, null, '  '));}
+                    else {
+                        $("#ocvAuthInfo").append(JSON.stringify(data, null, '  '));
+                    }
+                });
+            });
+        }
+
+        //show selected reader in menu
+        $('.dropdown-menu').on('click', function(event){
+            $('#selected_reader').empty();
+            $('#selected_reader').append(event.target.innerHTML);
+            $('.dropdown-toggle').html($(this).html() + '<span class="caret"></span>');
+        });
+
+        // Core Functionality
+        $("#info").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.info(callback);
+        });
+        $("#infoBrowser").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.infoBrowser(callback);
+        });
+        $("#getReaders").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.readers(callback);
+        });
+        $("#pollReaders").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.pollReaders(15,callback,function(){console.log('Please connect a reader')},function(){console.log('Stop waiting for readers, none found')});
+        });
+        $("#pollCard").on('click', function () {
+            $("#information").empty();
+            connector.core().pollCardInserted(20,callback,function(){console.log('Please connect a reader')},
+                    function(){console.log("Please insert card")},
+                    function(){console.log("Stop waiting for card, none found")}
+            );
+        });
+        $("#getReadersAvailable").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.readersCardAvailable(callback);
+        });
+        $("#getReadersUnavailable").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.readersCardsUnavailable(callback);
+        });
+        $("#getKey").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            var apikey = connector.config().apiKey;
+            if(apikey) $("#information").append(apikey);
+            else $("#information").append('no apikey set');
+        });
+        $("#getPubKeyDS").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            connector.ds().getPubKey(callback);
+        });
+        $("#getPubKeyGCL").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            connector.admin().getPubKey(callback);
+        });
+        $("#getJWT").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            connector.ds().getJWT(callback);
+        });
+        $("#getJWTRefresh").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            $("#validationError").empty();
+            connector.ds().refreshJWT(callback);
+        });
+        $("#getPlugins").on('click', function () {
+            $("#information").empty();
+            var core = connector.core();
+            core.plugins(callback);
+        });
+
+        // belgian eid functionality
+        $("#dnieFiltered").on('click', function () {
+            $("#information").empty();
+            var dnie = connector.dnie($("#selected_reader").text());
+            var filter = [];
+            if($("#rndata").is(":checked"))filter.push($("#rndata").val());
+            if($("#rootcert").is(":checked"))filter.push($("#rootcert").val());
+            if($("#authcert").is(":checked"))filter.push($("#authcert").val());
+            if($("#signcert").is(":checked"))filter.push($("#signcert").val());
+            dnie.allData(filter,callback);
+        });
+        $("#dnieCertsFiltered").on('click', function () {
+            $("#information").empty();
+            var dnie = connector.dnie($("#selected_reader").text());
+            var filter = [];
+            if($("#rootcertx").is(":checked"))filter.push($("#rootcertx").val());
+            if($("#authcertx").is(":checked"))filter.push($("#authcertx").val());
+            if($("#signcertx").is(":checked"))filter.push($("#signcertx").val());
+            dnie.allCerts(filter,callback);
+        });
+        $("#dnieRn").on('click', function () {
+            $("#information").empty();
+            var dnie = connector.dnie($("#selected_reader").text());
+            dnie.info(callback);
+        });
+        $("#dnieAllCert").on('click', function () {
+            $("#information").empty();
+            var dnie = connector.dnie($("#selected_reader").text());
+            dnie.allCerts([],callback);
+        });
+        $("#dnieRootCert").on('click', function () {
+            $("#information").empty();
+            var dnie = connector.dnie($("#selected_reader").text());
+            dnie.intermediateCertificate(callback);
+        });
+        $("#dnieSignCert").on('click', function () {
+            $("#information").empty();
+            var dnie = connector.dnie($("#selected_reader").text());
+            dnie.signingCertificate(callback);
+        });
+        $("#dnieAuthCert").on('click', function () {
+            $("#information").empty();
+            var dnie = connector.dnie($("#selected_reader").text());
+            dnie.authenticationCertificate(callback);
+        });
+        $("#dnieVerifyPin").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            $("#validationInformation").empty();
+            $("#validationInformation").hide();
+            $("#validationError").empty();
+            $("#validationError").hide();
+            $("#pinModal").modal('toggle');
+        });
+
+        $("#buttonValidate").on('click', function () {
+            var _body={};
+            _body.pin = $("#psw").val();
+            connector.dnie($("#selected_reader").text()).verifyPin(_body, validationCallback);
+        });
+
+        $("#dnieSign").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            $("#signInformation").empty();
+            $("#signInformation").hide();
+            $("#signError").empty();
+            $("#signError").hide();
+            $("#signModal").modal('toggle');
+        });
+
+        $("#buttonSign").on('click', function () {
+            var _body={};
+            _body.pin = $("#signpsw").val();
+            _body.algorithm_reference = "sha1";
+            _body.data = "I2e+u/sgy7fYgh+DWA0p2jzXQ7E=";
+            connector.dnie($("#selected_reader").text()).signData(_body, signCallback);
+        });
+
+        $("#dnieAuthenticate").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            $("#authInformation").empty();
+            $("#authInformation").hide();
+            $("#vauthError").empty();
+            $("#vauthError").hide();
+            $("#authModal").modal('toggle');
+        });
+
+        $("#buttonAuth").on('click', function () {
+            var _body={};
+            _body.data = "I2e+u/sgy7fYgh+DWA0p2jzXQ7E=";
+            _body.algorithm_reference = "sha1";
+            _body.pin = $("#authpsw").val();
+            connector.dnie($("#selected_reader").text()).authenticate(_body, authCallback);
+        });
+
+        //call to gcl in order to sign the server generated hash
+        $("#ocvButtonAuth").on('click', function () {
+            var _body={};
+            _body.data = $("#ocvtempvalue").val();
+            _body.algorithm_reference = "sha1";
+            _body.pin = $("#ocvAuthpsw").val();
+            connector.dnie($("#selected_reader").text()).authenticate(_body, ocvAuthCallback);
+        });
+
+        $("#downloadgcl").on('click',function(){
+            var core = connector.core();
+            var self = this;
+            core.infoBrowser(function(error,data){
+               if(error){$("#error").append('Could not retrieve browser info');}
+               connector.ds().downloadLink(data,function(error,data){
+                   if(error)$("#error").append('Error retrieving download link');
+                   $("#error").empty();
+                   $("#information").empty();
+                   $("#downloadModal").modal('toggle');
+                   $("a").remove('.downloadlinkref');
+                   $("#modalDownloadLink").append('<a class= "downloadlinkref" href="'+ data.url +'">Download link GCL</a>');
+               });
+            });
+        });
+
+        $("#clear").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+
+        });
+
+
+        $("#ocvGetChallenge").on('click',function(){
+            $("#information").empty();
+            $("#error").empty();
+            var ocv = connector.ocv();
+            ocv.getChallenge('SHA1',callback);
+        });
+
+        $("#ocvGetInfo").on('click',function(){
+            $("#information").empty();
+            $("#error").empty();
+            var ocv = connector.ocv();
+            ocv.getInfo(callback);
+        });
+
+        $("#ocvValidateSignature").on('click',function(){
+            $("#information").empty();
+            $("#error").empty();
+            if($("#selected_reader").text()=="No card reader selected"){
+                console.log("Please select a card reader and provide a card");
+                return $("#error").append("Please select a card reader and provide a card");
+            }
+            var dnie = connector.dnie($("#selected_reader").text());
+            var conn = connector;
+            //TODO Implement this
+            /*
+            dnie.allCerts([],function(err,rndata){
+                if(err) return callback(err,rndata);
+                var dnie_conn = dnie;
+                var connector = conn;
+                //get RRN certificate
+                dnie_conn.signingCertificate(function(err,rrncertdata){
+                    var req = {};
+                    req.rawData = rndata.data.raw_data;
+                    req.signedData = rndata.data.signature;
+                    req.signingCert = rrncertdata.data;
+                    var ocv = connector.ocv();
+                    ocv.validateSignature(req,function(err,ocvResponse){
+                       callback(err,ocvResponse);
+                    });
+                });
+            });
+            */
+        });
+
+        $("#ocvBeIDAuthenticate").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            var ocv = connector.ocv();
+            ocv.getChallenge('SHA1',function(err,data){
+                if(err){$("#error").empty();$("#error").append("ERROR:\n", JSON.stringify(err, null, '  '));}
+                else {
+                    $("#ocvtempvalue").val(data.hash);
+                }
+            });
+            $("#authInformation").empty();
+            $("#authInformation").hide();
+            $("#vauthError").empty();
+            $("#vauthError").hide();
+            $("#ocvAuthModal").modal('toggle');
+        });
+
+        $("#ocvValidateCertChain").on('click', function () {
+            $("#information").empty();
+            $("#error").empty();
+            //create certificate filter
+            var certFilter = [];
+            certFilter.push("intermediate-certificate");
+            certFilter.push("authentication-certificate");
+            certFilter.push("signing-certificate");
+            connector.dnie($("#selected_reader").text()).allCerts(certFilter,function(err,certdata){
+                //print output
+                callback(err,certdata);
+                var authCert = {};
+                authCert.order=0;
+                authCert.certificate = certdata.data.authentication_certificate;
+                var intermediateCert = {};
+                intermediateCert.order=1;
+                intermediateCert.certificate = certdata.data.citizen_certificate;
+                var rootCert = {};
+                rootCert.order=2;
+                rootCert.certificate = certdata.data.root_certificate;
+                var _body = {};
+                var certificates = [];
+                certificates.push(authCert);
+                certificates.push(intermediateCert);
+                certificates.push(rootCert);
+                _body.certificateChain = certificates;
+                connector.ocv().validateCertificateChain(_body,callback);
+            });
+        });
+
+    })(window.jQuery);
+</script>
+</body>
+</html>

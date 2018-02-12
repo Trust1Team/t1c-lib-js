@@ -66,6 +66,7 @@ class InitUtil {
                             resolve(SyncUtil.unManagedSynchronization(client.admin(), client.ds(), cfg, mergedInfo, uuid));
                         }, err => {
                             reject(err);
+                            // resolve(SyncUtil.unManagedSynchronization(client.admin(), client.ds(), cfg, mergedInfo, uuid));
                         });
                     }
                 }, () => {

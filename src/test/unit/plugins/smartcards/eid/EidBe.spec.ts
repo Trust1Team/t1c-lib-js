@@ -20,10 +20,13 @@ describe('Belgian eID Container', () => {
 
     beforeEach(() => {
         mock = new MockAdapter(axios);
-        PubKeyService.setPubKey('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlOJu6TyygqxfWT7eLtGDwajtN\n' +
-                                'FOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76\n' +
-                                'xFxdU6jE0NQ+Z+zEdhUTooNRaY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4\n' +
-                                'gwQco1KRMDSmXSMkDwIDAQAB\n');
+        PubKeyService.setPubKey('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtN7eepQuYsx4JdX3pQV/\n' +
+                                'RKyu8Le+jo7pmSbmcrJ5GZZQxcF4AFVGPhPqyY9EcQEeUq1ARyygJlJKGsiRGxHJ\n' +
+                                '9oClIm+Zhvgphk7sV+foib0h3HX1Anrmoi1EVHCvQPNiSO5bIjLjP1izQgaLXfye\n' +
+                                'v6lLDLZ5eFJFGKFmWcKTFLzqyu/2kPzAxJGxydyrzyqPy2ZMzow41LkcXbqfHve8\n' +
+                                '7QQqSz+zIX7ZA15B3WgqZbzCt7kPhRnbx0lzDVDG1rX2/PEdtTn1uwiAmYsj7yty\n' +
+                                'wPbpcqll7G2ellDvfApsiQ+rBYyZduEALRkTFNQaG5qZjndRCKZD7PZ5OzHCiMei\n' +
+                                'nQIDAQAB');
     });
 
     afterEach(() => {
@@ -94,8 +97,8 @@ describe('Belgian eID Container', () => {
         beforeEach(function () {
             mock.onPost('plugins/beid/123/verify-pin').reply((config) => {
                 let data = JSON.parse(config.data);
-                // console.log('pin verify beid');
-                // console.log(data);
+                console.log('pin verify beid');
+                console.log(data);
                 if (data && data.private_key_reference === 'non-repudiation' && data.pin && data.pin.length) {
                     return [ 200, { data: 'Verify Pin Data', success: true }];
                 } else { return [ 404 ]; }

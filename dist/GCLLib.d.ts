@@ -175,6 +175,7 @@ class GCLClient {
     agent: () => AbstractAgent;
     ds: () => DSClient;
     ocv: () => AbstractOCVClient;
+    pf: () => PluginFactory;
     beid: (reader_id?: string) => AbstractEidBE;
     dnie: (reader_id?: string) => AbstractDNIe;
     luxeid: (reader_id?: string, pin?: string) => AbstractEidLUX;
@@ -240,9 +241,7 @@ export { GCLConfig };
 export { CoreService };
 class CoreService implements CoreModel.AbstractCore {
     constructor(url: string, connection: LocalAuthConnection);
-    activate(callback?: (error: CoreExceptions.RestException, data: CoreModel.T1CResponse) => void): Promise<CoreModel.T1CResponse>;
     getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string, alertPosition?: string, type?: string, timeoutInSeconds?: number, callback?: (error: CoreExceptions.RestException, data: CoreModel.BoolDataResponse) => void): Promise<CoreModel.BoolDataResponse>;
-    getPubKey(callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse) => void): Promise<CoreModel.PubKeyResponse>;
     info(callback?: (error: CoreExceptions.RestException, data: CoreModel.InfoResponse) => void): Promise<CoreModel.InfoResponse>;
     infoBrowser(callback?: (error: CoreExceptions.RestException, data: CoreModel.BrowserInfoResponse) => void): Promise<CoreModel.BrowserInfoResponse>;
     plugins(callback?: (error: CoreExceptions.RestException, data: CoreModel.PluginsResponse) => void): Promise<CoreModel.PluginsResponse>;
@@ -253,7 +252,6 @@ class CoreService implements CoreModel.AbstractCore {
     readers(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void): Promise<CoreModel.CardReadersResponse>;
     readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void): Promise<CoreModel.CardReadersResponse>;
     readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void): Promise<CoreModel.CardReadersResponse>;
-    setPubKey(pubkey: string, callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse) => void): Promise<CoreModel.PubKeyResponse>;
     infoBrowserSync(): CoreModel.BrowserInfoResponse;
     getUrl(): string;
     version(): Promise<string>;
@@ -348,9 +346,7 @@ class OCVClient implements AbstractOCVClient {
 
 export { AbstractCore, T1CResponse, BoolDataResponse, DataResponse, DataArrayResponse, DataObjectResponse, InfoResponse, BrowserInfo, BrowserInfoResponse, Card, CardReader, CardReadersResponse, T1CCertificate, CertificateResponse, CertificatesResponse, SingleReaderResponse, PluginsResponse, PubKeyResponse, T1CInfo, Plugin };
 interface AbstractCore {
-    activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string, alertPosition?: string, type?: string, timeoutInSeconds?: number, callback?: (error: CoreExceptions.RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
-    getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     info(callback?: (error: CoreExceptions.RestException, data: InfoResponse) => void): void | Promise<InfoResponse>;
     infoBrowser(callback?: (error: CoreExceptions.RestException, data: BrowserInfoResponse) => void): Promise<BrowserInfoResponse>;
     plugins(callback?: (error: CoreExceptions.RestException, data: PluginsResponse) => void): Promise<PluginsResponse>;
@@ -361,7 +357,6 @@ interface AbstractCore {
     readers(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
     readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
     readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
-    setPubKey(pubkey: string, callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     getUrl(): string;
     infoBrowserSync(): BrowserInfoResponse;
     version(): Promise<string>;
@@ -1067,6 +1062,38 @@ declare class Info {
     constructor(first_name: string, last_names: string, national_number: string, card_number: string, serial: string);
 }
 
+export interface AbstractFactory {
+    createEidBE(reader_id?: string): AbstractEidBE;
+    createEidLUX(reader_id?: string): AbstractEidLUX;
+    createEmv(reader_id?: string): AbstractEMV;
+    createLuxTrust(reader_id?: string): AbstractLuxTrust;
+    createMobib(reader_id?: string): AbstractMobib;
+    createOcra(reader_id?: string): AbstractOcra;
+    createAventraNO(reader_id?: string): AbstractAventra;
+    createOberthurNO(reader_id?: string): AbstractOberthur;
+    createPIV(reader_id?: string): AbstractPiv;
+    createPKCS11(): AbstractPkcs11;
+}
+export declare class PluginFactory implements AbstractFactory {
+    constructor(url: string, connection: LocalConnection);
+    createDNIe(reader_id?: string): AbstractDNIe;
+    createEidBE(reader_id?: string): AbstractEidBE;
+    createEidLUX(reader_id?: string, pin?: string): AbstractEidLUX;
+    createEidPT(reader_id?: string): AbstractEidPT;
+    createEmv(reader_id?: string): EMV;
+    createLuxTrust(reader_id?: string): LuxTrust;
+    createMobib(reader_id?: string): Mobib;
+    createOcra(reader_id?: string): Ocra;
+    createAventraNO(reader_id?: string): Aventra;
+    createOberthurNO(reader_id?: string): Oberthur;
+    createPIV(reader_id?: string): PIV;
+    createPKCS11(): AbstractPkcs11;
+    createRemoteLoading(reader_id?: string): AbstractRemoteLoading;
+    createBelfius(reader_id?: string): AbstractBelfius;
+    createFileExchange(): AbstractFileExchange;
+    createDataContainer(containerPath: string): () => AbstractDataContainer;
+}
+
 export { Card, CertCard, PinCard, SecuredCertCard, AuthenticateOrSignData, ResetPinData, VerifyPinData, OptionalPin, GenericContainer, GenericReaderContainer, GenericSmartCard, GenericPinCard, GenericCertCard, GenericSecuredCertCard };
 interface Card {
     allData: (filters: string[], callback?: () => void) => Promise<DataObjectResponse>;
@@ -1355,9 +1382,8 @@ class Agent {
 export { AdminService };
 class AdminService implements AbstractAdmin {
     static JWT_ERROR_CODES: string[];
-    constructor(url: string, connection: LocalAuthConnection, client: GCLClient);
-    activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
-    activateGcl(data: any, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    constructor(url: string, connection: LocalAuthConnection);
+    activate(data: any, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     setPubKey(pubkey: string, callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     updateContainerConfig(config: any, callback?: (error: CoreExceptions.RestException, data: any) => void): Promise<any>;
@@ -1462,21 +1488,21 @@ declare class ModuleConfig {
     constructor(linux: string, mac: string, win: string);
 }
 
-export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteConnection, Connection, LocalTestConnection };
+export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteConnection, Connection, LocalTestConnection, RequestBody, RequestCallback, QueryParams };
 interface Connection {
-    get(basePath: string, suffix: string, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
-    post(basePath: string, suffix: string, body: {
-        [key: string]: any;
-    }, queryParams?: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
-    put(basePath: string, suffix: string, body: {
-        [key: string]: any;
-    }, queryParams?: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
+    get(basePath: string, suffix: string, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    post(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, callback?: RequestCallback): Promise<any>;
+    put(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, callback?: RequestCallback): Promise<any>;
+    delete(basePath: string, suffix: string, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+}
+interface RequestBody {
+    [key: string]: any;
+}
+interface QueryParams {
+    [key: string]: any;
+}
+interface RequestCallback {
+    (error: any, data: any): void;
 }
 abstract class GenericConnection implements Connection {
     cfg: GCLConfig;
@@ -1484,78 +1510,47 @@ abstract class GenericConnection implements Connection {
     static readonly BROWSER_AUTH_TOKEN: string;
     static readonly SHOULD_SEND_TOKEN: boolean;
     constructor(cfg: GCLConfig);
-    get(basePath: string, suffix: string, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
-    post(basePath: string, suffix: string, body: any, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
-    put(basePath: string, suffix: string, body: any, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
+    get(basePath: string, suffix: string, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    post(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    put(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    delete(basePath: string, suffix: string, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
 }
 class LocalAuthConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;
     constructor(cfg: GCLConfig);
-    get(basePath: string, suffix: string, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
-    getSkipCitrix(basePath: string, suffix: string, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
-    post(basePath: string, suffix: string, body: any, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
-    put(basePath: string, suffix: string, body: any, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
+    get(basePath: string, suffix: string, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    getSkipCitrix(basePath: string, suffix: string, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    post(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    put(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    delete(basePath: string, suffix: string, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
 }
 class LocalConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;
     constructor(cfg: GCLConfig);
-    get(basePath: string, suffix: string, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
-    getSkipCitrix(basePath: string, suffix: string, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
-    post(basePath: string, suffix: string, body: any, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
-    put(basePath: string, suffix: string, body: any, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
+    get(basePath: string, suffix: string, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    getSkipCitrix(basePath: string, suffix: string, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    post(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    put(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
     requestFile(basePath: string, suffix: string, body: {
         path: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
-    putFile(basePath: string, suffix: string, body: any, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
+    }, callback?: RequestCallback): Promise<any>;
+    putFile(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    delete(basePath: string, suffix: string, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
 }
 class RemoteConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;
     constructor(cfg: GCLConfig);
-    get(basePath: string, suffix: string, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
-    post(basePath: string, suffix: string, body: any, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
-    put(basePath: string, suffix: string, body: any, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
+    get(basePath: string, suffix: string, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    post(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    put(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    delete(basePath: string, suffix: string, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
 }
 class LocalTestConnection extends GenericConnection implements Connection {
     config: any;
-    get(basePath: string, suffix: string, queryParams?: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
-    post(basePath: string, suffix: string, body: any, queryParams?: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
-    put(basePath: string, suffix: string, body: any, queryParams: {
-        [key: string]: string;
-    }, callback?: (error: any, data: any) => void): Promise<any>;
+    get(basePath: string, suffix: string, queryParams?: QueryParams, callback?: RequestCallback): Promise<any>;
+    post(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, callback?: RequestCallback): Promise<any>;
+    put(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, callback?: RequestCallback): Promise<any>;
+    delete(basePath: string, suffix: string, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
 }
 
 export { AbstractOCVClient, CertificateAndOrder, CertificateChainData, CertificateChainResponse, ChallengeResponse, ChallengeSignedHashResponse, ChallengeSignedHashData, SignatureValidationData, SignatureValidationResponse, OCVInfoResponse };
@@ -1660,17 +1655,134 @@ declare class RequestHandler {
     static determineOptionsWithFilter(firstParam: string[] | Options): RequestOptions;
 }
 
-export { AbstractAdmin, PubKeyResponse };
+export { EMV };
+declare class EMV extends GenericPinCard implements AbstractEMV {
+    static APPLICATIONS: string;
+    static APPLICATION_DATA: string;
+    static ISSUER_PUBLIC_KEY_CERT: string;
+    static ICC_PUBLIC_KEY_CERT: string;
+    applicationData(callback?: (error: RestException, data: ApplicationDataResponse) => void): Promise<ApplicationDataResponse>;
+    applications(callback?: (error: RestException, data: ApplicationsResponse) => void): Promise<ApplicationsResponse>;
+    iccPublicKeyCertificate(aid: string, callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
+    issuerPublicKeyCertificate(aid: string, callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
+}
+
+export { Mobib };
+declare class Mobib extends GenericSmartCard implements AbstractMobib {
+    cardIssuing(callback?: (error: RestException, data: CardIssuingResponse) => void): Promise<CardIssuingResponse>;
+    contracts(callback?: (error: RestException, data: ContractsResponse) => void): Promise<ContractsResponse>;
+    picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    status(callback?: (error: RestException, data: StatusResponse) => void): Promise<StatusResponse>;
+}
+
+export { LuxTrust };
+declare class LuxTrust extends GenericCertCard implements AbstractLuxTrust {
+    static ACTIVATED: string;
+    activated(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    rootCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    authenticationCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    signingCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+}
+
+export { Ocra };
+declare class Ocra extends GenericPinCard implements AbstractOcra {
+    static CHALLENGE: string;
+    static READ_COUNTER: string;
+    challenge(body: ChallengeData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    readCounter(body: OptionalPin, callback?: (error: RestException, data: ReadCounterResponse) => void): Promise<ReadCounterResponse>;
+}
+
+export { Aventra };
+declare class Aventra extends GenericCertCard implements AbstractAventra {
+    static DEFAULT_VERIFY_PIN: string;
+    static RESET_PIN: string;
+    allDataFilters(): string[];
+    allCertFilters(): string[];
+    allKeyRefs(): string[];
+    rootCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    issuerCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    authenticationCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    signingCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    encryptionCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    resetPin(body: ResetPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+}
+
+export { Oberthur };
+declare class Oberthur extends GenericCertCard implements AbstractOberthur {
+    allDataFilters(): string[];
+    allCertFilters(): string[];
+    allKeyRefs(): string[];
+    rootCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    issuerCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    authenticationCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    signingCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    encryptionCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+}
+
+export { PIV };
+declare class PIV extends GenericSecuredCertCard implements AbstractPiv {
+    static PRINTED_INFORMATION: string;
+    static FACIAL_IMAGE: string;
+    allDataFilters(): string[];
+    allCertFilters(): string[];
+    allKeyRefs(): string[];
+    printedInformation(body: OptionalPin, callback?: (error: RestException, data: PrintedInformationResponse) => void): Promise<PrintedInformationResponse>;
+    facialImage(body: OptionalPin, callback?: (error: RestException, data: FacialImageResponse) => void): Promise<FacialImageResponse>;
+    authenticationCertificate(body: OptionalPin, options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    signingCertificate(body: OptionalPin, options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+}
+
+export { AbstractFileExchange, FileListResponse, ListFilesRequest, File };
+interface AbstractFileExchange {
+    listFiles(data: ListFilesRequest, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>;
+    setFolder(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    downloadFile(path: string, file: ArrayBuffer, fileName: string): Promise<DataResponse>;
+    uploadFile(path: string): Promise<string>;
+}
+declare class ListFilesRequest {
+    path: string;
+    extensions: string[];
+    constructor(path: string, extensions: string[]);
+}
+declare class File {
+    extension: string;
+    name: string;
+    path: string;
+    size: number;
+    last_modification_time: string;
+    constructor(extension: string, name: string, path: string, size: number, last_modification_time: string);
+}
+declare class FileListResponse extends T1CResponse {
+    data: File[];
+    success: boolean;
+    constructor(data: File[], success: boolean);
+}
+
+export { AbstractDataContainer };
+interface AbstractDataContainer {
+    create(data: any, callback?: (error: RestException, data: any) => void): Promise<any>;
+    read(id?: string, callback?: (error: RestException, data: any) => void): Promise<any>;
+    update(id: string, data: any, callback?: (error: RestException, data: any) => void): Promise<any>;
+    delete(id: string, callback?: (error: RestException, data: any) => void): Promise<any>;
+}
+
+export { AbstractAdmin, PubKeys, PubKeyResponse };
 interface AbstractAdmin {
-    activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
-    activateGcl(data: any, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    activate(data: any, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     setPubKey(pubkey: string, callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     updateContainerConfig(config: any, callback?: (error: CoreExceptions.RestException, data: any) => void): Promise<any>;
 }
 class PubKeyResponse implements T1CResponse {
-    data: string;
+    data: PubKeys;
     success: boolean;
-    constructor(data: string, success: boolean);
+    constructor(data: PubKeys, success: boolean);
+}
+class PubKeys {
+    device: string;
+    ssl: string;
+    constructor(device: string, ssl: string);
 }
 
