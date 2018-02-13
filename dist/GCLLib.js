@@ -82518,7 +82518,8 @@ var GCLLib =
 	            admin.getPubKey().then(function (pubKey) {
 	                return ds.synchronizationRequest(pubKey.data.device, mergedInfo, config.dsUrlBase).then(function (containerConfig) {
 	                    return admin.updateContainerConfig(containerConfig.data).then(function (containerState) {
-	                        DataContainerUtil_1.DataContainerUtil.setupDataContainers([{ path: 'atr', type: 'data' }, { path: 'btr', type: 'data' }]);
+	                        DataContainerUtil_1.DataContainerUtil.setupDataContainers([{ id: 'atr', name: 'ATR', version: '0.0.0.1', type: 'data' },
+	                            { id: 'btr', name: 'BTR', version: '0.0.0.1', type: 'data' }]);
 	                        return SyncUtil.syncDevice(ds, config, mergedInfo, uuid).then(function () {
 	                            mergedInfo.activated = true;
 	                            resolve();
@@ -82548,7 +82549,6 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var ClientService_1 = __webpack_require__(516);
-	var _ = __webpack_require__(331);
 	var DataContainerUtil = (function () {
 	    function DataContainerUtil() {
 	    }
@@ -82556,11 +82556,8 @@ var GCLLib =
 	        var client = ClientService_1.ClientService.getClient();
 	        containers.forEach(function (ct) {
 	            if (ct.type === 'data') {
-	                if (!_.startsWith(ct.path, '/')) {
-	                    ct.path = '/' + ct.path;
-	                }
-	                ct.property = 'data' + _.capitalize(_.join(_.drop(ct.path, 1), ''));
-	                client[ct.property] = client.pf().createDataContainer(ct.path);
+	                ct.path = '/' + ct.id;
+	                client[ct.id] = client.pf().createDataContainer(ct.path);
 	            }
 	        });
 	    };

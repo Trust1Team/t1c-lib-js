@@ -23,7 +23,8 @@ class SyncUtil {
                                            mergedInfo: DSPlatformInfo,
                                            uuid: string) {
         // TODO remove
-        // DataContainerUtil.setupDataContainers([ { path: 'atr', type: 'data' }, { path: '/btr', type: 'data' } ]);
+        // DataContainerUtil.setupDataContainers([ { id: 'atr', name: 'ATR', version: '0.0.0.1', type: 'data' },
+        //     { id: 'btr', name: 'BTR', version: '0.0.0.1', type: 'data' } ]);
         // let client = ClientService.getClient() as any;
         // client.dataAtr('1234').read('6789');
         // client.dataBtr('1234').delete('6789');
@@ -37,7 +38,8 @@ class SyncUtil {
                     return admin.updateContainerConfig(containerConfig.data).then(containerState => {
                         // TODO poll for container download completion?
                         // TODO setup data container paths
-                        DataContainerUtil.setupDataContainers([ { path: 'atr', type: 'data' }, { path: 'btr', type: 'data' } ]);
+                        DataContainerUtil.setupDataContainers([ { id: 'atr', name: 'ATR', version: '0.0.0.1', type: 'data' },
+                            { id: 'btr', name: 'BTR', version: '0.0.0.1', type: 'data' } ]);
                         // sync device
                         return SyncUtil.syncDevice(ds, config, mergedInfo, uuid).then(() => {
                             mergedInfo.activated = true;
