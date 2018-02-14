@@ -235,6 +235,7 @@ class GCLConfig implements GCLConfig {
     defaultConsentTimeout: number;
     syncManaged: boolean;
     pkcs11Config: ModuleConfig;
+    osPinDialog: boolean;
 }
 export { GCLConfig };
 

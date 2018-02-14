@@ -139,7 +139,7 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
                              params?: { filter?: string, pin?: string }): Promise<CertificateResponse> {
         let self = this;
 
-        return PinEnforcer.checkEncryptedPin(this.connection, this.reader_id, params.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, params.pin).then(() => {
             return self.connection.get(self.baseUrl, self.containerSuffix(EidLux.ALL_CERTIFICATES + certUrl), params).then(certData => {
                 return CertParser.process(certData, options.parseCerts, options.callback);
             }, err => { return ResponseHandler.error(err, options.callback); });
@@ -151,7 +151,7 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
                                   params?: { filter?: string, pin?: string }): Promise<CertificatesResponse> {
         let self = this;
 
-        return PinEnforcer.checkEncryptedPin(this.connection, this.reader_id, params.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, params.pin).then(() => {
             return self.connection.get(self.baseUrl, self.containerSuffix(EidLux.ALL_CERTIFICATES + certUrl), params).then(certData => {
                 return CertParser.process(certData, options.parseCerts, options.callback);
             }, err => { return ResponseHandler.error(err, options.callback); });
