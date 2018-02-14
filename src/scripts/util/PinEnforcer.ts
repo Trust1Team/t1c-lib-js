@@ -16,15 +16,15 @@ class PinEnforcer {
     public static check(connection: GenericConnection,
                         readerId: string,
                         body: { pin?: string }): Promise<any> {
-        return PinEnforcer.doPinCheck(connection, readerId, body.pin).then(() => {
+        return PinEnforcer.doPinCheck(connection, readerId, body).then(() => {
             return PinEnforcer.updateBodyWithEncryptedPin(body);
         });
     }
 
-    public static checkEncryptedPin(connection: GenericConnection,
-                                    readerId: string,
-                                    pin: string): Promise<any> {
-        return PinEnforcer.doPinCheck(connection, readerId, pin);
+    public static checkAlreadyEncryptedPin(connection: GenericConnection,
+                                           readerId: string,
+                                           pin: string): Promise<any> {
+        return PinEnforcer.doPinCheck(connection, readerId, { pin });
     }
 
 
@@ -38,7 +38,7 @@ class PinEnforcer {
         } else { return undefined; }
     }
 
-    private static doPinCheck(connection: GenericConnection, readerId: string, pin: string) {
+    private static doPinCheck(connection: GenericConnection, readerId: string, body: { pin?: string, showDialog?: boolean }) {
         // if forceHardwarePinpad enabled,
         return new Promise((resolve, reject) => {
             if (connection.cfg.forceHardwarePinpad) {
@@ -46,13 +46,17 @@ class PinEnforcer {
                 connection.get(connection.cfg.gclUrl, CORE_READERS + '/' + readerId, undefined).then(reader => {
                     if (reader.data.pinpad) {
                         // if true, check that no pin was sent
-                        if (pin) {
+                        if (body.pin) {
                             reject({ data: { message: 'Strict pinpad enforcement is enabled. This request was sent with a PIN, but the' +
                                                       ' reader has a pinpad.' } });
                         } else { resolve(); }
                     } else {
-                        // if false, check if a pin was sent
-                        if (!pin) {
+                        // non-pinpad reader, check if we need to trigger an OS pin dialog
+                        if (connection.cfg.osPinDialog) {
+                            body.showDialog = true;
+                        }
+                        // check if a pin was sent
+                        if (!body.pin) {
                             reject({ data: { message: 'Strict pinpad enforcement is enabled. This request was sent without a PIN, but the' +
                                                       ' reader does not have a pinpad.'} });
                         } else { resolve(); }

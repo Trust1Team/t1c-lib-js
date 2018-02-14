@@ -9040,6 +9040,7 @@ var GCLLib =
 	        resolvedCfg.citrix = cfg.citrix;
 	        resolvedCfg.agentPort = cfg.agentPort;
 	        resolvedCfg.syncManaged = cfg.syncManaged;
+	        resolvedCfg.osPinDialog = cfg.osPinDialog;
 	        return resolvedCfg;
 	    };
 	    GCLClient.prototype.containerFor = function (readerId, callback) {
@@ -9139,6 +9140,7 @@ var GCLLib =
 	        this._defaultConsentTimeout = 10;
 	        this._syncManaged = true;
 	        this._pkcs11Config = pkcs11Config;
+	        this._osPinDialog = false;
 	    }
 	    Object.defineProperty(GCLConfig.prototype, "ocvUrl", {
 	        get: function () {
@@ -9364,6 +9366,16 @@ var GCLLib =
 	        },
 	        set: function (value) {
 	            this._pkcs11Config = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "osPinDialog", {
+	        get: function () {
+	            return this._osPinDialog;
+	        },
+	        set: function (value) {
+	            this._osPinDialog = value;
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -31948,12 +31960,12 @@ var GCLLib =
 	    function PinEnforcer() {
 	    }
 	    PinEnforcer.check = function (connection, readerId, body) {
-	        return PinEnforcer.doPinCheck(connection, readerId, body.pin).then(function () {
+	        return PinEnforcer.doPinCheck(connection, readerId, body).then(function () {
 	            return PinEnforcer.updateBodyWithEncryptedPin(body);
 	        });
 	    };
-	    PinEnforcer.checkEncryptedPin = function (connection, readerId, pin) {
-	        return PinEnforcer.doPinCheck(connection, readerId, pin);
+	    PinEnforcer.checkAlreadyEncryptedPin = function (connection, readerId, pin) {
+	        return PinEnforcer.doPinCheck(connection, readerId, { pin: pin });
 	    };
 	    PinEnforcer.encryptPin = function (pin) {
 	        if (pin && pin.length) {
@@ -31966,12 +31978,12 @@ var GCLLib =
 	            return undefined;
 	        }
 	    };
-	    PinEnforcer.doPinCheck = function (connection, readerId, pin) {
+	    PinEnforcer.doPinCheck = function (connection, readerId, body) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
 	            if (connection.cfg.forceHardwarePinpad) {
 	                connection.get(connection.cfg.gclUrl, CORE_READERS + '/' + readerId, undefined).then(function (reader) {
 	                    if (reader.data.pinpad) {
-	                        if (pin) {
+	                        if (body.pin) {
 	                            reject({ data: { message: 'Strict pinpad enforcement is enabled. This request was sent with a PIN, but the' +
 	                                        ' reader has a pinpad.' } });
 	                        }
@@ -31980,7 +31992,10 @@ var GCLLib =
 	                        }
 	                    }
 	                    else {
-	                        if (!pin) {
+	                        if (connection.cfg.osPinDialog) {
+	                            body.showDialog = true;
+	                        }
+	                        if (!body.pin) {
 	                            reject({ data: { message: 'Strict pinpad enforcement is enabled. This request was sent without a PIN, but the' +
 	                                        ' reader does not have a pinpad.' } });
 	                        }
@@ -79613,7 +79628,7 @@ var GCLLib =
 	    };
 	    EidLux.prototype.getCertificate = function (certUrl, options, params) {
 	        var self = this;
-	        return PinEnforcer_1.PinEnforcer.checkEncryptedPin(this.connection, this.reader_id, params.pin).then(function () {
+	        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, params.pin).then(function () {
 	            return self.connection.get(self.baseUrl, self.containerSuffix(EidLux.ALL_CERTIFICATES + certUrl), params).then(function (certData) {
 	                return CertParser_1.CertParser.process(certData, options.parseCerts, options.callback);
 	            }, function (err) { return ResponseHandler_1.ResponseHandler.error(err, options.callback); });
@@ -79621,7 +79636,7 @@ var GCLLib =
 	    };
 	    EidLux.prototype.getCertificateArray = function (certUrl, options, params) {
 	        var self = this;
-	        return PinEnforcer_1.PinEnforcer.checkEncryptedPin(this.connection, this.reader_id, params.pin).then(function () {
+	        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, params.pin).then(function () {
 	            return self.connection.get(self.baseUrl, self.containerSuffix(EidLux.ALL_CERTIFICATES + certUrl), params).then(function (certData) {
 	                return CertParser_1.CertParser.process(certData, options.parseCerts, options.callback);
 	            }, function (err) { return ResponseHandler_1.ResponseHandler.error(err, options.callback); });

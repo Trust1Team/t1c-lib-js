@@ -127,6 +127,7 @@ class GCLClient {
         resolvedCfg.citrix = cfg.citrix;
         resolvedCfg.agentPort = cfg.agentPort;
         resolvedCfg.syncManaged = cfg.syncManaged;
+        resolvedCfg.osPinDialog = cfg.osPinDialog;
         return resolvedCfg;
     }
 

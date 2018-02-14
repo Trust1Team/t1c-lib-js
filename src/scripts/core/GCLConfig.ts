@@ -43,6 +43,7 @@ class GCLConfig  implements GCLConfig {
     private _defaultConsentTimeout: number;
     private _syncManaged: boolean;
     private _pkcs11Config: ModuleConfig;
+    private _osPinDialog: boolean;
 
     // constructor for DTO
     constructor (dsUriValue?: string, apiKey?: string, pkcs11Config?: ModuleConfig) {
@@ -64,6 +65,7 @@ class GCLConfig  implements GCLConfig {
         this._defaultConsentTimeout = 10;
         this._syncManaged = true;
         this._pkcs11Config = pkcs11Config;
+        this._osPinDialog = false;
     }
 
     get ocvUrl(): string {
@@ -243,6 +245,14 @@ class GCLConfig  implements GCLConfig {
 
     set pkcs11Config(value: ModuleConfig) {
         this._pkcs11Config = value;
+    }
+
+    get osPinDialog(): boolean {
+        return this._osPinDialog;
+    }
+
+    set osPinDialog(value: boolean) {
+        this._osPinDialog = value;
     }
 }
 
