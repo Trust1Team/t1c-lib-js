@@ -50,9 +50,9 @@ export interface AbstractFactory {
     createPKCS11(): AbstractPkcs11;
 }
 
-const CONTAINER_CONTEXT_PATH = '/plugins/';
+const CONTAINER_CONTEXT_PATH = '/containers/';
 const CONTAINER_NEW_CONTEXT_PATH = '/containers/';
-const CONTAINER_BEID = CONTAINER_CONTEXT_PATH + 'beid';
+const CONTAINER_BEID = CONTAINER_CONTEXT_PATH + 'beid/v00012';
 const CONTAINER_LUXEID = CONTAINER_CONTEXT_PATH + 'luxeid';
 const CONTAINER_DNIE = CONTAINER_CONTEXT_PATH + 'dnie';
 const CONTAINER_EMV = CONTAINER_CONTEXT_PATH + 'emv';

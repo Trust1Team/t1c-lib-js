@@ -31582,9 +31582,9 @@ var GCLLib =
 	var FileExchange_1 = __webpack_require__(507);
 	var pkcs11_1 = __webpack_require__(508);
 	var DataContainer_1 = __webpack_require__(509);
-	var CONTAINER_CONTEXT_PATH = '/plugins/';
+	var CONTAINER_CONTEXT_PATH = '/containers/';
 	var CONTAINER_NEW_CONTEXT_PATH = '/containers/';
-	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + 'beid';
+	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + 'beid/v00012';
 	var CONTAINER_LUXEID = CONTAINER_CONTEXT_PATH + 'luxeid';
 	var CONTAINER_DNIE = CONTAINER_CONTEXT_PATH + 'dnie';
 	var CONTAINER_EMV = CONTAINER_CONTEXT_PATH + 'emv';
@@ -31983,6 +31983,7 @@ var GCLLib =
 	    PinEnforcer.encryptPin = function (pin) {
 	        if (pin && pin.length) {
 	            var pubKey = PubKeyService_1.PubKeyService.getPubKey();
+	            console.log(pubKey);
 	            var crypt = new jsencrypt_1.JSEncrypt();
 	            crypt.setKey(pubKey);
 	            return crypt.encrypt(pin);
@@ -81224,6 +81225,7 @@ var GCLLib =
 	            });
 	            initPromise.then(function () {
 	                client.admin().getPubKey().then(function (pubKey) {
+	                    console.log(pubKey);
 	                    PubKeyService_1.PubKeyService.setPubKey(pubKey.data.device);
 	                    finalResolve();
 	                });

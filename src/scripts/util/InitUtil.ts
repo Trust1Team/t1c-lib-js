@@ -78,6 +78,7 @@ class InitUtil {
             initPromise.then(() => {
                 // store device PubKey
                 client.admin().getPubKey().then(pubKey => {
+                    console.log(pubKey);
                     PubKeyService.setPubKey(pubKey.data.device);
                     finalResolve();
                 });
