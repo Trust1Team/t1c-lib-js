@@ -31582,22 +31582,22 @@ var GCLLib =
 	var FileExchange_1 = __webpack_require__(507);
 	var pkcs11_1 = __webpack_require__(508);
 	var DataContainer_1 = __webpack_require__(509);
-	var CONTAINER_CONTEXT_PATH = '/containers/';
+	var CONTAINER_CONTEXT_PATH = '/plugins/';
 	var CONTAINER_NEW_CONTEXT_PATH = '/containers/';
-	var CONTAINER_BEID = CONTAINER_CONTEXT_PATH + 'beid/v00012';
-	var CONTAINER_LUXEID = CONTAINER_CONTEXT_PATH + 'luxeid';
-	var CONTAINER_DNIE = CONTAINER_CONTEXT_PATH + 'dnie';
-	var CONTAINER_EMV = CONTAINER_CONTEXT_PATH + 'emv';
-	var CONTAINER_FILE_EXCHANGE = CONTAINER_CONTEXT_PATH + 'file';
-	var CONTAINER_LUXTRUST = CONTAINER_CONTEXT_PATH + 'luxtrust';
-	var CONTAINER_MOBIB = CONTAINER_CONTEXT_PATH + 'mobib';
-	var CONTAINER_OCRA = CONTAINER_CONTEXT_PATH + 'ocra';
-	var CONTAINER_AVENTRA = CONTAINER_CONTEXT_PATH + 'aventra';
-	var CONTAINER_OBERTHUR = CONTAINER_CONTEXT_PATH + 'oberthur';
-	var CONTAINER_PIV = CONTAINER_CONTEXT_PATH + 'piv';
-	var CONTAINER_PTEID = CONTAINER_CONTEXT_PATH + 'pteid';
-	var CONTAINER_PKCS11 = CONTAINER_CONTEXT_PATH + 'pkcs11';
-	var CONTAINER_REMOTE_LOADING = CONTAINER_CONTEXT_PATH + 'readerapi';
+	var CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
+	var CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
+	var CONTAINER_DNIE = CONTAINER_NEW_CONTEXT_PATH + 'dnie';
+	var CONTAINER_EMV = CONTAINER_NEW_CONTEXT_PATH + 'emv';
+	var CONTAINER_FILE_EXCHANGE = CONTAINER_NEW_CONTEXT_PATH + 'file';
+	var CONTAINER_LUXTRUST = CONTAINER_NEW_CONTEXT_PATH + 'luxtrust';
+	var CONTAINER_MOBIB = CONTAINER_NEW_CONTEXT_PATH + 'mobib';
+	var CONTAINER_OCRA = CONTAINER_NEW_CONTEXT_PATH + 'ocra';
+	var CONTAINER_AVENTRA = CONTAINER_NEW_CONTEXT_PATH + 'aventra';
+	var CONTAINER_OBERTHUR = CONTAINER_NEW_CONTEXT_PATH + 'oberthur';
+	var CONTAINER_PIV = CONTAINER_NEW_CONTEXT_PATH + 'piv';
+	var CONTAINER_PTEID = CONTAINER_NEW_CONTEXT_PATH + 'pteid';
+	var CONTAINER_PKCS11 = CONTAINER_NEW_CONTEXT_PATH + 'pkcs11';
+	var CONTAINER_REMOTE_LOADING = CONTAINER_NEW_CONTEXT_PATH + 'readerapi';
 	var PluginFactory = (function () {
 	    function PluginFactory(url, connection) {
 	        this.url = url;
@@ -82623,14 +82623,16 @@ var GCLLib =
 	        function downloadErrored(config, status) {
 	            return _.find(config, function (cfgCt) {
 	                return _.find(status, function (statusCt) {
-	                    return cfgCt.id === statusCt.id && statusCt.status === SyncUtil.DOWNLOAD_ERROR;
+	                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
+	                        && statusCt.status === SyncUtil.DOWNLOAD_ERROR;
 	                });
 	            });
 	        }
 	        function downloadOngoing(config, status) {
 	            return _.find(config, function (cfgCt) {
 	                return _.find(status, function (statusCt) {
-	                    return cfgCt.id === statusCt.id && (statusCt.status === SyncUtil.INIT || statusCt.status === SyncUtil.DOWNLOADING);
+	                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
+	                        && (statusCt.status === SyncUtil.INIT || statusCt.status === SyncUtil.DOWNLOADING);
 	                });
 	            });
 	        }

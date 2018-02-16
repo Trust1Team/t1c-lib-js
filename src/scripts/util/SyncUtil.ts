@@ -98,18 +98,20 @@ class SyncUtil {
             });
         }
 
-        function downloadErrored(config: { id: string }[], status: { id: string, status: string }[]) {
+        function downloadErrored(config: { name: string, version: string }[], status: { name: string, version: string, status: string }[]) {
             return _.find(config, cfgCt => {
                 return _.find(status, statusCt => {
-                    return cfgCt.id === statusCt.id && statusCt.status === SyncUtil.DOWNLOAD_ERROR;
+                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
+                           && statusCt.status === SyncUtil.DOWNLOAD_ERROR;
                 });
             });
         }
 
-        function downloadOngoing(config: { id: string }[], status: { id: string, status: string }[]) {
+        function downloadOngoing(config: { name: string, version: string }[], status: { name: string, version: string, status: string }[]) {
             return _.find(config, cfgCt => {
                 return _.find(status, statusCt => {
-                    return cfgCt.id === statusCt.id && (statusCt.status === SyncUtil.INIT || statusCt.status === SyncUtil.DOWNLOADING);
+                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
+                           && (statusCt.status === SyncUtil.INIT || statusCt.status === SyncUtil.DOWNLOADING);
                 });
             });
         }
