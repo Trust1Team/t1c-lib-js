@@ -32,6 +32,7 @@ class PinEnforcer {
     public static encryptPin(pin: string): string {
         if (pin && pin.length) {
             let pubKey = PubKeyService.getPubKey();
+            console.log(pubKey);
             // encrypt pin with pubkey
             let crypt = new JSEncrypt();
             crypt.setKey(pubKey);
