@@ -62,7 +62,7 @@ class InitUtil {
                             // update core service
                             client.updateAuthConnection(cfg);
                             // device is activated, sync it
-                            resolve(SyncUtil.unManagedSynchronization(client.admin(), client.ds(), cfg, mergedInfo, uuid));
+                            resolve(SyncUtil.unManagedSynchronization(client, cfg, mergedInfo, uuid));
                         }, err => {
                             reject(err);
                             // resolve(SyncUtil.unManagedSynchronization(client.admin(), client.ds(), cfg, mergedInfo, uuid));

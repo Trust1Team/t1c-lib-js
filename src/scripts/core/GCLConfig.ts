@@ -44,6 +44,7 @@ class GCLConfig  implements GCLConfig {
     private _syncManaged: boolean;
     private _pkcs11Config: ModuleConfig;
     private _osPinDialog: boolean;
+    private _containerDownloadTimeout: number;
 
     // constructor for DTO
     constructor (dsUriValue?: string, apiKey?: string, pkcs11Config?: ModuleConfig) {
@@ -66,6 +67,7 @@ class GCLConfig  implements GCLConfig {
         this._syncManaged = true;
         this._pkcs11Config = pkcs11Config;
         this._osPinDialog = false;
+        this._containerDownloadTimeout = 30;
     }
 
     get ocvUrl(): string {
@@ -253,6 +255,14 @@ class GCLConfig  implements GCLConfig {
 
     set osPinDialog(value: boolean) {
         this._osPinDialog = value;
+    }
+
+    get containerDownloadTimeout(): number {
+        return this._containerDownloadTimeout;
+    }
+
+    set containerDownloadTimeout(value: number) {
+        this._containerDownloadTimeout = value;
     }
 }
 

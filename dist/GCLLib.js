@@ -9041,6 +9041,7 @@ var GCLLib =
 	        resolvedCfg.agentPort = cfg.agentPort;
 	        resolvedCfg.syncManaged = cfg.syncManaged;
 	        resolvedCfg.osPinDialog = cfg.osPinDialog;
+	        resolvedCfg.containerDownloadTimeout = cfg.containerDownloadTimeout;
 	        return resolvedCfg;
 	    };
 	    GCLClient.prototype.containerFor = function (readerId, callback) {
@@ -9141,6 +9142,7 @@ var GCLLib =
 	        this._syncManaged = true;
 	        this._pkcs11Config = pkcs11Config;
 	        this._osPinDialog = false;
+	        this._containerDownloadTimeout = 30;
 	    }
 	    Object.defineProperty(GCLConfig.prototype, "ocvUrl", {
 	        get: function () {
@@ -9376,6 +9378,16 @@ var GCLLib =
 	        },
 	        set: function (value) {
 	            this._osPinDialog = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "containerDownloadTimeout", {
+	        get: function () {
+	            return this._containerDownloadTimeout;
+	        },
+	        set: function (value) {
+	            this._containerDownloadTimeout = value;
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -79273,7 +79285,7 @@ var GCLLib =
 	}(T1CResponse));
 	exports.InfoResponse = InfoResponse;
 	var T1CInfo = (function () {
-	    function T1CInfo(activated, citrix, managed, arch, os, uid, version) {
+	    function T1CInfo(activated, citrix, managed, arch, os, uid, version, containers) {
 	        this.activated = activated;
 	        this.citrix = citrix;
 	        this.managed = managed;
@@ -79281,6 +79293,7 @@ var GCLLib =
 	        this.os = os;
 	        this.uid = uid;
 	        this.version = version;
+	        this.containers = containers;
 	    }
 	    return T1CInfo;
 	}());
@@ -81199,7 +81212,7 @@ var GCLLib =
 	                        }
 	                        activationPromise.then(function () {
 	                            client.updateAuthConnection(cfg);
-	                            resolve(SyncUtil_1.SyncUtil.unManagedSynchronization(client.admin(), client.ds(), cfg, mergedInfo, uuid));
+	                            resolve(SyncUtil_1.SyncUtil.unManagedSynchronization(client, cfg, mergedInfo, uuid));
 	                        }, function (err) {
 	                            reject(err);
 	                        });
@@ -82543,19 +82556,25 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(335);
 	var DataContainerUtil_1 = __webpack_require__(516);
+	var _ = __webpack_require__(331);
+	var CoreExceptions_1 = __webpack_require__(382);
 	var SyncUtil = (function () {
 	    function SyncUtil() {
 	    }
-	    SyncUtil.unManagedSynchronization = function (admin, ds, config, mergedInfo, uuid) {
+	    SyncUtil.unManagedSynchronization = function (client, config, mergedInfo, uuid) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            admin.getPubKey().then(function (pubKey) {
-	                return ds.synchronizationRequest(pubKey.data.device, mergedInfo, config.dsUrlBase).then(function (containerConfig) {
-	                    return admin.updateContainerConfig(containerConfig.data).then(function (containerState) {
+	            client.admin().getPubKey().then(function (pubKey) {
+	                return client.ds().synchronizationRequest(pubKey.data.device, mergedInfo, config.dsUrlBase).then(function (containerConfig) {
+	                    return client.admin().updateContainerConfig(containerConfig.data).then(function (containerState) {
 	                        DataContainerUtil_1.DataContainerUtil.setupDataContainers([{ id: 'atr', name: 'ATR', version: '0.0.0.1', type: 'data' },
 	                            { id: 'btr', name: 'BTR', version: '0.0.0.1', type: 'data' }]);
-	                        return SyncUtil.syncDevice(ds, config, mergedInfo, uuid).then(function () {
+	                        return SyncUtil.syncDevice(client.ds(), config, mergedInfo, uuid).then(function () {
 	                            mergedInfo.activated = true;
-	                            resolve();
+	                            SyncUtil.pollDownloadCompletion(client, containerConfig).then(function () {
+	                                resolve();
+	                            }, function (error) {
+	                                reject(error);
+	                            });
 	                        });
 	                    });
 	                });
@@ -82563,6 +82582,56 @@ var GCLLib =
 	                reject(err);
 	            });
 	        });
+	    };
+	    SyncUtil.pollDownloadCompletion = function (client, containerConfig) {
+	        var maxSeconds = client.config().containerDownloadTimeout || 30;
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            resolve(true);
+	        });
+	        function poll(resolve, reject) {
+	            _.delay(function () {
+	                --maxSeconds;
+	                client.core().info().then(function (infoData) {
+	                    checkDownloadsComplete(containerConfig, infoData.data.containers).then(function (ready) {
+	                        if (ready) {
+	                            resolve();
+	                        }
+	                        else {
+	                            poll(resolve, reject);
+	                        }
+	                    }, function (error) {
+	                        reject(error);
+	                    });
+	                });
+	            }, 1000);
+	        }
+	        function checkDownloadsComplete(cfg, containerStatus) {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                if (downloadErrored(cfg, containerStatus)) {
+	                    reject(new CoreExceptions_1.RestException(500, '903', 'Container download failed'));
+	                }
+	                else if (downloadOngoing(cfg, containerStatus)) {
+	                    resolve(false);
+	                }
+	                else {
+	                    resolve(true);
+	                }
+	            });
+	        }
+	        function downloadErrored(config, status) {
+	            return _.find(config, function (cfgCt) {
+	                return _.find(status, function (statusCt) {
+	                    return cfgCt.id === statusCt.id && statusCt.status === SyncUtil.DOWNLOAD_ERROR;
+	                });
+	            });
+	        }
+	        function downloadOngoing(config, status) {
+	            return _.find(config, function (cfgCt) {
+	                return _.find(status, function (statusCt) {
+	                    return cfgCt.id === statusCt.id && (statusCt.status === SyncUtil.INIT || statusCt.status === SyncUtil.DOWNLOADING);
+	                });
+	            });
+	        }
 	    };
 	    SyncUtil.syncDevice = function (client, config, info, deviceId) {
 	        return client.sync(info, deviceId).then(function (activationResponse) {
@@ -82572,6 +82641,10 @@ var GCLLib =
 	    };
 	    return SyncUtil;
 	}());
+	SyncUtil.DOWNLOAD_ERROR = 'DOWNLOAD_ERROR';
+	SyncUtil.INIT = 'INIT';
+	SyncUtil.DOWNLOADING = 'DOWNLOADING';
+	SyncUtil.INSTALLED = 'INSTALLED';
 	exports.SyncUtil = SyncUtil;
 
 

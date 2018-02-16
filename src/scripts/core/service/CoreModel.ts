@@ -95,7 +95,7 @@ class T1CInfo {
                 public arch: string,
                 public os: string,
                 public uid: string,
-                public version: string) {}
+                public version: string, public containers?: any) {}
 }
 
 class BrowserInfoResponse extends T1CResponse {
