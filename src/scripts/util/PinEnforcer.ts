@@ -5,6 +5,7 @@ import { GenericConnection } from '../core/client/Connection';
 import { Promise } from 'es6-promise';
 import { JSEncrypt} from 'jsencrypt';
 import { PubKeyService } from './PubKeyService';
+import { RestException } from '../core/exceptions/CoreExceptions';
 
 export { PinEnforcer };
 
@@ -38,33 +39,38 @@ class PinEnforcer {
         } else { return undefined; }
     }
 
-    private static doPinCheck(connection: GenericConnection, readerId: string, body: { pin?: string, showDialog?: boolean }) {
+    private static doPinCheck(connection: GenericConnection, readerId: string,
+                              body: { pin?: string, pinpad?: boolean, os_dialog?: boolean }) {
         // if forceHardwarePinpad enabled,
         return new Promise((resolve, reject) => {
-            if (connection.cfg.forceHardwarePinpad) {
-                // check if reader has pinpad
-                connection.get(connection.cfg.gclUrl, CORE_READERS + '/' + readerId, undefined).then(reader => {
-                    if (reader.data.pinpad) {
+            body.os_dialog = connection.cfg.osPinDialog;
+            connection.get(connection.cfg.gclUrl, CORE_READERS + '/' + readerId, undefined).then(reader => {
+                body.pinpad = reader.data.pinpad;
+
+                // check if we need to force HW pinpad
+                if (connection.cfg.forceHardwarePinpad) {
+                    // need to force hw
+                    if (body.pinpad) {
                         // if true, check that no pin was sent
                         if (body.pin) {
-                            reject({ data: { message: 'Strict pinpad enforcement is enabled. This request was sent with a PIN, but the' +
-                                                      ' reader has a pinpad.' } });
+                            reject(new RestException(400, '600', 'Strict pinpad enforcement is enabled.' +
+                                                              ' This request was sent with a PIN, but the reader has a pinpad.'));
                         } else { resolve(); }
                     } else {
-                        // non-pinpad reader, check if we need to trigger an OS pin dialog
-                        if (connection.cfg.osPinDialog) {
-                            body.showDialog = true;
-                        }
-                        // check if a pin was sent
-                        if (!body.pin) {
-                            reject({ data: { message: 'Strict pinpad enforcement is enabled. This request was sent without a PIN, but the' +
-                                                      ' reader does not have a pinpad.'} });
+                        // check if a pin was sent, or if we are using OS pin dialog
+                        if (!body.pin && !body.os_dialog) {
+                            reject(new RestException(400, '601', 'Strict pinpad enforcement is enabled.' +
+                                                              ' This request was sent without a PIN,' +
+                                                              ' but the reader does not have a pinpad and OS PIN dialog is not enabled.'));
                         } else { resolve(); }
                     }
-                }, error => {
-                    reject(error);
-                });
-            } else { resolve(); }
+                } else {
+                    // don't force, can resolve now
+                    resolve();
+                }
+            }, error => {
+                reject(error);
+            });
         });
     }
 
