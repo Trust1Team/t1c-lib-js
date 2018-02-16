@@ -128,6 +128,7 @@ class GCLClient {
         resolvedCfg.agentPort = cfg.agentPort;
         resolvedCfg.syncManaged = cfg.syncManaged;
         resolvedCfg.osPinDialog = cfg.osPinDialog;
+        resolvedCfg.containerDownloadTimeout = cfg.containerDownloadTimeout;
         return resolvedCfg;
     }
 

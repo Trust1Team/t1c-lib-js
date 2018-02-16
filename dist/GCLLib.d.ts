@@ -236,6 +236,7 @@ class GCLConfig implements GCLConfig {
     syncManaged: boolean;
     pkcs11Config: ModuleConfig;
     osPinDialog: boolean;
+    containerDownloadTimeout: number;
 }
 export { GCLConfig };
 
@@ -404,7 +405,8 @@ class T1CInfo {
     os: string;
     uid: string;
     version: string;
-    constructor(activated: boolean, citrix: boolean, managed: boolean, arch: string, os: string, uid: string, version: string);
+    containers: any;
+    constructor(activated: boolean, citrix: boolean, managed: boolean, arch: string, os: string, uid: string, version: string, containers?: any);
 }
 class BrowserInfoResponse extends T1CResponse {
     data: BrowserInfo;
