@@ -10,7 +10,6 @@ import { SyncUtil } from './SyncUtil';
 import { ActivationUtil } from './ActivationUtil';
 import { DSPlatformInfo } from '../core/ds/DSClientModel';
 import { PubKeyService } from './PubKeyService';
-import { ClientService } from './ClientService';
 
 export { InitUtil };
 

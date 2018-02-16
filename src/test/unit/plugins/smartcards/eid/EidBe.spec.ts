@@ -20,13 +20,13 @@ describe('Belgian eID Container', () => {
 
     beforeEach(() => {
         mock = new MockAdapter(axios);
-        PubKeyService.setPubKey('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtN7eepQuYsx4JdX3pQV/\n' +
-                                'RKyu8Le+jo7pmSbmcrJ5GZZQxcF4AFVGPhPqyY9EcQEeUq1ARyygJlJKGsiRGxHJ\n' +
-                                '9oClIm+Zhvgphk7sV+foib0h3HX1Anrmoi1EVHCvQPNiSO5bIjLjP1izQgaLXfye\n' +
-                                'v6lLDLZ5eFJFGKFmWcKTFLzqyu/2kPzAxJGxydyrzyqPy2ZMzow41LkcXbqfHve8\n' +
-                                '7QQqSz+zIX7ZA15B3WgqZbzCt7kPhRnbx0lzDVDG1rX2/PEdtTn1uwiAmYsj7yty\n' +
-                                'wPbpcqll7G2ellDvfApsiQ+rBYyZduEALRkTFNQaG5qZjndRCKZD7PZ5OzHCiMei\n' +
-                                'nQIDAQAB');
+        PubKeyService.setPubKey('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6WcG5DySxt06ocIV/YXk\n' +
+                                'Zf7KJs46la2LGYDal+EcAY4LrgPYQH/i1rhahyHSuhIk02mnZbgD7JeCZkorhyBO\n' +
+                                '7O5gm99Zx3NFVOyEmRFUQ8sTtIp9VghgKnKRKygQf6bT0gEmAI6pfcNH8tAvXktn\n' +
+                                '2eBqk/X5UF2ORISPjc90YyWNWojAJC6KHpsDAws3EBOrp6y2nLEE8PVnAMtiT3Ht\n' +
+                                'AepPlVKufC666jHaIAzCdceDPgBkNgMyGEQXdoBtfQjkFIf+QsYOtzzQpD7sCkXL\n' +
+                                'eIlSd0+bLrbMumyJVcm3HqE1saoF5tSvJ7pDULRjgQk/oKMRYL9a9DnLvqMoZH0x\n' +
+                                'XQIDAQAB');
     });
 
     afterEach(() => {
