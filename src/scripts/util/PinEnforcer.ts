@@ -6,8 +6,9 @@ import { Promise } from 'es6-promise';
 import { JSEncrypt} from 'jsencrypt';
 import { PubKeyService } from './PubKeyService';
 import { RestException } from '../core/exceptions/CoreExceptions';
+import { OptionalPin } from '../plugins/smartcards/Card';
 
-export { PinEnforcer };
+export { PinEnforcer, EncryptedOptionalPin };
 
 const CORE_READERS = '/card-readers';
 
@@ -40,7 +41,7 @@ class PinEnforcer {
     }
 
     private static doPinCheck(connection: GenericConnection, readerId: string,
-                              body: { pin?: string, pinpad?: boolean, os_dialog?: boolean }) {
+                              body: EncryptedOptionalPin) {
         // if forceHardwarePinpad enabled,
         return new Promise((resolve, reject) => {
             body.os_dialog = connection.cfg.osPinDialog;
@@ -80,4 +81,8 @@ class PinEnforcer {
         body.pin = PinEnforcer.encryptPin(body.pin);
         return body;
     }
+}
+
+class EncryptedOptionalPin {
+    constructor(public os_dialog?: boolean, public pinpad?: boolean, public pin?: string, public pace?: string) {}
 }

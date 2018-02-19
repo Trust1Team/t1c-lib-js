@@ -31983,7 +31983,6 @@ var GCLLib =
 	    PinEnforcer.encryptPin = function (pin) {
 	        if (pin && pin.length) {
 	            var pubKey = PubKeyService_1.PubKeyService.getPubKey();
-	            console.log(pubKey);
 	            var crypt = new jsencrypt_1.JSEncrypt();
 	            crypt.setKey(pubKey);
 	            return crypt.encrypt(pin);
@@ -32000,8 +31999,9 @@ var GCLLib =
 	                if (connection.cfg.forceHardwarePinpad) {
 	                    if (body.pinpad) {
 	                        if (body.pin) {
-	                            reject(new CoreExceptions_1.RestException(400, '600', 'Strict pinpad enforcement is enabled.' +
-	                                ' This request was sent with a PIN, but the reader has a pinpad.'));
+	                            reject({ data: new CoreExceptions_1.RestException(400, '600', 'Strict pinpad enforcement is enabled.' +
+	                                    ' This request was sent with a PIN,' +
+	                                    ' but the reader has a pinpad.'), success: false });
 	                        }
 	                        else {
 	                            resolve();
@@ -32009,9 +32009,10 @@ var GCLLib =
 	                    }
 	                    else {
 	                        if (!body.pin && !body.os_dialog) {
-	                            reject(new CoreExceptions_1.RestException(400, '601', 'Strict pinpad enforcement is enabled.' +
-	                                ' This request was sent without a PIN,' +
-	                                ' but the reader does not have a pinpad and OS PIN dialog is not enabled.'));
+	                            reject({ data: new CoreExceptions_1.RestException(400, '601', 'Strict pinpad enforcement is enabled.' +
+	                                    ' This request was sent without a PIN,' +
+	                                    ' but the reader does not have a pinpad and' +
+	                                    ' OS PIN dialog is not enabled.'), success: false });
 	                        }
 	                        else {
 	                            resolve();
@@ -32033,6 +32034,16 @@ var GCLLib =
 	    return PinEnforcer;
 	}());
 	exports.PinEnforcer = PinEnforcer;
+	var EncryptedOptionalPin = (function () {
+	    function EncryptedOptionalPin(os_dialog, pinpad, pin, pace) {
+	        this.os_dialog = os_dialog;
+	        this.pinpad = pinpad;
+	        this.pin = pin;
+	        this.pace = pace;
+	    }
+	    return EncryptedOptionalPin;
+	}());
+	exports.EncryptedOptionalPin = EncryptedOptionalPin;
 
 
 /***/ }),
@@ -79513,6 +79524,7 @@ var GCLLib =
 	var Card_1 = __webpack_require__(378);
 	var PinEnforcer_1 = __webpack_require__(379);
 	var RequestHandler_1 = __webpack_require__(493);
+	var _ = __webpack_require__(331);
 	var EidBe = (function (_super) {
 	    __extends(EidBe, _super);
 	    function EidBe() {
@@ -79545,8 +79557,8 @@ var GCLLib =
 	    EidBe.prototype.verifyPin = function (body, callback) {
 	        var _this = this;
 	        return PinEnforcer_1.PinEnforcer.check(this.connection, this.reader_id, body).then(function () {
-	            var _req = new Card_1.VerifyPinData(EidBe.VERIFY_PRIV_KEY_REF, body.pin);
-	            return _this.connection.post(_this.baseUrl, _this.containerSuffix(Card_1.GenericCertCard.VERIFY_PIN), _req, undefined, callback);
+	            var encryptedBody = _.extend({ private_key_reference: EidBe.VERIFY_PRIV_KEY_REF }, body);
+	            return _this.connection.post(_this.baseUrl, _this.containerSuffix(Card_1.GenericCertCard.VERIFY_PIN), encryptedBody, undefined, callback);
 	        });
 	    };
 	    return EidBe;
