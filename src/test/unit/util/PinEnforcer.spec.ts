@@ -43,9 +43,9 @@ describe('PinEnforcer Utility', () => {
             return PinEnforcer.check(enforcingConnection, '123', { pin: '1234'}).catch(err => {
                 expect(err).to.be.an('object');
                 expect(err).to.have.property('data');
-                expect(err.data).to.have.property('message');
-                expect(err.data.message).to.be.a('string').eq('Strict pinpad enforcement is enabled. This request was sent with a PIN,' +
-                                                              ' but the reader has a pinpad.');
+                expect(err.data).to.have.property('description');
+                expect(err.data.description).to.be.a('string').eq('Strict pinpad enforcement is enabled.' +
+                                                                  ' This request was sent with a PIN, but the reader has a pinpad.');
             });
         });
     });
@@ -68,9 +68,12 @@ describe('PinEnforcer Utility', () => {
             }, err => {
                 expect(err).to.be.an('object');
                 expect(err).to.have.property('data');
-                expect(err.data).to.have.property('message');
-                expect(err.data.message).to.be.a('string').eq('Strict pinpad enforcement is enabled. This request was sent without a PIN,' +
-                                                              ' but the reader does not have a pinpad.');
+                expect(err.data).to.have.property('status').eq(400);
+                expect(err.data).to.have.property('code').eq('601');
+                expect(err.data).to.have.property('description');
+                expect(err.data.description).to.be.a('string').eq('Strict pinpad enforcement is enabled.' +
+                                                                  ' This request was sent without a PIN, but the reader does not have' +
+                                                                  ' a pinpad and OS PIN dialog is not enabled.');
             });
         });
 
@@ -82,9 +85,11 @@ describe('PinEnforcer Utility', () => {
                 // console.log(err.data);
                 expect(err).to.be.an('object');
                 expect(err).to.have.property('data');
-                expect(err.data).to.have.property('message');
-                expect(err.data.message).to.be.a('string').eq('Strict pinpad enforcement is enabled. This request was sent with a PIN,' +
-                                                              ' but the reader has a pinpad.');
+                expect(err.data).to.have.property('status').eq(400);
+                expect(err.data).to.have.property('code').eq('600');
+                expect(err.data).to.have.property('description');
+                expect(err.data.description).to.be.a('string').eq('Strict pinpad enforcement is enabled.' +
+                                                                  ' This request was sent with a PIN, but the reader has a pinpad.');
             });
         });
     });

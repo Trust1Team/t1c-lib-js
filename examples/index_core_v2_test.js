@@ -1,7 +1,7 @@
 (function ($) {
     var gclConfig = new GCLLib.GCLConfig();
     gclConfig.apiKey = "2cc27598-2af7-48af-a2df-c7352e5368ff"; //test apikey rate limited
-    gclConfig.gclUrl = "https://localhost:10444/v1"; //override config for local dev
+    gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
     gclConfig.ocvUrl = "https://accapim.t1t.be:443/trust1team/ocv-api/v1";
     //gclConfig.ocvUrl = "http://localhost:8080/ocv-api-web/v1";
     gclConfig.localTestMode=false;

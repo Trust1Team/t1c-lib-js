@@ -19,6 +19,9 @@ describe('Generic cards and containers', () => {
 
     beforeEach(() => {
         mock = new MockAdapter(axios);
+        mock.onGet('https://localhost:10443/v1/card-readers/123').reply(() => {
+            return [ 200, { data: { pinpad: false }, success: true }];
+        });
         PubKeyService.setPubKey('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlOJu6TyygqxfWT7eLtGDwajtN\n' +
                                 'FOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76\n' +
                                 'xFxdU6jE0NQ+Z+zEdhUTooNRaY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4\n' +
@@ -37,11 +40,11 @@ describe('Generic cards and containers', () => {
         it('creates a correct container suffix', () => {
             let reloSuffix = (relo as any).containerSuffix('/test');
             expect(reloSuffix).to.be.a('string');
-            expect(reloSuffix, 'Wrong suffix created').to.eq('/plugins/readerapi/123/test');
+            expect(reloSuffix, 'Wrong suffix created').to.eq('/containers/readerapi/123/test');
 
             let beidSuffix = (beid as any).containerSuffix('/beid-url');
             expect(beidSuffix).to.be.a('string');
-            expect(beidSuffix, 'Wrong suffix created').to.eq('/plugins/beid/123134141/beid-url');
+            expect(beidSuffix, 'Wrong suffix created').to.eq('/containers/beid/123134141/beid-url');
         });
     });
 
@@ -51,7 +54,7 @@ describe('Generic cards and containers', () => {
         const mobib = new PluginFactory('', connection).createMobib('123');
 
         beforeEach(function () {
-            mock.onGet('plugins/mobib/123')
+            mock.onGet('containers/mobib/123')
                 .reply(config => {
                     return [ 200, { success: true, data: config.params } ];
                 });
@@ -88,7 +91,7 @@ describe('Generic cards and containers', () => {
         const ocra = new PluginFactory('', connection).createOcra('123');
 
         beforeEach(function () {
-            mock.onPost('plugins/ocra/123/verify-pin')
+            mock.onPost('containers/ocra/123/verify-pin')
                 .reply(config => {
                     return [ 200, { success: true, data: JSON.parse(config.data) } ];
                 });
@@ -125,26 +128,26 @@ describe('Generic cards and containers', () => {
 
         beforeEach(function () {
             // authenticate
-            mock.onGet('plugins/aventra/123/authenticate').reply(() => {
+            mock.onGet('containers/aventra/123/authenticate').reply(() => {
                 return [ 200, { success: true, data: [ 'algo', 'refs', 'authentication'] }];
             });
-            mock.onPost('plugins/aventra/123/authenticate').reply(config => {
+            mock.onPost('containers/aventra/123/authenticate').reply(config => {
                 return [ 200, { success: true, data: JSON.parse(config.data) }];
             });
 
             // sign
-            mock.onGet('plugins/aventra/123/sign').reply(() => {
+            mock.onGet('containers/aventra/123/sign').reply(() => {
                 return [ 200, { success: true, data: [ 'algo', 'refs', 'signing'] }];
             });
-            mock.onPost('plugins/aventra/123/sign').reply(config => {
+            mock.onPost('containers/aventra/123/sign').reply(config => {
                 return [ 200, { success: true, data: JSON.parse(config.data) }];
             });
 
             // certificates
-            mock.onGet('plugins/aventra/123/certificates').reply(config => {
+            mock.onGet('containers/aventra/123/certificates').reply(config => {
                 return [ 200, { success: true, data: config.params }];
             });
-            mock.onGet('plugins/aventra/123/certificates/root').reply(config => {
+            mock.onGet('containers/aventra/123/certificates/root').reply(config => {
                 return [ 200, { success: true, data: 'mockrootcert' }];
             });
         });
@@ -249,46 +252,46 @@ describe('Generic cards and containers', () => {
 
         beforeEach(function () {
             // all data
-            mock.onPost('plugins/piv/123').reply(config => {
+            mock.onPost('containers/piv/123').reply(config => {
                 return [ 200, { success: true, data: JSON.parse(config.data) }];
             });
 
             // authenticate
-            mock.onGet('plugins/piv/123/authenticate').reply(() => {
+            mock.onGet('containers/piv/123/authenticate').reply(() => {
                 return [ 200, { success: true, data: [ 'algo', 'refs', 'authentication'] }];
             });
-            mock.onPost('plugins/piv/123/authenticate').reply(config => {
+            mock.onPost('containers/piv/123/authenticate').reply(config => {
                 return [ 200, { success: true, data: JSON.parse(config.data) }];
             });
 
             // sign
-            mock.onGet('plugins/piv/123/sign').reply(() => {
+            mock.onGet('containers/piv/123/sign').reply(() => {
                 return [ 200, { success: true, data: [ 'algo', 'refs', 'signing'] }];
             });
-            mock.onPost('plugins/piv/123/sign').reply(config => {
+            mock.onPost('containers/piv/123/sign').reply(config => {
                 return [ 200, { success: true, data: JSON.parse(config.data) }];
             });
 
             // verify pin
-            mock.onPost('plugins/piv/123/verify-pin')
+            mock.onPost('containers/piv/123/verify-pin')
                 .reply(config => {
                     return [ 200, { success: true, data: JSON.parse(config.data) } ];
                 });
 
             // certificates
-            mock.onPost('plugins/piv/123/certificates').reply(config => {
+            mock.onPost('containers/piv/123/certificates').reply(config => {
                 let data = JSON.parse(config.data);
                 if (data && data.pin && data.pin.length) {
                     return [ 200, { success: true, data: config.params }];
                 } else { return [ 404 ]; }
             });
-            mock.onPost('plugins/piv/123/certificates/authentication').reply((config) => {
+            mock.onPost('containers/piv/123/certificates/authentication').reply((config) => {
                 let data = JSON.parse(config.data);
                 if (data && data.pin && data.pin.length) {
                     return [ 200, { success: true, data: 'mockauthcert' }];
                 } else { return [ 404 ]; }
             });
-            mock.onPost('plugins/piv/123/certificates/root').reply((config) => {
+            mock.onPost('containers/piv/123/certificates/root').reply((config) => {
                 let data = JSON.parse(config.data);
                 if (data && data.pin && data.pin.length) {
                     return [ 200, { success: true, data: [ 'mockrootcert', 'mockrootcert2' ] }];

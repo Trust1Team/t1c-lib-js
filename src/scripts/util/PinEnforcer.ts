@@ -32,7 +32,6 @@ class PinEnforcer {
     public static encryptPin(pin: string): string {
         if (pin && pin.length) {
             let pubKey = PubKeyService.getPubKey();
-            console.log(pubKey);
             // encrypt pin with pubkey
             let crypt = new JSEncrypt();
             crypt.setKey(pubKey);
@@ -54,15 +53,17 @@ class PinEnforcer {
                     if (body.pinpad) {
                         // if true, check that no pin was sent
                         if (body.pin) {
-                            reject(new RestException(400, '600', 'Strict pinpad enforcement is enabled.' +
-                                                              ' This request was sent with a PIN, but the reader has a pinpad.'));
+                            reject({ data: new RestException(400, '600', 'Strict pinpad enforcement is enabled.' +
+                                                              ' This request was sent with a PIN,' +
+                                                                         ' but the reader has a pinpad.' ), success: false });
                         } else { resolve(); }
                     } else {
                         // check if a pin was sent, or if we are using OS pin dialog
                         if (!body.pin && !body.os_dialog) {
-                            reject(new RestException(400, '601', 'Strict pinpad enforcement is enabled.' +
+                            reject({ data: new RestException(400, '601', 'Strict pinpad enforcement is enabled.' +
                                                               ' This request was sent without a PIN,' +
-                                                              ' but the reader does not have a pinpad and OS PIN dialog is not enabled.'));
+                                                              ' but the reader does not have a pinpad and' +
+                                                                         ' OS PIN dialog is not enabled.'), success: false });
                         } else { resolve(); }
                     }
                 } else {

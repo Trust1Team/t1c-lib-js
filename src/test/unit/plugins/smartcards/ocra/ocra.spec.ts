@@ -19,6 +19,9 @@ describe('OCRA Container', () => {
 
     beforeEach(() => {
         mock = new MockAdapter(axios);
+        mock.onGet('https://localhost:10443/v1/card-readers/123').reply(() => {
+            return [ 200, { data: { pinpad: false }, success: true }];
+        });
         PubKeyService.setPubKey('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlOJu6TyygqxfWT7eLtGDwajtN\n' +
                                 'FOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76\n' +
                                 'xFxdU6jE0NQ+Z+zEdhUTooNRaY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4\n' +
@@ -31,7 +34,7 @@ describe('OCRA Container', () => {
 
     describe('challenge', function () {
         beforeEach(function () {
-            mock.onPost('plugins/ocra/123/challenge').reply((config) => {
+            mock.onPost('containers/ocra/123/challenge').reply((config) => {
                 let data = JSON.parse(config.data);
                 if (data && data.challenge === 'theChallenge' && data.pin && data.pin.length) {
                     return [ 200, { data: 'Challenge Data', success: true }];
@@ -54,7 +57,7 @@ describe('OCRA Container', () => {
 
     describe('readCounter', function () {
         beforeEach(function () {
-            mock.onGet('plugins/ocra/123/counter').reply((config) => {
+            mock.onGet('containers/ocra/123/counter').reply((config) => {
                 if (config.params.pin) {
                     return [ 200, { counter: 'Read Counter Data', success: true }];
                 } else {
