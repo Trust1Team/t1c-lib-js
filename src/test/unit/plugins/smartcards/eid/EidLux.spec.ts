@@ -24,6 +24,9 @@ describe('Luxembourg eID Container', () => {
 
     beforeEach(() => {
         mock = new MockAdapter(axios);
+        mock.onGet('https://localhost:10443/v1/card-readers/123').reply(() => {
+            return [ 200, { data: { pinpad: false }, success: true }];
+        });
     });
 
     afterEach(() => {
@@ -32,7 +35,7 @@ describe('Luxembourg eID Container', () => {
 
     describe('allData', function () {
         beforeEach(function () {
-            mock.onGet('plugins/luxeid/123').reply((config) => {
+            mock.onGet('containers/luxeid/123').reply((config) => {
                 if (config.params.pin && config.params.pin.length) {
                     return [ 200, { data: { authentication_certificate: 'All Data' }, success: true }];
                 } else {
@@ -58,7 +61,7 @@ describe('Luxembourg eID Container', () => {
 
     describe('allCerts', function () {
         beforeEach(function () {
-            mock.onGet('plugins/luxeid/123/certificates').reply((config) => {
+            mock.onGet('containers/luxeid/123/certificates').reply((config) => {
                 if (config.params.pin && config.params.pin.length) {
                     return [ 200, { data: { authentication_certificate: 'AllCert Data' }, success: true }];
                 } else {
@@ -84,7 +87,7 @@ describe('Luxembourg eID Container', () => {
 
     describe('biometric', function () {
         beforeEach(function () {
-            mock.onGet('plugins/luxeid/123/biometric').reply((config) => {
+            mock.onGet('containers/luxeid/123/biometric').reply((config) => {
                 if (config.params.pin && config.params.pin.length) {
                     return [ 200, { data: 'Biometric Data', success: true }];
                 } else {
@@ -108,7 +111,7 @@ describe('Luxembourg eID Container', () => {
 
     describe('picture', function () {
         beforeEach(function () {
-            mock.onGet('plugins/luxeid/123/picture').reply((config) => {
+            mock.onGet('containers/luxeid/123/picture').reply((config) => {
                 if (config.params.pin && config.params.pin.length) {
                     return [ 200, { data: 'Picture Data', success: true }];
                 } else {
@@ -132,7 +135,7 @@ describe('Luxembourg eID Container', () => {
 
     describe('getCertificate', function () {
         beforeEach(function () {
-            mock.onGet('plugins/luxeid/123/certificates/authentication').reply((config) => {
+            mock.onGet('containers/luxeid/123/certificates/authentication').reply((config) => {
                 if (config.params.pin && config.params.pin.length) {
                     return [ 200, { data: 'Auth Cert Data', success: true }];
                 } else {
@@ -155,7 +158,7 @@ describe('Luxembourg eID Container', () => {
 
     describe('getCertificateArray', function () {
         beforeEach(function () {
-            mock.onGet('plugins/luxeid/123/certificates/root').reply((config) => {
+            mock.onGet('containers/luxeid/123/certificates/root').reply((config) => {
                 if (config.params.pin && config.params.pin.length) {
                     return [ 200, { data: ['Cert 1', 'Cert 2'], success: true }];
                 } else {
@@ -180,7 +183,7 @@ describe('Luxembourg eID Container', () => {
 
     describe('signatureImage', function () {
         beforeEach(function () {
-            mock.onGet('plugins/luxeid/123/signature-image').reply((config) => {
+            mock.onGet('containers/luxeid/123/signature-image').reply((config) => {
                 if (config.params.pin && config.params.pin.length) {
                     return [ 200, { data: 'Signature Image Data', success: true }];
                 } else {
@@ -204,7 +207,7 @@ describe('Luxembourg eID Container', () => {
 
     describe('verifyPin', function () {
         beforeEach(function () {
-            mock.onPost('plugins/luxeid/123/verify-pin').reply((config) => {
+            mock.onPost('containers/luxeid/123/verify-pin').reply((config) => {
                 let data = JSON.parse(config.data);
                 if (config.params.pin && config.params.pin.length && data && data.pin && data.pin.length) {
                     return [ 200, { data: 'Verify Pin Data', success: true }];
@@ -230,8 +233,8 @@ describe('Luxembourg eID Container', () => {
 
     describe('authenticate', function () {
         beforeEach(function () {
-            mock.onPost('plugins/luxeid/123/authenticate').reply((config) => {
-                let data = JSON.parse(config.data)
+            mock.onPost('containers/luxeid/123/authenticate').reply((config) => {
+                let data = JSON.parse(config.data);
                 if (config.params.pin && config.params.pin.length && data && data.pin && data.pin.length) {
                     return [ 200, { data: 'Authenticate Data', success: true }];
                 } else {
@@ -255,7 +258,7 @@ describe('Luxembourg eID Container', () => {
 
     describe('signData', function () {
         beforeEach(function () {
-            mock.onPost('plugins/luxeid/123/sign').reply((config) => {
+            mock.onPost('containers/luxeid/123/sign').reply((config) => {
                 let data = JSON.parse(config.data);
                 if (config.params.pin && config.params.pin.length && data && data.pin && data.pin.length) {
                     return [ 200, { data: 'Sign Data', success: true }];

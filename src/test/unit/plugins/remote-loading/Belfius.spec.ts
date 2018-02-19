@@ -30,10 +30,10 @@ describe('Belfius Container', () => {
 
     describe('can open a session', function () {
         beforeEach(function () {
-            mock.onPost('plugins/readerapi/123/open-session', { timeout: 5 }).reply(() => {
+            mock.onPost('containers/readerapi/123/open-session', { timeout: 5 }).reply(() => {
                 return [ 200, { data: '87d2ee2d-6f2e-4de4-a077-a57e8b8d42c3', success: true }];
             });
-            mock.onPost('plugins/readerapi/123/open-session', { timeout: 22 }).reply(() => {
+            mock.onPost('containers/readerapi/123/open-session', { timeout: 22 }).reply(() => {
                 return [ 200, { data: '7f6f5de4-3bb1-4a77-9b30-274196bdf15e', success: true }];
             });
         });
@@ -71,7 +71,7 @@ describe('Belfius Container', () => {
             mock.onGet('card-readers/321').reply(() => {
                 return [ 200, { success: true, data: { name: 'Some Other Reader'} }];
             });
-            mock.onPost('plugins/readerapi/123/apdu', { cla: 'F1', ins: '95', p1: 'F7', p2: 'E4', data: 'FE0000040001300000' })
+            mock.onPost('containers/readerapi/123/apdu', { cla: 'F1', ins: '95', p1: 'F7', p2: 'E4', data: 'FE0000040001300000' })
                 .reply(config => {
                     if (config.params && config.params['session-id'] && config.params['session-id'] === '123') {
                         return [ 200, { success: true, data: {
@@ -81,7 +81,7 @@ describe('Belfius Container', () => {
                         }];
                     } else { return [ 200, { success: false, data: 'Incorrect session-id received' } ]; }
                 });
-            mock.onPost('plugins/readerapi/321/apdu', { cla: 'F1', ins: '95', p1: 'F7', p2: 'E4', data: 'FE0000040001300000' })
+            mock.onPost('containers/readerapi/321/apdu', { cla: 'F1', ins: '95', p1: 'F7', p2: 'E4', data: 'FE0000040001300000' })
                 .reply(config => {
                     if (config.params && config.params['session-id'] && config.params['session-id'] === '123') {
                         return [ 200, { success: true, data: {
@@ -158,7 +158,7 @@ describe('Belfius Container', () => {
             mock.onGet('card-readers/123').reply(() => {
                 return [ 200, { success: true, data: { name: 'VASCO DIGIPASS 870'} }];
             });
-            mock.onPost('plugins/readerapi/123/apdu', { cla: 'F1', ins: '95', p1: 'F7', p2: 'E4', data: 'FE0000040001300000' })
+            mock.onPost('containers/readerapi/123/apdu', { cla: 'F1', ins: '95', p1: 'F7', p2: 'E4', data: 'FE0000040001300000' })
                 .reply(config => {
                     if (config.params && config.params['session-id'] && config.params['session-id'] === '123') {
                         return [ 200, { success: true, data: {
@@ -218,7 +218,7 @@ describe('Belfius Container', () => {
             mock.onGet('card-readers/123').reply(() => {
                 return [ 200, { success: true, data: { name: 'VASCO DIGIPASS 870'} }];
             });
-            mock.onPost('plugins/readerapi/123/apdu', { cla: 'F1', ins: '95', p1: 'F7', p2: 'E4', data: 'FE0000040001300000' })
+            mock.onPost('containers/readerapi/123/apdu', { cla: 'F1', ins: '95', p1: 'F7', p2: 'E4', data: 'FE0000040001300000' })
                 .reply(config => {
                     if (config.params && config.params['session-id'] && config.params['session-id'] === '123') {
                         return [ 200, { success: true, data: {
@@ -228,7 +228,7 @@ describe('Belfius Container', () => {
                         }];
                     } else { return [ 200, { success: false, data: 'Incorrect session-id received' } ]; }
                 });
-            mock.onPost('plugins/readerapi/123/apdu')
+            mock.onPost('containers/readerapi/123/apdu')
                 .reply(config => {
                     if (config.params && config.params['session-id'] && config.params['session-id'] === '123') {
                         return [ 200, { success: true, data: {
@@ -238,7 +238,7 @@ describe('Belfius Container', () => {
                         }];
                     } else { return [ 200, { success: false, data: 'Incorrect session-id received' } ]; }
                 });
-            mock.onPost('plugins/readerapi/123/apdus')
+            mock.onPost('containers/readerapi/123/apdus')
                 .reply(config => {
                     if (config.params && config.params['session-id'] && config.params['session-id'] === '123') {
                         const data = JSON.parse(config.data);
@@ -414,7 +414,7 @@ describe('Belfius Container', () => {
 
     describe('can close a session', function () {
         beforeEach(function () {
-            mock.onGet('plugins/readerapi/123/close-session').reply(() => {
+            mock.onGet('containers/readerapi/123/close-session').reply(() => {
                 return [ 200, { success: true }];
             });
         });

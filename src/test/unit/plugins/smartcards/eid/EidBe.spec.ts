@@ -20,13 +20,10 @@ describe('Belgian eID Container', () => {
 
     beforeEach(() => {
         mock = new MockAdapter(axios);
-        PubKeyService.setPubKey('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6WcG5DySxt06ocIV/YXk\n' +
-                                'Zf7KJs46la2LGYDal+EcAY4LrgPYQH/i1rhahyHSuhIk02mnZbgD7JeCZkorhyBO\n' +
-                                '7O5gm99Zx3NFVOyEmRFUQ8sTtIp9VghgKnKRKygQf6bT0gEmAI6pfcNH8tAvXktn\n' +
-                                '2eBqk/X5UF2ORISPjc90YyWNWojAJC6KHpsDAws3EBOrp6y2nLEE8PVnAMtiT3Ht\n' +
-                                'AepPlVKufC666jHaIAzCdceDPgBkNgMyGEQXdoBtfQjkFIf+QsYOtzzQpD7sCkXL\n' +
-                                'eIlSd0+bLrbMumyJVcm3HqE1saoF5tSvJ7pDULRjgQk/oKMRYL9a9DnLvqMoZH0x\n' +
-                                'XQIDAQAB');
+        mock.onGet('https://localhost:10443/v1/card-readers/123').reply(() => {
+            return [ 200, { data: { pinpad: false }, success: true }];
+        });
+        PubKeyService.setPubKey('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvb2PY42OifgdjoWrIPYezOiN0p859PK+k4ts0JY9S1I0WqWJROsoaB4o9JjubZPlP7A6chp30g++XE1KjQOzSm6Epr+t6rdlPxD+MfpB1y+4ACfB0xmoh6SWAtiSUKK4N76mPOyeIGvQ4/zmqKL1JyVxEFKyvUOH1zVQT4YPbmyxLpanXI2coP8q00BKcravSTxgmdOMlaCiD+bINwiv1x3rHq+lGT8rc2jUbTAHsS61Nj6Kten2QCtCpKYipe5H0jDTAnOlfaJHnEQ3qg7ULUN+KiwElIyvr2lf3SR9tLhyV9x8ezO8IOQPLZSMXT1w4UdGwIblXKpVgA9w2fs+SwIDAQAB');
     });
 
     afterEach(() => {
@@ -35,7 +32,7 @@ describe('Belgian eID Container', () => {
 
     describe('rnData', function () {
         beforeEach(function () {
-            mock.onGet('plugins/beid/123/rn').reply(() => {
+            mock.onGet('containers/beid/123/rn').reply(() => {
                 return [ 200, { data: 'RN Data', success: true }];
             });
         });
@@ -55,7 +52,7 @@ describe('Belgian eID Container', () => {
 
     describe('address', function () {
         beforeEach(function () {
-            mock.onGet('plugins/beid/123/address').reply(() => {
+            mock.onGet('containers/beid/123/address').reply(() => {
                 return [ 200, { data: 'Address Data', success: true }];
             });
         });
@@ -75,7 +72,7 @@ describe('Belgian eID Container', () => {
 
     describe('picture', function () {
         beforeEach(function () {
-            mock.onGet('plugins/beid/123/picture').reply(() => {
+            mock.onGet('containers/beid/123/picture').reply(() => {
                 return [ 200, { data: 'Picture Data', success: true }];
             });
         });
@@ -95,7 +92,7 @@ describe('Belgian eID Container', () => {
 
     describe('verifyPin', function () {
         beforeEach(function () {
-            mock.onPost('plugins/beid/123/verify-pin').reply((config) => {
+            mock.onPost('containers/beid/123/verify-pin').reply((config) => {
                 let data = JSON.parse(config.data);
                 console.log('pin verify beid');
                 console.log(data);

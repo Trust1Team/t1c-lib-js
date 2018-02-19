@@ -36,15 +36,15 @@ describe('PKCS#11 Container', () => {
 
     describe('certificates', function () {
         beforeEach(function () {
-            mock.onPost('plugins/pkcs11/certificates',
+            mock.onPost('containers/pkcs11/certificates',
                 { module: 'mac', slot_id: 1 }).reply(() => {
                 return [ 200, { data: [{ base64: 'Cert 1', id: '1' }, { base64: 'Cert 2', id: '2' }], success: true }];
             });
-            mock.onPost('plugins/pkcs11/certificates',
+            mock.onPost('containers/pkcs11/certificates',
                 { module: 'linux', slot_id: 1 }).reply(() => {
                 return [ 200, { data: [{ base64: 'Cert 1', id: '1' }, { base64: 'Cert 2', id: '2' }], success: true }];
             });
-            mock.onPost('plugins/pkcs11/certificates',
+            mock.onPost('containers/pkcs11/certificates',
                 { module: 'win', slot_id: 1 }).reply(() => {
                 return [ 200, { data: [{ base64: 'Cert 1', id: '1' }, { base64: 'Cert 2', id: '2' }], success: true }];
             });
@@ -66,15 +66,15 @@ describe('PKCS#11 Container', () => {
 
     describe('info', function () {
         beforeEach(function () {
-            mock.onPost('plugins/pkcs11/info',
+            mock.onPost('containers/pkcs11/info',
                 { module: 'mac' }).reply(() => {
                 return [ 200, { data: 'Info Data', success: true }];
             });
-            mock.onPost('plugins/pkcs11/info',
+            mock.onPost('containers/pkcs11/info',
                 { module: 'linux' }).reply(() => {
                 return [ 200, { data: 'Info Data', success: true }];
             });
-            mock.onPost('plugins/pkcs11/info',
+            mock.onPost('containers/pkcs11/info',
                 { module: 'win' }).reply(() => {
                 return [ 200, { data: 'Info Data', success: true }];
             });
@@ -94,7 +94,7 @@ describe('PKCS#11 Container', () => {
 
     describe('signData', function () {
         beforeEach(function () {
-            mock.onPost('plugins/pkcs11/sign').reply((config) => {
+            mock.onPost('containers/pkcs11/sign').reply((config) => {
                 const data = JSON.parse(config.data);
                 if (data.module === 'mac' || data.module === 'linux' || data.module === 'win' ) {
                     return [ 200, { data, success: true }];
@@ -135,7 +135,7 @@ describe('PKCS#11 Container', () => {
 
     describe('slots', function () {
         beforeEach(function () {
-            mock.onPost('plugins/pkcs11/slots',
+            mock.onPost('containers/pkcs11/slots',
                 { module: 'mac' }).reply((config) => {
                 if (config.params && config.params['token-present'] === 'true') {
                     return [ 200, { data: 'Slot Data With Token Present', success: true }];
@@ -143,7 +143,7 @@ describe('PKCS#11 Container', () => {
                     return [ 200, { data: 'Slot Data', success: true }];
                 }
             });
-            mock.onPost('plugins/pkcs11/slots',
+            mock.onPost('containers/pkcs11/slots',
                 { module: 'linux' }).reply((config) => {
                 if (config.params && config.params['token-present'] === 'true') {
                     return [ 200, { data: 'Slot Data With Token Present', success: true }];
@@ -151,7 +151,7 @@ describe('PKCS#11 Container', () => {
                     return [ 200, { data: 'Slot Data', success: true }];
                 }
             });
-            mock.onPost('plugins/pkcs11/slots',
+            mock.onPost('containers/pkcs11/slots',
                 { module: 'win' }).reply((config) => {
                 if (config.params && config.params['token-present'] === 'true') {
                     return [ 200, { data: 'Slot Data With Token Present', success: true }];
@@ -161,7 +161,7 @@ describe('PKCS#11 Container', () => {
             });
 
             // defaults
-            mock.onPost('plugins/pkcs11/slots',
+            mock.onPost('containers/pkcs11/slots',
                 { module: '/usr/local/lib/libeTPkcs11.dylib' }).reply((config) => {
                 if (config.params && config.params['token-present'] === 'true') {
                     return [ 200, { data: 'Default Slot Data With Token Present', success: true }];
@@ -169,7 +169,7 @@ describe('PKCS#11 Container', () => {
                     return [ 200, { data: 'Default Slot Data', success: true }];
                 }
             });
-            mock.onPost('plugins/pkcs11/slots',
+            mock.onPost('containers/pkcs11/slots',
                 { module: '/usr/local/lib/libeTPkcs11.so' }).reply((config) => {
                 if (config.params && config.params['token-present'] === 'true') {
                     return [ 200, { data: 'Default Slot Data With Token Present', success: true }];
@@ -177,7 +177,7 @@ describe('PKCS#11 Container', () => {
                     return [ 200, { data: 'Default Slot Data', success: true }];
                 }
             });
-            mock.onPost('plugins/pkcs11/slots',
+            mock.onPost('containers/pkcs11/slots',
                 { module: 'C:\\Windows\\System32\\eTPKCS11.dll' }).reply((config) => {
                 if (config.params && config.params['token-present'] === 'true') {
                     return [ 200, { data: 'Default Slot Data With Token Present', success: true }];
@@ -212,13 +212,13 @@ describe('PKCS#11 Container', () => {
 
     describe('token', function () {
         beforeEach(function () {
-            mock.onPost('plugins/pkcs11/token', { slot_id: 1, module: 'mac' }).reply((config) => {
+            mock.onPost('containers/pkcs11/token', { slot_id: 1, module: 'mac' }).reply((config) => {
                 return [ 200, { data: 'Token Data', success: true }];
             });
-            mock.onPost('plugins/pkcs11/token', { slot_id: 1, module: 'linux' }).reply((config) => {
+            mock.onPost('containers/pkcs11/token', { slot_id: 1, module: 'linux' }).reply((config) => {
                 return [ 200, { data: 'Token Data', success: true }];
             });
-            mock.onPost('plugins/pkcs11/token', { slot_id: 1, module: 'win' }).reply((config) => {
+            mock.onPost('containers/pkcs11/token', { slot_id: 1, module: 'win' }).reply((config) => {
                 return [ 200, { data: 'Token Data', success: true }];
             });
         });

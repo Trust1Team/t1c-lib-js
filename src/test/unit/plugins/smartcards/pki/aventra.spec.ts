@@ -19,6 +19,9 @@ describe('Aventra Container', () => {
 
     beforeEach(() => {
         mock = new MockAdapter(axios);
+        mock.onGet('https://localhost:10443/v1/card-readers/123').reply(() => {
+            return [ 200, { data: { pinpad: false }, success: true }];
+        });
         PubKeyService.setPubKey('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlOJu6TyygqxfWT7eLtGDwajtN\n' +
                                 'FOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76\n' +
                                 'xFxdU6jE0NQ+Z+zEdhUTooNRaY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4\n' +
@@ -31,7 +34,7 @@ describe('Aventra Container', () => {
 
     describe('resetPin', function () {
         beforeEach(function () {
-            mock.onPost('plugins/aventra/123/reset-pin',
+            mock.onPost('containers/aventra/123/reset-pin',
                 { puk: '9999999', new_pin: '1234', private_key_reference: 'non-repudiation' }).reply(() => {
                 return [ 200, { data: 'Reset Pin Data', success: true }];
             });
@@ -51,7 +54,7 @@ describe('Aventra Container', () => {
 
     describe('verifyPin', function () {
         beforeEach(function () {
-            mock.onPost('plugins/aventra/123/verify-pin').reply((config) => {
+            mock.onPost('containers/aventra/123/verify-pin').reply((config) => {
                 let data = JSON.parse(config.data);
                 if (data && data.private_key_reference === 'private_key' && data.pin && data.pin.length) {
                     return [ 200, { data: 'Verify Pin Data', success: true }];
