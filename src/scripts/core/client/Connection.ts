@@ -16,30 +16,34 @@ import * as ls from 'local-storage';
 import { BrowserFingerprint } from '../../util/BrowserFingerprint';
 
 export { GenericConnection, LocalConnection, LocalAuthConnection,
-    RemoteConnection, Connection, LocalTestConnection, RequestBody, RequestCallback, QueryParams };
+    RemoteConnection, Connection, LocalTestConnection, RequestBody, RequestHeaders, RequestCallback, QueryParams };
 
 
 interface Connection {
     get(basePath: string,
         suffix: string,
-        queryParams: QueryParams,
+        queryParams?: QueryParams,
+        headers?: RequestHeaders,
         callback?: RequestCallback): Promise<any>;
 
     post(basePath: string,
          suffix: string,
          body: RequestBody,
          queryParams?: QueryParams,
+         headers?: RequestHeaders,
          callback?: RequestCallback): Promise<any>;
 
     put(basePath: string,
         suffix: string,
         body: RequestBody,
         queryParams?: QueryParams,
+        headers?: RequestHeaders,
         callback?: RequestCallback): Promise<any>;
 
     delete(basePath: string,
            suffix: string,
-           queryParams: QueryParams,
+           queryParams?: QueryParams,
+           headers?: RequestHeaders,
            callback?: RequestCallback): Promise<any>;
 }
 
@@ -49,6 +53,10 @@ interface RequestBody {
 
 interface QueryParams {
     [key: string]: any
+}
+
+interface RequestHeaders {
+    [key: string]: string
 }
 
 interface RequestCallback {
@@ -64,32 +72,105 @@ abstract class GenericConnection implements Connection {
 
     public get(basePath: string,
                suffix: string,
-               queryParams: QueryParams,
+               queryParams?: QueryParams,
+               headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
-        return handleRequest(basePath, suffix, 'GET', this.cfg, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
+        return this.handleRequest(basePath, suffix, 'GET', this.cfg, GenericConnection.SHOULD_SEND_TOKEN,
+            undefined, queryParams, headers, callback);
     }
 
     public post(basePath: string,
                 suffix: string,
                 body: RequestBody,
-                queryParams: QueryParams,
+                queryParams?: QueryParams,
+                headers?: RequestHeaders,
                 callback?: RequestCallback): Promise<any> {
-        return handleRequest(basePath, suffix, 'POST', this.cfg, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
+        return this.handleRequest(basePath, suffix, 'POST', this.cfg, GenericConnection.SHOULD_SEND_TOKEN,
+            body, queryParams, headers, callback);
     }
 
     public put(basePath: string,
                suffix: string,
                body: RequestBody,
-               queryParams: QueryParams,
+               queryParams?: QueryParams,
+               headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
-        return handleRequest(basePath, suffix, 'PUT', this.cfg, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
+        return this.handleRequest(basePath, suffix, 'PUT', this.cfg, GenericConnection.SHOULD_SEND_TOKEN,
+            body, queryParams, headers, callback);
     }
 
     public delete(basePath: string,
                   suffix: string,
-                  queryParams: QueryParams,
+                  queryParams?: QueryParams,
+                  headers?: RequestHeaders,
                   callback?: RequestCallback): Promise<any> {
-        return handleRequest(basePath, suffix, 'DELETE', this.cfg, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
+        return this.handleRequest(basePath, suffix, 'DELETE', this.cfg, GenericConnection.SHOULD_SEND_TOKEN,
+            undefined, queryParams, headers, callback);
+    }
+
+    getRequestHeaders(headers: RequestHeaders): RequestHeaders {
+        let reqHeaders = headers || {};
+        reqHeaders['Accept-Language'] = 'en-US';
+        return reqHeaders;
+    }
+
+    protected handleRequest(basePath: string,
+                            suffix: string,
+                            method: string,
+                            gclConfig: GCLConfig,
+                            sendToken: boolean,
+                            body?: RequestBody,
+                            params?: QueryParams,
+                            headers?: RequestHeaders,
+                            callback?: RequestCallback,
+                            skipCitrixCheck?: boolean): Promise<any> {
+        // init callback if necessary
+        if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
+
+        // if Citrix environment, check that agentPort was defined in config
+        if (skipCitrixCheck || !gclConfig.citrix || gclConfig.agentPort !== -1) {
+            let config: AxiosRequestConfig = {
+                url: UrlUtil.create(basePath, suffix, gclConfig, skipCitrixCheck),
+                method,
+                headers: this.getRequestHeaders(headers),
+                responseType:  'json'
+            };
+            if (body) { config.data = body; }
+            if (params) { config.params = params; }
+            if (gclConfig.apiKey) { config.headers.apikey = gclConfig.apiKey; }
+            if (gclConfig.jwt) { config.headers.Authorization = 'Bearer ' + gclConfig.jwt; }
+            if (gclConfig.tokenCompatible && sendToken) {
+                config.headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
+            }
+
+            return new Promise((resolve, reject) => {
+                axios.request(config).then((response: AxiosResponse) => {
+                    callback(null, response.data);
+                    return resolve(response.data);
+                }).catch(function (error: AxiosError) {
+                    if (error.response) {
+                        if (error.response.data) {
+                            callback(error.response.data, null);
+                            return reject(error.response.data);
+                        } else {
+                            callback(error.response, null);
+                            return reject(error.response);
+                        }
+                    } else {
+                        callback(error, null);
+                        return reject(error);
+                    }
+                });
+            });
+        } else {
+            let agentPortError: RestException = {
+                description: 'Running in Citrix environment but no Agent port was defined in config.',
+                status: 400,
+                code: '801'
+            };
+            callback(agentPortError, null);
+            return Promise.reject(agentPortError);
+        }
     }
 }
 
@@ -98,44 +179,54 @@ class LocalAuthConnection extends GenericConnection implements Connection {
 
     public get(basePath: string,
                suffix: string,
-               queryParams: QueryParams,
+               queryParams?: QueryParams,
+               headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'apiKey');
-        return handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
+        return this.handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN,
+            undefined, queryParams, headers, callback);
     }
 
     public getSkipCitrix(basePath: string,
                          suffix: string,
-                         queryParams: QueryParams,
+                         queryParams?: QueryParams,
+                         headers?: RequestHeaders,
                          callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'apiKey');
-        return handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
+        return this.handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN,
+            undefined, queryParams, headers, callback, true);
     }
 
     public post(basePath: string,
                 suffix: string,
                 body: RequestBody,
-                queryParams: QueryParams,
+                queryParams?: QueryParams,
+                headers?: RequestHeaders,
                 callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'apiKey');
-        return handleRequest(basePath, suffix, 'POST', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
+        return this.handleRequest(basePath, suffix, 'POST', config, GenericConnection.SHOULD_SEND_TOKEN,
+            body, queryParams, headers, callback);
     }
 
     public put(basePath: string,
                suffix: string,
                body: RequestBody,
-               queryParams: QueryParams,
+               queryParams?: QueryParams,
+               headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'apiKey');
-        return handleRequest(basePath, suffix, 'PUT', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
+        return this.handleRequest(basePath, suffix, 'PUT', config, GenericConnection.SHOULD_SEND_TOKEN,
+            body, queryParams, headers, callback);
     }
 
     public delete(basePath: string,
                   suffix: string,
-                  queryParams: QueryParams,
+                  queryParams?: QueryParams,
+                  headers?: RequestHeaders,
                   callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'apiKey');
-        return handleRequest(basePath, suffix, 'DELETE', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
+        return this.handleRequest(basePath, suffix, 'DELETE', config, GenericConnection.SHOULD_SEND_TOKEN,
+            undefined, queryParams, headers, callback);
     }
 }
 
@@ -144,36 +235,44 @@ class LocalConnection extends GenericConnection implements Connection {
 
     public get(basePath: string,
                suffix: string,
-               queryParams: QueryParams,
+               queryParams?: QueryParams,
+               headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
-        return handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
+        return this.handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN,
+            undefined, queryParams, headers, callback);
     }
 
     public getSkipCitrix(basePath: string,
                          suffix: string,
-                         queryParams: QueryParams,
+                         queryParams?: QueryParams,
+                         headers?: RequestHeaders,
                          callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
-        return handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
+        return this.handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN,
+            undefined, queryParams, headers, callback, true);
     }
 
     public post(basePath: string,
                 suffix: string,
                 body: RequestBody,
-                queryParams: QueryParams,
+                queryParams?: QueryParams,
+                headers?: RequestHeaders,
                 callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
-        return handleRequest(basePath, suffix, 'POST', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
+        return this.handleRequest(basePath, suffix, 'POST', config, GenericConnection.SHOULD_SEND_TOKEN,
+            body, queryParams, headers, callback);
     }
 
     public put(basePath: string,
                suffix: string,
                body: RequestBody,
-               queryParams: QueryParams,
+               queryParams?: QueryParams,
+               headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
-        return handleRequest(basePath, suffix, 'PUT', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
+        return this.handleRequest(basePath, suffix, 'PUT', config, GenericConnection.SHOULD_SEND_TOKEN,
+            body, queryParams, headers, callback);
     }
 
     public requestFile(basePath: string, suffix: string, body: { path: string }, callback?: RequestCallback): Promise<any> {
@@ -249,10 +348,12 @@ class LocalConnection extends GenericConnection implements Connection {
 
     public delete(basePath: string,
                   suffix: string,
-                  queryParams: QueryParams,
+                  queryParams?: QueryParams,
+                  headers?: RequestHeaders,
                   callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
-        return handleRequest(basePath, suffix, 'DELETE', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
+        return this.handleRequest(basePath, suffix, 'DELETE', config, GenericConnection.SHOULD_SEND_TOKEN,
+            undefined, queryParams, headers, callback);
     }
 }
 
@@ -262,36 +363,44 @@ class RemoteConnection extends GenericConnection implements Connection {
 
     public get(basePath: string,
                suffix: string,
-               queryParams: QueryParams,
+               queryParams?: QueryParams,
+               headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'jwt');
-        return handleRequest(basePath, suffix, 'GET', config, this.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
+        return this.handleRequest(basePath, suffix, 'GET', config, this.SHOULD_SEND_TOKEN,
+            undefined, queryParams, headers, callback, true);
     }
 
     public post(basePath: string,
                 suffix: string,
                 body: RequestBody,
-                queryParams: QueryParams,
+                queryParams?: QueryParams,
+                headers?: RequestHeaders,
                 callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'jwt');
-        return handleRequest(basePath, suffix, 'POST', config, this.SHOULD_SEND_TOKEN, body, queryParams, callback, true);
+        return this.handleRequest(basePath, suffix, 'POST', config, this.SHOULD_SEND_TOKEN,
+            body, queryParams, headers, callback, true);
     }
 
     public put(basePath: string,
                suffix: string,
                body: RequestBody,
-               queryParams: QueryParams,
+               queryParams?: QueryParams,
+               headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'jwt');
-        return handleRequest(basePath, suffix, 'PUT', config, this.SHOULD_SEND_TOKEN, body, queryParams, callback, true);
+        return this.handleRequest(basePath, suffix, 'PUT', config, this.SHOULD_SEND_TOKEN,
+            body, queryParams, headers, callback, true);
     }
 
     public delete(basePath: string,
                   suffix: string,
-                  queryParams: QueryParams,
+                  queryParams?: QueryParams,
+                  headers?: RequestHeaders,
                   callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, 'jwt');
-        return handleRequest(basePath, suffix, 'DELETE', config, this.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
+        return this.handleRequest(basePath, suffix, 'DELETE', config, this.SHOULD_SEND_TOKEN,
+            undefined, queryParams, headers, callback, true);
     }
 }
 
@@ -301,142 +410,97 @@ class LocalTestConnection extends GenericConnection implements Connection {
     public get(basePath: string,
                suffix: string,
                queryParams?: QueryParams,
+               headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
-        return handleTestRequest(basePath, suffix, 'GET', this.config, undefined, queryParams, callback);
+        return this.handleTestRequest(basePath, suffix, 'GET', this.config,
+            undefined, queryParams, headers, callback);
     }
 
     public post(basePath: string,
                 suffix: string,
                 body: RequestBody,
                 queryParams?: QueryParams,
+                headers?: RequestHeaders,
                 callback?: RequestCallback): Promise<any> {
-        return handleTestRequest(basePath, suffix, 'POST', this.config, body, queryParams, callback);
+        return this.handleTestRequest(basePath, suffix, 'POST', this.config,
+            body, queryParams, headers, callback);
     }
 
     public put(basePath: string,
                suffix: string,
                body: RequestBody,
                queryParams?: QueryParams,
+               headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
-        return handleTestRequest(basePath, suffix, 'PUT', this.config, body, queryParams, callback);
+        return this.handleTestRequest(basePath, suffix, 'PUT', this.config,
+            body, queryParams, headers, callback);
     }
 
     public delete(basePath: string,
                   suffix: string,
-                  queryParams: QueryParams,
+                  queryParams?: QueryParams,
+                  headers?: RequestHeaders,
                   callback?: RequestCallback): Promise<any> {
-        return handleTestRequest(basePath, suffix, 'DELETE', this.config, undefined, queryParams, callback);
+        return this.handleTestRequest(basePath, suffix, 'DELETE', this.config,
+            undefined, queryParams, headers, callback);
     }
-}
 
-function handleRequest(basePath: string,
-                       suffix: string,
-                       method: string,
-                       gclConfig: GCLConfig,
-                       sendToken: boolean,
-                       body?: RequestBody,
-                       params?: QueryParams,
-                       callback?: RequestCallback,
-                       skipCitrixCheck?: boolean): Promise<any> {
-    // init callback if necessary
-    if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
+    getRequestHeaders(headers: RequestHeaders) {
+        let reqHeaders = headers || {};
+        reqHeaders['Accept-Language'] = 'en-US';
+        reqHeaders['X-Consumer-Username'] = 'testorg.testapp.v1';
+        reqHeaders[GenericConnection.AUTH_TOKEN_HEADER] = ls.get(GenericConnection.BROWSER_AUTH_TOKEN);
+        return reqHeaders;
+    }
 
-    // if Citrix environment, check that agentPort was defined in config
-    if (skipCitrixCheck || !gclConfig.citrix || gclConfig.agentPort !== -1) {
-        let config: AxiosRequestConfig = {
-            url: UrlUtil.create(basePath, suffix, gclConfig, skipCitrixCheck),
-            method,
-            headers:  {
-                'Accept-Language':  'en-US'
-            },
-            responseType:  'json'
-        };
-        if (body) { config.data = body; }
-        if (params) { config.params = params; }
-        if (gclConfig.apiKey) { config.headers.apikey = gclConfig.apiKey; }
-        if (gclConfig.jwt) { config.headers.Authorization = 'Bearer ' + gclConfig.jwt; }
-        if (gclConfig.tokenCompatible && sendToken) {
-            config.headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
-        }
+    private handleTestRequest(basePath: string,
+                              suffix: string,
+                              method: string,
+                              gclConfig: GCLConfig,
+                              body?: any,
+                              params?: any,
+                              headers?: RequestHeaders,
+                              callback?: (error: any, data: any) => void): Promise<any> {
+        // init callback if necessary
+        if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
 
-        return new Promise((resolve, reject) => {
-            axios.request(config).then((response: AxiosResponse) => {
-                callback(null, response.data);
-                return resolve(response.data);
-            }).catch(function (error: AxiosError) {
-                if (error.response) {
-                    if (error.response.data) {
-                        callback(error.response.data, null);
-                        return reject(error.response.data);
-                    } else {
+        // if Citrix environment, check that agentPort was defined in config
+        if (gclConfig.citrix && gclConfig.agentPort === -1) {
+            let agentPortError: RestException = {
+                description: 'Running in Citrix environment but no Agent port was defined in config.',
+                status: 400,
+                code: '801'
+            };
+            callback(agentPortError, null);
+            return Promise.reject(agentPortError);
+        } else {
+            let config: AxiosRequestConfig = {
+                url: UrlUtil.create(basePath, suffix, gclConfig, true),
+                method,
+                headers: this.getRequestHeaders(headers),
+                responseType:  'json'
+            };
+            if (body) { config.data = body; }
+            if (params) { config.params = params; }
+            if (gclConfig.jwt) { config.headers.Authorization = 'Bearer ' + gclConfig.jwt; }
+
+            return new Promise((resolve, reject) => {
+                axios.request(config).then((response: AxiosResponse) => {
+                    callback(null, response.data);
+                    return resolve(response.data);
+                }).catch(function (error: AxiosError) {
+                    if (error.response) {
                         callback(error.response, null);
                         return reject(error.response);
+                    } else {
+                        callback(error, null);
+                        return reject(error);
                     }
-                } else {
-                    callback(error, null);
-                    return reject(error);
-                }
+                });
             });
-        });
-    } else {
-        let agentPortError: RestException = {
-            description: 'Running in Citrix environment but no Agent port was defined in config.',
-            status: 400,
-            code: '801'
-        };
-        callback(agentPortError, null);
-        return Promise.reject(agentPortError);
+        }
     }
-}
 
-function handleTestRequest(basePath: string,
-                           suffix: string,
-                           method: string,
-                           gclConfig: GCLConfig,
-                           body?: any,
-                           params?: any,
-                           callback?: (error: any, data: any) => void): Promise<any> {
-    // init callback if necessary
-    if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
 
-    // if Citrix environment, check that agentPort was defined in config
-    if (gclConfig.citrix && gclConfig.agentPort === -1) {
-        let agentPortError: RestException = {
-            description: 'Running in Citrix environment but no Agent port was defined in config.',
-            status: 400,
-            code: '801'
-        };
-        callback(agentPortError, null);
-        return Promise.reject(agentPortError);
-    } else {
-        let config: AxiosRequestConfig = {
-            url: UrlUtil.create(basePath, suffix, gclConfig, true),
-            method,
-            headers:  {
-                'Accept-Language':  'en-US',
-                'X-Consumer-Username': 'testorg.testapp.v1',
-                [GenericConnection.AUTH_TOKEN_HEADER]: ls.get(GenericConnection.BROWSER_AUTH_TOKEN)
-            },
-            responseType:  'json'
-        };
-        if (body) { config.data = body; }
-        if (params) { config.params = params; }
-        if (gclConfig.jwt) { config.headers.Authorization = 'Bearer ' + gclConfig.jwt; }
-
-        return new Promise((resolve, reject) => {
-            axios.request(config).then((response: AxiosResponse) => {
-                callback(null, response.data);
-                return resolve(response.data);
-            }).catch(function (error: AxiosError) {
-                if (error.response) {
-                    callback(error.response, null);
-                    return reject(error.response);
-                } else {
-                    callback(error, null);
-                    return reject(error);
-                }
-            });
-        });
-    }
 }
 

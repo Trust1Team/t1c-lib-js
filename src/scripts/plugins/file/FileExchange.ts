@@ -22,12 +22,12 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
 
 
     public listFiles(data: ListFilesRequest, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FOLDER), data, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FOLDER), data, undefined, undefined, callback);
     }
 
 
     public setFolder(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.get(this.baseUrl, this.containerSuffix(FileExchange.FOLDER), undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(FileExchange.FOLDER), undefined, undefined, callback);
     }
 
 

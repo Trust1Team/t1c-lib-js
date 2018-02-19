@@ -62,12 +62,13 @@ class CoreService implements CoreModel.AbstractCore {
         let timeout: number = this.connection.cfg.defaultConsentTimeout;
         if (timeoutInSeconds) { timeout = timeoutInSeconds; }
         return this.connection.post(this.url, CORE_CONSENT,
-            { title, text: codeWord, days, alert_level: alertLevel, alert_position: alertPosition, type, timeout }, undefined, callback);
+            { title, text: codeWord, days, alert_level: alertLevel, alert_position: alertPosition, type, timeout },
+            undefined, undefined, callback);
     }
 
     public info(callback?: (error: CoreExceptions.RestException, data: CoreModel.InfoResponse)
         => void): Promise<CoreModel.InfoResponse> {
-        return this.connection.getSkipCitrix(this.url, CORE_INFO, undefined, callback);
+        return this.connection.getSkipCitrix(this.url, CORE_INFO, undefined, undefined, callback);
     }
 
     public infoBrowser(callback?: (error: CoreExceptions.RestException, data: CoreModel.BrowserInfoResponse)
@@ -78,7 +79,7 @@ class CoreService implements CoreModel.AbstractCore {
 
     public plugins(callback?: (error: CoreExceptions.RestException, data: CoreModel.PluginsResponse)
         => void): Promise<CoreModel.PluginsResponse> {
-        return this.connection.getSkipCitrix(this.url, CORE_PLUGINS, undefined, callback);
+        return this.connection.getSkipCitrix(this.url, CORE_PLUGINS, undefined, undefined, callback);
     }
 
     public pollCardInserted(secondsToPollCard?: number,
@@ -237,22 +238,22 @@ class CoreService implements CoreModel.AbstractCore {
     public reader(reader_id: string,
                   callback?: (error: CoreExceptions.RestException, data: CoreModel.SingleReaderResponse)
                       => void): Promise<CoreModel.SingleReaderResponse> {
-        return this.connection.get(this.url, CORE_READERS + '/' + reader_id, undefined, callback);
+        return this.connection.get(this.url, CORE_READERS + '/' + reader_id, undefined, undefined, callback);
     }
 
     public readers(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
         => void): Promise<CoreModel.CardReadersResponse> {
-        return this.connection.get(this.url, CORE_READERS, undefined, callback);
+        return this.connection.get(this.url, CORE_READERS, undefined, undefined, callback);
     }
 
     public readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
         => void): Promise<CoreModel.CardReadersResponse> {
-        return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(true), callback);
+        return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(true), undefined, callback);
     }
 
     public readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
         => void): Promise<CoreModel.CardReadersResponse> {
-        return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), callback);
+        return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), undefined, callback);
     }
 
     // sync

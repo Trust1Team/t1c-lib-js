@@ -19,7 +19,7 @@ class DNIe extends GenericCertCard implements AbstractDNIe {
     static CERT_INTERMEDIATE = '/intermediate';
 
     public info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse> {
-        return this.connection.get(this.baseUrl, this.containerSuffix(DNIe.INFO), undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(DNIe.INFO), undefined, undefined, callback);
     }
 
     public intermediateCertificate(options?: Options,
