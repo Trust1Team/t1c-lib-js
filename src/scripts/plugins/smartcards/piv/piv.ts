@@ -36,7 +36,8 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
                                           data: PrintedInformationResponse) => void): Promise<PrintedInformationResponse> {
         if (callback && typeof callback === 'function') {
             PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
-                return this.connection.post(this.baseUrl, this.containerSuffix(PIV.PRINTED_INFORMATION), body, undefined, callback);
+                return this.connection.post(this.baseUrl, this.containerSuffix(PIV.PRINTED_INFORMATION),
+                    body, undefined, undefined, callback);
             }, error => {
                 return callback(error, null);
             });
@@ -53,7 +54,7 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
                        callback?: (error: RestException, data: FacialImageResponse) => void): Promise<FacialImageResponse> {
         if (callback && typeof callback === 'function') {
             PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
-                return this.connection.post(this.baseUrl, this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined, callback);
+                return this.connection.post(this.baseUrl, this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined, undefined, callback);
             }, error => {
                 return callback(error, null);
             });
