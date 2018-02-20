@@ -23,7 +23,6 @@ class InitUtil {
                 let cfg = client.config();
                 client.core().info().then(infoResponse => {
                     // update config values
-                    // TODO check if this updates the cfg in GCLClient!
                     cfg.citrix = infoResponse.data.citrix;
                     cfg.tokenCompatible = InitUtil.checkTokenCompatible(infoResponse.data.version);
                     cfg.v2Compatible = InitUtil.coreV2Compatible(infoResponse.data.version);

@@ -1,4 +1,3 @@
-///<reference path="../../../../typings/index.d.ts"/>
 
 import { expect } from "chai";
 import { LocalConnection, LocalAuthConnection } from "../../../scripts/core/client/Connection";

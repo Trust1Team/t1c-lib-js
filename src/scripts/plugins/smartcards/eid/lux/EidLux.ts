@@ -12,7 +12,6 @@ import {
     BiometricResponse, PictureResponse, SignatureImageResponse
 } from './EidLuxModel';
 import { Promise } from 'es6-promise';
-import { Certificate } from 'pkijs';
 import { PinEnforcer } from '../../../../util/PinEnforcer';
 import { CertParser } from '../../../../util/CertParser';
 import { ResponseHandler } from '../../../../util/ResponseHandler';

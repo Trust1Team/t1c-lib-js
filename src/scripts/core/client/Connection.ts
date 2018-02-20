@@ -4,7 +4,6 @@
  * @author Maarten Somers
  * @since 2016
  */
-///<reference path='../../../../typings/index.d.ts'/>
 
 import {GCLConfig} from '../GCLConfig';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
