@@ -10,6 +10,7 @@ import { SyncUtil } from './SyncUtil';
 import { ActivationUtil } from './ActivationUtil';
 import { DSPlatformInfo } from '../core/ds/DSClientModel';
 import { PubKeyService } from './PubKeyService';
+import { RestException } from '../core/exceptions/CoreExceptions';
 
 export { InitUtil };
 
@@ -27,45 +28,52 @@ class InitUtil {
                     cfg.tokenCompatible = InitUtil.checkTokenCompatible(infoResponse.data.version);
                     cfg.v2Compatible = InitUtil.coreV2Compatible(infoResponse.data.version);
 
-                    let activated = infoResponse.data.activated;
-                    let managed = infoResponse.data.managed;
-                    let core_version = infoResponse.data.version;
-                    let uuid = infoResponse.data.uid;
-                    // compose info
-                    let info = client.core().infoBrowserSync();
-                    let mergedInfo = new DSPlatformInfo(activated, info.data, core_version);
+                    if (cfg.v2Compatible) {
+                        let activated = infoResponse.data.activated;
+                        let managed = infoResponse.data.managed;
+                        let core_version = infoResponse.data.version;
+                        let uuid = infoResponse.data.uid;
+                        // compose info
+                        let info = client.core().infoBrowserSync();
+                        let mergedInfo = new DSPlatformInfo(activated, info.data, core_version);
 
 
-                    if (managed) {
-                        // only attempt to sync if API key and DS URL are available,
-                        // and if syncing for managed devices is turned on
-                        if (cfg.apiKey && cfg.dsUrlBase && cfg.syncManaged) {
-                            // attempt to sync
-                            SyncUtil.syncDevice(client.ds(), cfg, mergedInfo, uuid).then(() => { resolve(); },
-                                () => { resolve(); });
+                        if (managed) {
+                            // only attempt to sync if API key and DS URL are available,
+                            // and if syncing for managed devices is turned on
+                            if (cfg.apiKey && cfg.dsUrlBase && cfg.syncManaged) {
+                                // attempt to sync
+                                SyncUtil.syncDevice(client.ds(), cfg, mergedInfo, uuid).then(() => { resolve(); },
+                                    () => { resolve(); });
+                            } else {
+                                // nothing to do here *jetpack*
+                                resolve();
+                            }
                         } else {
-                            // nothing to do here *jetpack*
-                            resolve();
+                            let activationPromise;
+                            if (activated) {
+                                // already activated, only need to sync device
+                                activationPromise = Promise.resolve();
+                            } else {
+                                // not yet activated, do this now
+                                activationPromise = ActivationUtil.unManagedInitialization(client.admin(),
+                                    client.ds(), cfg, mergedInfo, uuid);
+                            }
+                            activationPromise.then(() => {
+                                // update core service
+                                client.updateAuthConnection(cfg);
+                                // device is activated, sync it
+                                resolve(SyncUtil.unManagedSynchronization(client, cfg, mergedInfo, uuid));
+                            }, err => {
+                                reject(err);
+                                // resolve(SyncUtil.unManagedSynchronization(client.admin(), client.ds(), cfg, mergedInfo, uuid));
+                            });
                         }
                     } else {
-                        let activationPromise;
-                        if (activated) {
-                            // already activated, only need to sync device
-                            activationPromise = Promise.resolve();
-                        } else {
-                            // not yet activated, do this now
-                            activationPromise = ActivationUtil.unManagedInitialization(client.admin(),
-                                client.ds(), cfg, mergedInfo, uuid);
-                        }
-                        activationPromise.then(() => {
-                            // update core service
-                            client.updateAuthConnection(cfg);
-                            // device is activated, sync it
-                            resolve(SyncUtil.unManagedSynchronization(client, cfg, mergedInfo, uuid));
-                        }, err => {
-                            reject(err);
-                            // resolve(SyncUtil.unManagedSynchronization(client.admin(), client.ds(), cfg, mergedInfo, uuid));
-                        });
+                        // installed version is not compatible, reject initialization
+                        // TODO check if this works
+                        reject(new RestException(400, '301',
+                            'Installed GCL version is not v2 compatible. Please update to a compatible version.'));
                     }
                 }, () => {
                     // failure probably because GCL is not installed
