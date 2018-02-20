@@ -7,6 +7,7 @@
     gclConfig.localTestMode=false;
     gclConfig.allowAutoUpdate = true;
     gclConfig.implicitDownload = false;
+    gclConfig.osPinDialog = true;
 
     if (gclConfig.localTestMode) {
         gclConfig.dsUrl = "http://localhost:8080";
@@ -18,34 +19,39 @@
 
     }
 
-    var connector = new GCLLib.GCLClient(gclConfig);
+    var connector;
 
-    connector.core().info().then(function(data) {
-        $("#error").empty();
-        $("#error").append(data.data.version);
+    GCLLib.GCLClient.initialize(gclConfig).then(function(client) {
+        connector = client;
+        console.log(client.config());
+        connector.core().info().then(function(data) {
+            $("#error").empty();
+            $("#error").append(data.data.version);
 
-        if (data && data.data.activated === true) {
-            //check card readers upon refresh and provide the info
-            var core = connector.core();
-            core.readers().then(function(data) {
-                if (data && data.data) {
-                    data.data.forEach(function(reader) {
-                        if (reader.card) {
-                            $("#readerlist").append( '<li id="liid"><a href="#" ><h5><span' +
-                                                     ' class="label label-success" >' + reader.id + '</span></h5></a></li>' );
-                        } else {
-                            $("#readerlist").append( '<li><a href="#"><h5><span class="label' +
-                                                     ' label-warning">' + reader.id + '</span></h5></a></li>' );
-                        }
-                    })
-                } else {
-                    $("#readerlist").append( '<li> No readers connected </li>' );
-                }
-            }, function(err) {
-                console.log(JSON.stringify(err));
-            });
-        }
+            if (data && data.data.activated === true) {
+                //check card readers upon refresh and provide the info
+                var core = connector.core();
+                core.readers().then(function(data) {
+                    if (data && data.data) {
+                        data.data.forEach(function(reader) {
+                            if (reader.card) {
+                                $("#readerlist").append( '<li id="liid"><a href="#" ><h5><span' +
+                                                         ' class="label label-success" >' + reader.id + '</span></h5></a></li>' );
+                            } else {
+                                $("#readerlist").append( '<li><a href="#"><h5><span class="label' +
+                                                         ' label-warning">' + reader.id + '</span></h5></a></li>' );
+                            }
+                        })
+                    } else {
+                        $("#readerlist").append( '<li> No readers connected </li>' );
+                    }
+                }, function(err) {
+                    console.log(JSON.stringify(err));
+                });
+            }
+        });
     });
+
 
     function handleSuccess(data) {
         $("#information").append(JSON.stringify(data, null, '  '));
