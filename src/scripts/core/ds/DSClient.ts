@@ -32,8 +32,8 @@ const DEVICE = '/devices';
 class DSClient implements AbstractDSClient {
     constructor(private url: string, private connection: Connection, private cfg: GCLConfig) {}
 
-    public activationRequest(pubKey: string, info: any,
-                             callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse> {
+    public registerDevice(pubKey: string, info: any,
+                          callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse> {
         return this.connection.post(this.url, ACTIVATION, { pubKey, info }, undefined, undefined, callback);
     }
 

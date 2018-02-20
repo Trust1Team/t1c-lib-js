@@ -22,51 +22,39 @@ class ActivationUtil {
                                           mergedInfo: DSPlatformInfo,
                                           uuid: string): Promise<{}> {
         // do core v2 initialization flow
+        // 1. register device pub key
+        // 2. retrieve encrypted DS key and activate
         return new Promise((resolve, reject) => {
-            ActivationUtil.preRegister(admin)
-                          .then(pubKey => {
-                              return Promise.resolve({ ds, uuid, pubKey: pubKey.data.device, mergedInfo});
-                          })
-                          .then(ActivationUtil.register)
-                          .then(activationResponse => {
-                              return Promise.resolve({ admin, activationResponse });
-                          })
-                          .then(ActivationUtil.postRegister)
+            ActivationUtil.registerDevicePubKey(admin, ds, mergedInfo)
+                          .then(ActivationUtil.activateWithDsPubKey(admin, ds))
                           .then(() => {
                               // activation sequence complete, resolve promise
                               resolve();
-                          }).catch(err => {
-                reject(err);
-            });
+                          })
+                          .catch(err => {
+                              reject(err);
+                          });
         });
     }
 
-    private static preRegister(admin: AdminService): Promise<PubKeyResponse> {
-        // get GCL pubkey and registration info
-        return new Promise((resolve, reject) => {
-            admin.getPubKey().then(pubKey => {
-                resolve(pubKey);
-            }).catch(err => {
-                reject(err);
-            });
-        });
-
-    }
-
-    private static register(args: { ds: DSClient, uuid: string, pubKey: string,
-        mergedInfo: DSPlatformInfo }) {
-        // register with DS
-        return new Promise((resolve, reject) => {
-            args.ds.activationRequest(args.pubKey, args.mergedInfo).then(res => {
-                resolve(res.data);
-            }, err => {
-                reject(err);
-            });
+    private static registerDevicePubKey(admin: AdminService, ds: DSClient, mergedInfo: DSPlatformInfo): Promise<any> {
+        // get pub key
+        // register with ds
+        return admin.getPubKey().then(pubKey => {
+            // TODO check DS registration call
+            return ds.registerDevice(pubKey, mergedInfo);
         });
     }
 
-    private static postRegister(args: { admin: AdminService, activationResponse: any }) {
-        // activate GCL
-        return args.admin.activate(args.activationResponse);
+    private static activateWithDsPubKey(admin: AdminService, ds: DSClient): Promise<any> {
+        // retrieve encrypted pub key
+        // set certificate
+        // activate
+        return ds.getPubKey().then(pubKeyResponse => {
+            return admin.setPubKey(pubKeyResponse.pubKey).then(() => {
+                // TODO add data to activate
+                return admin.activate({});
+            });
+        });
     }
 }

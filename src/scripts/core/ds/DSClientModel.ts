@@ -14,8 +14,8 @@ export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DS
 
 
 interface AbstractDSClient {
-    activationRequest(pubKey: string, info: any,
-                      callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
+    registerDevice(pubKey: string, info: any,
+                   callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
     synchronizationRequest(pubKey: string, info: any, proxy: string,
                            callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
     getUrl(): string;
