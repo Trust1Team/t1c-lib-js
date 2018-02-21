@@ -7,6 +7,9 @@
 
 import * as _ from 'lodash';
 import { ModuleConfig } from '../plugins/smartcards/pkcs11/pkcs11Model';
+import { Promise } from 'es6-promise';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import * as jwtDecode from 'jwt-decode';
 
 const defaultGclUrl = 'https://localhost:10443/v1';
 const defaultDSUrl = 'https://accapim.t1t.be:443';
@@ -29,7 +32,8 @@ class GCLConfig  implements GCLConfig {
     private _apiKey: string;
     private _client_id: string;
     private _client_secret: string;
-    private _jwt: string;
+    private _gwJwt: string;
+    private _gclJwt: string;
     private _citrix: boolean;
     private _agentPort: number;
     private _allowAutoUpdate: boolean;
@@ -54,7 +58,6 @@ class GCLConfig  implements GCLConfig {
         this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
         this._dsUrlBase = dsUriValue;
         this._apiKey = apiKey;
-        this._jwt = 'none';
         this._citrix = false;
         this._agentPort = -1;
         this._allowAutoUpdate = defaultAllowAutoUpdate;
@@ -134,14 +137,6 @@ class GCLConfig  implements GCLConfig {
 
     set client_secret(value: string) {
         this._client_secret = value;
-    }
-
-    get jwt(): string {
-        return this._jwt;
-    }
-
-    set jwt(value: string) {
-        this._jwt = value;
     }
 
     get citrix(): boolean {
@@ -263,6 +258,54 @@ class GCLConfig  implements GCLConfig {
 
     set containerDownloadTimeout(value: number) {
         this._containerDownloadTimeout = value;
+    }
+
+    get gwJwt(): Promise<string> {
+        let self = this;
+        return new Promise((resolve, reject) => {
+            console.log('promise');
+            console.log(self);
+            if (!self._gwJwt || !self._gwJwt.length) {
+                console.log('no jwt');
+                // no jwt available, get one from the GW
+                resolve(self.getGwJwt());
+            } else {
+                console.log('jwt present');
+                let decoded = jwtDecode(self._gwJwt);
+                // check JWT expired
+                if (decoded.exp < new Date()) {
+                    // refresh
+                    console.log('refreshing');
+                    resolve(self.getGwJwt());
+                } else {
+                    // jwt ok to use
+                    console.log('jwt ok');
+                    resolve(self._gwJwt);
+                }
+            }
+        });
+    }
+
+    get gclJwt(): string {
+        return this._gclJwt;
+    }
+
+    set gclJwt(value: string) {
+        this._gclJwt = value;
+    }
+
+    getGwJwt(): Promise<string> {
+        console.log('get gw jwt');
+        let config: AxiosRequestConfig = {
+            url: this.dsUrlBase + '/apiengineauth/v1/login/application/token',
+            method: 'GET',
+            headers: { apikey: this.apiKey },
+            responseType:  'json'
+        };
+        return axios.request(config).then((response: AxiosResponse) => {
+            this._gwJwt = response.data.token;
+            return response.data.token;
+        });
     }
 }
 

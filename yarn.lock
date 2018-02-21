@@ -2944,9 +2944,9 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
-jwt-decode@2.1.0:
-  version "2.1.0"
-  resolved "https://repo.t1t.be/repository/npm-group/jwt-decode/-/jwt-decode-2.1.0.tgz#d3079cef1689d82d56bbb7aedcfea28b12f0e36a"
+jwt-decode@^2.2.0:
+  version "2.2.0"
+  resolved "https://repo.t1t.be/repository/npm-group/jwt-decode/-/jwt-decode-2.2.0.tgz#7d86bd56679f58ce6a84704a657dd392bba81a79"
 
 karma-chai@^0.1.0:
   version "0.1.0"

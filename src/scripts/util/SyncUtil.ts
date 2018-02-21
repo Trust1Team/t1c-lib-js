@@ -26,13 +26,6 @@ class SyncUtil {
                                            config: GCLConfig,
                                            mergedInfo: DSPlatformInfo,
                                            uuid: string) {
-        // TODO remove
-        // DataContainerUtil.setupDataContainers([ { id: 'atr', name: 'ATR', version: '0.0.0.1', type: 'data' },
-        //     { id: 'btr', name: 'BTR', version: '0.0.0.1', type: 'data' } ]);
-        // let client = ClientService.getClient() as any;
-        // client.dataAtr('1234').read('6789');
-        // client.dataBtr('1234').delete('6789');
-
         // do core v2 sync flow
         return new Promise((resolve, reject) => {
             // get GCL Pubkey
@@ -41,9 +34,9 @@ class SyncUtil {
                     // forward container config to GCL
                     return client.admin().updateContainerConfig(containerConfig.data).then(containerState => {
                         // TODO setup data container paths
-                        // DataContainerUtil.setupDataContainers(containerState);
-                        DataContainerUtil.setupDataContainers([ { id: 'atr', name: 'ATR', version: '0.0.0.1', type: 'data' },
-                            { id: 'btr', name: 'BTR', version: '0.0.0.1', type: 'data' } ]);
+                        DataContainerUtil.setupDataContainers(containerState);
+                        // DataContainerUtil.setupDataContainers([ { id: 'atr', name: 'ATR', version: '0.0.0.1', type: 'data' },
+                        //     { id: 'btr', name: 'BTR', version: '0.0.0.1', type: 'data' } ]);
                         // sync device
                         return SyncUtil.syncDevice(client.ds(), config, mergedInfo, uuid).then(() => {
                             mergedInfo.activated = true;
@@ -88,13 +81,21 @@ class SyncUtil {
         }
 
         function checkDownloadsComplete(cfg: any, containerStatus: any): Promise<boolean> {
+            // check all containers in list
             // if >= 1 error, reject
             // if >= 1 in progress, poll again
             // if all done, resolve
             return new Promise<boolean>((resolve, reject) => {
-                if (downloadErrored(cfg, containerStatus)) { reject(new RestException(500, '903', 'Container download failed')); }
+                if (containerMissing(cfg, containerStatus)) { reject(new RestException(500, '903', 'Container download failed')); }
+                else if (downloadErrored(cfg, containerStatus)) { reject(new RestException(500, '903', 'Container download failed')); }
                 else if (downloadOngoing(cfg, containerStatus)) { resolve(false); }
                 else { resolve(true); }
+            });
+        }
+
+        function containerMissing(config: { name: string, version: string}[], status: { name: string, version: string, status: string }[]) {
+            return _.find(config, cfgCt => {
+                return !_.find(status, statusCt => { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
             });
         }
 
@@ -119,7 +120,6 @@ class SyncUtil {
 
     public static syncDevice(client: DSClient, config: GCLConfig, info: DSPlatformInfo, deviceId: string): Promise<JWTResponse> {
         return client.sync(info, deviceId).then(activationResponse => {
-            config.jwt = activationResponse.token;
             return activationResponse;
         });
     }

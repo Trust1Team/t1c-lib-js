@@ -59,7 +59,6 @@ class GCLConfig implements GCLConfig {
     allowAutoUpdate: boolean;
     client_id: string;
     client_secret: string;
-    jwt: string;
     citrix: boolean;
     agentPort: number;
     implicitDownload: boolean;
@@ -76,6 +75,9 @@ class GCLConfig implements GCLConfig {
     pkcs11Config: ModuleConfig;
     osPinDialog: boolean;
     containerDownloadTimeout: number;
+    readonly gwJwt: Promise<string>;
+    gclJwt: string;
+    getGwJwt(): Promise<string>;
 }
 export { GCLConfig };
 
@@ -100,7 +102,7 @@ class CoreService implements CoreModel.AbstractCore {
 
 export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse, DeviceResponse, DSPlatformInfo };
 interface AbstractDSClient {
-    activationRequest(pubKey: string, info: any, callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
+    registerDevice(pubKey: string, info: any, callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
     synchronizationRequest(pubKey: string, info: any, proxy: string, callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
     getUrl(): string;
     getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
@@ -161,7 +163,7 @@ class DSPlatformInfo extends BrowserInfo {
 export { DSClient };
 class DSClient implements AbstractDSClient {
     constructor(url: string, connection: Connection, cfg: GCLConfig);
-    activationRequest(pubKey: string, info: any, callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
+    registerDevice(pubKey: string, info: any, callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
     synchronizationRequest(pubKey: string, info: any, proxy: string, callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
     getUrl(): string;
     getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
@@ -1353,18 +1355,34 @@ abstract class GenericConnection implements Connection {
     cfg: GCLConfig;
     static readonly AUTH_TOKEN_HEADER: string;
     static readonly BROWSER_AUTH_TOKEN: string;
-    static readonly SHOULD_SEND_TOKEN: boolean;
     constructor(cfg: GCLConfig);
+    static getSecurityConfig(): {
+        sendGwJwt: boolean;
+        sendGclJwt: boolean;
+        sendApiKey: boolean;
+        sendToken: boolean;
+    };
     get(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     post(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     put(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     delete(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     getRequestHeaders(headers: RequestHeaders): RequestHeaders;
-    protected handleRequest(basePath: string, suffix: string, method: string, gclConfig: GCLConfig, sendToken: boolean, body?: RequestBody, params?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback, skipCitrixCheck?: boolean): Promise<any>;
+    protected handleRequest(basePath: string, suffix: string, method: string, gclConfig: GCLConfig, securityConfig: {
+        sendGwJwt: boolean;
+        sendGclJwt: boolean;
+        sendApiKey: boolean;
+        sendToken: boolean;
+    }, body?: RequestBody, params?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback, skipCitrixCheck?: boolean): Promise<any>;
 }
 class LocalAuthConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;
     constructor(cfg: GCLConfig);
+    static getSecurityConfig(): {
+        sendGwJwt: boolean;
+        sendGclJwt: boolean;
+        sendApiKey: boolean;
+        sendToken: boolean;
+    };
     get(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     getSkipCitrix(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     post(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
@@ -1374,6 +1392,12 @@ class LocalAuthConnection extends GenericConnection implements Connection {
 class LocalConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;
     constructor(cfg: GCLConfig);
+    static getSecurityConfig(): {
+        sendGwJwt: boolean;
+        sendGclJwt: boolean;
+        sendApiKey: boolean;
+        sendToken: boolean;
+    };
     get(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     getSkipCitrix(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     post(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
@@ -1387,6 +1411,12 @@ class LocalConnection extends GenericConnection implements Connection {
 class RemoteConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;
     constructor(cfg: GCLConfig);
+    static getSecurityConfig(): {
+        sendGwJwt: boolean;
+        sendGclJwt: boolean;
+        sendApiKey: boolean;
+        sendToken: boolean;
+    };
     get(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     post(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     put(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;

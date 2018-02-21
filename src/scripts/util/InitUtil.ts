@@ -29,6 +29,7 @@ class InitUtil {
                     cfg.v2Compatible = InitUtil.coreV2Compatible(infoResponse.data.version);
 
                     if (cfg.v2Compatible) {
+                        // console.log('v2 compatible');
                         let activated = infoResponse.data.activated;
                         let managed = infoResponse.data.managed;
                         let core_version = infoResponse.data.version;
@@ -39,9 +40,11 @@ class InitUtil {
 
 
                         if (managed) {
+                            // console.log('managed');
                             // only attempt to sync if API key and DS URL are available,
                             // and if syncing for managed devices is turned on
                             if (cfg.apiKey && cfg.dsUrlBase && cfg.syncManaged) {
+                                // console.log('syncing');
                                 // attempt to sync
                                 SyncUtil.syncDevice(client.ds(), cfg, mergedInfo, uuid).then(() => { resolve(); },
                                     () => { resolve(); });
@@ -50,12 +53,15 @@ class InitUtil {
                                 resolve();
                             }
                         } else {
+                            // console.log('unmanaged');
                             let activationPromise;
                             if (activated) {
+                                // console.log('already activated');
                                 // already activated, only need to sync device
                                 activationPromise = Promise.resolve();
                             } else {
                                 // not yet activated, do this now
+                                // console.log('need to activate');
                                 activationPromise = ActivationUtil.unManagedInitialization(client.admin(),
                                     client.ds(), cfg, mergedInfo, uuid);
                             }
@@ -85,7 +91,7 @@ class InitUtil {
             initPromise.then(() => {
                 // store device PubKey
                 client.admin().getPubKey().then(pubKey => {
-                    console.log(pubKey);
+                    // console.log(pubKey);
                     PubKeyService.setPubKey(pubKey.data.device);
                     finalResolve();
                 });
