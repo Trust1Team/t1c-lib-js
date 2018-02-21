@@ -26,14 +26,13 @@ class ActivationUtil {
         // 2. retrieve encrypted DS key and activate
         return new Promise((resolve, reject) => {
             ActivationUtil.registerDevicePubKey(admin, ds, mergedInfo)
-                          .then(ActivationUtil.activateWithDsPubKey(admin, ds))
+                          .then(() => { return { admin, ds }; })
+                          .then(ActivationUtil.activateWithDsPubKey)
                           .then(() => {
                               // activation sequence complete, resolve promise
                               resolve();
                           })
-                          .catch(err => {
-                              reject(err);
-                          });
+                          .catch(err => { reject(err); });
         });
     }
 
@@ -46,14 +45,14 @@ class ActivationUtil {
         });
     }
 
-    private static activateWithDsPubKey(admin: AdminService, ds: DSClient): Promise<any> {
+    private static activateWithDsPubKey(args: { admin: AdminService, ds: DSClient }): Promise<any> {
         // retrieve encrypted pub key
         // set certificate
         // activate
-        return ds.getPubKey().then(pubKeyResponse => {
-            return admin.setPubKey(pubKeyResponse.pubKey).then(() => {
+        return args.ds.getPubKey().then(pubKeyResponse => {
+            return args.admin.setPubKey(pubKeyResponse.pubKey).then(() => {
                 // TODO add data to activate
-                return admin.activate({});
+                return args.admin.activate({});
             });
         });
     }

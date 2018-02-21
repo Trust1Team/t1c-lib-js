@@ -71,7 +71,7 @@ class DSClient implements AbstractDSClient {
                     if (callback) { return callback(error, null); }
                     else { reject(error); }
                 } else {
-                    if (data && data.token) { self.cfg.jwt = data.token; }
+                    if (data && data.token) { self.cfg.gclJwt = data.token; }
                     if (callback) { return callback(null, data); }
                     else { resolve(data); }
                 }
@@ -80,7 +80,7 @@ class DSClient implements AbstractDSClient {
     }
 
     public refreshJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse> {
-        let actualJWT = this.cfg.jwt;
+        let actualJWT = this.cfg.gclJwt;
         if (actualJWT) {
             return this.connection.post(this.url, SECURITY_JWT_REFRESH, { originalJWT: actualJWT }, undefined, undefined, callback);
         } else {

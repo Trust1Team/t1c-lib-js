@@ -21,9 +21,12 @@
 
     var connector;
 
+    console.log("init client");
+
     GCLLib.GCLClient.initialize(gclConfig).then(function(client) {
+        // console.log(client);
         connector = client;
-        console.log(client.config());
+        // console.log(client.config());
         connector.core().info().then(function(data) {
             $("#error").empty();
             $("#error").append(data.data.version);
@@ -50,6 +53,8 @@
                 });
             }
         });
+    }, function(error) {
+        console.log(error);
     });
 
 

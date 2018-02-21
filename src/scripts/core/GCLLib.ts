@@ -64,7 +64,7 @@ class GCLClient {
         this.localTestConnection = new LocalTestConnection(this.cfg);
         this.pluginFactory = new PluginFactory(this.cfg.gclUrl, this.connection);
         this.adminService = new AdminService(this.cfg.gclUrl, this.authConnection);
-        this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
+        this.coreService = new CoreService(this.cfg.gclUrl, this.connection);
         this.agentClient = new AgentClient(this.cfg.gclUrl, this.connection);
         if (this.cfg.localTestMode) { this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg); }
         else { this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg); }
@@ -115,7 +115,6 @@ class GCLClient {
         resolvedCfg.allowAutoUpdate = cfg.allowAutoUpdate;
         resolvedCfg.client_id = cfg.client_id;
         resolvedCfg.client_secret = cfg.client_secret;
-        resolvedCfg.jwt = cfg.jwt;
         resolvedCfg.gclUrl = cfg.gclUrl;
         resolvedCfg.ocvUrl = cfg.ocvUrl;
         resolvedCfg.implicitDownload = cfg.implicitDownload;
