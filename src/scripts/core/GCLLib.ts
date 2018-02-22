@@ -111,7 +111,7 @@ class GCLClient {
 
     private static resolveConfig(cfg: GCLConfig) {
         // must be the base url because the GCLConfig object adds the context path and keeps the base url intact
-        let resolvedCfg: GCLConfig = new GCLConfig(cfg.dsUrlBase, cfg.apiKey, cfg.pkcs11Config);
+        let resolvedCfg: GCLConfig = new GCLConfig(cfg.gwUrl, cfg.apiKey, cfg.pkcs11Config);
         resolvedCfg.allowAutoUpdate = cfg.allowAutoUpdate;
         resolvedCfg.client_id = cfg.client_id;
         resolvedCfg.client_secret = cfg.client_secret;

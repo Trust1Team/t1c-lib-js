@@ -44,7 +44,7 @@ class InitUtil {
                             // console.log('managed');
                             // only attempt to sync if API key and DS URL are available,
                             // and if syncing for managed devices is turned on
-                            if (cfg.apiKey && cfg.dsUrlBase && cfg.syncManaged) {
+                            if (cfg.apiKey && cfg.gwUrl && cfg.syncManaged) {
                                 // console.log('syncing');
                                 // attempt to sync
                                 resolve(SyncUtil.managedSynchronisation(client, mergedInfo, uuid, infoResponse.data.containers));
