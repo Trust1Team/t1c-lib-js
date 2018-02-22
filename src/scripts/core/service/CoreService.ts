@@ -77,11 +77,6 @@ class CoreService implements CoreModel.AbstractCore {
         else { return Promise.resolve(CoreService.platformInfo()); }
     }
 
-    public plugins(callback?: (error: CoreExceptions.RestException, data: CoreModel.PluginsResponse)
-        => void): Promise<CoreModel.PluginsResponse> {
-        return this.connection.getSkipCitrix(this.url, CORE_PLUGINS, undefined, undefined, callback);
-    }
-
     public pollCardInserted(secondsToPollCard?: number,
                             callback?: (error: CoreExceptions.RestException, data: CardReader) => void,
                             connectReaderCb?: () => void,

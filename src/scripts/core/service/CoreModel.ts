@@ -7,7 +7,7 @@ import * as CoreExceptions from '../exceptions/CoreExceptions';
 
 export { AbstractCore, T1CResponse, BoolDataResponse, DataResponse, DataArrayResponse, DataObjectResponse,
     InfoResponse, BrowserInfo, BrowserInfoResponse, Card, CardReader, CardReadersResponse, T1CCertificate,
-    CertificateResponse, CertificatesResponse, SingleReaderResponse, PluginsResponse, PubKeyResponse, T1CInfo, Plugin };
+    CertificateResponse, CertificatesResponse, SingleReaderResponse, T1CContainer, T1CInfo };
 
 
 interface AbstractCore {
@@ -22,7 +22,6 @@ interface AbstractCore {
                callback?: (error: CoreExceptions.RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>
     info(callback?: (error: CoreExceptions.RestException, data: InfoResponse) => void): void | Promise<InfoResponse>;
     infoBrowser(callback?: (error: CoreExceptions.RestException, data: BrowserInfoResponse) => void): Promise<BrowserInfoResponse>;
-    plugins(callback?: (error: CoreExceptions.RestException, data: PluginsResponse) => void): Promise<PluginsResponse>;
     pollCardInserted(secondsToPollCard?: number,
                      callback?: (error: CoreExceptions.RestException, data: CardReader) => void,
                      connectReader?: () => void,
@@ -95,9 +94,13 @@ class T1CInfo {
                 public arch: string,
                 public os: string,
                 public uid: string,
-                public version: string, public containers?: any) {}
+                public containers: T1CContainer[],
+                public version: string) {}
 }
 
+class T1CContainer {
+    constructor(public name: string, public version: string, public status: string) {}
+}
 class BrowserInfoResponse extends T1CResponse {
     constructor(public data: BrowserInfo, public success: boolean) {
         super(success, data);
@@ -143,22 +146,6 @@ class T1CCertificate {
 
 class SingleReaderResponse extends T1CResponse {
     constructor(public data: CardReader, public success: boolean) {
-        super(success, data);
-    }
-}
-
-class PluginsResponse extends T1CResponse {
-    constructor(public data: Plugin[], public success: boolean) {
-        super(success, data);
-    }
-}
-
-class Plugin {
-    constructor(public id: string, public name: string, public version: string) {}
-}
-
-class PubKeyResponse extends T1CResponse {
-    constructor(public data: string, public success: boolean) {
         super(success, data);
     }
 }

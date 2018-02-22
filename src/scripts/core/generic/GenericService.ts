@@ -151,11 +151,11 @@ class GenericService {
     }
 
     private static filterByAvailableContainers(args: { client: GCLClient, readers: CardReadersResponse }): Promise<CardReadersResponse> {
-        return args.client.core().plugins().then(plugins => {
+        return args.client.core().info().then(info => {
             return new Promise((resolve) => {
                 args.readers.data = _.filter(args.readers.data, reader => {
                     // TODO optimize
-                    return _.find(plugins.data, ct => { return ct.id === CardUtil.determineContainer(reader.card); });
+                    return _.find(info.data.containers, ct => { return ct.name === CardUtil.determineContainer(reader.card); });
                 });
                 resolve(args.readers);
             });
@@ -190,8 +190,8 @@ class GenericService {
     private static checkContainerAvailable(args: { client: GCLClient, container: string }) {
         return new Promise((resolve, reject) => {
             if (args && args.container) {
-                args.client.core().plugins().then(res => {
-                    if (_.find(res.data, ct => { return ct.id === args.container; })) {
+                args.client.core().info().then(res => {
+                    if (_.find(res.data.containers, ct => { return ct.name === args.container; })) {
                         resolve(args);
                     } else {
                         reject('Container for this card is not available');
