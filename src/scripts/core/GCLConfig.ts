@@ -24,7 +24,7 @@ const defaultLocalTestMode = false;
 class GCLConfig  implements GCLConfig {
     // singleton pattern
     private static instance: GCLConfig;
-    private _dsUrlBase: string;
+    private _gwUrl: string;
     private _ocvUrl: string;
     private _gclUrl: string;
     private _dsFileDownloadUrl: string;
@@ -51,12 +51,12 @@ class GCLConfig  implements GCLConfig {
     private _containerDownloadTimeout: number;
 
     // constructor for DTO
-    constructor (dsUriValue?: string, apiKey?: string, pkcs11Config?: ModuleConfig) {
+    constructor (gwUriValue?: string, apiKey?: string, pkcs11Config?: ModuleConfig) {
         this._gclUrl = defaultGclUrl;
-        this._dsUrl = dsUriValue + defaultDSContextPath;
-        this._ocvUrl = dsUriValue + defaultOCVContextPath;
-        this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
-        this._dsUrlBase = dsUriValue;
+        this._gwUrl = gwUriValue;
+        this._dsUrl = gwUriValue + defaultDSContextPath;
+        this._ocvUrl = gwUriValue + defaultOCVContextPath;
+        this._dsFileDownloadUrl = gwUriValue + fileDownloadUrlPostfix;
         this._apiKey = apiKey;
         this._citrix = false;
         this._agentPort = -1;
@@ -167,8 +167,8 @@ class GCLConfig  implements GCLConfig {
         return this._dsFileDownloadUrl;
     }
 
-    get dsUrlBase() {
-        return this._dsUrlBase;
+    get gwUrl() {
+        return this._gwUrl;
     }
 
     get localTestMode(): boolean {
@@ -297,7 +297,7 @@ class GCLConfig  implements GCLConfig {
     getGwJwt(): Promise<string> {
         console.log('get gw jwt');
         let config: AxiosRequestConfig = {
-            url: this.dsUrlBase + '/apiengineauth/v1/login/application/token',
+            url: this.gwUrl + '/apiengineauth/v1/login/application/token',
             method: 'GET',
             headers: { apikey: this.apiKey },
             responseType:  'json'
