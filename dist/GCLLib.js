@@ -29333,9 +29333,6 @@ var GCLLib =
 	            return es6_promise_1.Promise.resolve(CoreService.platformInfo());
 	        }
 	    };
-	    CoreService.prototype.plugins = function (callback) {
-	        return this.connection.getSkipCitrix(this.url, CORE_PLUGINS, undefined, undefined, callback);
-	    };
 	    CoreService.prototype.pollCardInserted = function (secondsToPollCard, callback, connectReaderCb, insertCardCb, cardTimeoutCb) {
 	        var maxSeconds = secondsToPollCard || 30;
 	        var self = this;
@@ -55713,19 +55710,28 @@ var GCLLib =
 	}(T1CResponse));
 	exports.InfoResponse = InfoResponse;
 	var T1CInfo = (function () {
-	    function T1CInfo(activated, citrix, managed, arch, os, uid, version, containers) {
+	    function T1CInfo(activated, citrix, managed, arch, os, uid, containers, version) {
 	        this.activated = activated;
 	        this.citrix = citrix;
 	        this.managed = managed;
 	        this.arch = arch;
 	        this.os = os;
 	        this.uid = uid;
-	        this.version = version;
 	        this.containers = containers;
+	        this.version = version;
 	    }
 	    return T1CInfo;
 	}());
 	exports.T1CInfo = T1CInfo;
+	var T1CContainer = (function () {
+	    function T1CContainer(name, version, status) {
+	        this.name = name;
+	        this.version = version;
+	        this.status = status;
+	    }
+	    return T1CContainer;
+	}());
+	exports.T1CContainer = T1CContainer;
 	var BrowserInfoResponse = (function (_super) {
 	    __extends(BrowserInfoResponse, _super);
 	    function BrowserInfoResponse(data, success) {
@@ -55817,37 +55823,6 @@ var GCLLib =
 	    return SingleReaderResponse;
 	}(T1CResponse));
 	exports.SingleReaderResponse = SingleReaderResponse;
-	var PluginsResponse = (function (_super) {
-	    __extends(PluginsResponse, _super);
-	    function PluginsResponse(data, success) {
-	        var _this = _super.call(this, success, data) || this;
-	        _this.data = data;
-	        _this.success = success;
-	        return _this;
-	    }
-	    return PluginsResponse;
-	}(T1CResponse));
-	exports.PluginsResponse = PluginsResponse;
-	var Plugin = (function () {
-	    function Plugin(id, name, version) {
-	        this.id = id;
-	        this.name = name;
-	        this.version = version;
-	    }
-	    return Plugin;
-	}());
-	exports.Plugin = Plugin;
-	var PubKeyResponse = (function (_super) {
-	    __extends(PubKeyResponse, _super);
-	    function PubKeyResponse(data, success) {
-	        var _this = _super.call(this, success, data) || this;
-	        _this.data = data;
-	        _this.success = success;
-	        return _this;
-	    }
-	    return PubKeyResponse;
-	}(T1CResponse));
-	exports.PubKeyResponse = PubKeyResponse;
 
 
 /***/ }),
@@ -57155,10 +57130,10 @@ var GCLLib =
 	        });
 	    };
 	    GenericService.filterByAvailableContainers = function (args) {
-	        return args.client.core().plugins().then(function (plugins) {
+	        return args.client.core().info().then(function (info) {
 	            return new es6_promise_1.Promise(function (resolve) {
 	                args.readers.data = _.filter(args.readers.data, function (reader) {
-	                    return _.find(plugins.data, function (ct) { return ct.id === CardUtil_1.CardUtil.determineContainer(reader.card); });
+	                    return _.find(info.data.containers, function (ct) { return ct.name === CardUtil_1.CardUtil.determineContainer(reader.card); });
 	                });
 	                resolve(args.readers);
 	            });
@@ -57195,8 +57170,8 @@ var GCLLib =
 	    GenericService.checkContainerAvailable = function (args) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
 	            if (args && args.container) {
-	                args.client.core().plugins().then(function (res) {
-	                    if (_.find(res.data, function (ct) { return ct.id === args.container; })) {
+	                args.client.core().info().then(function (res) {
+	                    if (_.find(res.data.containers, function (ct) { return ct.name === args.container; })) {
 	                        resolve(args);
 	                    }
 	                    else {

@@ -87,7 +87,6 @@ class CoreService implements CoreModel.AbstractCore {
     getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string, alertPosition?: string, type?: string, timeoutInSeconds?: number, callback?: (error: CoreExceptions.RestException, data: CoreModel.BoolDataResponse) => void): Promise<CoreModel.BoolDataResponse>;
     info(callback?: (error: CoreExceptions.RestException, data: CoreModel.InfoResponse) => void): Promise<CoreModel.InfoResponse>;
     infoBrowser(callback?: (error: CoreExceptions.RestException, data: CoreModel.BrowserInfoResponse) => void): Promise<CoreModel.BrowserInfoResponse>;
-    plugins(callback?: (error: CoreExceptions.RestException, data: CoreModel.PluginsResponse) => void): Promise<CoreModel.PluginsResponse>;
     pollCardInserted(secondsToPollCard?: number, callback?: (error: CoreExceptions.RestException, data: CardReader) => void, connectReaderCb?: () => void, insertCardCb?: () => void, cardTimeoutCb?: () => void): Promise<CardReader>;
     pollReadersWithCards(secondsToPollCard?: number, callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void, connectReaderCb?: () => void, insertCardCb?: () => void, cardTimeoutCb?: () => void): Promise<CoreModel.CardReadersResponse>;
     pollReaders(secondsToPollReader?: number, callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void, connectReaderCb?: () => void, readerTimeoutCb?: () => void): Promise<CoreModel.CardReadersResponse>;
@@ -187,12 +186,11 @@ class OCVClient implements AbstractOCVClient {
     validateCertificateChain(data: CertificateChainData, callback?: (error: RestException, data: CertificateChainResponse) => void): void | Promise<CertificateChainResponse>;
 }
 
-export { AbstractCore, T1CResponse, BoolDataResponse, DataResponse, DataArrayResponse, DataObjectResponse, InfoResponse, BrowserInfo, BrowserInfoResponse, Card, CardReader, CardReadersResponse, T1CCertificate, CertificateResponse, CertificatesResponse, SingleReaderResponse, PluginsResponse, PubKeyResponse, T1CInfo, Plugin };
+export { AbstractCore, T1CResponse, BoolDataResponse, DataResponse, DataArrayResponse, DataObjectResponse, InfoResponse, BrowserInfo, BrowserInfoResponse, Card, CardReader, CardReadersResponse, T1CCertificate, CertificateResponse, CertificatesResponse, SingleReaderResponse, T1CContainer, T1CInfo };
 interface AbstractCore {
     getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string, alertPosition?: string, type?: string, timeoutInSeconds?: number, callback?: (error: CoreExceptions.RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
     info(callback?: (error: CoreExceptions.RestException, data: InfoResponse) => void): void | Promise<InfoResponse>;
     infoBrowser(callback?: (error: CoreExceptions.RestException, data: BrowserInfoResponse) => void): Promise<BrowserInfoResponse>;
-    plugins(callback?: (error: CoreExceptions.RestException, data: PluginsResponse) => void): Promise<PluginsResponse>;
     pollCardInserted(secondsToPollCard?: number, callback?: (error: CoreExceptions.RestException, data: CardReader) => void, connectReader?: () => void, insertCard?: () => void, cardTimeout?: () => void): Promise<CardReader>;
     pollReadersWithCards(secondsToPollCard?: number, callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void, connectReader?: () => void, insertCard?: () => void, cardTimeout?: () => void): Promise<CardReadersResponse>;
     pollReaders(secondsToPollReader?: number, callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void, connectReader?: () => void, readerTimeout?: () => void): Promise<CardReadersResponse>;
@@ -245,9 +243,15 @@ class T1CInfo {
     arch: string;
     os: string;
     uid: string;
+    containers: T1CContainer[];
     version: string;
-    containers: any;
-    constructor(activated: boolean, citrix: boolean, managed: boolean, arch: string, os: string, uid: string, version: string, containers?: any);
+    constructor(activated: boolean, citrix: boolean, managed: boolean, arch: string, os: string, uid: string, containers: T1CContainer[], version: string);
+}
+class T1CContainer {
+    name: string;
+    version: string;
+    status: string;
+    constructor(name: string, version: string, status: string);
 }
 class BrowserInfoResponse extends T1CResponse {
     data: BrowserInfo;
@@ -311,22 +315,6 @@ class SingleReaderResponse extends T1CResponse {
     data: CardReader;
     success: boolean;
     constructor(data: CardReader, success: boolean);
-}
-class PluginsResponse extends T1CResponse {
-    data: Plugin[];
-    success: boolean;
-    constructor(data: Plugin[], success: boolean);
-}
-class Plugin {
-    id: string;
-    name: string;
-    version: string;
-    constructor(id: string, name: string, version: string);
-}
-class PubKeyResponse extends T1CResponse {
-    data: string;
-    success: boolean;
-    constructor(data: string, success: boolean);
 }
 
 export { AbstractEidBE, Address, AddressResponse, AllCertsResponse, AllDataResponse, RnData, RnDataResponse, AllBeIDData, AllBeIDCerts };
