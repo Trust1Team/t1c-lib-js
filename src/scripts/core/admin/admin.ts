@@ -5,7 +5,7 @@
 import { LocalAuthConnection } from '../client/Connection';
 import * as CoreExceptions from '../exceptions/CoreExceptions';
 import { Promise } from 'es6-promise';
-import { AbstractAdmin, PubKeyResponse } from './adminModel';
+import { AbstractAdmin, ContainerSyncRequest, PubKeyResponse, SetPubKeyRequest } from './adminModel';
 import { T1CResponse } from '../service/CoreModel';
 import { ResponseHandler } from '../../util/ResponseHandler';
 import * as _ from 'lodash';
@@ -38,8 +38,8 @@ class AdminService implements AbstractAdmin {
         }
     }
 
-    public activate(data: any, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse> {
-        return this.post(this.url, CORE_ACTIVATE, data, callback);
+    public activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+        return this.post(this.url, CORE_ACTIVATE, {}, callback);
     }
 
     public getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse)
@@ -47,15 +47,16 @@ class AdminService implements AbstractAdmin {
         return this.get(this.url, CORE_PUB_KEY, callback);
     }
 
-    public setPubKey(pubkey: string,
+    public setPubKey(keys: SetPubKeyRequest,
                      callback?: (error: CoreExceptions.RestException, data: PubKeyResponse)
                          => void): Promise<PubKeyResponse> {
-        return this.put(this.url, CORE_PUB_KEY, { certificate: pubkey }, callback);
+        return this.put(this.url, CORE_PUB_KEY, keys, callback);
     }
 
     // TODO implementation check
-    public updateContainerConfig(config: any, callback?: (error: CoreExceptions.RestException, data: any) => void): Promise<any> {
-        return this.post(this.url, CORE_CONTAINERS, config, callback);
+    public updateContainerConfig(containers: ContainerSyncRequest,
+                                 callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+        return this.post(this.url, CORE_CONTAINERS, containers, callback);
     }
 
 

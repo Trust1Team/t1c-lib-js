@@ -168,26 +168,6 @@ describe('Core Services', () => {
         });
     });
 
-    describe('plugins', () => {
-        beforeEach(function () {
-            mock.onGet('/plugins').reply(() => {
-                return [ 200, { data: 'Plugins Data', success: true }];
-            });
-        });
-
-        it('makes the correct call to get plugins', () => {
-            return core.plugins().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
-
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Plugins Data');
-            });
-        });
-    });
-
     describe('reader', () => {
         beforeEach(function () {
             mock.onGet('/card-readers/123').reply(() => {

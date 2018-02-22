@@ -13,7 +13,7 @@ import * as jwtDecode from 'jwt-decode';
 
 const defaultGclUrl = 'https://localhost:10443/v1';
 const defaultDSUrl = 'https://accapim.t1t.be:443';
-const defaultDSContextPath = '/trust1team/gclds/v1';
+const defaultDSContextPath = '/trust1team/gclds/v2';
 const defaultOCVContextPath = '/trust1team/ocv-api/v1';
 const defaultDSContextPathTestMode = '/gcl-ds-web/v1';
 const fileDownloadUrlPostfix = '/trust1team/gclds-file/v1';

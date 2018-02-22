@@ -23,6 +23,7 @@ class InitUtil {
             let initPromise = new Promise((resolve, reject) => {
                 let cfg = client.config();
                 client.core().info().then(infoResponse => {
+                    console.log(infoResponse);
                     // update config values
                     cfg.citrix = infoResponse.data.citrix;
                     cfg.tokenCompatible = InitUtil.checkTokenCompatible(infoResponse.data.version);
@@ -36,7 +37,7 @@ class InitUtil {
                         let uuid = infoResponse.data.uid;
                         // compose info
                         let info = client.core().infoBrowserSync();
-                        let mergedInfo = new DSPlatformInfo(activated, info.data, core_version);
+                        let mergedInfo = new DSPlatformInfo(activated, managed, info.data, core_version);
 
 
                         if (managed) {
@@ -46,8 +47,7 @@ class InitUtil {
                             if (cfg.apiKey && cfg.dsUrlBase && cfg.syncManaged) {
                                 // console.log('syncing');
                                 // attempt to sync
-                                SyncUtil.syncDevice(client.ds(), cfg, mergedInfo, uuid).then(() => { resolve(); },
-                                    () => { resolve(); });
+                                resolve(SyncUtil.managedSynchronisation(client, mergedInfo, uuid, infoResponse.data.containers));
                             } else {
                                 // nothing to do here *jetpack*
                                 resolve();
@@ -69,7 +69,7 @@ class InitUtil {
                                 // update core service
                                 client.updateAuthConnection(cfg);
                                 // device is activated, sync it
-                                resolve(SyncUtil.unManagedSynchronization(client, cfg, mergedInfo, uuid));
+                                resolve(SyncUtil.unManagedSynchronization(client, cfg, mergedInfo, uuid, false));
                             }, err => {
                                 reject(err);
                                 // resolve(SyncUtil.unManagedSynchronization(client.admin(), client.ds(), cfg, mergedInfo, uuid));
