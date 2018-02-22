@@ -3,13 +3,18 @@
  * @since 2018
  */
 import { GCLConfig } from '../core/GCLConfig';
-import { DSPlatformInfo, JWTResponse } from '../core/ds/DSClientModel';
+import {
+    DeviceResponse, DSContainer, DSPlatformInfo, DSRegistrationOrSyncRequest,
+    JWTResponse
+} from '../core/ds/DSClientModel';
 import { Promise } from 'es6-promise';
 import { DSClient } from '../core/ds/DSClient';
 import { DataContainerUtil } from './DataContainerUtil';
 import * as _ from 'lodash';
 import { GCLClient } from '../core/GCLLib';
 import { RestException } from '../core/exceptions/CoreExceptions';
+import { T1CContainer } from '../core/service/CoreModel';
+import { ContainerSyncRequest } from '../core/admin/adminModel';
 
 export { SyncUtil };
 
@@ -22,30 +27,49 @@ class SyncUtil {
     // constructor
     constructor() {}
 
+    public static managedSynchronisation(client: GCLClient, mergedInfo: DSPlatformInfo, uuid: string, containers: T1CContainer[]) {
+        return client.admin().getPubKey().then(keys => {
+            return SyncUtil.syncDevice(client.ds(), keys.data.device, mergedInfo, uuid, containers);
+        });
+    }
+
     public static unManagedSynchronization(client: GCLClient,
                                            config: GCLConfig,
                                            mergedInfo: DSPlatformInfo,
-                                           uuid: string) {
+                                           uuid: string,
+                                           isRetry: boolean) {
         // do core v2 sync flow
         return new Promise((resolve, reject) => {
             // get GCL Pubkey
+            // get current container state
+            // sync
+            // get container list
+            // pass container list to gcl
+            // wait completion/fail
+            // final sync with updated container list
             client.admin().getPubKey().then(pubKey => {
-                return client.ds().synchronizationRequest(pubKey.data.device, mergedInfo, config.dsUrlBase).then(containerConfig => {
-                    // forward container config to GCL
-                    return client.admin().updateContainerConfig(containerConfig.data).then(containerState => {
-                        // TODO setup data container paths
-                        DataContainerUtil.setupDataContainers(containerState);
-                        // DataContainerUtil.setupDataContainers([ { id: 'atr', name: 'ATR', version: '0.0.0.1', type: 'data' },
-                        //     { id: 'btr', name: 'BTR', version: '0.0.0.1', type: 'data' } ]);
-                        // sync device
-                        return SyncUtil.syncDevice(client.ds(), config, mergedInfo, uuid).then(() => {
-                            mergedInfo.activated = true;
-                            SyncUtil.pollDownloadCompletion(client, containerConfig).then(() => {
-                                // all download complete, lib ready to use
-                                resolve();
+                return client.core().info().then(info => {
+                    return SyncUtil.syncDevice(client.ds(), pubKey.data.device, mergedInfo, uuid, info.data.containers).then(device => {
+                        return client.admin().updateContainerConfig(new ContainerSyncRequest(device.containerResponses)).then(() => {
+                            // setup data container paths
+                            DataContainerUtil.setupDataContainers(device.containerResponses);
+
+                            return SyncUtil.pollDownloadCompletion(client,
+                                device.containerResponses, isRetry).then((finalContainerList) => {
+                                // all downloads complete, do final sync
+                                return SyncUtil.syncDevice(client.ds(),
+                                    pubKey.data.device, mergedInfo, uuid, finalContainerList).then(() => {
+                                    // lib ready to use
+                                    resolve();
+                                });
                             }, (error) => {
-                                // something went wrong, return error
-                                reject(error);
+                                if (typeof error === 'boolean' && !isRetry) {
+                                    // need to trigger retry
+                                    resolve(SyncUtil.unManagedSynchronization(client, config, mergedInfo, uuid, true));
+                                } else {
+                                    // something went wrong, return error
+                                    reject(error);
+                                }
                             });
                         });
                     });
@@ -56,22 +80,43 @@ class SyncUtil {
         });
     }
 
-    public static pollDownloadCompletion(client: GCLClient, containerConfig: any): Promise<any> {
+    public static syncDevice(ds: DSClient,
+                             pubKey: string,
+                             info: DSPlatformInfo,
+                             deviceId: string,
+                             containers: T1CContainer[]): Promise<DeviceResponse> {
+        return ds.sync(new DSRegistrationOrSyncRequest(info.managed,
+            info.activated,
+            deviceId,
+            info.core_version,
+            pubKey,
+            info.manufacturer,
+            info.browser,
+            info.os,
+            info.ua,
+            // TODO proxy domain handling!
+            '',
+            containers)
+        );
+    }
+
+    private static pollDownloadCompletion(client: GCLClient, containerConfig: DSContainer[], isRetry: boolean): Promise<T1CContainer[]> {
         let maxSeconds = client.config().containerDownloadTimeout || 30;
 
         return new Promise((resolve, reject) => {
             // TODO activate polling once DS and GCL are capable
             // poll(resolve, reject);
-            resolve(true);
+            resolve([]);
         });
 
-        function poll(resolve?: () => void, reject?: (error: any) => void) {
+        function poll(resolve?: (containers: T1CContainer[]) => void, reject?: (error: any) => void) {
             // monitor status for each container in config
             _.delay(() => {
                 --maxSeconds;
                 client.core().info().then(infoData => {
-                    checkDownloadsComplete(containerConfig, infoData.data.containers).then((ready) => {
-                        if (ready) { resolve(); }
+                    let containers = infoData.data.containers;
+                    checkDownloadsComplete(containerConfig, containers).then((ready) => {
+                        if (ready) { resolve(containers); }
                         else { poll(resolve, reject); }
                     }, error => {
                         reject(error);
@@ -86,8 +131,15 @@ class SyncUtil {
             // if >= 1 in progress, poll again
             // if all done, resolve
             return new Promise<boolean>((resolve, reject) => {
-                if (containerMissing(cfg, containerStatus)) { reject(new RestException(500, '903', 'Container download failed')); }
-                else if (downloadErrored(cfg, containerStatus)) { reject(new RestException(500, '903', 'Container download failed')); }
+                if (containerMissing(cfg, containerStatus) || downloadErrored(cfg, containerStatus)) {
+                    // check if we were already retrying
+                    if (isRetry) {
+                        reject(new RestException(500, '903', 'Container download failed'));
+                    } else {
+                        // trigger retry
+                        reject(false);
+                    }
+                }
                 else if (downloadOngoing(cfg, containerStatus)) { resolve(false); }
                 else { resolve(true); }
             });
@@ -116,11 +168,5 @@ class SyncUtil {
                 });
             });
         }
-    }
-
-    public static syncDevice(client: DSClient, config: GCLConfig, info: DSPlatformInfo, deviceId: string): Promise<JWTResponse> {
-        return client.sync(info, deviceId).then(activationResponse => {
-            return activationResponse;
-        });
     }
 }

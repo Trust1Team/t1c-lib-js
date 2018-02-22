@@ -8898,7 +8898,7 @@ var GCLLib =
 	var agent_1 = __webpack_require__(368);
 	var admin_1 = __webpack_require__(447);
 	var InitUtil_1 = __webpack_require__(448);
-	var ClientService_1 = __webpack_require__(452);
+	var ClientService_1 = __webpack_require__(453);
 	var GCLClient = (function () {
 	    function GCLClient(cfg, automatic) {
 	        var _this = this;
@@ -9063,7 +9063,7 @@ var GCLLib =
 	var jwtDecode = __webpack_require__(360);
 	var defaultGclUrl = 'https://localhost:10443/v1';
 	var defaultDSUrl = 'https://accapim.t1t.be:443';
-	var defaultDSContextPath = '/trust1team/gclds/v1';
+	var defaultDSContextPath = '/trust1team/gclds/v2';
 	var defaultOCVContextPath = '/trust1team/ocv-api/v1';
 	var defaultDSContextPathTestMode = '/gcl-ds-web/v1';
 	var fileDownloadUrlPostfix = '/trust1team/gclds-file/v1';
@@ -31516,16 +31516,11 @@ var GCLLib =
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var _ = __webpack_require__(329);
 	var es6_promise_1 = __webpack_require__(330);
-	var ACTIVATION = '/activate';
-	var SYNC = '/sync';
 	var SEPARATOR = '/';
 	var QP_APIKEY = '?apikey=';
 	var SECURITY = '/security';
 	var SYS_INFO = '/system/status';
-	var SECURITY_JWT_ISSUE = SECURITY + '/jwt/issue';
-	var SECURITY_JWT_REFRESH = SECURITY + '/jwt/refresh';
 	var DOWNLOAD = '/download/gcl';
 	var PUB_KEY = SECURITY + '/keys/public';
 	var DEVICE = '/devices';
@@ -31535,12 +31530,6 @@ var GCLLib =
 	        this.connection = connection;
 	        this.cfg = cfg;
 	    }
-	    DSClient.prototype.registerDevice = function (pubKey, info, callback) {
-	        return this.connection.post(this.url, ACTIVATION, { pubKey: pubKey, info: info }, undefined, undefined, callback);
-	    };
-	    DSClient.prototype.synchronizationRequest = function (pubKey, info, proxy, callback) {
-	        return this.connection.post(this.url, SYNC, { pubKey: pubKey, info: info, proxy: proxy }, undefined, undefined, callback);
-	    };
 	    DSClient.prototype.getUrl = function () { return this.url; };
 	    DSClient.prototype.getInfo = function (callback) {
 	        return this.connection.get(this.url, SYS_INFO, undefined, undefined, callback);
@@ -31548,55 +31537,8 @@ var GCLLib =
 	    DSClient.prototype.getDevice = function (uuid, callback) {
 	        return this.connection.get(this.url, DEVICE + SEPARATOR + uuid, undefined, undefined, callback);
 	    };
-	    DSClient.prototype.getJWT = function (callback) {
-	        var self = this;
-	        if (callback) {
-	            doGetJwt();
-	        }
-	        else {
-	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                doGetJwt(resolve, reject);
-	            });
-	        }
-	        function doGetJwt(resolve, reject) {
-	            self.connection.get(self.url, SECURITY_JWT_ISSUE, undefined, undefined, function (error, data) {
-	                if (error) {
-	                    if (callback) {
-	                        return callback(error, null);
-	                    }
-	                    else {
-	                        reject(error);
-	                    }
-	                }
-	                else {
-	                    if (data && data.token) {
-	                        self.cfg.gclJwt = data.token;
-	                    }
-	                    if (callback) {
-	                        return callback(null, data);
-	                    }
-	                    else {
-	                        resolve(data);
-	                    }
-	                }
-	            });
-	        }
-	    };
-	    DSClient.prototype.refreshJWT = function (callback) {
-	        var actualJWT = this.cfg.gclJwt;
-	        if (actualJWT) {
-	            return this.connection.post(this.url, SECURITY_JWT_REFRESH, { originalJWT: actualJWT }, undefined, undefined, callback);
-	        }
-	        else {
-	            var error = { code: '500', description: 'No JWT available', status: 412 };
-	            if (callback) {
-	                callback(error, null);
-	            }
-	            return es6_promise_1.Promise.reject(error);
-	        }
-	    };
-	    DSClient.prototype.getPubKey = function (callback) {
-	        return this.connection.get(this.url, PUB_KEY, undefined, undefined, callback);
+	    DSClient.prototype.getPubKey = function (uuid, callback) {
+	        return this.connection.get(this.url, PUB_KEY + SEPARATOR + uuid, undefined, undefined, callback);
 	    };
 	    DSClient.prototype.downloadLink = function (infoBrowser, callback) {
 	        var self = this;
@@ -31630,13 +31572,11 @@ var GCLLib =
 	            });
 	        }
 	    };
-	    DSClient.prototype.register = function (info, device_id, callback) {
-	        var req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, 'core_version'));
-	        return this.connection.put(this.url, DEVICE + SEPARATOR + device_id, req, undefined, undefined, callback);
+	    DSClient.prototype.register = function (registrationData, callback) {
+	        return this.connection.put(this.url, DEVICE + SEPARATOR + registrationData.uuid, registrationData, undefined, undefined, callback);
 	    };
-	    DSClient.prototype.sync = function (info, device_id, callback) {
-	        var req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, 'core_version'));
-	        return this.connection.post(this.url, DEVICE + SEPARATOR + device_id, req, undefined, undefined, callback);
+	    DSClient.prototype.sync = function (syncData, callback) {
+	        return this.connection.post(this.url, DEVICE + SEPARATOR + syncData.uuid, syncData, undefined, undefined, callback);
 	    };
 	    return DSClient;
 	}());
@@ -57473,7 +57413,7 @@ var GCLLib =
 	var ResponseHandler_1 = __webpack_require__(365);
 	var _ = __webpack_require__(329);
 	var InitUtil_1 = __webpack_require__(448);
-	var ClientService_1 = __webpack_require__(452);
+	var ClientService_1 = __webpack_require__(453);
 	var CORE_ACTIVATE = '/admin/activate';
 	var CORE_PUB_KEY = '/admin/certificate';
 	var CORE_CONTAINERS = '/admin/containers';
@@ -57490,17 +57430,17 @@ var GCLLib =
 	            return es6_promise_1.Promise.reject(error);
 	        }
 	    };
-	    AdminService.prototype.activate = function (data, callback) {
-	        return this.post(this.url, CORE_ACTIVATE, data, callback);
+	    AdminService.prototype.activate = function (callback) {
+	        return this.post(this.url, CORE_ACTIVATE, {}, callback);
 	    };
 	    AdminService.prototype.getPubKey = function (callback) {
 	        return this.get(this.url, CORE_PUB_KEY, callback);
 	    };
-	    AdminService.prototype.setPubKey = function (pubkey, callback) {
-	        return this.put(this.url, CORE_PUB_KEY, { certificate: pubkey }, callback);
+	    AdminService.prototype.setPubKey = function (keys, callback) {
+	        return this.put(this.url, CORE_PUB_KEY, keys, callback);
 	    };
-	    AdminService.prototype.updateContainerConfig = function (config, callback) {
-	        return this.post(this.url, CORE_CONTAINERS, config, callback);
+	    AdminService.prototype.updateContainerConfig = function (containers, callback) {
+	        return this.post(this.url, CORE_CONTAINERS, containers, callback);
 	    };
 	    AdminService.prototype.get = function (url, suffix, callback) {
 	        var self = this;
@@ -57572,8 +57512,8 @@ var GCLLib =
 	var _ = __webpack_require__(329);
 	var semver = __webpack_require__(449);
 	var SyncUtil_1 = __webpack_require__(450);
-	var ActivationUtil_1 = __webpack_require__(453);
-	var DSClientModel_1 = __webpack_require__(454);
+	var ActivationUtil_1 = __webpack_require__(455);
+	var DSClientModel_1 = __webpack_require__(451);
 	var PubKeyService_1 = __webpack_require__(382);
 	var CoreExceptions_1 = __webpack_require__(383);
 	var InitUtil = (function () {
@@ -57584,6 +57524,7 @@ var GCLLib =
 	            var initPromise = new es6_promise_1.Promise(function (resolve, reject) {
 	                var cfg = client.config();
 	                client.core().info().then(function (infoResponse) {
+	                    console.log(infoResponse);
 	                    cfg.citrix = infoResponse.data.citrix;
 	                    cfg.tokenCompatible = InitUtil.checkTokenCompatible(infoResponse.data.version);
 	                    cfg.v2Compatible = InitUtil.coreV2Compatible(infoResponse.data.version);
@@ -57593,10 +57534,10 @@ var GCLLib =
 	                        var core_version = infoResponse.data.version;
 	                        var uuid_1 = infoResponse.data.uid;
 	                        var info = client.core().infoBrowserSync();
-	                        var mergedInfo_1 = new DSClientModel_1.DSPlatformInfo(activated, info.data, core_version);
+	                        var mergedInfo_1 = new DSClientModel_1.DSPlatformInfo(activated, managed, info.data, core_version);
 	                        if (managed) {
 	                            if (cfg.apiKey && cfg.dsUrlBase && cfg.syncManaged) {
-	                                SyncUtil_1.SyncUtil.syncDevice(client.ds(), cfg, mergedInfo_1, uuid_1).then(function () { resolve(); }, function () { resolve(); });
+	                                resolve(SyncUtil_1.SyncUtil.managedSynchronisation(client, mergedInfo_1, uuid_1, infoResponse.data.containers));
 	                            }
 	                            else {
 	                                resolve();
@@ -57612,7 +57553,7 @@ var GCLLib =
 	                            }
 	                            activationPromise.then(function () {
 	                                client.updateAuthConnection(cfg);
-	                                resolve(SyncUtil_1.SyncUtil.unManagedSynchronization(client, cfg, mergedInfo_1, uuid_1));
+	                                resolve(SyncUtil_1.SyncUtil.unManagedSynchronization(client, cfg, mergedInfo_1, uuid_1, false));
 	                            }, function (err) {
 	                                reject(err);
 	                            });
@@ -58986,25 +58927,38 @@ var GCLLib =
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
+	var DSClientModel_1 = __webpack_require__(451);
 	var es6_promise_1 = __webpack_require__(330);
-	var DataContainerUtil_1 = __webpack_require__(451);
+	var DataContainerUtil_1 = __webpack_require__(452);
 	var _ = __webpack_require__(329);
 	var CoreExceptions_1 = __webpack_require__(383);
+	var adminModel_1 = __webpack_require__(454);
 	var SyncUtil = (function () {
 	    function SyncUtil() {
 	    }
-	    SyncUtil.unManagedSynchronization = function (client, config, mergedInfo, uuid) {
+	    SyncUtil.managedSynchronisation = function (client, mergedInfo, uuid, containers) {
+	        return client.admin().getPubKey().then(function (keys) {
+	            return SyncUtil.syncDevice(client.ds(), keys.data.device, mergedInfo, uuid, containers);
+	        });
+	    };
+	    SyncUtil.unManagedSynchronization = function (client, config, mergedInfo, uuid, isRetry) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
 	            client.admin().getPubKey().then(function (pubKey) {
-	                return client.ds().synchronizationRequest(pubKey.data.device, mergedInfo, config.dsUrlBase).then(function (containerConfig) {
-	                    return client.admin().updateContainerConfig(containerConfig.data).then(function (containerState) {
-	                        DataContainerUtil_1.DataContainerUtil.setupDataContainers(containerState);
-	                        return SyncUtil.syncDevice(client.ds(), config, mergedInfo, uuid).then(function () {
-	                            mergedInfo.activated = true;
-	                            SyncUtil.pollDownloadCompletion(client, containerConfig).then(function () {
-	                                resolve();
+	                return client.core().info().then(function (info) {
+	                    return SyncUtil.syncDevice(client.ds(), pubKey.data.device, mergedInfo, uuid, info.data.containers).then(function (device) {
+	                        return client.admin().updateContainerConfig(new adminModel_1.ContainerSyncRequest(device.containerResponses)).then(function () {
+	                            DataContainerUtil_1.DataContainerUtil.setupDataContainers(device.containerResponses);
+	                            return SyncUtil.pollDownloadCompletion(client, device.containerResponses, isRetry).then(function (finalContainerList) {
+	                                return SyncUtil.syncDevice(client.ds(), pubKey.data.device, mergedInfo, uuid, finalContainerList).then(function () {
+	                                    resolve();
+	                                });
 	                            }, function (error) {
-	                                reject(error);
+	                                if (typeof error === 'boolean' && !isRetry) {
+	                                    resolve(SyncUtil.unManagedSynchronization(client, config, mergedInfo, uuid, true));
+	                                }
+	                                else {
+	                                    reject(error);
+	                                }
 	                            });
 	                        });
 	                    });
@@ -59014,18 +58968,22 @@ var GCLLib =
 	            });
 	        });
 	    };
-	    SyncUtil.pollDownloadCompletion = function (client, containerConfig) {
+	    SyncUtil.syncDevice = function (ds, pubKey, info, deviceId, containers) {
+	        return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, '', containers));
+	    };
+	    SyncUtil.pollDownloadCompletion = function (client, containerConfig, isRetry) {
 	        var maxSeconds = client.config().containerDownloadTimeout || 30;
 	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            resolve(true);
+	            resolve([]);
 	        });
 	        function poll(resolve, reject) {
 	            _.delay(function () {
 	                --maxSeconds;
 	                client.core().info().then(function (infoData) {
-	                    checkDownloadsComplete(containerConfig, infoData.data.containers).then(function (ready) {
+	                    var containers = infoData.data.containers;
+	                    checkDownloadsComplete(containerConfig, containers).then(function (ready) {
 	                        if (ready) {
-	                            resolve();
+	                            resolve(containers);
 	                        }
 	                        else {
 	                            poll(resolve, reject);
@@ -59038,11 +58996,13 @@ var GCLLib =
 	        }
 	        function checkDownloadsComplete(cfg, containerStatus) {
 	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                if (containerMissing(cfg, containerStatus)) {
-	                    reject(new CoreExceptions_1.RestException(500, '903', 'Container download failed'));
-	                }
-	                else if (downloadErrored(cfg, containerStatus)) {
-	                    reject(new CoreExceptions_1.RestException(500, '903', 'Container download failed'));
+	                if (containerMissing(cfg, containerStatus) || downloadErrored(cfg, containerStatus)) {
+	                    if (isRetry) {
+	                        reject(new CoreExceptions_1.RestException(500, '903', 'Container download failed'));
+	                    }
+	                    else {
+	                        reject(false);
+	                    }
 	                }
 	                else if (downloadOngoing(cfg, containerStatus)) {
 	                    resolve(false);
@@ -59074,11 +59034,6 @@ var GCLLib =
 	            });
 	        }
 	    };
-	    SyncUtil.syncDevice = function (client, config, info, deviceId) {
-	        return client.sync(info, deviceId).then(function (activationResponse) {
-	            return activationResponse;
-	        });
-	    };
 	    return SyncUtil;
 	}());
 	SyncUtil.DOWNLOAD_ERROR = 'DOWNLOAD_ERROR';
@@ -59090,88 +59045,6 @@ var GCLLib =
 
 /***/ }),
 /* 451 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var ClientService_1 = __webpack_require__(452);
-	var DataContainerUtil = (function () {
-	    function DataContainerUtil() {
-	    }
-	    DataContainerUtil.setupDataContainers = function (containers) {
-	        var client = ClientService_1.ClientService.getClient();
-	        containers.forEach(function (ct) {
-	            if (ct.type === 'data') {
-	                ct.path = '/' + ct.id;
-	                client[ct.id] = client.pf().createDataContainer(ct.path);
-	            }
-	        });
-	    };
-	    return DataContainerUtil;
-	}());
-	exports.DataContainerUtil = DataContainerUtil;
-
-
-/***/ }),
-/* 452 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var ClientService = (function () {
-	    function ClientService() {
-	    }
-	    ClientService.getClient = function () {
-	        return ClientService.client;
-	    };
-	    ClientService.setClient = function (newClient) {
-	        ClientService.client = newClient;
-	    };
-	    return ClientService;
-	}());
-	exports.ClientService = ClientService;
-
-
-/***/ }),
-/* 453 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var es6_promise_1 = __webpack_require__(330);
-	var ActivationUtil = (function () {
-	    function ActivationUtil() {
-	    }
-	    ActivationUtil.unManagedInitialization = function (admin, ds, self_cfg, mergedInfo, uuid) {
-	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            ActivationUtil.registerDevicePubKey(admin, ds, mergedInfo)
-	                .then(function () { return { admin: admin, ds: ds }; })
-	                .then(ActivationUtil.activateWithDsPubKey)
-	                .then(function () {
-	                resolve();
-	            })
-	                .catch(function (err) { reject(err); });
-	        });
-	    };
-	    ActivationUtil.registerDevicePubKey = function (admin, ds, mergedInfo) {
-	        return admin.getPubKey().then(function (pubKey) {
-	            return ds.registerDevice(pubKey, mergedInfo);
-	        });
-	    };
-	    ActivationUtil.activateWithDsPubKey = function (args) {
-	        return args.ds.getPubKey().then(function (pubKeyResponse) {
-	            return args.admin.setPubKey(pubKeyResponse.pubKey).then(function () {
-	                return args.admin.activate({});
-	            });
-	        });
-	    };
-	    return ActivationUtil;
-	}());
-	exports.ActivationUtil = ActivationUtil;
-
-
-/***/ }),
-/* 454 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -59187,6 +59060,40 @@ var GCLLib =
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var CoreModel_1 = __webpack_require__(427);
+	var DSBrowser = (function () {
+	    function DSBrowser(name, version) {
+	        this.name = name;
+	        this.version = version;
+	    }
+	    return DSBrowser;
+	}());
+	exports.DSBrowser = DSBrowser;
+	var DSOperatingSystem = (function () {
+	    function DSOperatingSystem(architecture, name, version) {
+	        this.architecture = architecture;
+	        this.name = name;
+	        this.version = version;
+	    }
+	    return DSOperatingSystem;
+	}());
+	exports.DSOperatingSystem = DSOperatingSystem;
+	var DSRegistrationOrSyncRequest = (function () {
+	    function DSRegistrationOrSyncRequest(managed, activated, uuid, version, derEncodedPublicKey, manufacturer, browser, os, ua, proxyDomain, containerStates) {
+	        this.managed = managed;
+	        this.activated = activated;
+	        this.uuid = uuid;
+	        this.version = version;
+	        this.derEncodedPublicKey = derEncodedPublicKey;
+	        this.manufacturer = manufacturer;
+	        this.browser = browser;
+	        this.os = os;
+	        this.ua = ua;
+	        this.proxyDomain = proxyDomain;
+	        this.containerStates = containerStates;
+	    }
+	    return DSRegistrationOrSyncRequest;
+	}());
+	exports.DSRegistrationOrSyncRequest = DSRegistrationOrSyncRequest;
 	var DSInfoResponse = (function () {
 	    function DSInfoResponse(configFile, build, version, environemnt, storageAppName, storageServiceAccount, storageCertPath, storageBucket, storageDownloadPrefix, fileOsx, fileWin32, fileWin64, fileDefaultVersion, securityEnabled, securityPrivateKeyAvailable) {
 	        this.configFile = configFile;
@@ -59224,28 +59131,54 @@ var GCLLib =
 	}());
 	exports.JWTResponse = JWTResponse;
 	var DSPubKeyResponse = (function () {
-	    function DSPubKeyResponse(pubkey, success) {
-	        this.pubkey = pubkey;
+	    function DSPubKeyResponse(encryptedPublicKey, encryptedAesKey, success) {
+	        this.encryptedPublicKey = encryptedPublicKey;
+	        this.encryptedAesKey = encryptedAesKey;
 	        this.success = success;
 	    }
 	    return DSPubKeyResponse;
 	}());
 	exports.DSPubKeyResponse = DSPubKeyResponse;
 	var DeviceResponse = (function () {
-	    function DeviceResponse(activated, coreVersion, managed, uuid) {
-	        this.activated = activated;
-	        this.coreVersion = coreVersion;
-	        this.managed = managed;
+	    function DeviceResponse(uuid, activated, managed, coreVersion, containerResponses) {
 	        this.uuid = uuid;
+	        this.activated = activated;
+	        this.managed = managed;
+	        this.coreVersion = coreVersion;
+	        this.containerResponses = containerResponses;
 	    }
 	    return DeviceResponse;
 	}());
 	exports.DeviceResponse = DeviceResponse;
+	var DSContainer = (function () {
+	    function DSContainer(id, name, version, osStorage, language, availability, dependsOn, status) {
+	        this.id = id;
+	        this.name = name;
+	        this.version = version;
+	        this.osStorage = osStorage;
+	        this.language = language;
+	        this.availability = availability;
+	        this.dependsOn = dependsOn;
+	        this.status = status;
+	    }
+	    return DSContainer;
+	}());
+	exports.DSContainer = DSContainer;
+	var DSStorage = (function () {
+	    function DSStorage(hash, storagePath, os) {
+	        this.hash = hash;
+	        this.storagePath = storagePath;
+	        this.os = os;
+	    }
+	    return DSStorage;
+	}());
+	exports.DSStorage = DSStorage;
 	var DSPlatformInfo = (function (_super) {
 	    __extends(DSPlatformInfo, _super);
-	    function DSPlatformInfo(activated, bi, core_version) {
+	    function DSPlatformInfo(activated, managed, bi, core_version) {
 	        var _this = _super.call(this, bi.browser, bi.manufacturer, bi.os, bi.ua) || this;
 	        _this.activated = activated;
+	        _this.managed = managed;
 	        _this.bi = bi;
 	        _this.core_version = core_version;
 	        return _this;
@@ -59253,6 +59186,129 @@ var GCLLib =
 	    return DSPlatformInfo;
 	}(CoreModel_1.BrowserInfo));
 	exports.DSPlatformInfo = DSPlatformInfo;
+
+
+/***/ }),
+/* 452 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var ClientService_1 = __webpack_require__(453);
+	var DataContainerUtil = (function () {
+	    function DataContainerUtil() {
+	    }
+	    DataContainerUtil.setupDataContainers = function (containers) {
+	        var client = ClientService_1.ClientService.getClient();
+	        containers.forEach(function (ct) {
+	            if (ct.type === 'data') {
+	                ct.path = '/' + ct.name;
+	                client[ct.id] = client.pf().createDataContainer(ct.path);
+	            }
+	        });
+	    };
+	    return DataContainerUtil;
+	}());
+	exports.DataContainerUtil = DataContainerUtil;
+
+
+/***/ }),
+/* 453 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var ClientService = (function () {
+	    function ClientService() {
+	    }
+	    ClientService.getClient = function () {
+	        return ClientService.client;
+	    };
+	    ClientService.setClient = function (newClient) {
+	        ClientService.client = newClient;
+	    };
+	    return ClientService;
+	}());
+	exports.ClientService = ClientService;
+
+
+/***/ }),
+/* 454 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var SetPubKeyRequest = (function () {
+	    function SetPubKeyRequest(encryptedPublicKey, encryptedAesKey) {
+	        this.encryptedPublicKey = encryptedPublicKey;
+	        this.encryptedAesKey = encryptedAesKey;
+	    }
+	    return SetPubKeyRequest;
+	}());
+	exports.SetPubKeyRequest = SetPubKeyRequest;
+	var PubKeyResponse = (function () {
+	    function PubKeyResponse(data, success) {
+	        this.data = data;
+	        this.success = success;
+	    }
+	    return PubKeyResponse;
+	}());
+	exports.PubKeyResponse = PubKeyResponse;
+	var PubKeys = (function () {
+	    function PubKeys(device, ssl) {
+	        this.device = device;
+	        this.ssl = ssl;
+	    }
+	    return PubKeys;
+	}());
+	exports.PubKeys = PubKeys;
+	var ContainerSyncRequest = (function () {
+	    function ContainerSyncRequest(containerResponses) {
+	        this.containerResponses = containerResponses;
+	    }
+	    return ContainerSyncRequest;
+	}());
+	exports.ContainerSyncRequest = ContainerSyncRequest;
+
+
+/***/ }),
+/* 455 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var es6_promise_1 = __webpack_require__(330);
+	var DSClientModel_1 = __webpack_require__(451);
+	var ActivationUtil = (function () {
+	    function ActivationUtil() {
+	    }
+	    ActivationUtil.unManagedInitialization = function (admin, ds, self_cfg, mergedInfo, uuid) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            ActivationUtil.registerDevice(admin, ds, mergedInfo, uuid)
+	                .then(function () { return { admin: admin, ds: ds, uuid: uuid }; })
+	                .then(ActivationUtil.activateDevice)
+	                .then(function () {
+	                mergedInfo.activated = true;
+	                resolve();
+	            })
+	                .catch(function (err) { reject(err); });
+	        });
+	    };
+	    ActivationUtil.registerDevice = function (admin, ds, mergedInfo, uuid) {
+	        return admin.getPubKey().then(function (pubKey) {
+	            return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.managed, mergedInfo.activated, uuid, mergedInfo.core_version, pubKey, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, 'proxy'));
+	        });
+	    };
+	    ActivationUtil.activateDevice = function (args) {
+	        return args.ds.getPubKey(args.uuid).then(function (pubKeyResponse) {
+	            return args.admin.setPubKey(pubKeyResponse.pubKey).then(function () {
+	                return args.admin.activate();
+	            });
+	        });
+	    };
+	    return ActivationUtil;
+	}());
+	exports.ActivationUtil = ActivationUtil;
 
 
 /***/ })

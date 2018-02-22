@@ -1,6 +1,6 @@
 (function ($) {
     var gclConfig = new GCLLib.GCLConfig();
-    gclConfig.apiKey = "2cc27598-2af7-48af-a2df-c7352e5368ff"; //test apikey rate limited
+    gclConfig.apiKey = "44865b13-f94b-45e6-b1cf-2f12d4bd547d"; //test apikey rate limited
     gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
     gclConfig.ocvUrl = "https://accapim.t1t.be:443/trust1team/ocv-api/v1";
     //gclConfig.ocvUrl = "http://localhost:8080/ocv-api-web/v1";
@@ -24,9 +24,9 @@
     console.log("init client");
 
     GCLLib.GCLClient.initialize(gclConfig).then(function(client) {
-        // console.log(client);
+        console.log(client);
         connector = client;
-        // console.log(client.config());
+        console.log(client.config());
         connector.core().info().then(function(data) {
             $("#error").empty();
             $("#error").append(data.data.version);

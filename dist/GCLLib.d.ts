@@ -99,19 +99,40 @@ class CoreService implements CoreModel.AbstractCore {
     version(): Promise<string>;
 }
 
-export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse, DeviceResponse, DSPlatformInfo };
+export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse, DeviceResponse, DSPlatformInfo, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem, DSContainer, DSStorage };
 interface AbstractDSClient {
-    registerDevice(pubKey: string, info: any, callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
-    synchronizationRequest(pubKey: string, info: any, proxy: string, callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
     getUrl(): string;
-    getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
-    getJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
-    getDevice(uuid: string, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
-    refreshJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
-    getPubKey(callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse>;
-    downloadLink(infoBrowser: BrowserInfo, callback?: (error: CoreExceptions.RestException, data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
-    register(info: DSPlatformInfo, device_id: string, callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
-    sync(info: DSPlatformInfo, device_id: string, callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
+    getInfo(callback?: (error: RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
+    getDevice(uuid: string, callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
+    getPubKey(deviceId: string, callback?: (error: RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse>;
+    downloadLink(infoBrowser: BrowserInfo, callback?: (error: RestException, data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
+    register(registrationData: DSRegistrationOrSyncRequest, callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
+    sync(syncData: DSRegistrationOrSyncRequest, callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
+}
+class DSBrowser {
+    name: string;
+    version: string;
+    constructor(name: string, version: string);
+}
+class DSOperatingSystem {
+    architecture: number;
+    name: string;
+    version: string;
+    constructor(architecture: number, name: string, version: string);
+}
+class DSRegistrationOrSyncRequest {
+    managed: boolean;
+    activated: boolean;
+    uuid: string;
+    version: string;
+    derEncodedPublicKey: string;
+    manufacturer: string;
+    browser: DSBrowser;
+    os: DSOperatingSystem;
+    ua: string;
+    proxyDomain: string;
+    containerStates: T1CContainer[];
+    constructor(managed: boolean, activated: boolean, uuid: string, version: string, derEncodedPublicKey: string, manufacturer: string, browser: DSBrowser, os: DSOperatingSystem, ua: string, proxyDomain: string, containerStates?: T1CContainer[]);
 }
 class DSInfoResponse {
     configFile: string;
@@ -141,38 +162,54 @@ class JWTResponse {
     constructor(token: string);
 }
 class DSPubKeyResponse implements T1CResponse {
-    pubkey: string;
+    encryptedPublicKey: string;
+    encryptedAesKey: string;
     success: boolean;
-    constructor(pubkey: string, success: boolean);
+    constructor(encryptedPublicKey: string, encryptedAesKey: string, success: boolean);
 }
 class DeviceResponse {
-    activated: boolean;
-    coreVersion: string;
-    managed: boolean;
     uuid: string;
-    constructor(activated: boolean, coreVersion: string, managed: boolean, uuid: string);
+    activated: boolean;
+    managed: boolean;
+    coreVersion: string;
+    containerResponses: DSContainer[];
+    constructor(uuid: string, activated: boolean, managed: boolean, coreVersion: string, containerResponses: DSContainer[]);
+}
+class DSContainer {
+    id: string;
+    name: string;
+    version: string;
+    osStorage: DSStorage[];
+    language: string;
+    availability: string;
+    dependsOn: string[];
+    status: string;
+    constructor(id: string, name: string, version: string, osStorage: DSStorage[], language: string, availability: string, dependsOn: string[], status: string);
+}
+class DSStorage {
+    hash: string;
+    storagePath: string;
+    os: string;
+    constructor(hash: string, storagePath: string, os: string);
 }
 class DSPlatformInfo extends BrowserInfo {
     activated: boolean;
+    managed: boolean;
     bi: BrowserInfo;
     core_version: string;
-    constructor(activated: boolean, bi: BrowserInfo, core_version: string);
+    constructor(activated: boolean, managed: boolean, bi: BrowserInfo, core_version: string);
 }
 
 export { DSClient };
 class DSClient implements AbstractDSClient {
     constructor(url: string, connection: Connection, cfg: GCLConfig);
-    registerDevice(pubKey: string, info: any, callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
-    synchronizationRequest(pubKey: string, info: any, proxy: string, callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
     getUrl(): string;
     getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
     getDevice(uuid: string, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
-    getJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
-    refreshJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
-    getPubKey(callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse>;
+    getPubKey(uuid: string, callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse>;
     downloadLink(infoBrowser: BrowserInfo, callback?: (error: CoreExceptions.RestException, data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
-    register(info: DSPlatformInfo, device_id: string, callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
-    sync(info: DSPlatformInfo, device_id: string, callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
+    register(registrationData: DSRegistrationOrSyncRequest, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
+    sync(syncData: DSRegistrationOrSyncRequest, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
 }
 
 export { AbstractOCVClient, OCVClient };
@@ -1215,10 +1252,10 @@ export { AdminService };
 class AdminService implements AbstractAdmin {
     static JWT_ERROR_CODES: string[];
     constructor(url: string, connection: LocalAuthConnection);
-    activate(data: any, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
-    setPubKey(pubkey: string, callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
-    updateContainerConfig(config: any, callback?: (error: CoreExceptions.RestException, data: any) => void): Promise<any>;
+    setPubKey(keys: SetPubKeyRequest, callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
+    updateContainerConfig(containers: ContainerSyncRequest, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
 }
 
 export { AbstractPkcs11, InfoResponse, Pkcs11Certificate, Pkcs11CertificatesResponse, Pkcs11Info, Pkcs11SignData, Pkcs11VerifySignedData, Slot, SlotsResponse, TokenInfo, TokenResponse, ModuleConfig };
@@ -1634,12 +1671,17 @@ interface AbstractDataContainer {
     delete(id: string, callback?: (error: RestException, data: any) => void): Promise<any>;
 }
 
-export { AbstractAdmin, PubKeys, PubKeyResponse };
+export { AbstractAdmin, PubKeys, PubKeyResponse, SetPubKeyRequest, ContainerSyncRequest };
 interface AbstractAdmin {
-    activate(data: any, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
-    setPubKey(pubkey: string, callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
-    updateContainerConfig(config: any, callback?: (error: CoreExceptions.RestException, data: any) => void): Promise<any>;
+    setPubKey(keys: SetPubKeyRequest, callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
+    updateContainerConfig(containers: ContainerSyncRequest, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+}
+class SetPubKeyRequest {
+    encryptedPublicKey: string;
+    encryptedAesKey: string;
+    constructor(encryptedPublicKey: string, encryptedAesKey: string);
 }
 class PubKeyResponse implements T1CResponse {
     data: PubKeys;
@@ -1650,5 +1692,9 @@ class PubKeys {
     device: string;
     ssl: string;
     constructor(device: string, ssl: string);
+}
+class ContainerSyncRequest {
+    containerResponses: DSContainer[];
+    constructor(containerResponses: DSContainer[]);
 }
 

@@ -3,36 +3,48 @@
  * @since 2017
  */
 
-import * as CoreExceptions from "../exceptions/CoreExceptions";
-import { BrowserInfo, DataResponse, T1CResponse } from '../service/CoreModel';
-import { GCLConfig } from '../GCLConfig';
-import { Connection } from '../client/Connection';
-import { DSClient } from './DSClient';
+import { BrowserInfo, T1CContainer, T1CResponse } from '../service/CoreModel';
+import { RestException } from '../exceptions/CoreExceptions';
 
 export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse,
-    DeviceResponse, DSPlatformInfo };
+    DeviceResponse, DSPlatformInfo, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem, DSContainer, DSStorage };
 
 
 interface AbstractDSClient {
-    registerDevice(pubKey: string, info: any,
-                   callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
-    synchronizationRequest(pubKey: string, info: any, proxy: string,
-                           callback?: (error: CoreExceptions.RestException, data: DataResponse) => void): Promise<DataResponse>;
     getUrl(): string;
-    getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
-    getJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
-    getDevice(uuid: string, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
-    refreshJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
-    getPubKey(callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse>;
+    getInfo(callback?: (error: RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
+    getDevice(uuid: string, callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
+    getPubKey(deviceId: string,
+              callback?: (error: RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse>;
     downloadLink(infoBrowser: BrowserInfo,
-                 callback?: (error: CoreExceptions.RestException,
+                 callback?: (error: RestException,
                              data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
-    register(info: DSPlatformInfo,
-             device_id: string,
-             callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
-    sync(info: DSPlatformInfo,
-         device_id: string,
-         callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
+    register(registrationData: DSRegistrationOrSyncRequest,
+             callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
+    sync(syncData: DSRegistrationOrSyncRequest,
+         callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
+}
+
+class DSBrowser {
+    constructor(public name: string, public version: string) {}
+}
+
+class DSOperatingSystem {
+    constructor(public architecture: number, public name: string, public version: string) {}
+}
+
+class DSRegistrationOrSyncRequest {
+    constructor(public managed: boolean,
+                public activated: boolean,
+                public uuid: string,
+                public version: string,
+                public derEncodedPublicKey: string,
+                public manufacturer: string,
+                public browser: DSBrowser,
+                public os: DSOperatingSystem,
+                public ua: string,
+                public proxyDomain: string,
+                public containerStates?: T1CContainer[]) {}
 }
 
 class DSInfoResponse {
@@ -62,15 +74,35 @@ class JWTResponse {
 }
 
 class DSPubKeyResponse implements T1CResponse {
-    constructor(public pubkey: string, public success: boolean) {}
+    constructor(public encryptedPublicKey: string, public encryptedAesKey: string, public success: boolean) {}
 }
 
 class DeviceResponse {
-    constructor(public activated: boolean, public coreVersion: string, public managed: boolean, public uuid: string) {}
+    constructor(public uuid: string,
+                public activated: boolean,
+                public managed: boolean,
+                public coreVersion: string,
+                public containerResponses: DSContainer[]) {}
+}
+
+class DSContainer {
+    constructor(public id: string,
+                public name: string,
+                public version: string,
+                public osStorage: DSStorage[],
+                public language: string,
+                public availability: string,
+                public dependsOn: string[],
+                public status: string) {}
+}
+
+class DSStorage {
+    constructor(public hash: string, public storagePath: string, public os: string) {}
 }
 
 class DSPlatformInfo extends BrowserInfo {
     constructor(public activated: boolean,
+                public managed: boolean,
                 public bi: BrowserInfo,
                 public core_version: string) {
         super(bi.browser, bi.manufacturer, bi.os, bi.ua);
