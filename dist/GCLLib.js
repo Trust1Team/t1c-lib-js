@@ -30730,8 +30730,6 @@ var GCLLib =
 	        return { sendGwJwt: true, sendGclJwt: false, sendApiKey: true, sendToken: true };
 	    };
 	    GenericConnection.extractAccessToken = function (headers, config) {
-	        console.log('extract token');
-	        console.log(headers);
 	        if (headers && headers.access_token) {
 	            config.gclJwt = headers.access_token;
 	        }
