@@ -1,23 +1,18 @@
 (function ($) {
-    var gclConfig = new GCLLib.GCLConfig();
-    gclConfig.apiKey = "44865b13-f94b-45e6-b1cf-2f12d4bd547d"; //test apikey rate limited
-    gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
-    gclConfig.ocvUrl = "https://accapim.t1t.be:443/trust1team/ocv-api/v1";
-    //gclConfig.ocvUrl = "http://localhost:8080/ocv-api-web/v1";
-    gclConfig.localTestMode=false;
-    gclConfig.allowAutoUpdate = true;
-    gclConfig.implicitDownload = false;
-    gclConfig.osPinDialog = true;
+    var localTestMode = false;
 
-    if (gclConfig.localTestMode) {
-        gclConfig.dsUrl = "http://localhost:8080";
-    } else {
-        gclConfig.dsUrl = "https://accapim.t1t.be:443";
-        //gclConfig.dsUrl = "https://accapim.t1t.be:443";
-        //gclConfig.dsUrl = "https://prodapim.t1t.be:443";
-        //gclConfig.dsUrl = "https://t1c.t1t.be:443";
+    var gclOptions = {
+        apiKey: "44865b13-f94b-45e6-b1cf-2f12d4bd547d", //test apikey rate limited
+        gwOrProxyUrl: "https://accapim.t1t.be:443",
+        allowAutoUpdate: true,
+        implicitDownload: false,
+        osPinDialog: true,
+        localTestMode: localTestMode
+    };
 
-    }
+    if (localTestMode) { gclOptions.gwOrProxyUrl = 'http://localhost:8080' }
+
+    var gclConfig = new GCLLib.GCLConfig(gclOptions);
 
     var connector;
 
@@ -55,6 +50,9 @@
         });
     }, function(error) {
         console.log(error);
+        // error.client.download().then(function(result) {
+        //     console.log(result);
+        // })
     });
 
 

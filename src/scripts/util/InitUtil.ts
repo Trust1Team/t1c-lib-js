@@ -62,14 +62,13 @@ class InitUtil {
                             } else {
                                 // not yet activated, do this now
                                 // console.log('need to activate');
-                                activationPromise = ActivationUtil.unManagedInitialization(client.admin(),
-                                    client.ds(), cfg, mergedInfo, uuid);
+                                activationPromise = ActivationUtil.unManagedInitialization(client, mergedInfo, uuid);
                             }
                             activationPromise.then(() => {
                                 // update core service
                                 client.updateAuthConnection(cfg);
                                 // device is activated, sync it
-                                resolve(SyncUtil.unManagedSynchronization(client, cfg, mergedInfo, uuid, false));
+                                resolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, false));
                             }, err => {
                                 reject(err);
                                 // resolve(SyncUtil.unManagedSynchronization(client.admin(), client.ds(), cfg, mergedInfo, uuid));
@@ -77,9 +76,9 @@ class InitUtil {
                         }
                     } else {
                         // installed version is not compatible, reject initialization
-                        // TODO check if this works
+                        // return the client in the error so a new version can be downloaded!
                         reject(new RestException(400, '301',
-                            'Installed GCL version is not v2 compatible. Please update to a compatible version.'));
+                            'Installed GCL version is not v2 compatible. Please update to a compatible version.', client));
                     }
                 }, () => {
                     // failure probably because GCL is not installed

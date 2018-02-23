@@ -46,15 +46,41 @@ class RestException {
     status: number;
     code: string;
     description: string;
-    constructor(status: number, code: string, description: string);
+    client: GCLClient;
+    constructor(status: number, code: string, description: string, client?: GCLClient);
 }
 export { RestException };
 
-class GCLConfig implements GCLConfig {
-    constructor(dsUriValue?: string, apiKey?: string, pkcs11Config?: ModuleConfig);
-    ocvUrl: string;
+export { GCLConfig, GCLConfigOptions };
+class GCLConfigOptions {
     gclUrl: string;
-    dsUrl: string;
+    gwOrProxyUrl: string;
+    apiKey: string;
+    ocvContextPath: string;
+    dsContextPath: string;
+    dsFileContextPath: string;
+    pkcs11Config: ModuleConfig;
+    agentPort: number;
+    allowAutoUpdate: boolean;
+    implicitDownload: boolean;
+    forceHardwarePinpad: boolean;
+    sessionTimeout: number;
+    consentDuration: number;
+    consentTimeout: number;
+    syncManaged: boolean;
+    osPinDialog: boolean;
+    containerDownloadTimeout: number;
+    localTestMode: boolean;
+    constructor(gclUrl?: string, gwOrProxyUrl?: string, apiKey?: string, ocvContextPath?: string, dsContextPath?: string, dsFileContextPath?: string, pkcs11Config?: ModuleConfig, agentPort?: number, allowAutoUpdate?: boolean, implicitDownload?: boolean, forceHardwarePinpad?: boolean, sessionTimeout?: number, consentDuration?: number, consentTimeout?: number, syncManaged?: boolean, osPinDialog?: boolean, containerDownloadTimeout?: number, localTestMode?: boolean);
+}
+class GCLConfig implements GCLConfig {
+    constructor(options: GCLConfigOptions);
+    readonly ocvUrl: string;
+    ocvContextPath: string;
+    gclUrl: string;
+    readonly dsUrl: string;
+    dsContextPath: string;
+    dsFileContextPath: string;
     apiKey: string;
     allowAutoUpdate: boolean;
     client_id: string;
@@ -63,7 +89,7 @@ class GCLConfig implements GCLConfig {
     agentPort: number;
     implicitDownload: boolean;
     readonly dsFileDownloadUrl: string;
-    readonly dsUrlBase: string;
+    gwUrl: string;
     localTestMode: boolean;
     forceHardwarePinpad: boolean;
     defaultSessionTimeout: number;
@@ -79,7 +105,6 @@ class GCLConfig implements GCLConfig {
     gclJwt: string;
     getGwJwt(): Promise<string>;
 }
-export { GCLConfig };
 
 export { CoreService };
 class CoreService implements CoreModel.AbstractCore {
@@ -1691,7 +1716,8 @@ class PubKeyResponse implements T1CResponse {
 class PubKeys {
     device: string;
     ssl: string;
-    constructor(device: string, ssl: string);
+    ds: string;
+    constructor(device: string, ssl: string, ds?: string);
 }
 class ContainerSyncRequest {
     containerResponses: DSContainer[];

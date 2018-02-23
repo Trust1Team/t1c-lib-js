@@ -28,7 +28,7 @@ class PubKeyResponse implements T1CResponse {
 }
 
 class PubKeys {
-    constructor(public device: string, public ssl: string) {}
+    constructor(public device: string, public ssl: string, public ds?: string) {}
 }
 
 class ContainerSyncRequest {

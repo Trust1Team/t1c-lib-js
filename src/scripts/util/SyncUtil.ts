@@ -29,12 +29,11 @@ class SyncUtil {
 
     public static managedSynchronisation(client: GCLClient, mergedInfo: DSPlatformInfo, uuid: string, containers: T1CContainer[]) {
         return client.admin().getPubKey().then(keys => {
-            return SyncUtil.syncDevice(client.ds(), keys.data.device, mergedInfo, uuid, containers);
+            return SyncUtil.syncDevice(client, keys.data.device, mergedInfo, uuid, containers);
         });
     }
 
     public static unManagedSynchronization(client: GCLClient,
-                                           config: GCLConfig,
                                            mergedInfo: DSPlatformInfo,
                                            uuid: string,
                                            isRetry: boolean) {
@@ -49,7 +48,7 @@ class SyncUtil {
             // final sync with updated container list
             client.admin().getPubKey().then(pubKey => {
                 return client.core().info().then(info => {
-                    return SyncUtil.syncDevice(client.ds(), pubKey.data.device, mergedInfo, uuid, info.data.containers).then(device => {
+                    return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, info.data.containers).then(device => {
                         return client.admin().updateContainerConfig(new ContainerSyncRequest(device.containerResponses)).then(() => {
                             // setup data container paths
                             DataContainerUtil.setupDataContainers(device.containerResponses);
@@ -57,15 +56,14 @@ class SyncUtil {
                             return SyncUtil.pollDownloadCompletion(client,
                                 device.containerResponses, isRetry).then((finalContainerList) => {
                                 // all downloads complete, do final sync
-                                return SyncUtil.syncDevice(client.ds(),
-                                    pubKey.data.device, mergedInfo, uuid, finalContainerList).then(() => {
+                                return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, finalContainerList).then(() => {
                                     // lib ready to use
                                     resolve();
                                 });
                             }, (error) => {
                                 if (typeof error === 'boolean' && !isRetry) {
                                     // need to trigger retry
-                                    resolve(SyncUtil.unManagedSynchronization(client, config, mergedInfo, uuid, true));
+                                    resolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, true));
                                 } else {
                                     // something went wrong, return error
                                     reject(error);
@@ -80,12 +78,12 @@ class SyncUtil {
         });
     }
 
-    public static syncDevice(ds: DSClient,
+    public static syncDevice(client: GCLClient,
                              pubKey: string,
                              info: DSPlatformInfo,
                              deviceId: string,
                              containers: T1CContainer[]): Promise<DeviceResponse> {
-        return ds.sync(new DSRegistrationOrSyncRequest(info.managed,
+        return client.ds().sync(new DSRegistrationOrSyncRequest(info.managed,
             info.activated,
             deviceId,
             info.core_version,
@@ -94,8 +92,7 @@ class SyncUtil {
             info.browser,
             info.os,
             info.ua,
-            // TODO proxy domain handling!
-            '',
+            client.config().gwUrl,
             containers)
         );
     }

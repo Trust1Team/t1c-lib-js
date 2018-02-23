@@ -11,24 +11,57 @@ import { Promise } from 'es6-promise';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import * as jwtDecode from 'jwt-decode';
 
-const defaultGclUrl = 'https://localhost:10443/v1';
-const defaultDSUrl = 'https://accapim.t1t.be:443';
-const defaultDSContextPath = '/trust1team/gclds/v2';
-const defaultOCVContextPath = '/trust1team/ocv-api/v1';
-const defaultDSContextPathTestMode = '/gcl-ds-web/v1';
-const fileDownloadUrlPostfix = '/trust1team/gclds-file/v1';
-const defaultAllowAutoUpdate = true;
-const defaultImplicitDownload = false;
-const defaultLocalTestMode = false;
+export { GCLConfig, GCLConfigOptions };
+
+const defaults = {
+    gclUrl: 'https://localhost:10443/v1',
+    gwUrl: 'https://accapim.t1t.be:443',
+    dsContextPath: '/trust1team/gclds/v2',
+    ocvContextPath: '/trust1team/ocv-api/v1',
+    dsContextPathTestMode: '/gcl-ds-web/v2',
+    fileDownloadUrlPostfix: '/trust1team/gclds-file/v1',
+    tokenExchangeContextPath: '/apiengineauth/v1/login/application/token',
+    allowAutoUpdate: true,
+    implicitDownload: false,
+    localTestMode: false,
+    forceHardwarePinpad: false,
+    sessionTimeout: 5,
+    consentDuration: 1,
+    consentTimeout: 10,
+    syncManaged: true,
+    osPinDialog: false,
+    containerDownloadTimeout: 30
+};
+
+class GCLConfigOptions {
+    constructor(public gclUrl?: string,
+                public gwOrProxyUrl?: string,
+                public apiKey?: string,
+                public ocvContextPath?: string,
+                public dsContextPath?: string,
+                public dsFileContextPath?: string,
+                public pkcs11Config?: ModuleConfig,
+                public agentPort?: number,
+                public allowAutoUpdate?: boolean,
+                public implicitDownload?: boolean,
+                public forceHardwarePinpad?: boolean,
+                public sessionTimeout?: number,
+                public consentDuration?: number,
+                public consentTimeout?: number,
+                public syncManaged?: boolean,
+                public osPinDialog?: boolean,
+                public containerDownloadTimeout?: number,
+                public localTestMode?: boolean) {}
+}
 
 class GCLConfig  implements GCLConfig {
     // singleton pattern
     private static instance: GCLConfig;
     private _gwUrl: string;
-    private _ocvUrl: string;
     private _gclUrl: string;
-    private _dsFileDownloadUrl: string;
-    private _dsUrl: string;
+    private _dsContextPath: string;
+    private _dsFileContextPath: string;
+    private _ocvContextPath: string;
     private _apiKey: string;
     private _client_id: string;
     private _client_secret: string;
@@ -51,34 +84,38 @@ class GCLConfig  implements GCLConfig {
     private _containerDownloadTimeout: number;
 
     // constructor for DTO
-    constructor (gwUriValue?: string, apiKey?: string, pkcs11Config?: ModuleConfig) {
-        this._gclUrl = defaultGclUrl;
-        this._gwUrl = gwUriValue;
-        this._dsUrl = gwUriValue + defaultDSContextPath;
-        this._ocvUrl = gwUriValue + defaultOCVContextPath;
-        this._dsFileDownloadUrl = gwUriValue + fileDownloadUrlPostfix;
-        this._apiKey = apiKey;
+    constructor(options: GCLConfigOptions) {
+        this._gclUrl = options.gclUrl || defaults.gclUrl;
+        this._gwUrl = options.gwOrProxyUrl || defaults.gwUrl;
+        this._dsContextPath = options.dsContextPath || defaults.dsContextPath;
+        this._dsFileContextPath = options.dsFileContextPath || defaults.fileDownloadUrlPostfix;
+        this._ocvContextPath = options.ocvContextPath || defaults.ocvContextPath;
+        this._apiKey = options.apiKey;
         this._citrix = false;
-        this._agentPort = -1;
-        this._allowAutoUpdate = defaultAllowAutoUpdate;
-        this._implicitDownload = defaultImplicitDownload;
-        this._localTestMode = defaultLocalTestMode;
-        this._forceHardwarePinpad = false;
-        this._defaultSessionTimeout = 5;
-        this._defaultConsentDuration = 1;
-        this._defaultConsentTimeout = 10;
-        this._syncManaged = true;
-        this._pkcs11Config = pkcs11Config;
-        this._osPinDialog = false;
-        this._containerDownloadTimeout = 30;
+        this._agentPort = options.agentPort || -1;
+        this._allowAutoUpdate = options.allowAutoUpdate || defaults.allowAutoUpdate;
+        this._implicitDownload = options.implicitDownload || defaults.implicitDownload;
+        this._localTestMode = options.localTestMode || defaults.localTestMode;
+        this._forceHardwarePinpad = options.forceHardwarePinpad || defaults.forceHardwarePinpad;
+        this._defaultSessionTimeout = options.sessionTimeout || defaults.sessionTimeout;
+        this._defaultConsentDuration = options.consentDuration || defaults.consentDuration;
+        this._defaultConsentTimeout = options.consentTimeout || defaults.consentTimeout;
+        this._syncManaged = options.syncManaged || defaults.syncManaged;
+        this._pkcs11Config = options.pkcs11Config;
+        this._osPinDialog = options.osPinDialog || defaults.osPinDialog;
+        this._containerDownloadTimeout = options.containerDownloadTimeout || defaults.containerDownloadTimeout;
     }
 
     get ocvUrl(): string {
-        return this._ocvUrl;
+        return this.gwUrl + this.ocvContextPath;
     }
 
-    set ocvUrl(value: string) {
-        this._ocvUrl = value;
+    get ocvContextPath(): string {
+        return this._ocvContextPath;
+    }
+
+    set ocvContextPath(value: string) {
+        this._ocvContextPath = value;
     }
 
     get gclUrl(): string {
@@ -86,25 +123,28 @@ class GCLConfig  implements GCLConfig {
     }
 
     set gclUrl(value: string) {
-        this._gclUrl = value || defaultGclUrl;
+        this._gclUrl = value || defaults.gclUrl;
     }
 
     get dsUrl(): string {
-        return this._dsUrl;
+        if (this._localTestMode) { return this.gwUrl + defaults.dsContextPathTestMode; }
+        else { return this.gwUrl + this.dsContextPath; }
     }
 
-    set dsUrl(dsUriValue: string) {
-        if (_.endsWith(dsUriValue, defaultDSContextPath)) {
-            this._dsUrlBase = _.replace(dsUriValue, defaultDSContextPath, '');
-            this._dsUrl = dsUriValue;
-            this._dsFileDownloadUrl = this._dsUrlBase + fileDownloadUrlPostfix;
-            this._ocvUrl = this._dsUrlBase + defaultOCVContextPath;
-        } else {
-            this._dsUrl = dsUriValue + defaultDSContextPath;
-            this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
-            this._dsUrlBase = dsUriValue;
-            this._ocvUrl = dsUriValue + defaultOCVContextPath;
-        }
+    get dsContextPath(): string {
+        return this._dsContextPath;
+    }
+
+    set dsContextPath(value: string) {
+        this._dsContextPath = value;
+    }
+
+    get dsFileContextPath(): string {
+        return this._dsFileContextPath;
+    }
+
+    set dsFileContextPath(value: string) {
+        this._dsFileContextPath = value;
     }
 
     get apiKey(): string {
@@ -164,11 +204,15 @@ class GCLConfig  implements GCLConfig {
     }
 
     get dsFileDownloadUrl(): string {
-        return this._dsFileDownloadUrl;
+        return this.gwUrl + this.dsFileContextPath;
     }
 
     get gwUrl() {
         return this._gwUrl;
+    }
+
+    set gwUrl(value: string) {
+        this._gwUrl = value;
     }
 
     get localTestMode(): boolean {
@@ -177,7 +221,6 @@ class GCLConfig  implements GCLConfig {
 
     set localTestMode(value: boolean) {
         this._localTestMode = value;
-        if (this._localTestMode) { this._dsUrl = this._dsUrlBase + defaultDSContextPathTestMode; }
     }
 
     get forceHardwarePinpad(): boolean {
@@ -263,23 +306,17 @@ class GCLConfig  implements GCLConfig {
     get gwJwt(): Promise<string> {
         let self = this;
         return new Promise((resolve, reject) => {
-            console.log('promise');
-            console.log(self);
             if (!self._gwJwt || !self._gwJwt.length) {
-                console.log('no jwt');
                 // no jwt available, get one from the GW
                 resolve(self.getGwJwt());
             } else {
-                console.log('jwt present');
                 let decoded = jwtDecode(self._gwJwt);
                 // check JWT expired
                 if (decoded.exp < new Date()) {
                     // refresh
-                    console.log('refreshing');
                     resolve(self.getGwJwt());
                 } else {
                     // jwt ok to use
-                    console.log('jwt ok');
                     resolve(self._gwJwt);
                 }
             }
@@ -295,9 +332,8 @@ class GCLConfig  implements GCLConfig {
     }
 
     getGwJwt(): Promise<string> {
-        console.log('get gw jwt');
         let config: AxiosRequestConfig = {
-            url: this.gwUrl + '/apiengineauth/v1/login/application/token',
+            url: this.gwUrl + defaults.tokenExchangeContextPath,
             method: 'GET',
             headers: { apikey: this.apiKey },
             responseType:  'json'
@@ -308,5 +344,3 @@ class GCLConfig  implements GCLConfig {
         });
     }
 }
-
-export { GCLConfig };
