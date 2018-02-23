@@ -56,7 +56,7 @@ class GCLClient {
 
     constructor(cfg: GCLConfig, automatic: boolean) {
         // resolve config to singleton
-        this.cfg = GCLClient.resolveConfig(cfg);
+        this.cfg = cfg;
         // init communication
         this.connection = new LocalConnection(this.cfg);
         this.authConnection = new LocalAuthConnection(this.cfg);
@@ -105,31 +105,31 @@ class GCLClient {
     /**
      * Init security context
      */
-    private static initLibrary(): Promise<{}> {
+    private static initLibrary(): Promise<GCLClient> {
         return InitUtil.initializeLibrary(ClientService.getClient());
     }
 
-    private static resolveConfig(cfg: GCLConfig) {
-        // must be the base url because the GCLConfig object adds the context path and keeps the base url intact
-        let resolvedCfg: GCLConfig = new GCLConfig(cfg.gwUrl, cfg.apiKey, cfg.pkcs11Config);
-        resolvedCfg.allowAutoUpdate = cfg.allowAutoUpdate;
-        resolvedCfg.client_id = cfg.client_id;
-        resolvedCfg.client_secret = cfg.client_secret;
-        resolvedCfg.gclUrl = cfg.gclUrl;
-        resolvedCfg.ocvUrl = cfg.ocvUrl;
-        resolvedCfg.implicitDownload = cfg.implicitDownload;
-        resolvedCfg.localTestMode = cfg.localTestMode;
-        resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
-        resolvedCfg.defaultSessionTimeout = cfg.defaultSessionTimeout;
-        resolvedCfg.defaultConsentDuration = cfg.defaultConsentDuration;
-        resolvedCfg.defaultConsentTimeout = cfg.defaultConsentTimeout;
-        resolvedCfg.citrix = cfg.citrix;
-        resolvedCfg.agentPort = cfg.agentPort;
-        resolvedCfg.syncManaged = cfg.syncManaged;
-        resolvedCfg.osPinDialog = cfg.osPinDialog;
-        resolvedCfg.containerDownloadTimeout = cfg.containerDownloadTimeout;
-        return resolvedCfg;
-    }
+    // private static resolveConfig(cfg: GCLConfig) {
+    //     // must be the base url because the GCLConfig object adds the context path and keeps the base url intact
+    //     let resolvedCfg: GCLConfig = new GCLConfig(cfg);
+    //     resolvedCfg.allowAutoUpdate = cfg.allowAutoUpdate;
+    //     resolvedCfg.client_id = cfg.client_id;
+    //     resolvedCfg.client_secret = cfg.client_secret;
+    //     resolvedCfg.gclUrl = cfg.gclUrl;
+    //     resolvedCfg.ocvUrl = cfg.ocvUrl;
+    //     resolvedCfg.implicitDownload = cfg.implicitDownload;
+    //     resolvedCfg.localTestMode = cfg.localTestMode;
+    //     resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
+    //     resolvedCfg.defaultSessionTimeout = cfg.defaultSessionTimeout;
+    //     resolvedCfg.defaultConsentDuration = cfg.defaultConsentDuration;
+    //     resolvedCfg.defaultConsentTimeout = cfg.defaultConsentTimeout;
+    //     resolvedCfg.citrix = cfg.citrix;
+    //     resolvedCfg.agentPort = cfg.agentPort;
+    //     resolvedCfg.syncManaged = cfg.syncManaged;
+    //     resolvedCfg.osPinDialog = cfg.osPinDialog;
+    //     resolvedCfg.containerDownloadTimeout = cfg.containerDownloadTimeout;
+    //     return resolvedCfg;
+    // }
 
     // get admin services
     public admin = (): AdminService => { return this.adminService; };
