@@ -73,6 +73,7 @@ abstract class GenericConnection implements Connection {
     }
 
     private static extractAccessToken(headers: RequestHeaders, config: GCLConfig) {
+
         if (headers && headers.access_token) {
             config.gclJwt = headers.access_token;
         }

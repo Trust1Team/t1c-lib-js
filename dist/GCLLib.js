@@ -57549,7 +57549,6 @@ var GCLLib =
 	            var initPromise = new es6_promise_1.Promise(function (resolve, reject) {
 	                var cfg = client.config();
 	                client.core().info().then(function (infoResponse) {
-	                    console.log(infoResponse);
 	                    cfg.citrix = infoResponse.data.citrix;
 	                    cfg.tokenCompatible = InitUtil.checkTokenCompatible(infoResponse.data.version);
 	                    cfg.v2Compatible = InitUtil.coreV2Compatible(infoResponse.data.version);

@@ -23,7 +23,6 @@ class InitUtil {
             let initPromise = new Promise((resolve, reject) => {
                 let cfg = client.config();
                 client.core().info().then(infoResponse => {
-                    console.log(infoResponse);
                     // update config values
                     cfg.citrix = infoResponse.data.citrix;
                     cfg.tokenCompatible = InitUtil.checkTokenCompatible(infoResponse.data.version);
