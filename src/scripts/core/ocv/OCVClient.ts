@@ -2,7 +2,7 @@
  * @author Michallis Pashidis
  * @author Maarten Somers
  */
-import { RemoteConnection } from '../client/Connection';
+import { RemoteJwtConnection } from '../client/Connection';
 import { RestException } from '../exceptions/CoreExceptions';
 import {
     AbstractOCVClient, CertificateChainData, CertificateChainResponse, ChallengeResponse, ChallengeSignedHashData,
@@ -20,7 +20,7 @@ const SIGNATURE = '/signature/validate';
 
 class OCVClient implements AbstractOCVClient {
 
-    constructor(private url: string, private connection: RemoteConnection) {}
+    constructor(private url: string, private connection: RemoteJwtConnection) {}
 
     public getUrl() { return this.url; }
 

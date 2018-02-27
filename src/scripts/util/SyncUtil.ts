@@ -15,6 +15,7 @@ import { GCLClient } from '../core/GCLLib';
 import { RestException } from '../core/exceptions/CoreExceptions';
 import { T1CContainer } from '../core/service/CoreModel';
 import { ContainerSyncRequest } from '../core/admin/adminModel';
+import { error } from 'util';
 
 export { SyncUtil };
 
@@ -28,8 +29,14 @@ class SyncUtil {
     constructor() {}
 
     public static managedSynchronisation(client: GCLClient, mergedInfo: DSPlatformInfo, uuid: string, containers: T1CContainer[]) {
-        return client.admin().getPubKey().then(keys => {
-            return SyncUtil.syncDevice(client, keys.data.device, mergedInfo, uuid, containers);
+        // this is NON-BLOCKING and will always resolve!
+        return new Promise((resolve) => {
+            client.admin().getPubKey().then(keys => {
+                return SyncUtil.syncDevice(client, keys.data.device, mergedInfo, uuid, containers).then(() => { resolve(); });
+            }).catch(() => {
+                // error occurred, but non-blocking so we resolve
+                resolve();
+            });
         });
     }
 
@@ -101,9 +108,7 @@ class SyncUtil {
         let maxSeconds = client.config().containerDownloadTimeout || 30;
 
         return new Promise((resolve, reject) => {
-            // TODO activate polling once DS and GCL are capable
-            // poll(resolve, reject);
-            resolve([]);
+            poll(resolve, reject);
         });
 
         function poll(resolve?: (containers: T1CContainer[]) => void, reject?: (error: any) => void) {

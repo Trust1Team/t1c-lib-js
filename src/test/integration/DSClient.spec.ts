@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import {DSClient} from "../../scripts/core/ds/DSClient";
-import {RemoteConnection} from "../../scripts/core/client/Connection";
+import {RemoteJwtConnection} from "../../scripts/core/client/Connection";
 import {GCLClient} from "../../scripts/core/GCLLib";
 import {GCLConfig} from "../../scripts/core/GCLConfig";
 // workaround in order to use require for non available module in DefinitlyTyped
@@ -9,12 +9,12 @@ var jwtDecode = require("jwt-decode");
 
 describe("DSClient", () => {
     let dsUnderTest = "http://localhost:8080/gcl-ds-web/v1";
-    let remoteConnection: RemoteConnection;
+    let remoteConnection: RemoteJwtConnection;
     let dsClient: DSClient;
     let config = new GCLConfig("https://dist.t1t.be/v1", "someapikey");
 
     beforeEach(() => {
-        remoteConnection = new RemoteConnection(config);
+        remoteConnection = new RemoteJwtConnection(config);
         dsClient = new DSClient(dsUnderTest, remoteConnection, config);
     });
 
