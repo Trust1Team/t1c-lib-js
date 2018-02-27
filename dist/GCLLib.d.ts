@@ -9,6 +9,7 @@ class GCLClient {
     constructor(cfg: GCLConfig, automatic: boolean);
     static initialize(cfg: GCLConfig, callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): Promise<GCLClient>;
     admin: () => AdminService;
+    auth: () => AuthClient;
     core: () => CoreService;
     config: () => GCLConfig;
     agent: () => AbstractAgent;
@@ -75,6 +76,7 @@ class GCLConfigOptions {
 }
 class GCLConfig implements GCLConfig {
     constructor(options: GCLConfigOptions);
+    readonly authUrl: string;
     readonly ocvUrl: string;
     ocvContextPath: string;
     gclUrl: string;
@@ -239,7 +241,7 @@ class DSClient implements AbstractDSClient {
 
 export { AbstractOCVClient, OCVClient };
 class OCVClient implements AbstractOCVClient {
-    constructor(url: string, connection: RemoteConnection);
+    constructor(url: string, connection: RemoteJwtConnection);
     getUrl(): string;
     validateSignature(data: SignatureValidationData, callback?: (error: RestException, data: SignatureValidationResponse) => void): void | Promise<SignatureValidationResponse>;
     getInfo(callback?: (error: RestException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse>;
@@ -1382,7 +1384,14 @@ declare class ModuleConfig {
     constructor(linux: string, mac: string, win: string);
 }
 
-export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteConnection, Connection, LocalTestConnection, RequestBody, RequestHeaders, RequestCallback, QueryParams };
+export { AuthClient };
+class AuthClient implements AbstractAuth {
+    constructor(cfg: GCLConfig, connection: RemoteJwtConnection);
+    getJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
+    refreshJWT(currentJWT: string, callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
+}
+
+export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteApiKeyConnection, RemoteJwtConnection, Connection, LocalTestConnection, RequestBody, RequestHeaders, RequestCallback, QueryParams };
 interface Connection {
     get(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     post(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
@@ -1458,7 +1467,21 @@ class LocalConnection extends GenericConnection implements Connection {
     putFile(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
     delete(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
 }
-class RemoteConnection extends GenericConnection implements Connection {
+class RemoteApiKeyConnection extends GenericConnection implements Connection {
+    cfg: GCLConfig;
+    constructor(cfg: GCLConfig);
+    static getSecurityConfig(): {
+        sendGwJwt: boolean;
+        sendGclJwt: boolean;
+        sendApiKey: boolean;
+        sendToken: boolean;
+    };
+    get(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
+    post(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
+    put(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
+    delete(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
+}
+class RemoteJwtConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;
     constructor(cfg: GCLConfig);
     static getSecurityConfig(): {
@@ -1722,5 +1745,15 @@ class PubKeys {
 class ContainerSyncRequest {
     containerResponses: DSContainer[];
     constructor(containerResponses: DSContainer[]);
+}
+
+export { AbstractAuth, JWTResponse };
+interface AbstractAuth {
+    getJWT(callback?: (error: RestException, data: JWTResponse) => void): Promise<JWTResponse>;
+    refreshJWT(currentJWT: string, callback?: (error: RestException, data: JWTResponse) => void): Promise<JWTResponse>;
+}
+class JWTResponse {
+    token: string;
+    constructor(token: string);
 }
 

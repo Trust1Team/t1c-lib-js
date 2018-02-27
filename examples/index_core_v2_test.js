@@ -133,16 +133,20 @@
         $("#error").empty();
         connector.core().getPubKey().then(handleSuccess, handleError);
     });
+    var currentJwt;
     $("#getJWT").on('click', function () {
         $("#information").empty();
         $("#error").empty();
-        connector.ds().getJWT().then(handleSuccess, handleError);
+        connector.auth().getJWT().then(function(data) {
+            currentJwt = data.token;
+            return data;
+        }).then(handleSuccess, handleError);
     });
     $("#getJWTRefresh").on('click', function () {
         $("#information").empty();
         $("#error").empty();
         $("#validationError").empty();
-        connector.ds().refreshJWT().then(handleSuccess, handleError);
+        connector.auth().refreshJWT(currentJwt).then(handleSuccess, handleError);
     });
     $("#getPlugins").on('click', function () {
         $("#information").empty();

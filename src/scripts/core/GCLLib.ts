@@ -8,7 +8,10 @@ import * as CoreExceptions from './exceptions/CoreExceptions';
 
 import { GCLConfig } from './GCLConfig';
 import { CoreService } from './service/CoreService';
-import { LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection } from './client/Connection';
+import {
+    LocalConnection, RemoteJwtConnection, LocalAuthConnection, LocalTestConnection,
+    RemoteApiKeyConnection
+} from './client/Connection';
 import { DownloadLinkResponse } from './ds/DSClientModel';
 import { DSClient } from './ds/DSClient';
 import { AbstractOCVClient, OCVClient } from './ocv/OCVClient';
@@ -39,6 +42,7 @@ import { AdminService } from './admin/admin';
 import { InitUtil } from '../util/InitUtil';
 import { AbstractPkcs11 } from '../plugins/smartcards/pkcs11/pkcs11Model';
 import { ClientService } from '../util/ClientService';
+import { AuthClient } from './auth/Auth';
 
 class GCLClient {
     public GCLInstalled: boolean;
@@ -48,11 +52,13 @@ class GCLClient {
     private coreService: CoreService;
     private connection: LocalConnection;
     private authConnection: LocalAuthConnection;
-    private remoteConnection: RemoteConnection;
+    private remoteConnection: RemoteJwtConnection;
+    private remoteApiKeyConnection: RemoteApiKeyConnection;
     private localTestConnection: LocalTestConnection;
     private agentClient: AgentClient;
     private dsClient: DSClient;
     private ocvClient: OCVClient;
+    private authClient: AuthClient;
 
     constructor(cfg: GCLConfig, automatic: boolean) {
         // resolve config to singleton
@@ -60,7 +66,8 @@ class GCLClient {
         // init communication
         this.connection = new LocalConnection(this.cfg);
         this.authConnection = new LocalAuthConnection(this.cfg);
-        this.remoteConnection = new RemoteConnection(this.cfg);
+        this.remoteConnection = new RemoteJwtConnection(this.cfg);
+        this.remoteApiKeyConnection = new RemoteApiKeyConnection(this.cfg);
         this.localTestConnection = new LocalTestConnection(this.cfg);
         this.pluginFactory = new PluginFactory(this.cfg.gclUrl, this.connection);
         this.adminService = new AdminService(this.cfg.gclUrl, this.authConnection);
@@ -69,6 +76,7 @@ class GCLClient {
         if (this.cfg.localTestMode) { this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg); }
         else { this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg); }
         this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteConnection);
+        this.authClient = new AuthClient(this.cfg, this.remoteApiKeyConnection);
         // keep reference to client in ClientService
         ClientService.setClient(this);
 
@@ -109,30 +117,10 @@ class GCLClient {
         return InitUtil.initializeLibrary(ClientService.getClient());
     }
 
-    // private static resolveConfig(cfg: GCLConfig) {
-    //     // must be the base url because the GCLConfig object adds the context path and keeps the base url intact
-    //     let resolvedCfg: GCLConfig = new GCLConfig(cfg);
-    //     resolvedCfg.allowAutoUpdate = cfg.allowAutoUpdate;
-    //     resolvedCfg.client_id = cfg.client_id;
-    //     resolvedCfg.client_secret = cfg.client_secret;
-    //     resolvedCfg.gclUrl = cfg.gclUrl;
-    //     resolvedCfg.ocvUrl = cfg.ocvUrl;
-    //     resolvedCfg.implicitDownload = cfg.implicitDownload;
-    //     resolvedCfg.localTestMode = cfg.localTestMode;
-    //     resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
-    //     resolvedCfg.defaultSessionTimeout = cfg.defaultSessionTimeout;
-    //     resolvedCfg.defaultConsentDuration = cfg.defaultConsentDuration;
-    //     resolvedCfg.defaultConsentTimeout = cfg.defaultConsentTimeout;
-    //     resolvedCfg.citrix = cfg.citrix;
-    //     resolvedCfg.agentPort = cfg.agentPort;
-    //     resolvedCfg.syncManaged = cfg.syncManaged;
-    //     resolvedCfg.osPinDialog = cfg.osPinDialog;
-    //     resolvedCfg.containerDownloadTimeout = cfg.containerDownloadTimeout;
-    //     return resolvedCfg;
-    // }
-
     // get admin services
     public admin = (): AdminService => { return this.adminService; };
+    // get auth service
+    public auth = (): AuthClient => { return this.authClient; };
     // get core services
     public core = (): CoreService => { return this.coreService; };
     // get core config

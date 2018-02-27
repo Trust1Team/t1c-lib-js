@@ -3518,6 +3518,10 @@ mocha@2.5.3:
     supports-color "1.2.0"
     to-iso-string "0.0.2"
 
+moment@^2.20.1:
+  version "2.20.1"
+  resolved "https://repo.t1t.be/repository/npm-group/moment/-/moment-2.20.1.tgz#d6eb1a46cbcc14a2b2f9434112c1ff8907f313fd"
+
 ms@0.7.1:
   version "0.7.1"
   resolved "https://repo.t1t.be/repository/npm-group/ms/-/ms-0.7.1.tgz#9cd13c03adbff25b65effde7ce864ee952017098"

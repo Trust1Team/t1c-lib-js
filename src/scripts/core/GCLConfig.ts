@@ -5,11 +5,11 @@
  * @since 2016
  */
 
-import * as _ from 'lodash';
 import { ModuleConfig } from '../plugins/smartcards/pkcs11/pkcs11Model';
 import { Promise } from 'es6-promise';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import * as jwtDecode from 'jwt-decode';
+import * as moment from 'moment';
 
 export { GCLConfig, GCLConfigOptions };
 
@@ -20,7 +20,7 @@ const defaults = {
     ocvContextPath: '/trust1team/ocv-api/v1',
     dsContextPathTestMode: '/gcl-ds-web/v2',
     fileDownloadUrlPostfix: '/trust1team/gclds-file/v1',
-    tokenExchangeContextPath: '/apiengineauth/v1/login/application/token',
+    tokenExchangeContextPath: '/apiengineauth/v1',
     allowAutoUpdate: true,
     implicitDownload: false,
     localTestMode: false,
@@ -104,6 +104,10 @@ class GCLConfig  implements GCLConfig {
         this._pkcs11Config = options.pkcs11Config;
         this._osPinDialog = options.osPinDialog || defaults.osPinDialog;
         this._containerDownloadTimeout = options.containerDownloadTimeout || defaults.containerDownloadTimeout;
+    }
+
+    get authUrl(): string {
+        return this.gwUrl + defaults.tokenExchangeContextPath;
     }
 
     get ocvUrl(): string {
@@ -312,7 +316,7 @@ class GCLConfig  implements GCLConfig {
             } else {
                 let decoded = jwtDecode(self._gwJwt);
                 // check JWT expired
-                if (decoded.exp < new Date()) {
+                if (decoded.exp < moment(new Date()).format('X')) {
                     // refresh
                     resolve(self.getGwJwt());
                 } else {
@@ -333,7 +337,7 @@ class GCLConfig  implements GCLConfig {
 
     getGwJwt(): Promise<string> {
         let config: AxiosRequestConfig = {
-            url: this.gwUrl + defaults.tokenExchangeContextPath,
+            url: this.authUrl + '/login/application/token',
             method: 'GET',
             headers: { apikey: this.apiKey },
             responseType:  'json'

@@ -14,8 +14,8 @@ import { UrlUtil } from '../../util/UrlUtil';
 import * as ls from 'local-storage';
 import { BrowserFingerprint } from '../../util/BrowserFingerprint';
 
-export { GenericConnection, LocalConnection, LocalAuthConnection,
-    RemoteConnection, Connection, LocalTestConnection, RequestBody, RequestHeaders, RequestCallback, QueryParams };
+export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteApiKeyConnection,
+    RemoteJwtConnection, Connection, LocalTestConnection, RequestBody, RequestHeaders, RequestCallback, QueryParams };
 
 
 interface Connection {
@@ -374,7 +374,53 @@ class LocalConnection extends GenericConnection implements Connection {
     }
 }
 
-class RemoteConnection extends GenericConnection implements Connection {
+class RemoteApiKeyConnection extends GenericConnection implements Connection {
+    constructor(public cfg: GCLConfig) { super(cfg); }
+
+    static getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean } {
+        return {  sendGwJwt: false, sendGclJwt: false, sendApiKey: true, sendToken: false };
+    }
+
+    public get(basePath: string,
+               suffix: string,
+               queryParams?: QueryParams,
+               headers?: RequestHeaders,
+               callback?: RequestCallback): Promise<any> {
+        return this.handleRequest(basePath, suffix, 'GET', this.cfg, RemoteApiKeyConnection.getSecurityConfig(),
+            undefined, queryParams, headers, callback, true);
+    }
+
+    public post(basePath: string,
+                suffix: string,
+                body: RequestBody,
+                queryParams?: QueryParams,
+                headers?: RequestHeaders,
+                callback?: RequestCallback): Promise<any> {
+        return this.handleRequest(basePath, suffix, 'POST', this.cfg, RemoteApiKeyConnection.getSecurityConfig(),
+            body, queryParams, headers, callback, true);
+    }
+
+    public put(basePath: string,
+               suffix: string,
+               body: RequestBody,
+               queryParams?: QueryParams,
+               headers?: RequestHeaders,
+               callback?: RequestCallback): Promise<any> {
+        return this.handleRequest(basePath, suffix, 'PUT', this.cfg, RemoteApiKeyConnection.getSecurityConfig(),
+            body, queryParams, headers, callback, true);
+    }
+
+    public delete(basePath: string,
+                  suffix: string,
+                  queryParams?: QueryParams,
+                  headers?: RequestHeaders,
+                  callback?: RequestCallback): Promise<any> {
+        return this.handleRequest(basePath, suffix, 'DELETE', this.cfg, RemoteApiKeyConnection.getSecurityConfig(),
+            undefined, queryParams, headers, callback, true);
+    }
+}
+
+class RemoteJwtConnection extends GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) { super(cfg); }
 
     static getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean } {
@@ -386,7 +432,7 @@ class RemoteConnection extends GenericConnection implements Connection {
                queryParams?: QueryParams,
                headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'GET', this.cfg, RemoteConnection.getSecurityConfig(),
+        return this.handleRequest(basePath, suffix, 'GET', this.cfg, RemoteJwtConnection.getSecurityConfig(),
             undefined, queryParams, headers, callback, true);
     }
 
@@ -396,7 +442,7 @@ class RemoteConnection extends GenericConnection implements Connection {
                 queryParams?: QueryParams,
                 headers?: RequestHeaders,
                 callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'POST', this.cfg, RemoteConnection.getSecurityConfig(),
+        return this.handleRequest(basePath, suffix, 'POST', this.cfg, RemoteJwtConnection.getSecurityConfig(),
             body, queryParams, headers, callback, true);
     }
 
@@ -406,7 +452,7 @@ class RemoteConnection extends GenericConnection implements Connection {
                queryParams?: QueryParams,
                headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'PUT', this.cfg, RemoteConnection.getSecurityConfig(),
+        return this.handleRequest(basePath, suffix, 'PUT', this.cfg, RemoteJwtConnection.getSecurityConfig(),
             body, queryParams, headers, callback, true);
     }
 
@@ -415,7 +461,7 @@ class RemoteConnection extends GenericConnection implements Connection {
                   queryParams?: QueryParams,
                   headers?: RequestHeaders,
                   callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'DELETE', this.cfg, RemoteConnection.getSecurityConfig(),
+        return this.handleRequest(basePath, suffix, 'DELETE', this.cfg, RemoteJwtConnection.getSecurityConfig(),
             undefined, queryParams, headers, callback, true);
     }
 }
