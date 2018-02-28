@@ -105,7 +105,9 @@ class SyncUtil {
     }
 
     private static pollDownloadCompletion(client: GCLClient, containerConfig: DSContainer[], isRetry: boolean): Promise<T1CContainer[]> {
-        let maxSeconds = client.config().containerDownloadTimeout || 30;
+        const maxSeconds = client.config().containerDownloadTimeout || 30;
+        const pollInterval = 250;
+        let remainingTries = (maxSeconds * 1000) / pollInterval;
 
         return new Promise((resolve, reject) => {
             poll(resolve, reject);
@@ -114,17 +116,21 @@ class SyncUtil {
         function poll(resolve?: (containers: T1CContainer[]) => void, reject?: (error: any) => void) {
             // monitor status for each container in config
             _.delay(() => {
-                --maxSeconds;
+                --remainingTries;
                 client.core().info().then(infoData => {
                     let containers = infoData.data.containers;
                     checkDownloadsComplete(containerConfig, containers).then((ready) => {
                         if (ready) { resolve(containers); }
-                        else { poll(resolve, reject); }
+                        else {
+                            if (remainingTries === 0) {
+                                reject( new RestException(408, '904', 'Container download did not complete before timeout.', null));
+                            } else { poll(resolve, reject); }
+                        }
                     }, error => {
                         reject(error);
                     });
                 });
-            }, 1000);
+            }, pollInterval);
         }
 
         function checkDownloadsComplete(cfg: any, containerStatus: any): Promise<boolean> {

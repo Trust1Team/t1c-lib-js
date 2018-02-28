@@ -68,9 +68,6 @@ abstract class GenericConnection implements Connection {
 
     constructor(public cfg: GCLConfig) {}
 
-    static getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean } {
-        return {  sendGwJwt: true, sendGclJwt: false, sendApiKey: true, sendToken: true };
-    }
 
     private static extractAccessToken(headers: RequestHeaders, config: GCLConfig) {
 
@@ -84,7 +81,7 @@ abstract class GenericConnection implements Connection {
                queryParams?: QueryParams,
                headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'GET', this.cfg, GenericConnection.getSecurityConfig(),
+        return this.handleRequest(basePath, suffix, 'GET', this.cfg, this.getSecurityConfig(),
             undefined, queryParams, headers, callback);
     }
 
@@ -94,7 +91,7 @@ abstract class GenericConnection implements Connection {
                 queryParams?: QueryParams,
                 headers?: RequestHeaders,
                 callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'POST', this.cfg, GenericConnection.getSecurityConfig(),
+        return this.handleRequest(basePath, suffix, 'POST', this.cfg, this.getSecurityConfig(),
             body, queryParams, headers, callback);
     }
 
@@ -104,7 +101,7 @@ abstract class GenericConnection implements Connection {
                queryParams?: QueryParams,
                headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'PUT', this.cfg, GenericConnection.getSecurityConfig(),
+        return this.handleRequest(basePath, suffix, 'PUT', this.cfg, this.getSecurityConfig(),
             body, queryParams, headers, callback);
     }
 
@@ -113,7 +110,7 @@ abstract class GenericConnection implements Connection {
                   queryParams?: QueryParams,
                   headers?: RequestHeaders,
                   callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'DELETE', this.cfg, GenericConnection.getSecurityConfig(),
+        return this.handleRequest(basePath, suffix, 'DELETE', this.cfg, this.getSecurityConfig(),
             undefined, queryParams, headers, callback);
     }
 
@@ -123,23 +120,27 @@ abstract class GenericConnection implements Connection {
         return reqHeaders;
     }
 
+    getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean, skipCitrixCheck: boolean } {
+        return {  sendGwJwt: true, sendGclJwt: false, sendApiKey: true, sendToken: true, skipCitrixCheck: false };
+    }
+
     protected handleRequest(basePath: string,
                             suffix: string,
                             method: string,
                             gclConfig: GCLConfig,
-                            securityConfig: { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean },
+                            securityConfig: { sendGwJwt: boolean, sendGclJwt: boolean,
+                                sendApiKey: boolean, sendToken: boolean, skipCitrixCheck: boolean },
                             body?: RequestBody,
                             params?: QueryParams,
                             headers?: RequestHeaders,
-                            callback?: RequestCallback,
-                            skipCitrixCheck?: boolean): Promise<any> {
+                            callback?: RequestCallback): Promise<any> {
         // init callback if necessary
         if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
 
         // if Citrix environment, check that agentPort was defined in config
-        if (skipCitrixCheck || !gclConfig.citrix || gclConfig.agentPort !== -1) {
+        if (securityConfig.skipCitrixCheck || !gclConfig.citrix || gclConfig.agentPort !== -1) {
             let config: AxiosRequestConfig = {
-                url: UrlUtil.create(basePath, suffix, gclConfig, skipCitrixCheck),
+                url: UrlUtil.create(basePath, suffix, gclConfig, securityConfig.skipCitrixCheck),
                 method,
                 headers: this.getRequestHeaders(headers),
                 responseType:  'json'
@@ -196,17 +197,8 @@ abstract class GenericConnection implements Connection {
 class LocalAuthConnection extends GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) { super(cfg); }
 
-    static getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean } {
-        return {  sendGwJwt: false, sendGclJwt: true, sendApiKey: false, sendToken: true };
-    }
-
-    public get(basePath: string,
-               suffix: string,
-               queryParams?: QueryParams,
-               headers?: RequestHeaders,
-               callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'GET', this.cfg, LocalAuthConnection.getSecurityConfig(),
-            undefined, queryParams, headers, callback);
+    getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean, skipCitrixCheck: boolean } {
+        return {  sendGwJwt: false, sendGclJwt: true, sendApiKey: false, sendToken: true, skipCitrixCheck: false };
     }
 
     public getSkipCitrix(basePath: string,
@@ -214,36 +206,9 @@ class LocalAuthConnection extends GenericConnection implements Connection {
                          queryParams?: QueryParams,
                          headers?: RequestHeaders,
                          callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'GET', this.cfg, LocalAuthConnection.getSecurityConfig(),
-            undefined, queryParams, headers, callback, true);
-    }
-
-    public post(basePath: string,
-                suffix: string,
-                body: RequestBody,
-                queryParams?: QueryParams,
-                headers?: RequestHeaders,
-                callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'POST', this.cfg, LocalAuthConnection.getSecurityConfig(),
-            body, queryParams, headers, callback);
-    }
-
-    public put(basePath: string,
-               suffix: string,
-               body: RequestBody,
-               queryParams?: QueryParams,
-               headers?: RequestHeaders,
-               callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'PUT', this.cfg, LocalAuthConnection.getSecurityConfig(),
-            body, queryParams, headers, callback);
-    }
-
-    public delete(basePath: string,
-                  suffix: string,
-                  queryParams?: QueryParams,
-                  headers?: RequestHeaders,
-                  callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'DELETE', this.cfg, LocalAuthConnection.getSecurityConfig(),
+        let securityConfig = this.getSecurityConfig();
+        securityConfig.skipCitrixCheck = true;
+        return this.handleRequest(basePath, suffix, 'GET', this.cfg, securityConfig,
             undefined, queryParams, headers, callback);
     }
 }
@@ -251,17 +216,8 @@ class LocalAuthConnection extends GenericConnection implements Connection {
 class LocalConnection extends GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) { super(cfg); }
 
-    static getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean } {
-        return {  sendGwJwt: false, sendGclJwt: false, sendApiKey: false, sendToken: true };
-    }
-
-    public get(basePath: string,
-               suffix: string,
-               queryParams?: QueryParams,
-               headers?: RequestHeaders,
-               callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'GET', this.cfg, LocalConnection.getSecurityConfig(),
-            undefined, queryParams, headers, callback);
+    getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean, skipCitrixCheck: boolean } {
+        return {  sendGwJwt: false, sendGclJwt: false, sendApiKey: false, sendToken: true, skipCitrixCheck: false };
     }
 
     public getSkipCitrix(basePath: string,
@@ -269,28 +225,10 @@ class LocalConnection extends GenericConnection implements Connection {
                          queryParams?: QueryParams,
                          headers?: RequestHeaders,
                          callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'GET', this.cfg, LocalConnection.getSecurityConfig(),
-            undefined, queryParams, headers, callback, true);
-    }
-
-    public post(basePath: string,
-                suffix: string,
-                body: RequestBody,
-                queryParams?: QueryParams,
-                headers?: RequestHeaders,
-                callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'POST', this.cfg, LocalConnection.getSecurityConfig(),
-            body, queryParams, headers, callback);
-    }
-
-    public put(basePath: string,
-               suffix: string,
-               body: RequestBody,
-               queryParams?: QueryParams,
-               headers?: RequestHeaders,
-               callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'PUT', this.cfg, LocalConnection.getSecurityConfig(),
-            body, queryParams, headers, callback);
+        let securityConfig = this.getSecurityConfig();
+        securityConfig.skipCitrixCheck = true;
+        return this.handleRequest(basePath, suffix, 'GET', this.cfg, securityConfig,
+            undefined, queryParams, headers, callback);
     }
 
     public requestFile(basePath: string, suffix: string, body: { path: string }, callback?: RequestCallback): Promise<any> {
@@ -300,7 +238,7 @@ class LocalConnection extends GenericConnection implements Connection {
 
         return new Promise((resolve, reject) => {
             let headers = {};
-            if (config.tokenCompatible && LocalConnection.getSecurityConfig().sendToken) {
+            if (config.tokenCompatible && this.getSecurityConfig().sendToken) {
                 headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
             }
             axios.post(UrlUtil.create(basePath, suffix, config, false), body, {
@@ -337,7 +275,7 @@ class LocalConnection extends GenericConnection implements Connection {
         form.append('path', body.path);
         form.append('file', body.file, body.fileName);
         let headers = { 'Content-Type': 'multipart/form-data' };
-        if (config.tokenCompatible && LocalConnection.getSecurityConfig().sendToken) {
+        if (config.tokenCompatible && this.getSecurityConfig().sendToken) {
             headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
         }
 
@@ -363,106 +301,21 @@ class LocalConnection extends GenericConnection implements Connection {
             });
         });
     }
-
-    public delete(basePath: string,
-                  suffix: string,
-                  queryParams?: QueryParams,
-                  headers?: RequestHeaders,
-                  callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'DELETE', this.cfg, LocalConnection.getSecurityConfig(),
-            undefined, queryParams, headers, callback);
-    }
 }
 
 class RemoteApiKeyConnection extends GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) { super(cfg); }
 
-    static getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean } {
-        return {  sendGwJwt: false, sendGclJwt: false, sendApiKey: true, sendToken: false };
-    }
-
-    public get(basePath: string,
-               suffix: string,
-               queryParams?: QueryParams,
-               headers?: RequestHeaders,
-               callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'GET', this.cfg, RemoteApiKeyConnection.getSecurityConfig(),
-            undefined, queryParams, headers, callback, true);
-    }
-
-    public post(basePath: string,
-                suffix: string,
-                body: RequestBody,
-                queryParams?: QueryParams,
-                headers?: RequestHeaders,
-                callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'POST', this.cfg, RemoteApiKeyConnection.getSecurityConfig(),
-            body, queryParams, headers, callback, true);
-    }
-
-    public put(basePath: string,
-               suffix: string,
-               body: RequestBody,
-               queryParams?: QueryParams,
-               headers?: RequestHeaders,
-               callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'PUT', this.cfg, RemoteApiKeyConnection.getSecurityConfig(),
-            body, queryParams, headers, callback, true);
-    }
-
-    public delete(basePath: string,
-                  suffix: string,
-                  queryParams?: QueryParams,
-                  headers?: RequestHeaders,
-                  callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'DELETE', this.cfg, RemoteApiKeyConnection.getSecurityConfig(),
-            undefined, queryParams, headers, callback, true);
+    getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean, skipCitrixCheck: boolean } {
+        return {  sendGwJwt: false, sendGclJwt: false, sendApiKey: true, sendToken: false, skipCitrixCheck: true };
     }
 }
 
 class RemoteJwtConnection extends GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) { super(cfg); }
 
-    static getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean } {
-        return {  sendGwJwt: true, sendGclJwt: false, sendApiKey: false, sendToken: false };
-    }
-
-    public get(basePath: string,
-               suffix: string,
-               queryParams?: QueryParams,
-               headers?: RequestHeaders,
-               callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'GET', this.cfg, RemoteJwtConnection.getSecurityConfig(),
-            undefined, queryParams, headers, callback, true);
-    }
-
-    public post(basePath: string,
-                suffix: string,
-                body: RequestBody,
-                queryParams?: QueryParams,
-                headers?: RequestHeaders,
-                callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'POST', this.cfg, RemoteJwtConnection.getSecurityConfig(),
-            body, queryParams, headers, callback, true);
-    }
-
-    public put(basePath: string,
-               suffix: string,
-               body: RequestBody,
-               queryParams?: QueryParams,
-               headers?: RequestHeaders,
-               callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'PUT', this.cfg, RemoteJwtConnection.getSecurityConfig(),
-            body, queryParams, headers, callback, true);
-    }
-
-    public delete(basePath: string,
-                  suffix: string,
-                  queryParams?: QueryParams,
-                  headers?: RequestHeaders,
-                  callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'DELETE', this.cfg, RemoteJwtConnection.getSecurityConfig(),
-            undefined, queryParams, headers, callback, true);
+    getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean, skipCitrixCheck: boolean } {
+        return {  sendGwJwt: true, sendGclJwt: false, sendApiKey: false, sendToken: false, skipCitrixCheck: true };
     }
 }
 
