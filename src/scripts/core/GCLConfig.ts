@@ -10,6 +10,7 @@ import { Promise } from 'es6-promise';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import * as jwtDecode from 'jwt-decode';
 import * as moment from 'moment';
+import { RestException } from './exceptions/CoreExceptions';
 
 export { GCLConfig, GCLConfigOptions };
 
@@ -36,6 +37,7 @@ class GCLConfigOptions {
     constructor(public gclUrl?: string,
                 public gwOrProxyUrl?: string,
                 public apiKey?: string,
+                public gwJwt?: string,
                 public ocvContextPath?: string,
                 public dsContextPath?: string,
                 public dsFileContextPath?: string,
@@ -86,6 +88,7 @@ class GCLConfig  implements GCLConfig {
         this._dsFileContextPath = options.dsFileContextPath || defaults.dsFileContextPath;
         this._ocvContextPath = options.ocvContextPath || defaults.ocvContextPath;
         this._apiKey = options.apiKey;
+        this._gwJwt = options.gwJwt;
         this._citrix = false;
         this._agentPort = options.agentPort || -1;
         this._implicitDownload = options.implicitDownload || defaults.implicitDownload;
@@ -281,13 +284,13 @@ class GCLConfig  implements GCLConfig {
         let self = this;
         return new Promise((resolve, reject) => {
             if (!self._gwJwt || !self._gwJwt.length) {
-                // no jwt available, get one from the GW
+                // no jwt available, get one from the GW if we have an API key
                 resolve(self.getGwJwt());
             } else {
                 let decoded = jwtDecode(self._gwJwt);
                 // check JWT expired
                 if (decoded.exp < moment(new Date()).format('X')) {
-                    // refresh
+                    // refresh if we have an API key
                     resolve(self.getGwJwt());
                 } else {
                     // jwt ok to use
@@ -306,15 +309,24 @@ class GCLConfig  implements GCLConfig {
     }
 
     getGwJwt(): Promise<string> {
-        let config: AxiosRequestConfig = {
-            url: this.authUrl + '/login/application/token',
-            method: 'GET',
-            headers: { apikey: this.apiKey },
-            responseType:  'json'
-        };
-        return axios.request(config).then((response: AxiosResponse) => {
-            this._gwJwt = response.data.token;
-            return response.data.token;
-        });
+        if (this.apiKey && this.apiKey.length) {
+            let config: AxiosRequestConfig = {
+                url: this.authUrl + '/login/application/token',
+                method: 'GET',
+                headers: { apikey: this.apiKey },
+                responseType:  'json'
+            };
+            return axios.request(config).then((response: AxiosResponse) => {
+                this._gwJwt = response.data.token;
+                return response.data.token;
+            });
+        } else {
+            if (this._gwJwt && this._gwJwt.length) {
+                return Promise.reject(new RestException(412, '205', 'JWT expired'));
+            } else {
+                return Promise.reject(new RestException(412, '901', 'No JWT or API key found in configuration'));
+            }
+        }
+
     }
 }

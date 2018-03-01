@@ -8887,15 +8887,15 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var GCLConfig_1 = __webpack_require__(328);
 	exports.GCLConfig = GCLConfig_1.GCLConfig;
-	var CoreService_1 = __webpack_require__(483);
-	var Connection_1 = __webpack_require__(487);
-	var DSClient_1 = __webpack_require__(496);
-	var OCVClient_1 = __webpack_require__(497);
+	var CoreService_1 = __webpack_require__(485);
+	var Connection_1 = __webpack_require__(489);
+	var DSClient_1 = __webpack_require__(498);
+	var OCVClient_1 = __webpack_require__(499);
 	var es6_promise_1 = __webpack_require__(329);
-	var PluginFactory_1 = __webpack_require__(498);
+	var PluginFactory_1 = __webpack_require__(500);
 	var GenericService_1 = __webpack_require__(567);
-	var ResponseHandler_1 = __webpack_require__(486);
-	var agent_1 = __webpack_require__(489);
+	var ResponseHandler_1 = __webpack_require__(488);
+	var agent_1 = __webpack_require__(491);
 	var admin_1 = __webpack_require__(569);
 	var InitUtil_1 = __webpack_require__(570);
 	var ClientService_1 = __webpack_require__(575);
@@ -8943,7 +8943,7 @@ var GCLLib =
 	        else {
 	            this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg);
 	        }
-	        this.ocvClient = new OCVClient_1.OCVClient(this.cfg.ocvUrl, this.remoteConnection);
+	        this.ocvClient = new OCVClient_1.OCVClient(this.cfg.ocvUrl, this.remoteApiKeyConnection);
 	        this.authClient = new Auth_1.AuthClient(this.cfg, this.remoteApiKeyConnection);
 	        ClientService_1.ClientService.setClient(this);
 	        if (this.cfg.implicitDownload && true) {
@@ -9045,6 +9045,7 @@ var GCLLib =
 	var axios_1 = __webpack_require__(334);
 	var jwtDecode = __webpack_require__(359);
 	var moment = __webpack_require__(362);
+	var CoreExceptions_1 = __webpack_require__(483);
 	var defaults = {
 	    gclUrl: 'https://localhost:10443/v1',
 	    gwUrl: 'https://accapim.t1t.be:443',
@@ -9064,10 +9065,11 @@ var GCLLib =
 	    containerDownloadTimeout: 30
 	};
 	var GCLConfigOptions = (function () {
-	    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, ocvContextPath, dsContextPath, dsFileContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode) {
+	    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, gwJwt, ocvContextPath, dsContextPath, dsFileContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode) {
 	        this.gclUrl = gclUrl;
 	        this.gwOrProxyUrl = gwOrProxyUrl;
 	        this.apiKey = apiKey;
+	        this.gwJwt = gwJwt;
 	        this.ocvContextPath = ocvContextPath;
 	        this.dsContextPath = dsContextPath;
 	        this.dsFileContextPath = dsFileContextPath;
@@ -9094,6 +9096,7 @@ var GCLLib =
 	        this._dsFileContextPath = options.dsFileContextPath || defaults.dsFileContextPath;
 	        this._ocvContextPath = options.ocvContextPath || defaults.ocvContextPath;
 	        this._apiKey = options.apiKey;
+	        this._gwJwt = options.gwJwt;
 	        this._citrix = false;
 	        this._agentPort = options.agentPort || -1;
 	        this._implicitDownload = options.implicitDownload || defaults.implicitDownload;
@@ -9373,16 +9376,26 @@ var GCLLib =
 	    });
 	    GCLConfig.prototype.getGwJwt = function () {
 	        var _this = this;
-	        var config = {
-	            url: this.authUrl + '/login/application/token',
-	            method: 'GET',
-	            headers: { apikey: this.apiKey },
-	            responseType: 'json'
-	        };
-	        return axios_1.default.request(config).then(function (response) {
-	            _this._gwJwt = response.data.token;
-	            return response.data.token;
-	        });
+	        if (this.apiKey && this.apiKey.length) {
+	            var config = {
+	                url: this.authUrl + '/login/application/token',
+	                method: 'GET',
+	                headers: { apikey: this.apiKey },
+	                responseType: 'json'
+	            };
+	            return axios_1.default.request(config).then(function (response) {
+	                _this._gwJwt = response.data.token;
+	                return response.data.token;
+	            });
+	        }
+	        else {
+	            if (this._gwJwt && this._gwJwt.length) {
+	                return es6_promise_1.Promise.reject(new CoreExceptions_1.RestException(412, '205', 'JWT expired'));
+	            }
+	            else {
+	                return es6_promise_1.Promise.reject(new CoreExceptions_1.RestException(412, '901', 'No JWT or API key found in configuration'));
+	            }
+	        }
 	    };
 	    return GCLConfig;
 	}());
@@ -28645,10 +28658,47 @@ var GCLLib =
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var _ = __webpack_require__(484);
-	var platform = __webpack_require__(485);
+	var ObjectUtil_1 = __webpack_require__(484);
+	var RestException = (function () {
+	    function RestException(status, code, description, client) {
+	        this.status = status;
+	        this.code = code;
+	        this.description = description;
+	        this.client = client;
+	        ObjectUtil_1.ObjectUtil.removeNullAndUndefinedFields(this);
+	    }
+	    return RestException;
+	}());
+	exports.RestException = RestException;
+
+
+/***/ }),
+/* 484 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var ObjectUtil = (function () {
+	    function ObjectUtil() {
+	    }
+	    ObjectUtil.removeNullAndUndefinedFields = function (obj) {
+	        Object.keys(obj).forEach(function (key) { return !obj[key] && delete obj[key]; });
+	    };
+	    return ObjectUtil;
+	}());
+	exports.ObjectUtil = ObjectUtil;
+
+
+/***/ }),
+/* 485 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var _ = __webpack_require__(486);
+	var platform = __webpack_require__(487);
 	var es6_promise_1 = __webpack_require__(329);
-	var ResponseHandler_1 = __webpack_require__(486);
+	var ResponseHandler_1 = __webpack_require__(488);
 	var CORE_CONSENT = '/consent';
 	var CORE_INFO = '/';
 	var CORE_PLUGINS = '/plugins';
@@ -28882,7 +28932,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 484 */
+/* 486 */
 /***/ (function(module, exports) {
 
 	/**
@@ -45972,7 +46022,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 485 */
+/* 487 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(module, global) {/*!
@@ -47114,7 +47164,7 @@ var GCLLib =
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(331)(module), (function() { return this; }())))
 
 /***/ }),
-/* 486 */
+/* 488 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -47141,7 +47191,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 487 */
+/* 489 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -47157,31 +47207,60 @@ var GCLLib =
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var axios_1 = __webpack_require__(334);
-	var _ = __webpack_require__(484);
+	var _ = __webpack_require__(486);
 	var es6_promise_1 = __webpack_require__(329);
-	var UrlUtil_1 = __webpack_require__(488);
-	var ls = __webpack_require__(490);
-	var BrowserFingerprint_1 = __webpack_require__(493);
+	var CoreExceptions_1 = __webpack_require__(483);
+	var UrlUtil_1 = __webpack_require__(490);
+	var ls = __webpack_require__(492);
+	var BrowserFingerprint_1 = __webpack_require__(495);
+	var ResponseHandler_1 = __webpack_require__(488);
 	var GenericConnection = (function () {
 	    function GenericConnection(cfg) {
 	        this.cfg = cfg;
 	    }
+	    GenericConnection.disabledWithoutApiKey = function (callback) {
+	        return ResponseHandler_1.ResponseHandler.error(new CoreExceptions_1.RestException(412, '901', 'Configuration must contain API key to use this method'), callback);
+	    };
 	    GenericConnection.extractAccessToken = function (headers, config) {
 	        if (headers && headers.access_token) {
 	            config.gclJwt = headers.access_token;
 	        }
 	    };
 	    GenericConnection.prototype.get = function (basePath, suffix, queryParams, headers, callback) {
-	        return this.handleRequest(basePath, suffix, 'GET', this.cfg, this.getSecurityConfig(), undefined, queryParams, headers, callback);
+	        var securityConfig = this.getSecurityConfig();
+	        if (securityConfig.sendApiKey && !(this.cfg.apiKey && this.cfg.apiKey.length)) {
+	            return GenericConnection.disabledWithoutApiKey(callback);
+	        }
+	        else {
+	            return this.handleRequest(basePath, suffix, 'GET', this.cfg, securityConfig, undefined, queryParams, headers, callback);
+	        }
 	    };
 	    GenericConnection.prototype.post = function (basePath, suffix, body, queryParams, headers, callback) {
-	        return this.handleRequest(basePath, suffix, 'POST', this.cfg, this.getSecurityConfig(), body, queryParams, headers, callback);
+	        var securityConfig = this.getSecurityConfig();
+	        if (securityConfig.sendApiKey && !(this.cfg.apiKey && this.cfg.apiKey.length)) {
+	            return GenericConnection.disabledWithoutApiKey(callback);
+	        }
+	        else {
+	            return this.handleRequest(basePath, suffix, 'POST', this.cfg, securityConfig, body, queryParams, headers, callback);
+	        }
 	    };
 	    GenericConnection.prototype.put = function (basePath, suffix, body, queryParams, headers, callback) {
-	        return this.handleRequest(basePath, suffix, 'PUT', this.cfg, this.getSecurityConfig(), body, queryParams, headers, callback);
+	        var securityConfig = this.getSecurityConfig();
+	        if (securityConfig.sendApiKey && !(this.cfg.apiKey && this.cfg.apiKey.length)) {
+	            return GenericConnection.disabledWithoutApiKey(callback);
+	        }
+	        else {
+	            return this.handleRequest(basePath, suffix, 'PUT', this.cfg, securityConfig, body, queryParams, headers, callback);
+	        }
 	    };
 	    GenericConnection.prototype.delete = function (basePath, suffix, queryParams, headers, callback) {
-	        return this.handleRequest(basePath, suffix, 'DELETE', this.cfg, this.getSecurityConfig(), undefined, queryParams, headers, callback);
+	        var securityConfig = this.getSecurityConfig();
+	        if (securityConfig.sendApiKey && !(this.cfg.apiKey && this.cfg.apiKey.length)) {
+	            return GenericConnection.disabledWithoutApiKey(callback);
+	        }
+	        else {
+	            return this.handleRequest(basePath, suffix, 'DELETE', this.cfg, securityConfig, undefined, queryParams, headers, callback);
+	        }
 	    };
 	    GenericConnection.prototype.getRequestHeaders = function (headers) {
 	        var reqHeaders = headers || {};
@@ -47477,12 +47556,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 488 */
+/* 490 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var agent_1 = __webpack_require__(489);
+	var agent_1 = __webpack_require__(491);
 	var UrlUtil = (function () {
 	    function UrlUtil() {
 	    }
@@ -47500,7 +47579,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 489 */
+/* 491 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -47523,13 +47602,13 @@ var GCLLib =
 
 
 /***/ }),
-/* 490 */
+/* 492 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
 	
-	var stub = __webpack_require__(491);
-	var tracking = __webpack_require__(492);
+	var stub = __webpack_require__(493);
+	var tracking = __webpack_require__(494);
 	var ls = 'localStorage' in global && global.localStorage ? global.localStorage : stub;
 	
 	function accessor (key, value) {
@@ -47572,7 +47651,7 @@ var GCLLib =
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ }),
-/* 491 */
+/* 493 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -47610,7 +47689,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 492 */
+/* 494 */
 /***/ (function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {'use strict';
@@ -47670,15 +47749,15 @@ var GCLLib =
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ }),
-/* 493 */
+/* 495 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var cuid = __webpack_require__(494);
-	var ls = __webpack_require__(490);
-	var bases = __webpack_require__(495);
-	var _ = __webpack_require__(484);
+	var cuid = __webpack_require__(496);
+	var ls = __webpack_require__(492);
+	var bases = __webpack_require__(497);
+	var _ = __webpack_require__(486);
 	var BrowserFingerprint = (function () {
 	    function BrowserFingerprint() {
 	    }
@@ -47721,7 +47800,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 494 */
+/* 496 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/**
@@ -47837,7 +47916,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 495 */
+/* 497 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	// bases.js
@@ -47957,7 +48036,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 496 */
+/* 498 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -48030,7 +48109,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 497 */
+/* 499 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -48066,12 +48145,12 @@ var GCLLib =
 
 
 /***/ }),
-/* 498 */
+/* 500 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var EMV_1 = __webpack_require__(499);
+	var EMV_1 = __webpack_require__(501);
 	var EidBe_1 = __webpack_require__(551);
 	var EidLux_1 = __webpack_require__(552);
 	var mobib_1 = __webpack_require__(553);
@@ -48145,7 +48224,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 499 */
+/* 501 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -48160,7 +48239,7 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(500);
+	var Card_1 = __webpack_require__(502);
 	var EMV = (function (_super) {
 	    __extends(EMV, _super);
 	    function EMV() {
@@ -48188,7 +48267,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 500 */
+/* 502 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -48203,11 +48282,11 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var PinEnforcer_1 = __webpack_require__(501);
+	var PinEnforcer_1 = __webpack_require__(503);
 	var CertParser_1 = __webpack_require__(506);
-	var ResponseHandler_1 = __webpack_require__(486);
+	var ResponseHandler_1 = __webpack_require__(488);
 	var RequestHandler_1 = __webpack_require__(550);
-	var _ = __webpack_require__(484);
+	var _ = __webpack_require__(486);
 	var OptionalPin = (function () {
 	    function OptionalPin(pin, pace) {
 	        this.pin = pin;
@@ -48464,15 +48543,15 @@ var GCLLib =
 
 
 /***/ }),
-/* 501 */
+/* 503 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(329);
-	var jsencrypt_1 = __webpack_require__(502);
-	var PubKeyService_1 = __webpack_require__(503);
-	var CoreExceptions_1 = __webpack_require__(504);
+	var jsencrypt_1 = __webpack_require__(504);
+	var PubKeyService_1 = __webpack_require__(505);
+	var CoreExceptions_1 = __webpack_require__(483);
 	var CORE_READERS = '/card-readers';
 	var PinEnforcer = (function () {
 	    function PinEnforcer() {
@@ -48552,7 +48631,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 502 */
+/* 504 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*! JSEncrypt v2.3.1 | https://npmcdn.com/jsencrypt@2.3.1/LICENSE.txt */
@@ -52908,7 +52987,7 @@ var GCLLib =
 	});
 
 /***/ }),
-/* 503 */
+/* 505 */
 /***/ (function(module, exports) {
 
 	"use strict";
@@ -52928,54 +53007,17 @@ var GCLLib =
 
 
 /***/ }),
-/* 504 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var ObjectUtil_1 = __webpack_require__(505);
-	var RestException = (function () {
-	    function RestException(status, code, description, client) {
-	        this.status = status;
-	        this.code = code;
-	        this.description = description;
-	        this.client = client;
-	        ObjectUtil_1.ObjectUtil.removeNullAndUndefinedFields(this);
-	    }
-	    return RestException;
-	}());
-	exports.RestException = RestException;
-
-
-/***/ }),
-/* 505 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var ObjectUtil = (function () {
-	    function ObjectUtil() {
-	    }
-	    ObjectUtil.removeNullAndUndefinedFields = function (obj) {
-	        Object.keys(obj).forEach(function (key) { return !obj[key] && delete obj[key]; });
-	    };
-	    return ObjectUtil;
-	}());
-	exports.ObjectUtil = ObjectUtil;
-
-
-/***/ }),
 /* 506 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var _ = __webpack_require__(484);
+	var _ = __webpack_require__(486);
 	var asn1js = __webpack_require__(507);
 	var Base64 = __webpack_require__(509);
 	var Certificate_1 = __webpack_require__(510);
 	var CoreModel_1 = __webpack_require__(549);
-	var ResponseHandler_1 = __webpack_require__(486);
+	var ResponseHandler_1 = __webpack_require__(488);
 	var CertParser = (function () {
 	    function CertParser() {
 	    }
@@ -72237,7 +72279,7 @@ var GCLLib =
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var _ = __webpack_require__(484);
+	var _ = __webpack_require__(486);
 	var Options = (function () {
 	    function Options(parseCerts, filters) {
 	        this.parseCerts = parseCerts;
@@ -72318,10 +72360,10 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(500);
-	var PinEnforcer_1 = __webpack_require__(501);
+	var Card_1 = __webpack_require__(502);
+	var PinEnforcer_1 = __webpack_require__(503);
 	var RequestHandler_1 = __webpack_require__(550);
-	var _ = __webpack_require__(484);
+	var _ = __webpack_require__(486);
 	var EidBe = (function (_super) {
 	    __extends(EidBe, _super);
 	    function EidBe() {
@@ -72383,10 +72425,10 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(500);
-	var PinEnforcer_1 = __webpack_require__(501);
+	var Card_1 = __webpack_require__(502);
+	var PinEnforcer_1 = __webpack_require__(503);
 	var CertParser_1 = __webpack_require__(506);
-	var ResponseHandler_1 = __webpack_require__(486);
+	var ResponseHandler_1 = __webpack_require__(488);
 	var RequestHandler_1 = __webpack_require__(550);
 	var EidLux = (function (_super) {
 	    __extends(EidLux, _super);
@@ -72502,7 +72544,7 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(500);
+	var Card_1 = __webpack_require__(502);
 	var MOBIB_CARD_ISSUING = '/card-issuing';
 	var MOBIB_CONTRACTS = '/contracts';
 	var MOBIB_PHOTO = '/picture';
@@ -72545,7 +72587,7 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(500);
+	var Card_1 = __webpack_require__(502);
 	var RequestHandler_1 = __webpack_require__(550);
 	var LuxTrust = (function (_super) {
 	    __extends(LuxTrust, _super);
@@ -72586,8 +72628,8 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(500);
-	var PinEnforcer_1 = __webpack_require__(501);
+	var Card_1 = __webpack_require__(502);
+	var PinEnforcer_1 = __webpack_require__(503);
 	var es6_promise_1 = __webpack_require__(329);
 	var Ocra = (function (_super) {
 	    __extends(Ocra, _super);
@@ -72651,8 +72693,8 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(500);
-	var PinEnforcer_1 = __webpack_require__(501);
+	var Card_1 = __webpack_require__(502);
+	var PinEnforcer_1 = __webpack_require__(503);
 	var RequestHandler_1 = __webpack_require__(550);
 	var Aventra = (function (_super) {
 	    __extends(Aventra, _super);
@@ -72716,8 +72758,8 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(500);
-	var PinEnforcer_1 = __webpack_require__(501);
+	var Card_1 = __webpack_require__(502);
+	var PinEnforcer_1 = __webpack_require__(503);
 	var RequestHandler_1 = __webpack_require__(550);
 	var Oberthur = (function (_super) {
 	    __extends(Oberthur, _super);
@@ -72776,8 +72818,8 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(500);
-	var PinEnforcer_1 = __webpack_require__(501);
+	var Card_1 = __webpack_require__(502);
+	var PinEnforcer_1 = __webpack_require__(503);
 	var es6_promise_1 = __webpack_require__(329);
 	var RequestHandler_1 = __webpack_require__(550);
 	var PIV = (function (_super) {
@@ -72858,10 +72900,10 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(500);
+	var Card_1 = __webpack_require__(502);
 	var RequestHandler_1 = __webpack_require__(550);
 	var CertParser_1 = __webpack_require__(506);
-	var ResponseHandler_1 = __webpack_require__(486);
+	var ResponseHandler_1 = __webpack_require__(488);
 	var DNIe = (function (_super) {
 	    __extends(DNIe, _super);
 	    function DNIe() {
@@ -72908,7 +72950,7 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(500);
+	var Card_1 = __webpack_require__(502);
 	var RequestHandler_1 = __webpack_require__(550);
 	var EidPt = (function (_super) {
 	    __extends(EidPt, _super);
@@ -72968,8 +73010,8 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var _ = __webpack_require__(484);
-	var Card_1 = __webpack_require__(500);
+	var _ = __webpack_require__(486);
+	var Card_1 = __webpack_require__(502);
 	var RemoteLoading = (function (_super) {
 	    __extends(RemoteLoading, _super);
 	    function RemoteLoading() {
@@ -73056,8 +73098,8 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var RemoteLoading_1 = __webpack_require__(561);
 	var RemoteLoadingModel_1 = __webpack_require__(563);
-	var ResponseHandler_1 = __webpack_require__(486);
-	var _ = __webpack_require__(484);
+	var ResponseHandler_1 = __webpack_require__(488);
+	var _ = __webpack_require__(486);
 	var Belfius = (function (_super) {
 	    __extends(Belfius, _super);
 	    function Belfius() {
@@ -73234,7 +73276,7 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(500);
+	var Card_1 = __webpack_require__(502);
 	var FileExchange = (function (_super) {
 	    __extends(FileExchange, _super);
 	    function FileExchange() {
@@ -73266,12 +73308,12 @@ var GCLLib =
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var _ = __webpack_require__(484);
+	var _ = __webpack_require__(486);
 	var CertParser_1 = __webpack_require__(506);
-	var ResponseHandler_1 = __webpack_require__(486);
-	var platform = __webpack_require__(485);
+	var ResponseHandler_1 = __webpack_require__(488);
+	var platform = __webpack_require__(487);
 	var RequestHandler_1 = __webpack_require__(550);
-	var PinEnforcer_1 = __webpack_require__(501);
+	var PinEnforcer_1 = __webpack_require__(503);
 	var PKCS11 = (function () {
 	    function PKCS11(baseUrl, containerUrl, connection) {
 	        this.baseUrl = baseUrl;
@@ -73393,7 +73435,7 @@ var GCLLib =
 	    };
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var Card_1 = __webpack_require__(500);
+	var Card_1 = __webpack_require__(502);
 	var DataContainer = (function (_super) {
 	    __extends(DataContainer, _super);
 	    function DataContainer() {
@@ -73424,8 +73466,8 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(329);
 	var EidBe_1 = __webpack_require__(551);
-	var ResponseHandler_1 = __webpack_require__(486);
-	var _ = __webpack_require__(484);
+	var ResponseHandler_1 = __webpack_require__(488);
+	var _ = __webpack_require__(486);
 	var CardUtil_1 = __webpack_require__(568);
 	var Aventra_1 = __webpack_require__(556);
 	var Arguments = (function () {
@@ -73696,7 +73738,7 @@ var GCLLib =
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
-	var _ = __webpack_require__(484);
+	var _ = __webpack_require__(486);
 	var RequestHandler_1 = __webpack_require__(550);
 	var CardUtil = (function () {
 	    function CardUtil() {
@@ -73876,8 +73918,8 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(329);
-	var ResponseHandler_1 = __webpack_require__(486);
-	var _ = __webpack_require__(484);
+	var ResponseHandler_1 = __webpack_require__(488);
+	var _ = __webpack_require__(486);
 	var InitUtil_1 = __webpack_require__(570);
 	var ClientService_1 = __webpack_require__(575);
 	var CORE_ACTIVATE = '/admin/activate';
@@ -73975,13 +74017,13 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(329);
-	var _ = __webpack_require__(484);
+	var _ = __webpack_require__(486);
 	var semver = __webpack_require__(571);
 	var SyncUtil_1 = __webpack_require__(572);
 	var ActivationUtil_1 = __webpack_require__(577);
 	var DSClientModel_1 = __webpack_require__(573);
-	var PubKeyService_1 = __webpack_require__(503);
-	var CoreExceptions_1 = __webpack_require__(504);
+	var PubKeyService_1 = __webpack_require__(505);
+	var CoreExceptions_1 = __webpack_require__(483);
 	var InitUtil = (function () {
 	    function InitUtil() {
 	    }
@@ -75395,8 +75437,8 @@ var GCLLib =
 	var DSClientModel_1 = __webpack_require__(573);
 	var es6_promise_1 = __webpack_require__(329);
 	var DataContainerUtil_1 = __webpack_require__(574);
-	var _ = __webpack_require__(484);
-	var CoreExceptions_1 = __webpack_require__(504);
+	var _ = __webpack_require__(486);
+	var CoreExceptions_1 = __webpack_require__(483);
 	var adminModel_1 = __webpack_require__(576);
 	var SyncUtil = (function () {
 	    function SyncUtil() {

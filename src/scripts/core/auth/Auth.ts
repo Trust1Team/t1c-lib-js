@@ -2,12 +2,14 @@
  * @author Maarten Somers
  * @since 2018
  */
-import { RemoteJwtConnection } from '../client/Connection';
+import { RemoteApiKeyConnection, RemoteJwtConnection } from '../client/Connection';
 import { GCLConfig } from '../GCLConfig';
 import * as CoreExceptions from '../exceptions/CoreExceptions';
 import { Promise } from 'es6-promise';
 import { AbstractAuth } from './AuthModel';
 import { JWTResponse } from '../ds/DSClientModel';
+import { ResponseHandler } from '../../util/ResponseHandler';
+import { RestException } from '../exceptions/CoreExceptions';
 
 export { AuthClient };
 
@@ -19,7 +21,7 @@ const REFRESH = '/login/token/refresh';
 class AuthClient implements AbstractAuth {
     private url;
 
-    constructor(private cfg: GCLConfig, private connection: RemoteJwtConnection) {
+    constructor(private cfg: GCLConfig, private connection: RemoteApiKeyConnection) {
         this.url = cfg.authUrl;
     }
 
