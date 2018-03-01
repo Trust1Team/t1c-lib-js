@@ -11,7 +11,7 @@ import { LocalConnection } from '../../../../../scripts/core/client/Connection';
 import { PluginFactory } from '../../../../../scripts/plugins/PluginFactory';
 
 describe('Portuguese eID Container', () => {
-    const gclConfig = new GCLConfig();
+    const gclConfig = new GCLConfig({});
     const connection: LocalConnection = new LocalConnection(gclConfig);
     const pt = new PluginFactory('', connection).createEidPT('123');
     let mock: MockAdapter;

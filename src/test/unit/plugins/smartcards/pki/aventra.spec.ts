@@ -12,7 +12,7 @@ import { PluginFactory } from '../../../../../scripts/plugins/PluginFactory';
 import { PubKeyService } from '../../../../../scripts/util/PubKeyService';
 
 describe('Aventra Container', () => {
-    const gclConfig = new GCLConfig();
+    const gclConfig = new GCLConfig({});
     const connection: LocalConnection = new LocalConnection(gclConfig);
     const aventra = new PluginFactory('', connection).createAventraNO('123');
     let mock: MockAdapter;

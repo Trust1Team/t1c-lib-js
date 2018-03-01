@@ -11,8 +11,8 @@ import { GenericConnection, LocalConnection } from '../../../scripts/core/client
 import * as ls from 'local-storage';
 
 describe('Connection', () => {
-    const gclConfig = new GCLConfig();
-    const tokenConfig = new GCLConfig();
+    const gclConfig = new GCLConfig({});
+    const tokenConfig = new GCLConfig({});
     tokenConfig.tokenCompatible = true;
     const connection: LocalConnection = new LocalConnection(gclConfig);
     const tokenConnection: LocalConnection = new LocalConnection(tokenConfig);

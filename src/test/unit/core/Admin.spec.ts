@@ -12,7 +12,7 @@ import { Promise } from 'es6-promise';
 import { AdminService } from '../../../scripts/core/admin/admin';
 
 describe('Admin Services', () => {
-    let gclConfig = new GCLConfig();
+    let gclConfig = new GCLConfig({});
     const connection: LocalConnection = new LocalConnection(gclConfig);
     let admin = new AdminService('', connection);
     let mock: MockAdapter;
@@ -33,7 +33,7 @@ describe('Admin Services', () => {
         });
 
         it('makes the correct call to activate', () => {
-            return admin.activate('Activation Data').then(res => {
+            return admin.activate().then(res => {
                 expect(res).to.have.property('success');
                 expect(res.success).to.be.a('boolean');
                 expect(res.success).to.eq(true);
@@ -48,7 +48,7 @@ describe('Admin Services', () => {
 
     describe('getPubKey', () => {
         beforeEach(function () {
-            mock.onGet('admin/certificate').reply(() => {
+            mock.onGet('/admin/certificate').reply(() => {
                 return [ 200, { data: { device: 'Device Pub Key', ssl: 'SSL Pub Key' }, success: true }];
             });
         });
@@ -72,13 +72,13 @@ describe('Admin Services', () => {
 
     describe('setPubKey', () => {
         beforeEach(function () {
-            mock.onPut('/admin/certificate', { certificate: 'pubkey' }).reply(() => {
+            mock.onPut('/admin/certificate', { encryptedPublicKey: 'pubkey', encryptedAesKey: 'aeskey' }).reply(() => {
                 return [ 200, { data: 'Set Pub Key Data', success: true }];
             });
         });
 
         it('makes the correct call to set pub key', () => {
-            return admin.setPubKey('pubkey').then(res => {
+            return admin.setPubKey({ encryptedAesKey: 'aeskey', encryptedPublicKey: 'pubkey' }).then(res => {
                 expect(res).to.have.property('success');
                 expect(res.success).to.be.a('boolean');
                 expect(res.success).to.eq(true);

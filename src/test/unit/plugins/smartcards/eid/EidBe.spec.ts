@@ -13,7 +13,7 @@ import { AbstractEidBE } from '../../../../../scripts/plugins/smartcards/eid/be/
 import { PubKeyService } from '../../../../../scripts/util/PubKeyService';
 
 describe('Belgian eID Container', () => {
-    const gclConfig = new GCLConfig();
+    const gclConfig = new GCLConfig({});
     const connection: LocalConnection = new LocalConnection(gclConfig);
     const beid: AbstractEidBE = new PluginFactory('', connection).createEidBE('123');
     let mock: MockAdapter;

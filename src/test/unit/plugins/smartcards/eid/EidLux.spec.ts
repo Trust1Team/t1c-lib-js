@@ -13,7 +13,7 @@ import { AbstractEidLUX } from '../../../../../scripts/plugins/smartcards/eid/lu
 import { PubKeyService } from '../../../../../scripts/util/PubKeyService';
 
 describe('Luxembourg eID Container', () => {
-    const gclConfig = new GCLConfig();
+    const gclConfig = new GCLConfig({});
     const connection: LocalConnection = new LocalConnection(gclConfig);
     PubKeyService.setPubKey('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlOJu6TyygqxfWT7eLtGDwajtN\n' +
                             'FOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76\n' +
