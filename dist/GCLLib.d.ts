@@ -57,6 +57,7 @@ class GCLConfigOptions {
     gclUrl: string;
     gwOrProxyUrl: string;
     apiKey: string;
+    gwJwt: string;
     ocvContextPath: string;
     dsContextPath: string;
     dsFileContextPath: string;
@@ -71,7 +72,7 @@ class GCLConfigOptions {
     osPinDialog: boolean;
     containerDownloadTimeout: number;
     localTestMode: boolean;
-    constructor(gclUrl?: string, gwOrProxyUrl?: string, apiKey?: string, ocvContextPath?: string, dsContextPath?: string, dsFileContextPath?: string, pkcs11Config?: ModuleConfig, agentPort?: number, implicitDownload?: boolean, forceHardwarePinpad?: boolean, sessionTimeout?: number, consentDuration?: number, consentTimeout?: number, syncManaged?: boolean, osPinDialog?: boolean, containerDownloadTimeout?: number, localTestMode?: boolean);
+    constructor(gclUrl?: string, gwOrProxyUrl?: string, apiKey?: string, gwJwt?: string, ocvContextPath?: string, dsContextPath?: string, dsFileContextPath?: string, pkcs11Config?: ModuleConfig, agentPort?: number, implicitDownload?: boolean, forceHardwarePinpad?: boolean, sessionTimeout?: number, consentDuration?: number, consentTimeout?: number, syncManaged?: boolean, osPinDialog?: boolean, containerDownloadTimeout?: number, localTestMode?: boolean);
 }
 class GCLConfig implements GCLConfig {
     constructor(options: GCLConfigOptions);
@@ -1382,7 +1383,7 @@ declare class ModuleConfig {
 
 export { AuthClient };
 class AuthClient implements AbstractAuth {
-    constructor(cfg: GCLConfig, connection: RemoteJwtConnection);
+    constructor(cfg: GCLConfig, connection: RemoteApiKeyConnection);
     getJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
     refreshJWT(currentJWT: string, callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
 }

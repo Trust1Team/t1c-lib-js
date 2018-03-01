@@ -13,6 +13,9 @@ import { RestException } from '../exceptions/CoreExceptions';
 import { UrlUtil } from '../../util/UrlUtil';
 import * as ls from 'local-storage';
 import { BrowserFingerprint } from '../../util/BrowserFingerprint';
+import * as CoreExceptions from '../exceptions/CoreExceptions';
+import { ResponseHandler } from '../../util/ResponseHandler';
+import { JWTResponse } from '../ds/DSClientModel';
 
 export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteApiKeyConnection,
     RemoteJwtConnection, Connection, LocalTestConnection, RequestBody, RequestHeaders, RequestCallback, QueryParams };
@@ -69,6 +72,10 @@ abstract class GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) {}
 
 
+    private static disabledWithoutApiKey(callback: (error: CoreExceptions.RestException, data: JWTResponse) => void) {
+        return ResponseHandler.error(new RestException(412, '901', 'Configuration must contain API key to use this method'), callback);
+    }
+
     private static extractAccessToken(headers: RequestHeaders, config: GCLConfig) {
 
         if (headers && headers.access_token) {
@@ -76,13 +83,19 @@ abstract class GenericConnection implements Connection {
         }
     }
 
+
     public get(basePath: string,
                suffix: string,
                queryParams?: QueryParams,
                headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'GET', this.cfg, this.getSecurityConfig(),
-            undefined, queryParams, headers, callback);
+        const securityConfig = this.getSecurityConfig();
+        if (securityConfig.sendApiKey && !(this.cfg.apiKey && this.cfg.apiKey.length)) {
+            return GenericConnection.disabledWithoutApiKey(callback);
+        } else {
+            return this.handleRequest(basePath, suffix, 'GET', this.cfg, securityConfig,
+                undefined, queryParams, headers, callback);
+        }
     }
 
     public post(basePath: string,
@@ -91,8 +104,13 @@ abstract class GenericConnection implements Connection {
                 queryParams?: QueryParams,
                 headers?: RequestHeaders,
                 callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'POST', this.cfg, this.getSecurityConfig(),
-            body, queryParams, headers, callback);
+        const securityConfig = this.getSecurityConfig();
+        if (securityConfig.sendApiKey && !(this.cfg.apiKey && this.cfg.apiKey.length)) {
+            return GenericConnection.disabledWithoutApiKey(callback);
+        } else {
+            return this.handleRequest(basePath, suffix, 'POST', this.cfg, securityConfig,
+                body, queryParams, headers, callback);
+        }
     }
 
     public put(basePath: string,
@@ -101,8 +119,14 @@ abstract class GenericConnection implements Connection {
                queryParams?: QueryParams,
                headers?: RequestHeaders,
                callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'PUT', this.cfg, this.getSecurityConfig(),
-            body, queryParams, headers, callback);
+        const securityConfig = this.getSecurityConfig();
+        if (securityConfig.sendApiKey && !(this.cfg.apiKey && this.cfg.apiKey.length)) {
+            return GenericConnection.disabledWithoutApiKey(callback);
+        } else {
+            return this.handleRequest(basePath, suffix, 'PUT', this.cfg, securityConfig,
+                body, queryParams, headers, callback);
+        }
+
     }
 
     public delete(basePath: string,
@@ -110,8 +134,14 @@ abstract class GenericConnection implements Connection {
                   queryParams?: QueryParams,
                   headers?: RequestHeaders,
                   callback?: RequestCallback): Promise<any> {
-        return this.handleRequest(basePath, suffix, 'DELETE', this.cfg, this.getSecurityConfig(),
-            undefined, queryParams, headers, callback);
+        const securityConfig = this.getSecurityConfig();
+        if (securityConfig.sendApiKey && !(this.cfg.apiKey && this.cfg.apiKey.length)) {
+            return GenericConnection.disabledWithoutApiKey(callback);
+        } else {
+            return this.handleRequest(basePath, suffix, 'DELETE', this.cfg, securityConfig,
+                undefined, queryParams, headers, callback);
+        }
+
     }
 
     getRequestHeaders(headers: RequestHeaders): RequestHeaders {

@@ -75,7 +75,7 @@ class GCLClient {
         this.agentClient = new AgentClient(this.cfg.gclUrl, this.connection);
         if (this.cfg.localTestMode) { this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg); }
         else { this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg); }
-        this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteConnection);
+        this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteApiKeyConnection);
         this.authClient = new AuthClient(this.cfg, this.remoteApiKeyConnection);
         // keep reference to client in ClientService
         ClientService.setClient(this);
