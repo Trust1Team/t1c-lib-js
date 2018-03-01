@@ -4,7 +4,6 @@
     var gclOptions = {
         apiKey: "44865b13-f94b-45e6-b1cf-2f12d4bd547d", //test apikey rate limited
         gwOrProxyUrl: "https://accapim.t1t.be:443",
-        allowAutoUpdate: true,
         implicitDownload: false,
         osPinDialog: true,
         localTestMode: localTestMode
