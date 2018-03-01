@@ -12,9 +12,9 @@ import { PinEnforcer } from '../../../scripts/util/PinEnforcer';
 
 
 describe('PinEnforcer Utility', () => {
-    const gclConfig = new GCLConfig();
+    const gclConfig = new GCLConfig({});
     const connection: LocalConnection = new LocalConnection(gclConfig);
-    const enforcingConfig = new GCLConfig();
+    const enforcingConfig = new GCLConfig({});
     enforcingConfig.forceHardwarePinpad = true;
     const enforcingConnection = new LocalConnection(enforcingConfig);
     let mock: MockAdapter;

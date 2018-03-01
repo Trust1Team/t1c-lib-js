@@ -62,7 +62,6 @@ class GCLConfigOptions {
     dsFileContextPath: string;
     pkcs11Config: ModuleConfig;
     agentPort: number;
-    allowAutoUpdate: boolean;
     implicitDownload: boolean;
     forceHardwarePinpad: boolean;
     sessionTimeout: number;
@@ -72,7 +71,7 @@ class GCLConfigOptions {
     osPinDialog: boolean;
     containerDownloadTimeout: number;
     localTestMode: boolean;
-    constructor(gclUrl?: string, gwOrProxyUrl?: string, apiKey?: string, ocvContextPath?: string, dsContextPath?: string, dsFileContextPath?: string, pkcs11Config?: ModuleConfig, agentPort?: number, allowAutoUpdate?: boolean, implicitDownload?: boolean, forceHardwarePinpad?: boolean, sessionTimeout?: number, consentDuration?: number, consentTimeout?: number, syncManaged?: boolean, osPinDialog?: boolean, containerDownloadTimeout?: number, localTestMode?: boolean);
+    constructor(gclUrl?: string, gwOrProxyUrl?: string, apiKey?: string, ocvContextPath?: string, dsContextPath?: string, dsFileContextPath?: string, pkcs11Config?: ModuleConfig, agentPort?: number, implicitDownload?: boolean, forceHardwarePinpad?: boolean, sessionTimeout?: number, consentDuration?: number, consentTimeout?: number, syncManaged?: boolean, osPinDialog?: boolean, containerDownloadTimeout?: number, localTestMode?: boolean);
 }
 class GCLConfig implements GCLConfig {
     constructor(options: GCLConfigOptions);
@@ -84,9 +83,6 @@ class GCLConfig implements GCLConfig {
     dsContextPath: string;
     dsFileContextPath: string;
     apiKey: string;
-    allowAutoUpdate: boolean;
-    client_id: string;
-    client_secret: string;
     citrix: boolean;
     agentPort: number;
     implicitDownload: boolean;

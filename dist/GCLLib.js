@@ -9051,9 +9051,8 @@ var GCLLib =
 	    dsContextPath: '/trust1team/gclds/v2',
 	    ocvContextPath: '/trust1team/ocv-api/v1',
 	    dsContextPathTestMode: '/gcl-ds-web/v2',
-	    fileDownloadUrlPostfix: '/trust1team/gclds-file/v1',
+	    dsFileContextPath: '/trust1team/gclds-file/v1',
 	    tokenExchangeContextPath: '/apiengineauth/v1',
-	    allowAutoUpdate: true,
 	    implicitDownload: false,
 	    localTestMode: false,
 	    forceHardwarePinpad: false,
@@ -9065,7 +9064,7 @@ var GCLLib =
 	    containerDownloadTimeout: 30
 	};
 	var GCLConfigOptions = (function () {
-	    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, ocvContextPath, dsContextPath, dsFileContextPath, pkcs11Config, agentPort, allowAutoUpdate, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode) {
+	    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, ocvContextPath, dsContextPath, dsFileContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode) {
 	        this.gclUrl = gclUrl;
 	        this.gwOrProxyUrl = gwOrProxyUrl;
 	        this.apiKey = apiKey;
@@ -9074,7 +9073,6 @@ var GCLLib =
 	        this.dsFileContextPath = dsFileContextPath;
 	        this.pkcs11Config = pkcs11Config;
 	        this.agentPort = agentPort;
-	        this.allowAutoUpdate = allowAutoUpdate;
 	        this.implicitDownload = implicitDownload;
 	        this.forceHardwarePinpad = forceHardwarePinpad;
 	        this.sessionTimeout = sessionTimeout;
@@ -9093,12 +9091,11 @@ var GCLLib =
 	        this._gclUrl = options.gclUrl || defaults.gclUrl;
 	        this._gwUrl = options.gwOrProxyUrl || defaults.gwUrl;
 	        this._dsContextPath = options.dsContextPath || defaults.dsContextPath;
-	        this._dsFileContextPath = options.dsFileContextPath || defaults.fileDownloadUrlPostfix;
+	        this._dsFileContextPath = options.dsFileContextPath || defaults.dsFileContextPath;
 	        this._ocvContextPath = options.ocvContextPath || defaults.ocvContextPath;
 	        this._apiKey = options.apiKey;
 	        this._citrix = false;
 	        this._agentPort = options.agentPort || -1;
-	        this._allowAutoUpdate = options.allowAutoUpdate || defaults.allowAutoUpdate;
 	        this._implicitDownload = options.implicitDownload || defaults.implicitDownload;
 	        this._localTestMode = options.localTestMode || defaults.localTestMode;
 	        this._forceHardwarePinpad = options.forceHardwarePinpad || defaults.forceHardwarePinpad;
@@ -9182,36 +9179,6 @@ var GCLLib =
 	        },
 	        set: function (value) {
 	            this._apiKey = value;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(GCLConfig.prototype, "allowAutoUpdate", {
-	        get: function () {
-	            return this._allowAutoUpdate;
-	        },
-	        set: function (value) {
-	            this._allowAutoUpdate = value;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(GCLConfig.prototype, "client_id", {
-	        get: function () {
-	            return this._client_id;
-	        },
-	        set: function (value) {
-	            this._client_id = value;
-	        },
-	        enumerable: true,
-	        configurable: true
-	    });
-	    Object.defineProperty(GCLConfig.prototype, "client_secret", {
-	        get: function () {
-	            return this._client_secret;
-	        },
-	        set: function (value) {
-	            this._client_secret = value;
 	        },
 	        enumerable: true,
 	        configurable: true

@@ -13,8 +13,8 @@ import { ModuleConfig } from '../../../../../scripts/plugins/smartcards/pkcs11/p
 import { PubKeyService } from '../../../../../scripts/util/PubKeyService';
 
 describe('PKCS#11 Container', () => {
-    const gclConfig = new GCLConfig(undefined, undefined, new ModuleConfig('linux', 'mac', 'win '));
-    const failConfig = new GCLConfig(undefined, undefined, new ModuleConfig('fail', 'not there', 'wrong '));
+    const gclConfig = new GCLConfig({ pkcs11Config: new ModuleConfig('linux', 'mac', 'win ') });
+    const failConfig = new GCLConfig({ pkcs11Config:  new ModuleConfig('fail', 'not there', 'wrong ') });
     const connection: LocalConnection = new LocalConnection(gclConfig);
     const failConnection: LocalConnection = new LocalConnection(failConfig);
     const pkcs11 = new PluginFactory('', connection).createPKCS11();

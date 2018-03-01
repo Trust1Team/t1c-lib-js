@@ -11,7 +11,7 @@ import { LocalConnection } from '../../../../scripts/core/client/Connection';
 import { PluginFactory } from '../../../../scripts/plugins/PluginFactory';
 
 describe('Remote Loading Container', () => {
-    const gclConfig = new GCLConfig();
+    const gclConfig = new GCLConfig({});
     const connection: LocalConnection = new LocalConnection(gclConfig);
     const relo = new PluginFactory('', connection).createRemoteLoading('123');
     let mock: MockAdapter;

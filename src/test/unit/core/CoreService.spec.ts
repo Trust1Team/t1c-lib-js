@@ -12,10 +12,9 @@ import { LocalConnection } from '../../../scripts/core/client/Connection';
 import { Promise } from 'es6-promise';
 
 describe('Core Services', () => {
-    let gclConfig = new GCLConfig();
+    let gclConfig = new GCLConfig({});
     const connection: LocalConnection = new LocalConnection(gclConfig);
-    let gclConfigModified = new GCLConfig();
-    gclConfigModified.defaultConsentDuration = 5;
+    let gclConfigModified = new GCLConfig({ consentDuration: 5});
     const connectionModified: LocalConnection = new LocalConnection(gclConfigModified);
     let core = new CoreService('', connection);
     let coreModified = new CoreService('', connectionModified);

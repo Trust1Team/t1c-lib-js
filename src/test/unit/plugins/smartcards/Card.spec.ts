@@ -12,7 +12,7 @@ import { PluginFactory } from '../../../../scripts/plugins/PluginFactory';
 import { PubKeyService } from '../../../../scripts/util/PubKeyService';
 
 describe('Generic cards and containers', () => {
-    const gclConfig = new GCLConfig();
+    const gclConfig = new GCLConfig({});
     const connection: LocalConnection = new LocalConnection(gclConfig);
     let mock: MockAdapter;
 

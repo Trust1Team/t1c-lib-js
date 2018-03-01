@@ -12,7 +12,7 @@ import { PluginFactory } from '../../../../../scripts/plugins/PluginFactory';
 import { PubKeyService } from '../../../../../scripts/util/PubKeyService';
 
 describe('PIV/CIV Container', () => {
-    const gclConfig = new GCLConfig();
+    const gclConfig = new GCLConfig({});
     const connection: LocalConnection = new LocalConnection(gclConfig);
     const piv = new PluginFactory('', connection).createPIV('123');
     let mock: MockAdapter;

@@ -11,7 +11,7 @@ import {CoreService} from "../../../scripts/core/service/CoreService";
 import {LocalAuthConnection} from "../../../scripts/core/client/Connection";
 
 describe("Generic Service", () => {
-    const gclConfig = new GCLConfig();
+    const gclConfig = new GCLConfig({ gclUrl: 'https://localhost:10443/v1' });
     const gclUnderTest = "https://localhost:10443/v1";
     const localAuthConnection: LocalAuthConnection = new LocalAuthConnection(gclConfig);
     const core: CoreService = new CoreService(gclUnderTest, localAuthConnection);

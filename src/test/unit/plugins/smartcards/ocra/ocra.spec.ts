@@ -12,7 +12,7 @@ import { PluginFactory } from '../../../../../scripts/plugins/PluginFactory';
 import { PubKeyService } from '../../../../../scripts/util/PubKeyService';
 
 describe('OCRA Container', () => {
-    const gclConfig = new GCLConfig();
+    const gclConfig = new GCLConfig({});
     const connection: LocalConnection = new LocalConnection(gclConfig);
     const ocra = new PluginFactory('', connection).createOcra('123');
     let mock: MockAdapter;

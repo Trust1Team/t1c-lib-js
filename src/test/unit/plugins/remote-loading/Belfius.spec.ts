@@ -12,7 +12,7 @@ import { PluginFactory } from '../../../../scripts/plugins/PluginFactory';
 import { Promise } from 'es6-promise';
 
 describe('Belfius Container', () => {
-    const gclConfig = new GCLConfig();
+    const gclConfig = new GCLConfig({});
     const connection: LocalConnection = new LocalConnection(gclConfig);
     const belfius = new PluginFactory('', connection).createBelfius('123');
     const nonBelfiusReader = new PluginFactory('', connection).createBelfius('321');
