@@ -19,9 +19,8 @@ const defaults = {
     dsContextPath: '/trust1team/gclds/v2',
     ocvContextPath: '/trust1team/ocv-api/v1',
     dsContextPathTestMode: '/gcl-ds-web/v2',
-    fileDownloadUrlPostfix: '/trust1team/gclds-file/v1',
+    dsFileContextPath: '/trust1team/gclds-file/v1',
     tokenExchangeContextPath: '/apiengineauth/v1',
-    allowAutoUpdate: true,
     implicitDownload: false,
     localTestMode: false,
     forceHardwarePinpad: false,
@@ -42,7 +41,6 @@ class GCLConfigOptions {
                 public dsFileContextPath?: string,
                 public pkcs11Config?: ModuleConfig,
                 public agentPort?: number,
-                public allowAutoUpdate?: boolean,
                 public implicitDownload?: boolean,
                 public forceHardwarePinpad?: boolean,
                 public sessionTimeout?: number,
@@ -63,13 +61,10 @@ class GCLConfig  implements GCLConfig {
     private _dsFileContextPath: string;
     private _ocvContextPath: string;
     private _apiKey: string;
-    private _client_id: string;
-    private _client_secret: string;
     private _gwJwt: string;
     private _gclJwt: string;
     private _citrix: boolean;
     private _agentPort: number;
-    private _allowAutoUpdate: boolean;
     private _implicitDownload: boolean;
     private _localTestMode: boolean;
     private _forceHardwarePinpad: boolean;
@@ -88,12 +83,11 @@ class GCLConfig  implements GCLConfig {
         this._gclUrl = options.gclUrl || defaults.gclUrl;
         this._gwUrl = options.gwOrProxyUrl || defaults.gwUrl;
         this._dsContextPath = options.dsContextPath || defaults.dsContextPath;
-        this._dsFileContextPath = options.dsFileContextPath || defaults.fileDownloadUrlPostfix;
+        this._dsFileContextPath = options.dsFileContextPath || defaults.dsFileContextPath;
         this._ocvContextPath = options.ocvContextPath || defaults.ocvContextPath;
         this._apiKey = options.apiKey;
         this._citrix = false;
         this._agentPort = options.agentPort || -1;
-        this._allowAutoUpdate = options.allowAutoUpdate || defaults.allowAutoUpdate;
         this._implicitDownload = options.implicitDownload || defaults.implicitDownload;
         this._localTestMode = options.localTestMode || defaults.localTestMode;
         this._forceHardwarePinpad = options.forceHardwarePinpad || defaults.forceHardwarePinpad;
@@ -157,30 +151,6 @@ class GCLConfig  implements GCLConfig {
 
     set apiKey(value: string) {
         this._apiKey = value;
-    }
-
-    get allowAutoUpdate(): boolean {
-        return this._allowAutoUpdate;
-    }
-
-    set allowAutoUpdate(value: boolean) {
-        this._allowAutoUpdate = value;
-    }
-
-    get client_id(): string {
-        return this._client_id;
-    }
-
-    set client_id(value: string) {
-        this._client_id = value;
-    }
-
-    get client_secret(): string {
-        return this._client_secret;
-    }
-
-    set client_secret(value: string) {
-        this._client_secret = value;
     }
 
     get citrix(): boolean {
