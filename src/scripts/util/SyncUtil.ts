@@ -21,8 +21,11 @@ export { SyncUtil };
 
 class SyncUtil {
     static readonly DOWNLOAD_ERROR = 'DOWNLOAD_ERROR';
+    static readonly GENERIC_ERROR = 'ERROR';
+    static readonly ERROR_STATES = [ SyncUtil.DOWNLOAD_ERROR, SyncUtil.GENERIC_ERROR ];
     static readonly INIT = 'INIT';
     static readonly DOWNLOADING = 'DOWNLOADING';
+    static readonly ONGOING_STATES = [ SyncUtil.INIT, SyncUtil.DOWNLOADING ];
     static readonly INSTALLED = 'INSTALLED';
 
     // constructor
@@ -70,6 +73,7 @@ class SyncUtil {
                             }, (error) => {
                                 if (typeof error === 'boolean' && !isRetry) {
                                     // need to trigger retry
+                                    console.log('download error, retrying');
                                     resolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, true));
                                 } else {
                                     // something went wrong, return error
@@ -135,7 +139,7 @@ class SyncUtil {
 
         function checkDownloadsComplete(cfg: any, containerStatus: any): Promise<boolean> {
             // check all containers in list
-            // if >= 1 error, reject
+            // if >= 1 error or missing, reject
             // if >= 1 in progress, poll again
             // if all done, resolve
             return new Promise<boolean>((resolve, reject) => {
@@ -163,7 +167,7 @@ class SyncUtil {
             return _.find(config, cfgCt => {
                 return _.find(status, statusCt => {
                     return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-                           && statusCt.status === SyncUtil.DOWNLOAD_ERROR;
+                           && _.includes(SyncUtil.ERROR_STATES, statusCt.status);
                 });
             });
         }
@@ -172,7 +176,7 @@ class SyncUtil {
             return _.find(config, cfgCt => {
                 return _.find(status, statusCt => {
                     return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-                           && (statusCt.status === SyncUtil.INIT || statusCt.status === SyncUtil.DOWNLOADING);
+                           && _.includes(SyncUtil.ONGOING_STATES, statusCt.status);
                 });
             });
         }

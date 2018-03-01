@@ -75456,6 +75456,7 @@ var GCLLib =
 	                                });
 	                            }, function (error) {
 	                                if (typeof error === 'boolean' && !isRetry) {
+	                                    console.log('download error, retrying');
 	                                    resolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, true));
 	                                }
 	                                else {
@@ -75530,7 +75531,7 @@ var GCLLib =
 	            return _.find(config, function (cfgCt) {
 	                return _.find(status, function (statusCt) {
 	                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-	                        && statusCt.status === SyncUtil.DOWNLOAD_ERROR;
+	                        && _.includes(SyncUtil.ERROR_STATES, statusCt.status);
 	                });
 	            });
 	        }
@@ -75538,7 +75539,7 @@ var GCLLib =
 	            return _.find(config, function (cfgCt) {
 	                return _.find(status, function (statusCt) {
 	                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-	                        && (statusCt.status === SyncUtil.INIT || statusCt.status === SyncUtil.DOWNLOADING);
+	                        && _.includes(SyncUtil.ONGOING_STATES, statusCt.status);
 	                });
 	            });
 	        }
@@ -75546,8 +75547,11 @@ var GCLLib =
 	    return SyncUtil;
 	}());
 	SyncUtil.DOWNLOAD_ERROR = 'DOWNLOAD_ERROR';
+	SyncUtil.GENERIC_ERROR = 'ERROR';
+	SyncUtil.ERROR_STATES = [SyncUtil.DOWNLOAD_ERROR, SyncUtil.GENERIC_ERROR];
 	SyncUtil.INIT = 'INIT';
 	SyncUtil.DOWNLOADING = 'DOWNLOADING';
+	SyncUtil.ONGOING_STATES = [SyncUtil.INIT, SyncUtil.DOWNLOADING];
 	SyncUtil.INSTALLED = 'INSTALLED';
 	exports.SyncUtil = SyncUtil;
 
