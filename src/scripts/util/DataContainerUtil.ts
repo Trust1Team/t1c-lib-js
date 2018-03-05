@@ -13,7 +13,7 @@ class DataContainerUtil {
     constructor() {}
 
     // TODO switch to DSContainer[]
-    public static setupDataContainers(containers: [{ path?: string, id: string, name: string, version: string, type: string }]): void {
+    public static setupDataContainers(containers: { path?: string, id: string, name: string, version: string, type: string }[]): void {
         // go through list and find data containers
         // for each container found, spin up data container handler and attach to client
         let client = ClientService.getClient();
@@ -22,7 +22,7 @@ class DataContainerUtil {
             if (ct.type === 'data') {
                 // make sure the path starts with a slash
                 ct.path = '/' + ct.name;
-                client[ct.id] = client.pf().createDataContainer(ct.path);
+                client[ct.name] = client.pf().createDataContainer(ct.path);
             }
         });
     }
