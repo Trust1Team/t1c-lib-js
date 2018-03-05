@@ -58,7 +58,6 @@ class ActivationUtil {
         // set certificate
         // activate
         return args.client.ds().getPubKey(args.uuid).then(pubKeyResponse => {
-            console.log(pubKeyResponse);
             let pubKeyReq = new SetPubKeyRequest(pubKeyResponse.encryptedPublicKey, pubKeyResponse.encryptedAesKey);
             return args.client.admin().setPubKey(pubKeyReq).then(() => {
                 return args.client.admin().activate();

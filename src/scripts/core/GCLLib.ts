@@ -43,6 +43,7 @@ import { InitUtil } from '../util/InitUtil';
 import { AbstractPkcs11 } from '../plugins/smartcards/pkcs11/pkcs11Model';
 import { ClientService } from '../util/ClientService';
 import { AuthClient } from './auth/Auth';
+import moment = require('moment');
 
 class GCLClient {
     public GCLInstalled: boolean;
@@ -93,6 +94,7 @@ class GCLClient {
     public static initialize(cfg: GCLConfig,
                              callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): Promise<GCLClient> {
         return new Promise((resolve, reject) => {
+            const initTime = moment();
             let client = new GCLClient(cfg, true);
             // keep reference to client in ClientService
             ClientService.setClient(client);
@@ -102,6 +104,9 @@ class GCLClient {
 
             GCLClient.initLibrary().then(() => {
                 if (callback && typeof callback === 'function') { callback(null, client); }
+                const completionTime = moment();
+                const duration = moment.duration(completionTime.diff(initTime));
+                console.log('init completed in ' + duration.asMilliseconds() + ' ms');
                 resolve(client);
             }, error => {
                 if (callback && typeof callback === 'function') { callback(error, null); }

@@ -8896,10 +8896,11 @@ var GCLLib =
 	var GenericService_1 = __webpack_require__(567);
 	var ResponseHandler_1 = __webpack_require__(488);
 	var agent_1 = __webpack_require__(491);
-	var admin_1 = __webpack_require__(569);
-	var InitUtil_1 = __webpack_require__(570);
-	var ClientService_1 = __webpack_require__(575);
+	var admin_1 = __webpack_require__(574);
+	var InitUtil_1 = __webpack_require__(575);
+	var ClientService_1 = __webpack_require__(572);
 	var Auth_1 = __webpack_require__(578);
+	var moment = __webpack_require__(362);
 	var GCLClient = (function () {
 	    function GCLClient(cfg, automatic) {
 	        var _this = this;
@@ -8955,6 +8956,7 @@ var GCLLib =
 	    }
 	    GCLClient.initialize = function (cfg, callback) {
 	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            var initTime = moment();
 	            var client = new GCLClient(cfg, true);
 	            ClientService_1.ClientService.setClient(client);
 	            client.GCLInstalled = true;
@@ -8962,6 +8964,9 @@ var GCLLib =
 	                if (callback && typeof callback === 'function') {
 	                    callback(null, client);
 	                }
+	                var completionTime = moment();
+	                var duration = moment.duration(completionTime.diff(initTime));
+	                console.log('init completed in ' + duration.asMilliseconds() + ' ms');
 	                resolve(client);
 	            }, function (error) {
 	                if (callback && typeof callback === 'function') {
@@ -47328,6 +47333,8 @@ var GCLLib =
 	                            return reject(error);
 	                        }
 	                    });
+	                }, function (err) {
+	                    return reject(err);
 	                });
 	            });
 	        }
@@ -73470,6 +73477,7 @@ var GCLLib =
 	var _ = __webpack_require__(486);
 	var CardUtil_1 = __webpack_require__(568);
 	var Aventra_1 = __webpack_require__(556);
+	var SyncUtil_1 = __webpack_require__(569);
 	var Arguments = (function () {
 	    function Arguments(client, readerId, container, data, dumpMethod, dumpOptions, reader) {
 	        this.client = client;
@@ -73619,7 +73627,7 @@ var GCLLib =
 	        return new es6_promise_1.Promise(function (resolve, reject) {
 	            if (args && args.container) {
 	                args.client.core().info().then(function (res) {
-	                    if (_.find(res.data.containers, function (ct) { return ct.name === args.container; })) {
+	                    if (_.find(res.data.containers, function (ct) { return ct.name === args.container && ct.status === SyncUtil_1.SyncUtil.INSTALLED; })) {
 	                        resolve(args);
 	                    }
 	                    else {
@@ -73917,11 +73925,377 @@ var GCLLib =
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
+	var DSClientModel_1 = __webpack_require__(570);
+	var es6_promise_1 = __webpack_require__(329);
+	var DataContainerUtil_1 = __webpack_require__(571);
+	var _ = __webpack_require__(486);
+	var CoreExceptions_1 = __webpack_require__(483);
+	var adminModel_1 = __webpack_require__(573);
+	var SyncUtil = (function () {
+	    function SyncUtil() {
+	    }
+	    SyncUtil.managedSynchronisation = function (client, mergedInfo, uuid, containers) {
+	        return new es6_promise_1.Promise(function (resolve) {
+	            client.admin().getPubKey().then(function (keys) {
+	                return SyncUtil.syncDevice(client, keys.data.device, mergedInfo, uuid, containers).then(function () { resolve(); });
+	            }).catch(function () {
+	                resolve();
+	            });
+	        });
+	    };
+	    SyncUtil.unManagedSynchronization = function (client, mergedInfo, uuid, isRetry) {
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            client.admin().getPubKey().then(function (pubKey) {
+	                return client.core().info().then(function (info) {
+	                    return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, info.data.containers).then(function (device) {
+	                        return client.admin().updateContainerConfig(new adminModel_1.ContainerSyncRequest(device.containerResponses)).then(function () {
+	                            DataContainerUtil_1.DataContainerUtil.setupDataContainers(device.containerResponses);
+	                            return SyncUtil.pollDownloadCompletion(client, device.containerResponses, isRetry).then(function (finalContainerList) {
+	                                return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, finalContainerList).then(function () {
+	                                    resolve();
+	                                });
+	                            }, function (error) {
+	                                if (typeof error === 'boolean' && !isRetry) {
+	                                    console.log('download error, retrying');
+	                                    resolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, true));
+	                                }
+	                                else {
+	                                    reject(error);
+	                                }
+	                            });
+	                        });
+	                    });
+	                });
+	            }).catch(function (err) {
+	                reject(err);
+	            });
+	        });
+	    };
+	    SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
+	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, containers));
+	    };
+	    SyncUtil.pollDownloadCompletion = function (client, containerConfig, isRetry) {
+	        var maxSeconds = client.config().containerDownloadTimeout || 30;
+	        var pollInterval = 250;
+	        var remainingTries = (maxSeconds * 1000) / pollInterval;
+	        return new es6_promise_1.Promise(function (resolve, reject) {
+	            poll(resolve, reject);
+	        });
+	        function poll(resolve, reject) {
+	            _.delay(function () {
+	                --remainingTries;
+	                client.core().info().then(function (infoData) {
+	                    var containers = infoData.data.containers;
+	                    checkDownloadsComplete(containerConfig, containers).then(function (ready) {
+	                        if (ready) {
+	                            resolve(containers);
+	                        }
+	                        else {
+	                            if (remainingTries === 0) {
+	                                reject(new CoreExceptions_1.RestException(408, '904', 'Container download did not complete before timeout.', null));
+	                            }
+	                            else {
+	                                poll(resolve, reject);
+	                            }
+	                        }
+	                    }, function (error) {
+	                        reject(error);
+	                    });
+	                });
+	            }, pollInterval);
+	        }
+	        function checkDownloadsComplete(cfg, containerStatus) {
+	            return new es6_promise_1.Promise(function (resolve, reject) {
+	                if (containerMissing(cfg, containerStatus) || downloadErrored(cfg, containerStatus)) {
+	                    if (isRetry) {
+	                        reject(new CoreExceptions_1.RestException(500, '903', 'Container download failed'));
+	                    }
+	                    else {
+	                        reject(false);
+	                    }
+	                }
+	                else if (downloadOngoing(cfg, containerStatus)) {
+	                    resolve(false);
+	                }
+	                else {
+	                    resolve(true);
+	                }
+	            });
+	        }
+	        function containerMissing(config, status) {
+	            return _.find(config, function (cfgCt) {
+	                return !_.find(status, function (statusCt) { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
+	            });
+	        }
+	        function downloadErrored(config, status) {
+	            return _.find(config, function (cfgCt) {
+	                return _.find(status, function (statusCt) {
+	                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
+	                        && _.includes(SyncUtil.ERROR_STATES, statusCt.status);
+	                });
+	            });
+	        }
+	        function downloadOngoing(config, status) {
+	            return _.find(config, function (cfgCt) {
+	                return _.find(status, function (statusCt) {
+	                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
+	                        && _.includes(SyncUtil.ONGOING_STATES, statusCt.status);
+	                });
+	            });
+	        }
+	    };
+	    return SyncUtil;
+	}());
+	SyncUtil.DOWNLOAD_ERROR = 'DOWNLOAD_ERROR';
+	SyncUtil.GENERIC_ERROR = 'ERROR';
+	SyncUtil.ERROR_STATES = [SyncUtil.DOWNLOAD_ERROR, SyncUtil.GENERIC_ERROR];
+	SyncUtil.INIT = 'INIT';
+	SyncUtil.DOWNLOADING = 'DOWNLOADING';
+	SyncUtil.ONGOING_STATES = [SyncUtil.INIT, SyncUtil.DOWNLOADING];
+	SyncUtil.INSTALLED = 'INSTALLED';
+	exports.SyncUtil = SyncUtil;
+
+
+/***/ }),
+/* 570 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var CoreModel_1 = __webpack_require__(549);
+	var DSBrowser = (function () {
+	    function DSBrowser(name, version) {
+	        this.name = name;
+	        this.version = version;
+	    }
+	    return DSBrowser;
+	}());
+	exports.DSBrowser = DSBrowser;
+	var DSOperatingSystem = (function () {
+	    function DSOperatingSystem(architecture, name, version) {
+	        this.architecture = architecture;
+	        this.name = name;
+	        this.version = version;
+	    }
+	    return DSOperatingSystem;
+	}());
+	exports.DSOperatingSystem = DSOperatingSystem;
+	var DSRegistrationOrSyncRequest = (function () {
+	    function DSRegistrationOrSyncRequest(managed, activated, uuid, version, derEncodedPublicKey, manufacturer, browser, os, ua, proxyDomain, containerStates) {
+	        this.managed = managed;
+	        this.activated = activated;
+	        this.uuid = uuid;
+	        this.version = version;
+	        this.derEncodedPublicKey = derEncodedPublicKey;
+	        this.manufacturer = manufacturer;
+	        this.browser = browser;
+	        this.os = os;
+	        this.ua = ua;
+	        this.proxyDomain = proxyDomain;
+	        this.containerStates = containerStates;
+	    }
+	    return DSRegistrationOrSyncRequest;
+	}());
+	exports.DSRegistrationOrSyncRequest = DSRegistrationOrSyncRequest;
+	var DSInfoResponse = (function () {
+	    function DSInfoResponse(configFile, build, version, environemnt, storageAppName, storageServiceAccount, storageCertPath, storageBucket, storageDownloadPrefix, fileOsx, fileWin32, fileWin64, fileDefaultVersion, securityEnabled, securityPrivateKeyAvailable) {
+	        this.configFile = configFile;
+	        this.build = build;
+	        this.version = version;
+	        this.environemnt = environemnt;
+	        this.storageAppName = storageAppName;
+	        this.storageServiceAccount = storageServiceAccount;
+	        this.storageCertPath = storageCertPath;
+	        this.storageBucket = storageBucket;
+	        this.storageDownloadPrefix = storageDownloadPrefix;
+	        this.fileOsx = fileOsx;
+	        this.fileWin32 = fileWin32;
+	        this.fileWin64 = fileWin64;
+	        this.fileDefaultVersion = fileDefaultVersion;
+	        this.securityEnabled = securityEnabled;
+	        this.securityPrivateKeyAvailable = securityPrivateKeyAvailable;
+	    }
+	    return DSInfoResponse;
+	}());
+	exports.DSInfoResponse = DSInfoResponse;
+	var DownloadLinkResponse = (function () {
+	    function DownloadLinkResponse(url, success) {
+	        this.url = url;
+	        this.success = success;
+	    }
+	    return DownloadLinkResponse;
+	}());
+	exports.DownloadLinkResponse = DownloadLinkResponse;
+	var JWTResponse = (function () {
+	    function JWTResponse(token) {
+	        this.token = token;
+	    }
+	    return JWTResponse;
+	}());
+	exports.JWTResponse = JWTResponse;
+	var DSPubKeyResponse = (function () {
+	    function DSPubKeyResponse(encryptedPublicKey, encryptedAesKey, success) {
+	        this.encryptedPublicKey = encryptedPublicKey;
+	        this.encryptedAesKey = encryptedAesKey;
+	        this.success = success;
+	    }
+	    return DSPubKeyResponse;
+	}());
+	exports.DSPubKeyResponse = DSPubKeyResponse;
+	var DeviceResponse = (function () {
+	    function DeviceResponse(uuid, activated, managed, coreVersion, containerResponses) {
+	        this.uuid = uuid;
+	        this.activated = activated;
+	        this.managed = managed;
+	        this.coreVersion = coreVersion;
+	        this.containerResponses = containerResponses;
+	    }
+	    return DeviceResponse;
+	}());
+	exports.DeviceResponse = DeviceResponse;
+	var DSContainer = (function () {
+	    function DSContainer(id, name, version, osStorage, language, availability, dependsOn, status) {
+	        this.id = id;
+	        this.name = name;
+	        this.version = version;
+	        this.osStorage = osStorage;
+	        this.language = language;
+	        this.availability = availability;
+	        this.dependsOn = dependsOn;
+	        this.status = status;
+	    }
+	    return DSContainer;
+	}());
+	exports.DSContainer = DSContainer;
+	var DSStorage = (function () {
+	    function DSStorage(hash, storagePath, os) {
+	        this.hash = hash;
+	        this.storagePath = storagePath;
+	        this.os = os;
+	    }
+	    return DSStorage;
+	}());
+	exports.DSStorage = DSStorage;
+	var DSPlatformInfo = (function (_super) {
+	    __extends(DSPlatformInfo, _super);
+	    function DSPlatformInfo(activated, managed, bi, core_version) {
+	        var _this = _super.call(this, bi.browser, bi.manufacturer, bi.os, bi.ua) || this;
+	        _this.activated = activated;
+	        _this.managed = managed;
+	        _this.bi = bi;
+	        _this.core_version = core_version;
+	        return _this;
+	    }
+	    return DSPlatformInfo;
+	}(CoreModel_1.BrowserInfo));
+	exports.DSPlatformInfo = DSPlatformInfo;
+
+
+/***/ }),
+/* 571 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var ClientService_1 = __webpack_require__(572);
+	var DataContainerUtil = (function () {
+	    function DataContainerUtil() {
+	    }
+	    DataContainerUtil.setupDataContainers = function (containers) {
+	        var client = ClientService_1.ClientService.getClient();
+	        containers.forEach(function (ct) {
+	            if (ct.type === 'data') {
+	                ct.path = '/' + ct.name;
+	                client[ct.id] = client.pf().createDataContainer(ct.path);
+	            }
+	        });
+	    };
+	    return DataContainerUtil;
+	}());
+	exports.DataContainerUtil = DataContainerUtil;
+
+
+/***/ }),
+/* 572 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var ClientService = (function () {
+	    function ClientService() {
+	    }
+	    ClientService.getClient = function () {
+	        return ClientService.client;
+	    };
+	    ClientService.setClient = function (newClient) {
+	        ClientService.client = newClient;
+	    };
+	    return ClientService;
+	}());
+	exports.ClientService = ClientService;
+
+
+/***/ }),
+/* 573 */
+/***/ (function(module, exports) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var SetPubKeyRequest = (function () {
+	    function SetPubKeyRequest(encryptedPublicKey, encryptedAesKey) {
+	        this.encryptedPublicKey = encryptedPublicKey;
+	        this.encryptedAesKey = encryptedAesKey;
+	    }
+	    return SetPubKeyRequest;
+	}());
+	exports.SetPubKeyRequest = SetPubKeyRequest;
+	var PubKeyResponse = (function () {
+	    function PubKeyResponse(data, success) {
+	        this.data = data;
+	        this.success = success;
+	    }
+	    return PubKeyResponse;
+	}());
+	exports.PubKeyResponse = PubKeyResponse;
+	var PubKeys = (function () {
+	    function PubKeys(device, ssl, ds) {
+	        this.device = device;
+	        this.ssl = ssl;
+	        this.ds = ds;
+	    }
+	    return PubKeys;
+	}());
+	exports.PubKeys = PubKeys;
+	var ContainerSyncRequest = (function () {
+	    function ContainerSyncRequest(containerResponses) {
+	        this.containerResponses = containerResponses;
+	    }
+	    return ContainerSyncRequest;
+	}());
+	exports.ContainerSyncRequest = ContainerSyncRequest;
+
+
+/***/ }),
+/* 574 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(329);
 	var ResponseHandler_1 = __webpack_require__(488);
 	var _ = __webpack_require__(486);
-	var InitUtil_1 = __webpack_require__(570);
-	var ClientService_1 = __webpack_require__(575);
+	var InitUtil_1 = __webpack_require__(575);
+	var ClientService_1 = __webpack_require__(572);
 	var CORE_ACTIVATE = '/admin/activate';
 	var CORE_PUB_KEY = '/admin/certificate';
 	var CORE_CONTAINERS = '/admin/containers';
@@ -74011,17 +74385,17 @@ var GCLLib =
 
 
 /***/ }),
-/* 570 */
+/* 575 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(329);
 	var _ = __webpack_require__(486);
-	var semver = __webpack_require__(571);
-	var SyncUtil_1 = __webpack_require__(572);
+	var semver = __webpack_require__(576);
+	var SyncUtil_1 = __webpack_require__(569);
 	var ActivationUtil_1 = __webpack_require__(577);
-	var DSClientModel_1 = __webpack_require__(573);
+	var DSClientModel_1 = __webpack_require__(570);
 	var PubKeyService_1 = __webpack_require__(505);
 	var CoreExceptions_1 = __webpack_require__(483);
 	var InitUtil = (function () {
@@ -74098,7 +74472,7 @@ var GCLLib =
 
 
 /***/ }),
-/* 571 */
+/* 576 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {exports = module.exports = SemVer;
@@ -75429,380 +75803,14 @@ var GCLLib =
 	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(330)))
 
 /***/ }),
-/* 572 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var DSClientModel_1 = __webpack_require__(573);
-	var es6_promise_1 = __webpack_require__(329);
-	var DataContainerUtil_1 = __webpack_require__(574);
-	var _ = __webpack_require__(486);
-	var CoreExceptions_1 = __webpack_require__(483);
-	var adminModel_1 = __webpack_require__(576);
-	var SyncUtil = (function () {
-	    function SyncUtil() {
-	    }
-	    SyncUtil.managedSynchronisation = function (client, mergedInfo, uuid, containers) {
-	        return new es6_promise_1.Promise(function (resolve) {
-	            client.admin().getPubKey().then(function (keys) {
-	                return SyncUtil.syncDevice(client, keys.data.device, mergedInfo, uuid, containers).then(function () { resolve(); });
-	            }).catch(function () {
-	                resolve();
-	            });
-	        });
-	    };
-	    SyncUtil.unManagedSynchronization = function (client, mergedInfo, uuid, isRetry) {
-	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            client.admin().getPubKey().then(function (pubKey) {
-	                return client.core().info().then(function (info) {
-	                    return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, info.data.containers).then(function (device) {
-	                        return client.admin().updateContainerConfig(new adminModel_1.ContainerSyncRequest(device.containerResponses)).then(function () {
-	                            DataContainerUtil_1.DataContainerUtil.setupDataContainers(device.containerResponses);
-	                            return SyncUtil.pollDownloadCompletion(client, device.containerResponses, isRetry).then(function (finalContainerList) {
-	                                return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, finalContainerList).then(function () {
-	                                    resolve();
-	                                });
-	                            }, function (error) {
-	                                if (typeof error === 'boolean' && !isRetry) {
-	                                    console.log('download error, retrying');
-	                                    resolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, true));
-	                                }
-	                                else {
-	                                    reject(error);
-	                                }
-	                            });
-	                        });
-	                    });
-	                });
-	            }).catch(function (err) {
-	                reject(err);
-	            });
-	        });
-	    };
-	    SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
-	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, containers));
-	    };
-	    SyncUtil.pollDownloadCompletion = function (client, containerConfig, isRetry) {
-	        var maxSeconds = client.config().containerDownloadTimeout || 30;
-	        var pollInterval = 250;
-	        var remainingTries = (maxSeconds * 1000) / pollInterval;
-	        return new es6_promise_1.Promise(function (resolve, reject) {
-	            poll(resolve, reject);
-	        });
-	        function poll(resolve, reject) {
-	            _.delay(function () {
-	                --remainingTries;
-	                client.core().info().then(function (infoData) {
-	                    var containers = infoData.data.containers;
-	                    checkDownloadsComplete(containerConfig, containers).then(function (ready) {
-	                        if (ready) {
-	                            resolve(containers);
-	                        }
-	                        else {
-	                            if (remainingTries === 0) {
-	                                reject(new CoreExceptions_1.RestException(408, '904', 'Container download did not complete before timeout.', null));
-	                            }
-	                            else {
-	                                poll(resolve, reject);
-	                            }
-	                        }
-	                    }, function (error) {
-	                        reject(error);
-	                    });
-	                });
-	            }, pollInterval);
-	        }
-	        function checkDownloadsComplete(cfg, containerStatus) {
-	            return new es6_promise_1.Promise(function (resolve, reject) {
-	                if (containerMissing(cfg, containerStatus) || downloadErrored(cfg, containerStatus)) {
-	                    if (isRetry) {
-	                        reject(new CoreExceptions_1.RestException(500, '903', 'Container download failed'));
-	                    }
-	                    else {
-	                        reject(false);
-	                    }
-	                }
-	                else if (downloadOngoing(cfg, containerStatus)) {
-	                    resolve(false);
-	                }
-	                else {
-	                    resolve(true);
-	                }
-	            });
-	        }
-	        function containerMissing(config, status) {
-	            return _.find(config, function (cfgCt) {
-	                return !_.find(status, function (statusCt) { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
-	            });
-	        }
-	        function downloadErrored(config, status) {
-	            return _.find(config, function (cfgCt) {
-	                return _.find(status, function (statusCt) {
-	                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-	                        && _.includes(SyncUtil.ERROR_STATES, statusCt.status);
-	                });
-	            });
-	        }
-	        function downloadOngoing(config, status) {
-	            return _.find(config, function (cfgCt) {
-	                return _.find(status, function (statusCt) {
-	                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-	                        && _.includes(SyncUtil.ONGOING_STATES, statusCt.status);
-	                });
-	            });
-	        }
-	    };
-	    return SyncUtil;
-	}());
-	SyncUtil.DOWNLOAD_ERROR = 'DOWNLOAD_ERROR';
-	SyncUtil.GENERIC_ERROR = 'ERROR';
-	SyncUtil.ERROR_STATES = [SyncUtil.DOWNLOAD_ERROR, SyncUtil.GENERIC_ERROR];
-	SyncUtil.INIT = 'INIT';
-	SyncUtil.DOWNLOADING = 'DOWNLOADING';
-	SyncUtil.ONGOING_STATES = [SyncUtil.INIT, SyncUtil.DOWNLOADING];
-	SyncUtil.INSTALLED = 'INSTALLED';
-	exports.SyncUtil = SyncUtil;
-
-
-/***/ }),
-/* 573 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	var __extends = (this && this.__extends) || (function () {
-	    var extendStatics = Object.setPrototypeOf ||
-	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-	    return function (d, b) {
-	        extendStatics(d, b);
-	        function __() { this.constructor = d; }
-	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	    };
-	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var CoreModel_1 = __webpack_require__(549);
-	var DSBrowser = (function () {
-	    function DSBrowser(name, version) {
-	        this.name = name;
-	        this.version = version;
-	    }
-	    return DSBrowser;
-	}());
-	exports.DSBrowser = DSBrowser;
-	var DSOperatingSystem = (function () {
-	    function DSOperatingSystem(architecture, name, version) {
-	        this.architecture = architecture;
-	        this.name = name;
-	        this.version = version;
-	    }
-	    return DSOperatingSystem;
-	}());
-	exports.DSOperatingSystem = DSOperatingSystem;
-	var DSRegistrationOrSyncRequest = (function () {
-	    function DSRegistrationOrSyncRequest(managed, activated, uuid, version, derEncodedPublicKey, manufacturer, browser, os, ua, proxyDomain, containerStates) {
-	        this.managed = managed;
-	        this.activated = activated;
-	        this.uuid = uuid;
-	        this.version = version;
-	        this.derEncodedPublicKey = derEncodedPublicKey;
-	        this.manufacturer = manufacturer;
-	        this.browser = browser;
-	        this.os = os;
-	        this.ua = ua;
-	        this.proxyDomain = proxyDomain;
-	        this.containerStates = containerStates;
-	    }
-	    return DSRegistrationOrSyncRequest;
-	}());
-	exports.DSRegistrationOrSyncRequest = DSRegistrationOrSyncRequest;
-	var DSInfoResponse = (function () {
-	    function DSInfoResponse(configFile, build, version, environemnt, storageAppName, storageServiceAccount, storageCertPath, storageBucket, storageDownloadPrefix, fileOsx, fileWin32, fileWin64, fileDefaultVersion, securityEnabled, securityPrivateKeyAvailable) {
-	        this.configFile = configFile;
-	        this.build = build;
-	        this.version = version;
-	        this.environemnt = environemnt;
-	        this.storageAppName = storageAppName;
-	        this.storageServiceAccount = storageServiceAccount;
-	        this.storageCertPath = storageCertPath;
-	        this.storageBucket = storageBucket;
-	        this.storageDownloadPrefix = storageDownloadPrefix;
-	        this.fileOsx = fileOsx;
-	        this.fileWin32 = fileWin32;
-	        this.fileWin64 = fileWin64;
-	        this.fileDefaultVersion = fileDefaultVersion;
-	        this.securityEnabled = securityEnabled;
-	        this.securityPrivateKeyAvailable = securityPrivateKeyAvailable;
-	    }
-	    return DSInfoResponse;
-	}());
-	exports.DSInfoResponse = DSInfoResponse;
-	var DownloadLinkResponse = (function () {
-	    function DownloadLinkResponse(url, success) {
-	        this.url = url;
-	        this.success = success;
-	    }
-	    return DownloadLinkResponse;
-	}());
-	exports.DownloadLinkResponse = DownloadLinkResponse;
-	var JWTResponse = (function () {
-	    function JWTResponse(token) {
-	        this.token = token;
-	    }
-	    return JWTResponse;
-	}());
-	exports.JWTResponse = JWTResponse;
-	var DSPubKeyResponse = (function () {
-	    function DSPubKeyResponse(encryptedPublicKey, encryptedAesKey, success) {
-	        this.encryptedPublicKey = encryptedPublicKey;
-	        this.encryptedAesKey = encryptedAesKey;
-	        this.success = success;
-	    }
-	    return DSPubKeyResponse;
-	}());
-	exports.DSPubKeyResponse = DSPubKeyResponse;
-	var DeviceResponse = (function () {
-	    function DeviceResponse(uuid, activated, managed, coreVersion, containerResponses) {
-	        this.uuid = uuid;
-	        this.activated = activated;
-	        this.managed = managed;
-	        this.coreVersion = coreVersion;
-	        this.containerResponses = containerResponses;
-	    }
-	    return DeviceResponse;
-	}());
-	exports.DeviceResponse = DeviceResponse;
-	var DSContainer = (function () {
-	    function DSContainer(id, name, version, osStorage, language, availability, dependsOn, status) {
-	        this.id = id;
-	        this.name = name;
-	        this.version = version;
-	        this.osStorage = osStorage;
-	        this.language = language;
-	        this.availability = availability;
-	        this.dependsOn = dependsOn;
-	        this.status = status;
-	    }
-	    return DSContainer;
-	}());
-	exports.DSContainer = DSContainer;
-	var DSStorage = (function () {
-	    function DSStorage(hash, storagePath, os) {
-	        this.hash = hash;
-	        this.storagePath = storagePath;
-	        this.os = os;
-	    }
-	    return DSStorage;
-	}());
-	exports.DSStorage = DSStorage;
-	var DSPlatformInfo = (function (_super) {
-	    __extends(DSPlatformInfo, _super);
-	    function DSPlatformInfo(activated, managed, bi, core_version) {
-	        var _this = _super.call(this, bi.browser, bi.manufacturer, bi.os, bi.ua) || this;
-	        _this.activated = activated;
-	        _this.managed = managed;
-	        _this.bi = bi;
-	        _this.core_version = core_version;
-	        return _this;
-	    }
-	    return DSPlatformInfo;
-	}(CoreModel_1.BrowserInfo));
-	exports.DSPlatformInfo = DSPlatformInfo;
-
-
-/***/ }),
-/* 574 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var ClientService_1 = __webpack_require__(575);
-	var DataContainerUtil = (function () {
-	    function DataContainerUtil() {
-	    }
-	    DataContainerUtil.setupDataContainers = function (containers) {
-	        var client = ClientService_1.ClientService.getClient();
-	        containers.forEach(function (ct) {
-	            if (ct.type === 'data') {
-	                ct.path = '/' + ct.name;
-	                client[ct.id] = client.pf().createDataContainer(ct.path);
-	            }
-	        });
-	    };
-	    return DataContainerUtil;
-	}());
-	exports.DataContainerUtil = DataContainerUtil;
-
-
-/***/ }),
-/* 575 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var ClientService = (function () {
-	    function ClientService() {
-	    }
-	    ClientService.getClient = function () {
-	        return ClientService.client;
-	    };
-	    ClientService.setClient = function (newClient) {
-	        ClientService.client = newClient;
-	    };
-	    return ClientService;
-	}());
-	exports.ClientService = ClientService;
-
-
-/***/ }),
-/* 576 */
-/***/ (function(module, exports) {
-
-	"use strict";
-	Object.defineProperty(exports, "__esModule", { value: true });
-	var SetPubKeyRequest = (function () {
-	    function SetPubKeyRequest(encryptedPublicKey, encryptedAesKey) {
-	        this.encryptedPublicKey = encryptedPublicKey;
-	        this.encryptedAesKey = encryptedAesKey;
-	    }
-	    return SetPubKeyRequest;
-	}());
-	exports.SetPubKeyRequest = SetPubKeyRequest;
-	var PubKeyResponse = (function () {
-	    function PubKeyResponse(data, success) {
-	        this.data = data;
-	        this.success = success;
-	    }
-	    return PubKeyResponse;
-	}());
-	exports.PubKeyResponse = PubKeyResponse;
-	var PubKeys = (function () {
-	    function PubKeys(device, ssl, ds) {
-	        this.device = device;
-	        this.ssl = ssl;
-	        this.ds = ds;
-	    }
-	    return PubKeys;
-	}());
-	exports.PubKeys = PubKeys;
-	var ContainerSyncRequest = (function () {
-	    function ContainerSyncRequest(containerResponses) {
-	        this.containerResponses = containerResponses;
-	    }
-	    return ContainerSyncRequest;
-	}());
-	exports.ContainerSyncRequest = ContainerSyncRequest;
-
-
-/***/ }),
 /* 577 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var es6_promise_1 = __webpack_require__(329);
-	var DSClientModel_1 = __webpack_require__(573);
-	var adminModel_1 = __webpack_require__(576);
+	var DSClientModel_1 = __webpack_require__(570);
+	var adminModel_1 = __webpack_require__(573);
 	var ActivationUtil = (function () {
 	    function ActivationUtil() {
 	    }
@@ -75825,7 +75833,6 @@ var GCLLib =
 	    };
 	    ActivationUtil.activateDevice = function (args) {
 	        return args.client.ds().getPubKey(args.uuid).then(function (pubKeyResponse) {
-	            console.log(pubKeyResponse);
 	            var pubKeyReq = new adminModel_1.SetPubKeyRequest(pubKeyResponse.encryptedPublicKey, pubKeyResponse.encryptedAesKey);
 	            return args.client.admin().setPubKey(pubKeyReq).then(function () {
 	                return args.client.admin().activate();

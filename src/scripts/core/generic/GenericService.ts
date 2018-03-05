@@ -14,6 +14,7 @@ import { CardUtil } from '../../util/CardUtil';
 import { Aventra } from '../../plugins/smartcards/pki/aventra/Aventra';
 import { Options } from '../../util/RequestHandler';
 import { ModuleConfig } from '../../plugins/smartcards/pkcs11/pkcs11Model';
+import { SyncUtil } from '../../util/SyncUtil';
 
 export { GenericService };
 
@@ -191,7 +192,7 @@ class GenericService {
         return new Promise((resolve, reject) => {
             if (args && args.container) {
                 args.client.core().info().then(res => {
-                    if (_.find(res.data.containers, ct => { return ct.name === args.container; })) {
+                    if (_.find(res.data.containers, ct => { return ct.name === args.container && ct.status === SyncUtil.INSTALLED; })) {
                         resolve(args);
                     } else {
                         reject('Container for this card is not available');

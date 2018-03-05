@@ -327,6 +327,5 @@ class GCLConfig  implements GCLConfig {
                 return Promise.reject(new RestException(412, '901', 'No JWT or API key found in configuration'));
             }
         }
-
     }
 }

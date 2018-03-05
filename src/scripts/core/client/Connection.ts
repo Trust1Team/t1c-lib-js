@@ -210,6 +210,9 @@ abstract class GenericConnection implements Connection {
                             return reject(error);
                         }
                     });
+                }, err => {
+                    // securityPromise will return error if JWT is expired or cannot be refreshed!
+                    return reject(err);
                 });
             });
         } else {
