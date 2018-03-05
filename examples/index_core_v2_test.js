@@ -2,8 +2,8 @@
     var localTestMode = false;
 
     var gclOptions = {
-        // apiKey: "44865b13-f94b-45e6-b1cf-2f12d4bd547d", //test apikey rate limited
-        gwJwt: "eyJhbGciOiJSUzI1NiIsIng1dSI6Imh0dHBzOi8vYWNjYXBpbS50MXQuYmUva2V5cy9wdWIiLCJ0eXAiOiJKV1QifQ.eyJpc1NlcnZpY2VBY2NvdW50Ijp0cnVlLCJzdWIiOiJpbnQtdHJ1c3QxdGVhbS50MWMtZHNkYXNoYm9hcmQudjEiLCJpc3MiOiJpbnQtdHJ1c3QxdGVhbS50MWMtZHNkYXNoYm9hcmQudjEiLCJleHAiOjE1MTk5MjYyNDYsIm5iZiI6MTUxOTkxODkyNn0.emHJF0SyyCZVtL8GEcRUnm2tc2fM-ZPxjLYNTmlre8n-AiFuMMkzI4c28s9UML8_gGqwbqFKT2_AV048KT_9PelIOEg0qkSzDj225lbOVBNfbkdum1Z2OWCK7WNOOizSVMhSzeYR-T1HUU0VrVRySM4aPmuzDwyMzYXIuO3lbqcvp9lMjQpBww4Fbju1tuHFXM65HwRUbUO6gjhxcCqBtjJhuvtomoiXvZ1mvDvN31UpBmupfL42J46_MkdPTIu4BdvoDlPF5pbayNzcn-qoqM2W2F_5N6gjvIeBE_RQp5cmC_dixG_pfaJ2JFNYf2HY3mR3fH9t42OYnAwPzA3cXA",
+        apiKey: "44865b13-f94b-45e6-b1cf-2f12d4bd547d", //test apikey rate limited
+        // gwJwt: "eyJhbGciOiJSUzI1NiIsIng1dSI6Imh0dHBzOi8vYWNjYXBpbS50MXQuYmUva2V5cy9wdWIiLCJ0eXAiOiJKV1QifQ.eyJpc1NlcnZpY2VBY2NvdW50Ijp0cnVlLCJzdWIiOiJpbnQtdHJ1c3QxdGVhbS50MWMtZHNkYXNoYm9hcmQudjEiLCJpc3MiOiJpbnQtdHJ1c3QxdGVhbS50MWMtZHNkYXNoYm9hcmQudjEiLCJleHAiOjE1MjAwMDgyMTcsIm5iZiI6MTUyMDAwMDg5N30.Qpq6EFeV2o94y6Ig2lNrKD1672Bndc5Uirk3iiP5-Wk3zkxBudMjNHV4NRL7yKX7btl0WWkSXGl-mlB0cJJ_4SPiV4gzeoYSmdUgpBCPmxkwOyuNf0pASQyakTYKxxHvqlI4Z9S8CxnabDtssU5_HQ5qPJepMq35qY-K95afkQijEmjMdbxr96vxRVUrPzkMpIjljr1fnDFpKvBbhOV_-egfiTFq3ZgVKO8px5_ETQEkMhDirNkkzcjaWBttYT_NnliRbN6XRiX-pK1DECS0I-ZigoVbmMYdpRZfrZIY9ABsI_p7o_YErNAqyQUuHv3gxXjaxtyor8ecVJedtrDwTQ",
         gwOrProxyUrl: "https://accapim.t1t.be:443",
         implicitDownload: false,
         osPinDialog: true,
@@ -439,7 +439,6 @@
         certFilter.push("authentication-certificate");
         certFilter.push("citizen-certificate");
         connector.beid($("#selected_reader").text()).allCerts(certFilter).then(function(certData) {
-            handleSuccess(certData);
             var authCert = {
                 order: 0,
                 certificate: certData.data.authentication_certificate
