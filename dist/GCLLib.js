@@ -74216,7 +74216,7 @@ var GCLLib =
 	        containers.forEach(function (ct) {
 	            if (ct.type === 'data') {
 	                ct.path = '/' + ct.name;
-	                client[ct.id] = client.pf().createDataContainer(ct.path);
+	                client[ct.name] = client.pf().createDataContainer(ct.path);
 	            }
 	        });
 	    };
