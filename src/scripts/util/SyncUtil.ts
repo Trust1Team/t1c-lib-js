@@ -108,6 +108,10 @@ class SyncUtil {
         );
     }
 
+    public static syncWhitelist() {
+        return Promise.resolve();
+    }
+
     private static pollDownloadCompletion(client: GCLClient, containerConfig: DSContainer[], isRetry: boolean): Promise<T1CContainer[]> {
         const maxSeconds = client.config().containerDownloadTimeout || 30;
         const pollInterval = 250;

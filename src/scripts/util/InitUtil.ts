@@ -92,6 +92,8 @@ class InitUtil {
                     // console.log(pubKey);
                     PubKeyService.setPubKey(pubKey.data.device);
                     finalResolve();
+                    // TODO synchronise container whitelist
+                    SyncUtil.syncWhitelist();
                 });
             }, err => {
                 finalReject(err);

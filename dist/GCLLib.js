@@ -73832,6 +73832,9 @@ var GCLLib =
 	            else if (findDescription(card.description, 'Mastercard')) {
 	                return 'emv';
 	            }
+	            else if (findDescription(card.description, 'Oberthur')) {
+	                return 'oberthur';
+	            }
 	            else if (findDescription(card.description, 'Aventra')) {
 	                return 'aventra';
 	            }
@@ -73973,6 +73976,9 @@ var GCLLib =
 	    };
 	    SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
 	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, containers));
+	    };
+	    SyncUtil.syncWhitelist = function () {
+	        return es6_promise_1.Promise.resolve();
 	    };
 	    SyncUtil.pollDownloadCompletion = function (client, containerConfig, isRetry) {
 	        var maxSeconds = client.config().containerDownloadTimeout || 30;
@@ -74452,6 +74458,7 @@ var GCLLib =
 	                client.admin().getPubKey().then(function (pubKey) {
 	                    PubKeyService_1.PubKeyService.setPubKey(pubKey.data.device);
 	                    finalResolve();
+	                    SyncUtil_1.SyncUtil.syncWhitelist();
 	                });
 	            }, function (err) {
 	                finalReject(err);
