@@ -79,6 +79,7 @@ class GCLConfig  implements GCLConfig {
     private _pkcs11Config: ModuleConfig;
     private _osPinDialog: boolean;
     private _containerDownloadTimeout: number;
+    private _contextToken: string;
 
     // constructor for DTO
     constructor(options: GCLConfigOptions) {
@@ -298,6 +299,14 @@ class GCLConfig  implements GCLConfig {
                 }
             }
         });
+    }
+
+    get contextToken(): string {
+        return this._contextToken;
+    }
+
+    set contextToken(value: string) {
+        this._contextToken = value;
     }
 
     get gclJwt(): string {

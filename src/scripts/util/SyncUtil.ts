@@ -35,7 +35,10 @@ class SyncUtil {
         // this is NON-BLOCKING and will always resolve!
         return new Promise((resolve) => {
             client.admin().getPubKey().then(keys => {
-                return SyncUtil.syncDevice(client, keys.data.device, mergedInfo, uuid, containers).then(() => { resolve(); });
+                return SyncUtil.syncDevice(client, keys.data.device, mergedInfo, uuid, containers).then((deviceResponse) => {
+                    client.config().contextToken = deviceResponse.contextToken;
+                    resolve();
+                });
             }).catch(() => {
                 // error occurred, but non-blocking so we resolve
                 resolve();
@@ -59,6 +62,7 @@ class SyncUtil {
             client.admin().getPubKey().then(pubKey => {
                 return client.core().info().then(info => {
                     return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, info.data.containers).then(device => {
+                        client.config().contextToken = device.contextToken;
                         return client.admin().updateContainerConfig(new ContainerSyncRequest(device.containerResponses)).then(() => {
                             // setup data container paths
                             DataContainerUtil.setupDataContainers(device.containerResponses);

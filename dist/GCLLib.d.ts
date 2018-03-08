@@ -101,6 +101,7 @@ class GCLConfig implements GCLConfig {
     osPinDialog: boolean;
     containerDownloadTimeout: number;
     readonly gwJwt: Promise<string>;
+    contextToken: string;
     gclJwt: string;
     getGwJwt(): Promise<string>;
 }
@@ -196,8 +197,9 @@ class DeviceResponse {
     activated: boolean;
     managed: boolean;
     coreVersion: string;
+    contextToken: string;
     containerResponses: DSContainer[];
-    constructor(uuid: string, activated: boolean, managed: boolean, coreVersion: string, containerResponses: DSContainer[]);
+    constructor(uuid: string, activated: boolean, managed: boolean, coreVersion: string, contextToken: string, containerResponses: DSContainer[]);
 }
 class DSContainer {
     id: string;
@@ -1411,6 +1413,7 @@ abstract class GenericConnection implements Connection {
     cfg: GCLConfig;
     static readonly AUTH_TOKEN_HEADER: string;
     static readonly BROWSER_AUTH_TOKEN: string;
+    static readonly CONTEXT_TOKEN_HEADER: string;
     constructor(cfg: GCLConfig);
     get(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     post(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
@@ -1447,6 +1450,7 @@ class LocalAuthConnection extends GenericConnection implements Connection {
 class LocalConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;
     constructor(cfg: GCLConfig);
+    getRequestHeaders(headers: RequestHeaders): RequestHeaders;
     getSecurityConfig(): {
         sendGwJwt: boolean;
         sendGclJwt: boolean;

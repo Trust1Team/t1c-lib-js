@@ -9369,6 +9369,16 @@ var GCLLib =
 	        enumerable: true,
 	        configurable: true
 	    });
+	    Object.defineProperty(GCLConfig.prototype, "contextToken", {
+	        get: function () {
+	            return this._contextToken;
+	        },
+	        set: function (value) {
+	            this._contextToken = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
 	    Object.defineProperty(GCLConfig.prototype, "gclJwt", {
 	        get: function () {
 	            return this._gclJwt;
@@ -47352,6 +47362,7 @@ var GCLLib =
 	}());
 	GenericConnection.AUTH_TOKEN_HEADER = 'X-Authentication-Token';
 	GenericConnection.BROWSER_AUTH_TOKEN = 't1c-js-browser-id-token';
+	GenericConnection.CONTEXT_TOKEN_HEADER = 'X-Context-Token';
 	exports.GenericConnection = GenericConnection;
 	var LocalAuthConnection = (function (_super) {
 	    __extends(LocalAuthConnection, _super);
@@ -47378,6 +47389,14 @@ var GCLLib =
 	        _this.cfg = cfg;
 	        return _this;
 	    }
+	    LocalConnection.prototype.getRequestHeaders = function (headers) {
+	        var reqHeaders = _super.prototype.getRequestHeaders.call(this, headers);
+	        var contextToken = this.cfg.contextToken;
+	        if (contextToken && !_.isNil(contextToken)) {
+	            reqHeaders[LocalConnection.CONTEXT_TOKEN_HEADER] = this.cfg.contextToken;
+	        }
+	        return reqHeaders;
+	    };
 	    LocalConnection.prototype.getSecurityConfig = function () {
 	        return { sendGwJwt: false, sendGclJwt: false, sendApiKey: false, sendToken: true, skipCitrixCheck: false };
 	    };
@@ -48093,7 +48112,7 @@ var GCLLib =
 	                    }
 	                }
 	                else {
-	                    var returnObject = { url: self.cfg.dsFileDownloadUrl + data.path + QP_APIKEY + self.cfg.apiKey, success: true };
+	                    var returnObject = { url: self.cfg.gwUrl + data.path + QP_APIKEY + self.cfg.apiKey, success: true };
 	                    if (callback) {
 	                        return callback(null, returnObject);
 	                    }
@@ -73940,7 +73959,10 @@ var GCLLib =
 	    SyncUtil.managedSynchronisation = function (client, mergedInfo, uuid, containers) {
 	        return new es6_promise_1.Promise(function (resolve) {
 	            client.admin().getPubKey().then(function (keys) {
-	                return SyncUtil.syncDevice(client, keys.data.device, mergedInfo, uuid, containers).then(function () { resolve(); });
+	                return SyncUtil.syncDevice(client, keys.data.device, mergedInfo, uuid, containers).then(function (deviceResponse) {
+	                    client.config().contextToken = deviceResponse.contextToken;
+	                    resolve();
+	                });
 	            }).catch(function () {
 	                resolve();
 	            });
@@ -73951,6 +73973,7 @@ var GCLLib =
 	            client.admin().getPubKey().then(function (pubKey) {
 	                return client.core().info().then(function (info) {
 	                    return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, info.data.containers).then(function (device) {
+	                        client.config().contextToken = device.contextToken;
 	                        return client.admin().updateContainerConfig(new adminModel_1.ContainerSyncRequest(device.containerResponses)).then(function () {
 	                            DataContainerUtil_1.DataContainerUtil.setupDataContainers(device.containerResponses);
 	                            return SyncUtil.pollDownloadCompletion(client, device.containerResponses, isRetry).then(function (finalContainerList) {
@@ -74159,11 +74182,12 @@ var GCLLib =
 	}());
 	exports.DSPubKeyResponse = DSPubKeyResponse;
 	var DeviceResponse = (function () {
-	    function DeviceResponse(uuid, activated, managed, coreVersion, containerResponses) {
+	    function DeviceResponse(uuid, activated, managed, coreVersion, contextToken, containerResponses) {
 	        this.uuid = uuid;
 	        this.activated = activated;
 	        this.managed = managed;
 	        this.coreVersion = coreVersion;
+	        this.contextToken = contextToken;
 	        this.containerResponses = containerResponses;
 	    }
 	    return DeviceResponse;

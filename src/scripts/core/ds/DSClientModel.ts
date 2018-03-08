@@ -82,6 +82,7 @@ class DeviceResponse {
                 public activated: boolean,
                 public managed: boolean,
                 public coreVersion: string,
+                public contextToken: string,
                 public containerResponses: DSContainer[]) {}
 }
 
