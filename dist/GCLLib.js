@@ -9052,7 +9052,7 @@ var GCLLib =
 	var moment = __webpack_require__(362);
 	var CoreExceptions_1 = __webpack_require__(483);
 	var defaults = {
-	    gclUrl: 'https://localhost:10443/v1',
+	    gclUrl: 'https://localhost:10443/v2',
 	    gwUrl: 'https://accapim.t1t.be:443',
 	    dsContextPath: '/trust1team/gclds/v2',
 	    ocvContextPath: '/trust1team/ocv-api/v1',
