@@ -1413,7 +1413,7 @@ abstract class GenericConnection implements Connection {
     cfg: GCLConfig;
     static readonly AUTH_TOKEN_HEADER: string;
     static readonly BROWSER_AUTH_TOKEN: string;
-    static readonly CONTEXT_TOKEN_HEADER: string;
+    static readonly RELAY_STATE_HEADER_PREFIX: string;
     constructor(cfg: GCLConfig);
     get(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     post(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;

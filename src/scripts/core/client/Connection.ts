@@ -68,7 +68,7 @@ interface RequestCallback {
 abstract class GenericConnection implements Connection {
     static readonly AUTH_TOKEN_HEADER = 'X-Authentication-Token';
     static readonly BROWSER_AUTH_TOKEN = 't1c-js-browser-id-token';
-    static readonly CONTEXT_TOKEN_HEADER = 'X-Context-Token';
+    static readonly RELAY_STATE_HEADER_PREFIX = 'X-Relay-State-';
 
     constructor(public cfg: GCLConfig) {}
 
@@ -253,7 +253,9 @@ class LocalConnection extends GenericConnection implements Connection {
     getRequestHeaders(headers: RequestHeaders): RequestHeaders {
         let reqHeaders = super.getRequestHeaders(headers);
         let contextToken = this.cfg.contextToken;
-        if (contextToken && !_.isNil(contextToken)) { reqHeaders[LocalConnection.CONTEXT_TOKEN_HEADER] = this.cfg.contextToken; }
+        if (contextToken && !_.isNil(contextToken)) {
+            reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
+        }
         return reqHeaders;
     }
 
