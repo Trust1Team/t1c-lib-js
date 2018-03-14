@@ -2,7 +2,9 @@
     var localTestMode = false;
 
     var gclOptions = {
-        apiKey: "44865b13-f94b-45e6-b1cf-2f12d4bd547d", //test apikey rate limited
+        // gclUrl: "https://localhost:10443/v1"
+        // apiKey: "44865b13-f94b-45e6-b1cf-2f12d4bd547d", //test apikey rate limited
+        apiKey: "1c79d46d-72e3-43ed-8c66-d5ffca6fd98b", //test apikey rate limited
         // gwJwt: "eyJhbGciOiJSUzI1NiIsIng1dSI6Imh0dHBzOi8vYWNjYXBpbS50MXQuYmUva2V5cy9wdWIiLCJ0eXAiOiJKV1QifQ.eyJpc1NlcnZpY2VBY2NvdW50Ijp0cnVlLCJzdWIiOiJpbnQtdHJ1c3QxdGVhbS50MWMtZHNkYXNoYm9hcmQudjEiLCJpc3MiOiJpbnQtdHJ1c3QxdGVhbS50MWMtZHNkYXNoYm9hcmQudjEiLCJleHAiOjE1MjAwMDgyMTcsIm5iZiI6MTUyMDAwMDg5N30.Qpq6EFeV2o94y6Ig2lNrKD1672Bndc5Uirk3iiP5-Wk3zkxBudMjNHV4NRL7yKX7btl0WWkSXGl-mlB0cJJ_4SPiV4gzeoYSmdUgpBCPmxkwOyuNf0pASQyakTYKxxHvqlI4Z9S8CxnabDtssU5_HQ5qPJepMq35qY-K95afkQijEmjMdbxr96vxRVUrPzkMpIjljr1fnDFpKvBbhOV_-egfiTFq3ZgVKO8px5_ETQEkMhDirNkkzcjaWBttYT_NnliRbN6XRiX-pK1DECS0I-ZigoVbmMYdpRZfrZIY9ABsI_p7o_YErNAqyQUuHv3gxXjaxtyor8ecVJedtrDwTQ",
         gwOrProxyUrl: "https://accapim.t1t.be:443",
         implicitDownload: false,
