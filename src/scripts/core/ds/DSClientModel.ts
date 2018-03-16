@@ -80,6 +80,7 @@ class DSPubKeyResponse implements T1CResponse {
 class DeviceResponse {
     constructor(public uuid: string,
                 public activated: boolean,
+                public atrList: { hash: string, storagePath: string },
                 public managed: boolean,
                 public coreVersion: string,
                 public contextToken: string,

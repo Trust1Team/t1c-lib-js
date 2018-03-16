@@ -195,11 +195,18 @@ class DSPubKeyResponse implements T1CResponse {
 class DeviceResponse {
     uuid: string;
     activated: boolean;
+    atrList: {
+        hash: string;
+        storagePath: string;
+    };
     managed: boolean;
     coreVersion: string;
     contextToken: string;
     containerResponses: DSContainer[];
-    constructor(uuid: string, activated: boolean, managed: boolean, coreVersion: string, contextToken: string, containerResponses: DSContainer[]);
+    constructor(uuid: string, activated: boolean, atrList: {
+        hash: string;
+        storagePath: string;
+    }, managed: boolean, coreVersion: string, contextToken: string, containerResponses: DSContainer[]);
 }
 class DSContainer {
     id: string;
@@ -1279,6 +1286,7 @@ class AdminService implements AbstractAdmin {
     static JWT_ERROR_CODES: string[];
     constructor(url: string, connection: LocalAuthConnection);
     activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    atr(atrList: AtrListRequest, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     setPubKey(keys: SetPubKeyRequest, callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     updateContainerConfig(containers: ContainerSyncRequest, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
@@ -1710,12 +1718,18 @@ interface AbstractDataContainer {
     delete(id: string, callback?: (error: RestException, data: any) => void): Promise<any>;
 }
 
-export { AbstractAdmin, PubKeys, PubKeyResponse, SetPubKeyRequest, ContainerSyncRequest };
+export { AbstractAdmin, AtrListRequest, PubKeys, PubKeyResponse, SetPubKeyRequest, ContainerSyncRequest };
 interface AbstractAdmin {
-    activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
-    getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
-    setPubKey(keys: SetPubKeyRequest, callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
-    updateContainerConfig(containers: ContainerSyncRequest, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    activate(callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    atr(atrList: AtrListRequest, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    getPubKey(callback?: (error: RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
+    setPubKey(keys: SetPubKeyRequest, callback?: (error: RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
+    updateContainerConfig(containers: ContainerSyncRequest, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+}
+class AtrListRequest {
+    hash: string;
+    storagePath: string;
+    constructor(hash: string, storagePath: string);
 }
 class SetPubKeyRequest {
     encryptedPublicKey: string;

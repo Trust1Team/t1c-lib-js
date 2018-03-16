@@ -5,7 +5,10 @@
 import { LocalAuthConnection } from '../client/Connection';
 import * as CoreExceptions from '../exceptions/CoreExceptions';
 import { Promise } from 'es6-promise';
-import { AbstractAdmin, ContainerSyncRequest, PubKeyResponse, SetPubKeyRequest } from './adminModel';
+import {
+    AbstractAdmin, AtrListRequest, ContainerSyncRequest, PubKeyResponse,
+    SetPubKeyRequest
+} from './adminModel';
 import { T1CResponse } from '../service/CoreModel';
 import { ResponseHandler } from '../../util/ResponseHandler';
 import * as _ from 'lodash';
@@ -18,6 +21,7 @@ export { AdminService };
 
 
 const CORE_ACTIVATE = '/admin/activate';
+const CORE_ATR_LIST = '/admin/atr';
 const CORE_PUB_KEY = '/admin/certificate';
 const CORE_CONTAINERS = '/admin/containers';
 
@@ -40,6 +44,10 @@ class AdminService implements AbstractAdmin {
 
     public activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.post(this.url, CORE_ACTIVATE, {}, callback);
+    }
+
+    public atr(atrList: AtrListRequest, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+        return this.post(this.url, CORE_ATR_LIST, atrList, callback);
     }
 
     public getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse)
