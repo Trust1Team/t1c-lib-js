@@ -74016,6 +74016,7 @@ var GCLLib =
 	                return client.core().info().then(function (info) {
 	                    return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, info.data.containers).then(function (device) {
 	                        client.config().contextToken = device.contextToken;
+	                        client.admin().atr(device.atrList);
 	                        return client.admin().updateContainerConfig(new adminModel_1.ContainerSyncRequest(device.containerResponses)).then(function () {
 	                            DataContainerUtil_1.DataContainerUtil.setupDataContainers(device.containerResponses);
 	                            return SyncUtil.pollDownloadCompletion(client, device.containerResponses, isRetry).then(function (finalContainerList) {
@@ -74224,9 +74225,10 @@ var GCLLib =
 	}());
 	exports.DSPubKeyResponse = DSPubKeyResponse;
 	var DeviceResponse = (function () {
-	    function DeviceResponse(uuid, activated, managed, coreVersion, contextToken, containerResponses) {
+	    function DeviceResponse(uuid, activated, atrList, managed, coreVersion, contextToken, containerResponses) {
 	        this.uuid = uuid;
 	        this.activated = activated;
+	        this.atrList = atrList;
 	        this.managed = managed;
 	        this.coreVersion = coreVersion;
 	        this.contextToken = contextToken;
@@ -74323,6 +74325,14 @@ var GCLLib =
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
+	var AtrListRequest = (function () {
+	    function AtrListRequest(hash, storagePath) {
+	        this.hash = hash;
+	        this.storagePath = storagePath;
+	    }
+	    return AtrListRequest;
+	}());
+	exports.AtrListRequest = AtrListRequest;
 	var SetPubKeyRequest = (function () {
 	    function SetPubKeyRequest(encryptedPublicKey, encryptedAesKey) {
 	        this.encryptedPublicKey = encryptedPublicKey;
@@ -74369,6 +74379,7 @@ var GCLLib =
 	var InitUtil_1 = __webpack_require__(580);
 	var ClientService_1 = __webpack_require__(577);
 	var CORE_ACTIVATE = '/admin/activate';
+	var CORE_ATR_LIST = '/admin/atr';
 	var CORE_PUB_KEY = '/admin/certificate';
 	var CORE_CONTAINERS = '/admin/containers';
 	var AdminService = (function () {
@@ -74386,6 +74397,9 @@ var GCLLib =
 	    };
 	    AdminService.prototype.activate = function (callback) {
 	        return this.post(this.url, CORE_ACTIVATE, {}, callback);
+	    };
+	    AdminService.prototype.atr = function (atrList, callback) {
+	        return this.post(this.url, CORE_ATR_LIST, atrList, callback);
 	    };
 	    AdminService.prototype.getPubKey = function (callback) {
 	        return this.get(this.url, CORE_PUB_KEY, callback);

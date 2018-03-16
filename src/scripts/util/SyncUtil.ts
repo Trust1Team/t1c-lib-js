@@ -62,7 +62,11 @@ class SyncUtil {
             client.admin().getPubKey().then(pubKey => {
                 return client.core().info().then(info => {
                     return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, info.data.containers).then(device => {
+                        // set context token
                         client.config().contextToken = device.contextToken;
+                        // pass ATR list info to GCL
+                        client.admin().atr(device.atrList);
+                        // update container config
                         return client.admin().updateContainerConfig(new ContainerSyncRequest(device.containerResponses)).then(() => {
                             // setup data container paths
                             DataContainerUtil.setupDataContainers(device.containerResponses);
