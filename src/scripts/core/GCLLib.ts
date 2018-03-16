@@ -42,6 +42,8 @@ import { AgentClient } from './agent/agent';
 import { AbstractAgent } from './agent/agentModel';
 import { AbstractFileExchange } from '../plugins/file/FileExchangeModel';
 
+window.setImmediate = undefined;
+
 class GCLClient {
     public GCLInstalled: boolean;
     private cfg: GCLConfig;
