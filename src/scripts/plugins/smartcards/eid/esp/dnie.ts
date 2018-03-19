@@ -10,6 +10,7 @@ import { AbstractDNIe, InfoResponse } from "./dnieModel";
 import { Options, RequestHandler } from "../../../../util/RequestHandler";
 import { CertParser } from "../../../../util/CertParser";
 import { ResponseHandler } from "../../../../util/ResponseHandler";
+import * as Bluebird from 'bluebird';
 
 export { DNIe };
 
@@ -18,12 +19,12 @@ class DNIe extends GenericCertCard implements AbstractDNIe {
     static INFO = "/info";
     static CERT_INTERMEDIATE = "/intermediate";
 
-    public info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse> {
+    public info(callback?: (error: RestException, data: InfoResponse) => void): Bluebird<InfoResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(DNIe.INFO), undefined, callback);
     }
 
     public intermediateCertificate(options?: Options,
-                                   callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
+                                   callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse> {
         const reqOptions = RequestHandler.determineOptions(options, callback);
         let self = this;
         return self.connection.get(self.baseUrl,
@@ -35,12 +36,12 @@ class DNIe extends GenericCertCard implements AbstractDNIe {
     }
 
     public authenticationCertificate(options?: Options,
-                                     callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
+                                     callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse> {
         return this.getCertificate(DNIe.CERT_AUTHENTICATION, RequestHandler.determineOptions(options, callback));
     }
 
     public signingCertificate(options?: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
+                              callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse> {
         return this.getCertificate(DNIe.CERT_SIGNING, RequestHandler.determineOptions(options, callback));
     }
 }

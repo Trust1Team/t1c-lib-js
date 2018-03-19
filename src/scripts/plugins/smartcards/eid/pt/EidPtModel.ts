@@ -5,22 +5,23 @@
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { CertCard, OptionalPin } from '../../Card';
 import { CertificateResponse, DataObjectResponse, DataResponse, T1CCertificate } from "../../../../core/service/CoreModel";
+import * as Bluebird from 'bluebird';
 
 export { AbstractEidPT, AllCertsResponse, AllDataResponse, IdDataResponse, PtAddressResponse };
 
 
 interface AbstractEidPT extends CertCard {
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
-    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
-    idData(callback?: (error: RestException, data: IdDataResponse) => void): Promise<IdDataResponse>;
-    idDataWithOutPhoto(callback?: (error: RestException, data: IdDataResponse) => void): Promise<IdDataResponse>;
-    address(data: OptionalPin, callback?: (error: RestException, data: PtAddressResponse) => void): Promise<PtAddressResponse>;
-    photo(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    rootCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    rootAuthenticationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    rootNonRepudiationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    authenticationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    nonRepudiationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Bluebird<AllDataResponse>;
+    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): Bluebird<AllCertsResponse>;
+    idData(callback?: (error: RestException, data: IdDataResponse) => void): Bluebird<IdDataResponse>;
+    idDataWithOutPhoto(callback?: (error: RestException, data: IdDataResponse) => void): Bluebird<IdDataResponse>;
+    address(data: OptionalPin, callback?: (error: RestException, data: PtAddressResponse) => void): Bluebird<PtAddressResponse>;
+    photo(callback?: (error: RestException, data: DataResponse) => void): Bluebird<DataResponse>;
+    rootCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
+    rootAuthenticationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
+    rootNonRepudiationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
+    authenticationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
+    nonRepudiationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
 }
 
 interface AllCertsResponse extends DataObjectResponse {

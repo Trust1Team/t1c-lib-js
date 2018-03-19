@@ -9,6 +9,7 @@ import {
 } from '../../../../core/service/CoreModel';
 import { Options } from '../../../../util/RequestHandler';
 import { AuthenticateOrSignData } from '../../Card';
+import * as Bluebird from 'bluebird';
 
 export { AbstractSafeNet, InfoResponse, SafeNetCertificate, SafeNetCertificatesResponse,
     SafeNetSignData, Slot, SlotsResponse, TokenInfo, TokensResponse };
@@ -16,12 +17,12 @@ export { AbstractSafeNet, InfoResponse, SafeNetCertificate, SafeNetCertificatesR
 interface AbstractSafeNet {
     certificates(slotId: number,
                  options?: Options,
-                 callback?: (error: RestException, data: SafeNetCertificatesResponse) => void): Promise<SafeNetCertificatesResponse>;
-    info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>;
-    signData(data: SafeNetSignData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    slots(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
-    slotsWithTokenPresent(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
-    tokens(callback?: (error: RestException, data: TokensResponse) => void): Promise<TokensResponse>;
+                 callback?: (error: RestException, data: SafeNetCertificatesResponse) => void): Bluebird<SafeNetCertificatesResponse>;
+    info(callback?: (error: RestException, data: InfoResponse) => void): Bluebird<InfoResponse>;
+    signData(data: SafeNetSignData, callback?: (error: RestException, data: DataResponse) => void): Bluebird<DataResponse>;
+    slots(callback?: (error: RestException, data: SlotsResponse) => void): Bluebird<SlotsResponse>;
+    slotsWithTokenPresent(callback?: (error: RestException, data: SlotsResponse) => void): Bluebird<SlotsResponse>;
+    tokens(callback?: (error: RestException, data: TokensResponse) => void): Bluebird<TokensResponse>;
 }
 
 
