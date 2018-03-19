@@ -24,69 +24,28 @@ class PolyfillChecker {
             // not found, load array.from polyfill (core-js)
             console.log('polyfilling Array');
             require('core-js/es6/array');
-            require('core-js/fn/array/from');
-            require('core-js/fn/array/of');
-            require('core-js/fn/array/is-array');
-            require('core-js/fn/array/iterator');
-            require('core-js/fn/array/copy-within');
-            require('core-js/fn/array/fill');
-            require('core-js/fn/array/find');
-            require('core-js/fn/array/find-index');
-            require('core-js/fn/array/values');
-            require('core-js/fn/array/keys');
-            require('core-js/fn/array/entries');
-            require('core-js/fn/array/slice');
-            require('core-js/fn/array/join');
-            require('core-js/fn/array/index-of');
-            require('core-js/fn/array/last-index-of');
-            require('core-js/fn/array/every');
-            require('core-js/fn/array/some');
-            require('core-js/fn/array/for-each');
-            require('core-js/fn/array/map');
-            require('core-js/fn/array/filter');
-            require('core-js/fn/array/reduce');
-            require('core-js/fn/array/reduce-right');
-            require('core-js/fn/array/sort');
-            require('core-js/fn/array/virtual/iterator');
-            require('core-js/fn/array/virtual/copy-within');
-            require('core-js/fn/array/virtual/fill');
-            require('core-js/fn/array/virtual/find');
-            require('core-js/fn/array/virtual/find-index');
-            require('core-js/fn/array/virtual/values');
-            require('core-js/fn/array/virtual/keys');
-            require('core-js/fn/array/virtual/entries');
-            require('core-js/fn/array/virtual/slice');
-            require('core-js/fn/array/virtual/join');
-            require('core-js/fn/array/virtual/index-of');
-            require('core-js/fn/array/virtual/last-index-of');
-            require('core-js/fn/array/virtual/every');
-            require('core-js/fn/array/virtual/some');
-            require('core-js/fn/array/virtual/for-each');
-            require('core-js/fn/array/virtual/map');
-            require('core-js/fn/array/virtual/filter');
-            require('core-js/fn/array/virtual/reduce');
-            require('core-js/fn/array/virtual/reduce-right');
-            require('core-js/fn/array/virtual/sort');
+            require('core-js/es6/date');
+            require('core-js/es6/function');
+            require('core-js/es6/index');
+            require('core-js/es6/map');
+            require('core-js/es6/math');
+            require('core-js/es6/number');
+            require('core-js/es6/object');
+            require('core-js/es6/parse-float');
+            require('core-js/es6/parse-int');
+            require('core-js/es6/reflect');
+            require('core-js/es6/regexp');
+            require('core-js/es6/set');
+            require('core-js/es6/string');
+            require('core-js/es6/typed');
+            require('core-js/es6/weak-map');
+            require('core-js/es6/weak-set');
         }
 
         // check Symbol
         if (!windowToCheck.Symbol) {
             console.log('polyfilling Symbol');
             require('core-js/es6/symbol');
-            require('core-js/fn/symbol');
-            require('core-js/fn/symbol/has-instance');
-            require('core-js/fn/symbol/is-concat-spreadable');
-            require('core-js/fn/symbol/iterator');
-            require('core-js/fn/symbol/match');
-            require('core-js/fn/symbol/replace');
-            require('core-js/fn/symbol/search');
-            require('core-js/fn/symbol/species');
-            require('core-js/fn/symbol/split');
-            require('core-js/fn/symbol/to-primitive');
-            require('core-js/fn/symbol/to-string-tag');
-            require('core-js/fn/symbol/unscopables');
-            require('core-js/fn/symbol/for');
-            require('core-js/fn/symbol/key-for');
         }
     }
 }
