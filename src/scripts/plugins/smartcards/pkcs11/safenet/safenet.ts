@@ -10,7 +10,7 @@ import {
 } from './safenetModel';
 import * as platform from 'platform';
 import { Options, RequestHandler } from '../../../../util/RequestHandler';
-import { Promise } from 'es6-promise';
+import * as Bluebird from 'bluebird';
 
 
 /**
@@ -53,7 +53,7 @@ class SafeNet implements AbstractSafeNet {
     public certificates(slotId: number,
                         options?: Options,
                         callback?: (error: RestException, data: SafeNetCertificatesResponse)
-                            => void): Promise<SafeNetCertificatesResponse> {
+                            => void): Bluebird<SafeNetCertificatesResponse> {
         let req = _.extend({ slot_id: slotId }, { module: this.modulePath });
         const reqOptions = RequestHandler.determineOptions(options, callback);
         return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.ALL_CERTIFICATES), req, undefined).then(data => {
@@ -72,7 +72,7 @@ class SafeNet implements AbstractSafeNet {
         });
     }
 
-    public info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse> {
+    public info(callback?: (error: RestException, data: InfoResponse) => void): Bluebird<InfoResponse> {
         let req = { module: this.modulePath };
         return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.INFO), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
@@ -84,7 +84,7 @@ class SafeNet implements AbstractSafeNet {
         });
     }
 
-    public signData(signData: SafeNetSignData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+    public signData(signData: SafeNetSignData, callback?: (error: RestException, data: DataResponse) => void): Bluebird<DataResponse> {
         let req = {
             module: this.modulePath,
             id: signData.cert_id,
@@ -110,7 +110,7 @@ class SafeNet implements AbstractSafeNet {
         });
     }
 
-    public slots(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse> {
+    public slots(callback?: (error: RestException, data: SlotsResponse) => void): Bluebird<SlotsResponse> {
         let req = { module: this.modulePath };
         return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SLOTS), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
@@ -122,7 +122,7 @@ class SafeNet implements AbstractSafeNet {
         });
     }
 
-    public slotsWithTokenPresent(callback: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse> {
+    public slotsWithTokenPresent(callback: (error: RestException, data: SlotsResponse) => void): Bluebird<SlotsResponse> {
         let req = { module: this.modulePath };
         return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.SLOTS), req, { 'token-present': 'true' }).then(data => {
             return ResponseHandler.response(data, callback);
@@ -135,7 +135,7 @@ class SafeNet implements AbstractSafeNet {
         });
     }
 
-    public tokens(callback: (error: RestException, data: TokensResponse) => void): Promise<TokensResponse> {
+    public tokens(callback: (error: RestException, data: TokensResponse) => void): Bluebird<TokensResponse> {
         let req = { module: this.modulePath };
         return this.connection.post(this.baseUrl, this.containerSuffix(SafeNet.TOKENS), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);

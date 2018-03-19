@@ -2,8 +2,6 @@
  * @author Maarten Somers
  * @since 2017
  */
-///<reference path="../../../../../typings/index.d.ts"/>
-
 import { expect } from "chai";
 import * as axios from "axios";
 import * as MockAdapter from "axios-mock-adapter";

@@ -5,6 +5,7 @@
 
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 import { BrowserInfo, T1CResponse } from "../service/CoreModel";
+import * as Bluebird from 'bluebird';
 
 export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse,
     DeviceResponse, DSPlatformInfo };
@@ -12,20 +13,20 @@ export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DS
 
 interface AbstractDSClient {
     getUrl(): string;
-    getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): void | Promise<DSInfoResponse>;
-    getJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse>;
-    getDevice(uuid: string, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): void | Promise<DeviceResponse>;
-    refreshJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse>;
-    getPubKey(callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): void | Promise<DSPubKeyResponse>;
+    getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): Bluebird<DSInfoResponse>;
+    getJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Bluebird<JWTResponse>;
+    getDevice(uuid: string, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Bluebird<DeviceResponse>;
+    refreshJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Bluebird<JWTResponse>;
+    getPubKey(callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): Bluebird<DSPubKeyResponse>;
     downloadLink(infoBrowser: BrowserInfo,
                  callback?: (error: CoreExceptions.RestException,
-                             data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
+                             data: DownloadLinkResponse) => void): Bluebird<DownloadLinkResponse>;
     register(info: DSPlatformInfo,
              device_id: string,
-             callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse>;
+             callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Bluebird<JWTResponse>;
     sync(info: DSPlatformInfo,
          device_id: string,
-         callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse>;
+         callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Bluebird<JWTResponse>;
 }
 
 interface DSInfoResponse {

@@ -9,6 +9,7 @@ import {
     T1CResponse
 } from "../../../../core/service/CoreModel";
 import { Options } from "../../../../util/RequestHandler";
+import * as Bluebird from 'bluebird';
 
 export { AbstractEidLUX, AllCertsResponse, AllDataResponse, Biometric, BiometricResponse,
     Picture, PictureResponse, SignatureImage, SignatureImageResponse };
@@ -17,17 +18,17 @@ export { AbstractEidLUX, AllCertsResponse, AllDataResponse, Biometric, Biometric
 interface AbstractEidLUX extends SecuredCertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
-    allData(options?: string[] | Options, callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
-    allCerts(options?: string[] | Options, callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>
-    biometric(callback?: (error: RestException, data: BiometricResponse) => void): Promise<BiometricResponse>;
-    picture(callback?: (error: RestException, data: PictureResponse) => void): Promise<PictureResponse>;
+    allData(options?: string[] | Options, callback?: (error: RestException, data: AllDataResponse) => void): Bluebird<AllDataResponse>;
+    allCerts(options?: string[] | Options, callback?: (error: RestException, data: AllCertsResponse) => void): Bluebird<AllCertsResponse>
+    biometric(callback?: (error: RestException, data: BiometricResponse) => void): Bluebird<BiometricResponse>;
+    picture(callback?: (error: RestException, data: PictureResponse) => void): Bluebird<PictureResponse>;
     rootCertificate(options?: Options,
-                    callback?: (error: RestException, data: CertificatesResponse) => void): Promise<CertificatesResponse>;
+                    callback?: (error: RestException, data: CertificatesResponse) => void): Bluebird<CertificatesResponse>;
     authenticationCertificate(options?: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                              callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
     nonRepudiationCertificate(options?: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    signatureImage(callback?: (error: RestException, data: SignatureImageResponse) => void): Promise<SignatureImageResponse>;
+                              callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
+    signatureImage(callback?: (error: RestException, data: SignatureImageResponse) => void): Bluebird<SignatureImageResponse>;
 }
 
 interface AllCertsResponse extends T1CResponse {

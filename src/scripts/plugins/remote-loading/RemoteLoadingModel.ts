@@ -4,24 +4,25 @@
  */
 import { RestException } from "../../core/exceptions/CoreExceptions";
 import { BoolDataResponse, DataResponse, T1CResponse } from "../../core/service/CoreModel";
+import * as Bluebird from 'bluebird';
 
 export { AbstractRemoteLoading, APDU, CommandResponse, CommandsResponse, Command };
 
 
 interface AbstractRemoteLoading {
-    atr(sessionId?: string, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    atr(sessionId?: string, callback?: (error: RestException, data: DataResponse) => void): Bluebird<DataResponse>;
     apdu(apdu: APDU, sessionId?: string,
-         callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse>;
+         callback?: (error: RestException, data: CommandResponse) => void): Bluebird<CommandResponse>;
     apdu(apdu: APDU[], sessionId?: string,
-         callback?: (error: RestException, data: CommandsResponse) => void): Promise<CommandsResponse>;
+         callback?: (error: RestException, data: CommandsResponse) => void): Bluebird<CommandsResponse>;
     ccid(feature: string, command: string, sessionId?: string,
-         callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse>;
-    ccidFeatures(sessionId?: string, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    command(tx: string, sessionId?: string, callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse>;
-    command(tx: string[], sessionId?: string, callback?: (error: RestException, data: CommandsResponse) => void): Promise<CommandsResponse>;
-    closeSession(sessionId?: string, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    isPresent(sessionId?: string, callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
-    openSession(timeout?: number, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+         callback?: (error: RestException, data: CommandResponse) => void): Bluebird<CommandResponse>;
+    ccidFeatures(sessionId?: string, callback?: (error: RestException, data: DataResponse) => void): Bluebird<DataResponse>;
+    command(tx: string, sessionId?: string, callback?: (error: RestException, data: CommandResponse) => void): Bluebird<CommandResponse>;
+    command(tx: string[], sessionId?: string, callback?: (error: RestException, data: CommandsResponse) => void): Bluebird<CommandsResponse>;
+    closeSession(sessionId?: string, callback?: (error: RestException, data: DataResponse) => void): Bluebird<DataResponse>;
+    isPresent(sessionId?: string, callback?: (error: RestException, data: BoolDataResponse) => void): Bluebird<BoolDataResponse>;
+    openSession(timeout?: number, callback?: (error: RestException, data: DataResponse) => void): Bluebird<DataResponse>;
 }
 
 interface APDU {
