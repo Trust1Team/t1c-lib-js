@@ -30,6 +30,20 @@ class PolyfillChecker {
         if (!windowToCheck.Symbol) {
             console.log('polyfilling Symbol');
             require('core-js/es6/symbol');
+            require('core-js/fn/symbol');
+            require('core-js/fn/symbol/has-instance');
+            require('core-js/fn/symbol/is-concat-spreadable');
+            require('core-js/fn/symbol/iterator');
+            require('core-js/fn/symbol/match');
+            require('core-js/fn/symbol/replace');
+            require('core-js/fn/symbol/search');
+            require('core-js/fn/symbol/species');
+            require('core-js/fn/symbol/split');
+            require('core-js/fn/symbol/to-primitive');
+            require('core-js/fn/symbol/to-string-tag');
+            require('core-js/fn/symbol/unscopables');
+            require('core-js/fn/symbol/for');
+            require('core-js/fn/symbol/key-for');
         }
     }
 }
