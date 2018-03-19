@@ -9,7 +9,6 @@ import * as platform from 'platform';
 import * as CoreModel from './CoreModel';
 import { CardReader } from './CoreModel';
 import { ResponseHandler } from '../../util/ResponseHandler';
-import * as Bluebird from 'bluebird';
 
 export { CoreService };
 
@@ -50,14 +49,14 @@ class CoreService implements CoreModel.AbstractCore {
 
     // async
     public activate(callback?: (error: CoreExceptions.RestException, data: CoreModel.T1CResponse)
-        => void): Bluebird<CoreModel.T1CResponse> {
+        => void): Promise<CoreModel.T1CResponse> {
         return this.connection.post(this.url, CORE_ACTIVATE, {}, undefined, callback);
     }
 
     public getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string,
                       alertPosition?: string, type?: string, timeoutInSeconds?: number,
                       callback?: (error: CoreExceptions.RestException, data: CoreModel.BoolDataResponse)
-                          => void): Bluebird<CoreModel.BoolDataResponse> {
+                          => void): Promise<CoreModel.BoolDataResponse> {
         if (!title || !title.length) {
             return ResponseHandler.error({ status: 400, description: 'Title is required!', code: '801' }, callback);
         }
@@ -74,23 +73,23 @@ class CoreService implements CoreModel.AbstractCore {
     }
 
     public getPubKey(callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse)
-        => void): Bluebird<CoreModel.PubKeyResponse> {
+        => void): Promise<CoreModel.PubKeyResponse> {
         return this.connection.get(this.url, CORE_PUB_KEY, undefined, callback);
     }
 
     public info(callback?: (error: CoreExceptions.RestException, data: CoreModel.InfoResponse)
-        => void): Bluebird<CoreModel.InfoResponse> {
+        => void): Promise<CoreModel.InfoResponse> {
         return this.connection.getSkipCitrix(this.url, CORE_INFO, undefined, callback);
     }
 
     public infoBrowser(callback?: (error: CoreExceptions.RestException, data: CoreModel.BrowserInfoResponse)
-        => void): Bluebird<CoreModel.BrowserInfoResponse> {
+        => void): Promise<CoreModel.BrowserInfoResponse> {
         if (callback) { callback(null, CoreService.platformInfo()); }
-        else { return Bluebird.resolve(CoreService.platformInfo()); }
+        else { return Promise.resolve(CoreService.platformInfo()); }
     }
 
     public plugins(callback?: (error: CoreExceptions.RestException, data: CoreModel.PluginsResponse)
-        => void): Bluebird<CoreModel.PluginsResponse> {
+        => void): Promise<CoreModel.PluginsResponse> {
         return this.connection.getSkipCitrix(this.url, CORE_PLUGINS, undefined, callback);
     }
 
@@ -98,7 +97,7 @@ class CoreService implements CoreModel.AbstractCore {
                             callback?: (error: CoreExceptions.RestException, data: CardReader) => void,
                             connectReaderCb?: () => void,
                             insertCardCb?: () => void,
-                            cardTimeoutCb?: () => void): Bluebird<CardReader> {
+                            cardTimeoutCb?: () => void): Promise<CardReader> {
         let maxSeconds = secondsToPollCard || 30;
         let self = this;
 
@@ -106,7 +105,7 @@ class CoreService implements CoreModel.AbstractCore {
         if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
 
         // promise
-        return new Bluebird<CardReader>((resolve, reject) => {
+        return new Promise<CardReader>((resolve, reject) => {
             poll(resolve, reject);
         });
 
@@ -151,7 +150,7 @@ class CoreService implements CoreModel.AbstractCore {
                                 callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
                                 connectReaderCb?: () => void,
                                 insertCardCb?: () => void,
-                                cardTimeoutCb?: () => void): Bluebird<CoreModel.CardReadersResponse> {
+                                cardTimeoutCb?: () => void): Promise<CoreModel.CardReadersResponse> {
         let maxSeconds = secondsToPollCard || 30;
         let self = this;
 
@@ -159,7 +158,7 @@ class CoreService implements CoreModel.AbstractCore {
         if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
 
         // promise
-        return new Bluebird<CoreModel.CardReadersResponse>((resolve, reject) => {
+        return new Promise<CoreModel.CardReadersResponse>((resolve, reject) => {
             poll(resolve, reject);
         });
 
@@ -206,7 +205,7 @@ class CoreService implements CoreModel.AbstractCore {
     public pollReaders(secondsToPollReader?: number,
                        callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void,
                        connectReaderCb?: () => void,
-                       readerTimeoutCb?: () => void): Bluebird<CoreModel.CardReadersResponse> {
+                       readerTimeoutCb?: () => void): Promise<CoreModel.CardReadersResponse> {
         let maxSeconds = secondsToPollReader || 30;
         let self = this;
 
@@ -214,7 +213,7 @@ class CoreService implements CoreModel.AbstractCore {
         if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
 
         // promise
-        return new Bluebird<CoreModel.CardReadersResponse>((resolve, reject) => {
+        return new Promise<CoreModel.CardReadersResponse>((resolve, reject) => {
             poll(resolve, reject);
         });
 
@@ -249,28 +248,28 @@ class CoreService implements CoreModel.AbstractCore {
 
     public reader(reader_id: string,
                   callback?: (error: CoreExceptions.RestException, data: CoreModel.SingleReaderResponse)
-                      => void): Bluebird<CoreModel.SingleReaderResponse> {
+                      => void): Promise<CoreModel.SingleReaderResponse> {
         return this.connection.get(this.url, CORE_READERS + '/' + reader_id, undefined, callback);
     }
 
     public readers(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
-        => void): Bluebird<CoreModel.CardReadersResponse> {
+        => void): Promise<CoreModel.CardReadersResponse> {
         return this.connection.get(this.url, CORE_READERS, undefined, callback);
     }
 
     public readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
-        => void): Bluebird<CoreModel.CardReadersResponse> {
+        => void): Promise<CoreModel.CardReadersResponse> {
         return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(true), callback);
     }
 
     public readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse)
-        => void): Bluebird<CoreModel.CardReadersResponse> {
+        => void): Promise<CoreModel.CardReadersResponse> {
         return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), callback);
     }
 
     public setPubKey(pubkey: string,
                      callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse)
-                         => void): Bluebird<CoreModel.PubKeyResponse> {
+                         => void): Promise<CoreModel.PubKeyResponse> {
         return this.connection.put(this.url, CORE_PUB_KEY, { certificate: pubkey }, undefined, callback);
     }
 
@@ -279,7 +278,7 @@ class CoreService implements CoreModel.AbstractCore {
     public getUrl(): string { return this.url; }
 
     // get Lib version
-    public version(): Bluebird<string> {
-        return Bluebird.resolve('%%GULP_INJECT_VERSION%%');
+    public version(): Promise<string> {
+        return Promise.resolve('%%GULP_INJECT_VERSION%%');
     }
 }

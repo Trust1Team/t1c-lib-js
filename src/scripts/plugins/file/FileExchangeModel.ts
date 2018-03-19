@@ -4,16 +4,15 @@
  */
 import { RestException } from '../../core/exceptions/CoreExceptions';
 import { DataResponse, T1CResponse } from '../../core/service/CoreModel';
-import * as Bluebird from 'bluebird';
 
 export { AbstractFileExchange, FileListResponse, ListFilesRequest };
 
 
 interface AbstractFileExchange {
-    listFiles(data: ListFilesRequest, callback?: (error: RestException, data: FileListResponse) => void): Bluebird<FileListResponse>;
-    setFolder(callback?: (error: RestException, data: DataResponse) => void): Bluebird<DataResponse>;
-    downloadFile(path: string, file: ArrayBuffer, fileName: string): Bluebird<DataResponse>;
-    uploadFile(path: string): Bluebird<string>;
+    listFiles(data: ListFilesRequest, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>;
+    setFolder(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    downloadFile(path: string, file: ArrayBuffer, fileName: string): Promise<DataResponse>;
+    uploadFile(path: string): Promise<string>;
 }
 
 
