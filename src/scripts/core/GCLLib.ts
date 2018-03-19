@@ -28,7 +28,6 @@ import { AbstractPiv } from '../plugins/smartcards/piv/pivModel';
 import { AbstractMobib } from '../plugins/smartcards/mobib/mobibModel';
 import { AbstractEidLUX } from '../plugins/smartcards/eid/lux/EidLuxModel';
 import { AbstractDNIe } from '../plugins/smartcards/eid/esp/dnieModel';
-import { Promise } from 'es6-promise';
 import { PluginFactory } from '../plugins/PluginFactory';
 import { AbstractSafeNet } from '../plugins/smartcards/pkcs11/safenet/safenetModel';
 import { AuthenticateOrSignData, OptionalPin } from '../plugins/smartcards/Card';
@@ -41,6 +40,8 @@ import { AbstractBelfius } from '../plugins/remote-loading/belfius/BelfiusModel'
 import { AgentClient } from './agent/agent';
 import { AbstractAgent } from './agent/agentModel';
 import { AbstractFileExchange } from '../plugins/file/FileExchangeModel';
+import * as Bluebird from 'bluebird';
+
 
 class GCLClient {
     public GCLInstalled: boolean;
@@ -85,8 +86,8 @@ class GCLClient {
     }
 
     public static initialize(cfg: GCLConfig,
-                             callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): Promise<GCLClient> {
-        return new Promise((resolve, reject) => {
+                             callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): Bluebird<GCLClient> {
+        return new Bluebird<GCLClient>((resolve, reject) => {
             let client = new GCLClient(cfg, true);
 
             // will be set to false if init fails
@@ -219,11 +220,11 @@ class GCLClient {
     /**
      * Init security context
      */
-    private initLibrary(): Promise<{}> {
+    private initLibrary(): Bluebird<{}> {
         let self = this;
         let self_cfg = this.cfg;
 
-        return new Promise((resolve, reject) => {
+        return new Bluebird((resolve, reject) => {
             self.core().info().then(infoResponse => {
                 self_cfg.citrix = infoResponse.data.citrix;
                 self_cfg.tokenCompatible = GCLClient.checkTokenCompatible(infoResponse.data.version);
@@ -290,7 +291,7 @@ class GCLClient {
         });
     }
 
-    private registerDevice(client: GCLClient, config: GCLConfig, info: DSPlatformInfo, deviceId: string): Promise<JWTResponse> {
+    private registerDevice(client: GCLClient, config: GCLConfig, info: DSPlatformInfo, deviceId: string): Bluebird<JWTResponse> {
         return client.dsClient.register(info, deviceId).then(activationResponse => {
             config.jwt = activationResponse.token;
             client.authConnection = new LocalAuthConnection(client.cfg);
@@ -299,7 +300,7 @@ class GCLClient {
         });
     }
 
-    private syncDevice(client: GCLClient, config: GCLConfig, info: DSPlatformInfo, deviceId: string): Promise<JWTResponse> {
+    private syncDevice(client: GCLClient, config: GCLConfig, info: DSPlatformInfo, deviceId: string): Bluebird<JWTResponse> {
         return client.dsClient.sync(info, deviceId).then(activationResponse => {
             config.jwt = activationResponse.token;
             return activationResponse;

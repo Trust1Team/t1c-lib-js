@@ -2,7 +2,7 @@
  * @author Maarten Somers
  */
 import { GenericConnection } from "../core/client/Connection";
-import { Promise } from "es6-promise";
+import * as Bluebird from 'bluebird';
 
 export { PinEnforcer };
 
@@ -10,13 +10,13 @@ const CORE_READERS = "/card-readers";
 
 class PinEnforcer  {
 
-    // TODO figure out how to use generics to return a promise with correct type
+    // TODO figure out how to use generics to return a Bluebird with correct type
     public static check(connection: GenericConnection,
                         baseUrl: string,
                         readerId: string,
-                        pinValue: string): Promise<any> {
+                        pinValue: string): Bluebird<any> {
         // if forceHardwarePinpad enabled,
-        return new Promise((resolve, reject) => {
+        return new Bluebird((resolve, reject) => {
             if (connection.cfg.forceHardwarePinpad) {
                 // check if reader has pinpad
                 connection.get(baseUrl, CORE_READERS + "/" + readerId, undefined).then(reader => {

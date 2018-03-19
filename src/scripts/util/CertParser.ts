@@ -2,7 +2,7 @@
  * @author Maarten Somers
  */
 
-import { Promise } from 'es6-promise';
+import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import * as asn1js from 'asn1js';
 import * as Base64 from 'Base64';
@@ -17,7 +17,7 @@ class CertParser {
 
     public static process(response: any,
                           parseCerts: boolean,
-                          callback?: (error: RestException, data: T1CResponse) => void):  Promise<any> {
+                          callback?: (error: RestException, data: T1CResponse) => void):  Bluebird<any> {
         // check if data has properties
         if (response && response.data && typeof response.data === 'object' && !_.isArray(response.data)) {
             _.forEach(response.data, (value, key) => {
@@ -64,7 +64,7 @@ class CertParser {
     }
 
 
-    public static processCert(certificate: string): T1CCertificate {
+    public static processCert(certificate: string): Certificate {
         let rawCert = Base64.atob(certificate);
         let buffer = CertParser.str2ab(rawCert);
         const asn1 = asn1js.fromBER(buffer);
