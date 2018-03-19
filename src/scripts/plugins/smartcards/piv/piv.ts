@@ -7,7 +7,6 @@ import { GenericSecuredCertCard, OptionalPin } from '../Card';
 import { CertificateResponse } from '../../../core/service/CoreModel';
 import { AbstractPiv, FacialImageResponse, PrintedInformationResponse } from './pivModel';
 import { PinEnforcer } from '../../../util/PinEnforcer';
-import * as Bluebird from 'bluebird';
 import { Options, RequestHandler } from '../../../util/RequestHandler';
 
 export { PIV };
@@ -33,7 +32,7 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
 
     public printedInformation(body: OptionalPin,
                               callback?: (error: RestException,
-                                          data: PrintedInformationResponse) => void): Bluebird<PrintedInformationResponse> {
+                                          data: PrintedInformationResponse) => void): Promise<PrintedInformationResponse> {
         if (callback && typeof callback === 'function') {
             PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
                 return this.connection.post(this.baseUrl, this.containerSuffix(PIV.PRINTED_INFORMATION), body, undefined, callback);
@@ -41,7 +40,7 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
                 return callback(error, null);
             });
         } else {
-            return new Bluebird<PrintedInformationResponse>((resolve, reject) => {
+            return new Promise<PrintedInformationResponse>((resolve, reject) => {
                 PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
                     resolve(this.connection.post(this.baseUrl, this.containerSuffix(PIV.PRINTED_INFORMATION), body, undefined));
                 }, error => { reject(error); });
@@ -50,7 +49,7 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
     }
 
     public facialImage(body: OptionalPin,
-                       callback?: (error: RestException, data: FacialImageResponse) => void): Bluebird<FacialImageResponse> {
+                       callback?: (error: RestException, data: FacialImageResponse) => void): Promise<FacialImageResponse> {
         if (callback && typeof callback === 'function') {
             PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
                 return this.connection.post(this.baseUrl, this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined, callback);
@@ -58,7 +57,7 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
                 return callback(error, null);
             });
         } else {
-            return new Bluebird<FacialImageResponse>((resolve, reject) => {
+            return new Promise<FacialImageResponse>((resolve, reject) => {
                 PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
                     resolve(this.connection.post(this.baseUrl, this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined));
                 }, error => { reject(error); });
@@ -68,13 +67,13 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
 
     public authenticationCertificate(body: OptionalPin,
                                      options?: Options,
-                                     callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse> {
+                                     callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(PIV.CERT_AUTHENTICATION, body, RequestHandler.determineOptions(options, callback));
     }
 
     public signingCertificate(body: OptionalPin,
                               options?: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse> {
+                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(PIV.CERT_SIGNING, body, RequestHandler.determineOptions(options, callback));
     }
 }

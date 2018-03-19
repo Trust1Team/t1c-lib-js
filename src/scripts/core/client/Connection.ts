@@ -8,7 +8,6 @@
 import {GCLConfig} from '../GCLConfig';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import * as _ from 'lodash';
-import * as Bluebird from 'bluebird';
 import { RestException } from '../exceptions/CoreExceptions';
 import { UrlUtil } from '../../util/UrlUtil';
 import * as ls from 'local-storage';
@@ -21,19 +20,19 @@ interface Connection {
     get(basePath: string,
         suffix: string,
         queryParams: { [key: string]: string },
-        callback?: (error: any, data: any) => void): Bluebird<any>;
+        callback?: (error: any, data: any) => void): Promise<any>;
 
     post(basePath: string,
          suffix: string,
          body: { [key: string]: any },
          queryParams?: { [key: string]: string },
-         callback?: (error: any, data: any) => void): Bluebird<any>;
+         callback?: (error: any, data: any) => void): Promise<any>;
 
     put(basePath: string,
         suffix: string,
         body: { [key: string]: any },
         queryParams?: { [key: string]: string },
-        callback?: (error: any, data: any) => void): Bluebird<any>;
+        callback?: (error: any, data: any) => void): Promise<any>;
 }
 
 abstract class GenericConnection implements Connection {
@@ -46,7 +45,7 @@ abstract class GenericConnection implements Connection {
     public get(basePath: string,
                suffix: string,
                queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Bluebird<any> {
+               callback?: (error: any, data: any) => void): Promise<any> {
         return handleRequest(basePath, suffix, 'GET', this.cfg, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
     }
 
@@ -54,7 +53,7 @@ abstract class GenericConnection implements Connection {
                 suffix: string,
                 body: any,
                 queryParams: { [key: string]: string },
-                callback?: (error: any, data: any) => void): Bluebird<any> {
+                callback?: (error: any, data: any) => void): Promise<any> {
         return handleRequest(basePath, suffix, 'POST', this.cfg, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
     }
 
@@ -62,7 +61,7 @@ abstract class GenericConnection implements Connection {
                suffix: string,
                body: any,
                queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Bluebird<any> {
+               callback?: (error: any, data: any) => void): Promise<any> {
         return handleRequest(basePath, suffix, 'PUT', this.cfg, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
     }
 }
@@ -73,7 +72,7 @@ class LocalAuthConnection extends GenericConnection implements Connection {
     public get(basePath: string,
                suffix: string,
                queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Bluebird<any> {
+               callback?: (error: any, data: any) => void): Promise<any> {
         let config: any = _.omit(this.cfg, 'apiKey');
         return handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
     }
@@ -81,7 +80,7 @@ class LocalAuthConnection extends GenericConnection implements Connection {
     public getSkipCitrix(basePath: string,
                          suffix: string,
                          queryParams: { [key: string]: string },
-                         callback?: (error: any, data: any) => void): Bluebird<any> {
+                         callback?: (error: any, data: any) => void): Promise<any> {
         let config: any = _.omit(this.cfg, 'apiKey');
         return handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
     }
@@ -90,7 +89,7 @@ class LocalAuthConnection extends GenericConnection implements Connection {
                 suffix: string,
                 body: any,
                 queryParams: { [key: string]: string },
-                callback?: (error: any, data: any) => void): Bluebird<any> {
+                callback?: (error: any, data: any) => void): Promise<any> {
         let config: any = _.omit(this.cfg, 'apiKey');
         return handleRequest(basePath, suffix, 'POST', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
     }
@@ -99,7 +98,7 @@ class LocalAuthConnection extends GenericConnection implements Connection {
                suffix: string,
                body: any,
                queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Bluebird<any> {
+               callback?: (error: any, data: any) => void): Promise<any> {
         let config: any = _.omit(this.cfg, 'apiKey');
         return handleRequest(basePath, suffix, 'PUT', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
     }
@@ -111,7 +110,7 @@ class LocalConnection extends GenericConnection implements Connection {
     public get(basePath: string,
                suffix: string,
                queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Bluebird<any> {
+               callback?: (error: any, data: any) => void): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         return handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback);
     }
@@ -119,7 +118,7 @@ class LocalConnection extends GenericConnection implements Connection {
     public getSkipCitrix(basePath: string,
                          suffix: string,
                          queryParams: { [key: string]: string },
-                         callback?: (error: any, data: any) => void): Bluebird<any> {
+                         callback?: (error: any, data: any) => void): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         return handleRequest(basePath, suffix, 'GET', config, GenericConnection.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
     }
@@ -128,7 +127,7 @@ class LocalConnection extends GenericConnection implements Connection {
                 suffix: string,
                 body: any,
                 queryParams: { [key: string]: string },
-                callback?: (error: any, data: any) => void): Bluebird<any> {
+                callback?: (error: any, data: any) => void): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         return handleRequest(basePath, suffix, 'POST', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
     }
@@ -137,18 +136,18 @@ class LocalConnection extends GenericConnection implements Connection {
                suffix: string,
                body: any,
                queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Bluebird<any> {
+               callback?: (error: any, data: any) => void): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         return handleRequest(basePath, suffix, 'PUT', config, GenericConnection.SHOULD_SEND_TOKEN, body, queryParams, callback);
     }
 
     public requestFile(basePath: string, suffix: string, body: { path: string },
-                       callback?: (error: any, data: any) => void): Bluebird<any> {
+                       callback?: (error: any, data: any) => void): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         // init callback if necessary
         if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
 
-        return new Bluebird((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             let headers = {};
             if (config.tokenCompatible && GenericConnection.SHOULD_SEND_TOKEN) {
                 headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
@@ -176,7 +175,7 @@ class LocalConnection extends GenericConnection implements Connection {
     }
 
     public putFile(basePath: string, suffix: string, body: any,
-                   queryParams: { [key: string]: string }, callback?: (error: any, data: any) => void): Bluebird<any> {
+                   queryParams: { [key: string]: string }, callback?: (error: any, data: any) => void): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         // init callback if necessary
         if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
@@ -191,7 +190,7 @@ class LocalConnection extends GenericConnection implements Connection {
             headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
         }
 
-        return new Bluebird((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             axios.put(UrlUtil.create(basePath, suffix, config, false), form, {
                 headers
             }).then(response => {
@@ -222,7 +221,7 @@ class RemoteConnection extends GenericConnection implements Connection {
     public get(basePath: string,
                suffix: string,
                queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Bluebird<any> {
+               callback?: (error: any, data: any) => void): Promise<any> {
         let config: any = _.omit(this.cfg, 'jwt');
         return handleRequest(basePath, suffix, 'GET', config, this.SHOULD_SEND_TOKEN, undefined, queryParams, callback, true);
     }
@@ -231,7 +230,7 @@ class RemoteConnection extends GenericConnection implements Connection {
                 suffix: string,
                 body: any,
                 queryParams: { [key: string]: string },
-                callback?: (error: any, data: any) => void): Bluebird<any> {
+                callback?: (error: any, data: any) => void): Promise<any> {
         let config: any = _.omit(this.cfg, 'jwt');
         return handleRequest(basePath, suffix, 'POST', config, this.SHOULD_SEND_TOKEN, body, queryParams, callback, true);
     }
@@ -240,7 +239,7 @@ class RemoteConnection extends GenericConnection implements Connection {
                suffix: string,
                body: any,
                queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Bluebird<any> {
+               callback?: (error: any, data: any) => void): Promise<any> {
         let config: any = _.omit(this.cfg, 'jwt');
         return handleRequest(basePath, suffix, 'PUT', config, this.SHOULD_SEND_TOKEN, body, queryParams, callback, true);
     }
@@ -251,14 +250,14 @@ class LocalTestConnection extends GenericConnection implements Connection {
 
     public get(basePath: string, suffix: string,
                queryParams?: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Bluebird<any> {
+               callback?: (error: any, data: any) => void): Promise<any> {
         return handleTestRequest(basePath, suffix, 'GET', this.config, undefined, queryParams, callback);
     }
 
     public post(basePath: string, suffix: string,
                 body: any,
                 queryParams?: { [key: string]: string },
-                callback?: (error: any, data: any) => void): Bluebird<any> {
+                callback?: (error: any, data: any) => void): Promise<any> {
         return handleTestRequest(basePath, suffix, 'POST', this.config, body, queryParams, callback);
     }
 
@@ -266,7 +265,7 @@ class LocalTestConnection extends GenericConnection implements Connection {
                suffix: string,
                body: any,
                queryParams: { [key: string]: string },
-               callback?: (error: any, data: any) => void): Bluebird<any> {
+               callback?: (error: any, data: any) => void): Promise<any> {
         return handleTestRequest(basePath, suffix, 'PUT', this.config, body, queryParams, callback);
     }
 }
@@ -279,7 +278,7 @@ function handleRequest(basePath: string,
                        body?: any,
                        params?: any,
                        callback?: (error: any, data: any) => void,
-                       skipCitrixCheck?: boolean): Bluebird<any> {
+                       skipCitrixCheck?: boolean): Promise<any> {
     // init callback if necessary
     if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
 
@@ -301,7 +300,7 @@ function handleRequest(basePath: string,
             config.headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
         }
 
-        return new Bluebird((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             axios.request(config).then((response: AxiosResponse) => {
                 callback(null, response.data);
                 return resolve(response.data);
@@ -327,7 +326,7 @@ function handleRequest(basePath: string,
             code: '801'
         };
         callback(agentPortError, null);
-        return Bluebird.reject(agentPortError);
+        return Promise.reject(agentPortError);
     }
 }
 
@@ -337,7 +336,7 @@ function handleTestRequest(basePath: string,
                            gclConfig: GCLConfig,
                            body?: any,
                            params?: any,
-                           callback?: (error: any, data: any) => void): Bluebird<any> {
+                           callback?: (error: any, data: any) => void): Promise<any> {
     // init callback if necessary
     if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
 
@@ -349,7 +348,7 @@ function handleTestRequest(basePath: string,
             code: '801'
         };
         callback(agentPortError, null);
-        return Bluebird.reject(agentPortError);
+        return Promise.reject(agentPortError);
     } else {
         let config: AxiosRequestConfig = {
             url: UrlUtil.create(basePath, suffix, gclConfig, true),
@@ -365,7 +364,7 @@ function handleTestRequest(basePath: string,
         if (params) { config.params = params; }
         if (gclConfig.jwt) { config.headers.Authorization = 'Bearer ' + gclConfig.jwt; }
 
-        return new Bluebird((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             axios.request(config).then((response: AxiosResponse) => {
                 callback(null, response.data);
                 return resolve(response.data);

@@ -2,7 +2,6 @@
  * @author Maarten Somers
  */
 
-import * as Bluebird from 'bluebird';
 import * as _ from 'lodash';
 import * as asn1js from 'asn1js';
 import * as Base64 from 'Base64';
@@ -17,7 +16,7 @@ class CertParser {
 
     public static process(response: any,
                           parseCerts: boolean,
-                          callback?: (error: RestException, data: T1CResponse) => void):  Bluebird<any> {
+                          callback?: (error: RestException, data: T1CResponse) => void):  Promise<any> {
         // check if data has properties
         if (response && response.data && typeof response.data === 'object' && !_.isArray(response.data)) {
             _.forEach(response.data, (value, key) => {

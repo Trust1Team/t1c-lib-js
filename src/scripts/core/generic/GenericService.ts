@@ -12,7 +12,6 @@ import * as _ from 'lodash';
 import { CardUtil } from '../../util/CardUtil';
 import { Aventra } from '../../plugins/smartcards/pki/aventra/Aventra';
 import { Options } from '../../util/RequestHandler';
-import Bluebird = require('bluebird');
 
 export { GenericService };
 
@@ -30,7 +29,7 @@ class GenericService {
 
     public static containerForReader(client: GCLClient,
                                      readerId: string,
-                                     callback?: (error: RestException, data: DataResponse) => void): Bluebird<DataResponse> {
+                                     callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         return this.checkPrerequisites(client, readerId, {}).then(res => {
             return ResponseHandler.response({ data: res.container, success: true }, callback);
         }).catch(err => { return ResponseHandler.error(err, callback); });
@@ -39,7 +38,7 @@ class GenericService {
     public static dumpData(client: GCLClient,
                            readerId: string,
                            data: OptionalPin,
-                           callback?: (error: ResponseHandler, data: DataResponse) => void): Bluebird<DataResponse> {
+                           callback?: (error: ResponseHandler, data: DataResponse) => void): Promise<DataResponse> {
         return this.checkPrerequisites(client, readerId, data)
                    .then(this.determineDataDumpMethod)
                    .then(GenericService.doDataDump)
@@ -110,29 +109,29 @@ class GenericService {
     }
 
     private static checkCanAuthenticate(data: CardReadersResponse) {
-        return new Bluebird((resolve) => {
+        return new Promise((resolve) => {
             data.data = _.filter(data.data, reader => { return CardUtil.canAuthenticate(reader.card); });
             resolve(data);
         });
     }
 
     private static checkCanSign(data: CardReadersResponse) {
-        return new Bluebird((resolve) => {
+        return new Promise((resolve) => {
             data.data = _.filter(data.data, reader => { return CardUtil.canSign(reader.card); });
             resolve(data);
         });
     }
 
     private static checkCanVerifyPin(data: CardReadersResponse) {
-        return new Bluebird((resolve) => {
+        return new Promise((resolve) => {
             data.data = _.filter(data.data, reader => { return CardUtil.canVerifyPin(reader.card); });
             resolve(data);
         });
     }
 
-    private static filterByAvailableContainers(args: { client: GCLClient, readers: CardReadersResponse }): Bluebird<CardReadersResponse> {
+    private static filterByAvailableContainers(args: { client: GCLClient, readers: CardReadersResponse }): Promise<CardReadersResponse> {
         return args.client.core().plugins().then(plugins => {
-            return new Bluebird<CardReadersResponse>((resolve) => {
+            return new Promise<CardReadersResponse>((resolve) => {
                 args.readers.data = _.filter(args.readers.data, reader => {
                     // TODO optimize
                     return _.find(plugins.data, ct => { return ct.id === CardUtil.determineContainer(reader.card); });
@@ -155,7 +154,7 @@ class GenericService {
     }
 
     private static checkReaderPresent(args: { readerId: string, certificateId: string, readers: CardReadersResponse }) {
-        return new Bluebird((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             let reader = _.find(args.readers.data, rd => { return rd.id === args.readerId; });
             if (reader) {
                 resolve(reader);
@@ -167,7 +166,7 @@ class GenericService {
     }
 
     private static checkContainerAvailable(args: { client: GCLClient, container: string }) {
-        return new Bluebird((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             if (args && args.container) {
                 args.client.core().plugins().then(res => {
                     if (_.find(res.data, ct => { return ct.id === args.container; })) {
@@ -181,7 +180,7 @@ class GenericService {
     }
 
     private static determineAlgorithm(args: { client: GCLClient, readerId: string, container: string, data: AuthenticateOrSignData }) {
-        return new Bluebird((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             if (!args.data.algorithm_reference || !args.data.algorithm_reference.length) {
                 args.data.algorithm_reference = CardUtil.defaultAlgo(args.container);
             }
@@ -191,7 +190,7 @@ class GenericService {
     }
 
     private static determineContainerForCard(reader: CardReader) {
-        return new Bluebird((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             if (reader && reader.card) {
                 resolve(CardUtil.determineContainer(reader.card));
             } else { reject('No card present in reader'); }
@@ -199,7 +198,7 @@ class GenericService {
     }
 
     private static determineDataDumpMethod(args: Arguments) {
-        return new Bluebird((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             args.dumpMethod = CardUtil.dumpMethod(args.container);
             args.dumpOptions = CardUtil.dumpOptions(args.container);
             if (args.dumpMethod) { resolve(args); }

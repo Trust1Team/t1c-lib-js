@@ -118,6 +118,10 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 ```
 # Release Notes
 
+## v1.5.3
+### Bug
+* [[T1C-1062](https://trust1t.atlassian.net/browse/T1C-1062)] - ES6-Promise polyfill causes issues on IE11
+
 ## v1.5.2
 ### Story
 * [[T1C-928](https://trust1t.atlassian.net/browse/T1C-928)] - Add request timeout in configuration, and when time out has reached the os.consent dialog should dissapear
