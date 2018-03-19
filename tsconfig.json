@@ -5,14 +5,14 @@
     "declaration": false,
     "diagnostics": true,
     "removeComments": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "lib": [ "es2015", "dom" ]
   },
   "compileOnSave": false,
   "exclude": [
     "node_modules"
   ],
   "files": [
-    "src/scripts/core/GCLLib.ts",
-    "typings/index.d.ts"
+    "src/scripts/core/GCLLib.ts"
   ]
 }

@@ -105,7 +105,7 @@ export class PluginFactory implements AbstractFactory {
         return new Belfius(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id);
     }
 
-    public createFileExchange(): AbstractFileExchange {
-        return new FileExchange(this.url, CONTAINER_FILE_EXCHANGE, this.connection);
-    }
+    // public createFileExchange(): AbstractFileExchange {
+    //     return new FileExchange(this.url, CONTAINER_FILE_EXCHANGE, this.connection);
+    // }
 }

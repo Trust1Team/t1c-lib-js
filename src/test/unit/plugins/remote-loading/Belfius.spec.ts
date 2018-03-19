@@ -2,7 +2,6 @@
  * @author Maarten Somers
  * @since 2017
  */
-///<reference path='../../../../../typings/index.d.ts'/>
 
 import { expect } from 'chai';
 import * as axios from 'axios';
@@ -10,7 +9,7 @@ import * as MockAdapter from 'axios-mock-adapter';
 import { GCLConfig } from '../../../../scripts/core/GCLConfig';
 import { LocalConnection } from '../../../../scripts/core/client/Connection';
 import { PluginFactory } from '../../../../scripts/plugins/PluginFactory';
-import { Promise } from 'es6-promise';
+import * as Bluebird from 'bluebird';
 
 describe('Belfius Container', () => {
     const gclConfig = new GCLConfig();
@@ -95,7 +94,7 @@ describe('Belfius Container', () => {
         it('checks if a sessionId was provided (Belfius Reader)', () => {
             const sessionId: string = undefined as any;
             return belfius.isBelfiusReader(sessionId).then(() => {
-                return Promise.reject(new Error('no sessionId was provided, this should fail!'));
+                return Bluebird.reject(new Error('no sessionId was provided, this should fail!'));
             }, error => {
                 expect(error).to.have.property('code');
                 expect(error.code).to.be.a('string');
@@ -114,7 +113,7 @@ describe('Belfius Container', () => {
         it('checks if a sessionId was provided (Non-Belfius Reader)', () => {
             const sessionId: string = undefined as any;
             return nonBelfiusReader.isBelfiusReader(sessionId).then(() => {
-                return Promise.reject(new Error('no sessionId was provided, this should fail!'));
+                return Bluebird.reject(new Error('no sessionId was provided, this should fail!'));
             }, error => {
                 expect(error).to.have.property('code');
                 expect(error.code).to.be.a('string');
@@ -173,7 +172,7 @@ describe('Belfius Container', () => {
         it('checks if a sessionId was provided', () => {
             const sessionId: string = undefined as any;
             return belfius.nonce(sessionId).then(() => {
-                return Promise.reject(new Error('no sessionId was provided, this should fail!'));
+                return Bluebird.reject(new Error('no sessionId was provided, this should fail!'));
             }, error => {
                 expect(error).to.have.property('code');
                 expect(error.code).to.be.a('string');
@@ -263,7 +262,7 @@ describe('Belfius Container', () => {
         it('checks if a sessionId was provided', () => {
             const sessionId: string = undefined as any;
             return belfius.stx('FE0000040001300000', sessionId).then(() => {
-                return Promise.reject(new Error('no sessionId was provided, this should fail!'));
+                return Bluebird.reject(new Error('no sessionId was provided, this should fail!'));
             }, error => {
                 expect(error).to.have.property('code');
                 expect(error.code).to.be.a('string');
