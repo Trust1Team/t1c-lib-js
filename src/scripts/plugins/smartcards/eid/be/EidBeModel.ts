@@ -9,27 +9,28 @@ import {
     T1CResponse
 } from "../../../../core/service/CoreModel";
 import { Options } from "../../../../util/RequestHandler";
+import * as Bluebird from 'bluebird';
 
 export { AbstractEidBE, Address, AddressResponse, AllCertsResponse, AllDataResponse, RnData, RnDataResponse };
 
 
 interface AbstractEidBE extends CertCard {
     allData(filters: string[] | Options,
-            callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+            callback?: (error: RestException, data: AllDataResponse) => void): Bluebird<AllDataResponse>;
     allCerts(filters: string[] | Options,
-             callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
-    rnData(callback?: (error: RestException, data: RnDataResponse) => void): Promise<RnDataResponse>;
-    address(callback?: (error: RestException, data: AddressResponse) => void): Promise<AddressResponse>;
-    picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    rootCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+             callback?: (error: RestException, data: AllCertsResponse) => void): Bluebird<AllCertsResponse>;
+    rnData(callback?: (error: RestException, data: RnDataResponse) => void): Bluebird<RnDataResponse>;
+    address(callback?: (error: RestException, data: AddressResponse) => void): Bluebird<AddressResponse>;
+    picture(callback?: (error: RestException, data: DataResponse) => void): Bluebird<DataResponse>;
+    rootCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
     citizenCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse)
-        => void): Promise<CertificateResponse>;
+        => void): Bluebird<CertificateResponse>;
     authenticationCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse)
-        => void): Promise<CertificateResponse>;
+        => void): Bluebird<CertificateResponse>;
     nonRepudiationCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse)
-        => void): Promise<CertificateResponse>;
-    rrnCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+        => void): Bluebird<CertificateResponse>;
+    rrnCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
+    verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void): Bluebird<T1CResponse>;
 }
 
 interface AddressResponse extends DataObjectResponse {

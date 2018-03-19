@@ -1,4 +1,3 @@
-///<reference path="../../../typings/index.d.ts"/>
 import {expect} from "chai";
 import {DSClient} from "../../scripts/core/ds/DSClient";
 import {RemoteConnection} from "../../scripts/core/client/Connection";

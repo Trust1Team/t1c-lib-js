@@ -9,7 +9,7 @@ import * as _ from 'lodash';
 import { BrowserInfo } from '../service/CoreModel';
 import { AbstractDSClient, DeviceResponse, DownloadLinkResponse,
     DSInfoResponse, DSPlatformInfo, DSPubKeyResponse, JWTResponse } from './DSClientModel';
-import { Promise } from 'es6-promise';
+import * as Bluebird from 'bluebird';
 
 export { DSClient };
 
@@ -30,23 +30,23 @@ class DSClient implements AbstractDSClient {
 
     public getUrl() { return this.url; }
 
-    public getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): void | Promise<DSInfoResponse> {
+    public getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): Bluebird<DSInfoResponse> {
         return this.connection.get(this.url, SYS_INFO, undefined, callback);
     }
 
     public getDevice(uuid: string,
-                     callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): void | Promise<DeviceResponse> {
+                     callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Bluebird<DeviceResponse> {
         return this.connection.get(this.url, DEVICE + SEPARATOR + uuid, undefined, callback);
     }
 
-    public getJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse> {
+    public getJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Bluebird<JWTResponse> {
         let self = this;
 
         if (callback) {
             doGetJwt();
         } else {
             // promise
-            return new Promise((resolve, reject) => {
+            return new Bluebird<JWTResponse>((resolve, reject) => {
                 doGetJwt(resolve, reject);
             });
         }
@@ -65,30 +65,30 @@ class DSClient implements AbstractDSClient {
         }
     }
 
-    public refreshJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): void | Promise<JWTResponse> {
+    public refreshJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Bluebird<JWTResponse> {
         let actualJWT = this.cfg.jwt;
         if (actualJWT) {
             return this.connection.post(this.url, SECURITY_JWT_REFRESH, { originalJWT: actualJWT }, undefined, callback);
         } else {
             let error = { code: '500', description: 'No JWT available', status: 412 };
-            if (callback) { return callback(error, null); }
-            else { return Promise.reject(error); }
+            if (callback) { callback(error, null); }
+            else { return Bluebird.reject(error); }
         }
     }
 
-    public getPubKey(callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse> {
+    public getPubKey(callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): Bluebird<DSPubKeyResponse> {
         return this.connection.get(this.url, PUB_KEY, undefined, callback);
     }
 
     public downloadLink(infoBrowser: BrowserInfo,
                         callback?: (error: CoreExceptions.RestException,
-                                    data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse> {
+                                    data: DownloadLinkResponse) => void): Bluebird<DownloadLinkResponse> {
         let self = this;
         if (callback) {
             doGetDownloadLink();
         } else {
             // promise
-            return new Promise((resolve, reject) => {
+            return new Bluebird<DownloadLinkResponse>((resolve, reject) => {
                 doGetDownloadLink(resolve, reject);
             });
         }
@@ -107,13 +107,13 @@ class DSClient implements AbstractDSClient {
     }
 
     public register(info: DSPlatformInfo, device_id: string,
-                    callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse> {
+                    callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Bluebird<JWTResponse> {
         let req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, 'core_version'));
         return this.connection.put(this.url, DEVICE + SEPARATOR + device_id, req, undefined, callback);
     }
 
     public sync(info: DSPlatformInfo, device_id: string,
-                callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse> {
+                callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Bluebird<JWTResponse> {
         let req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, 'core_version'));
         return this.connection.post(this.url, DEVICE + SEPARATOR + device_id, req, undefined, callback);
     }
