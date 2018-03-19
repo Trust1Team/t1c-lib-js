@@ -5,6 +5,7 @@
 import { RestException } from "../../../core/exceptions/CoreExceptions";
 import { GenericSecuredCertCard, OptionalPin } from "../Card";
 import { CertificateResponse, DataObjectResponse } from "../../../core/service/CoreModel";
+import * as Bluebird from 'bluebird';
 
 export { AbstractPiv, AllCertsResponse, AllDataResponse, PrintedInformation, PrintedInformationResponse, FacialImage, FacialImageResponse };
 
@@ -17,21 +18,21 @@ interface AbstractPiv extends GenericSecuredCertCard {
     // callback-based
     printedInformation(body: OptionalPin,
                        callback?: (error: RestException,
-                                   data: PrintedInformationResponse) => void): Promise<PrintedInformationResponse>;
+                                   data: PrintedInformationResponse) => void): Bluebird<PrintedInformationResponse>;
     facialImage(body: OptionalPin,
-                callback?: (error: RestException, data: FacialImageResponse) => void): Promise<FacialImageResponse>;
+                callback?: (error: RestException, data: FacialImageResponse) => void): Bluebird<FacialImageResponse>;
 
     allData(filters: string[], body: OptionalPin,
-            callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+            callback?: (error: RestException, data: AllDataResponse) => void): Bluebird<AllDataResponse>;
 
     allCerts(filters: string[], body: OptionalPin,
-             callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
+             callback?: (error: RestException, data: AllCertsResponse) => void): Bluebird<AllCertsResponse>;
 
     authenticationCertificate(body: OptionalPin,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                              callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
 
     signingCertificate(body: OptionalPin,
-                       callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                       callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
 }
 
 interface AllDataResponse extends AllCertsResponse {
