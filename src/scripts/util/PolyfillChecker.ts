@@ -43,7 +43,7 @@ class PolyfillChecker {
         require('core-js/es6/object');
         require('core-js/es6/parse-float');
         require('core-js/es6/parse-int');
-        require('core-js/es6/relect');
+        require('core-js/es6/reflect');
         require('core-js/es6/regexp');
         require('core-js/es6/set');
         require('core-js/es6/string');
