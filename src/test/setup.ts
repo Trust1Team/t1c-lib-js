@@ -1,8 +1,8 @@
 /**
  * @author Maarten Somers
- * @since 2017
+ * @since 2018
  */
-import { PolyfillChecker } from '../scripts/util/PolyfillChecker';
+import { Polyfills } from '../scripts/util/Polyfills';
 
 
-PolyfillChecker.browserCheck();
+Polyfills.check();

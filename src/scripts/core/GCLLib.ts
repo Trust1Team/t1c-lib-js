@@ -40,7 +40,7 @@ import { AbstractBelfius } from '../plugins/remote-loading/belfius/BelfiusModel'
 import { AgentClient } from './agent/agent';
 import { AbstractAgent } from './agent/agentModel';
 import { AbstractFileExchange } from '../plugins/file/FileExchangeModel';
-import { PolyfillChecker } from '../util/PolyfillChecker';
+import { Polyfills } from '../util/Polyfills';
 
 
 class GCLClient {
@@ -58,7 +58,8 @@ class GCLClient {
 
     constructor(cfg: GCLConfig, automatic: boolean) {
         // check if any polyfills are needed
-        PolyfillChecker.browserCheck();
+        Polyfills.check();
+
         let self = this;
         // resolve config to singleton
         this.cfg = GCLClient.resolveConfig(cfg);
