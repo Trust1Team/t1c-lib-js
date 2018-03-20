@@ -42,6 +42,9 @@ import { AbstractAgent } from './agent/agentModel';
 import { AbstractFileExchange } from '../plugins/file/FileExchangeModel';
 import { Polyfills } from '../util/Polyfills';
 
+// check if any polyfills are needed
+Polyfills.check();
+
 
 class GCLClient {
     public GCLInstalled: boolean;
@@ -57,9 +60,6 @@ class GCLClient {
     private ocvClient: OCVClient;
 
     constructor(cfg: GCLConfig, automatic: boolean) {
-        // check if any polyfills are needed
-        Polyfills.check();
-
         let self = this;
         // resolve config to singleton
         this.cfg = GCLClient.resolveConfig(cfg);

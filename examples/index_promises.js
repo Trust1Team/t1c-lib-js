@@ -18,7 +18,10 @@
 
     }
 
-    var connector = new GCLLib.GCLClient(gclConfig);
+    var connector;
+    GCLLib.GCLClient.initialize(gclConfig).then(function(client) {
+        connector = client;
+    });
 
     connector.core().info().then(function(data) {
         $("#error").empty();
