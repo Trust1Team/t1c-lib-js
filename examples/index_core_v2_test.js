@@ -150,11 +150,6 @@
         $("#validationError").empty();
         connector.auth().refreshJWT(currentJwt).then(handleSuccess, handleError);
     });
-    $("#getPlugins").on('click', function () {
-        $("#information").empty();
-        var core = connector.core();
-        core.plugins().then(handleSuccess, handleError);
-    });
 
     // belgian eid functionality
     $("#beidFiltered").on('click', function () {
@@ -325,6 +320,7 @@
         var core = connector.core();
         var self = this;
         core.infoBrowser().then(function(infoBrowser) {
+            infoBrowser.data.proxyDomain = 'https://accapim.t1t.be:443';
             connector.ds().downloadLink(infoBrowser.data).then(function(data) {
                 console.log(data);
                 $("#error").empty();

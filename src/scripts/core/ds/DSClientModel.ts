@@ -7,7 +7,7 @@ import { BrowserInfo, T1CContainer, T1CResponse } from '../service/CoreModel';
 import { RestException } from '../exceptions/CoreExceptions';
 
 export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse,
-    DeviceResponse, DSPlatformInfo, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem, DSContainer, DSStorage };
+    DeviceResponse, DSPlatformInfo, DSDownloadRequest, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem, DSContainer, DSStorage };
 
 
 interface AbstractDSClient {
@@ -16,7 +16,7 @@ interface AbstractDSClient {
     getDevice(uuid: string, callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
     getPubKey(deviceId: string,
               callback?: (error: RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse>;
-    downloadLink(infoBrowser: BrowserInfo,
+    downloadLink(downloadData: DSDownloadRequest,
                  callback?: (error: RestException,
                              data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
     register(registrationData: DSRegistrationOrSyncRequest,
@@ -31,6 +31,14 @@ class DSBrowser {
 
 class DSOperatingSystem {
     constructor(public architecture: number, public name: string, public version: string) {}
+}
+
+class DSDownloadRequest {
+    constructor(public browser: DSBrowser,
+                public manufacturer: string,
+                public os: DSOperatingSystem,
+                public ua: string,
+                proxyDomain: string) {}
 }
 
 class DSRegistrationOrSyncRequest {
