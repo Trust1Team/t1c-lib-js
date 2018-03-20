@@ -9,7 +9,6 @@ import * as MockAdapter from 'axios-mock-adapter';
 import { CoreService } from '../../../scripts/core/service/CoreService';
 import { GCLConfig } from '../../../scripts/core/GCLConfig';
 import { LocalConnection } from '../../../scripts/core/client/Connection';
-import * as Bluebird from 'bluebird';
 
 describe('Core Services', () => {
     let gclConfig = new GCLConfig();
@@ -133,7 +132,7 @@ describe('Core Services', () => {
 
         it('rejects the request if no title is provided', () => {
             return core.getConsent(undefined, 'code3', 2).then(() => {
-                return Bluebird.reject(new Error('no title was provided, this should fail!'));
+                return Promise.reject(new Error('no title was provided, this should fail!'));
             }, error => {
                 expect(error).to.have.property('code');
                 expect(error.code).to.be.a('string');
@@ -151,7 +150,7 @@ describe('Core Services', () => {
 
         it('rejects the request if no code word is provided', () => {
             return core.getConsent('test4', undefined, 4).then(() => {
-                return Bluebird.reject(new Error('no code word was provided, this should fail!'));
+                return Promise.reject(new Error('no code word was provided, this should fail!'));
             }, error => {
                 expect(error).to.have.property('code');
                 expect(error.code).to.be.a('string');

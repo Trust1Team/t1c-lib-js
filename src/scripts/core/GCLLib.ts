@@ -40,7 +40,7 @@ import { AbstractBelfius } from '../plugins/remote-loading/belfius/BelfiusModel'
 import { AgentClient } from './agent/agent';
 import { AbstractAgent } from './agent/agentModel';
 import { AbstractFileExchange } from '../plugins/file/FileExchangeModel';
-import * as Bluebird from 'bluebird';
+import { Polyfills } from '../util/Polyfills';
 
 
 class GCLClient {
@@ -57,6 +57,9 @@ class GCLClient {
     private ocvClient: OCVClient;
 
     constructor(cfg: GCLConfig, automatic: boolean) {
+        // check if any polyfills are needed
+        Polyfills.check();
+
         let self = this;
         // resolve config to singleton
         this.cfg = GCLClient.resolveConfig(cfg);
@@ -86,8 +89,8 @@ class GCLClient {
     }
 
     public static initialize(cfg: GCLConfig,
-                             callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): Bluebird<GCLClient> {
-        return new Bluebird<GCLClient>((resolve, reject) => {
+                             callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): Promise<GCLClient> {
+        return new Promise((resolve, reject) => {
             let client = new GCLClient(cfg, true);
 
             // will be set to false if init fails
@@ -220,11 +223,11 @@ class GCLClient {
     /**
      * Init security context
      */
-    private initLibrary(): Bluebird<{}> {
+    private initLibrary(): Promise<{}> {
         let self = this;
         let self_cfg = this.cfg;
 
-        return new Bluebird((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             self.core().info().then(infoResponse => {
                 self_cfg.citrix = infoResponse.data.citrix;
                 self_cfg.tokenCompatible = GCLClient.checkTokenCompatible(infoResponse.data.version);
@@ -291,7 +294,7 @@ class GCLClient {
         });
     }
 
-    private registerDevice(client: GCLClient, config: GCLConfig, info: DSPlatformInfo, deviceId: string): Bluebird<JWTResponse> {
+    private registerDevice(client: GCLClient, config: GCLConfig, info: DSPlatformInfo, deviceId: string): Promise<JWTResponse> {
         return client.dsClient.register(info, deviceId).then(activationResponse => {
             config.jwt = activationResponse.token;
             client.authConnection = new LocalAuthConnection(client.cfg);
@@ -300,7 +303,7 @@ class GCLClient {
         });
     }
 
-    private syncDevice(client: GCLClient, config: GCLConfig, info: DSPlatformInfo, deviceId: string): Bluebird<JWTResponse> {
+    private syncDevice(client: GCLClient, config: GCLConfig, info: DSPlatformInfo, deviceId: string): Promise<JWTResponse> {
         return client.dsClient.sync(info, deviceId).then(activationResponse => {
             config.jwt = activationResponse.token;
             return activationResponse;
