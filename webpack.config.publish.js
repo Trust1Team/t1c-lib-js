@@ -15,7 +15,7 @@ var libraryName = 'GCLLib',
     outputFile = libraryName + ".min.js";
 
 var config = {
-    entry: [ "babel-polyfill", "./src/scripts/core/GCLLib.ts" ],
+    entry: [ "./src/scripts/core/GCLLib.ts" ],
     devtool: "source-map",
     output: {
         path: path.resolve(__dirname, "dist"),

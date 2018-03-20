@@ -4,7 +4,6 @@
  */
 
 import * as CoreExceptions from "../exceptions/CoreExceptions";
-import * as Bluebird from 'bluebird';
 
 export { AbstractOCVClient, CertificateAndOrder, CertificateChainData, CertificateChainResponse,
     ChallengeResponse, ChallengeSignedHashResponse, ChallengeSignedHashData,
@@ -13,17 +12,17 @@ export { AbstractOCVClient, CertificateAndOrder, CertificateChainData, Certifica
 
 interface AbstractOCVClient {
     getChallenge(digestAlgorithm: string,
-                 callback?: (error: CoreExceptions.RestException, data: ChallengeResponse) => void): void | Bluebird<ChallengeResponse>;
+                 callback?: (error: CoreExceptions.RestException, data: ChallengeResponse) => void): void | Promise<ChallengeResponse>;
     validateChallengeSignedHash(data: ChallengeSignedHashData,
                                 callback?: (error: CoreExceptions.RestException, data: ChallengeSignedHashResponse)
-                                    => void): void | Bluebird<ChallengeSignedHashResponse>;
+                                    => void): void | Promise<ChallengeSignedHashResponse>;
     validateCertificateChain(data: CertificateChainData,
                              callback?: (error: CoreExceptions.RestException, data: CertificateChainResponse)
-                                 => void): void | Bluebird<CertificateChainResponse>;
+                                 => void): void | Promise<CertificateChainResponse>;
     validateSignature(data: SignatureValidationData,
                       callback?: (error: CoreExceptions.RestException, data: SignatureValidationResponse)
-                          => void): void | Bluebird<SignatureValidationResponse>;
-    getInfo(callback?: (error: CoreExceptions.RestException, data: OCVInfoResponse) => void): void | Bluebird<OCVInfoResponse>;
+                          => void): void | Promise<SignatureValidationResponse>;
+    getInfo(callback?: (error: CoreExceptions.RestException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse>;
 }
 
 interface CertificateChainData {

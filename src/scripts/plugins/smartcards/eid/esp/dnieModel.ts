@@ -6,22 +6,21 @@ import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { OptionalPin, SecuredCertCard } from "../../Card";
 import { CertificateResponse, DataObjectResponse, T1CResponse } from "../../../../core/service/CoreModel";
 import { Options } from "../../../../util/RequestHandler";
-import * as Bluebird from 'bluebird';
 
 export { AbstractDNIe, AllCertsResponse, AllDataResponse, InfoResponse };
 
 
 interface AbstractDNIe extends SecuredCertCard {
     allData(options: Options, body: OptionalPin,
-            callback?: (error: RestException, data: AllDataResponse) => void): Bluebird<AllDataResponse>;
-    allCerts(options: Options, callback?: (error: RestException, data: AllCertsResponse) => void): Bluebird<AllCertsResponse>;
-    info(callback?: (error: RestException, data: InfoResponse) => void): Bluebird<InfoResponse>
+            callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+    allCerts(options: Options, callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
+    info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>
     intermediateCertificate(options: Options,
-                            callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
+                            callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     authenticationCertificate(options: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
+                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     signingCertificate(options: Options,
-                       callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
+                       callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
 
 interface AllCertsResponse extends DataObjectResponse {

@@ -5,17 +5,16 @@
 import { RestException } from "../../../core/exceptions/CoreExceptions";
 import { DataObjectResponse, DataResponse, T1CResponse } from "../../../core/service/CoreModel";
 import { Card } from "../Card";
-import * as Bluebird from 'bluebird';
 
 export { AbstractMobib, AllDataResponse, StatusResponse, CardIssuing, CardIssuingResponse, Contract, ContractsResponse };
 
 
 interface AbstractMobib extends Card {
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Bluebird<AllDataResponse>;
-    cardIssuing(callback?: (error: RestException, data: CardIssuingResponse) => void): Bluebird<CardIssuingResponse>;
-    contracts(callback?: (error: RestException, data: ContractsResponse) => void): Bluebird<ContractsResponse>;
-    picture(callback?: (error: RestException, data: DataResponse) => void): Bluebird<DataResponse>;
-    status(callback?: (error: RestException, data: StatusResponse) => void): Bluebird<StatusResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+    cardIssuing(callback?: (error: RestException, data: CardIssuingResponse) => void): Promise<CardIssuingResponse>;
+    contracts(callback?: (error: RestException, data: ContractsResponse) => void): Promise<ContractsResponse>;
+    picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    status(callback?: (error: RestException, data: StatusResponse) => void): Promise<StatusResponse>;
 }
 
 interface AllDataResponse extends DataObjectResponse {
