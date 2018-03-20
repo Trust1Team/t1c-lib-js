@@ -9,7 +9,6 @@ import * as MockAdapter from 'axios-mock-adapter';
 import { GCLConfig } from '../../../../scripts/core/GCLConfig';
 import { LocalConnection } from '../../../../scripts/core/client/Connection';
 import { PluginFactory } from '../../../../scripts/plugins/PluginFactory';
-import { Promise } from 'es6-promise';
 
 describe('Belfius Container', () => {
     const gclConfig = new GCLConfig({});

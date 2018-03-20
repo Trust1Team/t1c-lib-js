@@ -8,10 +8,9 @@
 import {GCLConfig} from '../GCLConfig';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import * as _ from 'lodash';
-import { Promise } from 'es6-promise';
 import { RestException } from '../exceptions/CoreExceptions';
 import { UrlUtil } from '../../util/UrlUtil';
-import * as ls from 'local-storage';
+import * as store from 'store2';
 import { BrowserFingerprint } from '../../util/BrowserFingerprint';
 import * as CoreExceptions from '../exceptions/CoreExceptions';
 import { ResponseHandler } from '../../util/ResponseHandler';
@@ -407,7 +406,7 @@ class LocalTestConnection extends GenericConnection implements Connection {
         let reqHeaders = headers || {};
         reqHeaders['Accept-Language'] = 'en-US';
         reqHeaders['X-Consumer-Username'] = 'testorg.testapp.v1';
-        reqHeaders[GenericConnection.AUTH_TOKEN_HEADER] = ls.get(GenericConnection.BROWSER_AUTH_TOKEN);
+        reqHeaders[GenericConnection.AUTH_TOKEN_HEADER] = store.get(GenericConnection.BROWSER_AUTH_TOKEN);
         return reqHeaders;
     }
 

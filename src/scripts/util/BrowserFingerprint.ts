@@ -3,9 +3,9 @@
  * @since 2017
  */
 import * as cuid from 'cuid';
-import * as ls from 'local-storage';
 import * as bases from 'bases';
 import * as _ from 'lodash';
+import * as store from 'store2';
 
 export { BrowserFingerprint };
 
@@ -20,7 +20,7 @@ class BrowserFingerprint {
         // try to retrieve fingerprint
         let fingerPrint;
         try {
-            fingerPrint = ls.get(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION);
+            fingerPrint = store(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION);
         } catch (e) { /* will fail if the property exists but is null or undefined, after catching the error nothing needs to be done */ }
         // check if there is an authentication token in localStorage, if not, set it
         if (!fingerPrint) { fingerPrint = BrowserFingerprint.generateFingerprint(); }
@@ -44,7 +44,7 @@ class BrowserFingerprint {
         const browserCuid = cuid();
         const base36 = browserCuid.substr(1, 8);
         const token = browserCuid + (bases.fromBase36(base36) % 97);
-        ls.set(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION, token);
+        store(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION, token);
         return token;
     }
 }

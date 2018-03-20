@@ -2,7 +2,6 @@
  * @author Maarten Somers
  */
 import { RestException } from '../core/exceptions/CoreExceptions';
-import { Promise } from 'es6-promise';
 
 export { ResponseHandler };
 

@@ -6,7 +6,6 @@
  */
 
 import { ModuleConfig } from '../plugins/smartcards/pkcs11/pkcs11Model';
-import { Promise } from 'es6-promise';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import * as jwtDecode from 'jwt-decode';
 import * as moment from 'moment';
@@ -283,7 +282,7 @@ class GCLConfig  implements GCLConfig {
 
     get gwJwt(): Promise<string> {
         let self = this;
-        return new Promise((resolve, reject) => {
+        return new Promise<string>((resolve, reject) => {
             if (!self._gwJwt || !self._gwJwt.length) {
                 // no jwt available, get one from the GW if we have an API key
                 resolve(self.getGwJwt());
@@ -325,9 +324,13 @@ class GCLConfig  implements GCLConfig {
                 headers: { apikey: this.apiKey },
                 responseType:  'json'
             };
-            return axios.request(config).then((response: AxiosResponse) => {
-                this._gwJwt = response.data.token;
-                return response.data.token;
+            return new Promise((resolve, reject) => {
+                axios.request(config).then((response: AxiosResponse) => {
+                    this._gwJwt = response.data.token;
+                    resolve(response.data.token);
+                }, err => {
+                    reject(err);
+                });
             });
         } else {
             if (this._gwJwt && this._gwJwt.length) {

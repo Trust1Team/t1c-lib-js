@@ -8,7 +8,6 @@ import * as _ from 'lodash';
 import * as platform from 'platform';
 import * as CoreModel from './CoreModel';
 import { CardReader } from './CoreModel';
-import { Promise } from 'es6-promise';
 import { ResponseHandler } from '../../util/ResponseHandler';
 
 export { CoreService };

@@ -5,7 +5,6 @@
 import { RemoteApiKeyConnection, RemoteJwtConnection } from '../client/Connection';
 import { GCLConfig } from '../GCLConfig';
 import * as CoreExceptions from '../exceptions/CoreExceptions';
-import { Promise } from 'es6-promise';
 import { AbstractAuth } from './AuthModel';
 import { JWTResponse } from '../ds/DSClientModel';
 import { ResponseHandler } from '../../util/ResponseHandler';

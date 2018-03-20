@@ -5,7 +5,6 @@
 import { RestException } from '../../../../core/exceptions/CoreExceptions';
 import { CertificateResponse, DataResponse } from '../../../../core/service/CoreModel';
 import { GenericCertCard, OptionalPin } from '../../Card';
-import { Promise } from 'es6-promise';
 import { Options, RequestHandler } from '../../../../util/RequestHandler';
 import { AbstractEidPT, IdDataResponse, PtAddressResponse } from './EidPtModel';
 

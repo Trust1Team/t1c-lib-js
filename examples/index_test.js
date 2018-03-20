@@ -18,30 +18,32 @@
 
     }
 
-    var connector = new GCLLib.GCLClient(gclConfig);
-
-    connector.core().info(function(err,data) {
-        $("#error").empty();
-        $("#error").append(data.data.version);
-        if(data && data.data.activated==true){
-            //check card readers upon refresh and provide the info
-            var core = connector.core();
-            core.readers(function(err,data){
-                if(err) {
-                    console.log(JSON.stringify(err));
-                    return;
-                }
-                if(data && data.data){
-                    for(var i=0; i < data.data.length ; i ++){
-                        if(data.data[i].card){
-                            $("#readerlist").append( '<li id="liid"><a href="#" ><h5><span class="label label-success" >' + data.data[i].id + '</span></h5></a></li>' );
-                        }else{
-                            $("#readerlist").append( '<li><a href="#"><h5><span class="label label-warning">' + data.data[i].id + '</span></h5></a></li>' );
-                        }
+    var connector;
+    GCLLib.GCLClient.initialize(gclConfig).then(function(client) {
+        connector = client;
+        connector.core().info(function(err,data) {
+            $("#error").empty();
+            $("#error").append(data.data.version);
+            if(data && data.data.activated==true){
+                //check card readers upon refresh and provide the info
+                var core = connector.core();
+                core.readers(function(err,data){
+                    if(err) {
+                        console.log(JSON.stringify(err));
+                        return;
                     }
-                } else $("#readerlist").append( '<li> No readers connected </li>' );
-            });
-        }
+                    if(data && data.data){
+                        for(var i=0; i < data.data.length ; i ++){
+                            if(data.data[i].card){
+                                $("#readerlist").append( '<li id="liid"><a href="#" ><h5><span class="label label-success" >' + data.data[i].id + '</span></h5></a></li>' );
+                            }else{
+                                $("#readerlist").append( '<li><a href="#"><h5><span class="label label-warning">' + data.data[i].id + '</span></h5></a></li>' );
+                            }
+                        }
+                    } else $("#readerlist").append( '<li> No readers connected </li>' );
+                });
+            }
+        });
     });
 
     function callback(err,data) {

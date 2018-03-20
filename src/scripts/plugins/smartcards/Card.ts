@@ -4,7 +4,6 @@ import {
     T1CResponse
 } from '../../core/service/CoreModel';
 import { LocalConnection } from '../../core/client/Connection';
-import { Promise } from 'es6-promise';
 import { PinEnforcer } from '../../util/PinEnforcer';
 import { CertParser } from '../../util/CertParser';
 import { ResponseHandler } from '../../util/ResponseHandler';

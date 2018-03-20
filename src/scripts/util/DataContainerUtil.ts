@@ -13,7 +13,7 @@ class DataContainerUtil {
     constructor() {}
 
     // TODO switch to DSContainer[]
-    public static setupDataContainers(containers: { path?: string, id: string, name: string, version: string, type: string }[]): void {
+    public static setupDataContainers(containers: { path?: string, id: string, name: string, version: string, type?: string }[]): void {
         // go through list and find data containers
         // for each container found, spin up data container handler and attach to client
         let client = ClientService.getClient();

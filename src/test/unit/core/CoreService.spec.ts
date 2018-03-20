@@ -9,7 +9,6 @@ import * as MockAdapter from 'axios-mock-adapter';
 import { CoreService } from '../../../scripts/core/service/CoreService';
 import { GCLConfig } from '../../../scripts/core/GCLConfig';
 import { LocalConnection } from '../../../scripts/core/client/Connection';
-import { Promise } from 'es6-promise';
 
 describe('Core Services', () => {
     let gclConfig = new GCLConfig({});

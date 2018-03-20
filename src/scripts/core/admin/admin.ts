@@ -4,7 +4,6 @@
  */
 import { LocalAuthConnection } from '../client/Connection';
 import * as CoreExceptions from '../exceptions/CoreExceptions';
-import { Promise } from 'es6-promise';
 import {
     AbstractAdmin, AtrListRequest, ContainerSyncRequest, PubKeyResponse,
     SetPubKeyRequest
