@@ -10,7 +10,6 @@ import { RestException } from "../../../core/exceptions/CoreExceptions";
 import { APDU, CommandResponse } from "../RemoteLoadingModel";
 import { ResponseHandler } from "../../../util/ResponseHandler";
 import * as _ from "lodash";
-import * as Bluebird from 'bluebird';
 
 export { Belfius };
 
@@ -45,7 +44,7 @@ class Belfius extends RemoteLoading implements AbstractBelfius {
     }
 
     public isBelfiusReader(sessionId: string,
-                           callback?: (error: RestException, data: BoolDataResponse) => void): Bluebird<BoolDataResponse> {
+                           callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
         if (sessionId && sessionId.length) {
             return this.connection.get(this.baseUrl, "/card-readers/" + this.reader_id, undefined).then(reader => {
                 // check Nonce command works
@@ -60,7 +59,7 @@ class Belfius extends RemoteLoading implements AbstractBelfius {
         }
     }
 
-    public nonce(sessionId: string, callback?: (error: RestException, data: CommandResponse) => void): Bluebird<CommandResponse> {
+    public nonce(sessionId: string, callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse> {
         return this.isBelfiusReader(sessionId).then(compatibleReader => {
             if (compatibleReader.data) {
                 return this.apdu(Belfius.NONCE_APDU, sessionId, callback);
@@ -72,7 +71,7 @@ class Belfius extends RemoteLoading implements AbstractBelfius {
     }
 
     public stx(command: string, sessionId: string,
-               callback?: (error: RestException, data: CommandResponse) => void): Bluebird<CommandResponse> {
+               callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse> {
         return this.isBelfiusReader(sessionId).then(compatibleReader => {
             if (compatibleReader.data) {
                 if (command.length <= 500) {
