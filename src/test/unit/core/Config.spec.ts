@@ -15,7 +15,7 @@ describe('Config', () => {
     describe('gcl-config', () => {
         it('should return the default connector url', () => {
             let url: string = config.gclUrl;
-            expect(url).to.be.eq('https://localhost:10443/v1');
+            expect(url).to.be.eq('https://localhost:10443/v2');
         });
 
         it('should return the custom connector url', () => {
