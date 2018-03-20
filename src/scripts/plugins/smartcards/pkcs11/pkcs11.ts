@@ -6,7 +6,6 @@ import { CertParser } from '../../../util/CertParser';
 import { ResponseHandler } from '../../../util/ResponseHandler';
 import * as platform from 'platform';
 import { Options, RequestHandler } from '../../../util/RequestHandler';
-import { Promise } from 'es6-promise';
 import {
     AbstractPkcs11, InfoResponse, Pkcs11CertificatesResponse,
     Pkcs11SignData, Pkcs11VerifySignedData, SlotsResponse, TokenResponse

@@ -2,7 +2,6 @@
  * @author Maarten Somers
  */
 import { GenericConnection } from '../core/client/Connection';
-import { Promise } from 'es6-promise';
 import { JSEncrypt} from 'jsencrypt';
 import { PubKeyService } from './PubKeyService';
 import { RestException } from '../core/exceptions/CoreExceptions';

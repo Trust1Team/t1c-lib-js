@@ -26,7 +26,6 @@ import { AbstractPiv } from '../plugins/smartcards/piv/pivModel';
 import { AbstractMobib } from '../plugins/smartcards/mobib/mobibModel';
 import { AbstractEidLUX } from '../plugins/smartcards/eid/lux/EidLuxModel';
 import { AbstractDNIe } from '../plugins/smartcards/eid/esp/dnieModel';
-import { Promise } from 'es6-promise';
 import { PluginFactory } from '../plugins/PluginFactory';
 import { AuthenticateOrSignData, OptionalPin } from '../plugins/smartcards/Card';
 import { RestException } from './exceptions/CoreExceptions';
@@ -44,6 +43,11 @@ import { AbstractPkcs11 } from '../plugins/smartcards/pkcs11/pkcs11Model';
 import { ClientService } from '../util/ClientService';
 import { AuthClient } from './auth/Auth';
 import moment = require('moment');
+import { Polyfills } from '../util/Polyfills';
+
+// check if any polyfills are needed
+Polyfills.check();
+
 
 class GCLClient {
     public GCLInstalled: boolean;

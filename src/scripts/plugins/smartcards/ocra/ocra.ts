@@ -7,7 +7,6 @@ import { DataResponse } from '../../../core/service/CoreModel';
 import { RestException } from '../../../core/exceptions/CoreExceptions';
 import { AbstractOcra, ChallengeData, ReadCounterResponse } from './ocraModel';
 import { PinEnforcer } from '../../../util/PinEnforcer';
-import { Promise } from 'es6-promise';
 
 export { Ocra };
 

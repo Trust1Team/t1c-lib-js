@@ -4,7 +4,6 @@
  */
 import { GCLConfig } from '../core/GCLConfig';
 import { BrowserInfo } from '../core/service/CoreModel';
-import { Promise } from 'es6-promise';
 import { DSClient } from '../core/ds/DSClient';
 import { AdminService } from '../core/admin/admin';
 import { DSPlatformInfo, DSRegistrationOrSyncRequest } from '../core/ds/DSClientModel';

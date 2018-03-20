@@ -7,7 +7,6 @@ import {
     DeviceResponse, DSContainer, DSPlatformInfo, DSRegistrationOrSyncRequest,
     JWTResponse
 } from '../core/ds/DSClientModel';
-import { Promise } from 'es6-promise';
 import { DSClient } from '../core/ds/DSClient';
 import { DataContainerUtil } from './DataContainerUtil';
 import * as _ from 'lodash';

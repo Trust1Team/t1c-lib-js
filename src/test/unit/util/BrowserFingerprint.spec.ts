@@ -5,14 +5,13 @@
 
 import { expect } from 'chai';
 import { BrowserFingerprint } from '../../../scripts/util/BrowserFingerprint';
-import * as ls from 'local-storage';
-
+import * as store from 'store2';
 
 describe('Browser Fingerprint Utility', () => {
 
     describe('can set and retrieve browser fingerprint token', function () {
         beforeEach(() => {
-            ls.clear();
+            store.clear();
         });
 
         it('can generate a valid token', () => {
@@ -32,7 +31,7 @@ describe('Browser Fingerprint Utility', () => {
 
         it('adds a new token if the previous one disappears for whatever reason', () => {
             let token = BrowserFingerprint.get();
-            ls.remove(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION);
+            store.remove(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION);
             let newToken = BrowserFingerprint.get();
 
             expect(token).to.be.a('string');

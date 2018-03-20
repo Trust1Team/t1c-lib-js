@@ -8,7 +8,6 @@ import { RestException } from '../../../../core/exceptions/CoreExceptions';
 import { CertificateResponse, DataResponse, T1CResponse } from '../../../../core/service/CoreModel';
 import { GenericCertCard, OptionalPin, VerifyPinData } from '../../Card';
 import { PinEnforcer } from '../../../../util/PinEnforcer';
-import { Promise } from 'es6-promise';
 import { Options, RequestHandler } from '../../../../util/RequestHandler';
 import * as _ from 'lodash';
 

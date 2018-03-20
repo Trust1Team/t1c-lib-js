@@ -8,7 +8,7 @@ import * as axios from 'axios';
 import * as MockAdapter from 'axios-mock-adapter';
 import { GCLConfig } from '../../../scripts/core/GCLConfig';
 import { GenericConnection, LocalConnection } from '../../../scripts/core/client/Connection';
-import * as ls from 'local-storage';
+import * as store from 'store2';
 
 describe('Connection', () => {
     const gclConfig = new GCLConfig({});
@@ -19,12 +19,12 @@ describe('Connection', () => {
     let mock: MockAdapter;
 
     beforeEach(() => {
-        ls.set(GenericConnection.BROWSER_AUTH_TOKEN, 'cj9sgjq9t00022y609276dfxp90');
+        store(GenericConnection.BROWSER_AUTH_TOKEN, 'cj9sgjq9t00022y609276dfxp90');
         mock = new MockAdapter(axios);
     });
 
     afterEach(() => {
-        ls.remove(GenericConnection.BROWSER_AUTH_TOKEN);
+        store.remove(GenericConnection.BROWSER_AUTH_TOKEN);
         mock.restore();
     });
 

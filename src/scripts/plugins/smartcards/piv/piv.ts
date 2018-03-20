@@ -7,7 +7,6 @@ import { GenericSecuredCertCard, OptionalPin } from '../Card';
 import { CertificateResponse } from '../../../core/service/CoreModel';
 import { AbstractPiv, FacialImageResponse, PrintedInformationResponse } from './pivModel';
 import { PinEnforcer } from '../../../util/PinEnforcer';
-import { Promise } from 'es6-promise';
 import { Options, RequestHandler } from '../../../util/RequestHandler';
 
 export { PIV };

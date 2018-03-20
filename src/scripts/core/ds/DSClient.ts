@@ -11,7 +11,6 @@ import {
     AbstractDSClient, DeviceResponse, DownloadLinkResponse,
     DSInfoResponse, DSPlatformInfo, DSPubKeyResponse, DSRegistrationOrSyncRequest, JWTResponse
 } from './DSClientModel';
-import { Promise } from 'es6-promise';
 
 export { DSClient };
 

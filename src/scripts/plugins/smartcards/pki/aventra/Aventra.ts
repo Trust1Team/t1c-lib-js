@@ -8,7 +8,6 @@ import { CertificateResponse, T1CResponse } from '../../../../core/service/CoreM
 import { GenericCertCard, ResetPinData, VerifyPinData } from '../../Card';
 import { AbstractAventra} from './AventraModel';
 import { PinEnforcer } from '../../../../util/PinEnforcer';
-import { Promise } from 'es6-promise';
 import { Options, RequestHandler } from '../../../../util/RequestHandler';
 
 export { Aventra };

@@ -8,7 +8,6 @@ import { CertificateResponse, T1CResponse } from '../../../../core/service/CoreM
 import { GenericCertCard, VerifyPinData } from '../../Card';
 import { AbstractOberthur } from './OberthurModel';
 import { PinEnforcer } from '../../../../util/PinEnforcer';
-import { Promise } from 'es6-promise';
 import { Options, RequestHandler } from '../../../../util/RequestHandler';
 
 export { Oberthur };

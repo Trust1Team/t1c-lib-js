@@ -2,7 +2,6 @@
  * @author Maarten Somers
  * @since 2018
  */
-import { Promise } from 'es6-promise';
 import { GCLClient } from '../core/GCLLib';
 import * as _ from 'lodash';
 import * as semver from 'semver';
