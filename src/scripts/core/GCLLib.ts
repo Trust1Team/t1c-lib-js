@@ -12,7 +12,7 @@ import {
     LocalConnection, RemoteJwtConnection, LocalAuthConnection, LocalTestConnection,
     RemoteApiKeyConnection
 } from './client/Connection';
-import { DownloadLinkResponse } from './ds/DSClientModel';
+import { DownloadLinkResponse, DSDownloadRequest } from './ds/DSClientModel';
 import { DSClient } from './ds/DSClient';
 import { AbstractOCVClient, OCVClient } from './ocv/OCVClient';
 import { CardReadersResponse, DataResponse } from './service/CoreModel';
@@ -76,7 +76,7 @@ class GCLClient {
         this.localTestConnection = new LocalTestConnection(this.cfg);
         this.pluginFactory = new PluginFactory(this.cfg.gclUrl, this.connection);
         this.adminService = new AdminService(this.cfg.gclUrl, this.authConnection);
-        this.coreService = new CoreService(this.cfg.gclUrl, this.connection);
+        this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
         this.agentClient = new AgentClient(this.cfg.gclUrl, this.connection);
         if (this.cfg.localTestMode) { this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg); }
         else { this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg); }
@@ -183,7 +183,9 @@ class GCLClient {
 
     public download(callback?: (error: RestException, data: DownloadLinkResponse) => void) {
         return this.core().infoBrowser().then(info => {
-            return this.ds().downloadLink(info.data, callback);
+            let downloadData = new DSDownloadRequest(info.data.browser, info.data.manufacturer,
+                info.data.os, info.data.ua, this.config().gwUrl);
+            return this.ds().downloadLink(downloadData, callback);
         }, error => {
             return ResponseHandler.error(error, callback);
         });
@@ -231,7 +233,9 @@ class GCLClient {
                 // no gcl available - start download
                 let _info = self.core().infoBrowserSync();
                 console.log('implicit error', JSON.stringify(_info));
-                self.ds().downloadLink(_info.data,
+                let downloadData = new DSDownloadRequest(_info.data.browser,
+                    _info.data.manufacturer, _info.data.os, _info.data.ua, self.config().gwUrl);
+                self.ds().downloadLink(downloadData,
                     function(linkError: CoreExceptions.RestException, downloadResponse: DownloadLinkResponse) {
                         if (linkError) { console.error('could not download GCL package:', linkError.description); }
                         window.open(downloadResponse.url); return;

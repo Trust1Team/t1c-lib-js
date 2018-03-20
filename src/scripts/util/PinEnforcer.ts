@@ -1,11 +1,11 @@
 /**
  * @author Maarten Somers
  */
-import { GenericConnection } from '../core/client/Connection';
+import { GenericConnection, LocalAuthConnection } from '../core/client/Connection';
 import { JSEncrypt} from 'jsencrypt';
 import { PubKeyService } from './PubKeyService';
 import { RestException } from '../core/exceptions/CoreExceptions';
-import { OptionalPin } from '../plugins/smartcards/Card';
+import { GCLConfig } from '../core/GCLConfig';
 
 export { PinEnforcer, EncryptedOptionalPin };
 
@@ -17,7 +17,7 @@ class PinEnforcer {
     public static check(connection: GenericConnection,
                         readerId: string,
                         body: { pin?: string }): Promise<any> {
-        return PinEnforcer.doPinCheck(connection, readerId, body).then(() => {
+        return PinEnforcer.doPinCheck(connection.cfg, readerId, body).then(() => {
             return PinEnforcer.updateBodyWithEncryptedPin(body);
         });
     }
@@ -25,7 +25,7 @@ class PinEnforcer {
     public static checkAlreadyEncryptedPin(connection: GenericConnection,
                                            readerId: string,
                                            pin: string): Promise<any> {
-        return PinEnforcer.doPinCheck(connection, readerId, { pin });
+        return PinEnforcer.doPinCheck(connection.cfg, readerId, { pin });
     }
 
 
@@ -39,10 +39,11 @@ class PinEnforcer {
         } else { return undefined; }
     }
 
-    private static doPinCheck(connection: GenericConnection, readerId: string,
+    private static doPinCheck(cfg: GCLConfig, readerId: string,
                               body: EncryptedOptionalPin) {
         // if forceHardwarePinpad enabled,
         return new Promise((resolve, reject) => {
+            let connection = new LocalAuthConnection(cfg);
             body.os_dialog = connection.cfg.osPinDialog;
             connection.get(connection.cfg.gclUrl, CORE_READERS + '/' + readerId, undefined).then(reader => {
                 body.pinpad = reader.data.pinpad;

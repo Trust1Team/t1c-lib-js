@@ -120,13 +120,13 @@ class CoreService implements CoreModel.AbstractCore {
     version(): Promise<string>;
 }
 
-export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse, DeviceResponse, DSPlatformInfo, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem, DSContainer, DSStorage };
+export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse, DeviceResponse, DSPlatformInfo, DSDownloadRequest, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem, DSContainer, DSStorage };
 interface AbstractDSClient {
     getUrl(): string;
     getInfo(callback?: (error: RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
     getDevice(uuid: string, callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
     getPubKey(deviceId: string, callback?: (error: RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse>;
-    downloadLink(infoBrowser: BrowserInfo, callback?: (error: RestException, data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
+    downloadLink(downloadData: DSDownloadRequest, callback?: (error: RestException, data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
     register(registrationData: DSRegistrationOrSyncRequest, callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
     sync(syncData: DSRegistrationOrSyncRequest, callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
 }
@@ -140,6 +140,13 @@ class DSOperatingSystem {
     name: string;
     version: string;
     constructor(architecture: number, name: string, version: string);
+}
+class DSDownloadRequest {
+    browser: DSBrowser;
+    manufacturer: string;
+    os: DSOperatingSystem;
+    ua: string;
+    constructor(browser: DSBrowser, manufacturer: string, os: DSOperatingSystem, ua: string, proxyDomain: string);
 }
 class DSRegistrationOrSyncRequest {
     managed: boolean;
@@ -236,7 +243,7 @@ class DSClient implements AbstractDSClient {
     getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
     getDevice(uuid: string, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
     getPubKey(uuid: string, callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse>;
-    downloadLink(infoBrowser: BrowserInfo, callback?: (error: CoreExceptions.RestException, data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
+    downloadLink(downloadData: DSDownloadRequest, callback?: (error: CoreExceptions.RestException, data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
     register(registrationData: DSRegistrationOrSyncRequest, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
     sync(syncData: DSRegistrationOrSyncRequest, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
 }

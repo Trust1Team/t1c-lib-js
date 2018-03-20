@@ -8,7 +8,7 @@ import * as CoreExceptions from '../exceptions/CoreExceptions';
 import * as _ from 'lodash';
 import { BrowserInfo, DataResponse } from '../service/CoreModel';
 import {
-    AbstractDSClient, DeviceResponse, DownloadLinkResponse,
+    AbstractDSClient, DeviceResponse, DownloadLinkResponse, DSDownloadRequest,
     DSInfoResponse, DSPlatformInfo, DSPubKeyResponse, DSRegistrationOrSyncRequest, JWTResponse
 } from './DSClientModel';
 
@@ -43,7 +43,7 @@ class DSClient implements AbstractDSClient {
         return this.connection.get(this.url, PUB_KEY + SEPARATOR + uuid, undefined, undefined, callback);
     }
 
-    public downloadLink(infoBrowser: BrowserInfo,
+    public downloadLink(downloadData: DSDownloadRequest,
                         callback?: (error: CoreExceptions.RestException,
                                     data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse> {
         let self = this;
@@ -56,12 +56,13 @@ class DSClient implements AbstractDSClient {
             });
         }
         function doGetDownloadLink(resolve?: (data: any) => void, reject?: (data: any) => void) {
-            self.connection.post(self.url, DOWNLOAD, infoBrowser, undefined, undefined, function (err, data) {
+            self.connection.post(self.url, DOWNLOAD, downloadData, undefined, undefined, function (err, data) {
                 if (err) {
                     if (callback) { return callback(err, null); }
                     else { reject(err); }
                 } else {
-                    let returnObject = { url: self.cfg.gwUrl + data.path + QP_APIKEY + self.cfg.apiKey, success: true };
+                    console.log(data);
+                    let returnObject = { url: data.link + QP_APIKEY + self.cfg.apiKey, success: true };
                     if (callback) { return callback(null, returnObject); }
                     else { return resolve(returnObject); }
                 }
