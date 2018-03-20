@@ -5,19 +5,18 @@
 import { RestException } from "../../../core/exceptions/CoreExceptions";
 import { PinCard } from "../Card";
 import { DataObjectResponse, DataResponse, T1CResponse } from "../../../core/service/CoreModel";
-import * as Bluebird from 'bluebird';
 
 export { AbstractEMV, AllDataResponse, ApplicationDataResponse, ApplicationsResponse, EmvCertificateResponse };
 
 
 interface AbstractEMV extends PinCard {
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Bluebird<AllDataResponse>;
-    applications(callback?: (error: RestException, data: ApplicationsResponse) => void): Bluebird<ApplicationsResponse>;
-    applicationData(callback?: (error: RestException, data: ApplicationDataResponse) => void): Bluebird<ApplicationDataResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+    applications(callback?: (error: RestException, data: ApplicationsResponse) => void): Promise<ApplicationsResponse>;
+    applicationData(callback?: (error: RestException, data: ApplicationDataResponse) => void): Promise<ApplicationDataResponse>;
     iccPublicKeyCertificate(aid: string,
-                            callback?: (error: RestException, data: EmvCertificateResponse) => void): Bluebird<EmvCertificateResponse>;
+                            callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
     issuerPublicKeyCertificate(aid: string,
-                               callback?: (error: RestException, data: EmvCertificateResponse) => void): Bluebird<EmvCertificateResponse>;
+                               callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
 }
 
 interface AllDataResponse extends T1CResponse {

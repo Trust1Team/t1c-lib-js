@@ -5,18 +5,17 @@
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { CertificateResponse, DataObjectResponse, DataResponse } from "../../../../core/service/CoreModel";
 import { CertCard } from "../../Card";
-import * as Bluebird from 'bluebird';
 
 export { AbstractLuxTrust, AllCertsResponse, AllDataResponse };
 
 
 interface AbstractLuxTrust extends CertCard {
-    activated(callback?: (error: RestException, data: DataResponse) => void): Bluebird<DataResponse>;
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Bluebird<AllDataResponse>;
-    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): Bluebird<AllCertsResponse>;
-    rootCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
-    authenticationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
-    signingCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Bluebird<CertificateResponse>;
+    activated(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
+    rootCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    authenticationCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    signingCertificate(callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
 
 interface AllDataResponse extends AllCertsResponse {
