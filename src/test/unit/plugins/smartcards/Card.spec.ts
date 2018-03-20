@@ -18,7 +18,7 @@ describe('Generic cards and containers', () => {
 
     beforeEach(() => {
         mock = new MockAdapter(axios);
-        mock.onGet('https://localhost:10443/v1/card-readers/123').reply(() => {
+        mock.onGet('https://localhost:10443/v2/card-readers/123').reply(() => {
             return [ 200, { data: { pinpad: false }, success: true }];
         });
         PubKeyService.setPubKey('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlOJu6TyygqxfWT7eLtGDwajtN\n' +

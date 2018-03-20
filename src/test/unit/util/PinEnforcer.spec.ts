@@ -29,7 +29,7 @@ describe('PinEnforcer Utility', () => {
 
     describe('Configuration', function () {
         beforeEach(function () {
-            mock.onGet('https://localhost:10443/v1/card-readers/123')
+            mock.onGet('https://localhost:10443/v2/card-readers/123')
                 .reply(config => {
                     return [ 200, { success: true, data: { pinpad: true } }];
                 });
@@ -52,11 +52,11 @@ describe('PinEnforcer Utility', () => {
 
     describe('Pin Enforcement', () => {
         beforeEach(function () {
-            mock.onGet('https://localhost:10443/v1/card-readers/123')
+            mock.onGet('https://localhost:10443/v2/card-readers/123')
                 .reply(config => {
                     return [ 200, { success: true, data: { pinpad: true } }];
                 });
-            mock.onGet('https://localhost:10443/v1/card-readers/321')
+            mock.onGet('https://localhost:10443/v2/card-readers/321')
                 .reply(config => {
                     return [ 200, { success: true, data: { pinpad: false } }];
                 });
