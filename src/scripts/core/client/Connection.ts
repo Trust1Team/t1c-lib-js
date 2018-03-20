@@ -10,7 +10,7 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import * as _ from 'lodash';
 import { RestException } from '../exceptions/CoreExceptions';
 import { UrlUtil } from '../../util/UrlUtil';
-import * as ls from 'local-storage';
+import * as store from 'store2';
 import { BrowserFingerprint } from '../../util/BrowserFingerprint';
 
 export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteConnection, Connection, LocalTestConnection };
@@ -356,7 +356,7 @@ function handleTestRequest(basePath: string,
             headers:  {
                 'Accept-Language':  'en-US',
                 'X-Consumer-Username': 'testorg.testapp.v1',
-                [GenericConnection.AUTH_TOKEN_HEADER]: ls.get(GenericConnection.BROWSER_AUTH_TOKEN)
+                [GenericConnection.AUTH_TOKEN_HEADER]: store(GenericConnection.BROWSER_AUTH_TOKEN)
             },
             responseType:  'json'
         };
