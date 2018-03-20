@@ -19391,7 +19391,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return Promise.resolve('v1.5.3');
+	        return Promise.resolve('v1.8.2');
 	    };
 	    return CoreService;
 	}());
