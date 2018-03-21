@@ -151,6 +151,7 @@ class DSDownloadRequest {
     manufacturer: string;
     os: DSOperatingSystem;
     ua: string;
+    proxyDomain: string;
     constructor(browser: DSBrowser, manufacturer: string, os: DSOperatingSystem, ua: string, proxyDomain: string);
 }
 class DSRegistrationOrSyncRequest {
