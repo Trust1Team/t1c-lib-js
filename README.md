@@ -153,12 +153,15 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 * [[T1C-896](https://trust1t.atlassian.net/browse/T1C-896)] - RMC-citrix Upload file + show in viewer
 * [[T1C-897](https://trust1t.atlassian.net/browse/T1C-897)] - RMC-citrix sign selected file
 
+## v1.5.4
+### Task
+* [[T1C-1064](https://trust1t.atlassian.net/browse/T1C-1064)] - Conditionally polyfill missing features
+
 ## v1.5.3
 ### Bug
 * [[T1C-1062](https://trust1t.atlassian.net/browse/T1C-1062)] - ES6-Promise polyfill causes issues on IE11
 ### Task
 * [[T1C-1063](https://trust1t.atlassian.net/browse/T1C-1063)] - Stop using babel-polyfill
-* [[T1C-1064](https://trust1t.atlassian.net/browse/T1C-1064)] - Conditionally polyfill missing features
 
 ## v1.5.2
 ### Story
