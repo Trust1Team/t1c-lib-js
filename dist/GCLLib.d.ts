@@ -120,7 +120,7 @@ class CoreService implements CoreModel.AbstractCore {
     version(): Promise<string>;
 }
 
-export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse, DeviceResponse, DSPlatformInfo, DSDownloadRequest, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem, DSContainer, DSStorage };
+export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse, DeviceResponse, DSPlatformInfo, DSDownloadRequest, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem, DSClientInfo, DSContainer, DSStorage };
 interface AbstractDSClient {
     getUrl(): string;
     getInfo(callback?: (error: RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
@@ -141,6 +141,11 @@ class DSOperatingSystem {
     version: string;
     constructor(architecture: number, name: string, version: string);
 }
+class DSClientInfo {
+    type: string;
+    version: string;
+    constructor(type: string, version: string);
+}
 class DSDownloadRequest {
     browser: DSBrowser;
     manufacturer: string;
@@ -159,8 +164,9 @@ class DSRegistrationOrSyncRequest {
     os: DSOperatingSystem;
     ua: string;
     proxyDomain: string;
+    clientInfo: DSClientInfo;
     containerStates: T1CContainer[];
-    constructor(managed: boolean, activated: boolean, uuid: string, version: string, derEncodedPublicKey: string, manufacturer: string, browser: DSBrowser, os: DSOperatingSystem, ua: string, proxyDomain: string, containerStates?: T1CContainer[]);
+    constructor(managed: boolean, activated: boolean, uuid: string, version: string, derEncodedPublicKey: string, manufacturer: string, browser: DSBrowser, os: DSOperatingSystem, ua: string, proxyDomain: string, clientInfo: DSClientInfo, containerStates?: T1CContainer[]);
 }
 class DSInfoResponse {
     configFile: string;

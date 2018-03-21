@@ -38436,6 +38436,14 @@ var GCLLib =
 	    return DSOperatingSystem;
 	}());
 	exports.DSOperatingSystem = DSOperatingSystem;
+	var DSClientInfo = (function () {
+	    function DSClientInfo(type, version) {
+	        this.type = type;
+	        this.version = version;
+	    }
+	    return DSClientInfo;
+	}());
+	exports.DSClientInfo = DSClientInfo;
 	var DSDownloadRequest = (function () {
 	    function DSDownloadRequest(browser, manufacturer, os, ua, proxyDomain) {
 	        this.browser = browser;
@@ -38447,7 +38455,7 @@ var GCLLib =
 	}());
 	exports.DSDownloadRequest = DSDownloadRequest;
 	var DSRegistrationOrSyncRequest = (function () {
-	    function DSRegistrationOrSyncRequest(managed, activated, uuid, version, derEncodedPublicKey, manufacturer, browser, os, ua, proxyDomain, containerStates) {
+	    function DSRegistrationOrSyncRequest(managed, activated, uuid, version, derEncodedPublicKey, manufacturer, browser, os, ua, proxyDomain, clientInfo, containerStates) {
 	        this.managed = managed;
 	        this.activated = activated;
 	        this.uuid = uuid;
@@ -38458,6 +38466,7 @@ var GCLLib =
 	        this.os = os;
 	        this.ua = ua;
 	        this.proxyDomain = proxyDomain;
+	        this.clientInfo = clientInfo;
 	        this.containerStates = containerStates;
 	    }
 	    return DSRegistrationOrSyncRequest;
@@ -64494,7 +64503,7 @@ var GCLLib =
 	        });
 	    };
 	    SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
-	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, containers));
+	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.0.0'), containers));
 	    };
 	    SyncUtil.syncWhitelist = function () {
 	        return Promise.resolve();
@@ -66243,7 +66252,7 @@ var GCLLib =
 	    };
 	    ActivationUtil.registerDevice = function (client, mergedInfo, uuid) {
 	        return client.admin().getPubKey().then(function (pubKey) {
-	            return client.ds().register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.managed, mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl));
+	            return client.ds().register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.managed, mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.0.0')));
 	        });
 	    };
 	    ActivationUtil.activateDevice = function (args) {

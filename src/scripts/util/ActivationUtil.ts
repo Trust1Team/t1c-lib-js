@@ -6,7 +6,7 @@ import { GCLConfig } from '../core/GCLConfig';
 import { BrowserInfo } from '../core/service/CoreModel';
 import { DSClient } from '../core/ds/DSClient';
 import { AdminService } from '../core/admin/admin';
-import { DSPlatformInfo, DSRegistrationOrSyncRequest } from '../core/ds/DSClientModel';
+import { DSClientInfo, DSPlatformInfo, DSRegistrationOrSyncRequest } from '../core/ds/DSClientModel';
 import { PubKeyResponse, PubKeys, SetPubKeyRequest } from '../core/admin/adminModel';
 import { GCLClient } from '../core/GCLLib';
 
@@ -48,7 +48,8 @@ class ActivationUtil {
                 mergedInfo.browser,
                 mergedInfo.os,
                 mergedInfo.ua,
-                client.config().gwUrl));
+                client.config().gwUrl,
+                new DSClientInfo('JAVASCRIPT', '%%GULP_INJECT_VERSION%%')));
         });
     }
 
