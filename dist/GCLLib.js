@@ -67,6 +67,7 @@ var GCLLib =
 	var ResponseHandler_1 = __webpack_require__(9);
 	var agent_1 = __webpack_require__(37);
 	var Polyfills_1 = __webpack_require__(173);
+	Polyfills_1.Polyfills.check();
 	var GCLClient = (function () {
 	    function GCLClient(cfg, automatic) {
 	        var _this = this;
@@ -91,7 +92,6 @@ var GCLLib =
 	        };
 	        this.readerapi = function (reader_id) { return _this.pluginFactory.createRemoteLoading(reader_id); };
 	        this.belfius = function (reader_id) { return _this.pluginFactory.createBelfius(reader_id); };
-	        Polyfills_1.Polyfills.check();
 	        var self = this;
 	        this.cfg = GCLClient.resolveConfig(cfg);
 	        this.connection = new Connection_1.LocalConnection(this.cfg);
@@ -19391,7 +19391,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return Promise.resolve('v1.8.2');
+	        return Promise.resolve('v1.8.3');
 	    };
 	    return CoreService;
 	}());
