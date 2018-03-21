@@ -3,7 +3,7 @@
  * @since 2018
  */
 
-import { T1CResponse } from '../service/CoreModel';
+import { DataArrayResponse, T1CResponse } from '../service/CoreModel';
 import { DSContainer } from '../ds/DSClientModel';
 import { RestException } from '../exceptions/CoreExceptions';
 
@@ -13,6 +13,8 @@ export { AbstractAdmin, AtrListRequest, PubKeys, PubKeyResponse, SetPubKeyReques
 interface AbstractAdmin {
     activate(callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     atr(atrList: AtrListRequest, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    getLogfile(name: string, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    getLogfileList(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
     getPubKey(callback?: (error: RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     setPubKey(keys: SetPubKeyRequest,
               callback?: (error: RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;

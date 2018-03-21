@@ -37573,6 +37573,40 @@ var GCLLib =
 	        securityConfig.skipCitrixCheck = true;
 	        return this.handleRequest(basePath, suffix, 'GET', this.cfg, securityConfig, undefined, queryParams, headers, callback);
 	    };
+	    LocalAuthConnection.prototype.requestLogFile = function (basePath, suffix, callback) {
+	        var _this = this;
+	        if (!callback || typeof callback !== 'function') {
+	            callback = function () { };
+	        }
+	        return new Promise(function (resolve, reject) {
+	            var headers = {};
+	            headers.Authorization = 'Bearer ' + _this.cfg.gclJwt;
+	            if (_this.cfg.tokenCompatible && _this.getSecurityConfig().sendToken) {
+	                headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint_1.BrowserFingerprint.get();
+	            }
+	            axios_1.default.get(UrlUtil_1.UrlUtil.create(basePath, suffix, _this.cfg, false), {
+	                responseType: 'blob', headers: headers
+	            }).then(function (response) {
+	                callback(null, response);
+	                return resolve(response);
+	            }, function (error) {
+	                if (error.response) {
+	                    if (error.response.data) {
+	                        callback(error.response.data, null);
+	                        return reject(error.response.data);
+	                    }
+	                    else {
+	                        callback(error.response, null);
+	                        return reject(error.response);
+	                    }
+	                }
+	                else {
+	                    callback(error, null);
+	                    return reject(error);
+	                }
+	            });
+	        });
+	    };
 	    return LocalAuthConnection;
 	}(GenericConnection));
 	exports.LocalAuthConnection = LocalAuthConnection;
@@ -64653,6 +64687,7 @@ var GCLLib =
 	var CORE_ATR_LIST = '/admin/atr';
 	var CORE_PUB_KEY = '/admin/certificate';
 	var CORE_CONTAINERS = '/admin/containers';
+	var CORE_LOGFILE = '/admin/log';
 	var AdminService = (function () {
 	    function AdminService(url, connection) {
 	        this.url = url;
@@ -64672,6 +64707,12 @@ var GCLLib =
 	    AdminService.prototype.atr = function (atrList, callback) {
 	        return this.post(this.url, CORE_ATR_LIST, atrList, callback);
 	    };
+	    AdminService.prototype.getLogfile = function (name, callback) {
+	        return this.getLogFile(this.url, CORE_LOGFILE + '/' + name, callback);
+	    };
+	    AdminService.prototype.getLogfileList = function (callback) {
+	        return this.get(this.url, CORE_LOGFILE, callback);
+	    };
 	    AdminService.prototype.getPubKey = function (callback) {
 	        return this.get(this.url, CORE_PUB_KEY, callback);
 	    };
@@ -64689,6 +64730,24 @@ var GCLLib =
 	            }, function (err) {
 	                AdminService.errorHandler(err).then(function () {
 	                    self.connection.get(url, suffix, undefined).then(function (retryResult) {
+	                        resolve(ResponseHandler_1.ResponseHandler.response(retryResult, callback));
+	                    }, function (retryError) {
+	                        resolve(ResponseHandler_1.ResponseHandler.error(retryError, callback));
+	                    });
+	                }, function (retryError) {
+	                    resolve(ResponseHandler_1.ResponseHandler.error(retryError, callback));
+	                });
+	            });
+	        });
+	    };
+	    AdminService.prototype.getLogFile = function (url, suffix, callback) {
+	        var self = this;
+	        return new Promise(function (resolve, reject) {
+	            self.connection.requestLogFile(url, suffix).then(function (result) {
+	                resolve(ResponseHandler_1.ResponseHandler.response(result, callback));
+	            }, function (err) {
+	                AdminService.errorHandler(err).then(function () {
+	                    self.connection.requestLogFile(url, suffix).then(function (retryResult) {
 	                        resolve(ResponseHandler_1.ResponseHandler.response(retryResult, callback));
 	                    }, function (retryError) {
 	                        resolve(ResponseHandler_1.ResponseHandler.error(retryError, callback));

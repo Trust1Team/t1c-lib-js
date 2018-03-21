@@ -244,6 +244,38 @@ class LocalAuthConnection extends GenericConnection implements Connection {
         return this.handleRequest(basePath, suffix, 'GET', this.cfg, securityConfig,
             undefined, queryParams, headers, callback);
     }
+
+    public requestLogFile(basePath: string, suffix: string, callback?: RequestCallback): Promise<any> {
+        // init callback if necessary
+        if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
+
+        return new Promise((resolve, reject) => {
+            let headers: RequestHeaders = {};
+            headers.Authorization = 'Bearer ' + this.cfg.gclJwt;
+            if (this.cfg.tokenCompatible && this.getSecurityConfig().sendToken) {
+                headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
+            }
+            axios.get(UrlUtil.create(basePath, suffix, this.cfg, false), {
+                responseType: 'blob', headers
+            }).then(response => {
+                callback(null, response);
+                return resolve(response);
+            }, error => {
+                if (error.response) {
+                    if (error.response.data) {
+                        callback(error.response.data, null);
+                        return reject(error.response.data);
+                    } else {
+                        callback(error.response, null);
+                        return reject(error.response);
+                    }
+                } else {
+                    callback(error, null);
+                    return reject(error);
+                }
+            });
+        });
+    }
 }
 
 class LocalConnection extends GenericConnection implements Connection {
