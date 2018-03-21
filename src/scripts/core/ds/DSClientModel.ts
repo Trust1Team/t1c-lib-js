@@ -7,7 +7,8 @@ import { BrowserInfo, T1CContainer, T1CResponse } from '../service/CoreModel';
 import { RestException } from '../exceptions/CoreExceptions';
 
 export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse,
-    DeviceResponse, DSPlatformInfo, DSDownloadRequest, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem, DSContainer, DSStorage };
+    DeviceResponse, DSPlatformInfo, DSDownloadRequest, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem,
+    DSClientInfo, DSContainer, DSStorage };
 
 
 interface AbstractDSClient {
@@ -33,6 +34,10 @@ class DSOperatingSystem {
     constructor(public architecture: number, public name: string, public version: string) {}
 }
 
+class DSClientInfo {
+    constructor(public type: string, public version: string) {}
+}
+
 class DSDownloadRequest {
     constructor(public browser: DSBrowser,
                 public manufacturer: string,
@@ -52,6 +57,7 @@ class DSRegistrationOrSyncRequest {
                 public os: DSOperatingSystem,
                 public ua: string,
                 public proxyDomain: string,
+                public clientInfo: DSClientInfo,
                 public containerStates?: T1CContainer[]) {}
 }
 

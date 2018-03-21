@@ -4,7 +4,7 @@
  */
 import { GCLConfig } from '../core/GCLConfig';
 import {
-    DeviceResponse, DSContainer, DSPlatformInfo, DSRegistrationOrSyncRequest,
+    DeviceResponse, DSClientInfo, DSContainer, DSPlatformInfo, DSRegistrationOrSyncRequest,
     JWTResponse
 } from '../core/ds/DSClientModel';
 import { DSClient } from '../core/ds/DSClient';
@@ -111,6 +111,7 @@ class SyncUtil {
             info.os,
             info.ua,
             client.config().gwUrl,
+            new DSClientInfo('JAVASCRIPT', '%%GULP_INJECT_VERSION%%'),
             containers)
         );
     }
