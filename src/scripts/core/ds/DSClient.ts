@@ -61,7 +61,6 @@ class DSClient implements AbstractDSClient {
                     if (callback) { return callback(err, null); }
                     else { reject(err); }
                 } else {
-                    console.log(data);
                     let returnObject = { url: data.link + QP_APIKEY + self.cfg.apiKey, success: true };
                     if (callback) { return callback(null, returnObject); }
                     else { return resolve(returnObject); }

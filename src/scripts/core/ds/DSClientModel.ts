@@ -43,7 +43,7 @@ class DSDownloadRequest {
                 public manufacturer: string,
                 public os: DSOperatingSystem,
                 public ua: string,
-                proxyDomain: string) {}
+                public proxyDomain: string) {}
 }
 
 class DSRegistrationOrSyncRequest {

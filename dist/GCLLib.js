@@ -38450,6 +38450,7 @@ var GCLLib =
 	        this.manufacturer = manufacturer;
 	        this.os = os;
 	        this.ua = ua;
+	        this.proxyDomain = proxyDomain;
 	    }
 	    return DSDownloadRequest;
 	}());
@@ -38813,7 +38814,6 @@ var GCLLib =
 	                    }
 	                }
 	                else {
-	                    console.log(data);
 	                    var returnObject = { url: data.link + QP_APIKEY + self.cfg.apiKey, success: true };
 	                    if (callback) {
 	                        return callback(null, returnObject);
@@ -64869,7 +64869,7 @@ var GCLLib =
 	                    }
 	                }, function () {
 	                    client.GCLInstalled = false;
-	                    resolve();
+	                    reject(new CoreExceptions_1.RestException(400, '302', 'No installed GCL component found. Please download and install the GCL.', client));
 	                });
 	            });
 	            initPromise.then(function () {

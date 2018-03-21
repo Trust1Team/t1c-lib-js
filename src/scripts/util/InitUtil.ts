@@ -81,8 +81,9 @@ class InitUtil {
                 }, () => {
                     // failure probably because GCL is not installed
                     client.GCLInstalled = false;
-                    // resolve with client as-is to allow download
-                    resolve();
+                    // return the client in the error so a new version can be downloaded!
+                    reject(new RestException(400, '302',
+                        'No installed GCL component found. Please download and install the GCL.', client));
                 });
             });
             initPromise.then(() => {
