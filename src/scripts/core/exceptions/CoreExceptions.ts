@@ -1,12 +1,14 @@
 /**
  * @author Michallis Pashidis
+ * @author Maarten Somers
  */
-interface RestException {
-    description: string;
-    status: number;
-    code: string;
+import { GCLClient } from '../GCLLib';
+import { ObjectUtil } from '../../util/ObjectUtil';
+
+class RestException {
+    constructor(public status: number, public code: string, public description: string, public client?: GCLClient) {
+        ObjectUtil.removeNullAndUndefinedFields(this);
+    }
 }
 
-interface DataException {}
-
-export { RestException, DataException };
+export { RestException };

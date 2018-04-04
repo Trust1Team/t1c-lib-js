@@ -5,69 +5,118 @@
  * @since 2016
  */
 
-import * as _ from 'lodash';
+import { ModuleConfig } from '../plugins/smartcards/pkcs11/pkcs11Model';
+import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import * as jwtDecode from 'jwt-decode';
+import * as moment from 'moment';
+import { RestException } from './exceptions/CoreExceptions';
 
-const defaultGclUrl = 'https://localhost:10443/v1';
-const defaultDSUrl = 'https://accapim.t1t.be:443';
-const defaultDSContextPath = '/trust1team/gclds/v1';
-const defaultOCVContextPath = '/trust1team/ocv-api/v1';
-const defaultDSContextPathTestMode = '/gcl-ds-web/v1';
-const fileDownloadUrlPostfix = '/trust1team/gclds-file/v1';
-const defaultAllowAutoUpdate = true;
-const defaultImplicitDownload = false;
-const defaultLocalTestMode = false;
+export { GCLConfig, GCLConfigOptions };
+
+const defaults = {
+    gclUrl: 'https://localhost:10443/v2',
+    gwUrl: 'https://accapim.t1t.be:443',
+    dsContextPath: '/trust1team/gclds/v2',
+    ocvContextPath: '/trust1team/ocv-api/v1',
+    dsContextPathTestMode: '/gcl-ds-web/v2',
+    dsFileContextPath: '/trust1team/gclds-file/v1',
+    tokenExchangeContextPath: '/apiengineauth/v1',
+    implicitDownload: false,
+    localTestMode: false,
+    forceHardwarePinpad: false,
+    sessionTimeout: 5,
+    consentDuration: 1,
+    consentTimeout: 10,
+    syncManaged: true,
+    osPinDialog: false,
+    containerDownloadTimeout: 30
+};
+
+class GCLConfigOptions {
+    constructor(public gclUrl?: string,
+                public gwOrProxyUrl?: string,
+                public apiKey?: string,
+                public gwJwt?: string,
+                public ocvContextPath?: string,
+                public dsContextPath?: string,
+                public dsFileContextPath?: string,
+                public pkcs11Config?: ModuleConfig,
+                public agentPort?: number,
+                public implicitDownload?: boolean,
+                public forceHardwarePinpad?: boolean,
+                public sessionTimeout?: number,
+                public consentDuration?: number,
+                public consentTimeout?: number,
+                public syncManaged?: boolean,
+                public osPinDialog?: boolean,
+                public containerDownloadTimeout?: number,
+                public localTestMode?: boolean) {}
+}
 
 class GCLConfig  implements GCLConfig {
     // singleton pattern
     private static instance: GCLConfig;
-    private _dsUrlBase: string;
-    private _ocvUrl: string;
+    private _gwUrl: string;
     private _gclUrl: string;
-    private _dsFileDownloadUrl: string;
-    private _dsUrl: string;
+    private _dsContextPath: string;
+    private _dsFileContextPath: string;
+    private _ocvContextPath: string;
     private _apiKey: string;
-    private _client_id: string;
-    private _client_secret: string;
-    private _jwt: string;
+    private _gwJwt: string;
+    private _gclJwt: string;
     private _citrix: boolean;
     private _agentPort: number;
-    private _allowAutoUpdate: boolean;
     private _implicitDownload: boolean;
     private _localTestMode: boolean;
     private _forceHardwarePinpad: boolean;
     private _defaultSessionTimeout: number;
     private _tokenCompatible: boolean;
+    private _v2Compatible: boolean;
     private _defaultConsentDuration: number;
     private _defaultConsentTimeout: number;
     private _syncManaged: boolean;
+    private _pkcs11Config: ModuleConfig;
+    private _osPinDialog: boolean;
+    private _containerDownloadTimeout: number;
+    private _contextToken: string;
 
     // constructor for DTO
-    constructor (dsUriValue?: string, apiKey?: string) {
-        this._gclUrl = defaultGclUrl;
-        this._dsUrl = dsUriValue + defaultDSContextPath;
-        this._ocvUrl = dsUriValue + defaultOCVContextPath;
-        this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
-        this._dsUrlBase = dsUriValue;
-        this._apiKey = apiKey;
-        this._jwt = 'none';
+    constructor(options: GCLConfigOptions) {
+        this._gclUrl = options.gclUrl || defaults.gclUrl;
+        this._gwUrl = options.gwOrProxyUrl || defaults.gwUrl;
+        this._dsContextPath = options.dsContextPath || defaults.dsContextPath;
+        this._dsFileContextPath = options.dsFileContextPath || defaults.dsFileContextPath;
+        this._ocvContextPath = options.ocvContextPath || defaults.ocvContextPath;
+        this._apiKey = options.apiKey;
+        this._gwJwt = options.gwJwt;
         this._citrix = false;
-        this._agentPort = -1;
-        this._allowAutoUpdate = defaultAllowAutoUpdate;
-        this._implicitDownload = defaultImplicitDownload;
-        this._localTestMode = defaultLocalTestMode;
-        this._forceHardwarePinpad = false;
-        this._defaultSessionTimeout = 5;
-        this._defaultConsentDuration = 1;
-        this._defaultConsentTimeout = 10;
-        this._syncManaged = true;
+        this._agentPort = options.agentPort || -1;
+        this._implicitDownload = options.implicitDownload || defaults.implicitDownload;
+        this._localTestMode = options.localTestMode || defaults.localTestMode;
+        this._forceHardwarePinpad = options.forceHardwarePinpad || defaults.forceHardwarePinpad;
+        this._defaultSessionTimeout = options.sessionTimeout || defaults.sessionTimeout;
+        this._defaultConsentDuration = options.consentDuration || defaults.consentDuration;
+        this._defaultConsentTimeout = options.consentTimeout || defaults.consentTimeout;
+        this._syncManaged = options.syncManaged || defaults.syncManaged;
+        this._pkcs11Config = options.pkcs11Config;
+        this._osPinDialog = options.osPinDialog || defaults.osPinDialog;
+        this._containerDownloadTimeout = options.containerDownloadTimeout || defaults.containerDownloadTimeout;
+    }
+
+    get authUrl(): string {
+        return this.gwUrl + defaults.tokenExchangeContextPath;
     }
 
     get ocvUrl(): string {
-        return this._ocvUrl;
+        return this.gwUrl + this.ocvContextPath;
     }
 
-    set ocvUrl(value: string) {
-        this._ocvUrl = value;
+    get ocvContextPath(): string {
+        return this._ocvContextPath;
+    }
+
+    set ocvContextPath(value: string) {
+        this._ocvContextPath = value;
     }
 
     get gclUrl(): string {
@@ -75,25 +124,28 @@ class GCLConfig  implements GCLConfig {
     }
 
     set gclUrl(value: string) {
-        this._gclUrl = value || defaultGclUrl;
+        this._gclUrl = value || defaults.gclUrl;
     }
 
     get dsUrl(): string {
-        return this._dsUrl;
+        if (this._localTestMode) { return this.gwUrl + defaults.dsContextPathTestMode; }
+        else { return this.gwUrl + this.dsContextPath; }
     }
 
-    set dsUrl(dsUriValue: string) {
-        if (_.endsWith(dsUriValue, defaultDSContextPath)) {
-            this._dsUrlBase = _.replace(dsUriValue, defaultDSContextPath, '');
-            this._dsUrl = dsUriValue;
-            this._dsFileDownloadUrl = this._dsUrlBase + fileDownloadUrlPostfix;
-            this._ocvUrl = this._dsUrlBase + defaultOCVContextPath;
-        } else {
-            this._dsUrl = dsUriValue + defaultDSContextPath;
-            this._dsFileDownloadUrl = dsUriValue + fileDownloadUrlPostfix;
-            this._dsUrlBase = dsUriValue;
-            this._ocvUrl = dsUriValue + defaultOCVContextPath;
-        }
+    get dsContextPath(): string {
+        return this._dsContextPath;
+    }
+
+    set dsContextPath(value: string) {
+        this._dsContextPath = value;
+    }
+
+    get dsFileContextPath(): string {
+        return this._dsFileContextPath;
+    }
+
+    set dsFileContextPath(value: string) {
+        this._dsFileContextPath = value;
     }
 
     get apiKey(): string {
@@ -102,38 +154,6 @@ class GCLConfig  implements GCLConfig {
 
     set apiKey(value: string) {
         this._apiKey = value;
-    }
-
-    get allowAutoUpdate(): boolean {
-        return this._allowAutoUpdate;
-    }
-
-    set allowAutoUpdate(value: boolean) {
-        this._allowAutoUpdate = value;
-    }
-
-    get client_id(): string {
-        return this._client_id;
-    }
-
-    set client_id(value: string) {
-        this._client_id = value;
-    }
-
-    get client_secret(): string {
-        return this._client_secret;
-    }
-
-    set client_secret(value: string) {
-        this._client_secret = value;
-    }
-
-    get jwt(): string {
-        return this._jwt;
-    }
-
-    set jwt(value: string) {
-        this._jwt = value;
     }
 
     get citrix(): boolean {
@@ -161,11 +181,15 @@ class GCLConfig  implements GCLConfig {
     }
 
     get dsFileDownloadUrl(): string {
-        return this._dsFileDownloadUrl;
+        return this.gwUrl + this.dsFileContextPath;
     }
 
-    get dsUrlBase() {
-        return this._dsUrlBase;
+    get gwUrl() {
+        return this._gwUrl;
+    }
+
+    set gwUrl(value: string) {
+        this._gwUrl = value;
     }
 
     get localTestMode(): boolean {
@@ -174,7 +198,6 @@ class GCLConfig  implements GCLConfig {
 
     set localTestMode(value: boolean) {
         this._localTestMode = value;
-        if (this._localTestMode) { this._dsUrl = this._dsUrlBase + defaultDSContextPathTestMode; }
     }
 
     get forceHardwarePinpad(): boolean {
@@ -201,6 +224,14 @@ class GCLConfig  implements GCLConfig {
         this._tokenCompatible = value;
     }
 
+    get v2Compatible(): boolean {
+        return this._v2Compatible;
+    }
+
+    set v2Compatible(value: boolean) {
+        this._v2Compatible = value;
+    }
+
     get defaultConsentDuration(): number {
         return this._defaultConsentDuration;
     }
@@ -224,6 +255,89 @@ class GCLConfig  implements GCLConfig {
     set syncManaged(value: boolean) {
         this._syncManaged = value;
     }
-}
 
-export { GCLConfig };
+    get pkcs11Config(): ModuleConfig {
+        return this._pkcs11Config;
+    }
+
+    set pkcs11Config(value: ModuleConfig) {
+        this._pkcs11Config = value;
+    }
+
+    get osPinDialog(): boolean {
+        return this._osPinDialog;
+    }
+
+    set osPinDialog(value: boolean) {
+        this._osPinDialog = value;
+    }
+
+    get containerDownloadTimeout(): number {
+        return this._containerDownloadTimeout;
+    }
+
+    set containerDownloadTimeout(value: number) {
+        this._containerDownloadTimeout = value;
+    }
+
+    get gwJwt(): Promise<string> {
+        let self = this;
+        return new Promise<string>((resolve, reject) => {
+            if (!self._gwJwt || !self._gwJwt.length) {
+                // no jwt available, get one from the GW if we have an API key
+                resolve(self.getGwJwt());
+            } else {
+                let decoded = jwtDecode(self._gwJwt);
+                // check JWT expired
+                if (decoded.exp < moment(new Date()).format('X')) {
+                    // refresh if we have an API key
+                    resolve(self.getGwJwt());
+                } else {
+                    // jwt ok to use
+                    resolve(self._gwJwt);
+                }
+            }
+        });
+    }
+
+    get contextToken(): string {
+        return this._contextToken;
+    }
+
+    set contextToken(value: string) {
+        this._contextToken = value;
+    }
+
+    get gclJwt(): string {
+        return this._gclJwt;
+    }
+
+    set gclJwt(value: string) {
+        this._gclJwt = value;
+    }
+
+    getGwJwt(): Promise<string> {
+        if (this.apiKey && this.apiKey.length) {
+            let config: AxiosRequestConfig = {
+                url: this.authUrl + '/login/application/token',
+                method: 'GET',
+                headers: { apikey: this.apiKey },
+                responseType:  'json'
+            };
+            return new Promise((resolve, reject) => {
+                axios.request(config).then((response: AxiosResponse) => {
+                    this._gwJwt = response.data.token;
+                    resolve(response.data.token);
+                }, err => {
+                    reject(err);
+                });
+            });
+        } else {
+            if (this._gwJwt && this._gwJwt.length) {
+                return Promise.reject(new RestException(412, '205', 'JWT expired'));
+            } else {
+                return Promise.reject(new RestException(412, '901', 'No JWT or API key found in configuration'));
+            }
+        }
+    }
+}

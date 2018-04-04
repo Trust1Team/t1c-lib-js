@@ -5,10 +5,9 @@
 import { Connection } from '../client/Connection';
 import { GCLConfig } from '../GCLConfig';
 import * as CoreExceptions from '../exceptions/CoreExceptions';
-import * as _ from 'lodash';
-import { BrowserInfo } from '../service/CoreModel';
-import { AbstractDSClient, DeviceResponse, DownloadLinkResponse,
-    DSInfoResponse, DSPlatformInfo, DSPubKeyResponse, JWTResponse } from './DSClientModel';
+import {
+    AbstractDSClient, DeviceResponse, DownloadLinkResponse, DSDownloadRequest,
+    DSInfoResponse, DSPubKeyResponse, DSRegistrationOrSyncRequest } from './DSClientModel';
 
 export { DSClient };
 
@@ -17,8 +16,6 @@ const SEPARATOR = '/';
 const QP_APIKEY = '?apikey=';
 const SECURITY = '/security';
 const SYS_INFO = '/system/status';
-const SECURITY_JWT_ISSUE = SECURITY + '/jwt/issue';
-const SECURITY_JWT_REFRESH = SECURITY + '/jwt/refresh';
 const DOWNLOAD = '/download/gcl';
 const PUB_KEY = SECURITY + '/keys/public';
 const DEVICE = '/devices';
@@ -30,56 +27,20 @@ class DSClient implements AbstractDSClient {
     public getUrl() { return this.url; }
 
     public getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse> {
-        return this.connection.get(this.url, SYS_INFO, undefined, callback);
+        return this.connection.get(this.url, SYS_INFO, undefined, undefined, callback);
     }
 
     public getDevice(uuid: string,
                      callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse> {
-        return this.connection.get(this.url, DEVICE + SEPARATOR + uuid, undefined, callback);
+        return this.connection.get(this.url, DEVICE + SEPARATOR + uuid, undefined, undefined, callback);
     }
 
-    public getJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse> {
-        let self = this;
-
-        if (callback) {
-            doGetJwt();
-        } else {
-            // promise
-            return new Promise<JWTResponse>((resolve, reject) => {
-                doGetJwt(resolve, reject);
-            });
-        }
-
-        function doGetJwt(resolve?: (data: any) => void, reject?: (data: any) => void) {
-            self.connection.get(self.url, SECURITY_JWT_ISSUE, undefined, function (error, data) {
-                if (error) {
-                    if (callback) { return callback(error, null); }
-                    else { reject(error); }
-                } else {
-                    if (data && data.token) { self.cfg.jwt = data.token; }
-                    if (callback) { return callback(null, data); }
-                    else { resolve(data); }
-                }
-            });
-        }
+    public getPubKey(uuid: string,
+                     callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse> {
+        return this.connection.get(this.url, PUB_KEY + SEPARATOR + uuid, undefined, undefined, callback);
     }
 
-    public refreshJWT(callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse> {
-        let actualJWT = this.cfg.jwt;
-        if (actualJWT) {
-            return this.connection.post(this.url, SECURITY_JWT_REFRESH, { originalJWT: actualJWT }, undefined, callback);
-        } else {
-            let error = { code: '500', description: 'No JWT available', status: 412 };
-            if (callback) { callback(error, null); }
-            else { return Promise.reject(error); }
-        }
-    }
-
-    public getPubKey(callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse> {
-        return this.connection.get(this.url, PUB_KEY, undefined, callback);
-    }
-
-    public downloadLink(infoBrowser: BrowserInfo,
+    public downloadLink(downloadData: DSDownloadRequest,
                         callback?: (error: CoreExceptions.RestException,
                                     data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse> {
         let self = this;
@@ -92,12 +53,12 @@ class DSClient implements AbstractDSClient {
             });
         }
         function doGetDownloadLink(resolve?: (data: any) => void, reject?: (data: any) => void) {
-            self.connection.post(self.url, DOWNLOAD, infoBrowser, undefined, function (err, data) {
+            self.connection.post(self.url, DOWNLOAD, downloadData, undefined, undefined, function (err, data) {
                 if (err) {
                     if (callback) { return callback(err, null); }
                     else { reject(err); }
                 } else {
-                    let returnObject = { url: self.cfg.dsUrlBase + data.path + QP_APIKEY + self.cfg.apiKey, success: true };
+                    let returnObject = { url: data.link + QP_APIKEY + self.cfg.apiKey, success: true };
                     if (callback) { return callback(null, returnObject); }
                     else { return resolve(returnObject); }
                 }
@@ -105,16 +66,14 @@ class DSClient implements AbstractDSClient {
         }
     }
 
-    public register(info: DSPlatformInfo, device_id: string,
-                    callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse> {
-        let req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, 'core_version'));
-        return this.connection.put(this.url, DEVICE + SEPARATOR + device_id, req, undefined, callback);
+    public register(registrationData: DSRegistrationOrSyncRequest,
+                    callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse> {
+        return this.connection.put(this.url, DEVICE + SEPARATOR + registrationData.uuid, registrationData, undefined, undefined, callback);
     }
 
-    public sync(info: DSPlatformInfo, device_id: string,
-                callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse> {
-        let req = _.merge({ uuid: device_id, version: info.core_version }, _.omit(info, 'core_version'));
-        return this.connection.post(this.url, DEVICE + SEPARATOR + device_id, req, undefined, callback);
+    public sync(syncData: DSRegistrationOrSyncRequest,
+                callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse> {
+        return this.connection.post(this.url, DEVICE + SEPARATOR + syncData.uuid, syncData, undefined, undefined, callback);
     }
 
 }

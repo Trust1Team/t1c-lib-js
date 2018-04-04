@@ -3,7 +3,7 @@
  * @since 2017
  */
 
-import * as CoreExceptions from "../exceptions/CoreExceptions";
+import * as CoreExceptions from '../exceptions/CoreExceptions';
 
 export { AbstractOCVClient, CertificateAndOrder, CertificateChainData, CertificateChainResponse,
     ChallengeResponse, ChallengeSignedHashResponse, ChallengeSignedHashData,
@@ -25,63 +25,50 @@ interface AbstractOCVClient {
     getInfo(callback?: (error: CoreExceptions.RestException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse>;
 }
 
-interface CertificateChainData {
-    certificateChain: CertificateAndOrder[]
+class ChallengeSignedHashData {
+    constructor(public base64Signature: string, public base64Certificate: string, public hash: string, public digestAlgorithm: string) {}
 }
 
-interface CertificateChainResponse {
-    crlResponse: {
-        crlLocations: string[]
-        issuerCertificate: string
-        productionDate: string
-        signatureAlgorithm: string
-        status: boolean
-        version: string
+class SignatureValidationData {
+    constructor(public rawData: string, public certificate: string, public signature: string) {}
+}
+
+class CertificateChainData {
+    constructor(public certificateChain: CertificateAndOrder[]) {}
+}
+
+class CertificateChainResponse {
+    constructor(public crlResponse: { crlLocations: string[],
+                    issuerCertificate: string,
+                    productionData: string,
+                    signatureAlgorithm: string,
+                    status: boolean,
+                    version: string },
+                public ocspResponse: { ocspLocation: string, status: boolean }) {}
+}
+
+class CertificateAndOrder {
+    constructor(public certificate: string, public order: number) {}
+}
+
+class ChallengeResponse {
+    constructor(public hash: string, public digestAlgorithm: string) {}
+}
+
+class ChallengeSignedHashResponse extends ChallengeResponse {
+    constructor(public result: boolean, public hash: string, public digestAlgorithm: string) {
+        super(hash, digestAlgorithm);
     }
-    ocspResponse: {
-        ocspLocation: string
-        status: boolean
-    }
 }
 
-interface CertificateAndOrder {
-    certificate: string
-    order: number
+class SignatureValidationResponse {
+    constructor(public rawData: string,
+                public signature: string,
+                public digest: string,
+                public signatureAlgorithm: string,
+                result: string) {}
 }
 
-interface ChallengeResponse {
-    hash: string
-    digestAlgorithm: string
-}
-
-interface ChallengeSignedHashResponse extends ChallengeResponse {
-    result: boolean
-}
-
-interface ChallengeSignedHashData {
-    base64Signature: string
-    base64Certificate: string
-    hash: string
-    digestAlgorithm: string
-}
-
-interface SignatureValidationData {
-    rawData: string
-    signature: string
-    certificate: string
-}
-
-interface SignatureValidationResponse {
-    rawData: string
-    signature: string
-    digest: string
-    signatureAlgorithm: string
-    result: string
-}
-
-interface OCVInfoResponse {
-    configFile: string
-    build: string
-    version: string
-    environemnt: string
+class OCVInfoResponse {
+    constructor(public configFile: string, public build: string, public version: string, public environemnt: string) {}
 }

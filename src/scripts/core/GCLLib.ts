@@ -5,19 +5,17 @@
  * @since 2016
  */
 import * as CoreExceptions from './exceptions/CoreExceptions';
-import * as _ from 'lodash';
-import * as semver from 'semver';
 
 import { GCLConfig } from './GCLConfig';
 import { CoreService } from './service/CoreService';
-import { LocalConnection, RemoteConnection, LocalAuthConnection, LocalTestConnection } from './client/Connection';
 import {
-    AbstractDSClient, DownloadLinkResponse, DSPlatformInfo,
-    JWTResponse
-} from './ds/DSClientModel';
+    LocalConnection, RemoteJwtConnection, LocalAuthConnection, LocalTestConnection,
+    RemoteApiKeyConnection
+} from './client/Connection';
+import { DownloadLinkResponse, DSDownloadRequest } from './ds/DSClientModel';
 import { DSClient } from './ds/DSClient';
 import { AbstractOCVClient, OCVClient } from './ocv/OCVClient';
-import { CardReadersResponse, DataResponse, InfoResponse } from './service/CoreModel';
+import { CardReadersResponse, DataResponse } from './service/CoreModel';
 import { AbstractEidBE } from '../plugins/smartcards/eid/be/EidBeModel';
 import { AbstractEMV } from '../plugins/smartcards/emv/EMVModel';
 import { AbstractOcra } from '../plugins/smartcards/ocra/ocraModel';
@@ -29,7 +27,6 @@ import { AbstractMobib } from '../plugins/smartcards/mobib/mobibModel';
 import { AbstractEidLUX } from '../plugins/smartcards/eid/lux/EidLuxModel';
 import { AbstractDNIe } from '../plugins/smartcards/eid/esp/dnieModel';
 import { PluginFactory } from '../plugins/PluginFactory';
-import { AbstractSafeNet } from '../plugins/smartcards/pkcs11/safenet/safenetModel';
 import { AuthenticateOrSignData, OptionalPin } from '../plugins/smartcards/Card';
 import { RestException } from './exceptions/CoreExceptions';
 import { GenericService } from './generic/GenericService';
@@ -40,6 +37,12 @@ import { AbstractBelfius } from '../plugins/remote-loading/belfius/BelfiusModel'
 import { AgentClient } from './agent/agent';
 import { AbstractAgent } from './agent/agentModel';
 import { AbstractFileExchange } from '../plugins/file/FileExchangeModel';
+import { AdminService } from './admin/admin';
+import { InitUtil } from '../util/InitUtil';
+import { AbstractPkcs11 } from '../plugins/smartcards/pkcs11/pkcs11Model';
+import { ClientService } from '../util/ClientService';
+import { AuthClient } from './auth/Auth';
+import moment = require('moment');
 import { Polyfills } from '../util/Polyfills';
 
 // check if any polyfills are needed
@@ -50,30 +53,37 @@ class GCLClient {
     public GCLInstalled: boolean;
     private cfg: GCLConfig;
     private pluginFactory: PluginFactory;
+    private adminService: AdminService;
     private coreService: CoreService;
     private connection: LocalConnection;
     private authConnection: LocalAuthConnection;
-    private remoteConnection: RemoteConnection;
+    private remoteConnection: RemoteJwtConnection;
+    private remoteApiKeyConnection: RemoteApiKeyConnection;
     private localTestConnection: LocalTestConnection;
     private agentClient: AgentClient;
     private dsClient: DSClient;
     private ocvClient: OCVClient;
+    private authClient: AuthClient;
 
     constructor(cfg: GCLConfig, automatic: boolean) {
-        let self = this;
         // resolve config to singleton
-        this.cfg = GCLClient.resolveConfig(cfg);
+        this.cfg = cfg;
         // init communication
         this.connection = new LocalConnection(this.cfg);
         this.authConnection = new LocalAuthConnection(this.cfg);
-        this.remoteConnection = new RemoteConnection(this.cfg);
+        this.remoteConnection = new RemoteJwtConnection(this.cfg);
+        this.remoteApiKeyConnection = new RemoteApiKeyConnection(this.cfg);
         this.localTestConnection = new LocalTestConnection(this.cfg);
         this.pluginFactory = new PluginFactory(this.cfg.gclUrl, this.connection);
+        this.adminService = new AdminService(this.cfg.gclUrl, this.authConnection);
         this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
         this.agentClient = new AgentClient(this.cfg.gclUrl, this.connection);
         if (this.cfg.localTestMode) { this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg); }
         else { this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg); }
-        this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteConnection);
+        this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteApiKeyConnection);
+        this.authClient = new AuthClient(this.cfg, this.remoteApiKeyConnection);
+        // keep reference to client in ClientService
+        ClientService.setClient(this);
 
         // check if implicit download has been set
         if (this.cfg.implicitDownload && true) { this.implicitDownload(); }
@@ -81,23 +91,26 @@ class GCLClient {
 
         if (!automatic) {
             // setup security - fail safe
-            this.initLibrary();
+            GCLClient.initLibrary();
         }
-
-        // verify OCV accessibility
-        // this.initOCVContext();
     }
 
     public static initialize(cfg: GCLConfig,
                              callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): Promise<GCLClient> {
         return new Promise((resolve, reject) => {
+            const initTime = moment();
             let client = new GCLClient(cfg, true);
+            // keep reference to client in ClientService
+            ClientService.setClient(client);
 
             // will be set to false if init fails
             client.GCLInstalled = true;
 
-            client.initLibrary().then(() => {
+            GCLClient.initLibrary().then(() => {
                 if (callback && typeof callback === 'function') { callback(null, client); }
+                const completionTime = moment();
+                const duration = moment.duration(completionTime.diff(initTime));
+                console.log('init completed in ' + duration.asMilliseconds() + ' ms');
                 resolve(client);
             }, error => {
                 if (callback && typeof callback === 'function') { callback(error, null); }
@@ -106,33 +119,17 @@ class GCLClient {
         });
     }
 
-    private static checkTokenCompatible(version: string): boolean {
-        // sanitize version string
-        let sanitized = _.split(version, '-')[0];
-        return semver.satisfies(sanitized, '>=1.4.0');
+    /**
+     * Init security context
+     */
+    private static initLibrary(): Promise<GCLClient> {
+        return InitUtil.initializeLibrary(ClientService.getClient());
     }
 
-    private static resolveConfig(cfg: GCLConfig) {
-        // must be the base url because the GCLConfig object adds the context path and keeps the base url intact
-        let resolvedCfg: GCLConfig = new GCLConfig(cfg.dsUrlBase, cfg.apiKey);
-        resolvedCfg.allowAutoUpdate = cfg.allowAutoUpdate;
-        resolvedCfg.client_id = cfg.client_id;
-        resolvedCfg.client_secret = cfg.client_secret;
-        resolvedCfg.jwt = cfg.jwt;
-        resolvedCfg.gclUrl = cfg.gclUrl;
-        resolvedCfg.ocvUrl = cfg.ocvUrl;
-        resolvedCfg.implicitDownload = cfg.implicitDownload;
-        resolvedCfg.localTestMode = cfg.localTestMode;
-        resolvedCfg.forceHardwarePinpad = cfg.forceHardwarePinpad;
-        resolvedCfg.defaultSessionTimeout = cfg.defaultSessionTimeout;
-        resolvedCfg.defaultConsentDuration = cfg.defaultConsentDuration;
-        resolvedCfg.defaultConsentTimeout = cfg.defaultConsentTimeout;
-        resolvedCfg.citrix = cfg.citrix;
-        resolvedCfg.agentPort = cfg.agentPort;
-        resolvedCfg.syncManaged = cfg.syncManaged;
-        return resolvedCfg;
-    }
-
+    // get admin services
+    public admin = (): AdminService => { return this.adminService; };
+    // get auth service
+    public auth = (): AuthClient => { return this.authClient; };
     // get core services
     public core = (): CoreService => { return this.coreService; };
     // get core config
@@ -140,9 +137,11 @@ class GCLClient {
     // get agent client services
     public agent = (): AbstractAgent => { return this.agentClient; };
     // get ds client services
-    public ds = (): AbstractDSClient => { return this.dsClient; };
+    public ds = (): DSClient => { return this.dsClient; };
     // get ocv client services
     public ocv = (): AbstractOCVClient => { return this.ocvClient; };
+    // get plugin factory
+    public pf = (): PluginFactory => { return this.pluginFactory; };
     // get instance for belgian eID card
     public beid = (reader_id?: string): AbstractEidBE => { return this.pluginFactory.createEidBE(reader_id); };
     // get instance for spanish DNIe card
@@ -166,13 +165,15 @@ class GCLClient {
     // get instance for PT Eid
     public pteid = (reader_id?: string): AbstractEidPT => { return this.pluginFactory.createEidPT(reader_id); };
     // get instance for PKCS11
-    public safenet = (reader_id: string, moduleConfig: { linux: string, mac: string, win: string }): AbstractSafeNet => {
-        return this.pluginFactory.createSafeNet(moduleConfig); };
+    public pkcs11 = (): AbstractPkcs11 => {
+        return this.pluginFactory.createPKCS11();
+    }
     // get instance for Remote Loading
     public readerapi = (reader_id: string): AbstractRemoteLoading => { return this.pluginFactory.createRemoteLoading(reader_id); };
     // get instance for Belfius
     public belfius = (reader_id: string): AbstractBelfius => { return this.pluginFactory.createBelfius(reader_id); };
     // get instance for File Exchange
+    // created for POC only, disabled
     // public fileExchange = (): AbstractFileExchange => { return this.pluginFactory.createFileExchange(); };
 
     // generic methods
@@ -182,7 +183,9 @@ class GCLClient {
 
     public download(callback?: (error: RestException, data: DownloadLinkResponse) => void) {
         return this.core().infoBrowser().then(info => {
-            return this.ds().downloadLink(info.data, callback);
+            let downloadData = new DSDownloadRequest(info.data.browser, info.data.manufacturer,
+                info.data.os, info.data.ua, this.config().gwUrl);
+            return this.ds().downloadLink(downloadData, callback);
         }, error => {
             return ResponseHandler.error(error, callback);
         });
@@ -214,100 +217,11 @@ class GCLClient {
     }
 
     /**
-     * Init OCV - verify if OCV is available
+     * Utility methods
      */
-    private initOCVContext(cb?: (error: any) => any) {
-        return this.ocvClient.getInfo(cb);
-    }
-
-    /**
-     * Init security context
-     */
-    private initLibrary(): Promise<{}> {
-        let self = this;
-        let self_cfg = this.cfg;
-
-        return new Promise((resolve, reject) => {
-            self.core().info().then(infoResponse => {
-                self_cfg.citrix = infoResponse.data.citrix;
-                self_cfg.tokenCompatible = GCLClient.checkTokenCompatible(infoResponse.data.version);
-                let activated = infoResponse.data.activated;
-                let managed = infoResponse.data.managed;
-                let core_version = infoResponse.data.version;
-                let uuid = infoResponse.data.uid;
-                // compose info
-                let info = self.core().infoBrowserSync();
-                let mergedInfo = _.merge({ managed, core_version, activated }, info.data);
-
-                if (managed) {
-                    // only attempt to sync if API key and DS URL are available,
-                    // and if syncing for managed devices is turned on
-                    if (self_cfg.apiKey && self_cfg.dsUrlBase && self_cfg.syncManaged) {
-                        // attempt to sync
-                        self.syncDevice(self, self_cfg, mergedInfo, uuid).then(() => { resolve(); },
-                            () => { resolve(); });
-                    } else {
-                        // nothing to do here *jetpack*
-                        resolve();
-                    }
-                } else {
-                    // make sure pub key is set
-                    this.core().getPubKey().then(() => {
-                        // certificate loaded
-                        // console.log('certificate present, no need to retrieve from DS');
-                        resolve();
-                    }, err => {
-                        if (err && !err.success && err.code === 201) {
-                            // console.log('no certificate set - retrieve cert from DS');
-                            self.dsClient.getPubKey().then(dsResponse => {
-                                return self.core().setPubKey(dsResponse.pubkey).then(() => {
-                                    // activate and sync
-                                    if (!activated) {
-                                        // we need to register the device
-                                        // console.log('Register device:' + uuid);
-                                        return self.registerDevice(self, self_cfg, mergedInfo, uuid).then(() => {
-                                            return self.core().activate().then(() => {
-                                                // sync
-                                                mergedInfo.activated = true;
-                                                self.syncDevice(self, self_cfg, mergedInfo, uuid).then(() => { resolve(); });
-                                            });
-                                        });
-                                    } else {
-                                        // we need to synchronize the device
-                                        // console.log('Sync device:'+uuid);
-                                        return self.syncDevice(self, self_cfg, mergedInfo, uuid).then(() => { resolve(); });
-                                    }
-                                });
-                            }).catch(error => {
-                                reject(error);
-                                return;
-                            });
-                        }
-                    });
-                }
-            }, () => {
-                // failure probably because GCL is not installed
-                self.GCLInstalled = false;
-                // resolve with client as-is to allow download
-                resolve();
-            });
-        });
-    }
-
-    private registerDevice(client: GCLClient, config: GCLConfig, info: DSPlatformInfo, deviceId: string): Promise<JWTResponse> {
-        return client.dsClient.register(info, deviceId).then(activationResponse => {
-            config.jwt = activationResponse.token;
-            client.authConnection = new LocalAuthConnection(client.cfg);
-            client.coreService = new CoreService(client.cfg.gclUrl, client.authConnection);
-            return activationResponse;
-        });
-    }
-
-    private syncDevice(client: GCLClient, config: GCLConfig, info: DSPlatformInfo, deviceId: string): Promise<JWTResponse> {
-        return client.dsClient.sync(info, deviceId).then(activationResponse => {
-            config.jwt = activationResponse.token;
-            return activationResponse;
-        });
+    public updateAuthConnection(cfg: GCLConfig) {
+        this.authConnection = new LocalAuthConnection(cfg);
+        this.coreService = new CoreService(cfg.gclUrl, this.authConnection);
     }
 
     // implicit download GCL instance when not found
@@ -319,7 +233,9 @@ class GCLClient {
                 // no gcl available - start download
                 let _info = self.core().infoBrowserSync();
                 console.log('implicit error', JSON.stringify(_info));
-                self.ds().downloadLink(_info.data,
+                let downloadData = new DSDownloadRequest(_info.data.browser,
+                    _info.data.manufacturer, _info.data.os, _info.data.ua, self.config().gwUrl);
+                self.ds().downloadLink(downloadData,
                     function(linkError: CoreExceptions.RestException, downloadResponse: DownloadLinkResponse) {
                         if (linkError) { console.error('could not download GCL package:', linkError.description); }
                         window.open(downloadResponse.url); return;
