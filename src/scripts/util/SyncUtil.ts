@@ -2,19 +2,16 @@
  * @author Maarten Somers
  * @since 2018
  */
-import { GCLConfig } from '../core/GCLConfig';
 import {
     DeviceResponse, DSClientInfo, DSContainer, DSPlatformInfo, DSRegistrationOrSyncRequest,
     JWTResponse
 } from '../core/ds/DSClientModel';
-import { DSClient } from '../core/ds/DSClient';
 import { DataContainerUtil } from './DataContainerUtil';
 import * as _ from 'lodash';
 import { GCLClient } from '../core/GCLLib';
 import { RestException } from '../core/exceptions/CoreExceptions';
 import { T1CContainer } from '../core/service/CoreModel';
 import { ContainerSyncRequest } from '../core/admin/adminModel';
-import { error } from 'util';
 
 export { SyncUtil };
 
