@@ -11,15 +11,15 @@ import { GenericConnection, LocalConnection } from '../../../scripts/core/client
 import * as store from 'store2';
 
 describe('Connection', () => {
-    const gclConfig = new GCLConfig();
-    const tokenConfig = new GCLConfig();
+    const gclConfig = new GCLConfig({});
+    const tokenConfig = new GCLConfig({});
     tokenConfig.tokenCompatible = true;
     const connection: LocalConnection = new LocalConnection(gclConfig);
     const tokenConnection: LocalConnection = new LocalConnection(tokenConfig);
     let mock: MockAdapter;
 
     beforeEach(() => {
-        store.set(GenericConnection.BROWSER_AUTH_TOKEN, 'cj9sgjq9t00022y609276dfxp90');
+        store(GenericConnection.BROWSER_AUTH_TOKEN, 'cj9sgjq9t00022y609276dfxp90');
         mock = new MockAdapter(axios);
     });
 

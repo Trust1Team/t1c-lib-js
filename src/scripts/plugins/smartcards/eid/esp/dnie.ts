@@ -3,23 +3,23 @@
  * @author Maarten Somers
  * @since 2016
  */
-import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { CertificateResponse } from "../../../../core/service/CoreModel";
-import { GenericCertCard } from "../../Card";
-import { AbstractDNIe, InfoResponse } from "./dnieModel";
-import { Options, RequestHandler } from "../../../../util/RequestHandler";
-import { CertParser } from "../../../../util/CertParser";
-import { ResponseHandler } from "../../../../util/ResponseHandler";
+import { RestException } from '../../../../core/exceptions/CoreExceptions';
+import { CertificateResponse } from '../../../../core/service/CoreModel';
+import { GenericCertCard } from '../../Card';
+import { AbstractDNIe, InfoResponse } from './dnieModel';
+import { Options, RequestHandler } from '../../../../util/RequestHandler';
+import { CertParser } from '../../../../util/CertParser';
+import { ResponseHandler } from '../../../../util/ResponseHandler';
 
 export { DNIe };
 
 
 class DNIe extends GenericCertCard implements AbstractDNIe {
-    static INFO = "/info";
-    static CERT_INTERMEDIATE = "/intermediate";
+    static INFO = '/info';
+    static CERT_INTERMEDIATE = '/intermediate';
 
     public info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse> {
-        return this.connection.get(this.baseUrl, this.containerSuffix(DNIe.INFO), undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(DNIe.INFO), undefined, undefined, callback);
     }
 
     public intermediateCertificate(options?: Options,

@@ -5,24 +5,18 @@ import * as _ from 'lodash';
 
 export { RequestHandler, Options, RequestOptions };
 
-interface Options {
-    filters?: string[],
-    parseCerts?: boolean
+class Options {
+    constructor(public parseCerts: boolean, public filters?: string[]) {}
 }
 
-interface RequestOptions {
-    params?: {
-        [key: string]: string
-    },
-    parseCerts: boolean
-    callback?: () => void
+class RequestOptions {
+    constructor(public parseCerts: boolean, public params?: { [key: string]: string}, public callback?: () => void) {}
 }
 
 class RequestHandler {
     // maintains backward compatibility with the old request style
-
     public static determineOptions(firstParam: any, secondParam: any): RequestOptions {
-        let result: RequestOptions = { parseCerts: false };
+        let result = new RequestOptions(false);
         if (firstParam) {
             if (typeof firstParam === 'function') { result.callback = firstParam; }
             else {
@@ -37,7 +31,7 @@ class RequestHandler {
     }
 
     public static determineOptionsWithFilter(firstParam: string[] | Options): RequestOptions {
-        let result: RequestOptions = { parseCerts: false, params: {} };
+        let result = new RequestOptions(false, {});
         if (_.isArray(firstParam)) {
             // array of strings; assume parse boolean is false
             if (firstParam.length) { result.params.filter = firstParam.join(','); }

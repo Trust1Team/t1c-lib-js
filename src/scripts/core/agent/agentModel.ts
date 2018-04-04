@@ -6,7 +6,7 @@
 import * as CoreExceptions from "../exceptions/CoreExceptions";
 import { T1CResponse } from "../service/CoreModel";
 
-export { AbstractAgent, AgentResponse };
+export { AbstractAgent, AgentResponse, Agent };
 
 
 interface AbstractAgent {
@@ -18,8 +18,6 @@ interface AgentResponse extends T1CResponse {
     data: Agent[]
 }
 
-interface Agent {
-    port: number,
-    hostname: string
-    last_update: string
+class Agent {
+    constructor(public hostname: string, public port: number, public last_update: string) {}
 }
