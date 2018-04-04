@@ -5,7 +5,7 @@
 import * as _ from 'lodash';
 import * as asn1js from 'asn1js';
 import * as Base64 from 'Base64';
-import { Certificate } from 'pkijs';
+import Certificate from 'pkijs/build/Certificate';
 import { RestException } from '../core/exceptions/CoreExceptions';
 import { T1CCertificate, T1CResponse } from '../core/service/CoreModel';
 import { ResponseHandler } from './ResponseHandler';
@@ -23,13 +23,13 @@ class CertParser {
                 if (key.indexOf('certificate') > -1) {
                     if (typeof value === 'string') {
                         response.data[ key ] = { base64: value };
-                        if (parseCerts) { response.data[ key ].parsed = CertParser.processCert(value); }
+                        CertParser.setParsed(response.data[key], value, parseCerts);
                     }
                     if (_.isArray(value)) {
                         let newData = [];
                         _.forEach(value, (certificate: string) => {
-                            let cert: T1CCertificate = { base64: certificate };
-                            if (parseCerts) { cert.parsed = CertParser.processCert(certificate); }
+                            let cert: T1CCertificate = new T1CCertificate(certificate);
+                            CertParser.setParsed(cert, certificate, parseCerts);
                             newData.push(cert);
                         });
                         response.data[ key ] = newData;
@@ -42,20 +42,20 @@ class CertParser {
                 let newData = [];
                 _.forEach(response.data, (certificate: string | { base64: string, id: string }) => {
                     if (typeof certificate === 'string') {
-                        let cert: T1CCertificate = { base64: certificate };
-                        if (parseCerts) { cert.parsed = CertParser.processCert(certificate); }
+                        let cert: T1CCertificate = new T1CCertificate(certificate);
+                        CertParser.setParsed(cert, certificate, parseCerts);
                         newData.push(cert);
                     } else {
                         // assume object
-                        let cert: T1CCertificate = certificate;
-                        if (parseCerts) { cert.parsed = CertParser.processCert(certificate.base64); }
+                        let cert: T1CCertificate = new T1CCertificate(certificate.base64);
+                        CertParser.setParsed(cert, certificate.base64, parseCerts);
                         newData.push(cert);
                     }
                 });
                 response.data = newData;
             } else {
-                let cert: T1CCertificate = { base64: response.data };
-                if (parseCerts) { cert.parsed = CertParser.processCert(response.data); }
+                let cert: T1CCertificate = new T1CCertificate(response.data);
+                CertParser.setParsed(cert, response.data, parseCerts);
                 response.data = cert;
             }
         }
@@ -77,6 +77,11 @@ class CertParser {
         for (let i = 0, strLen = str.length; i < strLen; i++) { bufView[i] = str.charCodeAt(i); }
 
         return buf;
+    }
+
+    private static setParsed(cert: T1CCertificate, base64: string, parseCerts: boolean) {
+        if (parseCerts) { cert.parsed = CertParser.processCert(base64); }
+        else { delete cert.parsed; }
     }
 
 }

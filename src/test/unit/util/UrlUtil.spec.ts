@@ -13,7 +13,7 @@ describe("URL Utility", () => {
         let config: GCLConfig;
 
         beforeEach(() => {
-            config = new GCLConfig();
+            config = new GCLConfig({});
         });
 
         it("for a default environment", () => {

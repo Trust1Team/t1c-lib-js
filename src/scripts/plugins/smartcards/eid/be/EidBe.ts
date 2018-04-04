@@ -3,33 +3,34 @@
  * @author Maarten Somers
  * @since 2016
  */
-import { AbstractEidBE, AddressResponse, RnDataResponse } from "./EidBeModel";
-import { RestException } from "../../../../core/exceptions/CoreExceptions";
-import { CertificateResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
-import { GenericCertCard, OptionalPin, VerifyPinData } from "../../Card";
-import { PinEnforcer } from "../../../../util/PinEnforcer";
-import { Options, RequestHandler } from "../../../../util/RequestHandler";
+import { AbstractEidBE, AddressResponse, RnDataResponse } from './EidBeModel';
+import { RestException } from '../../../../core/exceptions/CoreExceptions';
+import { CertificateResponse, DataResponse, T1CResponse } from '../../../../core/service/CoreModel';
+import { GenericCertCard, OptionalPin, VerifyPinData } from '../../Card';
+import { PinEnforcer } from '../../../../util/PinEnforcer';
+import { Options, RequestHandler } from '../../../../util/RequestHandler';
+import * as _ from 'lodash';
 
 export { EidBe };
 
 
 class EidBe extends GenericCertCard implements AbstractEidBE {
-    static RN_DATA = "/rn";
-    static ADDRESS = "/address";
-    static PHOTO = "/picture";
-    static VERIFY_PRIV_KEY_REF = "non-repudiation";
+    static RN_DATA = '/rn';
+    static ADDRESS = '/address';
+    static PHOTO = '/picture';
+    static VERIFY_PRIV_KEY_REF = 'non-repudiation';
 
 
     public rnData(callback?: (error: RestException, data: RnDataResponse) => void): Promise<RnDataResponse> {
-        return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.RN_DATA), undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.RN_DATA), undefined, undefined, callback);
     }
 
     public address(callback?: (error: RestException, data: AddressResponse) => void): Promise<AddressResponse> {
-        return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.ADDRESS), undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.ADDRESS), undefined, undefined, callback);
     }
 
     public picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.PHOTO), undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.PHOTO), undefined, undefined, callback);
     }
 
     public rootCertificate(options: Options,
@@ -59,10 +60,10 @@ class EidBe extends GenericCertCard implements AbstractEidBE {
 
     public verifyPin(body: OptionalPin,
                      callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
-        let _req: VerifyPinData = { private_key_reference: EidBe.VERIFY_PRIV_KEY_REF };
-        if (body.pin) { _req.pin = body.pin; }
-        return PinEnforcer.check(this.connection, this.baseUrl, this.reader_id, body.pin).then(() => {
-            return this.connection.post(this.baseUrl, this.containerSuffix(GenericCertCard.VERIFY_PIN), _req, undefined, callback);
+        return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
+            let encryptedBody = _.extend({ private_key_reference: EidBe.VERIFY_PRIV_KEY_REF }, body);
+            return this.connection.post(this.baseUrl, this.containerSuffix(GenericCertCard.VERIFY_PIN),
+                encryptedBody, undefined, undefined, callback);
         });
     }
 }

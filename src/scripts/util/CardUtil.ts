@@ -3,6 +3,7 @@
  */
 import { Card } from '../core/service/CoreModel';
 import * as _ from 'lodash';
+import { Options } from './RequestHandler';
 
 export { CardUtil };
 
@@ -41,6 +42,7 @@ class CardUtil {
             case 'oberthur':
             case 'piv':
             case 'pteid':
+            case 'pkcs11':
                 return true;
             case 'ocra':
             case 'emv':
@@ -108,6 +110,7 @@ class CardUtil {
             case 'luxeid':
             case 'luxtrust':
             case 'pteid':
+            case 'pkcs11':
                 return 'sha256';
             default:
                 return undefined;
@@ -128,14 +131,14 @@ class CardUtil {
             case 'piv':
             case 'pteid':
                 return 'allData';
-            case 'safenet':
+            case 'pkcs11':
                 return 'slots';
             default:
                 return undefined;
         }
     }
 
-    public static dumpOptions(container: string) {
+    public static dumpOptions(container: string): Options {
         switch (container) {
             case 'aventra':
             case 'beid':
@@ -147,11 +150,11 @@ class CardUtil {
             case 'ocra':
             case 'piv':
             case 'pteid':
-                return { filters: [], parseCerts: true };
-            case 'safenet':
+                return new Options(true, []);
+            case 'pkcs11':
                 return undefined;
             case 'emv':
-                return [];
+                return new Options(false, []);
             default:
                 return undefined;
         }

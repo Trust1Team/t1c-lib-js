@@ -22,8 +22,6 @@ import { AbstractOberthur } from './smartcards/pki/oberthur/OberthurModel';
 import { AbstractPiv } from './smartcards/piv/pivModel';
 import { AbstractMobib } from './smartcards/mobib/mobibModel';
 import { AbstractEidLUX } from './smartcards/eid/lux/EidLuxModel';
-import { AbstractSafeNet } from './smartcards/pkcs11/safenet/safenetModel';
-import { SafeNet } from './smartcards/pkcs11/safenet/safenet';
 import { DNIe } from './smartcards/eid/esp/dnie';
 import { AbstractDNIe } from './smartcards/eid/esp/dnieModel';
 import { AbstractEidPT } from './smartcards/eid/pt/EidPtModel';
@@ -34,6 +32,10 @@ import { AbstractBelfius } from './remote-loading/belfius/BelfiusModel';
 import { Belfius } from './remote-loading/belfius/Belfius';
 import { AbstractFileExchange } from './file/FileExchangeModel';
 import { FileExchange } from './file/FileExchange';
+import { AbstractPkcs11, ModuleConfig } from './smartcards/pkcs11/pkcs11Model';
+import { PKCS11 } from './smartcards/pkcs11/pkcs11';
+import { AbstractDataContainer } from './data-container/DataContainerModel';
+import { DataContainer } from './data-container/DataContainer';
 
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
@@ -45,25 +47,25 @@ export interface AbstractFactory {
     createAventraNO(reader_id?: string): AbstractAventra;
     createOberthurNO(reader_id?: string): AbstractOberthur;
     createPIV(reader_id?: string): AbstractPiv;
-    createSafeNet(config?: { linux: string, mac: string, win: string }): AbstractSafeNet;
+    createPKCS11(): AbstractPkcs11;
 }
 
 const CONTAINER_CONTEXT_PATH = '/plugins/';
 const CONTAINER_NEW_CONTEXT_PATH = '/containers/';
-const CONTAINER_BEID = CONTAINER_CONTEXT_PATH + 'beid';
-const CONTAINER_LUXEID = CONTAINER_CONTEXT_PATH + 'luxeid';
-const CONTAINER_DNIE = CONTAINER_CONTEXT_PATH + 'dnie';
-const CONTAINER_EMV = CONTAINER_CONTEXT_PATH + 'emv';
-const CONTAINER_FILE_EXCHANGE = CONTAINER_CONTEXT_PATH + 'file';
-const CONTAINER_LUXTRUST = CONTAINER_CONTEXT_PATH + 'luxtrust';
-const CONTAINER_MOBIB = CONTAINER_CONTEXT_PATH + 'mobib';
-const CONTAINER_OCRA = CONTAINER_CONTEXT_PATH + 'ocra';
-const CONTAINER_AVENTRA = CONTAINER_CONTEXT_PATH + 'aventra';
-const CONTAINER_OBERTHUR = CONTAINER_CONTEXT_PATH + 'oberthur';
-const CONTAINER_PIV = CONTAINER_CONTEXT_PATH + 'piv';
-const CONTAINER_PTEID = CONTAINER_CONTEXT_PATH + 'pteid';
-const CONTAINER_SAFENET = CONTAINER_CONTEXT_PATH + 'safenet';
-const CONTAINER_REMOTE_LOADING = CONTAINER_CONTEXT_PATH + 'readerapi';
+const CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
+const CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
+const CONTAINER_DNIE = CONTAINER_NEW_CONTEXT_PATH + 'dnie';
+const CONTAINER_EMV = CONTAINER_NEW_CONTEXT_PATH + 'emv';
+const CONTAINER_FILE_EXCHANGE = CONTAINER_NEW_CONTEXT_PATH + 'file';
+const CONTAINER_LUXTRUST = CONTAINER_NEW_CONTEXT_PATH + 'luxtrust';
+const CONTAINER_MOBIB = CONTAINER_NEW_CONTEXT_PATH + 'mobib';
+const CONTAINER_OCRA = CONTAINER_NEW_CONTEXT_PATH + 'ocra';
+const CONTAINER_AVENTRA = CONTAINER_NEW_CONTEXT_PATH + 'aventra';
+const CONTAINER_OBERTHUR = CONTAINER_NEW_CONTEXT_PATH + 'oberthur';
+const CONTAINER_PIV = CONTAINER_NEW_CONTEXT_PATH + 'piv';
+const CONTAINER_PTEID = CONTAINER_NEW_CONTEXT_PATH + 'pteid';
+const CONTAINER_PKCS11 = CONTAINER_NEW_CONTEXT_PATH + 'pkcs11';
+const CONTAINER_REMOTE_LOADING = CONTAINER_NEW_CONTEXT_PATH + 'readerapi';
 
 
 export class PluginFactory implements AbstractFactory {
@@ -93,8 +95,8 @@ export class PluginFactory implements AbstractFactory {
 
     public createPIV(reader_id?: string): PIV { return new PIV(this.url, CONTAINER_PIV, this.connection, reader_id); }
 
-    public createSafeNet(config?: { linux: string, mac: string, win: string }): AbstractSafeNet {
-        return new SafeNet(this.url, CONTAINER_SAFENET, this.connection, config);
+    public createPKCS11(): AbstractPkcs11 {
+        return new PKCS11(this.url, CONTAINER_PKCS11, this.connection);
     }
 
     public createRemoteLoading(reader_id?: string): AbstractRemoteLoading {
@@ -105,7 +107,13 @@ export class PluginFactory implements AbstractFactory {
         return new Belfius(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id);
     }
 
-    // public createFileExchange(): AbstractFileExchange {
-    //     return new FileExchange(this.url, CONTAINER_FILE_EXCHANGE, this.connection);
-    // }
+    public createFileExchange(): AbstractFileExchange {
+        return new FileExchange(this.url, CONTAINER_FILE_EXCHANGE, this.connection);
+    }
+
+    public createDataContainer(containerPath: string): () => AbstractDataContainer {
+        return (): AbstractDataContainer => {
+            return new DataContainer(this.url, containerPath, this.connection, undefined);
+        };
+    }
 }
