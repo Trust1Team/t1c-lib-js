@@ -1,47 +1,47 @@
 (function ($) {
-    var gclConfig = new GCLLib.GCLConfig();
-    gclConfig.apiKey = "2cc27598-2af7-48af-a2df-c7352e5368ff"; //test apikey rate limited
-    gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
-    gclConfig.ocvUrl = "https://accapim.t1t.be:443/trust1team/ocv-api/v1";
-    //gclConfig.ocvUrl = "http://localhost:8080/ocv-api-web/v1";
-    gclConfig.localTestMode=false;
-    gclConfig.allowAutoUpdate = true;
-    gclConfig.implicitDownload = false;
+    var localTestMode = false;
 
-    if(gclConfig.localTestMode){
-        gclConfig.dsUrl = "http://localhost:8080";
-    }else {
-        gclConfig.dsUrl = "https://accapim.t1t.be:443";
-        //gclConfig.dsUrl = "https://accapim.t1t.be:443";
-        //gclConfig.dsUrl = "https://prodapim.t1t.be:443";
-        //gclConfig.dsUrl = "https://t1c.t1t.be:443";
+    var gclOptions = {
+        // gclUrl: "https://localhost:10443/v1"
+        // apiKey: "2cc27598-2af7-48af-a2df-c7352e5368ff", //test apikey rate limited
+        apiKey: "1c79d46d-72e3-43ed-8c66-d5ffca6fd98b", //test apikey rate limited
+        // gwJwt: "eyJhbGciOiJSUzI1NiIsIng1dSI6Imh0dHBzOi8vYWNjYXBpbS50MXQuYmUva2V5cy9wdWIiLCJ0eXAiOiJKV1QifQ.eyJpc1NlcnZpY2VBY2NvdW50Ijp0cnVlLCJzdWIiOiJpbnQtdHJ1c3QxdGVhbS50MWMtZHNkYXNoYm9hcmQudjEiLCJpc3MiOiJpbnQtdHJ1c3QxdGVhbS50MWMtZHNkYXNoYm9hcmQudjEiLCJleHAiOjE1MjAwMDgyMTcsIm5iZiI6MTUyMDAwMDg5N30.Qpq6EFeV2o94y6Ig2lNrKD1672Bndc5Uirk3iiP5-Wk3zkxBudMjNHV4NRL7yKX7btl0WWkSXGl-mlB0cJJ_4SPiV4gzeoYSmdUgpBCPmxkwOyuNf0pASQyakTYKxxHvqlI4Z9S8CxnabDtssU5_HQ5qPJepMq35qY-K95afkQijEmjMdbxr96vxRVUrPzkMpIjljr1fnDFpKvBbhOV_-egfiTFq3ZgVKO8px5_ETQEkMhDirNkkzcjaWBttYT_NnliRbN6XRiX-pK1DECS0I-ZigoVbmMYdpRZfrZIY9ABsI_p7o_YErNAqyQUuHv3gxXjaxtyor8ecVJedtrDwTQ",
+        gwOrProxyUrl: "https://accapim.t1t.be:443",
+        implicitDownload: false,
+        osPinDialog: true,
+        localTestMode: localTestMode
+    };
 
-    }
+    if (localTestMode) { gclOptions.gwOrProxyUrl = 'http://localhost:8080' }
 
-    var connector = new GCLLib.GCLClient(gclConfig);
+    var gclConfig = new GCLLib.GCLConfig(gclOptions);
 
-    connector.core().info(function(err,data) {
-        $("#error").empty();
-        $("#error").append(data.data.version);
-        if(data && data.data.activated==true){
-            //check card readers upon refresh and provide the info
-            var core = connector.core();
-            core.readers(function(err,data){
-                if(err) {
-                    console.log(JSON.stringify(err));
-                    return;
-                }
-                if(data && data.data){
-                    for(var i=0; i < data.data.length ; i ++){
-                        if(data.data[i].card){
-                            $("#readerlist").append( '<li id="liid"><a href="#" ><h5><span class="label label-success" >' + data.data[i].id + '</span></h5></a></li>' );
-                        }else{
-                            $("#readerlist").append( '<li><a href="#"><h5><span class="label label-warning">' + data.data[i].id + '</span></h5></a></li>' );
-                        }
+    var connector;
+    GCLLib.GCLClient.initialize(gclConfig).then(function(client) {
+        connector = client;
+        connector.core().info(function(err,data) {
+            $("#error").empty();
+            $("#error").append(data.data.version);
+            if(data && data.data.activated==true){
+                //check card readers upon refresh and provide the info
+                var core = connector.core();
+                core.readers(function(err,data){
+                    if(err) {
+                        console.log(JSON.stringify(err));
+                        return;
                     }
-                } else $("#readerlist").append( '<li> No readers connected </li>' );
-            });
-        }
+                    if(data && data.data){
+                        for(var i=0; i < data.data.length ; i ++){
+                            if(data.data[i].card){
+                                $("#readerlist").append( '<li id="liid"><a href="#" ><h5><span class="label label-success" >' + data.data[i].id + '</span></h5></a></li>' );
+                            }else{
+                                $("#readerlist").append( '<li><a href="#"><h5><span class="label label-warning">' + data.data[i].id + '</span></h5></a></li>' );
+                            }
+                        }
+                    } else $("#readerlist").append( '<li> No readers connected </li>' );
+                });
+            }
+        });
     });
 
     function callback(err,data) {
@@ -807,6 +807,7 @@
 
         // Verify PIN
         var body = { pin: pin };
+        var bodyCb = { pin: pin };
         promises.push(connector.beid(readerId).verifyPin(body).then(function(value) {
             return {
                 operation: 'Verify PIN (Promise)',
@@ -819,7 +820,7 @@
             }
         }));
         promises.push(new Promise(function(resolve, reject) {
-            connector.beid(readerId).verifyPin(body, function(error, data) {
+            connector.beid(readerId).verifyPin(bodyCb, function(error, data) {
                 if (error) reject( { operation: 'Verify PIN (Callback)', error: error });
                 else resolve({ operation: 'Verify PIN (Callback)',
                     result: data });
@@ -828,6 +829,11 @@
 
         // Sign Data
         var signBody = {
+            pin: pin,
+            algorithm_reference: "sha256",
+            data: "E1uHACbPvhLew0gGmBH83lvtKIAKxU2/RezfBOsT6Vs="
+        };
+        var signBodyCb = {
             pin: pin,
             algorithm_reference: "sha256",
             data: "E1uHACbPvhLew0gGmBH83lvtKIAKxU2/RezfBOsT6Vs="
@@ -844,7 +850,7 @@
             }
         }));
         promises.push(new Promise(function(resolve, reject) {
-            connector.beid(readerId).signData(signBody, function(error, data) {
+            connector.beid(readerId).signData(signBodyCb, function(error, data) {
                 if (error) reject( { operation: 'Sign Data (Callback)', error: error });
                 else resolve({ operation: 'Sign Data (Callback)',
                     result: data });
@@ -853,6 +859,11 @@
 
         // Authenticate
         var authBody = {
+            data: "I2e+u/sgy7fYgh+DWA0p2jzXQ7E=",
+            algorithm_reference: 'sha1',
+            pin: pin
+        };
+        var authBodyCb = {
             data: "I2e+u/sgy7fYgh+DWA0p2jzXQ7E=",
             algorithm_reference: 'sha1',
             pin: pin
@@ -870,7 +881,7 @@
             }
         }));
         promises.push(new Promise(function(resolve, reject) {
-            connector.beid(readerId).authenticate(authBody, function(error, data) {
+            connector.beid(readerId).authenticate(authBodyCb, function(error, data) {
                 if (error) reject( { operation: 'Authenticate (Callback)', error: error });
                 else resolve({ operation: 'Authenticate (Callback)',
                     result: data });

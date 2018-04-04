@@ -7,12 +7,11 @@ import * as CoreExceptions from '../exceptions/CoreExceptions';
 
 export { AbstractCore, T1CResponse, BoolDataResponse, DataResponse, DataArrayResponse, DataObjectResponse,
     InfoResponse, BrowserInfo, BrowserInfoResponse, Card, CardReader, CardReadersResponse, T1CCertificate,
-    CertificateResponse, CertificatesResponse, SingleReaderResponse, PluginsResponse, PubKeyResponse };
+    CertificateResponse, CertificatesResponse, SingleReaderResponse, T1CContainer, T1CInfo };
 
 
 interface AbstractCore {
     // async
-    activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     getConsent(title: string,
                codeWord: string,
                durationInDays?: number,
@@ -21,33 +20,29 @@ interface AbstractCore {
                type?: string,
                timeoutInSeconds?: number,
                callback?: (error: CoreExceptions.RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>
-    getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     info(callback?: (error: CoreExceptions.RestException, data: InfoResponse) => void): void | Promise<InfoResponse>;
     infoBrowser(callback?: (error: CoreExceptions.RestException, data: BrowserInfoResponse) => void): Promise<BrowserInfoResponse>;
-    plugins(callback?: (error: CoreExceptions.RestException, data: PluginsResponse) => void): Promise<PluginsResponse>;
     pollCardInserted(secondsToPollCard?: number,
                      callback?: (error: CoreExceptions.RestException, data: CardReader) => void,
                      connectReader?: () => void,
                      insertCard?: () => void,
-                     cardTimeout?: () => void): void | Promise<CardReader>;
+                     cardTimeout?: () => void): Promise<CardReader>;
     pollReadersWithCards(secondsToPollCard?: number,
                          callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void,
                          connectReader?: () => void,
                          insertCard?: () => void,
-                         cardTimeout?: () => void): void | Promise<CardReadersResponse>;
+                         cardTimeout?: () => void): Promise<CardReadersResponse>;
     pollReaders(secondsToPollReader?: number,
                 callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void,
                 connectReader?: () => void,
-                readerTimeout?: () => void): void | Promise<CardReadersResponse>;
+                readerTimeout?: () => void): Promise<CardReadersResponse>;
     reader(reader_id: string,
-           callback?: (error: CoreExceptions.RestException, data: SingleReaderResponse) => void): void | Promise<SingleReaderResponse>;
-    readers(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void): void | Promise<CardReadersResponse>;
+           callback?: (error: CoreExceptions.RestException, data: SingleReaderResponse) => void): Promise<SingleReaderResponse>;
+    readers(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
     readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse)
-        => void): void | Promise<CardReadersResponse>;
+        => void): Promise<CardReadersResponse>;
     readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse)
-        => void): void | Promise<CardReadersResponse>;
-    setPubKey(pubkey: string,
-              callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): void | Promise<PubKeyResponse>;
+        => void): Promise<CardReadersResponse>;
 
     // sync
     getUrl(): string;
@@ -57,101 +52,100 @@ interface AbstractCore {
     version(): Promise<string>;
 }
 
-interface T1CResponse {
-    data?: {}
-    success: boolean
+class T1CResponse {
+    constructor(public success: boolean, public data?: any) {}
 }
 
-interface BoolDataResponse extends T1CResponse {
-    data: boolean
-}
-
-interface DataResponse extends T1CResponse {
-    data: string
-}
-
-interface DataArrayResponse extends T1CResponse {
-    data: string[]
-}
-
-
-interface DataObjectResponse extends T1CResponse {
-    data: {
-        [key: string]: any
+class BoolDataResponse extends T1CResponse {
+    constructor(public data: boolean, public success: boolean) {
+        super(success, data);
     }
 }
 
-interface InfoResponse extends T1CResponse {
-    data: {
-        activated: boolean
-        citrix: boolean
-        managed: boolean
-        arch: string
-        os: string
-        uid: string
-        version: string
+class DataResponse extends T1CResponse {
+    constructor(public data: string, public success: boolean) {
+        super(success, data);
     }
 }
 
-interface BrowserInfoResponse extends T1CResponse {
-    data: BrowserInfo
-}
-
-interface BrowserInfo {
-    manufacturer: string
-    browser: {
-        name: string
-        version: string
+class DataArrayResponse extends T1CResponse {
+    constructor(public data: string[], public success: boolean) {
+        super(success, data);
     }
-    os: {
-        name: string
-        version: string
-        architecture: number
+}
+
+
+class DataObjectResponse extends T1CResponse {
+    constructor(public data: { [key: string]: any }, public success: boolean) {
+        super(success, data);
     }
-    ua: string
 }
 
-interface Card {
-    atr: string,
-    description: string[]
+class InfoResponse extends T1CResponse {
+    constructor(public data: T1CInfo, public success: boolean) {
+        super(success, data);
+    }
 }
 
-interface CardReader {
-    card?: Card
-    id: string
-    name: string
-    pinpad: boolean
+class T1CInfo {
+    constructor(public activated: boolean,
+                public citrix: boolean,
+                public managed: boolean,
+                public arch: string,
+                public os: string,
+                public uid: string,
+                public containers: T1CContainer[],
+                public version: string) {}
 }
 
-interface CardReadersResponse extends T1CResponse {
-    data: CardReader[]
+class T1CContainer {
+    constructor(public name: string, public version: string, public status: string) {}
+}
+class BrowserInfoResponse extends T1CResponse {
+    constructor(public data: BrowserInfo, public success: boolean) {
+        super(success, data);
+    }
 }
 
-interface CertificateResponse extends T1CResponse {
-    data: T1CCertificate
+class BrowserInfo {
+    constructor(public browser: { name: string, version: string },
+                public manufacturer: string,
+                public os: { name: string, version: string, architecture: number },
+                public ua: string) {}
 }
 
-interface CertificatesResponse extends T1CResponse {
-    data: T1CCertificate[]
+class Card {
+    constructor(public atr: string, public description: string[]) {}
 }
 
-interface T1CCertificate {
-    base64: string,
-    parsed?: object
+class CardReader {
+    constructor(public id: string, public name: string, public pinpad: boolean, public card?: Card) {}
 }
 
-interface SingleReaderResponse extends T1CResponse {
-    data: CardReader
+class CardReadersResponse extends T1CResponse {
+    constructor(public data: CardReader[], public success: boolean) {
+        super(success, data);
+    }
 }
 
-interface PluginsResponse extends T1CResponse {
-    data: [{
-        id: string
-        name: string
-        version: string
-    }]
+class CertificateResponse extends T1CResponse {
+    constructor(public data: T1CCertificate, public success: boolean) {
+        super(success, data);
+    }
 }
 
-interface PubKeyResponse extends T1CResponse {
-    data: string
+class CertificatesResponse extends T1CResponse {
+    constructor(public data: T1CCertificate[], public success: boolean) {
+        super(success, data);
+    }
+}
+
+class T1CCertificate {
+    constructor(public base64: string, public parsed?: object) {}
+}
+
+class SingleReaderResponse extends T1CResponse {
+    constructor(public data: CardReader, public success: boolean) {
+        super(success, data);
+    }
 }

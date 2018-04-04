@@ -2,11 +2,16 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from "../../../core/exceptions/CoreExceptions";
-import { GenericSecuredCertCard, OptionalPin } from "../Card";
-import { CertificateResponse, DataObjectResponse } from "../../../core/service/CoreModel";
+import { RestException } from '../../../core/exceptions/CoreExceptions';
+import { GenericSecuredCertCard, OptionalPin } from '../Card';
+import {
+    CertificateResponse, DataObjectResponse,
+    T1CCertificate
+} from '../../../core/service/CoreModel';
+import { Options } from '../../../util/RequestHandler';
 
-export { AbstractPiv, AllCertsResponse, AllDataResponse, PrintedInformation, PrintedInformationResponse, FacialImage, FacialImageResponse };
+export { AbstractPiv, AllCertsResponse, AllDataResponse, PrintedInformation,
+    PrintedInformationResponse, FacialImage, FacialImageResponse, AllPivCerts, AllPivData };
 
 
 interface AbstractPiv extends GenericSecuredCertCard {
@@ -28,46 +33,59 @@ interface AbstractPiv extends GenericSecuredCertCard {
              callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
 
     authenticationCertificate(body: OptionalPin,
+                              options?: Options,
                               callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
     signingCertificate(body: OptionalPin,
+                       options?: Options,
                        callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
 
-interface AllDataResponse extends AllCertsResponse {
-    data: {
-        printed_information: PrintedInformation
-        authentication_certificate: string
-        signing_certificate: string
-        facial_image: FacialImage
+class PrintedInformationResponse extends DataObjectResponse {
+    constructor(public data: PrintedInformation, public success: boolean) {
+        super(data, success);
     }
 }
 
-interface PrintedInformationResponse extends DataObjectResponse {
-    data: PrintedInformation
+class PrintedInformation {
+    constructor(public name: string,
+                public employee_affiliation: string,
+                public expiration_date: string,
+                public agency_card_serial_number,
+                public issuer_identification: string,
+                public organization_affiliation_line_1: string,
+                public organization_affiliation_line_2: string) {}
 }
 
-interface PrintedInformation {
-    name: string
-    employee_affiliation: string
-    expiration_date: string
-    agency_card_serial_number: string
-    issuer_identification: string
-    organization_affiliation_line_1: string
-    organization_affiliation_line_2: string
-}
-
-interface FacialImageResponse extends DataObjectResponse {
-    data: FacialImage
-}
-
-interface FacialImage {
-    image: string
-}
-
-interface AllCertsResponse extends DataObjectResponse {
-    data: {
-        authentication_certificate: string
-        signing_certificate: string
+class FacialImageResponse extends DataObjectResponse {
+    constructor(public data: FacialImage, public success: boolean) {
+        super(data, success);
     }
+}
+
+class FacialImage {
+    constructor(public image: string) {}
+}
+
+class AllCertsResponse extends DataObjectResponse {
+    constructor(public data: AllPivCerts, public success: boolean) {
+        super(data, success);
+    }
+}
+
+class AllPivCerts {
+    constructor(public authentication_certificate: T1CCertificate, public signing_certificate: T1CCertificate) {}
+}
+
+class AllDataResponse extends AllCertsResponse {
+    constructor(public data: AllPivData, public success: boolean) {
+        super(data, success);
+    }
+}
+
+class AllPivData {
+    constructor(public printed_information: PrintedInformation,
+                public authentication_certificate: T1CCertificate,
+                public signing_certificate: T1CCertificate,
+                public facial_image: FacialImage) {}
 }

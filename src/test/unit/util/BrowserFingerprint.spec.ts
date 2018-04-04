@@ -7,7 +7,6 @@ import { expect } from 'chai';
 import { BrowserFingerprint } from '../../../scripts/util/BrowserFingerprint';
 import * as store from 'store2';
 
-
 describe('Browser Fingerprint Utility', () => {
 
     describe('can set and retrieve browser fingerprint token', function () {

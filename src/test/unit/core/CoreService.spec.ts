@@ -11,10 +11,9 @@ import { GCLConfig } from '../../../scripts/core/GCLConfig';
 import { LocalConnection } from '../../../scripts/core/client/Connection';
 
 describe('Core Services', () => {
-    let gclConfig = new GCLConfig();
+    let gclConfig = new GCLConfig({});
     const connection: LocalConnection = new LocalConnection(gclConfig);
-    let gclConfigModified = new GCLConfig();
-    gclConfigModified.defaultConsentDuration = 5;
+    let gclConfigModified = new GCLConfig({ consentDuration: 5});
     const connectionModified: LocalConnection = new LocalConnection(gclConfigModified);
     let core = new CoreService('', connection);
     let coreModified = new CoreService('', connectionModified);
@@ -26,26 +25,6 @@ describe('Core Services', () => {
 
     afterEach(() => {
         mock.restore();
-    });
-
-    describe('activate', () => {
-        beforeEach(function () {
-            mock.onPost('admin/activate').reply(() => {
-                return [ 200, { data: 'Activation Data', success: true }];
-            });
-        });
-
-        it('makes the correct call to activate', () => {
-            return core.activate().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
-
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Activation Data');
-            });
-        });
     });
 
     describe('getConsent', () => {
@@ -167,26 +146,6 @@ describe('Core Services', () => {
         });
     });
 
-    describe('getPubKey', () => {
-        beforeEach(function () {
-            mock.onGet('admin/certificate').reply(() => {
-                return [ 200, { data: 'Get Pub Key Data', success: true }];
-            });
-        });
-
-        it('makes the correct call to get pub key', () => {
-            return core.getPubKey().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
-
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Get Pub Key Data');
-            });
-        });
-    });
-
     describe('info', () => {
         beforeEach(function () {
             mock.onGet('/').reply(() => {
@@ -203,26 +162,6 @@ describe('Core Services', () => {
                 expect(res).to.have.property('data');
                 expect(res.data).to.be.a('string');
                 expect(res.data).to.eq('Info Data');
-            });
-        });
-    });
-
-    describe('plugins', () => {
-        beforeEach(function () {
-            mock.onGet('/plugins').reply(() => {
-                return [ 200, { data: 'Plugins Data', success: true }];
-            });
-        });
-
-        it('makes the correct call to get plugins', () => {
-            return core.plugins().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
-
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Plugins Data');
             });
         });
     });
@@ -293,26 +232,6 @@ describe('Core Services', () => {
                 expect(res).to.have.property('data');
                 expect(res.data).to.be.a('string');
                 expect(res.data).to.eq('Readers Data No Card Inserted');
-            });
-        });
-    });
-
-    describe('setPubKey', () => {
-        beforeEach(function () {
-            mock.onPut('/admin/certificate', { certificate: 'pubkey' }).reply(() => {
-                return [ 200, { data: 'Set Pub Key Data', success: true }];
-            });
-        });
-
-        it('makes the correct call to set pub key', () => {
-            return core.setPubKey('pubkey').then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
-
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Set Pub Key Data');
             });
         });
     });

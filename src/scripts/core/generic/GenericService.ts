@@ -12,20 +12,24 @@ import * as _ from 'lodash';
 import { CardUtil } from '../../util/CardUtil';
 import { Aventra } from '../../plugins/smartcards/pki/aventra/Aventra';
 import { Options } from '../../util/RequestHandler';
+import { ModuleConfig } from '../../plugins/smartcards/pkcs11/pkcs11Model';
+import { SyncUtil } from '../../util/SyncUtil';
 
 export { GenericService };
 
-interface Arguments {
-    client: GCLClient,
-    readerId: string,
-    container: string,
-    data: OptionalPin,
-    dumpMethod?: string
-    dumpOptions?: Options
+class Arguments {
+    constructor(public client: GCLClient,
+                public readerId: string,
+                public container: string,
+                public data: OptionalPin,
+                public dumpMethod?: string,
+                public dumpOptions?: Options,
+                public reader?: CardReader) {}
 }
 
 
 class GenericService {
+    static PKCS11_FLAGS = [ 1, 3, 5, 7];
 
     public static containerForReader(client: GCLClient,
                                      readerId: string,
@@ -108,6 +112,23 @@ class GenericService {
                    .catch(err => { return ResponseHandler.error(err, callback); });
     }
 
+    public static checkPKCS11(client: GCLClient) {
+        return new Promise((resolve, reject) => {
+            // try a PKCS11 call, if success, it's PKCS11 :)
+            client.pkcs11().slotsWithTokenPresent().then(slots => {
+                if (slots && slots.data && slots.data.length) {
+                    // check if valid token present
+                    let validToken = _.find(slots.data, slot => {
+                        return _.includes(this.PKCS11_FLAGS, slot.flags);
+                    });
+                    resolve(!!validToken);
+                } else { resolve(false); }
+            }, err => {
+                reject(err);
+            });
+        });
+    }
+
     private static checkCanAuthenticate(data: CardReadersResponse) {
         return new Promise((resolve) => {
             data.data = _.filter(data.data, reader => { return CardUtil.canAuthenticate(reader.card); });
@@ -130,11 +151,11 @@ class GenericService {
     }
 
     private static filterByAvailableContainers(args: { client: GCLClient, readers: CardReadersResponse }): Promise<CardReadersResponse> {
-        return args.client.core().plugins().then(plugins => {
-            return new Promise<CardReadersResponse>((resolve) => {
+        return args.client.core().info().then(info => {
+            return new Promise((resolve) => {
                 args.readers.data = _.filter(args.readers.data, reader => {
                     // TODO optimize
-                    return _.find(plugins.data, ct => { return ct.id === CardUtil.determineContainer(reader.card); });
+                    return _.find(info.data.containers, ct => { return ct.name === CardUtil.determineContainer(reader.card); });
                 });
                 resolve(args.readers);
             });
@@ -145,11 +166,12 @@ class GenericService {
         return client.core().readersCardAvailable()
                      .then(readers => { return { readerId, readers }; })
                      .then(this.checkReaderPresent)
+                     .then(reader => { return { reader, client }; })
                      .then(this.determineContainerForCard)
                      .then(container => { return { client, container }; })
                      .then(this.checkContainerAvailable)
                      .then((args: { client: GCLClient, container: string }) => {
-                         return { client: args.client, readerId, container: args.container, data };
+                         return new Arguments(args.client, readerId, args.container, data);
                      });
     }
 
@@ -168,8 +190,8 @@ class GenericService {
     private static checkContainerAvailable(args: { client: GCLClient, container: string }) {
         return new Promise((resolve, reject) => {
             if (args && args.container) {
-                args.client.core().plugins().then(res => {
-                    if (_.find(res.data, ct => { return ct.id === args.container; })) {
+                args.client.core().info().then(res => {
+                    if (_.find(res.data.containers, ct => { return ct.name === args.container && ct.status === SyncUtil.INSTALLED; })) {
                         resolve(args);
                     } else {
                         reject('Container for this card is not available');
@@ -189,10 +211,17 @@ class GenericService {
         });
     }
 
-    private static determineContainerForCard(reader: CardReader) {
+    private static determineContainerForCard(args: { reader: CardReader, client: GCLClient }) {
         return new Promise((resolve, reject) => {
-            if (reader && reader.card) {
-                resolve(CardUtil.determineContainer(reader.card));
+            if (args.reader && args.reader.card) {
+                let container = CardUtil.determineContainer(args.reader.card);
+                if (!container) {
+                    GenericService.checkPKCS11(args.client).then(pkcs11 => {
+                        pkcs11 ? resolve('pkcs11') : resolve(undefined);
+                    }, () => {
+                        resolve(undefined);
+                    });
+                } else { resolve(container); }
             } else { reject('No card present in reader'); }
         });
     }

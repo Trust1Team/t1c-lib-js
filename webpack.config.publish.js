@@ -2,7 +2,7 @@ var webpack = require("webpack"),
     path = require("path");
 
 var libraryName = 'GCLLib',
-    plugins = [ new webpack.optimize.UglifyJsPlugin({
+    plugins = [ new DtsBundlePlugin(), new webpack.optimize.UglifyJsPlugin({
         minimize: true,
         compress: {
             drop_console: true,
@@ -43,6 +43,21 @@ var config = {
         emitErrors: true,
         failOnHint: true
     }
+};
+
+function DtsBundlePlugin(){}
+DtsBundlePlugin.prototype.apply = function (compiler) {
+    compiler.plugin('done', function(){
+        var dts = require('dts-bundle');
+
+        dts.bundle({
+            name: libraryName,
+            main: 'src/scripts/core/GCLLib.d.ts',
+            out: path.resolve(__dirname, "dist") + '/GCLLib.d.ts',
+            removeSource: true,
+            outputAsModuleFolder: true // to use npm in-package typings
+        });
+    });
 };
 
 module.exports = config;

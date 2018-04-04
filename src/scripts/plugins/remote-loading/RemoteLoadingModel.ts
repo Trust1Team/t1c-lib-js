@@ -24,25 +24,22 @@ interface AbstractRemoteLoading {
     openSession(timeout?: number, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
 }
 
-interface APDU {
-    cla: string
-    ins: string
-    p1: string
-    p2: string
-    data?: string
-    le?: string
+class APDU {
+    constructor(public cla: string, public ins: string, public p1: string, public p2: string, public data?: string, public le?: string) {}
 }
 
-interface CommandResponse extends T1CResponse {
-    data: Command
+class CommandResponse extends T1CResponse {
+    constructor(public data: Command, public success: boolean) {
+        super(success, data);
+    }
 }
 
-interface CommandsResponse extends T1CResponse {
-    data: Command[]
+class CommandsResponse extends T1CResponse {
+    constructor(public data: Command[], public success: boolean) {
+        super(success, data);
+    }
 }
 
-interface Command {
-    tx: string
-    rx?: string
-    sw: string
+class Command {
+    constructor(public sw: string, public tx: string, public rx?: string) {}
 }
