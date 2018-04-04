@@ -119,16 +119,16 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 
 ## v2.0.0
 ### Story
-    * [[T1C-455](https://trust1t.atlassian.net/browse/T1C-455)] - Add the API to download plugins
-    * [[T1C-561](https://trust1t.atlassian.net/browse/T1C-561)] - Whitelist CORS - T1C-JS init
-    * [[T1C-686](https://trust1t.atlassian.net/browse/T1C-686)] - T1C-JS lib v2 --> container syncing
-    * [[T1C-731](https://trust1t.atlassian.net/browse/T1C-731)] - All context paths should be configurable via GCLConfig
-    * [[T1C-881](https://trust1t.atlassian.net/browse/T1C-881)] - JS-Lib: Add support to retrieve the GCL certificates
-    * [[T1C-933](https://trust1t.atlassian.net/browse/T1C-933)] - Have T1C-JS check that the installed version of T1C is compatible with the lib on initialization
-    * [[T1C-1009](https://trust1t.atlassian.net/browse/T1C-1009)] - T1C-JS encrypts PIN codes passed via library
-    * [[T1C-1014](https://trust1t.atlassian.net/browse/T1C-1014)] - Data Container support
-    * [[T1C-1017](https://trust1t.atlassian.net/browse/T1C-1017)] - Config setting for OS PIN dialog in T1C-JS
-    * [[T1C-1024](https://trust1t.atlassian.net/browse/T1C-1024)] - Exchange API key for JWT for connections that communicate over GW
+* [[T1C-455](https://trust1t.atlassian.net/browse/T1C-455)] - Add the API to download plugins
+* [[T1C-561](https://trust1t.atlassian.net/browse/T1C-561)] - Whitelist CORS - T1C-JS init
+* [[T1C-686](https://trust1t.atlassian.net/browse/T1C-686)] - T1C-JS lib v2 --> container syncing
+* [[T1C-731](https://trust1t.atlassian.net/browse/T1C-731)] - All context paths should be configurable via GCLConfig
+* [[T1C-881](https://trust1t.atlassian.net/browse/T1C-881)] - JS-Lib: Add support to retrieve the GCL certificates
+* [[T1C-933](https://trust1t.atlassian.net/browse/T1C-933)] - Have T1C-JS check that the installed version of T1C is compatible with the lib on initialization
+* [[T1C-1009](https://trust1t.atlassian.net/browse/T1C-1009)] - T1C-JS encrypts PIN codes passed via library
+* [[T1C-1014](https://trust1t.atlassian.net/browse/T1C-1014)] - Data Container support
+* [[T1C-1017](https://trust1t.atlassian.net/browse/T1C-1017)] - Config setting for OS PIN dialog in T1C-JS
+* [[T1C-1024](https://trust1t.atlassian.net/browse/T1C-1024)] - Exchange API key for JWT for connections that communicate over GW
 
 ## v1.8.3
 ### Task
