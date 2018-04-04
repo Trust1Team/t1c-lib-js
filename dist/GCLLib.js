@@ -38771,7 +38771,6 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var SEPARATOR = '/';
-	var QP_APIKEY = '?apikey=';
 	var SECURITY = '/security';
 	var SYS_INFO = '/system/status';
 	var DOWNLOAD = '/download/gcl';
@@ -38814,7 +38813,7 @@ var GCLLib =
 	                    }
 	                }
 	                else {
-	                    var returnObject = { url: data.link + QP_APIKEY + self.cfg.apiKey, success: true };
+	                    var returnObject = { url: data.link, success: true };
 	                    if (callback) {
 	                        return callback(null, returnObject);
 	                    }

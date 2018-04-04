@@ -13,7 +13,6 @@ export { DSClient };
 
 
 const SEPARATOR = '/';
-const QP_APIKEY = '?apikey=';
 const SECURITY = '/security';
 const SYS_INFO = '/system/status';
 const DOWNLOAD = '/download/gcl';
@@ -58,7 +57,7 @@ class DSClient implements AbstractDSClient {
                     if (callback) { return callback(err, null); }
                     else { reject(err); }
                 } else {
-                    let returnObject = { url: data.link + QP_APIKEY + self.cfg.apiKey, success: true };
+                    let returnObject = { url: data.link, success: true };
                     if (callback) { return callback(null, returnObject); }
                     else { return resolve(returnObject); }
                 }
