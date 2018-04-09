@@ -17,6 +17,11 @@ class InitUtil {
     // constructor
     constructor() {}
 
+    /**
+     * Initializes the library.
+     * @param {GCLClient} client
+     * @returns {Promise<any>}
+     */
     public static initializeLibrary(client: GCLClient) {
         return new Promise((finalResolve, finalReject) => {
             let initPromise = new Promise((resolve, reject) => {
@@ -24,6 +29,7 @@ class InitUtil {
                 client.core().info().then(infoResponse => {
                     // update config values
                     cfg.citrix = infoResponse.data.citrix;
+                    // browser fingerprint compatible?
                     cfg.tokenCompatible = InitUtil.checkTokenCompatible(infoResponse.data.version);
                     cfg.v2Compatible = InitUtil.coreV2Compatible(infoResponse.data.version);
 
@@ -92,8 +98,6 @@ class InitUtil {
                     // console.log(pubKey);
                     PubKeyService.setPubKey(pubKey.data.device);
                     finalResolve();
-                    // TODO synchronise container whitelist
-                    SyncUtil.syncWhitelist();
                 });
             }, err => {
                 finalReject(err);

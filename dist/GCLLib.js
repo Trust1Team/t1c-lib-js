@@ -38893,7 +38893,6 @@ var GCLLib =
 	var FileExchange_1 = __webpack_require__(234);
 	var pkcs11_1 = __webpack_require__(235);
 	var DataContainer_1 = __webpack_require__(236);
-	var CONTAINER_CONTEXT_PATH = '/plugins/';
 	var CONTAINER_NEW_CONTEXT_PATH = '/containers/';
 	var CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
 	var CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
@@ -38942,7 +38941,7 @@ var GCLLib =
 	    PluginFactory.prototype.createDataContainer = function (containerPath) {
 	        var _this = this;
 	        return function () {
-	            return new DataContainer_1.DataContainer(_this.url, containerPath, _this.connection, undefined);
+	            return new DataContainer_1.DataContainer(_this.url, containerPath, _this.connection);
 	        };
 	    };
 	    return PluginFactory;
@@ -63985,7 +63984,7 @@ var GCLLib =
 	        return this.connection.delete(this.baseUrl, this.containerSuffix(id), undefined, undefined, callback);
 	    };
 	    return DataContainer;
-	}(Card_1.GenericReaderContainer));
+	}(Card_1.GenericContainer));
 	exports.DataContainer = DataContainer;
 
 
@@ -64504,9 +64503,6 @@ var GCLLib =
 	    SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
 	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.0.0'), containers));
 	    };
-	    SyncUtil.syncWhitelist = function () {
-	        return Promise.resolve();
-	    };
 	    SyncUtil.pollDownloadCompletion = function (client, containerConfig, isRetry) {
 	        var maxSeconds = client.config().containerDownloadTimeout || 30;
 	        var pollInterval = 250;
@@ -64875,7 +64871,6 @@ var GCLLib =
 	                client.admin().getPubKey().then(function (pubKey) {
 	                    PubKeyService_1.PubKeyService.setPubKey(pubKey.data.device);
 	                    finalResolve();
-	                    SyncUtil_1.SyncUtil.syncWhitelist();
 	                });
 	            }, function (err) {
 	                finalReject(err);
