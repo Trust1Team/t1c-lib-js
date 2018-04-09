@@ -35,7 +35,7 @@ module.exports = function (config) {
         port: 9876,
         colors: true,
         logLevel: config.LOG_DEBUG,
-        browsers: ['PhantomJS', 'ChromeHeadless'],
+        browsers: ['PhantomJS'],
         singleRun: false,
         concurrency: Infinity,
 

@@ -5,11 +5,11 @@
 
 import { AbstractDataContainer } from './DataContainerModel';
 import { RestException } from '../../core/exceptions/CoreExceptions';
-import { GenericReaderContainer } from '../smartcards/Card';
+import { GenericContainer } from '../smartcards/Card';
 
 export { DataContainer };
 
-class DataContainer extends GenericReaderContainer implements AbstractDataContainer {
+class DataContainer extends GenericContainer implements AbstractDataContainer {
     // constructor
 
     public create(data: any, callback?: (error: RestException, data: any) => void): Promise<any> {
