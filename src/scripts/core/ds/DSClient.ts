@@ -19,7 +19,9 @@ const DOWNLOAD = '/download/gcl';
 const PUB_KEY = SECURITY + '/keys/public';
 const DEVICE = '/devices';
 
-
+/**
+ * Provides access to Distribution Service endpoints
+ */
 class DSClient implements AbstractDSClient {
     constructor(private url: string, private connection: Connection, private cfg: GCLConfig) {}
 

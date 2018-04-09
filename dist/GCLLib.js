@@ -185,6 +185,7 @@ var GCLLib =
 	    };
 	    GCLClient.prototype.updateAuthConnection = function (cfg) {
 	        this.authConnection = new Connection_1.LocalAuthConnection(cfg);
+	        this.adminService = new admin_1.AdminService(cfg.gclUrl, this.authConnection);
 	        this.coreService = new CoreService_1.CoreService(cfg.gclUrl, this.authConnection);
 	    };
 	    GCLClient.prototype.implicitDownload = function () {
@@ -18912,7 +18913,6 @@ var GCLLib =
 	var ResponseHandler_1 = __webpack_require__(159);
 	var CORE_CONSENT = '/consent';
 	var CORE_INFO = '/';
-	var CORE_PLUGINS = '/plugins';
 	var CORE_READERS = '/card-readers';
 	var CoreService = (function () {
 	    function CoreService(url, connection) {

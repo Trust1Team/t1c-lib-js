@@ -154,7 +154,6 @@ class GenericService {
         return args.client.core().info().then(info => {
             return new Promise((resolve) => {
                 args.readers.data = _.filter(args.readers.data, reader => {
-                    // TODO optimize
                     return _.find(info.data.containers, ct => { return ct.name === CardUtil.determineContainer(reader.card); });
                 });
                 resolve(args.readers);

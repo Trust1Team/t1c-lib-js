@@ -221,6 +221,7 @@ class GCLClient {
      */
     public updateAuthConnection(cfg: GCLConfig) {
         this.authConnection = new LocalAuthConnection(cfg);
+        this.adminService = new AdminService(cfg.gclUrl, this.authConnection);
         this.coreService = new CoreService(cfg.gclUrl, this.authConnection);
     }
 
