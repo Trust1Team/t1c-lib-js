@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  - "8"
+  - "6"
 before_install:
   - echo "registry=https://repo.t1t.be/repository/npm-group\n_auth=\${NPM_TOKEN}\nemail=development@trust1team.com\nalways-auth=true" > .npmrc
 install:
