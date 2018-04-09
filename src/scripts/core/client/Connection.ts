@@ -76,8 +76,11 @@ interface SecurityConfig {
  * Base class for all connection types
  */
 abstract class GenericConnection implements Connection {
+    // consent token = browser fingerprint
     static readonly AUTH_TOKEN_HEADER = 'X-Authentication-Token';
+    // key for localStorage for browser fingerprint
     static readonly BROWSER_AUTH_TOKEN = 't1c-js-browser-id-token';
+    // whitelist application id prefix
     static readonly RELAY_STATE_HEADER_PREFIX = 'X-Relay-State-';
 
     constructor(public cfg: GCLConfig) {}
@@ -221,7 +224,7 @@ abstract class GenericConnection implements Connection {
     }
 
     /**
-     * Function to send the actual request. Used by all request types.
+     * Function to send the actual request. Used by all request types. Uses axios to make call.
      * @param {string} basePath: base URL path of the request
      * @param {string} suffix: path suffix of the request
      * @param {string} method: HTTP method to be used
@@ -260,6 +263,7 @@ abstract class GenericConnection implements Connection {
             // set security tokens/keys based on securityConfig settings
             if (securityConfig.sendApiKey) { config.headers.apikey = gclConfig.apiKey; }
             if (securityConfig.sendGclJwt) { config.headers.Authorization = 'Bearer ' + gclConfig.gclJwt; }
+            // browser fingerprinting
             if (gclConfig.tokenCompatible && securityConfig.sendToken) {
                 config.headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
             }
@@ -390,6 +394,7 @@ class LocalConnection extends GenericConnection implements Connection {
 
     getRequestHeaders(headers: RequestHeaders): RequestHeaders {
         let reqHeaders = super.getRequestHeaders(headers);
+        // contextToken = application id (ex. 26)
         let contextToken = this.cfg.contextToken;
         if (contextToken && !_.isNil(contextToken)) {
             reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
@@ -533,6 +538,7 @@ class RemoteJwtConnection extends GenericConnection implements Connection {
     }
 }
 
+// TODO remove?
 /**
  * Local testing connection
  */

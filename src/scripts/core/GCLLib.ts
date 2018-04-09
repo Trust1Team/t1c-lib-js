@@ -171,6 +171,7 @@ class GCLClient {
     }
     // get instance for Remote Loading
     public readerapi = (reader_id: string): AbstractRemoteLoading => { return this.pluginFactory.createRemoteLoading(reader_id); };
+    // TODO change name
     // get instance for Belfius
     public belfius = (reader_id: string): AbstractBelfius => { return this.pluginFactory.createBelfius(reader_id); };
     // get instance for File Exchange
@@ -226,6 +227,7 @@ class GCLClient {
         this.coreService = new CoreService(cfg.gclUrl, this.authConnection);
     }
 
+    // TODO review
     // implicit download GCL instance when not found
     private implicitDownload() {
         let self = this;

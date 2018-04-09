@@ -287,6 +287,7 @@ class GCLConfig implements GCLConfig {
         this._containerDownloadTimeout = value;
     }
 
+    // TODO should we refresh if expires < x time?
     get gwJwt(): Promise<string> {
         let self = this;
         return new Promise<string>((resolve, reject) => {
