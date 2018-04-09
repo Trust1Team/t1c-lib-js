@@ -1,5 +1,5 @@
-# Trust1Connector JavaScript Library
 [![Build Status](https://travis-ci.org/Trust1Team/t1c-lib-js.svg?branch=develop)](https://travis-ci.org/Trust1Team/t1c-lib-js) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0ee9b878274c401da8d25d1ae4680277)](https://www.codacy.com/app/maaso/t1c-lib-js?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Trust1Team/t1c-lib-js&amp;utm_campaign=Badge_Grade)
+# Trust1Connector JavaScript Library
 [![][t1c-logo]][Trust1Connector-url]
 
 The Trust1Connector library (T1C-Lib), is a javascript library to communicate with the Trust1Connector. The library simplifies the execution to the connector and works asynchronously.
