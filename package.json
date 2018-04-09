@@ -5,7 +5,7 @@
   "main": "dist/GCLLib.min.js",
   "types": "dist/GCLLib.d.ts",
   "scripts": {
-    "prepublish": "npm test && gulp webpack",
+    "prepublishOnly": "npm test && gulp webpack",
     "localTest": "./node_modules/karma-cli/bin/karma start --single-run",
     "test": "./node_modules/karma-cli/bin/karma start --reporters teamcity,html --single-run --colors false",
     "build": "gulp webpack"
