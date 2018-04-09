@@ -14,6 +14,7 @@ class RequestOptions {
 }
 
 class RequestHandler {
+    // TODO deprecate for v3
     // maintains backward compatibility with the old request style
     public static determineOptions(firstParam: any, secondParam: any): RequestOptions {
         let result = new RequestOptions(false);

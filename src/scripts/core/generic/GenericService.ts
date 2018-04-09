@@ -243,6 +243,7 @@ class GenericService {
     }
 
     private static doSign(args: Arguments) {
+        // TODO use marker interface for PACE
         if (args.container === 'luxeid') {
             return args.client.luxeid(args.readerId, args.data.pin).signData(args.data);
         } else {

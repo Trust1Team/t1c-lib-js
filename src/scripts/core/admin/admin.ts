@@ -73,7 +73,6 @@ class AdminService implements AbstractAdmin {
         return this.put(this.url, CORE_PUB_KEY, keys, callback);
     }
 
-    // TODO implementation check
     public updateContainerConfig(containers: ContainerSyncRequest,
                                  callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.post(this.url, CORE_CONTAINERS, containers, callback);
