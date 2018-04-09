@@ -1410,7 +1410,7 @@ class AuthClient implements AbstractAuth {
     refreshJWT(currentJWT: string, callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
 }
 
-export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteApiKeyConnection, RemoteJwtConnection, Connection, LocalTestConnection, RequestBody, RequestHeaders, RequestCallback, QueryParams };
+export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteApiKeyConnection, RemoteJwtConnection, Connection, LocalTestConnection, RequestBody, RequestHeaders, RequestCallback, SecurityConfig, QueryParams };
 interface Connection {
     get(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     post(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
@@ -1429,6 +1429,13 @@ interface RequestHeaders {
 interface RequestCallback {
     (error: any, data: any): void;
 }
+interface SecurityConfig {
+    sendGwJwt: boolean;
+    sendGclJwt: boolean;
+    sendApiKey: boolean;
+    sendToken: boolean;
+    skipCitrixCheck: boolean;
+}
 abstract class GenericConnection implements Connection {
     cfg: GCLConfig;
     static readonly AUTH_TOKEN_HEADER: string;
@@ -1440,31 +1447,13 @@ abstract class GenericConnection implements Connection {
     put(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     delete(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     getRequestHeaders(headers: RequestHeaders): RequestHeaders;
-    getSecurityConfig(): {
-        sendGwJwt: boolean;
-        sendGclJwt: boolean;
-        sendApiKey: boolean;
-        sendToken: boolean;
-        skipCitrixCheck: boolean;
-    };
-    protected handleRequest(basePath: string, suffix: string, method: string, gclConfig: GCLConfig, securityConfig: {
-        sendGwJwt: boolean;
-        sendGclJwt: boolean;
-        sendApiKey: boolean;
-        sendToken: boolean;
-        skipCitrixCheck: boolean;
-    }, body?: RequestBody, params?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
+    getSecurityConfig(): SecurityConfig;
+    protected handleRequest(basePath: string, suffix: string, method: string, gclConfig: GCLConfig, securityConfig: SecurityConfig, body?: RequestBody, params?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
 }
 class LocalAuthConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;
     constructor(cfg: GCLConfig);
-    getSecurityConfig(): {
-        sendGwJwt: boolean;
-        sendGclJwt: boolean;
-        sendApiKey: boolean;
-        sendToken: boolean;
-        skipCitrixCheck: boolean;
-    };
+    getSecurityConfig(): SecurityConfig;
     getSkipCitrix(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     requestLogFile(basePath: string, suffix: string, callback?: RequestCallback): Promise<any>;
 }
@@ -1472,13 +1461,7 @@ class LocalConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;
     constructor(cfg: GCLConfig);
     getRequestHeaders(headers: RequestHeaders): RequestHeaders;
-    getSecurityConfig(): {
-        sendGwJwt: boolean;
-        sendGclJwt: boolean;
-        sendApiKey: boolean;
-        sendToken: boolean;
-        skipCitrixCheck: boolean;
-    };
+    getSecurityConfig(): SecurityConfig;
     getSkipCitrix(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     requestFile(basePath: string, suffix: string, body: {
         path: string;
@@ -1488,24 +1471,12 @@ class LocalConnection extends GenericConnection implements Connection {
 class RemoteApiKeyConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;
     constructor(cfg: GCLConfig);
-    getSecurityConfig(): {
-        sendGwJwt: boolean;
-        sendGclJwt: boolean;
-        sendApiKey: boolean;
-        sendToken: boolean;
-        skipCitrixCheck: boolean;
-    };
+    getSecurityConfig(): SecurityConfig;
 }
 class RemoteJwtConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;
     constructor(cfg: GCLConfig);
-    getSecurityConfig(): {
-        sendGwJwt: boolean;
-        sendGclJwt: boolean;
-        sendApiKey: boolean;
-        sendToken: boolean;
-        skipCitrixCheck: boolean;
-    };
+    getSecurityConfig(): SecurityConfig;
 }
 class LocalTestConnection extends GenericConnection implements Connection {
     config: any;

@@ -8,6 +8,9 @@ import { LocalConnection } from '../client/Connection';
 
 export { AgentClient };
 
+/**
+ * Provides access to the /agent endpoint and a URL prefixing utility method
+ */
 class AgentClient implements AbstractAgent {
     static AGENT_PATH = '/agent';
 
