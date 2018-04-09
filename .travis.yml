@@ -3,3 +3,5 @@ node_js:
   - "8"
 before_install:
   - echo "registry=https://repo.t1t.be/repository/npm-group\n_auth=\${NPM_TOKEN}\nemail=development@trust1team.com\nalways-auth=true" > .npmrc
+script:
+  - ./node_modules/karma-cli/bin/karma start --single-run --colors false
