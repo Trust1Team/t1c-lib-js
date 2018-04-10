@@ -39,7 +39,7 @@ Navigate to the root directory and use Yarn to download and the necessary depend
 ```bash
 $ yarn
 ```
-#####OR
+##### OR
 Use npm install
 ```bash
 $ npm install
