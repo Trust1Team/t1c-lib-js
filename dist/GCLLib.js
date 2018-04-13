@@ -37522,19 +37522,26 @@ var GCLLib =
 	                        callback(null, response.data);
 	                        return resolve(response.data);
 	                    }).catch(function (error) {
-	                        if (error.response) {
-	                            if (error.response.data) {
-	                                callback(error.response.data, null);
-	                                return reject(error.response.data);
-	                            }
-	                            else {
-	                                callback(error.response, null);
-	                                return reject(error.response);
-	                            }
+	                        if (!error.code) {
+	                            var thrownError = new CoreExceptions_1.RestException(500, '999', 'Network error occurred. Request could not be completed');
+	                            callback(thrownError, null);
+	                            return reject(thrownError);
 	                        }
 	                        else {
-	                            callback(error, null);
-	                            return reject(error);
+	                            if (error.response) {
+	                                if (error.response.data) {
+	                                    callback(error.response.data, null);
+	                                    return reject(error.response.data);
+	                                }
+	                                else {
+	                                    callback(error.response, null);
+	                                    return reject(error.response);
+	                                }
+	                            }
+	                            else {
+	                                callback(error, null);
+	                                return reject(error);
+	                            }
 	                        }
 	                    });
 	                }, function (err) {
