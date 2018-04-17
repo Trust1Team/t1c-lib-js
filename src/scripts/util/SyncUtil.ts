@@ -65,6 +65,7 @@ class SyncUtil {
                         // update container config
                         return client.admin().updateContainerConfig(new ContainerSyncRequest(device.containerResponses)).then(() => {
                             // setup data container paths
+                            // TODO
                             DataContainerUtil.setupDataContainers(device.containerResponses);
 
                             return SyncUtil.pollDownloadCompletion(client,
@@ -111,10 +112,6 @@ class SyncUtil {
             new DSClientInfo('JAVASCRIPT', '%%GULP_INJECT_VERSION%%'),
             containers)
         );
-    }
-
-    public static syncWhitelist() {
-        return Promise.resolve();
     }
 
     private static pollDownloadCompletion(client: GCLClient, containerConfig: DSContainer[], isRetry: boolean): Promise<T1CContainer[]> {

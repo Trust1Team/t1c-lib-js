@@ -154,7 +154,6 @@ class GenericService {
         return args.client.core().info().then(info => {
             return new Promise((resolve) => {
                 args.readers.data = _.filter(args.readers.data, reader => {
-                    // TODO optimize
                     return _.find(info.data.containers, ct => { return ct.name === CardUtil.determineContainer(reader.card); });
                 });
                 resolve(args.readers);
@@ -244,6 +243,7 @@ class GenericService {
     }
 
     private static doSign(args: Arguments) {
+        // TODO use marker interface for PACE
         if (args.container === 'luxeid') {
             return args.client.luxeid(args.readerId, args.data.pin).signData(args.data);
         } else {

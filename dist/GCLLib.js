@@ -185,6 +185,7 @@ var GCLLib =
 	    };
 	    GCLClient.prototype.updateAuthConnection = function (cfg) {
 	        this.authConnection = new Connection_1.LocalAuthConnection(cfg);
+	        this.adminService = new admin_1.AdminService(cfg.gclUrl, this.authConnection);
 	        this.coreService = new CoreService_1.CoreService(cfg.gclUrl, this.authConnection);
 	    };
 	    GCLClient.prototype.implicitDownload = function () {
@@ -275,6 +276,7 @@ var GCLLib =
 	        this._apiKey = options.apiKey;
 	        this._gwJwt = options.gwJwt;
 	        this._citrix = false;
+	        this._isManaged = false;
 	        this._agentPort = options.agentPort || -1;
 	        this._implicitDownload = options.implicitDownload || defaults.implicitDownload;
 	        this._localTestMode = options.localTestMode || defaults.localTestMode;
@@ -369,6 +371,16 @@ var GCLLib =
 	        },
 	        set: function (value) {
 	            this._citrix = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "isManaged", {
+	        get: function () {
+	            return this._isManaged;
+	        },
+	        set: function (value) {
+	            this._isManaged = value;
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -18912,7 +18924,6 @@ var GCLLib =
 	var ResponseHandler_1 = __webpack_require__(159);
 	var CORE_CONSENT = '/consent';
 	var CORE_INFO = '/';
-	var CORE_PLUGINS = '/plugins';
 	var CORE_READERS = '/card-readers';
 	var CoreService = (function () {
 	    function CoreService(url, connection) {
@@ -19135,7 +19146,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return Promise.resolve('v2.0.0');
+	        return Promise.resolve('v2.1.0');
 	    };
 	    return CoreService;
 	}());
@@ -37522,19 +37533,26 @@ var GCLLib =
 	                        callback(null, response.data);
 	                        return resolve(response.data);
 	                    }).catch(function (error) {
-	                        if (error.response) {
-	                            if (error.response.data) {
-	                                callback(error.response.data, null);
-	                                return reject(error.response.data);
-	                            }
-	                            else {
-	                                callback(error.response, null);
-	                                return reject(error.response);
-	                            }
+	                        if (!error.code) {
+	                            var thrownError = new CoreExceptions_1.RestException(500, '999', 'Network error occurred. Request could not be completed');
+	                            callback(thrownError, null);
+	                            return reject(thrownError);
 	                        }
 	                        else {
-	                            callback(error, null);
-	                            return reject(error);
+	                            if (error.response) {
+	                                if (error.response.data) {
+	                                    callback(error.response.data, null);
+	                                    return reject(error.response.data);
+	                                }
+	                                else {
+	                                    callback(error.response, null);
+	                                    return reject(error.response);
+	                                }
+	                            }
+	                            else {
+	                                callback(error, null);
+	                                return reject(error);
+	                            }
 	                        }
 	                    });
 	                }, function (err) {
@@ -37620,7 +37638,7 @@ var GCLLib =
 	    LocalConnection.prototype.getRequestHeaders = function (headers) {
 	        var reqHeaders = _super.prototype.getRequestHeaders.call(this, headers);
 	        var contextToken = this.cfg.contextToken;
-	        if (contextToken && !_.isNil(contextToken)) {
+	        if (!this.cfg.isManaged && contextToken && !_.isNil(contextToken)) {
 	            reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
 	        }
 	        return reqHeaders;
@@ -38771,7 +38789,6 @@ var GCLLib =
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var SEPARATOR = '/';
-	var QP_APIKEY = '?apikey=';
 	var SECURITY = '/security';
 	var SYS_INFO = '/system/status';
 	var DOWNLOAD = '/download/gcl';
@@ -38814,7 +38831,7 @@ var GCLLib =
 	                    }
 	                }
 	                else {
-	                    var returnObject = { url: data.link + QP_APIKEY + self.cfg.apiKey, success: true };
+	                    var returnObject = { url: data.link, success: true };
 	                    if (callback) {
 	                        return callback(null, returnObject);
 	                    }
@@ -38894,7 +38911,6 @@ var GCLLib =
 	var FileExchange_1 = __webpack_require__(234);
 	var pkcs11_1 = __webpack_require__(235);
 	var DataContainer_1 = __webpack_require__(236);
-	var CONTAINER_CONTEXT_PATH = '/plugins/';
 	var CONTAINER_NEW_CONTEXT_PATH = '/containers/';
 	var CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
 	var CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
@@ -38943,7 +38959,7 @@ var GCLLib =
 	    PluginFactory.prototype.createDataContainer = function (containerPath) {
 	        var _this = this;
 	        return function () {
-	            return new DataContainer_1.DataContainer(_this.url, containerPath, _this.connection, undefined);
+	            return new DataContainer_1.DataContainer(_this.url, containerPath, _this.connection);
 	        };
 	    };
 	    return PluginFactory;
@@ -63986,7 +64002,7 @@ var GCLLib =
 	        return this.connection.delete(this.baseUrl, this.containerSuffix(id), undefined, undefined, callback);
 	    };
 	    return DataContainer;
-	}(Card_1.GenericReaderContainer));
+	}(Card_1.GenericContainer));
 	exports.DataContainer = DataContainer;
 
 
@@ -64503,10 +64519,7 @@ var GCLLib =
 	        });
 	    };
 	    SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
-	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.0.0'), containers));
-	    };
-	    SyncUtil.syncWhitelist = function () {
-	        return Promise.resolve();
+	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.0'), containers));
 	    };
 	    SyncUtil.pollDownloadCompletion = function (client, containerConfig, isRetry) {
 	        var maxSeconds = client.config().containerDownloadTimeout || 30;
@@ -64831,6 +64844,7 @@ var GCLLib =
 	                var cfg = client.config();
 	                client.core().info().then(function (infoResponse) {
 	                    cfg.citrix = infoResponse.data.citrix;
+	                    cfg.isManaged = infoResponse.data.managed;
 	                    cfg.tokenCompatible = InitUtil.checkTokenCompatible(infoResponse.data.version);
 	                    cfg.v2Compatible = InitUtil.coreV2Compatible(infoResponse.data.version);
 	                    if (cfg.v2Compatible) {
@@ -64876,7 +64890,6 @@ var GCLLib =
 	                client.admin().getPubKey().then(function (pubKey) {
 	                    PubKeyService_1.PubKeyService.setPubKey(pubKey.data.device);
 	                    finalResolve();
-	                    SyncUtil_1.SyncUtil.syncWhitelist();
 	                });
 	            }, function (err) {
 	                finalReject(err);
@@ -66252,7 +66265,7 @@ var GCLLib =
 	    };
 	    ActivationUtil.registerDevice = function (client, mergedInfo, uuid) {
 	        return client.admin().getPubKey().then(function (pubKey) {
-	            return client.ds().register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.managed, mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.0.0')));
+	            return client.ds().register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.managed, mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.0')));
 	        });
 	    };
 	    ActivationUtil.activateDevice = function (args) {

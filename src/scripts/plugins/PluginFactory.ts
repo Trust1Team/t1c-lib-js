@@ -50,7 +50,6 @@ export interface AbstractFactory {
     createPKCS11(): AbstractPkcs11;
 }
 
-const CONTAINER_CONTEXT_PATH = '/plugins/';
 const CONTAINER_NEW_CONTEXT_PATH = '/containers/';
 const CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
 const CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
@@ -113,7 +112,7 @@ export class PluginFactory implements AbstractFactory {
 
     public createDataContainer(containerPath: string): () => AbstractDataContainer {
         return (): AbstractDataContainer => {
-            return new DataContainer(this.url, containerPath, this.connection, undefined);
+            return new DataContainer(this.url, containerPath, this.connection);
         };
     }
 }

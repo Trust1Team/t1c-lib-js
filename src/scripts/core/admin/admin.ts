@@ -25,6 +25,10 @@ const CORE_PUB_KEY = '/admin/certificate';
 const CORE_CONTAINERS = '/admin/containers';
 const CORE_LOGFILE = '/admin/log';
 
+/**
+ * Provides access to the /admin endpoints
+ * All calls wil be automatically retried if a JWT related error is encountered
+ */
 class AdminService implements AbstractAdmin {
     static JWT_ERROR_CODES = [ '200', '201', '202', '203', '204', '205'];
 
@@ -69,7 +73,6 @@ class AdminService implements AbstractAdmin {
         return this.put(this.url, CORE_PUB_KEY, keys, callback);
     }
 
-    // TODO implementation check
     public updateContainerConfig(containers: ContainerSyncRequest,
                                  callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.post(this.url, CORE_CONTAINERS, containers, callback);

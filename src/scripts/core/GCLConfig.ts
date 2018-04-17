@@ -32,6 +32,9 @@ const defaults = {
     containerDownloadTimeout: 30
 };
 
+/**
+ * GCL Config Options object. Contains all user-configurable configuration settings. Used to initialize GCLConfig.
+ */
 class GCLConfigOptions {
     constructor(public gclUrl?: string,
                 public gwOrProxyUrl?: string,
@@ -53,7 +56,11 @@ class GCLConfigOptions {
                 public localTestMode?: boolean) {}
 }
 
-class GCLConfig  implements GCLConfig {
+/**
+ * GCL Configuration object. Represents the GCL Library configuration state.
+ * Most settings are configurable by the user; some are set by the library itself.
+ */
+class GCLConfig implements GCLConfig {
     // singleton pattern
     private static instance: GCLConfig;
     private _gwUrl: string;
@@ -79,6 +86,7 @@ class GCLConfig  implements GCLConfig {
     private _osPinDialog: boolean;
     private _containerDownloadTimeout: number;
     private _contextToken: string;
+    private _isManaged: boolean;
 
     // constructor for DTO
     constructor(options: GCLConfigOptions) {
@@ -89,7 +97,8 @@ class GCLConfig  implements GCLConfig {
         this._ocvContextPath = options.ocvContextPath || defaults.ocvContextPath;
         this._apiKey = options.apiKey;
         this._gwJwt = options.gwJwt;
-        this._citrix = false;
+        this._citrix = false; // will be set to true during initialisation if Citrix environment is detected
+        this._isManaged = false; // will be set to true during initialisation if managed install is detected
         this._agentPort = options.agentPort || -1;
         this._implicitDownload = options.implicitDownload || defaults.implicitDownload;
         this._localTestMode = options.localTestMode || defaults.localTestMode;
@@ -162,6 +171,14 @@ class GCLConfig  implements GCLConfig {
 
     set citrix(value: boolean) {
         this._citrix = value;
+    }
+
+    get isManaged(): boolean {
+        return this._isManaged;
+    }
+
+    set isManaged(value: boolean) {
+        this._isManaged = value;
     }
 
     get agentPort(): number {
@@ -280,6 +297,7 @@ class GCLConfig  implements GCLConfig {
         this._containerDownloadTimeout = value;
     }
 
+    // TODO should we refresh if expires < x time?
     get gwJwt(): Promise<string> {
         let self = this;
         return new Promise<string>((resolve, reject) => {
@@ -316,6 +334,16 @@ class GCLConfig  implements GCLConfig {
         this._gclJwt = value;
     }
 
+    /**
+     * Returns Gateway JWT promise.
+     * If JWT is available and valid, it is immediately returned;
+     * if not, a new JWT is requested from the Gateway using the configured API key.
+     *
+     * If no API key is available (eg. the library was initialised with a JWT token), an error is returned.
+     * The application then needs to refresh the JWT token an reinitialized the library.
+     *
+     * @returns {Promise<string>}
+     */
     getGwJwt(): Promise<string> {
         if (this.apiKey && this.apiKey.length) {
             let config: AxiosRequestConfig = {

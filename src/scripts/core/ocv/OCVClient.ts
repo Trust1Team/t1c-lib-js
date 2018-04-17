@@ -17,7 +17,9 @@ const CERTIFICATE = '/certs/validate-chain';
 const SYSTEM_STATUS = '/system/status';
 const SIGNATURE = '/signature/validate';
 
-
+/**
+ * Provides access to OCV endpoints
+ */
 class OCVClient implements AbstractOCVClient {
 
     constructor(private url: string, private connection: RemoteJwtConnection) {}

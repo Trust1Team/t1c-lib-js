@@ -44,25 +44,7 @@ gulp.task('webpack', ['webpack-debug'], function () {
                .pipe(gulp.dest('dist/'))
 });
 
-gulp.task('webpack-dev-server', function (callback) {
-    new WebpackDevServer(webpack(webpackConfig), {
-    }).listen(8080, 'localhost', function (err) {
-        if (err) {
-            throw new gutil.PluginError('webpack-dev-server', err);
-        }
-        gutil.log('[webpack-dev-server]', 'http://localhost:8080/index.html');
-    });
-});
 
-gulp.task('test', function (done) {
-    var karmaServer = new karma.Server({
-        configFile: __dirname + '/karma.conf.js',
-        singleRun: true
-    }, function (exitCode) {
-        done();
-        process.exit(exitCode);
-    }).start();
-});
 
 gulp.task("clean-css", function(cb) {
     return del([FOLDER_CSS], cb);
