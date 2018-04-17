@@ -29,6 +29,7 @@ class InitUtil {
                 client.core().info().then(infoResponse => {
                     // update config values
                     cfg.citrix = infoResponse.data.citrix;
+                    cfg.isManaged = infoResponse.data.managed;
                     // browser fingerprint compatible?
                     cfg.tokenCompatible = InitUtil.checkTokenCompatible(infoResponse.data.version);
                     cfg.v2Compatible = InitUtil.coreV2Compatible(infoResponse.data.version);
