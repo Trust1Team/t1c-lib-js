@@ -81,6 +81,7 @@ class GCLConfig implements GCLConfig {
     dsFileContextPath: string;
     apiKey: string;
     citrix: boolean;
+    isManaged: boolean;
     agentPort: number;
     implicitDownload: boolean;
     readonly dsFileDownloadUrl: string;

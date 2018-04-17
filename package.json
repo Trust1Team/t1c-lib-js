@@ -1,6 +1,6 @@
 {
   "name": "trust1connector",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "The Trust1Connector library (T1C-Lib), is a javascript library to communicate with the Trust1Connector. The library simplifies the execution to the connector and works asynchronously.",
   "main": "dist/GCLLib.min.js",
   "types": "dist/GCLLib.d.ts",
@@ -13,6 +13,9 @@
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com:Trust1Team/t1c-lib-js.git"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
   },
   "author": "Trust1Team",
   "license": "SEE LICENSE IN license.txt",
