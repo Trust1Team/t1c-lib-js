@@ -17,7 +17,7 @@ import { ResponseHandler } from '../../util/ResponseHandler';
 import { JWTResponse } from '../ds/DSClientModel';
 
 export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteApiKeyConnection,
-    RemoteJwtConnection, Connection, LocalTestConnection, RequestBody, RequestHeaders, RequestCallback, QueryParams };
+    RemoteJwtConnection, Connection, LocalTestConnection, RequestBody, RequestHeaders, RequestCallback, SecurityConfig, QueryParams };
 
 
 interface Connection {
@@ -64,26 +64,57 @@ interface RequestCallback {
     (error: any, data: any): void
 }
 
+interface SecurityConfig {
+    sendGwJwt: boolean,
+    sendGclJwt: boolean,
+    sendApiKey: boolean,
+    sendToken: boolean,
+    skipCitrixCheck: boolean
+}
+
+/**
+ * Base class for all connection types
+ */
 abstract class GenericConnection implements Connection {
+    // consent token = browser fingerprint
     static readonly AUTH_TOKEN_HEADER = 'X-Authentication-Token';
+    // key for localStorage for browser fingerprint
     static readonly BROWSER_AUTH_TOKEN = 't1c-js-browser-id-token';
+    // whitelist application id prefix
     static readonly RELAY_STATE_HEADER_PREFIX = 'X-Relay-State-';
 
     constructor(public cfg: GCLConfig) {}
 
-
+    /**
+     * Returns relevant error for requests that cannot be completed without an API key
+     * @param {(error: RestException, data: JWTResponse) => void} callback
+     * @returns {Promise<never>}
+     */
     private static disabledWithoutApiKey(callback: (error: CoreExceptions.RestException, data: JWTResponse) => void) {
         return ResponseHandler.error(new RestException(412, '901', 'Configuration must contain API key to use this method'), callback);
     }
 
+    /**
+     * Checks headers for an "access_token" header. This header is used by the DS to send the client JWT.
+     * If found, the value is saved as GCL JWT.
+     * @param {RequestHeaders} headers
+     * @param {GCLConfig} config
+     */
     private static extractAccessToken(headers: RequestHeaders, config: GCLConfig) {
-
         if (headers && headers.access_token) {
             config.gclJwt = headers.access_token;
         }
     }
 
-
+    /**
+     * Helper function for GET requests
+     * @param {string} basePath
+     * @param {string} suffix
+     * @param {QueryParams} queryParams
+     * @param {RequestHeaders} headers
+     * @param {RequestCallback} callback
+     * @returns {Promise<any>}
+     */
     public get(basePath: string,
                suffix: string,
                queryParams?: QueryParams,
@@ -98,6 +129,16 @@ abstract class GenericConnection implements Connection {
         }
     }
 
+    /**
+     * Helper function for POST requests
+     * @param {string} basePath
+     * @param {string} suffix
+     * @param {RequestBody} body
+     * @param {QueryParams} queryParams
+     * @param {RequestHeaders} headers
+     * @param {RequestCallback} callback
+     * @returns {Promise<any>}
+     */
     public post(basePath: string,
                 suffix: string,
                 body: RequestBody,
@@ -113,6 +154,16 @@ abstract class GenericConnection implements Connection {
         }
     }
 
+    /**
+     * Helper function for PUT requests
+     * @param {string} basePath
+     * @param {string} suffix
+     * @param {RequestBody} body
+     * @param {QueryParams} queryParams
+     * @param {RequestHeaders} headers
+     * @param {RequestCallback} callback
+     * @returns {Promise<any>}
+     */
     public put(basePath: string,
                suffix: string,
                body: RequestBody,
@@ -129,6 +180,15 @@ abstract class GenericConnection implements Connection {
 
     }
 
+    /**
+     * Helper function for DELETE requests
+     * @param {string} basePath
+     * @param {string} suffix
+     * @param {QueryParams} queryParams
+     * @param {RequestHeaders} headers
+     * @param {RequestCallback} callback
+     * @returns {Promise<any>}
+     */
     public delete(basePath: string,
                   suffix: string,
                   queryParams?: QueryParams,
@@ -144,22 +204,43 @@ abstract class GenericConnection implements Connection {
 
     }
 
+    /**
+     * Sets provided headers + defaults, or default headers if no custom headers are provided
+     * @param {RequestHeaders} headers: Headers to be set
+     * @returns {RequestHeaders}
+     */
     getRequestHeaders(headers: RequestHeaders): RequestHeaders {
         let reqHeaders = headers || {};
         reqHeaders['Accept-Language'] = 'en-US';
         return reqHeaders;
     }
 
-    getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean, skipCitrixCheck: boolean } {
+    /**
+     * Returns the security configuration for the current connection type
+     * @returns {SecurityConfig}
+     */
+    getSecurityConfig(): SecurityConfig {
         return {  sendGwJwt: true, sendGclJwt: false, sendApiKey: true, sendToken: true, skipCitrixCheck: false };
     }
 
+    /**
+     * Function to send the actual request. Used by all request types. Uses axios to make call.
+     * @param {string} basePath: base URL path of the request
+     * @param {string} suffix: path suffix of the request
+     * @param {string} method: HTTP method to be used
+     * @param {GCLConfig} gclConfig: GCLConfig to be used
+     * @param {SecurityConfig} securityConfig: Security configuration, varies with connection subtype
+     * @param {RequestBody} body: Body to be sent, for POST/PUT/...
+     * @param {QueryParams} params: Query parameters to be sent with request
+     * @param {RequestHeaders} headers: Headers to be sent with request
+     * @param {RequestCallback} callback: Optional callback function if not using Promises
+     * @returns {Promise<any>}
+     */
     protected handleRequest(basePath: string,
                             suffix: string,
                             method: string,
                             gclConfig: GCLConfig,
-                            securityConfig: { sendGwJwt: boolean, sendGclJwt: boolean,
-                                sendApiKey: boolean, sendToken: boolean, skipCitrixCheck: boolean },
+                            securityConfig: SecurityConfig,
                             body?: RequestBody,
                             params?: QueryParams,
                             headers?: RequestHeaders,
@@ -170,6 +251,7 @@ abstract class GenericConnection implements Connection {
         // if Citrix environment, check that agentPort was defined in config
         if (securityConfig.skipCitrixCheck || !gclConfig.citrix || gclConfig.agentPort !== -1) {
             let config: AxiosRequestConfig = {
+                // use UrlUtil to create correct URL based on config
                 url: UrlUtil.create(basePath, suffix, gclConfig, securityConfig.skipCitrixCheck),
                 method,
                 headers: this.getRequestHeaders(headers),
@@ -177,8 +259,11 @@ abstract class GenericConnection implements Connection {
             };
             if (body) { config.data = body; }
             if (params) { config.params = params; }
+
+            // set security tokens/keys based on securityConfig settings
             if (securityConfig.sendApiKey) { config.headers.apikey = gclConfig.apiKey; }
             if (securityConfig.sendGclJwt) { config.headers.Authorization = 'Bearer ' + gclConfig.gclJwt; }
+            // browser fingerprinting
             if (gclConfig.tokenCompatible && securityConfig.sendToken) {
                 config.headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
             }
@@ -194,20 +279,30 @@ abstract class GenericConnection implements Connection {
                     axios.request(config).then((response: AxiosResponse) => {
                         // check if access-token included in headers
                         GenericConnection.extractAccessToken(response.headers, gclConfig);
+
+                        // call callback function
                         callback(null, response.data);
+                        // and resolve the promise
                         return resolve(response.data);
                     }).catch(function (error: AxiosError) {
-                        if (error.response) {
-                            if (error.response.data) {
-                                callback(error.response.data, null);
-                                return reject(error.response.data);
-                            } else {
-                                callback(error.response, null);
-                                return reject(error.response);
-                            }
+                        // check for generic network error
+                        if (!error.code) {
+                            const thrownError = new RestException(500, '999', 'Network error occurred. Request could not be completed');
+                            callback(thrownError, null);
+                            return reject(thrownError);
                         } else {
-                            callback(error, null);
-                            return reject(error);
+                            if (error.response) {
+                                if (error.response.data) {
+                                    callback(error.response.data, null);
+                                    return reject(error.response.data);
+                                } else {
+                                    callback(error.response, null);
+                                    return reject(error.response);
+                                }
+                            } else {
+                                callback(error, null);
+                                return reject(error);
+                            }
                         }
                     });
                 }, err => {
@@ -227,13 +322,26 @@ abstract class GenericConnection implements Connection {
     }
 }
 
+/**
+ * Local connection with authorization token, used for /admin endpoints and some core endpoints
+ */
 class LocalAuthConnection extends GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) { super(cfg); }
 
-    getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean, skipCitrixCheck: boolean } {
+    getSecurityConfig(): SecurityConfig {
         return {  sendGwJwt: false, sendGclJwt: true, sendApiKey: false, sendToken: true, skipCitrixCheck: false };
     }
 
+    /**
+     * Helper method for GET requests; will ignore Citrix environment and not sent agent URL prefix,
+     * even if an agent port is present in GCLConfig
+     * @param {string} basePath
+     * @param {string} suffix
+     * @param {QueryParams} queryParams
+     * @param {RequestHeaders} headers
+     * @param {RequestCallback} callback
+     * @returns {Promise<any>}
+     */
     public getSkipCitrix(basePath: string,
                          suffix: string,
                          queryParams?: QueryParams,
@@ -245,6 +353,13 @@ class LocalAuthConnection extends GenericConnection implements Connection {
             undefined, queryParams, headers, callback);
     }
 
+    /**
+     * Helper method for requesting log files. These are sent as arraybuffers and require special handling.
+     * @param {string} basePath
+     * @param {string} suffix
+     * @param {RequestCallback} callback
+     * @returns {Promise<any>}
+     */
     public requestLogFile(basePath: string, suffix: string, callback?: RequestCallback): Promise<any> {
         // init callback if necessary
         if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
@@ -278,22 +393,37 @@ class LocalAuthConnection extends GenericConnection implements Connection {
     }
 }
 
+/**
+ * Local connection without security token or keys
+ */
 class LocalConnection extends GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) { super(cfg); }
 
     getRequestHeaders(headers: RequestHeaders): RequestHeaders {
         let reqHeaders = super.getRequestHeaders(headers);
+        // contextToken = application id (ex. 26)
         let contextToken = this.cfg.contextToken;
-        if (contextToken && !_.isNil(contextToken)) {
+        // only send the relay state header for unmanaged installs
+        if (!this.cfg.isManaged && contextToken && !_.isNil(contextToken)) {
             reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
         }
         return reqHeaders;
     }
 
-    getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean, skipCitrixCheck: boolean } {
+    getSecurityConfig(): SecurityConfig {
         return {  sendGwJwt: false, sendGclJwt: false, sendApiKey: false, sendToken: true, skipCitrixCheck: false };
     }
 
+    /**
+     * Helper method for GET requests; will ignore Citrix environment and not sent agent URL prefix,
+     * even if an agent port is present in GCLConfig
+     * @param {string} basePath
+     * @param {string} suffix
+     * @param {QueryParams} queryParams
+     * @param {RequestHeaders} headers
+     * @param {RequestCallback} callback
+     * @returns {Promise<any>}
+     */
     public getSkipCitrix(basePath: string,
                          suffix: string,
                          queryParams?: QueryParams,
@@ -305,6 +435,14 @@ class LocalConnection extends GenericConnection implements Connection {
             undefined, queryParams, headers, callback);
     }
 
+    /**
+     * Helper method for requesting files. These are sent as arraybuffers and require special handling.
+     * @param {string} basePath
+     * @param {string} suffix
+     * @param {{path: string}} body
+     * @param {RequestCallback} callback
+     * @returns {Promise<any>}
+     */
     public requestFile(basePath: string, suffix: string, body: { path: string }, callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         // init callback if necessary
@@ -337,6 +475,15 @@ class LocalConnection extends GenericConnection implements Connection {
         });
     }
 
+    /**
+     * Helper method for uploading files. These are uploaded as multipart/form-data and require special handling.
+     * @param {string} basePath
+     * @param {string} suffix
+     * @param {RequestBody} body
+     * @param {QueryParams} queryParams
+     * @param {RequestCallback} callback
+     * @returns {Promise<any>}
+     */
     public putFile(basePath: string, suffix: string, body: RequestBody,
                    queryParams: QueryParams, callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
@@ -377,22 +524,32 @@ class LocalConnection extends GenericConnection implements Connection {
     }
 }
 
+/**
+ * Remote connection which will set API key header
+ */
 class RemoteApiKeyConnection extends GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) { super(cfg); }
 
-    getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean, skipCitrixCheck: boolean } {
+    getSecurityConfig(): SecurityConfig {
         return {  sendGwJwt: false, sendGclJwt: false, sendApiKey: true, sendToken: false, skipCitrixCheck: true };
     }
 }
 
+/**
+ * Remote connection which will set Authorization: Bearer token
+ */
 class RemoteJwtConnection extends GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) { super(cfg); }
 
-    getSecurityConfig(): { sendGwJwt: boolean, sendGclJwt: boolean, sendApiKey: boolean, sendToken: boolean, skipCitrixCheck: boolean } {
+    getSecurityConfig(): SecurityConfig {
         return {  sendGwJwt: true, sendGclJwt: false, sendApiKey: false, sendToken: false, skipCitrixCheck: true };
     }
 }
 
+// TODO remove?
+/**
+ * Local testing connection
+ */
 class LocalTestConnection extends GenericConnection implements Connection {
     config = undefined;
 

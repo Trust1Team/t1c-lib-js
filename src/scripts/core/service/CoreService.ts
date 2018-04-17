@@ -15,9 +15,11 @@ export { CoreService };
 
 const CORE_CONSENT = '/consent';
 const CORE_INFO = '/';
-const CORE_PLUGINS = '/plugins';
 const CORE_READERS = '/card-readers';
 
+/**
+ * Core service fucntions: GCL information, reader detection, consent, polling, etc.
+ */
 class CoreService implements CoreModel.AbstractCore {
     // constructor
     constructor(private url: string, private connection: LocalAuthConnection) {}
@@ -105,7 +107,6 @@ class CoreService implements CoreModel.AbstractCore {
                     if (maxSeconds === 0) {
                         if (cardTimeoutCb) { return cardTimeoutCb(); }
                         else {
-                            // TODO improve handling of timeout in combination with promises
                             if (reject) { reject({ success: false, message: 'Timed out' }); }
                         }
                     } // reader timeout
@@ -156,7 +157,6 @@ class CoreService implements CoreModel.AbstractCore {
                     if (maxSeconds === 0) {
                         if (cardTimeoutCb) { return cardTimeoutCb(); }
                         else {
-                            // TODO improve handling of timeout in combination with promises
                             if (reject) { reject({ success: false, message: 'Timed out' }); }
                         }
                     } // reader timeout
@@ -212,7 +212,6 @@ class CoreService implements CoreModel.AbstractCore {
                     if (maxSeconds === 0) {
                         if (readerTimeoutCb) { return readerTimeoutCb(); } // reader timeout
                         else {
-                            // TODO improve handling of timeout in combination with promises
                             if (reject) { reject({ success: false, message: 'Timed out' }); }
                         }
                     }
