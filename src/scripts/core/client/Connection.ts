@@ -403,7 +403,8 @@ class LocalConnection extends GenericConnection implements Connection {
         let reqHeaders = super.getRequestHeaders(headers);
         // contextToken = application id (ex. 26)
         let contextToken = this.cfg.contextToken;
-        if (contextToken && !_.isNil(contextToken)) {
+        // only send the relay state header for unmanaged installs
+        if (!this.cfg.isManaged && contextToken && !_.isNil(contextToken)) {
             reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
         }
         return reqHeaders;

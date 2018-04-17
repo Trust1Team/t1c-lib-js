@@ -276,6 +276,7 @@ var GCLLib =
 	        this._apiKey = options.apiKey;
 	        this._gwJwt = options.gwJwt;
 	        this._citrix = false;
+	        this._isManaged = false;
 	        this._agentPort = options.agentPort || -1;
 	        this._implicitDownload = options.implicitDownload || defaults.implicitDownload;
 	        this._localTestMode = options.localTestMode || defaults.localTestMode;
@@ -370,6 +371,16 @@ var GCLLib =
 	        },
 	        set: function (value) {
 	            this._citrix = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "isManaged", {
+	        get: function () {
+	            return this._isManaged;
+	        },
+	        set: function (value) {
+	            this._isManaged = value;
 	        },
 	        enumerable: true,
 	        configurable: true
@@ -37627,7 +37638,7 @@ var GCLLib =
 	    LocalConnection.prototype.getRequestHeaders = function (headers) {
 	        var reqHeaders = _super.prototype.getRequestHeaders.call(this, headers);
 	        var contextToken = this.cfg.contextToken;
-	        if (contextToken && !_.isNil(contextToken)) {
+	        if (!this.cfg.isManaged && contextToken && !_.isNil(contextToken)) {
 	            reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
 	        }
 	        return reqHeaders;
@@ -64833,6 +64844,7 @@ var GCLLib =
 	                var cfg = client.config();
 	                client.core().info().then(function (infoResponse) {
 	                    cfg.citrix = infoResponse.data.citrix;
+	                    cfg.isManaged = infoResponse.data.managed;
 	                    cfg.tokenCompatible = InitUtil.checkTokenCompatible(infoResponse.data.version);
 	                    cfg.v2Compatible = InitUtil.coreV2Compatible(infoResponse.data.version);
 	                    if (cfg.v2Compatible) {

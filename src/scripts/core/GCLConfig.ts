@@ -86,6 +86,7 @@ class GCLConfig implements GCLConfig {
     private _osPinDialog: boolean;
     private _containerDownloadTimeout: number;
     private _contextToken: string;
+    private _isManaged: boolean;
 
     // constructor for DTO
     constructor(options: GCLConfigOptions) {
@@ -97,6 +98,7 @@ class GCLConfig implements GCLConfig {
         this._apiKey = options.apiKey;
         this._gwJwt = options.gwJwt;
         this._citrix = false; // will be set to true during initialisation if Citrix environment is detected
+        this._isManaged = false; // will be set to true during initialisation if managed install is detected
         this._agentPort = options.agentPort || -1;
         this._implicitDownload = options.implicitDownload || defaults.implicitDownload;
         this._localTestMode = options.localTestMode || defaults.localTestMode;
@@ -169,6 +171,14 @@ class GCLConfig implements GCLConfig {
 
     set citrix(value: boolean) {
         this._citrix = value;
+    }
+
+    get isManaged(): boolean {
+        return this._isManaged;
+    }
+
+    set isManaged(value: boolean) {
+        this._isManaged = value;
     }
 
     get agentPort(): number {
