@@ -64835,6 +64835,7 @@ var GCLLib =
 	var DSClientModel_1 = __webpack_require__(167);
 	var PubKeyService_1 = __webpack_require__(176);
 	var CoreExceptions_1 = __webpack_require__(154);
+	var axios_1 = __webpack_require__(3);
 	var InitUtil = (function () {
 	    function InitUtil() {
 	    }
@@ -64883,7 +64884,12 @@ var GCLLib =
 	                    }
 	                }, function () {
 	                    client.GCLInstalled = false;
-	                    reject(new CoreExceptions_1.RestException(400, '302', 'No installed GCL component found. Please download and install the GCL.', client));
+	                    axios_1.default.get('https://localhost:10443/v1').then(function (response) {
+	                        console.log(response);
+	                        reject(new CoreExceptions_1.RestException(400, '301', 'Installed GCL version is not v2 compatible. Please update to a compatible version.', client));
+	                    }).catch(function () {
+	                        reject(new CoreExceptions_1.RestException(400, '302', 'No installed GCL component found. Please download and install the GCL.', client));
+	                    });
 	                });
 	            });
 	            initPromise.then(function () {
