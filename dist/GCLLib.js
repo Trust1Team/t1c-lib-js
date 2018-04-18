@@ -19146,7 +19146,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return Promise.resolve('v2.1.0');
+	        return Promise.resolve('v2.1.1');
 	    };
 	    return CoreService;
 	}());
@@ -64519,7 +64519,7 @@ var GCLLib =
 	        });
 	    };
 	    SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
-	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.0'), containers));
+	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.1'), containers));
 	    };
 	    SyncUtil.pollDownloadCompletion = function (client, containerConfig, isRetry) {
 	        var maxSeconds = client.config().containerDownloadTimeout || 30;
@@ -64835,6 +64835,7 @@ var GCLLib =
 	var DSClientModel_1 = __webpack_require__(167);
 	var PubKeyService_1 = __webpack_require__(176);
 	var CoreExceptions_1 = __webpack_require__(154);
+	var axios_1 = __webpack_require__(3);
 	var InitUtil = (function () {
 	    function InitUtil() {
 	    }
@@ -64883,7 +64884,11 @@ var GCLLib =
 	                    }
 	                }, function () {
 	                    client.GCLInstalled = false;
-	                    reject(new CoreExceptions_1.RestException(400, '302', 'No installed GCL component found. Please download and install the GCL.', client));
+	                    axios_1.default.get('https://localhost:10443/v1').then(function (response) {
+	                        reject(new CoreExceptions_1.RestException(400, '301', 'Installed GCL version is not v2 compatible. Please update to a compatible version.', client));
+	                    }).catch(function () {
+	                        reject(new CoreExceptions_1.RestException(400, '302', 'No installed GCL component found. Please download and install the GCL.', client));
+	                    });
 	                });
 	            });
 	            initPromise.then(function () {
@@ -66265,7 +66270,7 @@ var GCLLib =
 	    };
 	    ActivationUtil.registerDevice = function (client, mergedInfo, uuid) {
 	        return client.admin().getPubKey().then(function (pubKey) {
-	            return client.ds().register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.managed, mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.0')));
+	            return client.ds().register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.managed, mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.1')));
 	        });
 	    };
 	    ActivationUtil.activateDevice = function (args) {

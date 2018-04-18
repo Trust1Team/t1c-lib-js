@@ -10,6 +10,9 @@ import { ActivationUtil } from './ActivationUtil';
 import { DSPlatformInfo } from '../core/ds/DSClientModel';
 import { PubKeyService } from './PubKeyService';
 import { RestException } from '../core/exceptions/CoreExceptions';
+import { GenericConnection } from '../core/client/Connection';
+import { AxiosError, AxiosResponse } from 'axios';
+import axios from 'axios';
 
 export { InitUtil };
 
@@ -88,9 +91,17 @@ class InitUtil {
                 }, () => {
                     // failure probably because GCL is not installed
                     client.GCLInstalled = false;
-                    // return the client in the error so a new version can be downloaded!
-                    reject(new RestException(400, '302',
-                        'No installed GCL component found. Please download and install the GCL.', client));
+                    // check if older GCL version is available at v1 endpoint
+                    axios.get('https://localhost:10443/v1').then((response: AxiosResponse) => {
+                        // response received, inform user that he needs to update
+                        reject(new RestException(400, '301',
+                            'Installed GCL version is not v2 compatible. Please update to a compatible version.', client));
+                    }).catch(() => {
+                        // no response, no older GCL version installed
+                        // return the client in the error so a new version can be downloaded!
+                        reject(new RestException(400, '302',
+                            'No installed GCL component found. Please download and install the GCL.', client));
+                    });
                 });
             });
             initPromise.then(() => {
