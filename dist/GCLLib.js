@@ -19146,7 +19146,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return Promise.resolve('v2.1.1');
+	        return Promise.resolve('v2.1.2');
 	    };
 	    return CoreService;
 	}());
@@ -64369,9 +64369,6 @@ var GCLLib =
 	            else if (findDescription(card.description, 'MOBIB')) {
 	                return 'mobib';
 	            }
-	            else if (findDescription(card.description, 'Mastercard')) {
-	                return 'emv';
-	            }
 	            else if (findDescription(card.description, 'Oberthur')) {
 	                return 'oberthur';
 	            }
@@ -64387,6 +64384,12 @@ var GCLLib =
 	            else if (findDescription(card.description, 'Portuguese')) {
 	                return 'pteid';
 	            }
+	            else if (findDescription(card.description, 'Mastercard') ||
+	                findDescription(card.description, 'American') ||
+	                findDescription(card.description, 'VISA') ||
+	                findDescription(card.description, 'Bank')) {
+	                return 'emv';
+	            }
 	            else {
 	                return undefined;
 	            }
@@ -64396,7 +64399,9 @@ var GCLLib =
 	        }
 	        function findDescription(descriptions, toFind) {
 	            return !!_.find(descriptions, function (desc) {
-	                return desc.indexOf(toFind) > -1;
+	                var lowercaseDesc = desc.toLowerCase();
+	                var lowercaseToFind = toFind.toLowerCase();
+	                return lowercaseDesc.indexOf(lowercaseToFind) > -1;
 	            });
 	        }
 	    };
@@ -64519,7 +64524,7 @@ var GCLLib =
 	        });
 	    };
 	    SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
-	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.1'), containers));
+	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.2'), containers));
 	    };
 	    SyncUtil.pollDownloadCompletion = function (client, containerConfig, isRetry) {
 	        var maxSeconds = client.config().containerDownloadTimeout || 30;
@@ -66270,7 +66275,7 @@ var GCLLib =
 	    };
 	    ActivationUtil.registerDevice = function (client, mergedInfo, uuid) {
 	        return client.admin().getPubKey().then(function (pubKey) {
-	            return client.ds().register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.managed, mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.1')));
+	            return client.ds().register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.managed, mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.2')));
 	        });
 	    };
 	    ActivationUtil.activateDevice = function (args) {
