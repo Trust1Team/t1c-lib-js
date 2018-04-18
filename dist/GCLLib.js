@@ -64369,9 +64369,6 @@ var GCLLib =
 	            else if (findDescription(card.description, 'MOBIB')) {
 	                return 'mobib';
 	            }
-	            else if (findDescription(card.description, 'Mastercard')) {
-	                return 'emv';
-	            }
 	            else if (findDescription(card.description, 'Oberthur')) {
 	                return 'oberthur';
 	            }
@@ -64387,6 +64384,12 @@ var GCLLib =
 	            else if (findDescription(card.description, 'Portuguese')) {
 	                return 'pteid';
 	            }
+	            else if (findDescription(card.description, 'Mastercard') ||
+	                findDescription(card.description, 'American') ||
+	                findDescription(card.description, 'VISA') ||
+	                findDescription(card.description, 'Bank')) {
+	                return 'emv';
+	            }
 	            else {
 	                return undefined;
 	            }
@@ -64396,7 +64399,9 @@ var GCLLib =
 	        }
 	        function findDescription(descriptions, toFind) {
 	            return !!_.find(descriptions, function (desc) {
-	                return desc.indexOf(toFind) > -1;
+	                var lowercaseDesc = desc.toLowerCase();
+	                var lowercaseToFind = toFind.toLowerCase();
+	                return lowercaseDesc.indexOf(lowercaseToFind) > -1;
 	            });
 	        }
 	    };
