@@ -82,12 +82,16 @@ class CardUtil {
             else if (findDescription(card.description, 'LuxTrust card')) { return 'luxtrust'; }
             else if (findDescription(card.description, 'Juridic Person\'s Token (PKI)')) { return 'ocra'; }
             else if (findDescription(card.description, 'MOBIB')) { return 'mobib'; }
-            else if (findDescription(card.description, 'Mastercard')) { return 'emv'; }
             else if (findDescription(card.description, 'Oberthur')) { return 'oberthur'; }
             else if (findDescription(card.description, 'Aventra')) { return 'aventra'; }
             else if (findDescription(card.description, 'PIV')) { return 'piv'; }
             else if (findDescription(card.description, 'CIV')) { return 'piv'; }
             else if (findDescription(card.description, 'Portuguese')) { return 'pteid'; }
+            // emv check last to avoid any false positives
+            else if (findDescription(card.description, 'Mastercard') ||
+                     findDescription(card.description, 'American') ||
+                     findDescription(card.description, 'VISA') ||
+                     findDescription(card.description, 'Bank')) { return 'emv'; }
             else { return undefined; }
         } else {
             return undefined;
@@ -95,7 +99,10 @@ class CardUtil {
 
         function findDescription(descriptions: string[], toFind: string) {
             return !!_.find(descriptions, desc => {
-                return desc.indexOf(toFind) > -1;
+                // make sure there are no casing issues with our search strings
+                const lowercaseDesc = desc.toLowerCase();
+                const lowercaseToFind = toFind.toLowerCase();
+                return lowercaseDesc.indexOf(lowercaseToFind) > -1;
             });
         }
     }
