@@ -1,7 +1,7 @@
 (function ($) {
     var gclConfig = new GCLLib.GCLConfig({
         apiKey: "1c79d46d-72e3-43ed-8c66-d5ffca6fd98b",
-        pkcs11ModuleConfig: {
+        pkcs11Config: {
             linux: '/usr/local/lib/libeTPkcs11.so',
             mac: '/usr/local/lib/libeTPkcs11.dylib',
             win: 'C:\\Windows\\System32\\eTPKCS11.dll'
@@ -369,10 +369,11 @@
         var pkcs11 = connector.pkcs11();
         pkcs11.slotsWithTokenPresent().then(handleSuccess, handleError);
     });
-    $("#pkcs11Tokens").on('click', function () {
+    $("#pkcs11Token").on('click', function () {
         $("#information").empty();
         var pkcs11 = connector.pkcs11();
-        pkcs11.tokens().then(handleSuccess, handleError);
+        var slotId = parseInt($("#pkcs11Slot").val());
+        pkcs11.token(slotId).then(handleSuccess, handleError);
     });
 
     $("#buttonValidateEMV").on('click', function () {
