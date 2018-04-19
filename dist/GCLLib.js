@@ -108,7 +108,7 @@ var GCLLib =
 	        this.pluginFactory = new PluginFactory_1.PluginFactory(this.cfg.gclUrl, this.connection);
 	        this.adminService = new admin_1.AdminService(this.cfg.gclUrl, this.authConnection);
 	        this.coreService = new CoreService_1.CoreService(this.cfg.gclUrl, this.authConnection);
-	        this.agentClient = new agent_1.AgentClient(this.cfg.gclUrl, this.connection);
+	        this.agentClient = new agent_1.AgentClient(this.cfg.gclUrl, this.authConnection);
 	        if (this.cfg.localTestMode) {
 	            this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg);
 	        }
