@@ -39325,7 +39325,7 @@ var GCLLib =
 	            var connection = new Connection_1.LocalAuthConnection(cfg);
 	            body.os_dialog = connection.cfg.osPinDialog;
 	            connection.get(connection.cfg.gclUrl, CORE_READERS + '/' + readerId, undefined).then(function (reader) {
-	                body.pinpad = reader.data.pinpad;
+	                body.pinpad = reader.data.pinpad || false;
 	                if (connection.cfg.forceHardwarePinpad) {
 	                    if (body.pinpad) {
 	                        if (body.pin) {
@@ -63907,7 +63907,9 @@ var GCLLib =
 	            slot_id: signData.slot_id,
 	            pin: PinEnforcer_1.PinEnforcer.encryptPin(signData.pin),
 	            data: signData.data,
-	            digest: signData.algorithm_reference
+	            digest: signData.algorithm_reference,
+	            pinpad: false,
+	            os_dialog: this.connection.cfg.osPinDialog
 	        };
 	        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.SIGN), req, undefined).then(function (data) {
 	            return ResponseHandler_1.ResponseHandler.response(data, callback);
@@ -63947,7 +63949,9 @@ var GCLLib =
 	            pin: PinEnforcer_1.PinEnforcer.encryptPin(verifyData.pin),
 	            data: verifyData.data,
 	            digest: verifyData.algorithm_reference,
-	            signature: verifyData.signature
+	            signature: verifyData.signature,
+	            pinpad: false,
+	            os_dialog: this.connection.cfg.osPinDialog
 	        };
 	        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.VERIFY), req, undefined).then(function (data) {
 	            return ResponseHandler_1.ResponseHandler.response(data, callback);

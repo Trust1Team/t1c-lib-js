@@ -5,7 +5,8 @@
             linux: '/usr/local/lib/libeTPkcs11.so',
             mac: '/usr/local/lib/libeTPkcs11.dylib',
             win: 'C:\\Windows\\System32\\eTPKCS11.dll'
-        }
+        },
+        osPinDialog: true
     });
     // gclConfig.apiKey = "2cc27598-2af7-48af-a2df-c7352e5368ff"; //test apikey rate limited
     // gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
@@ -374,6 +375,19 @@
         var pkcs11 = connector.pkcs11();
         var slotId = parseInt($("#pkcs11Slot").val());
         pkcs11.token(slotId).then(handleSuccess, handleError);
+    });
+    $("#pkcs11Verify").on('click', function () {
+        $("#information").empty();
+        var pkcs11 = connector.pkcs11();
+        var data = {
+            slot_id: parseInt($("#pkcs11Slot").val()),
+            cert_id: $("#pkcs11CertId").val(),
+            data: $("#pkcs11Data").val(),
+            pin: $("#pkcs11Pin").val(),
+            algorithm_reference: $("#pkcs11Algo").val(),
+            signature: $("#pkcs11SignedData").val()
+        };
+        pkcs11.verifySignedData(data).then(handleSuccess, handleError);
     });
 
     $("#buttonValidateEMV").on('click', function () {

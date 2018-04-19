@@ -79,7 +79,9 @@ class PKCS11 implements AbstractPkcs11 {
             slot_id: signData.slot_id,
             pin: PinEnforcer.encryptPin(signData.pin),
             data: signData.data,
-            digest: signData.algorithm_reference
+            digest: signData.algorithm_reference,
+            pinpad: false,
+            os_dialog: this.connection.cfg.osPinDialog
         };
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.SIGN), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
@@ -124,7 +126,9 @@ class PKCS11 implements AbstractPkcs11 {
             pin: PinEnforcer.encryptPin(verifyData.pin),
             data: verifyData.data,
             digest: verifyData.algorithm_reference,
-            signature: verifyData.signature
+            signature: verifyData.signature,
+            pinpad: false,
+            os_dialog: this.connection.cfg.osPinDialog
         };
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.VERIFY), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
