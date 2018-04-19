@@ -77,7 +77,7 @@ class GCLClient {
         this.pluginFactory = new PluginFactory(this.cfg.gclUrl, this.connection);
         this.adminService = new AdminService(this.cfg.gclUrl, this.authConnection);
         this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
-        this.agentClient = new AgentClient(this.cfg.gclUrl, this.connection);
+        this.agentClient = new AgentClient(this.cfg.gclUrl, this.authConnection);
         if (this.cfg.localTestMode) { this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg); }
         else { this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg); }
         // TODO don't init if OCV not enabled
