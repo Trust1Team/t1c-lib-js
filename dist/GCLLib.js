@@ -64386,8 +64386,7 @@ var GCLLib =
 	            }
 	            else if (findDescription(card.description, 'Mastercard') ||
 	                findDescription(card.description, 'American') ||
-	                findDescription(card.description, 'VISA') ||
-	                findDescription(card.description, 'Bank')) {
+	                findDescription(card.description, 'VISA')) {
 	                return 'emv';
 	            }
 	            else {
