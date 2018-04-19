@@ -1,50 +1,52 @@
 (function ($) {
-    var gclConfig = new GCLLib.GCLConfig();
-    gclConfig.apiKey = "2cc27598-2af7-48af-a2df-c7352e5368ff"; //test apikey rate limited
-    gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
-    gclConfig.ocvUrl = "https://accapim.t1t.be:443/trust1team/ocv-api/v1";
+    var gclConfig = new GCLLib.GCLConfig({
+        apiKey: "1c79d46d-72e3-43ed-8c66-d5ffca6fd98b",
+        pkcs11Config: {
+            linux: '/usr/local/lib/libeTPkcs11.so',
+            mac: '/usr/local/lib/libeTPkcs11.dylib',
+            win: 'C:\\Windows\\System32\\eTPKCS11.dll'
+        },
+        osPinDialog: true
+    });
+    // gclConfig.apiKey = "2cc27598-2af7-48af-a2df-c7352e5368ff"; //test apikey rate limited
+    // gclConfig.gclUrl = "https://localhost:10443/v1"; //override config for local dev
+    // gclConfig.ocvUrl = "https://accapim.t1t.be:443/trust1team/ocv-api/v1";
     //gclConfig.ocvUrl = "http://localhost:8080/ocv-api-web/v1";
-    gclConfig.localTestMode=false;
-    gclConfig.allowAutoUpdate = true;
-    gclConfig.implicitDownload = false;
+    // gclConfig.localTestMode=false;
+    // gclConfig.allowAutoUpdate = true;
+    // gclConfig.implicitDownload = false;
 
-    if (gclConfig.localTestMode) {
-        gclConfig.dsUrl = "http://localhost:8080";
-    } else {
-        gclConfig.dsUrl = "https://accapim.t1t.be:443";
-        //gclConfig.dsUrl = "https://accapim.t1t.be:443";
-        //gclConfig.dsUrl = "https://prodapim.t1t.be:443";
-        //gclConfig.dsUrl = "https://t1c.t1t.be:443";
+    var connector;
 
-    }
 
-    var connector = new GCLLib.GCLClient(gclConfig);
+    GCLLib.GCLClient.initialize(gclConfig).then(function(client) {
+        connector = client;
+        connector.core().info().then(function(data) {
+            $("#error").empty();
+            $("#error").append(data.data.version);
 
-    connector.core().info().then(function(data) {
-        $("#error").empty();
-        $("#error").append(data.data.version);
-
-        if (data && data.data.activated === true) {
-            //check card readers upon refresh and provide the info
-            var core = connector.core();
-            core.readers().then(function(data) {
-                if (data && data.data) {
-                    data.data.forEach(function(reader) {
-                        if (reader.card) {
-                            $("#readerlist").append( '<li id="liid"><a href="#" ><h5><span' +
-                                                     ' class="label label-success" >' + reader.id + '</span></h5></a></li>' );
-                        } else {
-                            $("#readerlist").append( '<li><a href="#"><h5><span class="label' +
-                                                     ' label-warning">' + reader.id + '</span></h5></a></li>' );
-                        }
-                    })
-                } else {
-                    $("#readerlist").append( '<li> No readers connected </li>' );
-                }
-            }, function(err) {
-                console.log(JSON.stringify(err));
-            });
-        }
+            if (data && data.data.activated === true) {
+                //check card readers upon refresh and provide the info
+                var core = connector.core();
+                core.readers().then(function(data) {
+                    if (data && data.data) {
+                        data.data.forEach(function(reader) {
+                            if (reader.card) {
+                                $("#readerlist").append( '<li id="liid"><a href="#" ><h5><span' +
+                                                         ' class="label label-success" >' + reader.id + '</span></h5></a></li>' );
+                            } else {
+                                $("#readerlist").append( '<li><a href="#"><h5><span class="label' +
+                                                         ' label-warning">' + reader.id + '</span></h5></a></li>' );
+                            }
+                        })
+                    } else {
+                        $("#readerlist").append( '<li> No readers connected </li>' );
+                    }
+                }, function(err) {
+                    console.log(JSON.stringify(err));
+                });
+            }
+        });
     });
 
     function handleSuccess(data) {
@@ -332,46 +334,60 @@
 
     });
 
-    // SafeNet PKCS11 functionality
-    $("#safenetCerts").on('click', function () {
+    // PKCS11 functionality
+    $("#pkcs11Certs").on('click', function () {
         $("#information").empty();
-        var safenet = connector.safenet();
-        safenet.certificates(parseInt($("#safenetSlot").val())).then(handleSuccess, handleError);
+        var pkcs11 = connector.pkcs11();
+        pkcs11.certificates(parseInt($("#pkcs11Slot").val())).then(handleSuccess, handleError);
     });
-    $("#safenetInfo").on('click', function () {
+    $("#pkcs11Info").on('click', function () {
         $("#information").empty();
-        var safenet = connector.safenet();
+        var pkcs11 = connector.pkcs11();
         var body = {
-            pin: $("#safenetPin").val()
+            pin: $("#pkcs11Pin").val()
         };
-        safenet.info(body).then(handleSuccess, handleError);
+        pkcs11.info(body).then(handleSuccess, handleError);
     });
-    $("#safenetSign").on('click', function () {
+    $("#pkcs11Sign").on('click', function () {
         $("#information").empty();
-        var safenet = connector.safenet();
+        var pkcs11 = connector.pkcs11();
         var data = {
-            slot_id: parseInt($("#safenetSlot").val()),
-            cert_id: $("#safenetCertId").val(),
-            data: $("#safenetData").val(),
-            pin: $("#safenetPin").val(),
-            algorithm_reference: $("#safenetAlgo").val()
+            slot_id: parseInt($("#pkcs11Slot").val()),
+            cert_id: $("#pkcs11CertId").val(),
+            data: $("#pkcs11Data").val(),
+            pin: $("#pkcs11Pin").val(),
+            algorithm_reference: $("#pkcs11Algo").val()
         };
-        safenet.signData(data).then(handleSuccess, handleError);
+        pkcs11.signData(data).then(handleSuccess, handleError);
     });
-    $("#safenetSlots").on('click', function () {
+    $("#pkcs11Slots").on('click', function () {
         $("#information").empty();
-        var safenet = connector.safenet();
-        safenet.slots().then(handleSuccess, handleError);
+        var pkcs11 = connector.pkcs11();
+        pkcs11.slots().then(handleSuccess, handleError);
     });
-    $("#safenetSlotsWithToken").on('click', function () {
+    $("#pkcs11SlotsWithToken").on('click', function () {
         $("#information").empty();
-        var safenet = connector.safenet();
-        safenet.slotsWithTokenPresent().then(handleSuccess, handleError);
+        var pkcs11 = connector.pkcs11();
+        pkcs11.slotsWithTokenPresent().then(handleSuccess, handleError);
     });
-    $("#safenetTokens").on('click', function () {
+    $("#pkcs11Token").on('click', function () {
         $("#information").empty();
-        var safenet = connector.safenet();
-        safenet.tokens().then(handleSuccess, handleError);
+        var pkcs11 = connector.pkcs11();
+        var slotId = parseInt($("#pkcs11Slot").val());
+        pkcs11.token(slotId).then(handleSuccess, handleError);
+    });
+    $("#pkcs11Verify").on('click', function () {
+        $("#information").empty();
+        var pkcs11 = connector.pkcs11();
+        var data = {
+            slot_id: parseInt($("#pkcs11Slot").val()),
+            cert_id: $("#pkcs11CertId").val(),
+            data: $("#pkcs11Data").val(),
+            pin: $("#pkcs11Pin").val(),
+            algorithm_reference: $("#pkcs11Algo").val(),
+            signature: $("#pkcs11SignedData").val()
+        };
+        pkcs11.verifySignedData(data).then(handleSuccess, handleError);
     });
 
     $("#buttonValidateEMV").on('click', function () {

@@ -19146,7 +19146,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return Promise.resolve('v2.1.3');
+	        return Promise.resolve('v2.1.4');
 	    };
 	    return CoreService;
 	}());
@@ -37533,7 +37533,7 @@ var GCLLib =
 	                        callback(null, response.data);
 	                        return resolve(response.data);
 	                    }).catch(function (error) {
-	                        if (!error.code) {
+	                        if (!error.code && !error.response) {
 	                            var thrownError = new CoreExceptions_1.RestException(500, '999', 'Network error occurred. Request could not be completed');
 	                            callback(thrownError, null);
 	                            return reject(thrownError);
@@ -38762,8 +38762,9 @@ var GCLLib =
 	}(T1CResponse));
 	exports.CertificatesResponse = CertificatesResponse;
 	var T1CCertificate = (function () {
-	    function T1CCertificate(base64, parsed) {
+	    function T1CCertificate(base64, id, parsed) {
 	        this.base64 = base64;
+	        this.id = id;
 	        this.parsed = parsed;
 	    }
 	    return T1CCertificate;
@@ -39324,7 +39325,7 @@ var GCLLib =
 	            var connection = new Connection_1.LocalAuthConnection(cfg);
 	            body.os_dialog = connection.cfg.osPinDialog;
 	            connection.get(connection.cfg.gclUrl, CORE_READERS + '/' + readerId, undefined).then(function (reader) {
-	                body.pinpad = reader.data.pinpad;
+	                body.pinpad = reader.data.pinpad || false;
 	                if (connection.cfg.forceHardwarePinpad) {
 	                    if (body.pinpad) {
 	                        if (body.pin) {
@@ -43796,7 +43797,7 @@ var GCLLib =
 	                        newData_2.push(cert);
 	                    }
 	                    else {
-	                        var cert = new CoreModel_1.T1CCertificate(certificate.base64);
+	                        var cert = new CoreModel_1.T1CCertificate(certificate.base64, certificate.id);
 	                        CertParser.setParsed(cert, certificate.base64, parseCerts);
 	                        newData_2.push(cert);
 	                    }
@@ -63905,7 +63906,9 @@ var GCLLib =
 	            slot_id: signData.slot_id,
 	            pin: PinEnforcer_1.PinEnforcer.encryptPin(signData.pin),
 	            data: signData.data,
-	            digest: signData.algorithm_reference
+	            digest: signData.algorithm_reference,
+	            pinpad: false,
+	            os_dialog: this.connection.cfg.osPinDialog
 	        };
 	        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.SIGN), req, undefined).then(function (data) {
 	            return ResponseHandler_1.ResponseHandler.response(data, callback);
@@ -63945,7 +63948,9 @@ var GCLLib =
 	            pin: PinEnforcer_1.PinEnforcer.encryptPin(verifyData.pin),
 	            data: verifyData.data,
 	            digest: verifyData.algorithm_reference,
-	            signature: verifyData.signature
+	            signature: verifyData.signature,
+	            pinpad: false,
+	            os_dialog: this.connection.cfg.osPinDialog
 	        };
 	        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.VERIFY), req, undefined).then(function (data) {
 	            return ResponseHandler_1.ResponseHandler.response(data, callback);
@@ -64523,7 +64528,7 @@ var GCLLib =
 	        });
 	    };
 	    SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
-	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.3'), containers));
+	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.4'), containers));
 	    };
 	    SyncUtil.pollDownloadCompletion = function (client, containerConfig, isRetry) {
 	        var maxSeconds = client.config().containerDownloadTimeout || 30;
@@ -66274,7 +66279,7 @@ var GCLLib =
 	    };
 	    ActivationUtil.registerDevice = function (client, mergedInfo, uuid) {
 	        return client.admin().getPubKey().then(function (pubKey) {
-	            return client.ds().register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.managed, mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.3')));
+	            return client.ds().register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.managed, mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.4')));
 	        });
 	    };
 	    ActivationUtil.activateDevice = function (args) {

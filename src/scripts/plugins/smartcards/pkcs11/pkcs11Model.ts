@@ -57,7 +57,7 @@ class SlotsResponse extends DataObjectResponse {
 
 class Pkcs11Certificate extends T1CCertificate {
     constructor(public id: string, public base64: string, public parsed?: object) {
-        super(base64, parsed);
+        super(base64, id, parsed);
     }
 }
 
