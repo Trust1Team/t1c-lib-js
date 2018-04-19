@@ -37533,7 +37533,7 @@ var GCLLib =
 	                        callback(null, response.data);
 	                        return resolve(response.data);
 	                    }).catch(function (error) {
-	                        if (!error.code) {
+	                        if (!error.code && !error.response) {
 	                            var thrownError = new CoreExceptions_1.RestException(500, '999', 'Network error occurred. Request could not be completed');
 	                            callback(thrownError, null);
 	                            return reject(thrownError);
