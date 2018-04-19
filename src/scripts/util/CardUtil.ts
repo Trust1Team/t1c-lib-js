@@ -90,8 +90,7 @@ class CardUtil {
             // emv check last to avoid any false positives
             else if (findDescription(card.description, 'Mastercard') ||
                      findDescription(card.description, 'American') ||
-                     findDescription(card.description, 'VISA') ||
-                     findDescription(card.description, 'Bank')) { return 'emv'; }
+                     findDescription(card.description, 'VISA')) { return 'emv'; }
             else { return undefined; }
         } else {
             return undefined;
