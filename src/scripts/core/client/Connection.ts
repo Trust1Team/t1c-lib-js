@@ -286,7 +286,7 @@ abstract class GenericConnection implements Connection {
                         return resolve(response.data);
                     }).catch(function (error: AxiosError) {
                         // check for generic network error
-                        if (!error.code) {
+                        if (!error.code && !error.response) {
                             const thrownError = new RestException(500, '999', 'Network error occurred. Request could not be completed');
                             callback(thrownError, null);
                             return reject(thrownError);
