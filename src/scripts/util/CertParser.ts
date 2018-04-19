@@ -39,6 +39,7 @@ class CertParser {
         } else {
             // assuming data is a string or string[]
             if (_.isArray(response.data)) {
+                console.log('cert array');
                 let newData = [];
                 _.forEach(response.data, (certificate: string | { base64: string, id: string }) => {
                     if (typeof certificate === 'string') {
@@ -47,7 +48,7 @@ class CertParser {
                         newData.push(cert);
                     } else {
                         // assume object
-                        let cert: T1CCertificate = new T1CCertificate(certificate.base64);
+                        let cert: T1CCertificate = new T1CCertificate(certificate.base64, certificate.id);
                         CertParser.setParsed(cert, certificate.base64, parseCerts);
                         newData.push(cert);
                     }

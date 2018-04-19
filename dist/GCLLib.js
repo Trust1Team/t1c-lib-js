@@ -38762,8 +38762,9 @@ var GCLLib =
 	}(T1CResponse));
 	exports.CertificatesResponse = CertificatesResponse;
 	var T1CCertificate = (function () {
-	    function T1CCertificate(base64, parsed) {
+	    function T1CCertificate(base64, id, parsed) {
 	        this.base64 = base64;
+	        this.id = id;
 	        this.parsed = parsed;
 	    }
 	    return T1CCertificate;
@@ -43788,6 +43789,7 @@ var GCLLib =
 	        }
 	        else {
 	            if (_.isArray(response.data)) {
+	                console.log('cert array');
 	                var newData_2 = [];
 	                _.forEach(response.data, function (certificate) {
 	                    if (typeof certificate === 'string') {
@@ -43796,7 +43798,7 @@ var GCLLib =
 	                        newData_2.push(cert);
 	                    }
 	                    else {
-	                        var cert = new CoreModel_1.T1CCertificate(certificate.base64);
+	                        var cert = new CoreModel_1.T1CCertificate(certificate.base64, certificate.id);
 	                        CertParser.setParsed(cert, certificate.base64, parseCerts);
 	                        newData_2.push(cert);
 	                    }
