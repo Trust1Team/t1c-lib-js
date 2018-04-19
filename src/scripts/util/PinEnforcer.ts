@@ -46,7 +46,7 @@ class PinEnforcer {
             let connection = new LocalAuthConnection(cfg);
             body.os_dialog = connection.cfg.osPinDialog;
             connection.get(connection.cfg.gclUrl, CORE_READERS + '/' + readerId, undefined).then(reader => {
-                body.pinpad = reader.data.pinpad;
+                body.pinpad = reader.data.pinpad || false;
 
                 // check if we need to force HW pinpad
                 if (connection.cfg.forceHardwarePinpad) {
