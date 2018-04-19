@@ -43789,7 +43789,6 @@ var GCLLib =
 	        }
 	        else {
 	            if (_.isArray(response.data)) {
-	                console.log('cert array');
 	                var newData_2 = [];
 	                _.forEach(response.data, function (certificate) {
 	                    if (typeof certificate === 'string') {
