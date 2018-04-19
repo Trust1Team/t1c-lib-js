@@ -39,7 +39,6 @@ class CertParser {
         } else {
             // assuming data is a string or string[]
             if (_.isArray(response.data)) {
-                console.log('cert array');
                 let newData = [];
                 _.forEach(response.data, (certificate: string | { base64: string, id: string }) => {
                     if (typeof certificate === 'string') {
