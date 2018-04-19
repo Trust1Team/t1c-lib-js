@@ -389,8 +389,9 @@ class CertificatesResponse extends T1CResponse {
 }
 class T1CCertificate {
     base64: string;
+    id: string;
     parsed: object;
-    constructor(base64: string, parsed?: object);
+    constructor(base64: string, id?: string, parsed?: object);
 }
 class SingleReaderResponse extends T1CResponse {
     data: CardReader;

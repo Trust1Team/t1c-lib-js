@@ -141,7 +141,7 @@ class CertificatesResponse extends T1CResponse {
 }
 
 class T1CCertificate {
-    constructor(public base64: string, public parsed?: object) {}
+    constructor(public base64: string, public id?: string, public parsed?: object ) {}
 }
 
 class SingleReaderResponse extends T1CResponse {
