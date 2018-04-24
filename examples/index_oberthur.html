@@ -210,6 +210,10 @@
                         <input type="password" class="form-control" id="signpsw" placeholder="Enter pin code">
                     </div>
                     <div class="form-group">
+                        <label for="psw">Cert ID</label>
+                        <input type="text" class="form-control" id="signCertId" placeholder="Enter certificate ID">
+                    </div>
+                    <div class="form-group">
                         <pre id="signInfo" hidden="true"></pre>
                         <pre id="signError" hidden="true"></pre>
                     </div>
@@ -236,6 +240,10 @@
                         <label for="psw">Base64-encoded challenge (SHA1): I2e+u/sgy7fYgh+DWA0p2jzXQ7E=</label>
                         <label for="psw"><span class="glyphicon glyphicon-eye-open"></span> Pin</label>
                         <input type="password" class="form-control" id="authpsw" placeholder="Enter pin code">
+                    </div>
+                    <div class="form-group">
+                        <label for="psw">Cert ID</label>
+                        <input type="text" class="form-control" id="authCertId" placeholder="Enter certificate ID">
                     </div>
                     <div class="form-group">
                         <pre id="authInfo" hidden="true"></pre>
@@ -616,6 +624,7 @@
         $("#buttonSign").on('click', function () {
             var _body={};
             _body.pin = $("#signpsw").val();
+            _body.id = $("#signCertId").val();
             _body.algorithm_reference = "sha1";
             _body.data = "K4d2IAU03FedJ74fV7n/QfXkk/o=";
             connector.oberthur($("#selected_reader").text()).signData(_body, signCallback);
@@ -634,6 +643,7 @@
         $("#buttonAuth").on('click', function () {
             var _body={};
             _body.data = "K4d2IAU03FedJ74fV7n/QfXkk/o=";
+            _body.id = $("#authCertId").val();
             _body.algorithm_reference = "sha1";
             _body.pin = $("#authpsw").val();
             connector.oberthur($("#selected_reader").text()).authenticate(_body, authCallback);

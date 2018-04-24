@@ -50,7 +50,8 @@ interface SecuredCertCard {
 
 interface AuthenticateOrSignData extends OptionalPin {
     algorithm_reference: string
-    data: string
+    data: string,
+    id: string
 }
 
 interface ResetPinData {

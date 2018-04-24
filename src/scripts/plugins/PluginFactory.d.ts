@@ -1,0 +1,57 @@
+import { EMV } from './smartcards/emv/EMV';
+import { LocalConnection } from '../core/client/Connection';
+import { Mobib } from './smartcards/mobib/mobib';
+import { LuxTrust } from './smartcards/pki/luxtrust/LuxTrust';
+import { Ocra } from './smartcards/ocra/ocra';
+import { Aventra } from './smartcards/pki/aventra/Aventra';
+import { Oberthur } from './smartcards/pki/oberthur/Oberthur';
+import { PIV } from './smartcards/piv/piv';
+import { AbstractEidBE } from './smartcards/eid/be/EidBeModel';
+import { AbstractEMV } from './smartcards/emv/EMVModel';
+import { AbstractOcra } from './smartcards/ocra/ocraModel';
+import { AbstractAventra } from './smartcards/pki/aventra/AventraModel';
+import { AbstractLuxTrust } from './smartcards/pki/luxtrust/LuxTrustModel';
+import { AbstractOberthur } from './smartcards/pki/oberthur/OberthurModel';
+import { AbstractPiv } from './smartcards/piv/pivModel';
+import { AbstractMobib } from './smartcards/mobib/mobibModel';
+import { AbstractEidLUX } from './smartcards/eid/lux/EidLuxModel';
+import { AbstractDNIe } from './smartcards/eid/esp/dnieModel';
+import { AbstractEidPT } from './smartcards/eid/pt/EidPtModel';
+import { AbstractRemoteLoading } from './remote-loading/RemoteLoadingModel';
+import { AbstractBelfius } from './remote-loading/belfius/BelfiusModel';
+import { AbstractFileExchange } from './file/FileExchangeModel';
+import { AbstractPkcs11 } from './smartcards/pkcs11/pkcs11Model';
+import { AbstractDataContainer } from './data-container/DataContainerModel';
+export interface AbstractFactory {
+    createEidBE(reader_id?: string): AbstractEidBE;
+    createEidLUX(reader_id?: string): AbstractEidLUX;
+    createEmv(reader_id?: string): AbstractEMV;
+    createLuxTrust(reader_id?: string): AbstractLuxTrust;
+    createMobib(reader_id?: string): AbstractMobib;
+    createOcra(reader_id?: string): AbstractOcra;
+    createAventraNO(reader_id?: string): AbstractAventra;
+    createOberthurNO(reader_id?: string): AbstractOberthur;
+    createPIV(reader_id?: string): AbstractPiv;
+    createPKCS11(): AbstractPkcs11;
+}
+export declare class PluginFactory implements AbstractFactory {
+    private url;
+    private connection;
+    constructor(url: string, connection: LocalConnection);
+    createDNIe(reader_id?: string): AbstractDNIe;
+    createEidBE(reader_id?: string): AbstractEidBE;
+    createEidLUX(reader_id?: string, pin?: string): AbstractEidLUX;
+    createEidPT(reader_id?: string): AbstractEidPT;
+    createEmv(reader_id?: string): EMV;
+    createLuxTrust(reader_id?: string): LuxTrust;
+    createMobib(reader_id?: string): Mobib;
+    createOcra(reader_id?: string): Ocra;
+    createAventraNO(reader_id?: string): Aventra;
+    createOberthurNO(reader_id?: string): Oberthur;
+    createPIV(reader_id?: string): PIV;
+    createPKCS11(): AbstractPkcs11;
+    createRemoteLoading(reader_id?: string): AbstractRemoteLoading;
+    createBelfius(reader_id?: string): AbstractBelfius;
+    createFileExchange(): AbstractFileExchange;
+    createDataContainer(containerPath: string): () => AbstractDataContainer;
+}
