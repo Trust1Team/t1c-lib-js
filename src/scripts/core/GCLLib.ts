@@ -81,7 +81,12 @@ class GCLClient {
         if (this.cfg.localTestMode) { this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg); }
         else { this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg); }
         // TODO don't init if OCV not enabled
-        this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteApiKeyConnection);
+        // check if initialised with API key or JWT to determine which to use
+        if (this.cfg.apiKey && this.cfg.apiKey.length) {
+            this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteApiKeyConnection);
+        } else {
+            this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteConnection);
+        }
         this.authClient = new AuthClient(this.cfg, this.remoteApiKeyConnection);
         // keep reference to client in ClientService
         ClientService.setClient(this);
