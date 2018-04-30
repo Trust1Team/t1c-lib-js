@@ -1675,7 +1675,7 @@ interface AbstractFileExchange {
     listFiles(data: ListFilesRequest, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>;
     setFolder(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     downloadFile(path: string, file: ArrayBuffer, fileName: string): Promise<DataResponse>;
-    uploadFile(path: string): Promise<string>;
+    uploadFile(path: string): Promise<ArrayBuffer>;
 }
 declare class ListFilesRequest {
     path: string;

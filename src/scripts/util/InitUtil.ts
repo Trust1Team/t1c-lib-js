@@ -52,6 +52,7 @@ class InitUtil {
                             // console.log('managed');
                             // only attempt to sync if API key and DS URL are available,
                             // and if syncing for managed devices is turned on
+                            // TODO what if initialized with JWT?
                             if (cfg.apiKey && cfg.gwUrl && cfg.syncManaged) {
                                 // console.log('syncing');
                                 // attempt to sync
@@ -76,7 +77,7 @@ class InitUtil {
                                 // update core service
                                 client.updateAuthConnection(cfg);
                                 // device is activated, sync it
-                                resolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, false));
+                                resolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, infoResponse.data.containers));
                             }, err => {
                                 reject(err);
                                 // resolve(SyncUtil.unManagedSynchronization(client.admin(), client.ds(), cfg, mergedInfo, uuid));
