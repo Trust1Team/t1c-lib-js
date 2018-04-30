@@ -12,6 +12,7 @@ import { GCLClient } from '../core/GCLLib';
 import { RestException } from '../core/exceptions/CoreExceptions';
 import { T1CContainer } from '../core/service/CoreModel';
 import { ContainerSyncRequest } from '../core/admin/adminModel';
+import { ActivationUtil } from './ActivationUtil';
 
 export { SyncUtil };
 
@@ -27,14 +28,26 @@ class SyncUtil {
     // constructor
     constructor() {}
 
-    public static managedSynchronisation(client: GCLClient, mergedInfo: DSPlatformInfo, uuid: string, containers: T1CContainer[]) {
+    public static managedSynchronisation(client: GCLClient,
+                                         mergedInfo: DSPlatformInfo,
+                                         uuid: string,
+                                         containers: T1CContainer[]) {
         // this is NON-BLOCKING and will always resolve!
         return new Promise((resolve) => {
+            // make sure the DS pub key is set
             client.admin().getPubKey().then(keys => {
-                return SyncUtil.syncDevice(client, keys.data.device, mergedInfo, uuid, containers).then((deviceResponse) => {
-                    client.config().contextToken = deviceResponse.contextToken;
+                let keyPromise: Promise<any>;
+                if (keys.data.ds && keys.data.ds.length) {
+                    // ds key is available, we can continue
+                    keyPromise = Promise.resolve();
+                } else {
+                    // ds key not set, perform managed init
+                    keyPromise = ActivationUtil.managedInitialization(client, mergedInfo, uuid);
+                }
+                // execute sync flow
+                return keyPromise.then(() => SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, false).then(() => {
                     resolve();
-                });
+                }));
             }).catch(() => {
                 // error occurred, but non-blocking so we resolve
                 resolve();
@@ -45,49 +58,12 @@ class SyncUtil {
     public static unManagedSynchronization(client: GCLClient,
                                            mergedInfo: DSPlatformInfo,
                                            uuid: string,
-                                           isRetry: boolean) {
+                                           containers: T1CContainer[]) {
         // do core v2 sync flow
+        // unmanaged sync is blocking, so reject if an error occurs
         return new Promise((resolve, reject) => {
-            // get GCL Pubkey
-            // get current container state
-            // sync
-            // get container list
-            // pass container list to gcl
-            // wait completion/fail
-            // final sync with updated container list
-            client.admin().getPubKey().then(pubKey => {
-                return client.core().info().then(info => {
-                    return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, info.data.containers).then(device => {
-                        // set context token
-                        client.config().contextToken = device.contextToken;
-                        // pass ATR list info to GCL
-                        client.admin().atr(device.atrList);
-                        // update container config
-                        return client.admin().updateContainerConfig(new ContainerSyncRequest(device.containerResponses)).then(() => {
-                            // setup data container paths
-                            // TODO
-                            DataContainerUtil.setupDataContainers(device.containerResponses);
-
-                            return SyncUtil.pollDownloadCompletion(client,
-                                device.containerResponses, isRetry).then((finalContainerList) => {
-                                // all downloads complete, do final sync
-                                return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, finalContainerList).then(() => {
-                                    // lib ready to use
-                                    resolve();
-                                });
-                            }, (error) => {
-                                if (typeof error === 'boolean' && !isRetry) {
-                                    // need to trigger retry
-                                    console.log('download error, retrying');
-                                    resolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, true));
-                                } else {
-                                    // something went wrong, return error
-                                    reject(error);
-                                }
-                            });
-                        });
-                    });
-                });
+            SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, false).then(() => {
+                resolve();
             }).catch(err => {
                 reject(err);
             });
@@ -112,6 +88,45 @@ class SyncUtil {
             new DSClientInfo('JAVASCRIPT', '%%GULP_INJECT_VERSION%%'),
             containers)
         );
+    }
+
+    private static doSyncFlow(client: GCLClient, mergedInfo: DSPlatformInfo, uuid: string, containers: T1CContainer[], isRetry: boolean) {
+        // get GCL Pubkey
+        // get current container state
+        // sync
+        // get container list
+        // pass container list to gcl
+        // wait completion/fail
+        // final sync with updated container list
+        return client.admin().getPubKey().then(pubKey => {
+            return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, containers).then(device => {
+                // set context token
+                client.config().contextToken = device.contextToken;
+                // pass ATR list info to GCL
+                client.admin().atr(device.atrList);
+                // update container config
+                return client.admin().updateContainerConfig(new ContainerSyncRequest(device.containerResponses)).then(() => {
+                    // setup data container paths
+                    // TODO
+                    DataContainerUtil.setupDataContainers(device.containerResponses);
+
+                    return SyncUtil.pollDownloadCompletion(client,
+                        device.containerResponses, isRetry).then((finalContainerList) => {
+                        // all downloads complete, do final sync
+                        return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, finalContainerList);
+                    }, (error) => {
+                        if (typeof error === 'boolean' && !isRetry) {
+                            // need to trigger retry
+                            console.log('download error, retrying');
+                            return Promise.resolve(SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, true));
+                        } else {
+                            // something went wrong, return error
+                            return Promise.reject(error);
+                        }
+                    });
+                });
+            });
+        });
     }
 
     private static pollDownloadCompletion(client: GCLClient, containerConfig: DSContainer[], isRetry: boolean): Promise<T1CContainer[]> {
