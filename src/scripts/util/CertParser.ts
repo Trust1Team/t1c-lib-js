@@ -34,6 +34,10 @@ class CertParser {
                         });
                         response.data[ key ] = newData;
                     }
+                    if (_.isObject(value)) {
+                        response.data[ key ] = { base64: value.base64 };
+                        if (parseCerts) { response.data[ key ].parsed = CertParser.processCert(value.base64); }
+                    }
                 }
             });
         } else {
