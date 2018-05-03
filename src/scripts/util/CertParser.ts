@@ -25,7 +25,7 @@ class CertParser {
                         response.data[ key ] = { base64: value };
                         if (parseCerts) { response.data[ key ].parsed = CertParser.processCert(value); }
                     }
-                    if (_.isArray(value)) {
+                    else if (_.isArray(value)) {
                         let newData = [];
                         _.forEach(value, (certificate: string) => {
                             let cert: T1CCertificate = { base64: certificate };
@@ -34,7 +34,7 @@ class CertParser {
                         });
                         response.data[ key ] = newData;
                     }
-                    if (_.isObject(value)) {
+                    else if (_.isObject(value)) {
                         response.data[ key ] = { base64: value.base64 };
                         if (parseCerts) { response.data[ key ].parsed = CertParser.processCert(value.base64); }
                     }

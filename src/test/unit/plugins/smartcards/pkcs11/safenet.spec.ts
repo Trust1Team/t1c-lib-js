@@ -172,7 +172,10 @@ describe('SafeNet Container', () => {
             const algo = 'sha1';
             const slotId = 1;
 
-            return safenet.signData({ pin, slot_id: slotId, cert_id: certId, data, algorithm_reference: algo }).then(res => {
+            return safenet.signData({
+                id: '',
+                pace: '',
+                pin, slot_id: slotId, cert_id: certId, data, algorithm_reference: algo }).then(res => {
                 expect(res).to.have.property('success');
                 expect(res.success).to.be.a('boolean');
                 expect(res.success).to.eq(true);
@@ -196,7 +199,10 @@ describe('SafeNet Container', () => {
             const algo = 'sha256';
             const slotId = 7;
 
-            return defaultSafenet.signData({ pin, slot_id: slotId, cert_id: certId, data, algorithm_reference: algo }).then(res => {
+            return defaultSafenet.signData({
+                id: '',
+                pace: '',
+                pin, slot_id: slotId, cert_id: certId, data, algorithm_reference: algo }).then(res => {
                 expect(res).to.have.property('success');
                 expect(res.success).to.be.a('boolean');
                 expect(res.success).to.eq(true);

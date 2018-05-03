@@ -3,14 +3,14 @@
   "globalDependencies": {
     "assertion-error": "github:DefinitelyTyped/DefinitelyTyped/assertion-error/assertion-error.d.ts#830e4aaac859e4f648efaa16712f1d6e378e6902",
     "chai": "github:DefinitelyTyped/DefinitelyTyped/chai/chai.d.ts#830e4aaac859e4f648efaa16712f1d6e378e6902",
-    "jquery": "registry:dt/jquery#1.10.0+20160704162008",
+    "jquery": "registry:dt/jquery#1.10.0+20170310222111",
     "mocha": "github:DefinitelyTyped/DefinitelyTyped/mocha/mocha.d.ts#830e4aaac859e4f648efaa16712f1d6e378e6902",
     "pkijs": "registry:dt/pkijs#0.0.0+20161101131123",
     "platform": "registry:dt/platform#1.0.0+20160316155526",
     "sinon": "github:DefinitelyTyped/DefinitelyTyped/sinon/sinon.d.ts#830e4aaac859e4f648efaa16712f1d6e378e6902"
   },
   "dependencies": {
-    "debug": "registry:npm/debug#2.0.0+20160723033700",
+    "debug": "registry:npm/debug#2.0.0+20170504163145",
     "es6-promise": "registry:npm/es6-promise#3.0.0+20160211003958",
     "lodash": "registry:npm/lodash#4.0.0+20161015015725"
   }

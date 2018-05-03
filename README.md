@@ -43,6 +43,8 @@ Debug:
 $ typings install debug --save
 ```
 
+=> ?? npm install @types/node --save-dev
+
 Use npm install to download the necessary dependencies
 ```bash
 $ npm install

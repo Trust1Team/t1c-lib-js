@@ -132,11 +132,14 @@ class GenericService {
     private static filterByAvailableContainers(args: { client: GCLClient, readers: CardReadersResponse }): Promise<CardReadersResponse> {
         return args.client.core().plugins().then(plugins => {
             return new Promise<CardReadersResponse>((resolve) => {
-                args.readers.data = _.filter(args.readers.data, reader => {
+                let readerList = args.readers;
+                readerList.data = _.filter(args.readers.data, reader => {
                     // TODO optimize
-                    return _.find(plugins.data, ct => { return ct.id === CardUtil.determineContainer(reader.card); });
+                    return _.toLength(_.find(plugins.data, plugin => {
+                        return plugin.id === CardUtil.determineContainer(reader.card);
+                    })) > 0;
                 });
-                resolve(args.readers);
+                resolve(readerList);
             });
         });
     }
