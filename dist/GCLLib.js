@@ -25238,6 +25238,8 @@ var GCLLib =
 	
 				if (inputLength > 1) this.warnings.push("Boolean value encoded in more then 1 octet");
 	
+				this.value = intBuffer[0] !== 0x00;
+	
 				this.isHexOnly = true;
 	
 				//region Copy input buffer to internal array
@@ -25247,8 +25249,6 @@ var GCLLib =
 				for (var i = 0; i < intBuffer.length; i++) {
 					view[i] = intBuffer[i];
 				} //endregion
-	
-				if (_pvutils.utilDecodeTC.call(this) !== 0) this.value = true;else this.value = false;
 	
 				this.blockLength = inputLength;
 	
@@ -25488,11 +25488,6 @@ var GCLLib =
 				if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
 	
 				this.blockLength += inputLength;
-	
-				if (inputOffset + inputLength > inputBuffer.byteLength) {
-					this.error = "End of input reached before message was fully decoded (inconsistent offset and length values)";
-					return -1;
-				}
 	
 				return inputOffset + inputLength;
 			}
@@ -25772,7 +25767,7 @@ var GCLLib =
 	
 			_this19.unusedBits = (0, _pvutils.getParametersValue)(parameters, "unusedBits", 0);
 			_this19.isConstructed = (0, _pvutils.getParametersValue)(parameters, "isConstructed", false);
-			_this19.blockLength = _this19.valueHex.byteLength;
+			_this19.blockLength = _this19.valueHex.byteLength + 1; // "+1" for "unusedBits"
 			return _this19;
 		}
 		//**********************************************************************************
@@ -25814,12 +25809,12 @@ var GCLLib =
 							return -1;
 						}
 	
-						if (this.unusedBits > 0 && this.value[i].valueBlock.unusedBits > 0) {
+						if (this.unusedBits > 0 && this.value[i].unusedBits > 0) {
 							this.error = "Usign of \"unused bits\" inside constructive BIT STRING allowed for least one only";
 							return -1;
 						}
 	
-						this.unusedBits = this.value[i].valueBlock.unusedBits;
+						this.unusedBits = this.value[i].unusedBits;
 						if (this.unusedBits > 7) {
 							this.error = "Unused bits for BitString must be in range 0-7";
 							return -1;
@@ -25838,7 +25833,6 @@ var GCLLib =
 				var intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
 	
 				this.unusedBits = intBuffer[0];
-	
 				if (this.unusedBits > 7) {
 					this.error = "Unused bits for BitString must be in range 0-7";
 					return -1;
@@ -29967,7 +29961,7 @@ var GCLLib =
 	 */
 	function bufferToHexCodes(inputBuffer) {
 		var inputOffset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-		var inputLength = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : inputBuffer.byteLength - inputOffset;
+		var inputLength = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : inputBuffer.byteLength;
 	
 		var result = "";
 	
@@ -30046,8 +30040,6 @@ var GCLLib =
 	function utilFromBase(inputBuffer, inputBase) {
 		var result = 0;
 	
-		if (inputBuffer.length === 1) return inputBuffer[0];
-	
 		for (var i = inputBuffer.length - 1; i >= 0; i--) {
 			result += inputBuffer[inputBuffer.length - 1 - i] * Math.pow(2, inputBase * i);
 		}return result;
@@ -30061,9 +30053,9 @@ var GCLLib =
 	 * @returns {ArrayBuffer}
 	 */
 	function utilToBase(value, base) {
-		var reserved = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -1;
+		var reserved = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
 	
-		var internalReserved = reserved;
+		var internalReserved = reserved || -1;
 		var internalValue = value;
 	
 		var result = 0;
@@ -30362,9 +30354,6 @@ var GCLLib =
 	 */
 	function padNumber(inputNumber, fullLength) {
 		var str = inputNumber.toString(10);
-	
-		if (fullLength < str.length) return "";
-	
 		var dif = fullLength - str.length;
 	
 		var padding = new Array(dif);
@@ -30498,7 +30487,7 @@ var GCLLib =
 				}
 			}
 	
-			if (nonZeroStart !== -1) output = output.slice(0, nonZeroStart + 1);else output = "";
+			if (nonZeroStart !== -1) output = output.slice(0, nonZeroStart + 1);
 		}
 	
 		return output;
@@ -69041,6 +69030,7 @@ var GCLLib =
 	var $export = __webpack_require__(183);
 	var redefine = __webpack_require__(196);
 	var hide = __webpack_require__(186);
+	var has = __webpack_require__(197);
 	var Iterators = __webpack_require__(201);
 	var $iterCreate = __webpack_require__(202);
 	var setToStringTag = __webpack_require__(217);
@@ -69067,7 +69057,7 @@ var GCLLib =
 	  var VALUES_BUG = false;
 	  var proto = Base.prototype;
 	  var $native = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT];
-	  var $default = $native || getMethod(DEFAULT);
+	  var $default = (!BUGGY && $native) || getMethod(DEFAULT);
 	  var $entries = DEFAULT ? !DEF_VALUES ? $default : getMethod('entries') : undefined;
 	  var $anyNative = NAME == 'Array' ? proto.entries || $native : $native;
 	  var methods, key, IteratorPrototype;
@@ -69078,7 +69068,7 @@ var GCLLib =
 	      // Set @@toStringTag to native iterators
 	      setToStringTag(IteratorPrototype, TAG, true);
 	      // fix for some old engines
-	      if (!LIBRARY && typeof IteratorPrototype[ITERATOR] != 'function') hide(IteratorPrototype, ITERATOR, returnThis);
+	      if (!LIBRARY && !has(IteratorPrototype, ITERATOR)) hide(IteratorPrototype, ITERATOR, returnThis);
 	    }
 	  }
 	  // fix Array#{values, @@iterator}.name in V8 / FF
@@ -69179,7 +69169,7 @@ var GCLLib =
 /* 185 */
 /***/ (function(module, exports) {
 
-	var core = module.exports = { version: '2.5.5' };
+	var core = module.exports = { version: '2.5.3' };
 	if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
 

@@ -63,6 +63,7 @@
         <hr />
         <button id="oberthurAllData" type="button" class="btn btn-default btn-lg">Oberthur allData</button>
         <button id="oberthurAllCert" type="button" class="btn btn-default btn-lg">Oberthur All Cert</button>
+        <button id="oberthurAllCertParsed" type="button" class="btn btn-default btn-lg">Oberthur All Cert (Parsed)</button>
         <button id="oberthurRootCert" type="button" class="btn btn-default btn-lg">Oberthur Root Cert</button>
         <button id="oberthurAuthenticationCert" type="button" class="btn btn-default btn-lg">Oberthur Authentication Cert</button>
         <button id="oberthurIssuerCert" type="button" class="btn btn-default btn-lg">Oberthur Issuer Cert</button>
@@ -501,6 +502,13 @@
             var oberthur = connector.oberthur($("#selected_reader").text(),pin);
             oberthur.allCerts([],callback);
         });
+
+        $("#oberthurAllCertParsed").on('click', function () {
+            $("#information").empty();
+            var oberthur = connector.oberthur($("#selected_reader").text(),pin);
+            oberthur.allCerts({parseCerts: true},callback);
+        });
+
         $("#oberthurRootCert").on('click', function () {
             $("#information").empty();
             var oberthur = connector.oberthur($("#selected_reader").text(),pin);
