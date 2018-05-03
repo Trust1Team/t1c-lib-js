@@ -23539,7 +23539,10 @@ var GCLLib =
 	                        response.data[key] = newData_1;
 	                    }
 	                    else if (_.isObject(value)) {
-	                        response.data[key] = { base64: value.base64, id: value.id };
+	                        response.data[key] = { base64: value.base64 };
+	                        if (value.id) {
+	                            response.data[key].id = value.id;
+	                        }
 	                        if (parseCerts) {
 	                            response.data[key].parsed = CertParser.processCert(value.base64);
 	                        }
