@@ -3033,10 +3033,6 @@ karma-sinon@1.0.5:
   version "1.0.5"
   resolved "https://repo.t1t.be/repository/npm-group/karma-sinon/-/karma-sinon-1.0.5.tgz#4e3443f2830fdecff624d3747163f1217daa2a9a"
 
-karma-teamcity-reporter@1.0.0:
-  version "1.0.0"
-  resolved "https://repo.t1t.be/repository/npm-group/karma-teamcity-reporter/-/karma-teamcity-reporter-1.0.0.tgz#d33c1217753c141897f64560f25f0f37be905233"
-
 karma-typescript-preprocessor2@1.2.1:
   version "1.2.1"
   resolved "https://repo.t1t.be/repository/npm-group/karma-typescript-preprocessor2/-/karma-typescript-preprocessor2-1.2.1.tgz#691d4fe84b7bec8c6b9a04cdb0e887c179429e86"
