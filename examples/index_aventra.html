@@ -504,7 +504,7 @@
             var aventra = connector.aventra($("#selected_reader").text(),pin);
             aventra.allCerts({parseCerts: true},callback);
         });
-        
+
         $("#aventraRootCert").on('click', function () {
             $("#information").empty();
             var aventra = connector.aventra($("#selected_reader").text(),pin);
