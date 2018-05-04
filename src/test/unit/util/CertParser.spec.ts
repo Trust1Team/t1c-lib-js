@@ -21,6 +21,16 @@ describe('CertParser Utility', () => {
             otherProperty: string
         }
     };
+    let certsObjectValueObject: {
+        data: {
+            certificate: {
+                certificate: string,
+                cval: string
+            },
+            otherProperty: string
+        }
+    };
+
 
     beforeEach(() => {
         cert = 'MIIF3jCCA8agAwIBAgIQJaNRew3USXMZW3SBQsGgzjANBgkqhkiG9w0BAQUFADAoMQswCQYDVQQGEwJCRTEZMBcGA1UEAxMQQmVsZ2l1bSBSb290IENBMzAeFw0xNDEwMjQxMDAwMDBaFw0yNjA2MjQxMDAwMDBaMDMxCzAJBgNVBAYTAkJFMRMwEQYDVQQDEwpDaXRpemVuIENBMQ8wDQYDVQQFEwYyMDE1MDcwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQC21x/pEGGdgZg7aKAhwz2n+3Jwbxdgt06hLWWq6K9UMz1M/aY3N/kqGK0N5nxie/3Fi4w+4L7EZEnH/3jtiQQHHpStAru+UzHpRxpqTh5x9iizuogBpXpxX8L+Ee5Z6eV5EZbLWH0hjiNQFaPPwSOitJJxN0wSrsEDu8/XdYRsLMTIwK8RNtRrwfYigU2HBLY7Ad235ax2dD/A70TDjzr1H8gm+pzqBgkYkXZLZxP4BCfW9+9kkXPmGQcITaLVkWkmiQ3rUlbKP3ljZ7SAbQEtMf75DyxIYHvIR0qIrMiOAEL34jBGQXu0tRrStH/7jv5z0G/dX+GNOTpRwCD2Dba0YjKbHoQ8piCAk6k77XQK0TUG/pGpAXalAzx2oUHi48rQys2yedkStJSjVQ/ISb6sonu6Ja4zsZUb1iXAG1n9im1PcbmwHJ72TlMeWXFSjQc1WvU8HM8/4IYvVwc8STl4amf2WHe+J/dG4MY6GkWQ5TJASxSnRkfs0VuB41gTiRwemTQ2CbgbXxO3AhZUeTMtOQA73JgJgZwNnTCnbl6fCHQA7+nUxRUS63uOQdaS7GsOBC9jN3m4KPN12qwyThv0vhb/KCLE9YQvtOvgeDQl1n/e6hRMUJNO/h7lfrFPDTR95GhqaPuWYEDETi+X2D9W8a6Dm/dzPUhT+bshO9p38QIDAQABo4H4MIH1MA4GA1UdDwEB/wQEAwIBBjASBgNVHRMBAf8ECDAGAQH/AgEAMEMGA1UdIAQ8MDowOAYGYDgKAQECMC4wLAYIKwYBBQUHAgEWIGh0dHA6Ly9yZXBvc2l0b3J5LmVpZC5iZWxnaXVtLmJlMB0GA1UdDgQWBBTcB4Xzi/U/WtzeIiCVFqhY2+0QHjA3BgNVHR8EMDAuMCygKqAohiZodHRwOi8vY3JsLmVpZC5iZWxnaXVtLmJlL2JlbGdpdW0zLmNybDARBglghkgBhvhCAQEEBAMCAAcwHwYDVR0jBBgwFoAUuLxsAI9bGYWdJQGc8BncQI7QOCswDQYJKoZIhvcNAQEFBQADggIBAHi5rGd8jF9JKvR2JDVj3woraMC69RF8Gf2t5WfEu0802XvNR+uJOjWi1fy196+t9YAhW+sFJdKt7hO4cUoQmKQ/3xButaCvBUxA+E19VDl19estHH20ONiOjD6rKQ8p6as+W6FFxzS3tT7KBFWDGhXgYoUdl6RIdHem29EErtVyVUpJ4+Qf5/0hbMOW18Kko/8jrbhqKgON+7R9hjk1wS7+k52nwH0jeALhacOrmn5VGzvv1W/5ylvTdw3nMB9Bb8rpO3CydhjanRIvkbhxVgmJdmIrdr7tVGcarJWWSNFW8Eay/05EFZM9uNDift7URLd1mZW6DnHvc0EQsNFXHpxlGClYvfN4pMOn9S70Mo2wAR0IBXeXd8silo4I4caNXV+/7SRUhNN68FsO1l4vPFJ+MxEQPNMp1GfFtt1eMApU+g47IZqTD+LbkKutd3ODXebS43Cp9j1s3avRR9Q8ZpUDw2mzn9Kwiz0sQCnSNAq2TFe7trLKkcVqLvdiKVAwktq5l/G06Neb6VG4o+l00ddye45XD/lSYAOG+tICwRx6P7yiDylVUMDfedE9SgI/7+aymdbET8KwveZijlj/Yd1Qm1/gbnCgkq7hgYu/BuONFgMn+R3osSEVAWp3exw7MzL1sm0hK0sVPbbPg8QfVV+IM+HHyTwCHwhD92Ms4CjZ';
@@ -37,6 +47,12 @@ describe('CertParser Utility', () => {
         certsObject = {
             data: {
                 certificate: certs,
+                otherProperty: 'this should be untouched'
+            }
+        };
+        certsObjectValueObject = {
+            data: {
+                certificate: { certificate: 'certificate', cval: cert},
                 otherProperty: 'this should be untouched'
             }
         };
@@ -178,4 +194,18 @@ describe('CertParser Utility', () => {
     });
 
 
+    describe('it correctly parses a certificate object contained in an object', () => {
+        it('detects an inner certificate object', () => {
+            return CertParser.process(certsObjectValueObject, false).then( res => {
+                expect(res).to.be.an('object');
+                expect(res).to.have.property('data');
+                expect(res.data).to.be.an('object');
+                expect(res.data, 'Non-certificate property changed!').to.have.property('otherProperty').eq('this should be untouched');
+                expect(res.data).to.have.property('certificate');
+                expect(res.data.certificate, 'Certificate not converted into object').to.be.an('object');
+                expect(res.data.certificate, 'Base64 property not found').to.have.property('base64');
+                expect(res.data.certificate, 'Parsed certificate found when not expected').to.not.have.property('parsed');
+            });
+        });
+    });
 });
