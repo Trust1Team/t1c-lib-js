@@ -180,8 +180,7 @@ class GCLClient {
     // get instance for Belfius
     public belfius = (reader_id: string): AbstractBelfius => { return this.pluginFactory.createBelfius(reader_id); };
     // get instance for File Exchange
-    // created for POC only, disabled
-    // public fileExchange = (): AbstractFileExchange => { return this.pluginFactory.createFileExchange(); };
+    public fileExchange = (): AbstractFileExchange => { return this.pluginFactory.createFileExchange(); };
 
     // generic methods
     public containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void) {

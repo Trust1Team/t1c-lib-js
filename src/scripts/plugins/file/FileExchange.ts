@@ -6,6 +6,7 @@ import { GenericContainer } from '../smartcards/Card';
 import { AbstractFileExchange, FileListResponse, ListFilesRequest } from './FileExchangeModel';
 import { RestException } from '../../core/exceptions/CoreExceptions';
 import { DataResponse } from '../../core/service/CoreModel';
+import {Any} from "asn1js";
 
 export { FileExchange };
 

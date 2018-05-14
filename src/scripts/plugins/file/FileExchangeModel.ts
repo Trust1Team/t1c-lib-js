@@ -4,6 +4,7 @@
  */
 import { RestException } from '../../core/exceptions/CoreExceptions';
 import { DataResponse, T1CResponse } from '../../core/service/CoreModel';
+import {Any} from "asn1js";
 
 export { AbstractFileExchange, FileListResponse, ListFilesRequest, File };
 
@@ -13,6 +14,14 @@ interface AbstractFileExchange {
     setFolder(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     downloadFile(path: string, file: ArrayBuffer, fileName: string): Promise<DataResponse>;
     uploadFile(path: string): Promise<ArrayBuffer>;
+
+    getFolderMappings(): Any;
+    getFilesByType(): Any;
+    createFileMapping(): Any;
+    updateFileMapping(): Any;
+    deleteFileMapping(): Any;
+    readFileMapping(): Any;
+    getSupportedFileTypes(): Any;
 }
 
 
