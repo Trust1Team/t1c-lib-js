@@ -16,45 +16,56 @@ interface AbstractFileExchange {
     uploadFile(path: string): Promise<ArrayBuffer>;
 
     // access rights!!!
+    // paging and total
 
+    // download file
+    download(type: string, file: ArrayBuffer, filename: string): Promise<DataResponse>; // error: no write access
+    upload(type: string, filename: string): Promise<DataResponse>; // error: no read access
+    
     // generic
     getSupportedFileExtensions(): Any;
 
     // shows a full list of types related to their mapping (optional mapping)
     listTypes(): Any;
     // returns access rights, and if exists
-    listType(type: String): Any;
+    listType(type: string): Any; // contains access mode and mappingmode
     // shows a type and its optional mapping
-    listTypeMap(type: String): Any;
+    listTypeDir(type: string, abspath: [string]);
     // shows all files for a certain mapping or return no files for mapping, or mapping not defined
-    listTypeMapFiles(type: String): Any;
-    // list all files persisted in mapped type folders
+    listTypeFiles(type: string): Any;
+    // list all files persisted in mapped type folders - recursively through all files
     listFiles(): Any;
 
     // verifies if the type exists and is mapped
-    existsType(type: String): Any;
-    existsFile(type: String, recursive?: Boolean): Any;
+    existsType(type: string): Boolean;
+    existsFile(type: string, recursive?: Boolean): Boolean;
+    existsDir(type: string, abspath: [string]): Boolean;
 
-    // create directory -
-    createDirectory(type: String)
+    getAccessMode(type: string, filename: string, optionalAbsPath: [string]): Any
 
+    // create directory - absolute path /some/path/etc -.  string array
+    createDir(type: string, recursive?: Boolean): Any;
 
     // copy operations
+    copyFile(fromType: string, toType: string, filename: string, newfilename: string): Any
 
     // move operations
+    moveFile(fromType: string, toType: string, filename: string): Any
+
+    // rename
+    renameFile(type: string, filename: string)
 
 
     // search
-
-    // absolute path vs relative path
+    getFileInfo(type:string, filename: string, recursive?: Boolean)
+    getFileInfo(filename: string)
 
     // create a new type and trigger user to choose folder, error handler if no folder chosen by user
-    createTypeMap(type: String, initVal?: String): Any;
+    createTypeMap(type: string, initRelPath?: string, initAbsPath?: [string]): Any;
     // implicit => trigger user to choose file in file chooser
-    updateTypeMap(type: String, implicit?: Boolean, initVal?: String): Any;
+    updateTypeMap(type: string, implicit?: Boolean, initVal?: string): Any;
     // delete type from mapping (but maintain directory and files)
-    deleteTypeMap(type: String)
-
+    deleteTypeMap(type: string)
 
 }
 
@@ -77,11 +88,11 @@ class FileListResponse extends T1CResponse {
     }
 }
 
-enum AccessMode {
+export enum AccessMode {
     READ, WRITE, EXECUTE
 }
 
-enum TypeStatus {
+export enum TypeStatus {
     MAPPED,
     UNMAPPED
 }
