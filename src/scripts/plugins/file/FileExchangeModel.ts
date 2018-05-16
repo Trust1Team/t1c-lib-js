@@ -41,22 +41,24 @@ interface AbstractFileExchange {
     // create directory - relative path /some/path/etc -.  string array || if existant returns the files in folder - rec => tail rec for folder creation
     createDir(type: string, relpath: [string], recursive?: boolean, callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
     // copy operations
-    copyFile(fromType: string, toType: string, filename: string, newfilename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>
+    copyFile(fromType: string, toType: string, filename: string, newfilename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
     // move operations
     moveFile(fromType: string, toType: string, filename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
     // rename
-    renameFile(type: string, filename: string, newfilename: string, torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>
+    renameFile(type: string, filename: string, newfilename: string, torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
 
-    // search
-    getFileInfo( type: string, filename: string, torelpath?: [string], callback?: (error: RestException, data: FileListResponse) => void)
-    getFileInfo( type: string, filename: string, recursive?: boolean, callback?: (error: RestException, data: FileListResponse) => void)
+    // search (relative path)
+    getFileInfo( type: string, filename: string, torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
+    // search (recursively)
+    getFileInfoRec( type: string, filename: string, recursive?: boolean, callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
+
     // create a new type and trigger user to choose folder, error handler if no folder chosen by user
-    createType(type: string, initabspath?: [string], callback?: (error: RestException, data: FileListResponse) => void): Any; // if not valid => show file chooser
-    createTypeDirs(type: string, initrelpath?: [string], callback?: (error: RestException, data: FileListResponse) => void): Any; //implicit type creation
+    createType(type: string, initabspath?: [string], callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse>; // if not valid => show file chooser
+    createTypeDirs(type: string, initrelpath: [string], callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>; // implicit type creation
     // implicit => trigger user to choose file in file chooser
-    updateType(type: string, callback?: (error: RestException, data: FileListResponse) => void): Any;
+    updateType(type: string, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse>;
     // delete type from mapping (but maintain directory and files)
-    deleteType(type: string, callback?: (error: RestException, data: FileListResponse) => void): Any;
+    deleteType(type: string, callback?: (error: RestException, data: boolean) => void): Promise<boolean>;
     // retrieve user choice upon installation
     getEnabledContainers(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
 
