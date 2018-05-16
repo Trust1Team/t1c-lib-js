@@ -3,10 +3,10 @@
  * @since 2017
  */
 import { RestException } from '../../core/exceptions/CoreExceptions';
-import { DataResponse, T1CResponse } from '../../core/service/CoreModel';
+import {DataArrayResponse, DataResponse, T1CResponse} from '../../core/service/CoreModel';
 import {Any} from "asn1js";
 
-export { AbstractFileExchange, FileListResponse, ListFilesRequest, File };
+export { AbstractFileExchange, FileListResponse, ListFilesRequest, File, Page, AccessMode, FileAction, FileSort, TypeStatus, TypeResponse, Type, TypeListResponse, FileResponse };
 
 
 interface AbstractFileExchange {
@@ -16,60 +16,53 @@ interface AbstractFileExchange {
     uploadFile(path: string): Promise<ArrayBuffer>;
 
     // access rights!!!
-    // paging and total
+    // paging and count (start, end, total)
+    // update Type with abs path
+    // local folders/files are never deleted only MD for type in T1C
+    // https://t1t.gitbook.io/t1c-js-belfius-guide/core/status-codes
 
-    // download file
-    download(type: string, file: ArrayBuffer, filename: string): Promise<DataResponse>; // error: no write access
-    upload(type: string, filename: string): Promise<DataResponse>; // error: no read access
-    
-    // generic
-    getSupportedFileExtensions(): Any;
-
-    // shows a full list of types related to their mapping (optional mapping)
-    listTypes(): Any;
+    // download file - access mode error
+    download(type: string, file: ArrayBuffer, filename: string, notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
+    upload(type: string, filename: string, notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<ArrayBuffer>;
+    getProgress(type: String, filename: String, action?: FileAction, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
+    // shows a full list of types related to their mapping (optional mapping), directories
+    listTypes(page?: Page, callback?: (error: RestException, data: TypeListResponse) => void): Promise<TypeListResponse>;
     // returns access rights, and if exists
-    listType(type: string): Any; // contains access mode and mappingmode
-    // shows a type and its optional mapping
-    listTypeDir(type: string, abspath: [string]);
-    // shows all files for a certain mapping or return no files for mapping, or mapping not defined
-    listTypeFiles(type: string): Any;
-    // list all files persisted in mapped type folders - recursively through all files
-    listFiles(): Any;
-
+    listType(type: string, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse>;
+    // shows all files for a certain mapping or return no files for mapping, or mapping not defined (files and dires)
+    listTypeContent(type: string, relpath?: [string], page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>;
+    // doc rest exception an error status
+    listContent(page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>;
     // verifies if the type exists and is mapped
-    existsType(type: string): Boolean;
-    existsFile(type: string, recursive?: Boolean): Boolean;
-    existsDir(type: string, abspath: [string]): Boolean;
-
-    getAccessMode(type: string, filename: string, optionalAbsPath: [string]): Any
-
-    // create directory - absolute path /some/path/etc -.  string array
-    createDir(type: string, recursive?: Boolean): Any;
-
+    existsType(type: string, callback?: (error: RestException, data: boolean) => void): Promise<boolean>;
+    existsFile(type: string, recursive?: boolean, callback?: (error: RestException, data: boolean) => void): Promise<boolean>;
+    existsDir(type: string, relpath: [string], callback?: (error: RestException, data: boolean) => void): Promise<boolean>;
+    getAccessMode(type: string, filename?: string, relpath?: [string], callback?: (error: RestException, data: AccessMode) => void): Promise<AccessMode>;
+    // create directory - relative path /some/path/etc -.  string array || if existant returns the files in folder - rec => tail rec for folder creation
+    createDir(type: string, relpath: [string], recursive?: boolean, callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
     // copy operations
-    copyFile(fromType: string, toType: string, filename: string, newfilename: string): Any
-
+    copyFile(fromType: string, toType: string, filename: string, newfilename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>
     // move operations
-    moveFile(fromType: string, toType: string, filename: string): Any
-
+    moveFile(fromType: string, toType: string, filename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
     // rename
-    renameFile(type: string, filename: string)
-
+    renameFile(type: string, filename: string, newfilename: string, torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>
 
     // search
-    getFileInfo(type:string, filename: string, recursive?: Boolean)
-    getFileInfo(filename: string)
-
+    getFileInfo( type: string, filename: string, torelpath?: [string], callback?: (error: RestException, data: FileListResponse) => void)
+    getFileInfo( type: string, filename: string, recursive?: boolean, callback?: (error: RestException, data: FileListResponse) => void)
     // create a new type and trigger user to choose folder, error handler if no folder chosen by user
-    createTypeMap(type: string, initRelPath?: string, initAbsPath?: [string]): Any;
+    createType(type: string, initabspath?: [string], callback?: (error: RestException, data: FileListResponse) => void): Any; // if not valid => show file chooser
+    createTypeDirs(type: string, initrelpath?: [string], callback?: (error: RestException, data: FileListResponse) => void): Any; //implicit type creation
     // implicit => trigger user to choose file in file chooser
-    updateTypeMap(type: string, implicit?: Boolean, initVal?: string): Any;
+    updateType(type: string, callback?: (error: RestException, data: FileListResponse) => void): Any;
     // delete type from mapping (but maintain directory and files)
-    deleteTypeMap(type: string)
+    deleteType(type: string, callback?: (error: RestException, data: FileListResponse) => void): Any;
+    // retrieve user choice upon installation
+    getEnabledContainers(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
 
 }
 
-
+/* Model */
 class ListFilesRequest {
     constructor(public path: string, public extensions: string[]) {}
 }
@@ -79,7 +72,9 @@ class File {
                 public name: string,
                 public path: string,
                 public size: number,
-                public last_modification_time: string) {}
+                public last_modification_time: string,
+                public is_dir: boolean,
+                public access: AccessMode) {}
 }
 
 class FileListResponse extends T1CResponse {
@@ -87,12 +82,47 @@ class FileListResponse extends T1CResponse {
         super(success, data);
     }
 }
+class FileResponse extends T1CResponse {
+    constructor(public data: File, public success: boolean) {
+        super(success, data);
+    }
+}
 
-export enum AccessMode {
+class TypeListResponse extends T1CResponse {
+    constructor(public data: Type[], public success: boolean) {
+        super(success, data);
+    }
+}
+
+class TypeResponse extends T1CResponse {
+    constructor(public data: Type, public success: boolean){
+        super(success, data);
+    }
+}
+
+class Type {
+    constructor(public appid: string, public name: string, public abspath: string, public files: number, access: AccessMode, status: TypeStatus) {}
+}
+
+class Page {
+    constructor (public start: number, public size: number, public sort: FileSort) {}
+}
+
+/* Enumerations */
+
+enum FileSort {
+    ASC, DESC
+}
+
+enum AccessMode {
     READ, WRITE, EXECUTE
 }
 
-export enum TypeStatus {
+enum TypeStatus {
     MAPPED,
     UNMAPPED
+}
+
+enum FileAction {
+    UPLOAD, DOWNLOAD
 }
