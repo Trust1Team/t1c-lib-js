@@ -65,6 +65,7 @@ interface AllDataResponse extends AllCertsResponse {
         rn?: RnData
         root_certificate?: string
         rrn_certificate?: string
+        token?: Token
     }
 }
 
@@ -89,6 +90,19 @@ interface RnData {
     special_status: string
     third_name: string
     version: number
+}
+
+interface Token{
+    eid_compliant: number
+    electrical_perso_interface_version: number
+    electrical_perso_version: number
+    graphical_perso_version: number
+    label: string
+    prn_generation: string
+    raw_data: string
+    serial_number: string
+    version: number
+    version_rfu: number
 }
 
 interface RnDataResponse extends DataObjectResponse {
