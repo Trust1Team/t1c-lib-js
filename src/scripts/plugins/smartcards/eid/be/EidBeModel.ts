@@ -102,6 +102,19 @@ class RnData {
                 public version: number) {}
 }
 
+interface Token{
+    eid_compliant: number
+    electrical_perso_interface_version: number
+    electrical_perso_version: number
+    graphical_perso_version: number
+    label: string
+    prn_generation: string
+    raw_data: string
+    serial_number: string
+    version: number
+    version_rfu: number
+}
+
 class RnDataResponse extends DataObjectResponse {
     constructor(public data: RnData, public success: boolean) {
         super(data, success);
