@@ -11,7 +11,7 @@ import {
 import { Options } from '../../../../util/RequestHandler';
 
 export { AbstractEidBE, Address, AddressResponse, AllCertsResponse,
-    AllDataResponse, RnData, RnDataResponse, AllBeIDData, AllBeIDCerts };
+    AllDataResponse, RnData, RnDataResponse, AllBeIDData, AllBeIDCerts, Token };
 
 
 interface AbstractEidBE extends CertCard {
@@ -75,6 +75,7 @@ class AllBeIDData {
                 public non_repudiation_certificate?: T1CCertificate,
                 public picture?: string,
                 public rn?: RnData,
+                public token?: Token,
                 public root_certificate?: T1CCertificate,
                 public rrn_certificate?: T1CCertificate) {}
 }
