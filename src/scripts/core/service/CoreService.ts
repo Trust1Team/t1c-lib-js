@@ -79,9 +79,6 @@ class CoreService implements CoreModel.AbstractCore {
         }
         let days: number = this.connection.cfg.defaultConsentDuration;
         if (durationInDays) { days = durationInDays; }
-        // TODO post to clipboard
-
-        let timeout: number = this.connection.cfg.defaultConsentTimeout;
         return this.connection.post(this.url, CORE_CONSENT_IMPLICIT,
             { challenge: codeWord, days, type }, undefined, callback);
     }

@@ -19153,6 +19153,7 @@ var GCLLib =
 	var platform = __webpack_require__(7);
 	var ResponseHandler_1 = __webpack_require__(9);
 	var CORE_CONSENT = '/consent';
+	var CORE_CONSENT_IMPLICIT = '/consent/implicit';
 	var CORE_INFO = '/';
 	var CORE_PLUGINS = '/plugins';
 	var CORE_READERS = '/card-readers';
@@ -19203,6 +19204,16 @@ var GCLLib =
 	            timeout = timeoutInSeconds;
 	        }
 	        return this.connection.post(this.url, CORE_CONSENT, { title: title, text: codeWord, days: days, alert_level: alertLevel, alert_position: alertPosition, type: type, timeout: timeout }, undefined, callback);
+	    };
+	    CoreService.prototype.getImplicitConsent = function (codeWord, durationInDays, type, callback) {
+	        if (!codeWord || !codeWord.length) {
+	            return ResponseHandler_1.ResponseHandler.error({ status: 400, description: 'Code word is required!', code: '801' }, callback);
+	        }
+	        var days = this.connection.cfg.defaultConsentDuration;
+	        if (durationInDays) {
+	            days = durationInDays;
+	        }
+	        return this.connection.post(this.url, CORE_CONSENT_IMPLICIT, { challenge: codeWord, days: days, type: type }, undefined, callback);
 	    };
 	    CoreService.prototype.getPubKey = function (callback) {
 	        return this.connection.get(this.url, CORE_PUB_KEY, undefined, callback);
