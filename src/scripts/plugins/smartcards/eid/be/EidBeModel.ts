@@ -10,7 +10,7 @@ import {
 } from "../../../../core/service/CoreModel";
 import { Options } from "../../../../util/RequestHandler";
 
-export { AbstractEidBE, Address, AddressResponse, AllCertsResponse, AllDataResponse, RnData, RnDataResponse };
+export { AbstractEidBE, Address, AddressResponse, AllCertsResponse, AllDataResponse, RnData, RnDataResponse, TokenDataResponse, TokenData };
 
 
 interface AbstractEidBE extends CertCard {
@@ -19,6 +19,7 @@ interface AbstractEidBE extends CertCard {
     allCerts(filters: string[] | Options,
              callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
     rnData(callback?: (error: RestException, data: RnDataResponse) => void): Promise<RnDataResponse>;
+    tokenData(callback?: (error: RestException, data: TokenDataResponse) => void): Promise<TokenDataResponse>;
     address(callback?: (error: RestException, data: AddressResponse) => void): Promise<AddressResponse>;
     picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     rootCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
@@ -65,7 +66,7 @@ interface AllDataResponse extends AllCertsResponse {
         rn?: RnData
         root_certificate?: string
         rrn_certificate?: string
-        token?: Token
+        token_data?: TokenData
     }
 }
 
@@ -92,7 +93,7 @@ interface RnData {
     version: number
 }
 
-interface Token{
+interface TokenData{
     eid_compliant: number
     electrical_perso_interface_version: number
     electrical_perso_version: number
@@ -107,5 +108,9 @@ interface Token{
 
 interface RnDataResponse extends DataObjectResponse {
     data: RnData
+}
+
+interface TokenDataResponse extends DataObjectResponse {
+    data: TokenData
 }
 

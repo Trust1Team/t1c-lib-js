@@ -3,7 +3,7 @@
  * @author Maarten Somers
  * @since 2016
  */
-import { AbstractEidBE, AddressResponse, RnDataResponse } from "./EidBeModel";
+import { AbstractEidBE, AddressResponse, RnDataResponse, TokenDataResponse } from "./EidBeModel";
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { CertificateResponse, DataResponse, T1CResponse } from "../../../../core/service/CoreModel";
 import { GenericCertCard, OptionalPin, VerifyPinData } from "../../Card";
@@ -17,11 +17,16 @@ class EidBe extends GenericCertCard implements AbstractEidBE {
     static RN_DATA = "/rn";
     static ADDRESS = "/address";
     static PHOTO = "/picture";
+    static TOKEN = "/token";
     static VERIFY_PRIV_KEY_REF = "non-repudiation";
 
 
     public rnData(callback?: (error: RestException, data: RnDataResponse) => void): Promise<RnDataResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.RN_DATA), undefined, callback);
+    }
+
+    public tokenData(callback?: (error: RestException, data: TokenDataResponse) => void): Promise<TokenDataResponse> {
+        return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.TOKEN), undefined, callback);
     }
 
     public address(callback?: (error: RestException, data: AddressResponse) => void): Promise<AddressResponse> {
