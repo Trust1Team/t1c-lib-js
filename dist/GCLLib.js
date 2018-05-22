@@ -66305,6 +66305,9 @@ var GCLLib =
 	    EidBe.prototype.rnData = function (callback) {
 	        return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.RN_DATA), undefined, callback);
 	    };
+	    EidBe.prototype.tokenData = function (callback) {
+	        return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.TOKEN), undefined, callback);
+	    };
 	    EidBe.prototype.address = function (callback) {
 	        return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.ADDRESS), undefined, callback);
 	    };
@@ -66341,6 +66344,7 @@ var GCLLib =
 	EidBe.RN_DATA = "/rn";
 	EidBe.ADDRESS = "/address";
 	EidBe.PHOTO = "/picture";
+	EidBe.TOKEN = "/token";
 	EidBe.VERIFY_PRIV_KEY_REF = "non-repudiation";
 	exports.EidBe = EidBe;
 

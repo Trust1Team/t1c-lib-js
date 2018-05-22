@@ -14,6 +14,7 @@ export { CoreService };
 
 
 const CORE_CONSENT = '/consent';
+const CORE_CONSENT_IMPLICIT = '/consent/implicit';
 const CORE_INFO = '/';
 const CORE_PLUGINS = '/plugins';
 const CORE_READERS = '/card-readers';
@@ -70,6 +71,19 @@ class CoreService implements CoreModel.AbstractCore {
         if (timeoutInSeconds) { timeout = timeoutInSeconds; }
         return this.connection.post(this.url, CORE_CONSENT,
             { title, text: codeWord, days, alert_level: alertLevel, alert_position: alertPosition, type, timeout }, undefined, callback);
+    }
+
+    public getImplicitConsent(codeWord: string, durationInDays?: number, type?: string, callback?: (error: CoreExceptions.RestException, data: CoreModel.BoolDataResponse) => void): Promise<CoreModel.BoolDataResponse> {
+        if (!codeWord || !codeWord.length) {
+            return ResponseHandler.error({ status: 400, description: 'Code word is required!', code: '801' }, callback);
+        }
+        let days: number = this.connection.cfg.defaultConsentDuration;
+        if (durationInDays) { days = durationInDays; }
+        // TODO post to clipboard
+
+        let timeout: number = this.connection.cfg.defaultConsentTimeout;
+        return this.connection.post(this.url, CORE_CONSENT_IMPLICIT,
+            { challenge: codeWord, days, type }, undefined, callback);
     }
 
     public getPubKey(callback?: (error: CoreExceptions.RestException, data: CoreModel.PubKeyResponse)
