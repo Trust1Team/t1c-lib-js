@@ -6,7 +6,7 @@ import { RestException } from '../../core/exceptions/CoreExceptions';
 import {DataArrayResponse, DataResponse, T1CResponse} from '../../core/service/CoreModel';
 import {Any} from "asn1js";
 
-export { AbstractFileExchange, FileListResponse, ListFilesRequest, File, Page, AccessMode, FileAction, FileSort, TypeStatus, TypeResponse, Type, TypeListResponse, FileResponse, ModalType };
+export { AbstractFileExchange, FileListResponse, ListFilesRequest, File, FileList, Page, AccessMode, FileAction, FileSort, TypeStatus, TypeResponse, Type, TypeList, TypeListResponse, FileResponse, ModalType };
 
 
 interface AbstractFileExchange {
@@ -15,14 +15,14 @@ interface AbstractFileExchange {
     // downloadFile(path: string, file: ArrayBuffer, fileName: string): Promise<DataResponse>;
     // uploadFile(path: string): Promise<ArrayBuffer>;
 
-    download(type: string, file: ArrayBuffer, filename: string, relpath?: [string], notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
+    download(type: string, file: ArrayBuffer, filename: string, relpath?: [string], createMissingDir?: boolean, notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
     upload(type: string, filename: string, relpath?: [string], notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<ArrayBuffer>;
     getProgress(type: String, filename?: String, action?: FileAction, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
     showModal(title: string, text: string, modal: ModalType, callback?: (error: RestException, data: FileListResponse) => void): Promise<boolean>;
     listTypes(page?: Page, callback?: (error: RestException, data: TypeListResponse) => void): Promise<TypeListResponse>;
     listType(type: string, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse>;
     listTypeFiles(type: string, relpath?: [string], page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>; // should add total files
-    listFiles(page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>;
+    listContent(page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>;
     existsType(type: string, callback?: (error: RestException, data: boolean) => void): Promise<boolean>;
     existsFile(type: string, relpath: [string], callback?: (error: RestException, data: boolean) => void): Promise<boolean>;
     getAccessMode(type: string, filename?: string, relpath?: [string], callback?: (error: RestException, data: AccessMode) => void): Promise<AccessMode>;
@@ -31,8 +31,8 @@ interface AbstractFileExchange {
     moveFile(fromType: string, toType: string, filename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
     renameFile(type: string, filename: string, newfilename: string, relpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
     getFileInfo( type: string, filename: string, relpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
-    createType(type: string, initabspath?: [string], callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse>; // if not valid => show file chooser
-    createTypeDirs(type: string, initrelpath: [string], callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>; // implicit type creation
+    createType(type: string, initabspath?: [string], showModal?: boolean, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse>; // if not valid => show file chooser
+    createTypeDirs(type: string, initrelpath: [string], showModal?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>; // implicit type creation
     updateType(type: string, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse>;
     deleteType(type: string, callback?: (error: RestException, data: boolean) => void): Promise<boolean>;
     getEnabledContainers(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
@@ -54,10 +54,15 @@ class File {
 }
 
 class FileListResponse extends T1CResponse {
-    constructor(public data: File[], public success: boolean) {
+    constructor(public data: FileList, public success: boolean) {
         super(success, data);
     }
 }
+
+class FileList {
+    constructor(public files: File[], public total: number) {}
+}
+
 class FileResponse extends T1CResponse {
     constructor(public data: File, public success: boolean) {
         super(success, data);
@@ -65,7 +70,7 @@ class FileResponse extends T1CResponse {
 }
 
 class TypeListResponse extends T1CResponse {
-    constructor(public data: Type[], public success: boolean) {
+    constructor(public data: TypeList, public success: boolean) {
         super(success, data);
     }
 }
@@ -78,6 +83,10 @@ class TypeResponse extends T1CResponse {
 
 class Type {
     constructor(public appid: string, public name: string, public abspath: string, access: AccessMode, status: TypeStatus, public files?: number) {}
+}
+
+class TypeList{
+    constructor(public types: Type[], public total: number) {}
 }
 
 class Page {
