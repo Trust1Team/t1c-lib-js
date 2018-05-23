@@ -35,11 +35,16 @@ class BrowserFingerprint {
     }
 
     private static validateFingerprint(print: string): boolean {
-        // drop last two digits from print and recalculate
-        const printBase = _.join(_.dropRight(_.split(print, ''), 2), '');
-        const base36 = printBase.substr(1, 8);
-        const token =  printBase + (bases.fromBase36(base36) % 97);
-        return token === print;
+        //base64 decode
+        const resolvedToken = Base64.atob(print);
+        //retrieve bits
+        const checkbits = resolvedToken.substring(resolvedToken.length - 8, resolvedToken.length);
+        //get uuid
+        const initUuid = resolvedToken.substring(0, resolvedToken.length - 9);
+        //calculate sha256
+        const initUuidSha = sha(initUuid);
+        const tobeverifiedbits = initUuidSha.substring(initUuidSha.length - 8, initUuidSha.length);
+        return tobeverifiedbits === checkbits;
     }
 
     private static generateFingerprint(): string {
