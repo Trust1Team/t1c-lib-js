@@ -19402,7 +19402,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return Promise.resolve('v1.5.4');
+	        return Promise.resolve('v1.5.5');
 	    };
 	    return CoreService;
 	}());
@@ -22747,15 +22747,10 @@ var GCLLib =
 	    };
 	    BrowserFingerprint.generateFingerprint = function () {
 	        var browserId = uuid_1.v4();
-	        console.log('browserId:' + browserId);
 	        var sha256BrowserId = sha(browserId);
-	        console.log('SHAbrowserId:' + sha256BrowserId);
 	        var checkbits = sha256BrowserId.substring(sha256BrowserId.length - 8, sha256BrowserId.length);
-	        console.log('checkbits:' + checkbits);
 	        var resolvedToken = browserId + '-' + checkbits;
-	        console.log('resolvedtToken:' + resolvedToken);
 	        var token = Base64.btoa(browserId + '-' + checkbits);
-	        console.log('token:' + token);
 	        store(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION, token);
 	        return token;
 	    };
