@@ -82,7 +82,7 @@ class TypeResponse extends T1CResponse {
 }
 
 class Type {
-    constructor(public appid: string, public name: string, public abspath: string, access: AccessMode, status: TypeStatus, public files?: number) {}
+    constructor(public appid: string, public entity: string, public name: string, public abspath: string, access: AccessMode, status: TypeStatus, public files?: number) {}
 }
 
 class TypeList{
