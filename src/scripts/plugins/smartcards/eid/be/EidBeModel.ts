@@ -11,7 +11,7 @@ import {
 import { Options } from '../../../../util/RequestHandler';
 
 export { AbstractEidBE, Address, AddressResponse, AllCertsResponse,
-    AllDataResponse, RnData, RnDataResponse, AllBeIDData, AllBeIDCerts };
+    AllDataResponse, RnData, RnDataResponse, AllBeIDData, AllBeIDCerts, TokenData, TokenDataResponse };
 
 
 interface AbstractEidBE extends CertCard {
@@ -20,6 +20,7 @@ interface AbstractEidBE extends CertCard {
     allCerts(filters: string[] | Options,
              callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
     rnData(callback?: (error: RestException, data: RnDataResponse) => void): Promise<RnDataResponse>;
+    tokenData(callback?: (error: RestException, data: TokenDataResponse) => void): Promise<TokenDataResponse>;
     address(callback?: (error: RestException, data: AddressResponse) => void): Promise<AddressResponse>;
     picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     rootCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
@@ -31,6 +32,8 @@ interface AbstractEidBE extends CertCard {
         => void): Promise<CertificateResponse>;
     rrnCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    tokenData(callback?: (error: RestException, data: TokenDataResponse) => void): Promise<TokenDataResponse>;
+
 }
 
 class AddressResponse extends DataObjectResponse {
@@ -76,8 +79,30 @@ class AllBeIDData {
                 public picture?: string,
                 public rn?: RnData,
                 public root_certificate?: T1CCertificate,
-                public rrn_certificate?: T1CCertificate) {}
+                public rrn_certificate?: T1CCertificate,
+                public token_data?: TokenData) {}
 }
+
+class TokenData {
+    constructor(
+        public eid_compliant?: number,
+        public electrical_perso_interface_version?: number,
+        public electrical_perso_version?: number,
+        public graphical_perso_version?: number,
+        public label?: string,
+        public prn_generation?: string,
+        public raw_data?: string,
+        public serial_number?: string,
+        public version?: number,
+        public version_rfu?: number) {}
+}
+
+class TokenDataResponse extends DataObjectResponse {
+    constructor( public data: TokenData, public success: boolean) {
+        super(data, success);
+    }
+}
+
 
 class RnData {
     constructor(public birth_date: string,
