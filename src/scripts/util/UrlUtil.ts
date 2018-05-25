@@ -1,8 +1,8 @@
 /**
  * @author Maarten Somers
  */
-import { GCLConfig } from "../core/GCLConfig";
-import { AgentClient } from "../core/agent/agent";
+import { GCLConfig } from '../core/GCLConfig';
+import { AgentClient } from '../core/agent/agent';
 
 export { UrlUtil };
 
