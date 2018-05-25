@@ -1,11 +1,13 @@
 /**
- * @author Maarten Somers
- * @since 2017
+ * @author Michallis Pashidis
+ * @since 2018
  */
-import * as cuid from 'cuid';
 import * as bases from 'bases';
 import * as _ from 'lodash';
 import * as store from 'store2';
+import * as Base64 from 'Base64';
+import { v4 as uuid } from 'uuid';
+import * as sha from 'sha256';
 
 export { BrowserFingerprint };
 
@@ -32,18 +34,23 @@ class BrowserFingerprint {
         }
     }
 
+    /*https://t1t.gitbook.io/t1c-js-guide-v2/core/consent#consent-components-1*/
     private static validateFingerprint(print: string): boolean {
-        // drop last two digits from print and recalculate
-        const printBase = _.join(_.dropRight(_.split(print, ''), 2), '');
-        const base36 = printBase.substr(1, 8);
-        const token =  printBase + (bases.fromBase36(base36) % 97);
-        return token === print;
+        const resolvedToken = Base64.atob(print);
+        const checkbits = resolvedToken.substring(resolvedToken.length - 8, resolvedToken.length);
+        const initUuid = resolvedToken.substring(0, resolvedToken.length - 9);
+        const initUuidSha = sha(initUuid);
+        const tobeverifiedbits = initUuidSha.substring(initUuidSha.length - 8, initUuidSha.length);
+        return tobeverifiedbits === checkbits;
     }
 
+    /*https://t1t.gitbook.io/t1c-js-guide-v2/core/consent#consent-components-1*/
     private static generateFingerprint(): string {
-        const browserCuid = cuid();
-        const base36 = browserCuid.substr(1, 8);
-        const token = browserCuid + (bases.fromBase36(base36) % 97);
+        const browserId: string = uuid();
+        const sha256BrowserId = sha(browserId);
+        const checkbits = sha256BrowserId.substring(sha256BrowserId.length-8, sha256BrowserId.length);
+        const resolvedToken = browserId + '-' + checkbits;
+        const token = Base64.btoa(browserId + '-' + checkbits);
         store(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION, token);
         return token;
     }
