@@ -4,7 +4,6 @@
  */
 import { RestException } from '../../core/exceptions/CoreExceptions';
 import {DataArrayResponse, DataResponse, T1CResponse} from '../../core/service/CoreModel';
-import {Any} from "asn1js";
 
 export { AbstractFileExchange, FileListResponse, ListFilesRequest, File, FileList, Page, AccessMode, FileAction, FileSort, TypeStatus, TypeResponse, Type, TypeList, TypeListResponse, FileResponse, ModalType };
 
@@ -15,7 +14,8 @@ interface AbstractFileExchange {
     // downloadFile(path: string, file: ArrayBuffer, fileName: string): Promise<DataResponse>;
     // uploadFile(path: string): Promise<ArrayBuffer>;
 
-    download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], createMissingDir?: boolean, notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
+    download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], createMissingDir?: boolean,
+             notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
     upload(entity: string, type: string, filename: string, relpath?: [string], notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<ArrayBuffer>;
     getProgress(entity: string, type: String, filename?: String, action?: FileAction, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
     showModal(title: string, text: string, modal: ModalType, timeoutInSeconds?: number, callback?: (error: RestException, data: FileListResponse) => void): Promise<boolean>;

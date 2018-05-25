@@ -16,6 +16,7 @@ export { CoreService };
 const CORE_CONSENT = '/consent';
 const CORE_INFO = '/';
 const CORE_READERS = '/card-readers';
+const CORE_CONSENT_IMPLICIT = '/consent/implicit';
 
 /**
  * Core service fucntions: GCL information, reader detection, consent, polling, etc.
@@ -65,6 +66,17 @@ class CoreService implements CoreModel.AbstractCore {
         return this.connection.post(this.url, CORE_CONSENT,
             { title, text: codeWord, days, alert_level: alertLevel, alert_position: alertPosition, type, timeout },
             undefined, undefined, callback);
+    }
+
+    /*NOTE: The application is responsible to copy the codeWord on the clipboard BEFORE calling this function*/
+    public getImplicitConsent(codeWord: string, durationInDays?: number, type?: string, callback?: (error: CoreExceptions.RestException, data: CoreModel.BoolDataResponse) => void): Promise<CoreModel.BoolDataResponse> {
+        if (!codeWord || !codeWord.length) {
+            return ResponseHandler.error({ status: 400, description: 'Code word is required!', code: '801' }, callback);
+        }
+        let days: number = this.connection.cfg.defaultConsentDuration;
+        if (durationInDays) { days = durationInDays; }
+        return this.connection.post(this.url, CORE_CONSENT_IMPLICIT,
+            { challenge: codeWord, days, type }, undefined, undefined, callback);
     }
 
     public info(callback?: (error: CoreExceptions.RestException, data: CoreModel.InfoResponse)
