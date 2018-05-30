@@ -14,8 +14,7 @@ interface AbstractFileExchange {
     // downloadFile(path: string, file: ArrayBuffer, fileName: string): Promise<DataResponse>;
     // uploadFile(path: string): Promise<ArrayBuffer>;
 
-    download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], createMissingDir?: boolean,
-             notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
+    download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], implicitCreationType?: boolean, notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>; // implicit
     upload(entity: string, type: string, filename: string, relpath?: [string], notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<ArrayBuffer>;
     getProgress(entity: string, type: String, filename?: String, action?: FileAction, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
     showModal(title: string, text: string, modal: ModalType, timeoutInSeconds?: number, callback?: (error: RestException, data: FileListResponse) => void): Promise<boolean>;
@@ -82,7 +81,7 @@ class TypeResponse extends T1CResponse {
 }
 
 class Type {
-    constructor(public appid: string, public name: string, public abspath: string, access: AccessMode, status: TypeStatus, public files?: number) {}
+    constructor(public appid: string, public entity: string, public name: string, public abspath: string, access: AccessMode, status: TypeStatus, public files?: number) {}
 }
 
 class TypeList{
