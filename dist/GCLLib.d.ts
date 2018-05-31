@@ -38,7 +38,7 @@ class GCLClient {
     verifyPin(readerId: string, data: OptionalPin, callback?: (error: RestException, data: DataResponse) => void): Promise<any>;
     updateAuthConnection(cfg: GCLConfig): void;
 }
-export { GCLClient, GCLConfig };
+export { GCLClient, GCLConfig, GCLConfigOptions };
 
 class RestException {
     status: number;
@@ -1319,7 +1319,7 @@ class Agent {
 
 export { AbstractFileExchange, FileListResponse, ListFilesRequest, File, FileList, Page, AccessMode, FileAction, FileSort, TypeStatus, TypeResponse, Type, TypeList, TypeListResponse, FileResponse, ModalType };
 interface AbstractFileExchange {
-    download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], createMissingDir?: boolean, notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
+    download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], implicitCreationType?: boolean, notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
     upload(entity: string, type: string, filename: string, relpath?: [string], notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<ArrayBuffer>;
     getProgress(entity: string, type: String, filename?: String, action?: FileAction, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
     showModal(title: string, text: string, modal: ModalType, timeoutInSeconds?: number, callback?: (error: RestException, data: FileListResponse) => void): Promise<boolean>;
@@ -1383,10 +1383,11 @@ declare class TypeResponse extends T1CResponse {
 }
 declare class Type {
     appid: string;
+    entity: string;
     name: string;
     abspath: string;
     files: number;
-    constructor(appid: string, name: string, abspath: string, access: AccessMode, status: TypeStatus, files?: number);
+    constructor(appid: string, entity: string, name: string, abspath: string, access: AccessMode, status: TypeStatus, files?: number);
 }
 declare class TypeList {
     types: Type[];

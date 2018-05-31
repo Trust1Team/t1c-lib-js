@@ -56,6 +56,7 @@ var GCLLib =
 	Object.defineProperty(exports, "__esModule", { value: true });
 	var GCLConfig_1 = __webpack_require__(2);
 	exports.GCLConfig = GCLConfig_1.GCLConfig;
+	exports.GCLConfigOptions = GCLConfig_1.GCLConfigOptions;
 	var CoreService_1 = __webpack_require__(156);
 	var Connection_1 = __webpack_require__(160);
 	var DSClientModel_1 = __webpack_require__(174);
