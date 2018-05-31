@@ -6,7 +6,7 @@
  */
 import * as CoreExceptions from './exceptions/CoreExceptions';
 
-import { GCLConfig } from './GCLConfig';
+import { GCLConfig, GCLConfigOptions } from './GCLConfig';
 import { CoreService } from './service/CoreService';
 import {
     LocalConnection, RemoteJwtConnection, LocalAuthConnection, LocalTestConnection,
@@ -253,5 +253,5 @@ class GCLClient {
     }
 }
 
-export { GCLClient, GCLConfig };
+export { GCLClient, GCLConfig, GCLConfigOptions };
 
