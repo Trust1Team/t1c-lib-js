@@ -1,8 +1,8 @@
 /**
- * @author Maarten Somers
+ * @author Michallis Pashidis
  * @since 2018
  */
-import { LocalAuthConnection } from '../client/Connection';
+import { LocalAuthAdminConnection } from '../client/Connection';
 import * as CoreExceptions from '../exceptions/CoreExceptions';
 import {
     AbstractAdmin, AtrListRequest, ContainerSyncRequest, PubKeyResponse,
@@ -33,7 +33,7 @@ class AdminService implements AbstractAdmin {
     static JWT_ERROR_CODES = [ '200', '201', '202', '203', '204', '205'];
 
     // constructor
-    constructor(private url: string, private connection: LocalAuthConnection) {}
+    constructor(private url: string, private connection: LocalAuthAdminConnection) {}
 
     private static errorHandler(error: RestException) {
         // check if the error is JWT related

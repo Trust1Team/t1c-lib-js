@@ -60,7 +60,7 @@ class GCLConfigOptions {
  * GCL Configuration object. Represents the GCL Library configuration state.
  * Most settings are configurable by the user; some are set by the library itself.
  */
-class GCLConfig implements GCLConfig {
+class GCLConfig {
     // singleton pattern
     private static instance: GCLConfig;
     private _gwUrl: string;
