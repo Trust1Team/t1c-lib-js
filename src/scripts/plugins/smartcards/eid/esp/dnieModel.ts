@@ -5,7 +5,7 @@
 import { RestException } from "../../../../core/exceptions/CoreExceptions";
 import { OptionalPin, SecuredCertCard } from "../../Card";
 import {
-    CertificateResponse, DataObjectResponse, T1CCertificate,
+    CertificateResponse, DataObjectResponse, DataResponse, T1CCertificate,
     T1CResponse
 } from '../../../../core/service/CoreModel';
 import { Options } from "../../../../util/RequestHandler";

@@ -3,6 +3,7 @@
 class GCLClient {
     GCLInstalled: boolean;
     constructor(cfg: GCLConfig, automatic: boolean);
+    static checkPolyfills(): void;
     static initialize(cfg: GCLConfig, callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): Promise<GCLClient>;
     admin: () => AdminService;
     auth: () => AuthClient;
@@ -38,7 +39,7 @@ class GCLClient {
     verifyPin(readerId: string, data: OptionalPin, callback?: (error: RestException, data: DataResponse) => void): Promise<any>;
     updateAuthConnection(cfg: GCLConfig): void;
 }
-export { GCLClient, GCLConfig, GCLConfigOptions };
+export { GCLClient };
 
 class RestException {
     status: number;
@@ -71,7 +72,7 @@ class GCLConfigOptions {
     localTestMode: boolean;
     constructor(gclUrl?: string, gwOrProxyUrl?: string, apiKey?: string, gwJwt?: string, ocvContextPath?: string, dsContextPath?: string, dsFileContextPath?: string, pkcs11Config?: ModuleConfig, agentPort?: number, implicitDownload?: boolean, forceHardwarePinpad?: boolean, sessionTimeout?: number, consentDuration?: number, consentTimeout?: number, syncManaged?: boolean, osPinDialog?: boolean, containerDownloadTimeout?: number, localTestMode?: boolean);
 }
-class GCLConfig implements GCLConfig {
+class GCLConfig {
     constructor(options: GCLConfigOptions);
     readonly authUrl: string;
     readonly ocvUrl: string;
@@ -105,20 +106,20 @@ class GCLConfig implements GCLConfig {
 }
 
 export { CoreService };
-class CoreService implements CoreModel.AbstractCore {
+class CoreService implements AbstractCore {
     constructor(url: string, connection: LocalAuthConnection);
-    getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string, alertPosition?: string, type?: string, timeoutInSeconds?: number, callback?: (error: CoreExceptions.RestException, data: CoreModel.BoolDataResponse) => void): Promise<CoreModel.BoolDataResponse>;
-    getImplicitConsent(codeWord: string, durationInDays?: number, type?: string, callback?: (error: CoreExceptions.RestException, data: CoreModel.BoolDataResponse) => void): Promise<CoreModel.BoolDataResponse>;
-    info(callback?: (error: CoreExceptions.RestException, data: CoreModel.InfoResponse) => void): Promise<CoreModel.InfoResponse>;
-    infoBrowser(callback?: (error: CoreExceptions.RestException, data: CoreModel.BrowserInfoResponse) => void): Promise<CoreModel.BrowserInfoResponse>;
+    getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string, alertPosition?: string, type?: string, timeoutInSeconds?: number, callback?: (error: CoreExceptions.RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
+    getImplicitConsent(codeWord: string, durationInDays?: number, type?: string, callback?: (error: CoreExceptions.RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
+    info(callback?: (error: CoreExceptions.RestException, data: InfoResponse) => void): Promise<InfoResponse>;
+    infoBrowser(callback?: (error: CoreExceptions.RestException, data: BrowserInfoResponse) => void): Promise<BrowserInfoResponse>;
     pollCardInserted(secondsToPollCard?: number, callback?: (error: CoreExceptions.RestException, data: CardReader) => void, connectReaderCb?: () => void, insertCardCb?: () => void, cardTimeoutCb?: () => void): Promise<CardReader>;
-    pollReadersWithCards(secondsToPollCard?: number, callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void, connectReaderCb?: () => void, insertCardCb?: () => void, cardTimeoutCb?: () => void): Promise<CoreModel.CardReadersResponse>;
-    pollReaders(secondsToPollReader?: number, callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void, connectReaderCb?: () => void, readerTimeoutCb?: () => void): Promise<CoreModel.CardReadersResponse>;
-    reader(reader_id: string, callback?: (error: CoreExceptions.RestException, data: CoreModel.SingleReaderResponse) => void): Promise<CoreModel.SingleReaderResponse>;
-    readers(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void): Promise<CoreModel.CardReadersResponse>;
-    readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void): Promise<CoreModel.CardReadersResponse>;
-    readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CoreModel.CardReadersResponse) => void): Promise<CoreModel.CardReadersResponse>;
-    infoBrowserSync(): CoreModel.BrowserInfoResponse;
+    pollReadersWithCards(secondsToPollCard?: number, callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void, connectReaderCb?: () => void, insertCardCb?: () => void, cardTimeoutCb?: () => void): Promise<CardReadersResponse>;
+    pollReaders(secondsToPollReader?: number, callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void, connectReaderCb?: () => void, readerTimeoutCb?: () => void): Promise<CardReadersResponse>;
+    reader(reader_id: string, callback?: (error: CoreExceptions.RestException, data: SingleReaderResponse) => void): Promise<SingleReaderResponse>;
+    readers(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
+    readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
+    readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
+    infoBrowserSync(): BrowserInfoResponse;
     getUrl(): string;
     version(): Promise<string>;
 }
@@ -1321,7 +1322,6 @@ export { AbstractFileExchange, FileListResponse, ListFilesRequest, File, FileLis
 interface AbstractFileExchange {
     download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], implicitCreationType?: boolean, notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
     upload(entity: string, type: string, filename: string, relpath?: [string], notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<ArrayBuffer>;
-    getProgress(entity: string, type: String, filename?: String, action?: FileAction, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
     showModal(title: string, text: string, modal: ModalType, timeoutInSeconds?: number, callback?: (error: RestException, data: FileListResponse) => void): Promise<boolean>;
     listTypes(entity: string, page?: Page, callback?: (error: RestException, data: TypeListResponse) => void): Promise<TypeListResponse>;
     listType(entity: string, type: string, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse>;
@@ -1427,7 +1427,7 @@ declare enum ModalType {
 export { AdminService };
 class AdminService implements AbstractAdmin {
     static JWT_ERROR_CODES: string[];
-    constructor(url: string, connection: LocalAuthConnection);
+    constructor(url: string, connection: LocalAuthAdminConnection);
     activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     atr(atrList: AtrListRequest, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     getLogfile(name: string, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
@@ -1543,7 +1543,7 @@ class AuthClient implements AbstractAuth {
     refreshJWT(currentJWT: string, callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse>;
 }
 
-export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteApiKeyConnection, RemoteJwtConnection, Connection, LocalTestConnection, RequestBody, RequestHeaders, RequestCallback, SecurityConfig, QueryParams };
+export { GenericConnection, LocalConnection, LocalAuthConnection, LocalAuthAdminConnection, RemoteApiKeyConnection, RemoteJwtConnection, Connection, LocalTestConnection, RequestBody, RequestHeaders, RequestCallback, SecurityConfig, QueryParams };
 interface Connection {
     get(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     post(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
@@ -1583,6 +1583,12 @@ abstract class GenericConnection implements Connection {
     getSecurityConfig(): SecurityConfig;
     protected handleRequest(basePath: string, suffix: string, method: string, gclConfig: GCLConfig, securityConfig: SecurityConfig, body?: RequestBody, params?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
 }
+class LocalAuthAdminConnection extends GenericConnection implements Connection {
+    cfg: GCLConfig;
+    constructor(cfg: GCLConfig);
+    getSecurityConfig(): SecurityConfig;
+    requestLogFile(basePath: string, suffix: string, callback?: RequestCallback): Promise<any>;
+}
 class LocalAuthConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;
     constructor(cfg: GCLConfig);
@@ -1599,7 +1605,7 @@ class LocalConnection extends GenericConnection implements Connection {
     requestFile(basePath: string, suffix: string, body: {
         path: string;
     }, callback?: RequestCallback): Promise<any>;
-    putFile(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
+    postFile(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
 }
 class RemoteApiKeyConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;

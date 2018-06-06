@@ -1,8 +1,6 @@
 /**
- * @author Maarten Casteels
  * @author Michallis Pashidis
- * @author Maarten Somers
- * @since 2016
+ * @since 2017
  */
 
 import {GCLConfig} from '../GCLConfig';
@@ -16,7 +14,7 @@ import * as CoreExceptions from '../exceptions/CoreExceptions';
 import { ResponseHandler } from '../../util/ResponseHandler';
 import { JWTResponse } from '../ds/DSClientModel';
 
-export { GenericConnection, LocalConnection, LocalAuthConnection, RemoteApiKeyConnection,
+export { GenericConnection, LocalConnection, LocalAuthConnection, LocalAuthAdminConnection, RemoteApiKeyConnection,
     RemoteJwtConnection, Connection, LocalTestConnection, RequestBody, RequestHeaders, RequestCallback, SecurityConfig, QueryParams };
 
 
@@ -323,7 +321,57 @@ abstract class GenericConnection implements Connection {
 }
 
 /**
- * Local connection with authorization token, used for /admin endpoints and some core endpoints
+ * Local connection with authorization token, used for protected endpoints
+ */
+class LocalAuthAdminConnection extends GenericConnection implements Connection {
+    constructor(public cfg: GCLConfig) { super(cfg); }
+
+    getSecurityConfig(): SecurityConfig {
+        return {  sendGwJwt: false, sendGclJwt: true, sendApiKey: false, sendToken: true, skipCitrixCheck: true };
+    }
+
+    /**
+     * Helper method for requesting log files. These are sent as arraybuffers and require special handling.
+     * @param {string} basePath
+     * @param {string} suffix
+     * @param {RequestCallback} callback
+     * @returns {Promise<any>}
+     */
+    public requestLogFile(basePath: string, suffix: string, callback?: RequestCallback): Promise<any> {
+        // init callback if necessary
+        if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
+
+        return new Promise((resolve, reject) => {
+            let headers: RequestHeaders = {};
+            headers.Authorization = 'Bearer ' + this.cfg.gclJwt;
+            if (this.cfg.tokenCompatible && this.getSecurityConfig().sendToken) {
+                headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
+            }
+            axios.get(UrlUtil.create(basePath, suffix, this.cfg, true), {
+                responseType: 'blob', headers
+            }).then(response => {
+                callback(null, response);
+                return resolve(response);
+            }, error => {
+                if (error.response) {
+                    if (error.response.data) {
+                        callback(error.response.data, null);
+                        return reject(error.response.data);
+                    } else {
+                        callback(error.response, null);
+                        return reject(error.response);
+                    }
+                } else {
+                    callback(error, null);
+                    return reject(error);
+                }
+            });
+        });
+    }
+}
+
+/**
+ * Local connection with authorization token, used for protected endpoints
  */
 class LocalAuthConnection extends GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) { super(cfg); }
@@ -484,8 +532,7 @@ class LocalConnection extends GenericConnection implements Connection {
      * @param {RequestCallback} callback
      * @returns {Promise<any>}
      */
-    public putFile(basePath: string, suffix: string, body: RequestBody,
-                   queryParams: QueryParams, callback?: RequestCallback): Promise<any> {
+    public postFile(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         // init callback if necessary
         if (!callback || typeof callback !== 'function') { callback = function () { /* no-op */ }; }
@@ -501,7 +548,7 @@ class LocalConnection extends GenericConnection implements Connection {
         }
 
         return new Promise((resolve, reject) => {
-            axios.put(UrlUtil.create(basePath, suffix, config, false), form, {
+            axios.post(UrlUtil.create(basePath, suffix, config, false), form, {
                 headers
             }).then(response => {
                 callback(null, response.data);

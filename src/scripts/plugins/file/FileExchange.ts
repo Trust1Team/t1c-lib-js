@@ -6,6 +6,7 @@ import { GenericContainer } from '../smartcards/Card';
 import {AbstractFileExchange, AccessMode, FileAction, FileListResponse, FileResponse, ListFilesRequest, ModalType, Page, TypeListResponse, TypeResponse} from './FileExchangeModel';
 import { RestException } from '../../core/exceptions/CoreExceptions';
 import {DataArrayResponse, DataResponse} from '../../core/service/CoreModel';
+import {isNullOrUndefined, isUndefined} from 'util';
 
 export { FileExchange };
 
@@ -14,6 +15,7 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     static DOWNLOAD = '/download';
     static FOLDER = '/folder';
     static UPLOAD = '/upload';
+    static CREATE_TYPE = '/create-type';
 
     copyFile(entity: string, fromType: string, toType: string, filename: string, newfilename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
         return undefined;
@@ -23,8 +25,12 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
         return undefined;
     }
 
+    // TODO add headers for i18n and security
     createType(entity: string, type: string, initabspath?: [string], showModal?: boolean, timeoutInSeconds?: number, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse> {
-        return undefined;
+        const show_modal: boolean = (showModal == null) ? undefined : showModal;
+        const timeout: number = (timeoutInSeconds == null) ? undefined : timeoutInSeconds;
+        const init_tabs_path = (initabspath == null) ? undefined : initabspath.join();
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.CREATE_TYPE), { entity, type, show_modal, timeout, init_tabs_path  }, undefined, undefined, callback);
     }
 
     createTypeDirs(entity: string, type: string, initrelpath: [string], showModal?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse> {
@@ -37,6 +43,10 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
 
     download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], createMissingDir?: boolean, notifyOnCompletion?: boolean,
              showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse> {
+        const fileName = filename;
+        // string tokenizer
+        // const rel_path =
+        // return this.connection.postFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), { entity, type, file, fileName, rel_path, implicit_creation_type, notify_on_completion }, undefined, callback);
         return undefined;
     }
 
