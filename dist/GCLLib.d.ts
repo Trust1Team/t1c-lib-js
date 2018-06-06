@@ -27,7 +27,7 @@ class GCLClient {
     pkcs11: () => AbstractPkcs11;
     readerapi: (reader_id: string) => AbstractRemoteLoading;
     belfius: (reader_id: string) => AbstractBelfius;
-    fileExchange: () => AbstractFileExchange;
+    filex: () => AbstractFileExchange;
     containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     download(callback?: (error: RestException, data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
     dumpData(readerId: string, data: OptionalPin, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
@@ -39,7 +39,7 @@ class GCLClient {
     verifyPin(readerId: string, data: OptionalPin, callback?: (error: RestException, data: DataResponse) => void): Promise<any>;
     updateAuthConnection(cfg: GCLConfig): void;
 }
-export { GCLClient };
+export { GCLClient, GCLConfig };
 
 class RestException {
     status: number;
