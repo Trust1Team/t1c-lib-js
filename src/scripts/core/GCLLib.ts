@@ -81,9 +81,6 @@ class GCLClient {
         this.adminService = new AdminService(this.cfg.gclUrl, this.authAdminConnection);
         this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
         this.agentClient = new AgentClient(this.cfg.gclUrl, this.authConnection);
-        console.log('LocalTestMode:' + this.cfg.localTestMode);
-        console.log('URL:' + this.cfg.dsUrl);
-        console.log('URL:' + this.cfg.ocvUrl);
         if (this.cfg.localTestMode) {
             this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg);
         }
