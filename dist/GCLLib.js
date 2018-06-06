@@ -155,9 +155,6 @@ var GCLLib =
 	        this.adminService = new admin_1.AdminService(this.cfg.gclUrl, this.authAdminConnection);
 	        this.coreService = new CoreService_1.CoreService(this.cfg.gclUrl, this.authConnection);
 	        this.agentClient = new agent_1.AgentClient(this.cfg.gclUrl, this.authConnection);
-	        console.log('LocalTestMode:' + this.cfg.localTestMode);
-	        console.log('URL:' + this.cfg.dsUrl);
-	        console.log('URL:' + this.cfg.ocvUrl);
 	        if (this.cfg.localTestMode) {
 	            this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg);
 	        }
@@ -37953,7 +37950,7 @@ var GCLLib =
 	    function UrlUtil() {
 	    }
 	    UrlUtil.create = function (base, suffix, config, skipCitrixCheck) {
-	        if (config.citrix && config.agentPort != null && !skipCitrixCheck) {
+	        if (config.citrix && config.agentPort != null && config.agentPort !== -1 && !skipCitrixCheck) {
 	            return base + agent_1.AgentClient.urlPrefix(config.agentPort) + suffix;
 	        }
 	        else {
@@ -39233,7 +39230,6 @@ var GCLLib =
 	    }
 	    DSClient.prototype.getUrl = function () { return this.url; };
 	    DSClient.prototype.getInfo = function (callback) {
-	        console.log('DS call url: ' + this.url);
 	        return this.connection.get(this.url, SYS_INFO, undefined, undefined, callback);
 	    };
 	    DSClient.prototype.getDevice = function (uuid, callback) {
@@ -39305,7 +39301,6 @@ var GCLLib =
 	        return this.connection.post(this.url, SIGNATURE, data, undefined, undefined, callback);
 	    };
 	    OCVClient.prototype.getInfo = function (callback) {
-	        console.log('OCV call url: ' + this.getUrl());
 	        return this.connection.get(this.getUrl(), SYSTEM_STATUS, undefined, undefined, callback);
 	    };
 	    OCVClient.prototype.getChallenge = function (digestAlgorithm, callback) {
