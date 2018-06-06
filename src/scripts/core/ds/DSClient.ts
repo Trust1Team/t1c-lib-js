@@ -28,6 +28,7 @@ class DSClient implements AbstractDSClient {
     public getUrl() { return this.url; }
 
     public getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse> {
+        console.log('DS call url: ' + this.url);
         return this.connection.get(this.url, SYS_INFO, undefined, undefined, callback);
     }
 

@@ -81,6 +81,9 @@ class GCLClient {
         this.adminService = new AdminService(this.cfg.gclUrl, this.authAdminConnection);
         this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
         this.agentClient = new AgentClient(this.cfg.gclUrl, this.authConnection);
+        console.log('LocalTestMode:' + this.cfg.localTestMode);
+        console.log('URL:' + this.cfg.dsUrl);
+        console.log('URL:' + this.cfg.ocvUrl);
         if (this.cfg.localTestMode) {
             this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg);
         }
@@ -152,96 +155,96 @@ class GCLClient {
     // get admin services
     public admin = (): AdminService => {
         return this.adminService;
-    }
+    };
     // get auth service
     public auth = (): AuthClient => {
         return this.authClient;
-    }
+    };
     // get core services
     public core = (): CoreService => {
         return this.coreService;
-    }
+    };
     // get core config
     public config = (): GCLConfig => {
         return this.cfg;
-    }
+    };
     // get agent client services
     public agent = (): AbstractAgent => {
         return this.agentClient;
-    }
+    };
     // get ds client services
     public ds = (): DSClient => {
         return this.dsClient;
-    }
+    };
     // get ocv client services
     public ocv = (): AbstractOCVClient => {
         return this.ocvClient;
-    }
+    };
     // get plugin factory
     public pf = (): PluginFactory => {
         return this.pluginFactory;
-    }
+    };
     // get instance for belgian eID card
     public beid = (reader_id?: string): AbstractEidBE => {
         return this.pluginFactory.createEidBE(reader_id);
-    }
+    };
     // get instance for spanish DNIe card
     public dnie = (reader_id?: string): AbstractDNIe => {
         return this.pluginFactory.createDNIe(reader_id);
-    }
+    };
     // get instance for luxemburg eID card
     public luxeid = (reader_id?: string, pin?: string): AbstractEidLUX => {
         return this.pluginFactory.createEidLUX(reader_id, pin);
-    }
+    };
     // get instance for luxtrust card
     public luxtrust = (reader_id?: string, pin?: string): AbstractLuxTrust => {
         return this.pluginFactory.createLuxTrust(reader_id);
-    }
+    };
     // get instance for EMV
     public emv = (reader_id?: string): AbstractEMV => {
         return this.pluginFactory.createEmv(reader_id);
-    }
+    };
     // get instance for MOBIB
     public mobib = (reader_id?: string): AbstractMobib => {
         return this.pluginFactory.createMobib(reader_id);
-    }
+    };
     // get instance for OCRA
     public ocra = (reader_id?: string): AbstractOcra => {
         return this.pluginFactory.createOcra(reader_id);
-    }
+    };
     // get instance for Aventra
     public aventra = (reader_id?: string): AbstractAventra => {
         return this.pluginFactory.createAventraNO(reader_id);
-    }
+    };
     // get instance for Oberthur
     public oberthur = (reader_id?: string): AbstractOberthur => {
         return this.pluginFactory.createOberthurNO(reader_id);
-    }
+    };
     // get instance for PIV
     public piv = (reader_id?: string): AbstractPiv => {
         return this.pluginFactory.createPIV(reader_id);
-    }
+    };
     // get instance for PT Eid
     public pteid = (reader_id?: string): AbstractEidPT => {
         return this.pluginFactory.createEidPT(reader_id);
-    }
+    };
     // get instance for PKCS11
     public pkcs11 = (): AbstractPkcs11 => {
         return this.pluginFactory.createPKCS11();
-    }
+    };
     // get instance for Remote Loading
     public readerapi = (reader_id: string): AbstractRemoteLoading => {
         return this.pluginFactory.createRemoteLoading(reader_id);
-    }
+    };
     // TODO change name
     // get instance for Belfius
     public belfius = (reader_id: string): AbstractBelfius => {
         return this.pluginFactory.createBelfius(reader_id);
-    }
+    };
     // get instance for File Exchange
-    public fileExchange = (): AbstractFileExchange => {
+    public filex = (): AbstractFileExchange => {
         return this.pluginFactory.createFileExchange();
-    }
+    };
 
     // generic methods
     public containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void) {
@@ -322,5 +325,5 @@ class GCLClient {
     }
 }
 
-export {GCLClient};
+export {GCLClient, GCLConfig};
 
