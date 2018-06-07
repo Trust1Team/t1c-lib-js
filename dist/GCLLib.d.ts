@@ -1323,7 +1323,7 @@ interface AbstractFileExchange {
     download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], implicitCreationType?: boolean, notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
     upload(entity: string, type: string, filename: string, relpath?: [string], notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<ArrayBuffer>;
     showModal(title: string, text: string, modal: ModalType, timeoutInSeconds?: number, callback?: (error: RestException, data: FileListResponse) => void): Promise<boolean>;
-    listTypes(entity: string, page?: Page, callback?: (error: RestException, data: TypeListResponse) => void): Promise<TypeListResponse>;
+    listTypes(entity?: string, page?: Page, callback?: (error: RestException, data: TypeListResponse) => void): Promise<TypeListResponse>;
     listType(entity: string, type: string, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse>;
     listTypeContent(entity: string, type: string, relpath?: [string], page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>;
     listContent(entity: string, page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>;
@@ -1351,10 +1351,12 @@ declare class File {
     name: string;
     path: string;
     size: number;
+    type: string;
+    entity: string;
     last_modification_time: string;
     is_dir: boolean;
-    access: AccessMode;
-    constructor(extension: string, name: string, path: string, size: number, last_modification_time: string, is_dir: boolean, access: AccessMode);
+    access_mode: AccessMode;
+    constructor(extension: string, name: string, path: string, size: number, type: string, entity: string, last_modification_time: string, is_dir: boolean, access_mode: AccessMode);
 }
 declare class FileListResponse extends T1CResponse {
     data: FileList;
@@ -1384,10 +1386,10 @@ declare class TypeResponse extends T1CResponse {
 declare class Type {
     appid: string;
     entity: string;
-    name: string;
-    abspath: string;
+    type: string;
+    abs_path: string;
     files: number;
-    constructor(appid: string, entity: string, name: string, abspath: string, access: AccessMode, status: TypeStatus, files?: number);
+    constructor(appid?: string, entity?: string, type?: string, abs_path?: string, access_mode?: AccessMode, status?: string, files?: number);
 }
 declare class TypeList {
     types: Type[];
@@ -1400,9 +1402,9 @@ declare class Page {
     sort: FileSort;
     constructor(start: number, size: number, sort: FileSort);
 }
-declare enum FileSort {
-    ASC = 0,
-    DESC = 1,
+declare class FileSort {
+    static ASC: string;
+    static DESC: string;
 }
 declare enum AccessMode {
     READ = 0,
