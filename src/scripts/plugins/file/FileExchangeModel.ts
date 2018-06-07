@@ -18,7 +18,7 @@ interface AbstractFileExchange {
     upload(entity: string, type: string, filename: string, relpath?: [string], notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<ArrayBuffer>;
     // getProgress(entity: string, type: String, filename?: String, action?: FileAction, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
     showModal(title: string, text: string, modal: ModalType, timeoutInSeconds?: number, callback?: (error: RestException, data: FileListResponse) => void): Promise<boolean>;
-    listTypes(entity: string, page?: Page, callback?: (error: RestException, data: TypeListResponse) => void): Promise<TypeListResponse>;
+    listTypes(entity?: string, page?: Page, callback?: (error: RestException, data: TypeListResponse) => void): Promise<TypeListResponse>;
     listType(entity: string, type: string, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse>;
     listTypeContent(entity: string, type: string, relpath?: [string], page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>; // should add total files
     listContent(entity: string, page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>;
@@ -47,9 +47,11 @@ class File {
                 public name: string,
                 public path: string,
                 public size: number,
+                public type: string,
+                public entity: string,
                 public last_modification_time: string,
                 public is_dir: boolean,
-                public access: AccessMode) {}
+                public access_mode: AccessMode) {}
 }
 
 class FileListResponse extends T1CResponse {
@@ -81,10 +83,10 @@ class TypeResponse extends T1CResponse {
 }
 
 class Type {
-    constructor(public appid: string, public entity: string, public name: string, public abspath: string, access: AccessMode, status: TypeStatus, public files?: number) {}
+    constructor(public appid?: string, public entity?: string, public type?: string, public abs_path?: string, access_mode?: AccessMode, status?: string, public files?: number) {}
 }
 
-class TypeList{
+class TypeList {
     constructor(public types: Type[], public total: number) {}
 }
 
@@ -94,8 +96,9 @@ class Page {
 
 /* Enumerations */
 
-enum FileSort {
-    ASC, DESC
+class FileSort {
+    static ASC = 'asc';
+    static DESC = 'desc';
 }
 
 enum AccessMode {

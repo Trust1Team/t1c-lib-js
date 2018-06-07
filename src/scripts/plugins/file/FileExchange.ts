@@ -3,7 +3,7 @@
  * @since 2017
  */
 import { GenericContainer } from '../smartcards/Card';
-import {AbstractFileExchange, AccessMode, FileAction, FileListResponse, FileResponse, ListFilesRequest, ModalType, Page, TypeListResponse, TypeResponse} from './FileExchangeModel';
+import {AbstractFileExchange, AccessMode, FileAction, FileListResponse, FileResponse, FileSort, ListFilesRequest, ModalType, Page, TypeListResponse, TypeResponse} from './FileExchangeModel';
 import { RestException } from '../../core/exceptions/CoreExceptions';
 import {DataArrayResponse, DataResponse} from '../../core/service/CoreModel';
 import {isNullOrUndefined, isUndefined} from 'util';
@@ -16,6 +16,9 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     static FOLDER = '/folder';
     static UPLOAD = '/upload';
     static CREATE_TYPE = '/create-type';
+    static LIST_TYPES = '/list-types';
+    static LIST_TYPE_CONTENT = '/list-type-content';
+
 
     copyFile(entity: string, fromType: string, toType: string, filename: string, newfilename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
         return undefined;
@@ -83,11 +86,15 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     }
 
     listTypeContent(entity: string, type: string, relpath?: [string], page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse> {
-        return undefined;
+        let paging: Page;
+        if (page) { paging = page; } else { paging = { start: 1, size: 10, sort: FileSort.ASC}; }
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.LIST_TYPE_CONTENT), { entity, type, paging }, undefined, undefined, callback);
     }
 
     listTypes(entity: string, page?: Page, callback?: (error: RestException, data: TypeListResponse) => void): Promise<TypeListResponse> {
-        return undefined;
+        let paging: Page;
+        if (page) { paging = page; } else { paging = { start: 1, size: 10, sort: FileSort.ASC}; }
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.LIST_TYPES), { entity, paging }, undefined, undefined, callback);
     }
 
     moveFile(entity: string, fromType: string, toType: string, filename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
