@@ -18,6 +18,7 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     static CREATE_TYPE = '/create-type';
     static LIST_TYPES = '/list-types';
     static LIST_TYPE_CONTENT = '/list-type-content';
+    static DELETE_TYPE = '/delete-type';
 
 
     copyFile(entity: string, fromType: string, toType: string, filename: string, newfilename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
@@ -31,8 +32,8 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     // TODO add headers for i18n and security
     createType(entity: string, type: string, initabspath?: [string], showModal?: boolean, timeoutInSeconds?: number, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse> {
         const show_modal: boolean = (showModal == null) ? undefined : showModal;
-        const timeout: number = (timeoutInSeconds == null) ? undefined : timeoutInSeconds;
-        const init_tabs_path = (initabspath == null) ? undefined : initabspath.join();
+        const timeout: number = (timeoutInSeconds == null) ? 30 : timeoutInSeconds;
+        const init_tabs_path = (initabspath == null) ? undefined : initabspath;
         return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.CREATE_TYPE), { entity, type, show_modal, timeout, init_tabs_path  }, undefined, undefined, callback);
     }
 
@@ -41,7 +42,7 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     }
 
     deleteType(entity: string, type: string, callback?: (error: RestException, data: boolean) => void): Promise<boolean> {
-        return undefined;
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.DELETE_TYPE), { entity, type }, undefined, undefined, callback);
     }
 
     download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], createMissingDir?: boolean, notifyOnCompletion?: boolean,
