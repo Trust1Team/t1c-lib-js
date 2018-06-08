@@ -45,13 +45,9 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
         return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.DELETE_TYPE), { entity, type }, undefined, undefined, callback);
     }
 
-    download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], createMissingDir?: boolean, notifyOnCompletion?: boolean,
-             showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse> {
-        const fileName = filename;
-        // string tokenizer
-        // const rel_path =
-        // return this.connection.postFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), { entity, type, file, fileName, rel_path, implicit_creation_type, notify_on_completion }, undefined, callback);
-        return undefined;
+    download(entity: string, type: string, file: ArrayBuffer, fileName: string, rel_path?: [string], implicit_creation_type?: boolean, notify_on_completion?: boolean,
+             callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse> {
+        return this.connection.postFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), { entity, type, file, fileName, rel_path, implicit_creation_type, notify_on_completion }, undefined, callback);
     }
 
     existsFile(entity: string, type: string, relpath: [string], callback?: (error: RestException, data: boolean) => void): Promise<boolean> {

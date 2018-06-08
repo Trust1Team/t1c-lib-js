@@ -1320,7 +1320,7 @@ class Agent {
 
 export { AbstractFileExchange, FileListResponse, ListFilesRequest, File, FileList, Page, AccessMode, FileAction, FileSort, TypeStatus, TypeResponse, Type, TypeList, TypeListResponse, FileResponse, ModalType };
 interface AbstractFileExchange {
-    download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], implicitCreationType?: boolean, notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
+    download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], implicitCreationType?: boolean, notifyOnCompletion?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
     upload(entity: string, type: string, filename: string, relpath?: [string], notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<ArrayBuffer>;
     showModal(title: string, text: string, modal: ModalType, timeoutInSeconds?: number, callback?: (error: RestException, data: FileListResponse) => void): Promise<boolean>;
     listTypes(entity?: string, page?: Page, callback?: (error: RestException, data: TypeListResponse) => void): Promise<TypeListResponse>;
