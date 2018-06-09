@@ -13,6 +13,7 @@ export { AgentClient };
  */
 class AgentClient implements AbstractAgent {
     static AGENT_PATH = '/agent';
+    static AGENT_RESOLVE_PATH = '/resolve';
 
     // constructor
     constructor(private url: string, private connection: LocalAuthConnection) {}
@@ -23,6 +24,10 @@ class AgentClient implements AbstractAgent {
 
     public get(filters?: { [filterParam: string]: string }, callback?: (error: RestException, data: AgentResponse) => void): Promise<any> {
         return this.connection.getSkipCitrix(this.url, AgentClient.AGENT_PATH, filters, undefined, callback);
+    }
+
+    public resolve (challenge: string, callback?: (error: RestException, data: AgentResponse) => void): Promise<any> {
+        return this.connection.post(this.url, AgentClient.AGENT_PATH + AgentClient.AGENT_RESOLVE_PATH, { challenge }, [], undefined, callback);
     }
 
 }

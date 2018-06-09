@@ -37979,9 +37979,13 @@ var GCLLib =
 	    AgentClient.prototype.get = function (filters, callback) {
 	        return this.connection.getSkipCitrix(this.url, AgentClient.AGENT_PATH, filters, undefined, callback);
 	    };
+	    AgentClient.prototype.resolve = function (challenge, callback) {
+	        return this.connection.post(this.url, AgentClient.AGENT_PATH + AgentClient.AGENT_RESOLVE_PATH, { challenge: challenge }, [], undefined, callback);
+	    };
 	    return AgentClient;
 	}());
 	AgentClient.AGENT_PATH = '/agent';
+	AgentClient.AGENT_RESOLVE_PATH = '/resolve';
 	exports.AgentClient = AgentClient;
 
 
