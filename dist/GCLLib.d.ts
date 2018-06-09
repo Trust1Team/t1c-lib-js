@@ -1302,12 +1302,12 @@ interface AbstractBelfius {
     stx(command: string, sessionId: string, callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse>;
 }
 
-export { AbstractAgent, AgentResponse, Agent };
+export { AbstractAgent, AgentResponse, Agent, ResolvedAgent };
 interface AbstractAgent {
     get(filters?: {
         [filterParam: string]: string;
     }, callback?: (error: CoreExceptions.RestException, data: AgentResponse) => void): Promise<AgentResponse>;
-    resolve(challenge: string, callback?: (error: RestException, data: AgentResponse) => void): Promise<any>;
+    resolve(challenge: string, callback?: (error: RestException, data: ResolvedAgent) => void): Promise<any>;
 }
 interface AgentResponse extends T1CResponse {
     data: Agent[];
@@ -1317,6 +1317,16 @@ class Agent {
     port: number;
     last_update: string;
     constructor(hostname: string, port: number, last_update: string);
+}
+class ResolvedAgent {
+    hostname: string;
+    challenge: string;
+    last_update: string;
+    metadata: any;
+    port: number;
+    type: string;
+    username: string;
+    constructor(hostname?: string, challenge?: string, last_update?: string, metadata?: any, port?: number, type?: string, username?: string);
 }
 
 export { AbstractFileExchange, FileListResponse, ListFilesRequest, File, FileList, Page, AccessMode, FileAction, FileSort, TypeStatus, TypeResponse, Type, TypeList, TypeListResponse, FileResponse, ModalType };
