@@ -1307,6 +1307,7 @@ interface AbstractAgent {
     get(filters?: {
         [filterParam: string]: string;
     }, callback?: (error: CoreExceptions.RestException, data: AgentResponse) => void): Promise<AgentResponse>;
+    resolve(challenge: string, callback?: (error: RestException, data: AgentResponse) => void): Promise<any>;
 }
 interface AgentResponse extends T1CResponse {
     data: Agent[];
