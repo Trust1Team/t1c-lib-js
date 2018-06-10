@@ -5,13 +5,12 @@
 import { LocalAuthAdminConnection } from '../client/Connection';
 import * as CoreExceptions from '../exceptions/CoreExceptions';
 import {
-    AbstractAdmin, AtrListRequest, ContainerSyncRequest, PubKeyResponse,
+    AbstractAdmin, AtrListRequest, ContainerSyncRequest, PubKeyResponse, ResolvedAgent, ResolvedAgentResponse,
     SetPubKeyRequest
 } from './adminModel';
-import { DataArrayResponse, T1CResponse } from '../service/CoreModel';
+import {DataArrayResponse, T1CResponse} from '../service/CoreModel';
 import { ResponseHandler } from '../../util/ResponseHandler';
 import * as _ from 'lodash';
-import { GCLClient } from '../GCLLib';
 import { InitUtil } from '../../util/InitUtil';
 import { RestException } from '../exceptions/CoreExceptions';
 import { ClientService } from '../../util/ClientService';
@@ -24,6 +23,7 @@ const CORE_ATR_LIST = '/admin/atr';
 const CORE_PUB_KEY = '/admin/certificate';
 const CORE_CONTAINERS = '/admin/containers';
 const CORE_LOGFILE = '/admin/log';
+const CORE_AGENT_RESOLVE = '/agent/resolve';
 
 /**
  * Provides access to the /admin endpoints
@@ -78,6 +78,11 @@ class AdminService implements AbstractAdmin {
         return this.post(this.url, CORE_CONTAINERS, containers, callback);
     }
 
+    // resolve Agent for citrix environment
+    public resolveAgent (challenge: string, callback?: (error: RestException, data: ResolvedAgentResponse) => void): Promise<ResolvedAgentResponse> {
+        console.log('resolve agent url: ' + this.url);
+        return this.connection.post(this.url, CORE_AGENT_RESOLVE, { challenge }, [], undefined, callback);
+    }
 
     // private methods
     // ===============

@@ -37979,13 +37979,9 @@ var GCLLib =
 	    AgentClient.prototype.get = function (filters, callback) {
 	        return this.connection.getSkipCitrix(this.url, AgentClient.AGENT_PATH, filters, undefined, callback);
 	    };
-	    AgentClient.prototype.resolve = function (challenge, callback) {
-	        return this.connection.post(this.url, AgentClient.AGENT_PATH + AgentClient.AGENT_RESOLVE_PATH, { challenge: challenge }, [], undefined, callback);
-	    };
 	    return AgentClient;
 	}());
 	AgentClient.AGENT_PATH = '/agent';
-	AgentClient.AGENT_RESOLVE_PATH = '/resolve';
 	exports.AgentClient = AgentClient;
 
 
@@ -65313,6 +65309,19 @@ var GCLLib =
 	    return ContainerSyncRequest;
 	}());
 	exports.ContainerSyncRequest = ContainerSyncRequest;
+	var ResolvedAgent = (function () {
+	    function ResolvedAgent(hostname, challenge, last_update, metadata, port, type, username) {
+	        this.hostname = hostname;
+	        this.challenge = challenge;
+	        this.last_update = last_update;
+	        this.metadata = metadata;
+	        this.port = port;
+	        this.type = type;
+	        this.username = username;
+	    }
+	    return ResolvedAgent;
+	}());
+	exports.ResolvedAgent = ResolvedAgent;
 
 
 /***/ }),
@@ -65385,6 +65394,7 @@ var GCLLib =
 	var CORE_PUB_KEY = '/admin/certificate';
 	var CORE_CONTAINERS = '/admin/containers';
 	var CORE_LOGFILE = '/admin/log';
+	var CORE_AGENT_RESOLVE = '/agent/resolve';
 	var AdminService = (function () {
 	    function AdminService(url, connection) {
 	        this.url = url;
@@ -65418,6 +65428,10 @@ var GCLLib =
 	    };
 	    AdminService.prototype.updateContainerConfig = function (containers, callback) {
 	        return this.post(this.url, CORE_CONTAINERS, containers, callback);
+	    };
+	    AdminService.prototype.resolveAgent = function (challenge, callback) {
+	        console.log('resolve agent url: ' + this.url);
+	        return this.connection.post(this.url, CORE_AGENT_RESOLVE, { challenge: challenge }, [], undefined, callback);
 	    };
 	    AdminService.prototype.get = function (url, suffix, callback) {
 	        var self = this;

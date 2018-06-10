@@ -3,11 +3,12 @@
  * @since 2018
  */
 
-import { DataArrayResponse, T1CResponse } from '../service/CoreModel';
+import {DataArrayResponse, T1CResponse} from '../service/CoreModel';
 import { DSContainer } from '../ds/DSClientModel';
 import { RestException } from '../exceptions/CoreExceptions';
+import {Agent} from '../agent/agentModel';
 
-export { AbstractAdmin, AtrListRequest, PubKeys, PubKeyResponse, SetPubKeyRequest, ContainerSyncRequest };
+export { AbstractAdmin, AtrListRequest, PubKeys, PubKeyResponse, SetPubKeyRequest, ContainerSyncRequest, ResolvedAgent, ResolvedAgentResponse };
 
 
 interface AbstractAdmin {
@@ -19,7 +20,9 @@ interface AbstractAdmin {
     setPubKey(keys: SetPubKeyRequest,
               callback?: (error: RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     updateContainerConfig(containers: ContainerSyncRequest,
-                          callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>
+                          callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    // resolve agent
+    resolveAgent(challenge: string, callback?: (error: RestException, data: ResolvedAgentResponse) => void): Promise<ResolvedAgentResponse>;
 }
 
 class AtrListRequest {
@@ -40,4 +43,12 @@ class PubKeys {
 
 class ContainerSyncRequest {
     constructor(public containerResponses: DSContainer[]) {}
+}
+
+class ResolvedAgent {
+    constructor(public hostname?: string, public challenge?: string, public last_update?: string, public metadata?: any, public port?: number, public type?: string, public username?: string) {}
+}
+
+interface ResolvedAgentResponse extends T1CResponse {
+    data: ResolvedAgent[]
 }

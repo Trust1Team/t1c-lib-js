@@ -4,6 +4,7 @@
  */
 
 import * as CoreExceptions from '../exceptions/CoreExceptions';
+import {RestException} from '../exceptions/CoreExceptions';
 
 export { AbstractCore, T1CResponse, BoolDataResponse, DataResponse, DataArrayResponse, DataObjectResponse,
     InfoResponse, BrowserInfo, BrowserInfoResponse, Card, CardReader, CardReadersResponse, T1CCertificate,

@@ -1302,12 +1302,11 @@ interface AbstractBelfius {
     stx(command: string, sessionId: string, callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse>;
 }
 
-export { AbstractAgent, AgentResponse, Agent, ResolvedAgent };
+export { AbstractAgent, AgentResponse, Agent };
 interface AbstractAgent {
     get(filters?: {
         [filterParam: string]: string;
     }, callback?: (error: CoreExceptions.RestException, data: AgentResponse) => void): Promise<AgentResponse>;
-    resolve(challenge: string, callback?: (error: RestException, data: ResolvedAgent) => void): Promise<any>;
 }
 interface AgentResponse extends T1CResponse {
     data: Agent[];
@@ -1317,16 +1316,6 @@ class Agent {
     port: number;
     last_update: string;
     constructor(hostname: string, port: number, last_update: string);
-}
-class ResolvedAgent {
-    hostname: string;
-    challenge: string;
-    last_update: string;
-    metadata: any;
-    port: number;
-    type: string;
-    username: string;
-    constructor(hostname?: string, challenge?: string, last_update?: string, metadata?: any, port?: number, type?: string, username?: string);
 }
 
 export { AbstractFileExchange, FileListResponse, ListFilesRequest, File, FileList, Page, AccessMode, FileAction, FileSort, TypeStatus, TypeResponse, Type, TypeList, TypeListResponse, FileResponse, ModalType };
@@ -1448,6 +1437,7 @@ class AdminService implements AbstractAdmin {
     getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     setPubKey(keys: SetPubKeyRequest, callback?: (error: CoreExceptions.RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     updateContainerConfig(containers: ContainerSyncRequest, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    resolveAgent(challenge: string, callback?: (error: RestException, data: ResolvedAgentResponse) => void): Promise<ResolvedAgentResponse>;
 }
 
 export { AbstractPkcs11, InfoResponse, Pkcs11Certificate, Pkcs11CertificatesResponse, Pkcs11Info, Pkcs11SignData, Pkcs11VerifySignedData, Slot, SlotsResponse, TokenInfo, TokenResponse, ModuleConfig };
@@ -1828,7 +1818,7 @@ interface AbstractDataContainer {
     delete(id: string, callback?: (error: RestException, data: any) => void): Promise<any>;
 }
 
-export { AbstractAdmin, AtrListRequest, PubKeys, PubKeyResponse, SetPubKeyRequest, ContainerSyncRequest };
+export { AbstractAdmin, AtrListRequest, PubKeys, PubKeyResponse, SetPubKeyRequest, ContainerSyncRequest, ResolvedAgent, ResolvedAgentResponse };
 interface AbstractAdmin {
     activate(callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     atr(atrList: AtrListRequest, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
@@ -1837,6 +1827,7 @@ interface AbstractAdmin {
     getPubKey(callback?: (error: RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     setPubKey(keys: SetPubKeyRequest, callback?: (error: RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     updateContainerConfig(containers: ContainerSyncRequest, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+    resolveAgent(challenge: string, callback?: (error: RestException, data: ResolvedAgentResponse) => void): Promise<ResolvedAgentResponse>;
 }
 class AtrListRequest {
     hash: string;
@@ -1862,6 +1853,19 @@ class PubKeys {
 class ContainerSyncRequest {
     containerResponses: DSContainer[];
     constructor(containerResponses: DSContainer[]);
+}
+class ResolvedAgent {
+    hostname: string;
+    challenge: string;
+    last_update: string;
+    metadata: any;
+    port: number;
+    type: string;
+    username: string;
+    constructor(hostname?: string, challenge?: string, last_update?: string, metadata?: any, port?: number, type?: string, username?: string);
+}
+interface ResolvedAgentResponse extends T1CResponse {
+    data: ResolvedAgent[];
 }
 
 export { AbstractAuth, JWTResponse };
