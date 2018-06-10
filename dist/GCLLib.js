@@ -37803,7 +37803,11 @@ var GCLLib =
 	            callback = function () { };
 	        }
 	        var form = new FormData();
-	        form.append('path', body.path);
+	        form.append('entity', body.entity);
+	        form.append('type', body.type);
+	        form.append('rel_path', body.rel_path);
+	        form.append('implicit_creation_type', body.implicit_creation_type);
+	        form.append('notify_on_completion', body.notify_on_completion);
 	        form.append('file', body.file, body.fileName);
 	        var headers = { 'Content-Type': 'multipart/form-data' };
 	        if (config.tokenCompatible && this.getSecurityConfig().sendToken) {
@@ -64222,8 +64226,8 @@ var GCLLib =
 	    FileExchange.prototype.deleteType = function (entity, type, callback) {
 	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_DELETE), { entity: entity, type: type }, undefined, undefined, callback);
 	    };
-	    FileExchange.prototype.download = function (entity, type, file, fileName, rel_path, implicit_creation_type, notify_on_completion, callback) {
-	        return this.connection.postFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), { entity: entity, type: type, file: file, fileName: fileName, rel_path: rel_path, implicit_creation_type: implicit_creation_type, notify_on_completion: notify_on_completion }, undefined, callback);
+	    FileExchange.prototype.download = function (entity, type, file, filename, rel_path, implicit_creation_type, notify_on_completion, callback) {
+	        return this.connection.postFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), { entity: entity, type: type, file: file, filename: filename, rel_path: rel_path, implicit_creation_type: implicit_creation_type, notify_on_completion: notify_on_completion }, undefined, callback);
 	    };
 	    FileExchange.prototype.existsFile = function (entity, type, relpath, callback) {
 	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_EXISTS), { entity: entity, type: type, relpath: relpath }, undefined, undefined, callback);
