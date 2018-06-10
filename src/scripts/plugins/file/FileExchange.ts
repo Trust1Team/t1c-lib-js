@@ -34,7 +34,7 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     // TODO add headers for i18n and security
     createType(entity: string, type: string, initabspath?: [string], showModal?: boolean, timeoutInSeconds?: number, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse> {
         const show_modal: boolean = (showModal == null) ? undefined : showModal;
-        const timeout: number = (timeoutInSeconds == null) ? 0 : timeoutInSeconds;
+        const timeout: number = (timeoutInSeconds == null) ? 30 : timeoutInSeconds;
         const init_tabs_path = (initabspath == null) ? undefined : initabspath;
         return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CREATE), { entity, type, show_modal, timeout, init_tabs_path  }, undefined, undefined, callback);
     }
@@ -109,7 +109,7 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     }
 
     updateType(entity: string, type: string, timeoutInSeconds?: number, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse> {
-        const timeout: number = (timeoutInSeconds == null) ? 0 : timeoutInSeconds;
+        const timeout: number = (timeoutInSeconds == null) ? 30 : timeoutInSeconds;
         return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_UPDATE), { entity, type, timeout  }, undefined, undefined, callback);
     }
 
