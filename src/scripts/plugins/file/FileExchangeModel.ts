@@ -114,6 +114,7 @@ enum FileAction {
     UPLOAD, DOWNLOAD, COPY, MOVE
 }
 
-enum ModalType {
-    INFO, CHOICE
+class ModalType {
+    static INFO = 'info';
+    static CHOICE = 'choice';
 }

@@ -21,6 +21,7 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     static TYPE_DELETE = '/delete-type';
     static TYPE_EXISTS = '/exists-type';
     static FILE_EXISTS = '/exists-file';
+    static MODAL_SHOW = '/show-modal';
 
 
     copyFile(entity: string, fromType: string, toType: string, filename: string, newfilename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
@@ -72,9 +73,9 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
         return undefined;
     }
 
-    getProgress(entity: string, type: String, filename?: String, action?: FileAction, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse> {
+/*    getProgress(entity: string, type: String, filename?: String, action?: FileAction, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse> {
         return undefined;
-    }
+    }*/
 
     listContent(entity: string, page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse> {
         return undefined;
@@ -105,7 +106,8 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     }
 
     showModal(title: string, text: string, modal: ModalType, timeoutInSeconds?: number, callback?: (error: RestException, data: FileListResponse) => void): Promise<boolean> {
-        return undefined;
+        const timeout: number = (timeoutInSeconds == null) ? 30 : timeoutInSeconds;
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.MODAL_SHOW), { title, text, modal, timeout }, undefined, undefined, callback);
     }
 
     updateType(entity: string, type: string, timeoutInSeconds?: number, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse> {
