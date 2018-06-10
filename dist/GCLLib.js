@@ -64213,8 +64213,11 @@ var GCLLib =
 	        var init_tabs_path = (initabspath == null) ? undefined : initabspath;
 	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CREATE), { entity: entity, type: type, show_modal: show_modal, timeout: timeout, init_tabs_path: init_tabs_path }, undefined, undefined, callback);
 	    };
-	    FileExchange.prototype.createTypeDirs = function (entity, type, initrelpath, showModal, callback) {
-	        return undefined;
+	    FileExchange.prototype.createTypeDirs = function (entity, type, relpath, showModal, timeoutInSeconds, callback) {
+	        var timeout = (timeoutInSeconds == null) ? 30 : timeoutInSeconds;
+	        var show_modal = (showModal == null) ? undefined : showModal;
+	        var rel_path = (relpath == null) ? undefined : relpath;
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CREATE), { entity: entity, type: type, show_modal: show_modal, timeout: timeout, rel_path: rel_path }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.deleteType = function (entity, type, callback) {
 	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_DELETE), { entity: entity, type: type }, undefined, undefined, callback);
@@ -64229,10 +64232,11 @@ var GCLLib =
 	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_EXISTS), { entity: entity, type: type }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.getAccessMode = function (entity, type, filename, relpath, callback) {
-	        return undefined;
+	        var rel_path = (relpath == null) ? undefined : relpath;
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.ACCESS_MODE), { entity: entity, type: type, filename: filename, rel_path: rel_path }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.getEnabledContainers = function (callback) {
-	        return undefined;
+	        return this.connection.get(this.baseUrl, this.containerSuffix(FileExchange.CONTAINERS_ENABLED), [], undefined, callback);
 	    };
 	    FileExchange.prototype.getFileInfo = function (entity, type, filename, relpath, callback) {
 	        return undefined;
@@ -64241,7 +64245,7 @@ var GCLLib =
 	        return undefined;
 	    };
 	    FileExchange.prototype.listType = function (entity, type, callback) {
-	        return undefined;
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_LIST), { entity: entity, type: type }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.listTypeContent = function (entity, type, relpath, page, callback) {
 	        var paging;
@@ -64261,7 +64265,7 @@ var GCLLib =
 	        else {
 	            paging = { start: 1, size: 10, sort: FileExchangeModel_1.FileSort.ASC };
 	        }
-	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_LIST), { entity: entity, paging: paging }, undefined, undefined, callback);
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPES_LIST), { entity: entity, paging: paging }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.moveFile = function (entity, fromType, toType, filename, fromrelpath, torelpath, callback) {
 	        return undefined;
@@ -64286,13 +64290,17 @@ var GCLLib =
 	FileExchange.FOLDER = '/folder';
 	FileExchange.UPLOAD = '/upload';
 	FileExchange.TYPE_CREATE = '/create-type';
+	FileExchange.TYPE_DIRS_CREATE = '/create-type-dirs';
 	FileExchange.TYPE_UPDATE = '/update-type';
-	FileExchange.TYPE_LIST = '/list-types';
+	FileExchange.TYPES_LIST = '/list-types';
+	FileExchange.TYPE_LIST = '/list-type';
 	FileExchange.TYPE_CONTENT_LIST = '/list-type-content';
 	FileExchange.TYPE_DELETE = '/delete-type';
 	FileExchange.TYPE_EXISTS = '/exists-type';
 	FileExchange.FILE_EXISTS = '/exists-file';
 	FileExchange.MODAL_SHOW = '/show-modal';
+	FileExchange.ACCESS_MODE = '/access-mode';
+	FileExchange.CONTAINERS_ENABLED = 'enabled-containers';
 	exports.FileExchange = FileExchange;
 
 
@@ -64424,12 +64432,18 @@ var GCLLib =
 	FileSort.ASC = 'asc';
 	FileSort.DESC = 'desc';
 	exports.FileSort = FileSort;
-	var AccessMode;
-	(function (AccessMode) {
-	    AccessMode[AccessMode["READ"] = 0] = "READ";
-	    AccessMode[AccessMode["WRITE"] = 1] = "WRITE";
-	    AccessMode[AccessMode["EXECUTE"] = 2] = "EXECUTE";
-	})(AccessMode || (AccessMode = {}));
+	var AccessMode = (function () {
+	    function AccessMode() {
+	    }
+	    return AccessMode;
+	}());
+	AccessMode.READ = 'r';
+	AccessMode.WRITE = 'w';
+	AccessMode.EXEC = 'x';
+	AccessMode.READ_WRITE = 'rw';
+	AccessMode.READ_EXEC = 'rx';
+	AccessMode.WRITE_EXEC = 'wx';
+	AccessMode.READ_WRITE_EXEC = 'rwx';
 	exports.AccessMode = AccessMode;
 	var TypeStatus;
 	(function (TypeStatus) {
