@@ -540,7 +540,12 @@ class LocalConnection extends GenericConnection implements Connection {
         const form = new FormData();
         // second argument  can take Buffer or Stream (lazily read during the request) too.
         // third argument is filename if you want to simulate a file upload. Otherwise omit.
-        form.append('path', body.path);
+        // entity, type, file, filename, rel_path, implicit_creation_type, notify_on_completion
+        form.append('entity', body.entity);
+        form.append('type', body.type);
+        form.append('rel_path', body.rel_path);
+        form.append('implicit_creation_type', body.implicit_creation_type);
+        form.append('notify_on_completion', body.notify_on_completion);
         form.append('file', body.file, body.fileName);
         let headers = { 'Content-Type': 'multipart/form-data' };
         if (config.tokenCompatible && this.getSecurityConfig().sendToken) {
