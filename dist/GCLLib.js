@@ -64223,10 +64223,10 @@ var GCLLib =
 	        return this.connection.postFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), { entity: entity, type: type, file: file, fileName: fileName, rel_path: rel_path, implicit_creation_type: implicit_creation_type, notify_on_completion: notify_on_completion }, undefined, callback);
 	    };
 	    FileExchange.prototype.existsFile = function (entity, type, relpath, callback) {
-	        return undefined;
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_EXISTS), { entity: entity, type: type, relpath: relpath }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.existsType = function (entity, type, callback) {
-	        return undefined;
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_EXISTS), { entity: entity, type: type }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.getAccessMode = function (entity, type, filename, relpath, callback) {
 	        return undefined;
@@ -64292,6 +64292,8 @@ var GCLLib =
 	FileExchange.TYPE_LIST = '/list-types';
 	FileExchange.TYPE_CONTENT_LIST = '/list-type-content';
 	FileExchange.TYPE_DELETE = '/delete-type';
+	FileExchange.TYPE_EXISTS = '/exists-type';
+	FileExchange.FILE_EXISTS = '/exists-file';
 	exports.FileExchange = FileExchange;
 
 
