@@ -64217,7 +64217,7 @@ var GCLLib =
 	        var timeout = (timeoutInSeconds == null) ? 30 : timeoutInSeconds;
 	        var show_modal = (showModal == null) ? undefined : showModal;
 	        var rel_path = (relpath == null) ? undefined : relpath;
-	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CREATE), { entity: entity, type: type, show_modal: show_modal, timeout: timeout, rel_path: rel_path }, undefined, undefined, callback);
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_DIRS_CREATE), { entity: entity, type: type, show_modal: show_modal, timeout: timeout, rel_path: rel_path }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.deleteType = function (entity, type, callback) {
 	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_DELETE), { entity: entity, type: type }, undefined, undefined, callback);
