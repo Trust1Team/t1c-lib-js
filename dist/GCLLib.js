@@ -37806,9 +37806,9 @@ var GCLLib =
 	        form.append('entity', body.entity);
 	        form.append('type', body.type);
 	        form.append('rel_path', body.rel_path);
-	        form.append('implicit_creation_type', body.implicit_creation_type);
+	        form.append('filename', body.filename);
 	        form.append('notify_on_completion', body.notify_on_completion);
-	        form.append('file', body.file, body.fileName);
+	        form.append('file', body.file);
 	        var headers = { 'Content-Type': 'multipart/form-data' };
 	        if (config.tokenCompatible && this.getSecurityConfig().sendToken) {
 	            headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint_1.BrowserFingerprint.get();
