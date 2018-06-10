@@ -1329,14 +1329,14 @@ interface AbstractFileExchange {
     listContent(entity: string, page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>;
     existsType(entity: string, type: string, callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
     existsFile(entity: string, type: string, relpath: [string], callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
-    getAccessMode(entity: string, type: string, filename?: string, relpath?: [string], callback?: (error: RestException, data: AccessMode) => void): Promise<AccessMode>;
+    getAccessMode(entity: string, type: string, filename?: string, relpath?: [string], callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     createDir(entity: string, type: string, relpath: [string], recursive?: boolean, callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
     copyFile(entity: string, fromType: string, toType: string, filename: string, newfilename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
     moveFile(entity: string, fromType: string, toType: string, filename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
     renameFile(entity: string, type: string, filename: string, newfilename: string, relpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
     getFileInfo(entity: string, type: string, filename: string, relpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
     createType(entity: string, type: string, initabspath?: [string], showModal?: boolean, timeoutInSeconds?: number, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse>;
-    createTypeDirs(entity: string, type: string, initrelpath: [string], showModal?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>;
+    createTypeDirs(entity: string, type: string, rel_path: [string], show_modal?: boolean, timeoutInSeconds?: number, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>;
     updateType(entity: string, type: string, timeoutInSeconds?: number, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse>;
     deleteType(entity: string, type: string, callback?: (error: RestException, data: boolean) => void): Promise<boolean>;
     getEnabledContainers(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
@@ -1406,10 +1406,14 @@ declare class FileSort {
     static ASC: string;
     static DESC: string;
 }
-declare enum AccessMode {
-    READ = 0,
-    WRITE = 1,
-    EXECUTE = 2,
+declare class AccessMode {
+    static READ: string;
+    static WRITE: string;
+    static EXEC: string;
+    static READ_WRITE: string;
+    static READ_EXEC: string;
+    static WRITE_EXEC: string;
+    static READ_WRITE_EXEC: string;
 }
 declare enum TypeStatus {
     MAPPED = 0,
