@@ -64209,15 +64209,15 @@ var GCLLib =
 	    };
 	    FileExchange.prototype.createType = function (entity, type, initabspath, showModal, timeoutInSeconds, callback) {
 	        var show_modal = (showModal == null) ? undefined : showModal;
-	        var timeout = (timeoutInSeconds == null) ? 30 : timeoutInSeconds;
+	        var timeout = (timeoutInSeconds == null) ? 0 : timeoutInSeconds;
 	        var init_tabs_path = (initabspath == null) ? undefined : initabspath;
-	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.CREATE_TYPE), { entity: entity, type: type, show_modal: show_modal, timeout: timeout, init_tabs_path: init_tabs_path }, undefined, undefined, callback);
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CREATE), { entity: entity, type: type, show_modal: show_modal, timeout: timeout, init_tabs_path: init_tabs_path }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.createTypeDirs = function (entity, type, initrelpath, showModal, callback) {
 	        return undefined;
 	    };
 	    FileExchange.prototype.deleteType = function (entity, type, callback) {
-	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.DELETE_TYPE), { entity: entity, type: type }, undefined, undefined, callback);
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_DELETE), { entity: entity, type: type }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.download = function (entity, type, file, fileName, rel_path, implicit_creation_type, notify_on_completion, callback) {
 	        return this.connection.postFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), { entity: entity, type: type, file: file, fileName: fileName, rel_path: rel_path, implicit_creation_type: implicit_creation_type, notify_on_completion: notify_on_completion }, undefined, callback);
@@ -64254,7 +64254,7 @@ var GCLLib =
 	        else {
 	            paging = { start: 1, size: 10, sort: FileExchangeModel_1.FileSort.ASC };
 	        }
-	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.LIST_TYPE_CONTENT), { entity: entity, type: type, paging: paging }, undefined, undefined, callback);
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CONTENT_LIST), { entity: entity, type: type, paging: paging }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.listTypes = function (entity, page, callback) {
 	        var paging;
@@ -64264,7 +64264,7 @@ var GCLLib =
 	        else {
 	            paging = { start: 1, size: 10, sort: FileExchangeModel_1.FileSort.ASC };
 	        }
-	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.LIST_TYPES), { entity: entity, paging: paging }, undefined, undefined, callback);
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_LIST), { entity: entity, paging: paging }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.moveFile = function (entity, fromType, toType, filename, fromrelpath, torelpath, callback) {
 	        return undefined;
@@ -64276,7 +64276,8 @@ var GCLLib =
 	        return undefined;
 	    };
 	    FileExchange.prototype.updateType = function (entity, type, timeoutInSeconds, callback) {
-	        return undefined;
+	        var timeout = (timeoutInSeconds == null) ? 0 : timeoutInSeconds;
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_UPDATE), { entity: entity, type: type, timeout: timeout }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.upload = function (entity, type, filename, relpath, notifyOnCompletion, showProgressBar, callback) {
 	        return undefined;
@@ -64286,10 +64287,11 @@ var GCLLib =
 	FileExchange.DOWNLOAD = '/download';
 	FileExchange.FOLDER = '/folder';
 	FileExchange.UPLOAD = '/upload';
-	FileExchange.CREATE_TYPE = '/create-type';
-	FileExchange.LIST_TYPES = '/list-types';
-	FileExchange.LIST_TYPE_CONTENT = '/list-type-content';
-	FileExchange.DELETE_TYPE = '/delete-type';
+	FileExchange.TYPE_CREATE = '/create-type';
+	FileExchange.TYPE_UPDATE = '/update-type';
+	FileExchange.TYPE_LIST = '/list-types';
+	FileExchange.TYPE_CONTENT_LIST = '/list-type-content';
+	FileExchange.TYPE_DELETE = '/delete-type';
 	exports.FileExchange = FileExchange;
 
 

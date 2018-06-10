@@ -5,8 +5,7 @@
 import { GenericContainer } from '../smartcards/Card';
 import {AbstractFileExchange, AccessMode, FileAction, FileListResponse, FileResponse, FileSort, ListFilesRequest, ModalType, Page, TypeListResponse, TypeResponse} from './FileExchangeModel';
 import { RestException } from '../../core/exceptions/CoreExceptions';
-import {DataArrayResponse, DataResponse} from '../../core/service/CoreModel';
-import {isNullOrUndefined, isUndefined} from 'util';
+import {BoolDataResponse, DataArrayResponse, DataResponse} from '../../core/service/CoreModel';
 
 export { FileExchange };
 
@@ -15,10 +14,13 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     static DOWNLOAD = '/download';
     static FOLDER = '/folder';
     static UPLOAD = '/upload';
-    static CREATE_TYPE = '/create-type';
-    static LIST_TYPES = '/list-types';
-    static LIST_TYPE_CONTENT = '/list-type-content';
-    static DELETE_TYPE = '/delete-type';
+    static TYPE_CREATE = '/create-type';
+    static TYPE_UPDATE = '/update-type';
+    static TYPE_LIST = '/list-types';
+    static TYPE_CONTENT_LIST = '/list-type-content';
+    static TYPE_DELETE = '/delete-type';
+    static TYPE_EXISTS = '/exists-type';
+    static FILE_EXISTS = '/exists-file';
 
 
     copyFile(entity: string, fromType: string, toType: string, filename: string, newfilename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
@@ -32,9 +34,9 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     // TODO add headers for i18n and security
     createType(entity: string, type: string, initabspath?: [string], showModal?: boolean, timeoutInSeconds?: number, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse> {
         const show_modal: boolean = (showModal == null) ? undefined : showModal;
-        const timeout: number = (timeoutInSeconds == null) ? 30 : timeoutInSeconds;
+        const timeout: number = (timeoutInSeconds == null) ? 0 : timeoutInSeconds;
         const init_tabs_path = (initabspath == null) ? undefined : initabspath;
-        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.CREATE_TYPE), { entity, type, show_modal, timeout, init_tabs_path  }, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CREATE), { entity, type, show_modal, timeout, init_tabs_path  }, undefined, undefined, callback);
     }
 
     createTypeDirs(entity: string, type: string, initrelpath: [string], showModal?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse> {
@@ -42,7 +44,7 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     }
 
     deleteType(entity: string, type: string, callback?: (error: RestException, data: boolean) => void): Promise<boolean> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.DELETE_TYPE), { entity, type }, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_DELETE), { entity, type }, undefined, undefined, callback);
     }
 
     download(entity: string, type: string, file: ArrayBuffer, fileName: string, rel_path?: [string], implicit_creation_type?: boolean, notify_on_completion?: boolean,
@@ -50,12 +52,12 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
         return this.connection.postFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), { entity, type, file, fileName, rel_path, implicit_creation_type, notify_on_completion }, undefined, callback);
     }
 
-    existsFile(entity: string, type: string, relpath: [string], callback?: (error: RestException, data: boolean) => void): Promise<boolean> {
-        return undefined;
+    existsFile(entity: string, type: string, relpath: [string], callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_EXISTS), { entity, type, relpath }, undefined, undefined, callback);
     }
 
-    existsType(entity: string, type: string, callback?: (error: RestException, data: boolean) => void): Promise<boolean> {
-        return undefined;
+    existsType(entity: string, type: string, callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_EXISTS), { entity, type }, undefined, undefined, callback);
     }
 
     getAccessMode(entity: string, type: string, filename?: string, relpath?: [string], callback?: (error: RestException, data: AccessMode) => void): Promise<AccessMode> {
@@ -85,13 +87,13 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     listTypeContent(entity: string, type: string, relpath?: [string], page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse> {
         let paging: Page;
         if (page) { paging = page; } else { paging = { start: 1, size: 10, sort: FileSort.ASC}; }
-        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.LIST_TYPE_CONTENT), { entity, type, paging }, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CONTENT_LIST), { entity, type, paging }, undefined, undefined, callback);
     }
 
     listTypes(entity: string, page?: Page, callback?: (error: RestException, data: TypeListResponse) => void): Promise<TypeListResponse> {
         let paging: Page;
         if (page) { paging = page; } else { paging = { start: 1, size: 10, sort: FileSort.ASC}; }
-        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.LIST_TYPES), { entity, paging }, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_LIST), { entity, paging }, undefined, undefined, callback);
     }
 
     moveFile(entity: string, fromType: string, toType: string, filename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
@@ -107,7 +109,8 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     }
 
     updateType(entity: string, type: string, timeoutInSeconds?: number, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse> {
-        return undefined;
+        const timeout: number = (timeoutInSeconds == null) ? 0 : timeoutInSeconds;
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_UPDATE), { entity, type, timeout  }, undefined, undefined, callback);
     }
 
     upload(entity: string, type: string, filename: string, relpath?: [string], notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<ArrayBuffer> {
