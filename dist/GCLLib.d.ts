@@ -1421,9 +1421,9 @@ declare enum FileAction {
     COPY = 2,
     MOVE = 3,
 }
-declare enum ModalType {
-    INFO = 0,
-    CHOICE = 1,
+declare class ModalType {
+    static INFO: string;
+    static CHOICE: string;
 }
 
 export { AdminService };

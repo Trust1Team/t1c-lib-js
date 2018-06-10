@@ -64237,9 +64237,6 @@ var GCLLib =
 	    FileExchange.prototype.getFileInfo = function (entity, type, filename, relpath, callback) {
 	        return undefined;
 	    };
-	    FileExchange.prototype.getProgress = function (entity, type, filename, action, callback) {
-	        return undefined;
-	    };
 	    FileExchange.prototype.listContent = function (entity, page, callback) {
 	        return undefined;
 	    };
@@ -64273,7 +64270,8 @@ var GCLLib =
 	        return undefined;
 	    };
 	    FileExchange.prototype.showModal = function (title, text, modal, timeoutInSeconds, callback) {
-	        return undefined;
+	        var timeout = (timeoutInSeconds == null) ? 30 : timeoutInSeconds;
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.MODAL_SHOW), { title: title, text: text, modal: modal, timeout: timeout }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.updateType = function (entity, type, timeoutInSeconds, callback) {
 	        var timeout = (timeoutInSeconds == null) ? 30 : timeoutInSeconds;
@@ -64294,6 +64292,7 @@ var GCLLib =
 	FileExchange.TYPE_DELETE = '/delete-type';
 	FileExchange.TYPE_EXISTS = '/exists-type';
 	FileExchange.FILE_EXISTS = '/exists-file';
+	FileExchange.MODAL_SHOW = '/show-modal';
 	exports.FileExchange = FileExchange;
 
 
@@ -64446,11 +64445,13 @@ var GCLLib =
 	    FileAction[FileAction["MOVE"] = 3] = "MOVE";
 	})(FileAction || (FileAction = {}));
 	exports.FileAction = FileAction;
-	var ModalType;
-	(function (ModalType) {
-	    ModalType[ModalType["INFO"] = 0] = "INFO";
-	    ModalType[ModalType["CHOICE"] = 1] = "CHOICE";
-	})(ModalType || (ModalType = {}));
+	var ModalType = (function () {
+	    function ModalType() {
+	    }
+	    return ModalType;
+	}());
+	ModalType.INFO = 'info';
+	ModalType.CHOICE = 'choice';
 	exports.ModalType = ModalType;
 
 
