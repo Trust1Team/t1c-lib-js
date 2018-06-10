@@ -64209,7 +64209,7 @@ var GCLLib =
 	    };
 	    FileExchange.prototype.createType = function (entity, type, initabspath, showModal, timeoutInSeconds, callback) {
 	        var show_modal = (showModal == null) ? undefined : showModal;
-	        var timeout = (timeoutInSeconds == null) ? 0 : timeoutInSeconds;
+	        var timeout = (timeoutInSeconds == null) ? 30 : timeoutInSeconds;
 	        var init_tabs_path = (initabspath == null) ? undefined : initabspath;
 	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CREATE), { entity: entity, type: type, show_modal: show_modal, timeout: timeout, init_tabs_path: init_tabs_path }, undefined, undefined, callback);
 	    };
@@ -64276,7 +64276,7 @@ var GCLLib =
 	        return undefined;
 	    };
 	    FileExchange.prototype.updateType = function (entity, type, timeoutInSeconds, callback) {
-	        var timeout = (timeoutInSeconds == null) ? 0 : timeoutInSeconds;
+	        var timeout = (timeoutInSeconds == null) ? 30 : timeoutInSeconds;
 	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_UPDATE), { entity: entity, type: type, timeout: timeout }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.upload = function (entity, type, filename, relpath, notifyOnCompletion, showProgressBar, callback) {
