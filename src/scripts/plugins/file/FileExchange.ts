@@ -47,7 +47,7 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
         const timeout: number = (timeoutInSeconds == null) ? 30 : timeoutInSeconds;
         const show_modal: boolean = (showModal == null) ? undefined : showModal;
         const rel_path = (relpath == null) ? undefined : relpath;
-        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CREATE), {entity, type, show_modal, timeout, rel_path}, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_DIRS_CREATE), {entity, type, show_modal, timeout, rel_path}, undefined, undefined, callback);
     }
 
     deleteType(entity: string, type: string, callback?: (error: RestException, data: boolean) => void): Promise<boolean> {
