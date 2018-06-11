@@ -34,7 +34,7 @@ describe("URL Utility", () => {
             config.citrix = true;
             let url = UrlUtil.create("http://base", "/suffix", config, false);
             expect(url).to.be.a("string");
-            expect(url).to.eq("http://base/suffix");
+            expect(url).to.eq("http://base/agent/-1/suffix");
         });
 
         it("for a Citrix environment, for a request that doesn't need to be proxied to the agent", () => {
