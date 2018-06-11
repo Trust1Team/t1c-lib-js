@@ -6,7 +6,7 @@ module.exports = function (config) {
         frameworks: ['mocha', 'chai', 'sinon'],
         plugins: [require('karma-htmlfile-reporter'), require('progress'), require('karma-mocha'),
                   require('karma-phantomjs-launcher'), require('karma-chai'), require('karma-sinon'),
-                  require('karma-teamcity-reporter'), require('karma-webpack')],
+                  require('karma-webpack')],
         files: [
             'src/test/**/*.ts'
         ],

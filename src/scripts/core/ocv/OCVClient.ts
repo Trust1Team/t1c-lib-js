@@ -33,7 +33,7 @@ class OCVClient implements AbstractOCVClient {
     }
 
     public getInfo(callback?: (error: RestException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse> {
-        return this.connection.get(this.url, SYSTEM_STATUS, undefined, undefined, callback);
+        return this.connection.get(this.getUrl(), SYSTEM_STATUS, undefined, undefined, callback);
     }
 
     public getChallenge(digestAlgorithm: string,

@@ -21,7 +21,7 @@
     "jsdoc-format": true,
     "label-position": true,
     "label-undefined": true,
-    "max-line-length": [ true, 140 ],
+    "max-line-length": [ true, 300 ],
     "member-ordering": [
       true, {
         "order": "fields-first"
@@ -45,7 +45,7 @@
     "no-duplicate-key": true,
     "no-shadowed-variable": true,
     "no-duplicate-variable": true,
-    "no-empty": true,
+    "no-empty": false,
     "no-eval": true,
     "no-inferrable-types": true,
     "no-internal-module": true,
