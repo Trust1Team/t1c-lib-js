@@ -131,6 +131,6 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     }
 
     upload(entity: string, type: string, filename: string, rel_path?: [string], notify_on_completion?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<ArrayBuffer> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.UPLOAD), {entity, type, filename, rel_path, notify_on_completion}, undefined, undefined, callback);
+        return this.connection.requestFile(this.baseUrl, this.containerSuffix(FileExchange.UPLOAD), {entity, type, filename, rel_path, notify_on_completion}, callback);
     }
 }
