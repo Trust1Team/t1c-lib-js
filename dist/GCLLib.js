@@ -64271,8 +64271,8 @@ var GCLLib =
 	        }
 	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPES_LIST), { entity: entity, paging: paging }, undefined, undefined, callback);
 	    };
-	    FileExchange.prototype.moveFile = function (entity, fromType, toType, filename, fromrelpath, torelpath, callback) {
-	        return undefined;
+	    FileExchange.prototype.moveFile = function (entity, from_type, to_type, filename, from_rel_path, to_rel_path, callback) {
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_MOVE), { entity: entity, from_type: from_type, to_type: to_type, filename: filename, from_rel_path: from_rel_path, to_rel_path: to_rel_path }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.renameFile = function (entity, type, filename, newfilename, relpath, callback) {
 	        return undefined;
@@ -64285,13 +64285,12 @@ var GCLLib =
 	        var timeout = (timeoutInSeconds == null) ? 30 : timeoutInSeconds;
 	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_UPDATE), { entity: entity, type: type, timeout: timeout }, undefined, undefined, callback);
 	    };
-	    FileExchange.prototype.upload = function (entity, type, filename, relpath, notifyOnCompletion, showProgressBar, callback) {
-	        return undefined;
+	    FileExchange.prototype.upload = function (entity, type, filename, rel_path, notify_on_completion, callback) {
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.UPLOAD), { entity: entity, type: type, filename: filename, rel_path: rel_path, notify_on_completion: notify_on_completion }, undefined, undefined, callback);
 	    };
 	    return FileExchange;
 	}(Card_1.GenericContainer));
 	FileExchange.DOWNLOAD = '/download';
-	FileExchange.FOLDER = '/folder';
 	FileExchange.UPLOAD = '/upload';
 	FileExchange.TYPE_CREATE = '/create-type';
 	FileExchange.TYPE_DIRS_CREATE = '/create-type-dirs';
@@ -64302,6 +64301,7 @@ var GCLLib =
 	FileExchange.TYPE_DELETE = '/delete-type';
 	FileExchange.TYPE_EXISTS = '/exists-type';
 	FileExchange.FILE_EXISTS = '/exists-file';
+	FileExchange.FILE_MOVE = '/move-file';
 	FileExchange.MODAL_SHOW = '/show-modal';
 	FileExchange.ACCESS_MODE = '/access-mode';
 	FileExchange.CONTAINERS_ENABLED = 'enabled-containers';
