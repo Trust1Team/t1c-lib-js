@@ -1,17 +1,16 @@
 /**
- * @author Maarten Somers
+ * @author Michallis Pashidis
  * @since 2018
  */
-import { LocalAuthConnection } from '../client/Connection';
+import { LocalAuthAdminConnection } from '../client/Connection';
 import * as CoreExceptions from '../exceptions/CoreExceptions';
 import {
-    AbstractAdmin, AtrListRequest, ContainerSyncRequest, PubKeyResponse,
+    AbstractAdmin, AtrListRequest, ContainerSyncRequest, PubKeyResponse, ResolvedAgent, ResolvedAgentResponse,
     SetPubKeyRequest
 } from './adminModel';
-import { DataArrayResponse, T1CResponse } from '../service/CoreModel';
+import {DataArrayResponse, T1CResponse} from '../service/CoreModel';
 import { ResponseHandler } from '../../util/ResponseHandler';
 import * as _ from 'lodash';
-import { GCLClient } from '../GCLLib';
 import { InitUtil } from '../../util/InitUtil';
 import { RestException } from '../exceptions/CoreExceptions';
 import { ClientService } from '../../util/ClientService';
@@ -24,6 +23,7 @@ const CORE_ATR_LIST = '/admin/atr';
 const CORE_PUB_KEY = '/admin/certificate';
 const CORE_CONTAINERS = '/admin/containers';
 const CORE_LOGFILE = '/admin/log';
+const CORE_AGENT_RESOLVE = '/agent/resolve';
 
 /**
  * Provides access to the /admin endpoints
@@ -33,7 +33,7 @@ class AdminService implements AbstractAdmin {
     static JWT_ERROR_CODES = [ '200', '201', '202', '203', '204', '205'];
 
     // constructor
-    constructor(private url: string, private connection: LocalAuthConnection) {}
+    constructor(private url: string, private connection: LocalAuthAdminConnection) {}
 
     private static errorHandler(error: RestException) {
         // check if the error is JWT related
@@ -78,6 +78,11 @@ class AdminService implements AbstractAdmin {
         return this.post(this.url, CORE_CONTAINERS, containers, callback);
     }
 
+    // resolve Agent for citrix environment
+    public resolveAgent (challenge: string, callback?: (error: RestException, data: ResolvedAgentResponse) => void): Promise<ResolvedAgentResponse> {
+        console.log('resolve agent url: ' + this.url);
+        return this.connection.post(this.url, CORE_AGENT_RESOLVE, { challenge }, [], undefined, callback);
+    }
 
     // private methods
     // ===============

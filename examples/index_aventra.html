@@ -63,6 +63,7 @@
         <hr />
         <button id="aventraAllData" type="button" class="btn btn-default btn-lg">Aventra allData</button>
         <button id="aventraAllCert" type="button" class="btn btn-default btn-lg">Aventra All Cert</button>
+        <button id="aventraAllCertParsed" type="button" class="btn btn-default btn-lg">Aventra All Cert Parsed</button>
         <button id="aventraRootCert" type="button" class="btn btn-default btn-lg">Aventra Root Cert</button>
         <button id="aventraAuthenticationCert" type="button" class="btn btn-default btn-lg">Aventra Authentication Cert</button>
         <button id="aventraIssuerCert" type="button" class="btn btn-default btn-lg">Aventra Issuer Cert</button>
@@ -497,6 +498,13 @@
             var aventra = connector.aventra($("#selected_reader").text(),pin);
             aventra.allCerts([],callback);
         });
+
+        $("#aventraAllCertParsed").on('click', function () {
+            $("#information").empty();
+            var aventra = connector.aventra($("#selected_reader").text(),pin);
+            aventra.allCerts({parseCerts: true},callback);
+        });
+
         $("#aventraRootCert").on('click', function () {
             $("#information").empty();
             var aventra = connector.aventra($("#selected_reader").text(),pin);

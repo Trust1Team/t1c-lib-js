@@ -25,7 +25,7 @@ class CertParser {
                         response.data[ key ] = { base64: value };
                         CertParser.setParsed(response.data[key], value, parseCerts);
                     }
-                    if (_.isArray(value)) {
+                    else if (_.isArray(value)) {
                         let newData = [];
                         _.forEach(value, (certificate: string) => {
                             let cert: T1CCertificate = new T1CCertificate(certificate);
@@ -33,6 +33,12 @@ class CertParser {
                             newData.push(cert);
                         });
                         response.data[ key ] = newData;
+                    }
+                    else if (_.isObject(value)) {
+                        response.data[ key ] = { base64: value.base64 };
+                        // only aventra, oberthur en pkcs11 have id property returned from GCL, other cards can use fixed location
+                        if (value.id) {response.data[ key ].id = value.id; }
+                        if (parseCerts) { response.data[ key ].parsed = CertParser.processCert(value.base64); }
                     }
                 }
             });

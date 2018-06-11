@@ -2,7 +2,7 @@
  * @author Maarten Somers
  */
 import { RestException } from '../exceptions/CoreExceptions';
-import { AbstractAgent, AgentResponse } from './agentModel';
+import {AbstractAgent, AgentResponse} from './agentModel';
 import { LocalAuthConnection } from '../client/Connection';
 
 

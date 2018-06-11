@@ -3,8 +3,8 @@
  * @since 2017
  */
 
-import * as CoreExceptions from "../exceptions/CoreExceptions";
-import { T1CResponse } from "../service/CoreModel";
+import * as CoreExceptions from '../exceptions/CoreExceptions';
+import { T1CResponse } from '../service/CoreModel';
 
 export { AbstractAgent, AgentResponse, Agent };
 
@@ -21,3 +21,4 @@ interface AgentResponse extends T1CResponse {
 class Agent {
     constructor(public hostname: string, public port: number, public last_update: string) {}
 }
+
