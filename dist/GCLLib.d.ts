@@ -1610,7 +1610,11 @@ class LocalConnection extends GenericConnection implements Connection {
     getSecurityConfig(): SecurityConfig;
     getSkipCitrix(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     requestFile(basePath: string, suffix: string, body: {
-        path: string;
+        entity: string;
+        type: string;
+        filename: string;
+        rel_path: string[];
+        notify_on_completion: boolean;
     }, callback?: RequestCallback): Promise<any>;
     postFile(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any>;
 }

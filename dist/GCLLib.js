@@ -37557,7 +37557,8 @@ var GCLLib =
 	    };
 	    GenericConnection.prototype.handleRequest = function (basePath, suffix, method, gclConfig, securityConfig, body, params, headers, callback) {
 	        if (!callback || typeof callback !== 'function') {
-	            callback = function () { };
+	            callback = function () {
+	            };
 	        }
 	        if (securityConfig.skipCitrixCheck || !gclConfig.citrix || gclConfig.agentPort !== -1) {
 	            var config_1 = {
@@ -37654,7 +37655,8 @@ var GCLLib =
 	    LocalAuthAdminConnection.prototype.requestLogFile = function (basePath, suffix, callback) {
 	        var _this = this;
 	        if (!callback || typeof callback !== 'function') {
-	            callback = function () { };
+	            callback = function () {
+	            };
 	        }
 	        return new Promise(function (resolve, reject) {
 	            var headers = {};
@@ -37706,7 +37708,8 @@ var GCLLib =
 	    LocalAuthConnection.prototype.requestLogFile = function (basePath, suffix, callback) {
 	        var _this = this;
 	        if (!callback || typeof callback !== 'function') {
-	            callback = function () { };
+	            callback = function () {
+	            };
 	        }
 	        return new Promise(function (resolve, reject) {
 	            var headers = {};
@@ -37767,7 +37770,8 @@ var GCLLib =
 	        var _this = this;
 	        var config = _.omit(this.cfg, ['apiKey', 'jwt']);
 	        if (!callback || typeof callback !== 'function') {
-	            callback = function () { };
+	            callback = function () {
+	            };
 	        }
 	        return new Promise(function (resolve, reject) {
 	            var headers = {};
@@ -37800,7 +37804,8 @@ var GCLLib =
 	    LocalConnection.prototype.postFile = function (basePath, suffix, body, queryParams, callback) {
 	        var config = _.omit(this.cfg, ['apiKey', 'jwt']);
 	        if (!callback || typeof callback !== 'function') {
-	            callback = function () { };
+	            callback = function () {
+	            };
 	        }
 	        var form = new FormData();
 	        form.append('entity', body.entity);
@@ -37894,7 +37899,8 @@ var GCLLib =
 	    };
 	    LocalTestConnection.prototype.handleTestRequest = function (basePath, suffix, method, gclConfig, body, params, headers, callback) {
 	        if (!callback || typeof callback !== 'function') {
-	            callback = function () { };
+	            callback = function () {
+	            };
 	        }
 	        if (gclConfig.citrix && gclConfig.agentPort === -1) {
 	            var agentPortError = {
@@ -64286,7 +64292,7 @@ var GCLLib =
 	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_UPDATE), { entity: entity, type: type, timeout: timeout }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.upload = function (entity, type, filename, rel_path, notify_on_completion, callback) {
-	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.UPLOAD), { entity: entity, type: type, filename: filename, rel_path: rel_path, notify_on_completion: notify_on_completion }, undefined, undefined, callback);
+	        return this.connection.requestFile(this.baseUrl, this.containerSuffix(FileExchange.UPLOAD), { entity: entity, type: type, filename: filename, rel_path: rel_path, notify_on_completion: notify_on_completion }, callback);
 	    };
 	    return FileExchange;
 	}(Card_1.GenericContainer));
