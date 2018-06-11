@@ -12,7 +12,6 @@ export {FileExchange};
 
 class FileExchange extends GenericContainer implements AbstractFileExchange {
     static DOWNLOAD = '/download';
-    static FOLDER = '/folder';
     static UPLOAD = '/upload';
     static TYPE_CREATE = '/create-type';
     static TYPE_DIRS_CREATE = '/create-type-dirs';
@@ -23,6 +22,7 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     static TYPE_DELETE = '/delete-type';
     static TYPE_EXISTS = '/exists-type';
     static FILE_EXISTS = '/exists-file';
+    static FILE_MOVE = '/move-file';
     static MODAL_SHOW = '/show-modal';
     static ACCESS_MODE = '/access-mode';
     static CONTAINERS_ENABLED = 'enabled-containers';
@@ -112,8 +112,8 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
         return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPES_LIST), {entity, paging}, undefined, undefined, callback);
     }
 
-    moveFile(entity: string, fromType: string, toType: string, filename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
-        return undefined;
+    moveFile(entity: string, from_type: string, to_type: string, filename: string, from_rel_path?: [string], to_rel_path?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_MOVE), {entity, from_type, to_type, filename, from_rel_path, to_rel_path}, undefined, undefined, callback);
     }
 
     renameFile(entity: string, type: string, filename: string, newfilename: string, relpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
@@ -130,29 +130,7 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
         return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_UPDATE), {entity, type, timeout}, undefined, undefined, callback);
     }
 
-    upload(entity: string, type: string, filename: string, relpath?: [string], notifyOnCompletion?: boolean, showProgressBar?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<ArrayBuffer> {
-        return undefined;
+    upload(entity: string, type: string, filename: string, rel_path?: [string], notify_on_completion?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<ArrayBuffer> {
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.UPLOAD), {entity, type, filename, rel_path, notify_on_completion}, undefined, undefined, callback);
     }
-
-
-    /*    public downloadFile(path: string, file: ArrayBuffer, fileName: string): Promise<DataResponse> {
-            return this.connection.putFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), { path, file, fileName }, undefined);
-        }
-
-
-        public listFiles(data: ListFilesRequest, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse> {
-            return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FOLDER), data, undefined, undefined, callback);
-        }
-
-
-        public setFolder(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
-            return this.connection.get(this.baseUrl, this.containerSuffix(FileExchange.FOLDER), undefined, undefined, callback);
-        }
-
-
-        public uploadFile(path: string): Promise<ArrayBuffer> {
-            return this.connection.requestFile(this.baseUrl, this.containerSuffix(FileExchange.UPLOAD), { path });
-        }*/
-
-
 }
