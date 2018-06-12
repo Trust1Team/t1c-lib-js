@@ -59,7 +59,13 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
 
     download(entity: string, type: string, file: ArrayBuffer, filename: string, rel_path?: [string], implicit_creation_type?: boolean, notify_on_completion?: boolean,
              callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse> {
-        return this.connection.postFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), {entity, type, file, filename, rel_path, implicit_creation_type, notify_on_completion}, undefined, callback);
+        let relPathInput;
+        if (rel_path && rel_path.length > 0){
+            relPathInput = rel_path.join();
+        } else {
+            relPathInput = undefined;
+        }
+        return this.connection.postFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), {entity, type, file, filename, relPathInput, implicit_creation_type, notify_on_completion}, undefined, callback);
     }
 
     existsFile(entity: string, type: string, relpath: [string], callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
@@ -76,7 +82,7 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     }
 
     getEnabledContainers(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
-        return this.connection.get(this.baseUrl, this.containerSuffix(FileExchange.CONTAINERS_ENABLED) ,[] , undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(FileExchange.CONTAINERS_ENABLED), [], undefined, callback);
     }
 
     getFileInfo(entity: string, type: string, filename: string, relpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
