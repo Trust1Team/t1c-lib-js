@@ -60,7 +60,7 @@ class FileExchange extends GenericContainer implements AbstractFileExchange {
     download(entity: string, type: string, file: ArrayBuffer, filename: string, rel_path?: [string], implicit_creation_type?: boolean, notify_on_completion?: boolean,
              callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse> {
         let relPathInput;
-        if (rel_path && rel_path.length > 0){
+        if (rel_path && rel_path.length > 0) {
             relPathInput = rel_path.join();
         } else {
             relPathInput = undefined;
