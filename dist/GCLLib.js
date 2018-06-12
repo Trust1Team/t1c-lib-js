@@ -37810,10 +37810,17 @@ var GCLLib =
 	        var form = new FormData();
 	        form.append('entity', body.entity);
 	        form.append('type', body.type);
-	        form.append('rel_path', body.rel_path);
 	        form.append('filename', body.filename);
 	        form.append('notify_on_completion', body.notify_on_completion);
-	        form.append('file', body.file);
+	        if (body.relPathInput) {
+	            form.append('rel_path', body.relPathInput);
+	        }
+	        if (body.implicit_creation_type) {
+	            form.append('implicit_creation_type', body.implicit_creation_type);
+	        }
+	        if (body.notify_on_completion) {
+	            form.append('file', body.file);
+	        }
 	        var headers = { 'Content-Type': 'multipart/form-data' };
 	        if (config.tokenCompatible && this.getSecurityConfig().sendToken) {
 	            headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint_1.BrowserFingerprint.get();
@@ -64211,11 +64218,11 @@ var GCLLib =
 	    function FileExchange() {
 	        return _super !== null && _super.apply(this, arguments) || this;
 	    }
-	    FileExchange.prototype.copyFile = function (entity, fromType, toType, filename, newfilename, fromrelpath, torelpath, callback) {
-	        return undefined;
+	    FileExchange.prototype.copyFile = function (entity, from_type, to_type, filename, new_filename, from_rel_path, to_rel_path, callback) {
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_COPY), { entity: entity, from_type: from_type, to_type: to_type, filename: filename, new_filename: new_filename, from_rel_path: from_rel_path, to_rel_path: to_rel_path }, undefined, undefined, callback);
 	    };
-	    FileExchange.prototype.createDir = function (entity, type, relpath, recursive, callback) {
-	        return undefined;
+	    FileExchange.prototype.createDir = function (entity, type, rel_path, recursive, callback) {
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.DIR_CREATE), { entity: entity, type: type, rel_path: rel_path, recursive: recursive }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.createType = function (entity, type, initabspath, showModal, timeoutInSeconds, callback) {
 	        var show_modal = (showModal == null) ? undefined : showModal;
@@ -64233,7 +64240,14 @@ var GCLLib =
 	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_DELETE), { entity: entity, type: type }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.download = function (entity, type, file, filename, rel_path, implicit_creation_type, notify_on_completion, callback) {
-	        return this.connection.postFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), { entity: entity, type: type, file: file, filename: filename, rel_path: rel_path, implicit_creation_type: implicit_creation_type, notify_on_completion: notify_on_completion }, undefined, callback);
+	        var relPathInput;
+	        if (rel_path && rel_path.length > 0) {
+	            relPathInput = rel_path.join();
+	        }
+	        else {
+	            relPathInput = undefined;
+	        }
+	        return this.connection.postFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), { entity: entity, type: type, file: file, filename: filename, relPathInput: relPathInput, implicit_creation_type: implicit_creation_type, notify_on_completion: notify_on_completion }, undefined, callback);
 	    };
 	    FileExchange.prototype.existsFile = function (entity, type, relpath, callback) {
 	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_EXISTS), { entity: entity, type: type, relpath: relpath }, undefined, undefined, callback);
@@ -64280,8 +64294,8 @@ var GCLLib =
 	    FileExchange.prototype.moveFile = function (entity, from_type, to_type, filename, from_rel_path, to_rel_path, callback) {
 	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_MOVE), { entity: entity, from_type: from_type, to_type: to_type, filename: filename, from_rel_path: from_rel_path, to_rel_path: to_rel_path }, undefined, undefined, callback);
 	    };
-	    FileExchange.prototype.renameFile = function (entity, type, filename, newfilename, relpath, callback) {
-	        return undefined;
+	    FileExchange.prototype.renameFile = function (entity, type, filename, new_filename, rel_path, callback) {
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_RENAME), { entity: entity, type: type, filename: filename, new_filename: new_filename, rel_path: rel_path }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.showModal = function (title, text, modal, timeoutInSeconds, callback) {
 	        var timeout = (timeoutInSeconds == null) ? 30 : timeoutInSeconds;
@@ -64308,9 +64322,12 @@ var GCLLib =
 	FileExchange.TYPE_EXISTS = '/exists-type';
 	FileExchange.FILE_EXISTS = '/exists-file';
 	FileExchange.FILE_MOVE = '/move-file';
+	FileExchange.FILE_COPY = '/copy-file';
+	FileExchange.FILE_RENAME = '/rename-file';
 	FileExchange.MODAL_SHOW = '/show-modal';
 	FileExchange.ACCESS_MODE = '/access-mode';
 	FileExchange.CONTAINERS_ENABLED = 'enabled-containers';
+	FileExchange.DIR_CREATE = '/create-dir';
 	exports.FileExchange = FileExchange;
 
 
