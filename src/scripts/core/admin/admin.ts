@@ -59,12 +59,12 @@ class AdminService implements AbstractAdmin {
     }
 
     public getLogfileList(callback?: (error: CoreExceptions.RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
-        return this.get(this.url, CORE_LOGFILE, callback);
+        return this.getLogfiles(this.url, CORE_LOGFILE, callback);
     }
 
     public getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse)
         => void): Promise<PubKeyResponse> {
-        return this.get(this.url, CORE_PUB_KEY, callback);
+        return this.getPubKeys(this.url, CORE_PUB_KEY, callback);
     }
 
     public setPubKey(keys: SetPubKeyRequest,
@@ -86,7 +86,7 @@ class AdminService implements AbstractAdmin {
 
     // private methods
     // ===============
-    private get(url: string, suffix: string, callback?: any) {
+    private getLogfiles(url: string, suffix: string, callback?: any): Promise<DataArrayResponse> {
         let self = this;
         return new Promise((resolve, reject) => {
             self.connection.get(url, suffix, undefined).then(result => {
@@ -106,7 +106,27 @@ class AdminService implements AbstractAdmin {
         });
     }
 
-    private getLogFile(url: string, suffix: string, callback?: any) {
+    private getPubKeys(url: string, suffix: string, callback?: any): Promise<PubKeyResponse> {
+        let self = this;
+        return new Promise((resolve, reject) => {
+            self.connection.get(url, suffix, undefined).then(result => {
+                resolve(ResponseHandler.response(result, callback));
+            }, err => {
+                AdminService.errorHandler(err).then(() => {
+                    // retry initial request
+                    self.connection.get(url, suffix, undefined).then(retryResult => {
+                        resolve(ResponseHandler.response(retryResult, callback));
+                    }, retryError => {
+                        resolve(ResponseHandler.error(retryError, callback));
+                    });
+                }, retryError => {
+                    resolve(ResponseHandler.error(retryError, callback));
+                });
+            });
+        });
+    }
+
+    private getLogFile(url: string, suffix: string, callback?: any): Promise<T1CResponse> {
         let self = this;
         return new Promise((resolve, reject) => {
             self.connection.requestLogFile(url, suffix).then(result => {
@@ -126,7 +146,7 @@ class AdminService implements AbstractAdmin {
         });
     }
 
-    private post(url: string, suffix: string, body: any, callback?: any) {
+    private post(url: string, suffix: string, body: any, callback?: any): Promise<T1CResponse> {
         let self = this;
         return new Promise((resolve, reject) => {
             self.connection.post(url, suffix, body, undefined).then(result => {
@@ -146,7 +166,7 @@ class AdminService implements AbstractAdmin {
         });
     }
 
-    private put(url: string, suffix: string, body: any, callback?: any) {
+    private put(url: string, suffix: string, body: any, callback?: any): Promise<T1CResponse> {
         let self = this;
         return new Promise((resolve, reject) => {
             self.connection.put(url, suffix, body, undefined).then(result => {

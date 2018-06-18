@@ -587,9 +587,15 @@ class LocalConnection extends GenericConnection implements Connection {
         form.append('type', body.type);
         form.append('filename', body.filename);
         form.append('notify_on_completion', body.notify_on_completion);
-        if (body.relPathInput) { form.append('rel_path', body.relPathInput); }
-        if (body.implicit_creation_type) { form.append('implicit_creation_type', body.implicit_creation_type); }
-        if (body.notify_on_completion) { form.append('file', body.file); }
+        if (body.relPathInput) {
+            form.append('rel_path', body.relPathInput);
+        }
+        if (body.implicit_creation_type) {
+            form.append('implicit_creation_type', body.implicit_creation_type);
+        }
+        if (body.notify_on_completion) {
+            form.append('file', body.file);
+        }
         let headers = {'Content-Type': 'multipart/form-data'};
         if (config.tokenCompatible && this.getSecurityConfig().sendToken) {
             headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
