@@ -2,14 +2,15 @@
  * @author Michallis Pashidis
  * @author Maarten Somers
  */
-import { Connection } from '../client/Connection';
-import { GCLConfig } from '../GCLConfig';
+import {Connection} from '../client/Connection';
+import {GCLConfig} from '../GCLConfig';
 import * as CoreExceptions from '../exceptions/CoreExceptions';
 import {
     AbstractDSClient, DeviceResponse, DownloadLinkResponse, DSDownloadRequest,
-    DSInfoResponse, DSPubKeyResponse, DSRegistrationOrSyncRequest } from './DSClientModel';
+    DSInfoResponse, DSPubKeyResponse, DSRegistrationOrSyncRequest
+} from './DSClientModel';
 
-export { DSClient };
+export {DSClient};
 
 
 const SEPARATOR = '/';
@@ -23,9 +24,12 @@ const DEVICE = '/devices';
  * Provides access to Distribution Service endpoints
  */
 class DSClient implements AbstractDSClient {
-    constructor(private url: string, private connection: Connection, private cfg: GCLConfig) {}
+    constructor(private url: string, private connection: Connection, private cfg: GCLConfig) {
+    }
 
-    public getUrl() { return this.url; }
+    public getUrl() {
+        return this.url;
+    }
 
     public getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse> {
         return this.connection.get(this.url, SYS_INFO, undefined, undefined, callback);
@@ -53,15 +57,24 @@ class DSClient implements AbstractDSClient {
                 doGetDownloadLink(resolve, reject);
             });
         }
+
         function doGetDownloadLink(resolve?: (data: any) => void, reject?: (data: any) => void) {
             self.connection.post(self.url, DOWNLOAD, downloadData, undefined, undefined, function (err, data) {
                 if (err) {
-                    if (callback) { return callback(err, null); }
-                    else { reject(err); }
+                    if (callback) {
+                        return callback(err, null);
+                    }
+                    else {
+                        reject(err);
+                    }
                 } else {
-                    let returnObject = { url: data.link, success: true };
-                    if (callback) { return callback(null, returnObject); }
-                    else { return resolve(returnObject); }
+                    let returnObject = {url: data.link, success: true};
+                    if (callback) {
+                        return callback(null, returnObject);
+                    }
+                    else {
+                        return resolve(returnObject);
+                    }
                 }
             });
         }

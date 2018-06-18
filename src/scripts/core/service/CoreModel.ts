@@ -55,7 +55,7 @@ interface AbstractCore {
 }
 
 class T1CResponse {
-    constructor(public success: boolean, public data?: any) {}
+    constructor(public success: boolean, public data: any) {}
 }
 
 class BoolDataResponse extends T1CResponse {

@@ -2,13 +2,13 @@
  * @author Maarten Somers
  * @since 2018
  */
-import { RemoteApiKeyConnection } from '../client/Connection';
-import { GCLConfig } from '../GCLConfig';
+import {RemoteApiKeyConnection} from '../client/Connection';
+import {GCLConfig} from '../GCLConfig';
 import * as CoreExceptions from '../exceptions/CoreExceptions';
-import { AbstractAuth } from './AuthModel';
-import { JWTResponse } from '../ds/DSClientModel';
+import {AbstractAuth} from './AuthModel';
+import {JWTResponse} from '../ds/DSClientModel';
 
-export { AuthClient };
+export {AuthClient};
 
 
 const TOKEN = '/login/application/token';
@@ -30,6 +30,6 @@ class AuthClient implements AbstractAuth {
 
     public refreshJWT(currentJWT: string,
                       callback?: (error: CoreExceptions.RestException, data: JWTResponse) => void): Promise<JWTResponse> {
-        return this.connection.post(this.url, REFRESH, { token: currentJWT }, undefined, undefined, callback);
+        return this.connection.post(this.url, REFRESH, {token: currentJWT}, undefined, undefined, callback);
     }
 }
