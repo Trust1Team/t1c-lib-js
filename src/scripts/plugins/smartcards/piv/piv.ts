@@ -5,7 +5,7 @@
 import { RestException } from '../../../core/exceptions/CoreExceptions';
 import { GenericSecuredCertCard, OptionalPin } from '../Card';
 import { CertificateResponse } from '../../../core/service/CoreModel';
-import { AbstractPiv, FacialImageResponse, PrintedInformationResponse } from './pivModel';
+import { AbstractPiv, PivFacialImageResponse, PivPrintedInformationResponse } from './pivModel';
 import { PinEnforcer } from '../../../util/PinEnforcer';
 import { Options, RequestHandler } from '../../../util/RequestHandler';
 
@@ -32,7 +32,7 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
 
     public printedInformation(body: OptionalPin,
                               callback?: (error: RestException,
-                                          data: PrintedInformationResponse) => void): Promise<PrintedInformationResponse> {
+                                          data: PivPrintedInformationResponse) => void): Promise<PivPrintedInformationResponse> {
         if (callback && typeof callback === 'function') {
             PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
                 return this.connection.post(this.baseUrl, this.containerSuffix(PIV.PRINTED_INFORMATION),
@@ -50,7 +50,7 @@ class PIV extends GenericSecuredCertCard implements AbstractPiv {
     }
 
     public facialImage(body: OptionalPin,
-                       callback?: (error: RestException, data: FacialImageResponse) => void): Promise<FacialImageResponse> {
+                       callback?: (error: RestException, data: PivFacialImageResponse) => void): Promise<PivFacialImageResponse> {
         if (callback && typeof callback === 'function') {
             PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
                 return this.connection.post(this.baseUrl, this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined, undefined, callback);
