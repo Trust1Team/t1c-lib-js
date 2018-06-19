@@ -6,7 +6,7 @@ import { RestException } from '../../../../core/exceptions/CoreExceptions';
 import { CertificateResponse, DataResponse } from '../../../../core/service/CoreModel';
 import { GenericCertCard, OptionalPin } from '../../Card';
 import { Options, RequestHandler } from '../../../../util/RequestHandler';
-import { AbstractEidPT, IdDataResponse, PtAddressResponse } from './EidPtModel';
+import { AbstractEidPT, PtIdDataResponse, PtAddressResponse } from './EidPtModel';
 
 export { EidPt };
 
@@ -19,11 +19,11 @@ class EidPt extends GenericCertCard implements AbstractEidPT {
     static PHOTO = '/photo';
 
 
-    public idData(callback?: (error: RestException, data: IdDataResponse) => void): Promise<IdDataResponse> {
+    public idData(callback?: (error: RestException, data: PtIdDataResponse) => void): Promise<PtIdDataResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidPt.ID_DATA), undefined, undefined, callback);
     }
 
-    public idDataWithOutPhoto(callback?: (error: RestException, data: IdDataResponse) => void): Promise<IdDataResponse> {
+    public idDataWithOutPhoto(callback?: (error: RestException, data: PtIdDataResponse) => void): Promise<PtIdDataResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidPt.ID_DATA), { photo: 'false' }, undefined, callback);
     }
 

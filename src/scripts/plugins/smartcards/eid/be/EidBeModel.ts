@@ -10,7 +10,7 @@ import {
 } from '../../../../core/service/CoreModel';
 import { Options } from '../../../../util/RequestHandler';
 
-export { AbstractEidBE, BeidAddress, AddressResponse, BeidAllCertsResponse,
+export { AbstractEidBE, BeidAddress, BeidAddressResponse, BeidAllCertsResponse,
     BeidAllDataResponse, BeidRnData, BeidRnDataResponse, BeidAllData, BeidAllCerts, BeidTokenData, BeidTokenDataResponse };
 
 
@@ -21,7 +21,7 @@ interface AbstractEidBE extends CertCard {
              callback?: (error: RestException, data: BeidAllCertsResponse) => void): Promise<BeidAllCertsResponse>;
     rnData(callback?: (error: RestException, data: BeidRnDataResponse) => void): Promise<BeidRnDataResponse>;
     tokenData(callback?: (error: RestException, data: BeidTokenDataResponse) => void): Promise<BeidTokenDataResponse>;
-    address(callback?: (error: RestException, data: AddressResponse) => void): Promise<AddressResponse>;
+    address(callback?: (error: RestException, data: BeidAddressResponse) => void): Promise<BeidAddressResponse>;
     picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     rootCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     citizenCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse)
@@ -36,7 +36,7 @@ interface AbstractEidBE extends CertCard {
 
 }
 
-class AddressResponse extends DataObjectResponse {
+class BeidAddressResponse extends DataObjectResponse {
     constructor(public data: BeidAddress, public success: boolean) {
         super(data, success);
     }
