@@ -11,8 +11,6 @@ import {
 } from './DSClientModel';
 import {RestException} from '../exceptions/CoreExceptions';
 
-export {DSClient};
-
 
 const SEPARATOR = '/';
 const SECURITY = '/security';
@@ -24,7 +22,7 @@ const DEVICE = '/devices';
 /**
  * Provides access to Distribution Service endpoints
  */
-class DSClient implements AbstractDSClient {
+export class DSClient implements AbstractDSClient {
     constructor(private url: string, private connection: Connection, private cfg: GCLConfig) {
     }
 

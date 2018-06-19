@@ -2,16 +2,13 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from '../../../../core/exceptions/CoreExceptions';
-import { CertificateResponse, DataResponse } from '../../../../core/service/CoreModel';
-import { GenericCertCard, OptionalPin } from '../../Card';
-import { Options, RequestHandler } from '../../../../util/RequestHandler';
-import { AbstractEidPT, PtIdDataResponse, PtAddressResponse } from './EidPtModel';
+import {RestException} from '../../../../core/exceptions/CoreExceptions';
+import {CertificateResponse, DataResponse} from '../../../../core/service/CoreModel';
+import {GenericCertCard, OptionalPin} from '../../Card';
+import {Options, RequestHandler} from '../../../../util/RequestHandler';
+import {AbstractEidPT, PtIdDataResponse, PtAddressResponse} from './EidPtModel';
 
-export { EidPt };
-
-
-class EidPt extends GenericCertCard implements AbstractEidPT {
+export class EidPt extends GenericCertCard implements AbstractEidPT {
     static ADDRESS = '/address';
     static CERT_ROOT_AUTH = '/root-authentication';
     static CERT_ROOT_NON_REP = '/root-non-repudiation';
@@ -24,7 +21,7 @@ class EidPt extends GenericCertCard implements AbstractEidPT {
     }
 
     public idDataWithOutPhoto(callback?: (error: RestException, data: PtIdDataResponse) => void): Promise<PtIdDataResponse> {
-        return this.connection.get(this.baseUrl, this.containerSuffix(EidPt.ID_DATA), { photo: 'false' }, undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(EidPt.ID_DATA), {photo: 'false'}, undefined, callback);
     }
 
     public address(data: OptionalPin, callback?: (error: RestException, data: PtAddressResponse) => void): Promise<PtAddressResponse> {

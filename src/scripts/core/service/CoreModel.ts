@@ -5,12 +5,7 @@
 
 import {RestException} from '../exceptions/CoreExceptions';
 
-export { AbstractCore, T1CResponse, BoolDataResponse, DataResponse, DataArrayResponse, DataObjectResponse,
-    InfoResponse, BrowserInfo, BrowserInfoResponse, Card, CardReader, CardReadersResponse, T1CCertificate,
-    CertificateResponse, CertificatesResponse, SingleReaderResponse, T1CContainer, T1CInfo };
-
-
-interface AbstractCore {
+export interface AbstractCore {
     // async
     getConsent(title: string,
                codeWord: string,
@@ -53,42 +48,42 @@ interface AbstractCore {
     version(): Promise<string>;
 }
 
-class T1CResponse {
+export class T1CResponse {
     constructor(public success: boolean, public data: any) {}
 }
 
-class BoolDataResponse extends T1CResponse {
+export class BoolDataResponse extends T1CResponse {
     constructor(public data: boolean, public success: boolean) {
         super(success, data);
     }
 }
 
-class DataResponse extends T1CResponse {
+export class DataResponse extends T1CResponse {
     constructor(public data: string, public success: boolean) {
         super(success, data);
     }
 }
 
-class DataArrayResponse extends T1CResponse {
+export class DataArrayResponse extends T1CResponse {
     constructor(public data: any[], public success: boolean) {
         super(success, data);
     }
 }
 
 
-class DataObjectResponse extends T1CResponse {
+export class DataObjectResponse extends T1CResponse {
     constructor(public data: { [key: string]: any }, public success: boolean) {
         super(success, data);
     }
 }
 
-class InfoResponse extends T1CResponse {
+export class InfoResponse extends T1CResponse {
     constructor(public data: T1CInfo, public success: boolean) {
         super(success, data);
     }
 }
 
-class T1CInfo {
+export class T1CInfo {
     constructor(public activated: boolean,
                 public citrix: boolean,
                 public managed: boolean,
@@ -99,53 +94,54 @@ class T1CInfo {
                 public version: string) {}
 }
 
-class T1CContainer {
+export class T1CContainer {
     constructor(public name: string, public version: string, public status: string) {}
 }
-class BrowserInfoResponse extends T1CResponse {
+
+export class BrowserInfoResponse extends T1CResponse {
     constructor(public data: BrowserInfo, public success: boolean) {
         super(success, data);
     }
 }
 
-class BrowserInfo {
+export class BrowserInfo {
     constructor(public browser: { name: string, version: string },
                 public manufacturer: string,
                 public os: { name: string, version: string, architecture: number },
                 public ua: string) {}
 }
 
-class Card {
-    constructor(public atr: string, public description: string[]) {}
+export class SmartCard {
+    constructor(public atr?: string, public description?: string[]) {}
 }
 
-class CardReader {
-    constructor(public id: string, public name: string, public pinpad: boolean, public card?: Card) {}
+export class CardReader {
+    constructor(public id: string, public name: string, public pinpad: boolean, public card?: SmartCard) {}
 }
 
-class CardReadersResponse extends T1CResponse {
+export class CardReadersResponse extends T1CResponse {
     constructor(public data: CardReader[], public success: boolean) {
         super(success, data);
     }
 }
 
-class CertificateResponse extends T1CResponse {
+export class CertificateResponse extends T1CResponse {
     constructor(public data: T1CCertificate, public success: boolean) {
         super(success, data);
     }
 }
 
-class CertificatesResponse extends T1CResponse {
+export class CertificatesResponse extends T1CResponse {
     constructor(public data: T1CCertificate[], public success: boolean) {
         super(success, data);
     }
 }
 
-class T1CCertificate {
+export class T1CCertificate {
     constructor(public base64: string, public id?: string, public parsed?: object ) {}
 }
 
-class SingleReaderResponse extends T1CResponse {
+export class SingleReaderResponse extends T1CResponse {
     constructor(public data: CardReader, public success: boolean) {
         super(success, data);
     }

@@ -8,10 +8,7 @@ import { AbstractEMV, EmvApplicationDataResponse, EmvApplicationsResponse, EmvCe
 import { RestException } from '../../../core/exceptions/CoreExceptions';
 import { GenericPinCard } from '../Card';
 
-export { EMV };
-
-
-class EMV extends GenericPinCard implements AbstractEMV {
+export class EMV extends GenericPinCard implements AbstractEMV {
     static APPLICATIONS = '/applications';
     static APPLICATION_DATA = '/application-data';
     static ISSUER_PUBLIC_KEY_CERT = '/issuer-public-key-certificate';

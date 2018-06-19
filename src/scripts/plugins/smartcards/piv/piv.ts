@@ -9,10 +9,7 @@ import { AbstractPiv, PivFacialImageResponse, PivPrintedInformationResponse } fr
 import { PinEnforcer } from '../../../util/PinEnforcer';
 import { Options, RequestHandler } from '../../../util/RequestHandler';
 
-export { PIV };
-
-
-class PIV extends GenericSecuredCertCard implements AbstractPiv {
+export class PIV extends GenericSecuredCertCard implements AbstractPiv {
     static PRINTED_INFORMATION = '/printed-information';
     static FACIAL_IMAGE = '/facial-image';
 

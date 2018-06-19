@@ -8,10 +8,8 @@ import * as _ from 'lodash';
 import { BoolDataResponse, DataResponse, T1CResponse } from '../../core/service/CoreModel';
 import { GenericReaderContainer } from '../smartcards/Card';
 
-export { RemoteLoading };
 
-
-class RemoteLoading extends GenericReaderContainer implements AbstractRemoteLoading {
+export class RemoteLoading extends GenericReaderContainer implements AbstractRemoteLoading {
     static ATR = '/atr';
     static APDU = '/apdu';
     static APDUS = '/apdus';

@@ -7,11 +7,7 @@ import { CertCard, OptionalPin } from '../../Card';
 import { CertificateResponse, DataObjectResponse, DataResponse, T1CCertificate } from '../../../../core/service/CoreModel';
 import { Options } from '../../../../util/RequestHandler';
 
-export { AbstractEidPT, PtAllCertsResponse,
-    PtAllDataResponse, PtIdDataResponse, PtAddressResponse, PtAllData, PtAllCerts, PtIdData, PtAddressData };
-
-
-interface AbstractEidPT extends CertCard {
+export interface AbstractEidPT extends CertCard {
     allData(filters: string[], callback?: (error: RestException, data: PtAllDataResponse) => void): Promise<PtAllDataResponse>;
     allCerts(filters: string[], callback?: (error: RestException, data: PtAllCertsResponse) => void): Promise<PtAllCertsResponse>;
     idData(callback?: (error: RestException, data: PtIdDataResponse) => void): Promise<PtIdDataResponse>;
@@ -29,13 +25,13 @@ interface AbstractEidPT extends CertCard {
                               callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
 
-class PtAllCertsResponse extends DataObjectResponse {
+export class PtAllCertsResponse extends DataObjectResponse {
     constructor(public data: PtAllCerts, public success: boolean) {
         super(data, success);
     }
 }
 
-class PtAllCerts {
+export class PtAllCerts {
     constructor(public authentication_certificate?: T1CCertificate,
                 public non_repudiation_certificate?: T1CCertificate,
                 public root_authentication_certificate?: T1CCertificate,
@@ -43,13 +39,13 @@ class PtAllCerts {
                 public root_non_repudiation_certificate?: T1CCertificate) {}
 }
 
-class PtAllDataResponse extends PtAllCertsResponse {
+export class PtAllDataResponse extends DataObjectResponse {
     constructor(public data: PtAllData, public success: boolean) {
         super(data, success);
     }
 }
 
-class PtAllData {
+export class PtAllData {
     constructor(public id?: PtIdData,
                 public authentication_certificate?: T1CCertificate,
                 public non_repudiation_certificate?: T1CCertificate,
@@ -58,7 +54,7 @@ class PtAllData {
                 public root_non_repudiaton_certificate?: T1CCertificate) {}
 }
 
-class PtIdData {
+export class PtIdData {
     constructor(public accidental_indications?: boolean,
                 public civilian_number?: string,
                 public country?: string,
@@ -90,13 +86,13 @@ class PtIdData {
                 public photo?: string) {}
 }
 
-class PtIdDataResponse extends DataObjectResponse {
+export class PtIdDataResponse extends DataObjectResponse {
     constructor(public data: PtIdData, public success: boolean) {
         super(data, success);
     }
 }
 
-class PtAddressData {
+export class PtAddressData {
     constructor(public abbr_building_type?: string,
                 public abbr_street_type?: string,
                 public building_type?: string,
@@ -122,7 +118,7 @@ class PtAddressData {
                 public zip4?: string) {}
 }
 
-class PtAddressResponse extends DataObjectResponse {
+export class PtAddressResponse extends DataObjectResponse {
     constructor(public data: PtAddressData, public success: boolean) {
         super(data, success);
     }

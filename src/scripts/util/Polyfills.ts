@@ -3,11 +3,9 @@
  * @since 2018
  */
 
-export { Polyfills };
 
 declare function require(name: string);
-
-class Polyfills {
+export class Polyfills {
     // utility to check browser compatibility with Promise, Array.from, Symbol
 
     public static check() {

@@ -11,10 +11,7 @@ import {Options, RequestHandler} from '../../../../util/RequestHandler';
 import {CertParser} from '../../../../util/CertParser';
 import {ResponseHandler} from '../../../../util/ResponseHandler';
 
-export {DNIe};
-
-
-class DNIe extends GenericSecuredCertCard implements AbstractDNIe {
+export class DNIe extends GenericSecuredCertCard implements AbstractDNIe {
     static INFO = '/info';
     static CERT_INTERMEDIATE = '/intermediate';
 

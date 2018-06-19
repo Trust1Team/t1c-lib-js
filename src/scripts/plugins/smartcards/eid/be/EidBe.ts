@@ -11,10 +11,7 @@ import { PinEnforcer } from '../../../../util/PinEnforcer';
 import { Options, RequestHandler } from '../../../../util/RequestHandler';
 import * as _ from 'lodash';
 
-export { EidBe };
-
-
-class EidBe extends GenericCertCard implements AbstractEidBE {
+export class EidBe extends GenericCertCard implements AbstractEidBE {
     static RN_DATA = '/rn';
     static ADDRESS = '/address';
     static PHOTO = '/picture';

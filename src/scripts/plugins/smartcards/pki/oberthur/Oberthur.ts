@@ -10,10 +10,8 @@ import {AbstractOberthur} from './OberthurModel';
 import {PinEnforcer} from '../../../../util/PinEnforcer';
 import {Options, RequestHandler} from '../../../../util/RequestHandler';
 
-export {Oberthur};
 
-
-class Oberthur extends GenericCertCard implements AbstractOberthur {
+export class Oberthur extends GenericCertCard implements AbstractOberthur {
 
     // filters
     public allDataFilters() {

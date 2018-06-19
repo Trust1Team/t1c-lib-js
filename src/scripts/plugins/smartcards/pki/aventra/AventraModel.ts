@@ -10,10 +10,7 @@ import {
 import { CertCard, ResetPinData, VerifyPinData } from '../../Card';
 import { Options } from '../../../../util/RequestHandler';
 
-export { AbstractAventra, AventraAllCertsResponse, AventraAllDataResponse, AventraAllCerts, AventraAllData, AventraAppletInfo};
-
-
-interface AbstractAventra extends CertCard {
+export interface AbstractAventra extends CertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allKeyRefs(): string[];
@@ -34,13 +31,13 @@ interface AbstractAventra extends CertCard {
     resetPin(body: ResetPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
 }
 
-class AventraAllCertsResponse extends DataObjectResponse {
+export class AventraAllCertsResponse extends DataObjectResponse {
     constructor(public data: AventraAllCerts, public success: boolean) {
         super(data, success);
     }
 }
 
-class AventraAllCerts {
+export class AventraAllCerts {
     constructor(public authentication_certificate?: T1CCertificate,
                 public encryption_certificate?: T1CCertificate,
                 public issuer_certificate?: T1CCertificate,
@@ -48,13 +45,13 @@ class AventraAllCerts {
                 public root_certificate?: T1CCertificate) {}
 }
 
-class AventraAllDataResponse extends DataObjectResponse {
+export class AventraAllDataResponse extends DataObjectResponse {
     constructor(public data: AventraAllData, public success: boolean) {
         super(data, success);
     }
 }
 
-class AventraAllData {
+export class AventraAllData {
     constructor(public applet_info?: AventraAppletInfo,
                 public authentication_certificate?: T1CCertificate,
                 public encryption_certificate?: T1CCertificate,
@@ -62,6 +59,6 @@ class AventraAllData {
                 public signing_certificate?: T1CCertificate, public root_certificate?: T1CCertificate) {}
 }
 
-class AventraAppletInfo {
+export class AventraAppletInfo {
     constructor(public change_counter?: number, public name?: string, public serial?: string, public version?: string) {}
 }

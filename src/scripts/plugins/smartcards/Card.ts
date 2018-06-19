@@ -15,26 +15,22 @@ import * as _ from 'lodash';
  */
 
 
-export { Card, CertCard, PinCard, SecuredCertCard, AuthenticateOrSignData, ResetPinData, VerifyPinData, OptionalPin,
-    GenericContainer, GenericReaderContainer, GenericSmartCard, GenericPinCard, GenericCertCard, GenericSecuredCertCard };
-
-
 // interfaces
-interface Card {
-    allData: (filters: string[], callback?: () => void) => Promise<DataObjectResponse>;
+export interface Card {
+    allData: (filters: string[]| Options, callback?: () => void) => Promise<DataObjectResponse>;
 }
 
-interface PinCard extends Card {
+export interface PinCard extends Card {
     verifyPin: (body: VerifyPinData, callback?: () => void) => Promise<T1CResponse>;
 }
 
-interface CertCard extends PinCard {
+export interface CertCard extends PinCard {
     allCerts: (filters: string[] | Options, callback?: () => void) => Promise<DataObjectResponse>
     authenticate: (body: any, callback?: () => void) => Promise<DataResponse>
     signData: (body: any, callback?: () => void) => Promise<DataResponse>
 }
 
-interface SecuredCertCard {
+export interface SecuredCertCard {
     allCerts: (filters: string[] | Options, body: OptionalPin, callback?: () => void) => Promise<DataObjectResponse>
     allData: (filters: string[] | Options, body: OptionalPin, callback?: () => void) => Promise<DataObjectResponse>
     authenticate: (body: any, callback?: () => void) => Promise<DataResponse>
@@ -44,27 +40,27 @@ interface SecuredCertCard {
 
 
 // classes
-class OptionalPin {
+export class OptionalPin {
     constructor(public pin?: string, public pace?: string) {}
 }
 
-class AuthenticateOrSignData extends OptionalPin {
+export class AuthenticateOrSignData extends OptionalPin {
     constructor(public algorithm_reference: string, public data: string, public pin?: string, public pace?: string) {
         super(pin, pace);
     }
 }
 
-class VerifyPinData extends OptionalPin {
+export class VerifyPinData extends OptionalPin {
     constructor(public private_key_reference?: string, public pin?: string, public pace?: string) {
         super(pin, pace);
     }
 }
 
-class ResetPinData {
+export class ResetPinData {
     constructor(public puk: string, public new_pin: string, public private_key_reference: string) {}
 }
 
-abstract class GenericContainer {
+export abstract class GenericContainer {
 
     constructor(protected baseUrl: string,
                 protected containerUrl: string,
@@ -77,7 +73,7 @@ abstract class GenericContainer {
     }
 }
 
-abstract class GenericReaderContainer extends GenericContainer {
+export abstract class GenericReaderContainer extends GenericContainer {
 
     constructor(protected baseUrl: string,
                 protected containerUrl: string,
@@ -95,7 +91,7 @@ abstract class GenericReaderContainer extends GenericContainer {
     }
 }
 
-abstract class GenericSmartCard extends GenericReaderContainer implements Card {
+export abstract class GenericSmartCard extends GenericReaderContainer implements Card {
     public allData(options: string[] | Options, callback?: (error: RestException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
         const requestOptions = RequestHandler.determineOptionsWithFilter(options);
         return this.connection.get(this.baseUrl, this.containerSuffix(), requestOptions.params).then(data => {
@@ -106,10 +102,10 @@ abstract class GenericSmartCard extends GenericReaderContainer implements Card {
     }
 }
 
-abstract class GenericPinCard extends GenericSmartCard implements PinCard {
+export abstract class GenericPinCard extends GenericSmartCard implements PinCard {
     static VERIFY_PIN = '/verify-pin';
 
-    public verifyPin(body: OptionalPin,
+    public verifyPin(body: VerifyPinData,
                      callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericPinCard.VERIFY_PIN),
@@ -118,7 +114,7 @@ abstract class GenericPinCard extends GenericSmartCard implements PinCard {
     }
 }
 
-abstract class GenericCertCard extends GenericPinCard implements CertCard {
+export abstract class GenericCertCard extends GenericPinCard implements CertCard {
     static ALL_CERTIFICATES = '/certificates';
     static AUTHENTICATE = '/authenticate';
     static CERT_ROOT = '/root';
@@ -180,7 +176,7 @@ abstract class GenericCertCard extends GenericPinCard implements CertCard {
     }
 }
 
-abstract class GenericSecuredCertCard extends GenericReaderContainer implements SecuredCertCard {
+export abstract class GenericSecuredCertCard extends GenericReaderContainer implements SecuredCertCard {
     static ALL_CERTIFICATES = '/certificates';
     static AUTHENTICATE = '/authenticate';
     static CERT_AUTHENTICATION = '/authentication';
