@@ -7,7 +7,7 @@ import {BrowserInfo, T1CContainer} from '../service/CoreModel';
 import {RestException} from '../exceptions/CoreExceptions';
 
 export {
-    AbstractDSClient, DSInfoResponse, DSDownloadLinkResponse, JWTResponse, DSPubKeyResponse,
+    AbstractDSClient, DSInfoResponse, DSDownloadLinkResponse, DSJWTResponse, DSPubKeyResponse,
     DeviceResponse, DSPlatformInfo, DSDownloadRequest, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem,
     DSClientInfo, DSContainer, DSStorage
 };
@@ -99,7 +99,7 @@ class DSDownloadLinkResponse {
     }
 }
 
-class JWTResponse {
+class DSJWTResponse {
     constructor(public token: string) {
     }
 }
