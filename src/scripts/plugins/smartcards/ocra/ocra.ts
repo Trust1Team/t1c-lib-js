@@ -5,7 +5,7 @@
 import { GenericPinCard, OptionalPin } from '../Card';
 import { DataResponse } from '../../../core/service/CoreModel';
 import { RestException } from '../../../core/exceptions/CoreExceptions';
-import { AbstractOcra, ChallengeData, ReadCounterResponse } from './ocraModel';
+import { AbstractOcra, OcraChallenge, OcraReadCounterResponse } from './ocraModel';
 import { PinEnforcer } from '../../../util/PinEnforcer';
 
 export { Ocra };
@@ -15,7 +15,7 @@ class Ocra extends GenericPinCard implements AbstractOcra {
     static CHALLENGE = '/challenge';
     static READ_COUNTER = '/counter';
 
-    public challenge(body: ChallengeData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+    public challenge(body: OcraChallenge, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         if (callback && typeof callback === 'function') {
             PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
                 return this.connection.post(this.baseUrl, this.containerSuffix(Ocra.CHALLENGE), body, undefined, undefined, callback);
@@ -32,7 +32,7 @@ class Ocra extends GenericPinCard implements AbstractOcra {
     }
 
     public readCounter(body: OptionalPin,
-                       callback?: (error: RestException, data: ReadCounterResponse) => void): Promise<ReadCounterResponse> {
+                       callback?: (error: RestException, data: OcraReadCounterResponse) => void): Promise<OcraReadCounterResponse> {
         if (callback && typeof callback === 'function') {
             PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
                 return this.connection.get(this.baseUrl, this.containerSuffix(Ocra.READ_COUNTER), { pin: body.pin}, undefined, callback);
