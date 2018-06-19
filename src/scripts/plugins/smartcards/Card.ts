@@ -96,8 +96,7 @@ abstract class GenericReaderContainer extends GenericContainer {
 }
 
 abstract class GenericSmartCard extends GenericReaderContainer implements Card {
-    public allData(options: string[] | Options,
-                   callback?: (error: RestException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
+    public allData(options: string[] | Options, callback?: (error: RestException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
         const requestOptions = RequestHandler.determineOptionsWithFilter(options);
         return this.connection.get(this.baseUrl, this.containerSuffix(), requestOptions.params).then(data => {
             return CertParser.process(data, requestOptions.parseCerts, callback);

@@ -32,5 +32,9 @@ class Polyfills {
             console.log('T1C-JS Lib: applying polyfill for ES6 Symbol');
             require('core-js/es6/symbol');
         }
+
+        if (typeof Object.assign !== 'function') {
+            require('object-assign');
+        }
     }
 }
