@@ -7,7 +7,7 @@ import {BrowserInfo, T1CContainer, T1CResponse} from '../service/CoreModel';
 import {RestException} from '../exceptions/CoreExceptions';
 
 export {
-    AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse,
+    AbstractDSClient, DSInfoResponse, DSDownloadLinkResponse, JWTResponse, DSPubKeyResponse,
     DeviceResponse, DSPlatformInfo, DSDownloadRequest, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem,
     DSClientInfo, DSContainer, DSStorage
 };
@@ -25,7 +25,7 @@ interface AbstractDSClient {
 
     downloadLink(downloadData: DSDownloadRequest,
                  callback?: (error: RestException,
-                             data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
+                             data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse>;
 
     register(registrationData: DSRegistrationOrSyncRequest,
              callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
@@ -93,8 +93,9 @@ class DSInfoResponse {
     }
 }
 
-class DownloadLinkResponse implements T1CResponse {
+class DSDownloadLinkResponse {
     constructor(public url: string, public success: boolean) {
+
     }
 }
 
@@ -103,7 +104,7 @@ class JWTResponse {
     }
 }
 
-class DSPubKeyResponse implements T1CResponse {
+class DSPubKeyResponse {
     constructor(public encryptedPublicKey: string, public encryptedAesKey: string, public success: boolean) {
     }
 }

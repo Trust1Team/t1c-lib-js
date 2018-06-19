@@ -38958,12 +38958,12 @@ var GCLLib =
 	exports.DSInfoResponse = DSInfoResponse;
 	var DownloadLinkResponse = (function () {
 	    function DownloadLinkResponse(url, success) {
-	        this.url = url;
+	        this.data = url;
 	        this.success = success;
 	    }
 	    return DownloadLinkResponse;
 	}());
-	exports.DownloadLinkResponse = DownloadLinkResponse;
+	exports.DSDownloadLinkResponse = DownloadLinkResponse;
 	var JWTResponse = (function () {
 	    function JWTResponse(token) {
 	        this.token = token;

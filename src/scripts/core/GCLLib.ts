@@ -12,7 +12,7 @@ import {
     LocalConnection, RemoteJwtConnection, LocalAuthConnection, LocalTestConnection,
     RemoteApiKeyConnection, LocalAuthAdminConnection
 } from './client/Connection';
-import {DownloadLinkResponse, DSDownloadRequest} from './ds/DSClientModel';
+import {DSDownloadLinkResponse, DSDownloadRequest} from './ds/DSClientModel';
 import {DSClient} from './ds/DSClient';
 import {AbstractOCVClient, OCVClient} from './ocv/OCVClient';
 import {CardReadersResponse, DataResponse} from './service/CoreModel';
@@ -248,7 +248,7 @@ class GCLClient {
         return GenericService.containerForReader(this, readerId, callback);
     }
 
-    public download(callback?: (error: RestException, data: DownloadLinkResponse) => void) {
+    public download(callback?: (error: RestException, data: DSDownloadLinkResponse) => void) {
         return this.core().infoBrowser().then(info => {
             let downloadData = new DSDownloadRequest(info.data.browser, info.data.manufacturer,
                 info.data.os, info.data.ua, this.config().gwUrl);
@@ -308,7 +308,7 @@ class GCLClient {
                 let downloadData = new DSDownloadRequest(_info.data.browser,
                     _info.data.manufacturer, _info.data.os, _info.data.ua, self.config().gwUrl);
                 self.ds().downloadLink(downloadData,
-                    function (linkError: CoreExceptions.RestException, downloadResponse: DownloadLinkResponse) {
+                    function (linkError: CoreExceptions.RestException, downloadResponse: DSDownloadLinkResponse) {
                         if (linkError) {
                             console.error('could not download GCL package:', linkError.description);
                         }

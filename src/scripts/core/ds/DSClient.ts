@@ -6,7 +6,7 @@ import {Connection} from '../client/Connection';
 import {GCLConfig} from '../GCLConfig';
 import * as CoreExceptions from '../exceptions/CoreExceptions';
 import {
-    AbstractDSClient, DeviceResponse, DownloadLinkResponse, DSDownloadRequest,
+    AbstractDSClient, DeviceResponse, DSDownloadLinkResponse, DSDownloadRequest,
     DSInfoResponse, DSPubKeyResponse, DSRegistrationOrSyncRequest
 } from './DSClientModel';
 
@@ -47,13 +47,13 @@ class DSClient implements AbstractDSClient {
 
     public downloadLink(downloadData: DSDownloadRequest,
                         callback?: (error: CoreExceptions.RestException,
-                                    data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse> {
+                                    data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse> {
         let self = this;
         if (callback) {
             doGetDownloadLink();
         } else {
             // promise
-            return new Promise<DownloadLinkResponse>((resolve, reject) => {
+            return new Promise<DSDownloadLinkResponse>((resolve, reject) => {
                 doGetDownloadLink(resolve, reject);
             });
         }
