@@ -10,7 +10,7 @@ import {
 import { CertCard, VerifyPinData } from '../../Card';
 import { Options } from '../../../../util/RequestHandler';
 
-export { AbstractOberthur, AllCertsResponse, AllDataResponse, AllOberthurCerts };
+export { AbstractOberthur, OberthurAllCertsResponse, OberthurAllDataResponse, OberthurAllCerts };
 
 
 interface AbstractOberthur extends CertCard {
@@ -19,8 +19,8 @@ interface AbstractOberthur extends CertCard {
     allKeyRefs(): string[];
     allAlgoRefsForAuthentication(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
     allAlgoRefsForSigning(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
-    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: OberthurAllDataResponse) => void): Promise<OberthurAllDataResponse>;
+    allCerts(filters: string[], callback?: (error: RestException, data: OberthurAllCertsResponse) => void): Promise<OberthurAllCertsResponse>;
     rootCertificate(options?: Options,
                     callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     issuerCertificate(options?: Options,
@@ -31,26 +31,25 @@ interface AbstractOberthur extends CertCard {
                        callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     encryptionCertificate(options?: Options,
                           callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
 }
 
 
-class AllCertsResponse extends DataObjectResponse {
-    constructor(public data: AllOberthurCerts, public success: boolean) {
+class OberthurAllCertsResponse extends DataObjectResponse {
+    constructor(public data: OberthurAllCerts, public success: boolean) {
         super(data, success);
     }
 }
 
-class AllOberthurCerts {
-    constructor(public root_certificate: T1CCertificate,
-                public issuer_certificate: T1CCertificate,
-                public authentication_certificate: T1CCertificate,
-                public signing_certificate: T1CCertificate,
-                public encryption_certificate: T1CCertificate) {}
+class OberthurAllCerts {
+    constructor(public root_certificate?: T1CCertificate,
+                public issuer_certificate?: T1CCertificate,
+                public authentication_certificate?: T1CCertificate,
+                public signing_certificate?: T1CCertificate,
+                public encryption_certificate?: T1CCertificate) {}
 }
 
-class AllDataResponse extends AllCertsResponse {
-    constructor(public data: AllOberthurCerts, public success: boolean) {
+class OberthurAllDataResponse extends OberthurAllCertsResponse {
+    constructor(public data: OberthurAllCerts, public success: boolean) {
         super(data, success);
     }
 }
