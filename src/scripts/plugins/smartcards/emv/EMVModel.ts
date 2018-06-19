@@ -6,12 +6,12 @@ import { RestException } from '../../../core/exceptions/CoreExceptions';
 import { PinCard } from '../Card';
 import { DataObjectResponse } from '../../../core/service/CoreModel';
 
-export { AbstractEMV, AllDataResponse, EmvApplicationDataResponse, EmvApplicationsResponse,
+export { AbstractEMV, EmvAllDataResponse, EmvApplicationDataResponse, EmvApplicationsResponse,
     EmvCertificateResponse, EmvApplicationData, EmvApplication, EmvCertificate };
 
 
 interface AbstractEMV extends PinCard {
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: EmvAllDataResponse) => void): Promise<EmvAllDataResponse>;
     applications(callback?: (error: RestException, data: EmvApplicationsResponse) => void): Promise<EmvApplicationsResponse>;
     applicationData(callback?: (error: RestException, data: EmvApplicationDataResponse) => void): Promise<EmvApplicationDataResponse>;
     iccPublicKeyCertificate(aid: string,
@@ -20,7 +20,7 @@ interface AbstractEMV extends PinCard {
                                callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
 }
 
-class AllDataResponse extends DataObjectResponse {
+class EmvAllDataResponse extends DataObjectResponse {
     constructor(public data: { applications?: EmvApplication[], application_data?: EmvApplicationData }, public success: boolean) {
         super(data, success);
     }

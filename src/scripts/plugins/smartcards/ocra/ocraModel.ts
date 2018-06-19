@@ -6,17 +6,17 @@ import { OptionalPin, PinCard } from '../Card';
 import { DataObjectResponse, DataResponse } from '../../../core/service/CoreModel';
 import { RestException } from '../../../core/exceptions/CoreExceptions';
 
-export { AbstractOcra, AllDataResponse, OcraChallenge, OcraReadCounterResponse, OcraAllData };
+export { AbstractOcra, OcraAllDataResponse, OcraChallenge, OcraReadCounterResponse, OcraAllData };
 
 
 interface AbstractOcra extends PinCard {
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: OcraAllDataResponse) => void): Promise<OcraAllDataResponse>;
     challenge(body: OcraChallenge, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     readCounter(body: OptionalPin,
                 callback?: (error: RestException, data: OcraReadCounterResponse) => void): Promise<OcraReadCounterResponse>;
 }
 
-class AllDataResponse extends DataObjectResponse {
+class OcraAllDataResponse extends DataObjectResponse {
     constructor(public data: OcraAllData, public success: boolean) {
         super(data, success);
     }

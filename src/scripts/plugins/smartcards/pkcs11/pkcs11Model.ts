@@ -10,24 +10,24 @@ import {
 import { Options } from '../../../util/RequestHandler';
 import { AuthenticateOrSignData } from '../Card';
 
-export { AbstractPkcs11, InfoResponse, Pkcs11Certificate, Pkcs11CertificatesResponse, Pkcs11Info,
-    Pkcs11SignData, Pkcs11VerifySignedData, Slot, SlotsResponse, TokenInfo, TokenResponse, ModuleConfig };
+export { AbstractPkcs11, Pkcs11InfoResponse, Pkcs11Certificate, Pkcs11CertificatesResponse, Pkcs11Info,
+    Pkcs11SignData, Pkcs11VerifySignedData, Pkcs11Slot, Pkcs11SlotsResponse, Pkcs11TokenInfo, Pkcs11TokenResponse, Pkcs11ModuleConfig };
 
 
 interface AbstractPkcs11 {
     certificates(slotId: number,
                  options?: Options,
                  callback?: (error: RestException, data: Pkcs11CertificatesResponse) => void): Promise<Pkcs11CertificatesResponse>;
-    info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>;
+    info(callback?: (error: RestException, data: Pkcs11InfoResponse) => void): Promise<Pkcs11InfoResponse>;
     signData(data: Pkcs11SignData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    slots(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
-    slotsWithTokenPresent(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
-    token(slotId: number, callback?: (error: RestException, data: TokenResponse) => void): Promise<TokenResponse>;
+    slots(callback?: (error: RestException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse>;
+    slotsWithTokenPresent(callback?: (error: RestException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse>;
+    token(slotId: number, callback?: (error: RestException, data: Pkcs11TokenResponse) => void): Promise<Pkcs11TokenResponse>;
     verifySignedData(data: Pkcs11VerifySignedData,
                      callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
 }
 
-class InfoResponse extends DataObjectResponse {
+class Pkcs11InfoResponse extends DataObjectResponse {
     constructor(public data: Pkcs11Info, public success: boolean) {
         super(data, success);
     }
@@ -41,7 +41,7 @@ class Pkcs11Info {
                 public library_version: string) {}
 }
 
-class Slot {
+class Pkcs11Slot {
     constructor(public slot_id: string,
                 public description: string,
                 public flags: number,
@@ -49,8 +49,8 @@ class Slot {
                 public firmware_version: string) {}
 }
 
-class SlotsResponse extends DataObjectResponse {
-    constructor(public data: Slot[], public success: boolean) {
+class Pkcs11SlotsResponse extends DataObjectResponse {
+    constructor(public data: Pkcs11Slot[], public success: boolean) {
         super(data, success);
     }
 }
@@ -90,7 +90,7 @@ class Pkcs11VerifySignedData extends Pkcs11SignData {
     }
 }
 
-class TokenInfo {
+class Pkcs11TokenInfo {
     constructor(public slot_id: string,
                 public label: string,
                 public manufacturer_id: string,
@@ -111,12 +111,12 @@ class TokenInfo {
                 public firmware_version: string) {}
 }
 
-class TokenResponse extends DataObjectResponse {
-    constructor(public data: TokenInfo, public success: boolean) {
+class Pkcs11TokenResponse extends DataObjectResponse {
+    constructor(public data: Pkcs11TokenInfo, public success: boolean) {
         super(data, success);
     }
 }
 
-class ModuleConfig {
+class Pkcs11ModuleConfig {
     constructor(public linux: string, public mac: string, public win: string) {}
 }
