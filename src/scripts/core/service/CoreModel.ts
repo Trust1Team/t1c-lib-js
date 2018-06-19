@@ -3,7 +3,6 @@
  * @since 2017
  */
 
-import * as CoreExceptions from '../exceptions/CoreExceptions';
 import {RestException} from '../exceptions/CoreExceptions';
 
 export { AbstractCore, T1CResponse, BoolDataResponse, DataResponse, DataArrayResponse, DataObjectResponse,
@@ -20,30 +19,30 @@ interface AbstractCore {
                alertPosition?: string,
                type?: string,
                timeoutInSeconds?: number,
-               callback?: (error: CoreExceptions.RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>
-    getImplicitConsent(codeWord: string, durationInDays?: number, type?: string, callback?: (error: CoreExceptions.RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>
-    info(callback?: (error: CoreExceptions.RestException, data: InfoResponse) => void): void | Promise<InfoResponse>;
-    infoBrowser(callback?: (error: CoreExceptions.RestException, data: BrowserInfoResponse) => void): Promise<BrowserInfoResponse>;
+               callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>
+    getImplicitConsent(codeWord: string, durationInDays?: number, type?: string, callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>
+    info(callback?: (error: RestException, data: InfoResponse) => void): void | Promise<InfoResponse>;
+    infoBrowser(callback?: (error: RestException, data: BrowserInfoResponse) => void): Promise<BrowserInfoResponse>;
     pollCardInserted(secondsToPollCard?: number,
-                     callback?: (error: CoreExceptions.RestException, data: CardReader) => void,
+                     callback?: (error: RestException, data: CardReader) => void,
                      connectReader?: () => void,
                      insertCard?: () => void,
                      cardTimeout?: () => void): Promise<CardReader>;
     pollReadersWithCards(secondsToPollCard?: number,
-                         callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void,
+                         callback?: (error: RestException, data: CardReadersResponse) => void,
                          connectReader?: () => void,
                          insertCard?: () => void,
                          cardTimeout?: () => void): Promise<CardReadersResponse>;
     pollReaders(secondsToPollReader?: number,
-                callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void,
+                callback?: (error: RestException, data: CardReadersResponse) => void,
                 connectReader?: () => void,
                 readerTimeout?: () => void): Promise<CardReadersResponse>;
     reader(reader_id: string,
-           callback?: (error: CoreExceptions.RestException, data: SingleReaderResponse) => void): Promise<SingleReaderResponse>;
-    readers(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
-    readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse)
+           callback?: (error: RestException, data: SingleReaderResponse) => void): Promise<SingleReaderResponse>;
+    readers(callback?: (error: RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
+    readersCardAvailable(callback?: (error: RestException, data: CardReadersResponse)
         => void): Promise<CardReadersResponse>;
-    readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse)
+    readersCardsUnavailable(callback?: (error: RestException, data: CardReadersResponse)
         => void): Promise<CardReadersResponse>;
 
     // sync

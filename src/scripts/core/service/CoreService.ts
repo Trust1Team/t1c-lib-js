@@ -3,11 +3,11 @@
  * @author Maarten Somers
  */
 import { LocalAuthConnection } from '../client/Connection';
-import * as CoreExceptions from '../exceptions/CoreExceptions';
 import * as _ from 'lodash';
 import * as platform from 'platform';
 import { ResponseHandler } from '../../util/ResponseHandler';
 import {AbstractCore, BoolDataResponse, BrowserInfoResponse, CardReader, CardReadersResponse, InfoResponse, SingleReaderResponse} from './CoreModel';
+import {RestException} from '../exceptions/CoreExceptions';
 
 export { CoreService };
 
@@ -49,7 +49,7 @@ class CoreService implements AbstractCore {
 
     public getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string,
                       alertPosition?: string, type?: string, timeoutInSeconds?: number,
-                      callback?: (error: CoreExceptions.RestException, data: BoolDataResponse)
+                      callback?: (error: RestException, data: BoolDataResponse)
                           => void): Promise<BoolDataResponse> {
         if (!title || !title.length) {
             return ResponseHandler.error({ status: 400, description: 'Title is required!', code: '801' }, callback);
@@ -68,7 +68,7 @@ class CoreService implements AbstractCore {
     }
 
     /*NOTE: The application is responsible to copy the codeWord on the clipboard BEFORE calling this function*/
-    public getImplicitConsent(codeWord: string, durationInDays?: number, type?: string, callback?: (error: CoreExceptions.RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
+    public getImplicitConsent(codeWord: string, durationInDays?: number, type?: string, callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
         if (!codeWord || !codeWord.length) {
             return ResponseHandler.error({ status: 400, description: 'Code word is required!', code: '801' }, callback);
         }
@@ -78,19 +78,19 @@ class CoreService implements AbstractCore {
             { challenge: codeWord, days, type }, undefined, undefined, callback);
     }
 
-    public info(callback?: (error: CoreExceptions.RestException, data: InfoResponse)
+    public info(callback?: (error: RestException, data: InfoResponse)
         => void): Promise<InfoResponse> {
         return this.connection.getSkipCitrix(this.url, CORE_INFO, undefined, undefined, callback);
     }
 
-    public infoBrowser(callback?: (error: CoreExceptions.RestException, data: BrowserInfoResponse)
+    public infoBrowser(callback?: (error: RestException, data: BrowserInfoResponse)
         => void): Promise<BrowserInfoResponse> {
         if (callback) { callback(null, CoreService.platformInfo()); }
         else { return Promise.resolve(CoreService.platformInfo()); }
     }
 
     public pollCardInserted(secondsToPollCard?: number,
-                            callback?: (error: CoreExceptions.RestException, data: CardReader) => void,
+                            callback?: (error: RestException, data: CardReader) => void,
                             connectReaderCb?: () => void,
                             insertCardCb?: () => void,
                             cardTimeoutCb?: () => void): Promise<CardReader> {
@@ -109,7 +109,7 @@ class CoreService implements AbstractCore {
             _.delay(() => {
                 // console.debug('seconds left:', maxSeconds);
                 --maxSeconds;
-                self.readers((error: CoreExceptions.RestException, data: CardReadersResponse) => {
+                self.readers((error: RestException, data: CardReadersResponse) => {
                     if (error) {
                         if (connectReaderCb) { connectReaderCb(); } // ask to connect reader
                         poll(resolve, reject); // no reader found and waiting - recursive call
@@ -142,7 +142,7 @@ class CoreService implements AbstractCore {
     }
 
     public pollReadersWithCards(secondsToPollCard?: number,
-                                callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void,
+                                callback?: (error: RestException, data: CardReadersResponse) => void,
                                 connectReaderCb?: () => void,
                                 insertCardCb?: () => void,
                                 cardTimeoutCb?: () => void): Promise<CardReadersResponse> {
@@ -160,7 +160,7 @@ class CoreService implements AbstractCore {
         function poll(resolve?: (data: any) => void, reject?: (error: any) => void) {
             _.delay(() => {
                 --maxSeconds;
-                self.readers((error: CoreExceptions.RestException, data: CardReadersResponse) => {
+                self.readers((error: RestException, data: CardReadersResponse) => {
                     if (error) {
                         if (connectReaderCb) { connectReaderCb(); }
                         poll(resolve, reject);
@@ -197,7 +197,7 @@ class CoreService implements AbstractCore {
     }
 
     public pollReaders(secondsToPollReader?: number,
-                       callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void,
+                       callback?: (error: RestException, data: CardReadersResponse) => void,
                        connectReaderCb?: () => void,
                        readerTimeoutCb?: () => void): Promise<CardReadersResponse> {
         let maxSeconds = secondsToPollReader || 30;
@@ -214,7 +214,7 @@ class CoreService implements AbstractCore {
         function poll(resolve?: (data: any) => void, reject?: (error: any) => void) {
             _.delay(function () {
                 --maxSeconds;
-                self.readers(function(error: CoreExceptions.RestException, data: CardReadersResponse): void {
+                self.readers(function(error: RestException, data: CardReadersResponse): void {
                     if (error) {
                         if (connectReaderCb) { connectReaderCb(); } // ask to connect reader
                         poll(resolve, reject); // no reader found and waiting - recursive call
@@ -240,22 +240,22 @@ class CoreService implements AbstractCore {
     }
 
     public reader(reader_id: string,
-                  callback?: (error: CoreExceptions.RestException, data: SingleReaderResponse)
+                  callback?: (error: RestException, data: SingleReaderResponse)
                       => void): Promise<SingleReaderResponse> {
         return this.connection.get(this.url, CORE_READERS + '/' + reader_id, undefined, undefined, callback);
     }
 
-    public readers(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse)
+    public readers(callback?: (error: RestException, data: CardReadersResponse)
         => void): Promise<CardReadersResponse> {
         return this.connection.get(this.url, CORE_READERS, undefined, undefined, callback);
     }
 
-    public readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse)
+    public readersCardAvailable(callback?: (error: RestException, data: CardReadersResponse)
         => void): Promise<CardReadersResponse> {
         return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(true), undefined, callback);
     }
 
-    public readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse)
+    public readersCardsUnavailable(callback?: (error: RestException, data: CardReadersResponse)
         => void): Promise<CardReadersResponse> {
         return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), undefined, callback);
     }

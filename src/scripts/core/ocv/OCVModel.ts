@@ -2,8 +2,7 @@
  * @author Maarten Somers
  * @since 2017
  */
-
-import * as CoreExceptions from '../exceptions/CoreExceptions';
+import {RestException} from '../exceptions/CoreExceptions';
 
 export { AbstractOCVClient, CertificateAndOrder, CertificateChainData, CertificateChainResponse,
     ChallengeResponse, ChallengeSignedHashResponse, ChallengeSignedHashData,
@@ -12,17 +11,17 @@ export { AbstractOCVClient, CertificateAndOrder, CertificateChainData, Certifica
 
 interface AbstractOCVClient {
     getChallenge(digestAlgorithm: string,
-                 callback?: (error: CoreExceptions.RestException, data: ChallengeResponse) => void): void | Promise<ChallengeResponse>;
+                 callback?: (error: RestException, data: ChallengeResponse) => void): void | Promise<ChallengeResponse>;
     validateChallengeSignedHash(data: ChallengeSignedHashData,
-                                callback?: (error: CoreExceptions.RestException, data: ChallengeSignedHashResponse)
+                                callback?: (error: RestException, data: ChallengeSignedHashResponse)
                                     => void): void | Promise<ChallengeSignedHashResponse>;
     validateCertificateChain(data: CertificateChainData,
-                             callback?: (error: CoreExceptions.RestException, data: CertificateChainResponse)
+                             callback?: (error: RestException, data: CertificateChainResponse)
                                  => void): void | Promise<CertificateChainResponse>;
     validateSignature(data: SignatureValidationData,
-                      callback?: (error: CoreExceptions.RestException, data: SignatureValidationResponse)
+                      callback?: (error: RestException, data: SignatureValidationResponse)
                           => void): void | Promise<SignatureValidationResponse>;
-    getInfo(callback?: (error: CoreExceptions.RestException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse>;
+    getInfo(callback?: (error: RestException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse>;
 }
 
 class ChallengeSignedHashData {

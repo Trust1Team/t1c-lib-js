@@ -11,8 +11,6 @@ import * as jwtDecode from 'jwt-decode';
 import * as moment from 'moment';
 import { RestException } from './exceptions/CoreExceptions';
 
-export { GCLConfig, GCLConfigOptions };
-
 const defaults = {
     gclUrl: 'https://localhost:10443/v2',
     gwUrl: 'https://accapim.t1t.be:443',
@@ -35,32 +33,32 @@ const defaults = {
 /**
  * GCL Config Options object. Contains all user-configurable configuration settings. Used to initialize GCLConfig.
  */
-class GCLConfigOptions {
-    constructor(public gclUrl?: string,
-                public gwOrProxyUrl?: string,
-                public apiKey?: string,
-                public gwJwt?: string,
-                public ocvContextPath?: string,
-                public dsContextPath?: string,
-                public dsFileContextPath?: string,
-                public pkcs11Config?: ModuleConfig,
-                public agentPort?: number,
-                public implicitDownload?: boolean,
-                public forceHardwarePinpad?: boolean,
-                public sessionTimeout?: number,
-                public consentDuration?: number,
-                public consentTimeout?: number,
-                public syncManaged?: boolean,
-                public osPinDialog?: boolean,
-                public containerDownloadTimeout?: number,
-                public localTestMode?: boolean) {}
+export class GCLConfigOptions {
+    public gclUrl?: string;
+    public gwOrProxyUrl?: string;
+    public apiKey?: string;
+    public gwJwt?: string;
+    public ocvContextPath?: string;
+    public dsContextPath?: string;
+    public dsFileContextPath?: string;
+    public pkcs11Config?: ModuleConfig;
+    public agentPort?: number;
+    public implicitDownload?: boolean;
+    public forceHardwarePinpad?: boolean;
+    public sessionTimeout?: number;
+    public consentDuration?: number;
+    public consentTimeout?: number;
+    public syncManaged?: boolean;
+    public osPinDialog?: boolean;
+    public containerDownloadTimeout?: number;
+    public localTestMode?: boolean;
 }
 
 /**
  * GCL Configuration object. Represents the GCL Library configuration state.
  * Most settings are configurable by the user; some are set by the library itself.
  */
-class GCLConfig {
+export class GCLConfig {
     // singleton pattern
     private static instance: GCLConfig;
     private _gwUrl: string;

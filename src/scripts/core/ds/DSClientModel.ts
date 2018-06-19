@@ -3,7 +3,7 @@
  * @since 2017
  */
 
-import {BrowserInfo, T1CContainer, T1CResponse} from '../service/CoreModel';
+import {BrowserInfo, T1CContainer} from '../service/CoreModel';
 import {RestException} from '../exceptions/CoreExceptions';
 
 export {
