@@ -51,6 +51,9 @@ Use npm run the test suite of the project
 $ npm run localTest
 ```
 
+tsconfig.js 
+    "types": [ "node", "mocha", "chai", "sinon" ]
+
 #### Linting
 To lint the code,
 ```bash

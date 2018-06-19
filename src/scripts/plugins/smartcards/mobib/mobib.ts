@@ -4,7 +4,7 @@
  */
 import { RestException } from '../../../core/exceptions/CoreExceptions';
 import { DataResponse } from '../../../core/service/CoreModel';
-import { AbstractMobib, CardIssuingResponse, ContractsResponse, StatusResponse } from './mobibModel';
+import { AbstractMobib, MobibCardIssuingResponse, MobibContractsResponse, MobibStatusResponse } from './mobibModel';
 import { GenericSmartCard } from '../Card';
 
 export { Mobib };
@@ -17,11 +17,11 @@ const MOBIB_STATUS = '/status';
 
 class Mobib extends GenericSmartCard implements AbstractMobib {
 
-    public cardIssuing(callback?: (error: RestException, data: CardIssuingResponse) => void): Promise<CardIssuingResponse> {
+    public cardIssuing(callback?: (error: RestException, data: MobibCardIssuingResponse) => void): Promise<MobibCardIssuingResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(MOBIB_CARD_ISSUING), undefined, undefined, callback);
     }
 
-    public contracts(callback?: (error: RestException, data: ContractsResponse) => void): Promise<ContractsResponse> {
+    public contracts(callback?: (error: RestException, data: MobibContractsResponse) => void): Promise<MobibContractsResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(MOBIB_CONTRACTS), undefined, undefined, callback);
     }
 
@@ -29,7 +29,7 @@ class Mobib extends GenericSmartCard implements AbstractMobib {
         return this.connection.get(this.baseUrl, this.containerSuffix(MOBIB_PHOTO), undefined, undefined, callback);
     }
 
-    public status(callback?: (error: RestException, data: StatusResponse) => void): Promise<StatusResponse> {
+    public status(callback?: (error: RestException, data: MobibStatusResponse) => void): Promise<MobibStatusResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(MOBIB_STATUS), undefined, undefined, callback);
     }
 }
