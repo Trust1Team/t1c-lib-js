@@ -29,7 +29,7 @@ class GCLClient {
     belfius: (reader_id: string) => AbstractBelfius;
     filex: () => AbstractFileExchange;
     containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    download(callback?: (error: RestException, data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
+    download(callback?: (error: RestException, data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse>;
     dumpData(readerId: string, data: OptionalPin, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     readersCanAuthenticate(callback?: (error: RestException, data: CardReadersResponse) => void): Promise<any>;
     authenticate(readerId: string, data: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void): Promise<any>;
@@ -39,7 +39,7 @@ class GCLClient {
     verifyPin(readerId: string, data: OptionalPin, callback?: (error: RestException, data: DataResponse) => void): Promise<any>;
     updateAuthConnection(cfg: GCLConfig): void;
 }
-export { GCLClient, GCLConfig };
+export { GCLClient };
 
 class RestException {
     status: number;
@@ -124,13 +124,13 @@ class CoreService implements AbstractCore {
     version(): Promise<string>;
 }
 
-export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse, DeviceResponse, DSPlatformInfo, DSDownloadRequest, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem, DSClientInfo, DSContainer, DSStorage };
+export { AbstractDSClient, DSInfoResponse, DSDownloadLinkResponse, JWTResponse, DSPubKeyResponse, DeviceResponse, DSPlatformInfo, DSDownloadRequest, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem, DSClientInfo, DSContainer, DSStorage };
 interface AbstractDSClient {
     getUrl(): string;
     getInfo(callback?: (error: RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
     getDevice(uuid: string, callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
     getPubKey(deviceId: string, callback?: (error: RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse>;
-    downloadLink(downloadData: DSDownloadRequest, callback?: (error: RestException, data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
+    downloadLink(downloadData: DSDownloadRequest, callback?: (error: RestException, data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse>;
     register(registrationData: DSRegistrationOrSyncRequest, callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
     sync(syncData: DSRegistrationOrSyncRequest, callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
 }
@@ -191,7 +191,7 @@ class DSInfoResponse {
     securityPrivateKeyAvailable: boolean;
     constructor(configFile: string, build: string, version: string, environemnt: string, storageAppName: string, storageServiceAccount: string, storageCertPath: string, storageBucket: string, storageDownloadPrefix: string, fileOsx: string, fileWin32: string, fileWin64: string, fileDefaultVersion: string, securityEnabled: string, securityPrivateKeyAvailable: boolean);
 }
-class DownloadLinkResponse implements T1CResponse {
+class DSDownloadLinkResponse {
     url: string;
     success: boolean;
     constructor(url: string, success: boolean);
@@ -200,7 +200,7 @@ class JWTResponse {
     token: string;
     constructor(token: string);
 }
-class DSPubKeyResponse implements T1CResponse {
+class DSPubKeyResponse {
     encryptedPublicKey: string;
     encryptedAesKey: string;
     success: boolean;
@@ -254,7 +254,7 @@ class DSClient implements AbstractDSClient {
     getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
     getDevice(uuid: string, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
     getPubKey(uuid: string, callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse>;
-    downloadLink(downloadData: DSDownloadRequest, callback?: (error: CoreExceptions.RestException, data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
+    downloadLink(downloadData: DSDownloadRequest, callback?: (error: CoreExceptions.RestException, data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse>;
     register(registrationData: DSRegistrationOrSyncRequest, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
     sync(syncData: DSRegistrationOrSyncRequest, callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
 }
@@ -290,7 +290,7 @@ interface AbstractCore {
 class T1CResponse {
     success: boolean;
     data: any;
-    constructor(success: boolean, data?: any);
+    constructor(success: boolean, data: any);
 }
 class BoolDataResponse extends T1CResponse {
     data: boolean;
@@ -303,9 +303,9 @@ class DataResponse extends T1CResponse {
     constructor(data: string, success: boolean);
 }
 class DataArrayResponse extends T1CResponse {
-    data: string[];
+    data: any[];
     success: boolean;
-    constructor(data: string[], success: boolean);
+    constructor(data: any[], success: boolean);
 }
 class DataObjectResponse extends T1CResponse {
     data: {
@@ -403,13 +403,13 @@ class SingleReaderResponse extends T1CResponse {
     constructor(data: CardReader, success: boolean);
 }
 
-export { AbstractEidBE, Address, AddressResponse, AllCertsResponse, AllDataResponse, RnData, RnDataResponse, AllBeIDData, AllBeIDCerts, TokenData, TokenDataResponse };
+export { AbstractEidBE, BeidAddress, BeidAddressResponse, BeidAllCertsResponse, BeidAllDataResponse, BeidRnData, BeidRnDataResponse, BeidAllData, BeidAllCerts, BeidTokenData, BeidTokenDataResponse };
 interface AbstractEidBE extends CertCard {
-    allData(filters: string[] | Options, callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
-    allCerts(filters: string[] | Options, callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
-    rnData(callback?: (error: RestException, data: RnDataResponse) => void): Promise<RnDataResponse>;
-    tokenData(callback?: (error: RestException, data: TokenDataResponse) => void): Promise<TokenDataResponse>;
-    address(callback?: (error: RestException, data: AddressResponse) => void): Promise<AddressResponse>;
+    allData(filters: string[] | Options, callback?: (error: RestException, data: BeidAllDataResponse) => void): Promise<BeidAllDataResponse>;
+    allCerts(filters: string[] | Options, callback?: (error: RestException, data: BeidAllCertsResponse) => void): Promise<BeidAllCertsResponse>;
+    rnData(callback?: (error: RestException, data: BeidRnDataResponse) => void): Promise<BeidRnDataResponse>;
+    tokenData(callback?: (error: RestException, data: BeidTokenDataResponse) => void): Promise<BeidTokenDataResponse>;
+    address(callback?: (error: RestException, data: BeidAddressResponse) => void): Promise<BeidAddressResponse>;
     picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     rootCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     citizenCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
@@ -417,14 +417,14 @@ interface AbstractEidBE extends CertCard {
     nonRepudiationCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     rrnCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
-    tokenData(callback?: (error: RestException, data: TokenDataResponse) => void): Promise<TokenDataResponse>;
+    tokenData(callback?: (error: RestException, data: BeidTokenDataResponse) => void): Promise<BeidTokenDataResponse>;
 }
-declare class AddressResponse extends DataObjectResponse {
-    data: Address;
+declare class BeidAddressResponse extends DataObjectResponse {
+    data: BeidAddress;
     success: boolean;
-    constructor(data: Address, success: boolean);
+    constructor(data: BeidAddress, success: boolean);
 }
-declare class Address {
+declare class BeidAddress {
     municipality: string;
     raw_data: string;
     signature: string;
@@ -433,12 +433,12 @@ declare class Address {
     zipcode: string;
     constructor(municipality: string, raw_data: string, signature: string, street_and_number: string, version: number, zipcode: string);
 }
-declare class AllCertsResponse extends DataObjectResponse {
-    data: AllBeIDCerts;
+declare class BeidAllCertsResponse extends DataObjectResponse {
+    data: BeidAllCerts;
     success: boolean;
-    constructor(data: AllBeIDCerts, success: boolean);
+    constructor(data: BeidAllCerts, success: boolean);
 }
-declare class AllBeIDCerts {
+declare class BeidAllCerts {
     authentication_certificate: T1CCertificate;
     citizen_certificate: T1CCertificate;
     non_repudiation_certificate: T1CCertificate;
@@ -446,24 +446,24 @@ declare class AllBeIDCerts {
     rrn_certificate: T1CCertificate;
     constructor(authentication_certificate?: T1CCertificate, citizen_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, root_certificate?: T1CCertificate, rrn_certificate?: T1CCertificate);
 }
-declare class AllDataResponse extends AllCertsResponse {
-    data: AllBeIDData;
+declare class BeidAllDataResponse extends BeidAllCertsResponse {
+    data: BeidAllData;
     success: boolean;
-    constructor(data: AllBeIDData, success: boolean);
+    constructor(data: BeidAllData, success: boolean);
 }
-declare class AllBeIDData {
-    address: Address;
+declare class BeidAllData {
+    address: BeidAddress;
     authentication_certificate: T1CCertificate;
     citizen_certificate: T1CCertificate;
     non_repudiation_certificate: T1CCertificate;
     picture: string;
-    rn: RnData;
+    rn: BeidRnData;
     root_certificate: T1CCertificate;
     rrn_certificate: T1CCertificate;
-    token_data: TokenData;
-    constructor(address?: Address, authentication_certificate?: T1CCertificate, citizen_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, picture?: string, rn?: RnData, root_certificate?: T1CCertificate, rrn_certificate?: T1CCertificate, token_data?: TokenData);
+    token_data: BeidTokenData;
+    constructor(address?: BeidAddress, authentication_certificate?: T1CCertificate, citizen_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, picture?: string, rn?: BeidRnData, root_certificate?: T1CCertificate, rrn_certificate?: T1CCertificate, token_data?: BeidTokenData);
 }
-declare class TokenData {
+declare class BeidTokenData {
     eid_compliant: number;
     electrical_perso_interface_version: number;
     electrical_perso_version: number;
@@ -476,12 +476,12 @@ declare class TokenData {
     version_rfu: number;
     constructor(eid_compliant?: number, electrical_perso_interface_version?: number, electrical_perso_version?: number, graphical_perso_version?: number, label?: string, prn_generation?: string, raw_data?: string, serial_number?: string, version?: number, version_rfu?: number);
 }
-declare class TokenDataResponse extends DataObjectResponse {
-    data: TokenData;
+declare class BeidTokenDataResponse extends DataObjectResponse {
+    data: BeidTokenData;
     success: boolean;
-    constructor(data: TokenData, success: boolean);
+    constructor(data: BeidTokenData, success: boolean);
 }
-declare class RnData {
+declare class BeidRnData {
     birth_date: string;
     birth_location: string;
     card_delivery_municipality: string;
@@ -504,43 +504,43 @@ declare class RnData {
     version: number;
     constructor(birth_date: string, birth_location: string, card_delivery_municipality: string, card_number: string, card_validity_date_begin: string, card_validity_date_end: string, chip_number: string, document_type: string, first_names: string, name: string, national_number: string, nationality: string, noble_condition: string, picture_hash: string, raw_data: string, sex: string, signature: string, special_status: string, third_name: string, version: number);
 }
-declare class RnDataResponse extends DataObjectResponse {
-    data: RnData;
+declare class BeidRnDataResponse extends DataObjectResponse {
+    data: BeidRnData;
     success: boolean;
-    constructor(data: RnData, success: boolean);
+    constructor(data: BeidRnData, success: boolean);
 }
 
-export { AbstractEMV, AllDataResponse, ApplicationDataResponse, ApplicationsResponse, EmvCertificateResponse, ApplicationData, Application, EmvCertificate };
+export { AbstractEMV, AllDataResponse, EmvApplicationDataResponse, EmvApplicationsResponse, EmvCertificateResponse, EmvApplicationData, EmvApplication, EmvCertificate };
 interface AbstractEMV extends PinCard {
     allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
-    applications(callback?: (error: RestException, data: ApplicationsResponse) => void): Promise<ApplicationsResponse>;
-    applicationData(callback?: (error: RestException, data: ApplicationDataResponse) => void): Promise<ApplicationDataResponse>;
+    applications(callback?: (error: RestException, data: EmvApplicationsResponse) => void): Promise<EmvApplicationsResponse>;
+    applicationData(callback?: (error: RestException, data: EmvApplicationDataResponse) => void): Promise<EmvApplicationDataResponse>;
     iccPublicKeyCertificate(aid: string, callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
     issuerPublicKeyCertificate(aid: string, callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
 }
 declare class AllDataResponse extends DataObjectResponse {
     data: {
-        applications: Application[];
-        application_data: ApplicationData;
+        applications?: EmvApplication[];
+        application_data?: EmvApplicationData;
     };
     success: boolean;
     constructor(data: {
-        applications: Application[];
-        application_data: ApplicationData;
+        applications?: EmvApplication[];
+        application_data?: EmvApplicationData;
     }, success: boolean);
 }
-declare class Application {
+declare class EmvApplication {
     aid: string;
     name: string;
     priority: number;
     constructor(aid: string, name: string, priority: number);
 }
-declare class ApplicationsResponse extends DataObjectResponse {
-    data: Application[];
+declare class EmvApplicationsResponse extends DataObjectResponse {
+    data: EmvApplication[];
     success: boolean;
-    constructor(data: Application[], success: boolean);
+    constructor(data: EmvApplication[], success: boolean);
 }
-declare class ApplicationData {
+declare class EmvApplicationData {
     country: string;
     country_code: string;
     effective_data: string;
@@ -548,12 +548,12 @@ declare class ApplicationData {
     language: string;
     pan: string;
     name: string;
-    constructor(country: string, country_code: string, effective_data: string, expiration_date: string, language: string, pan: string, name?: string);
+    constructor(country?: string, country_code?: string, effective_data?: string, expiration_date?: string, language?: string, pan?: string, name?: string);
 }
-declare class ApplicationDataResponse extends DataObjectResponse {
-    data: ApplicationData;
+declare class EmvApplicationDataResponse extends DataObjectResponse {
+    data: EmvApplicationData;
     success: boolean;
-    constructor(data: ApplicationData, success: boolean);
+    constructor(data: EmvApplicationData, success: boolean);
 }
 declare class EmvCertificate {
     data: string;
@@ -567,42 +567,42 @@ declare class EmvCertificateResponse extends DataObjectResponse {
     constructor(data: EmvCertificate, success: boolean);
 }
 
-export { AbstractOcra, AllDataResponse, ChallengeData, ReadCounterResponse, AllOcraData };
+export { AbstractOcra, AllDataResponse, OcraChallenge, OcraReadCounterResponse, OcraAllData };
 interface AbstractOcra extends PinCard {
     allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
-    challenge(body: ChallengeData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    readCounter(body: OptionalPin, callback?: (error: RestException, data: ReadCounterResponse) => void): Promise<ReadCounterResponse>;
+    challenge(body: OcraChallenge, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    readCounter(body: OptionalPin, callback?: (error: RestException, data: OcraReadCounterResponse) => void): Promise<OcraReadCounterResponse>;
 }
 declare class AllDataResponse extends DataObjectResponse {
-    data: AllOcraData;
+    data: OcraAllData;
     success: boolean;
-    constructor(data: AllOcraData, success: boolean);
+    constructor(data: OcraAllData, success: boolean);
 }
-declare class AllOcraData {
+declare class OcraAllData {
     counter: string;
-    constructor(counter: string);
+    constructor(counter?: string);
 }
-declare class ChallengeData extends OptionalPin {
+declare class OcraChallenge extends OptionalPin {
     challenge: string;
     pin: string;
     pace: string;
     constructor(challenge: string, pin?: string, pace?: string);
 }
-declare class ReadCounterResponse {
+declare class OcraReadCounterResponse {
     counter: string;
     success: boolean;
-    constructor(counter: string, success: boolean);
+    constructor(counter?: string, success?: boolean);
 }
 
-export { AbstractAventra, AllCertsResponse, AllDataResponse, AllAventraCerts, AllAventraData, AppletInfo };
+export { AbstractAventra, AventraAllCertsResponse, AventraAllDataResponse, AventraAllCerts, AventraAllData, AventraAppletInfo };
 interface AbstractAventra extends CertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allKeyRefs(): string[];
     allAlgoRefsForAuthentication(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
     allAlgoRefsForSigning(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
-    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: AventraAllDataResponse) => void): Promise<AventraAllDataResponse>;
+    allCerts(filters: string[], callback?: (error: RestException, data: AventraAllCertsResponse) => void): Promise<AventraAllCertsResponse>;
     rootCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     issuerCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     authenticationCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
@@ -611,120 +611,124 @@ interface AbstractAventra extends CertCard {
     verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
     resetPin(body: ResetPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
 }
-declare class AllCertsResponse extends DataObjectResponse {
-    data: AllAventraCerts;
+declare class AventraAllCertsResponse extends DataObjectResponse {
+    data: AventraAllCerts;
     success: boolean;
-    constructor(data: AllAventraCerts, success: boolean);
+    constructor(data: AventraAllCerts, success: boolean);
 }
-declare class AllAventraCerts {
+declare class AventraAllCerts {
     authentication_certificate: T1CCertificate;
     encryption_certificate: T1CCertificate;
     issuer_certificate: T1CCertificate;
     signing_certificate: T1CCertificate;
     root_certificate: T1CCertificate;
-    constructor(authentication_certificate: T1CCertificate, encryption_certificate: T1CCertificate, issuer_certificate: T1CCertificate, signing_certificate: T1CCertificate, root_certificate: T1CCertificate);
+    constructor(authentication_certificate?: T1CCertificate, encryption_certificate?: T1CCertificate, issuer_certificate?: T1CCertificate, signing_certificate?: T1CCertificate, root_certificate?: T1CCertificate);
 }
-declare class AllDataResponse extends AllCertsResponse {
-    data: AllAventraData;
+declare class AventraAllDataResponse extends DataObjectResponse {
+    data: AventraAllData;
     success: boolean;
-    constructor(data: AllAventraData, success: boolean);
+    constructor(data: AventraAllData, success: boolean);
 }
-declare class AllAventraData {
-    applet_info: AppletInfo;
+declare class AventraAllData {
+    applet_info: AventraAppletInfo;
     authentication_certificate: T1CCertificate;
     encryption_certificate: T1CCertificate;
     issuer_certificate: T1CCertificate;
     signing_certificate: T1CCertificate;
     root_certificate: T1CCertificate;
-    constructor(applet_info: AppletInfo, authentication_certificate: T1CCertificate, encryption_certificate: T1CCertificate, issuer_certificate: T1CCertificate, signing_certificate: T1CCertificate, root_certificate: T1CCertificate);
+    constructor(applet_info?: AventraAppletInfo, authentication_certificate?: T1CCertificate, encryption_certificate?: T1CCertificate, issuer_certificate?: T1CCertificate, signing_certificate?: T1CCertificate, root_certificate?: T1CCertificate);
 }
-declare class AppletInfo {
+declare class AventraAppletInfo {
     change_counter: number;
     name: string;
     serial: string;
     version: string;
-    constructor(change_counter: number, name: string, serial: string, version: string);
+    constructor(change_counter?: number, name?: string, serial?: string, version?: string);
 }
 
-export { AbstractLuxTrust, AllCertsResponse, AllDataResponse, AllLuxTrustCerts };
+export { AbstractLuxTrust, LuxtrustAllCertsResponse, LuxtrustAllDataResponse, LuxtrustAllCerts };
 interface AbstractLuxTrust extends CertCard {
     activated(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
-    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: LuxtrustAllDataResponse) => void): Promise<LuxtrustAllDataResponse>;
+    allCerts(filters: string[], callback?: (error: RestException, data: LuxtrustAllCertsResponse) => void): Promise<LuxtrustAllCertsResponse>;
     rootCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     authenticationCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     signingCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
-declare class AllCertsResponse extends DataObjectResponse {
-    data: AllLuxTrustCerts;
+declare class LuxtrustAllCertsResponse extends DataObjectResponse {
+    data: LuxtrustAllCerts;
     success: boolean;
-    constructor(data: AllLuxTrustCerts, success: boolean);
+    constructor(data: LuxtrustAllCerts, success: boolean);
 }
-declare class AllLuxTrustCerts {
+declare class LuxtrustAllCerts {
     authentication_certificate: T1CCertificate;
     non_repudiation_certificate: T1CCertificate;
     root_certificate: T1CCertificate[];
-    constructor(authentication_certificate: T1CCertificate, non_repudiation_certificate: T1CCertificate, root_certificate: T1CCertificate[]);
+    constructor(authentication_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, root_certificate?: T1CCertificate[]);
 }
-declare class AllDataResponse extends AllCertsResponse {
-    data: AllLuxTrustCerts;
+declare class LuxtrustAllDataResponse extends LuxtrustAllCertsResponse {
+    data: LuxtrustAllCerts;
     success: boolean;
-    constructor(data: AllLuxTrustCerts, success: boolean);
+    constructor(data: LuxtrustAllCerts, success: boolean);
 }
 
-export { AbstractOberthur, AllCertsResponse, AllDataResponse, AllOberthurCerts };
+export { AbstractOberthur, OberthurAllCertsResponse, OberthurAllDataResponse, OberthurAllCerts };
 interface AbstractOberthur extends CertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allKeyRefs(): string[];
     allAlgoRefsForAuthentication(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
     allAlgoRefsForSigning(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
-    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: OberthurAllDataResponse) => void): Promise<OberthurAllDataResponse>;
+    allCerts(filters: string[], callback?: (error: RestException, data: OberthurAllCertsResponse) => void): Promise<OberthurAllCertsResponse>;
     rootCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     issuerCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     authenticationCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     signingCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     encryptionCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
 }
-declare class AllCertsResponse extends DataObjectResponse {
-    data: AllOberthurCerts;
+declare class OberthurAllCertsResponse extends DataObjectResponse {
+    data: OberthurAllCerts;
     success: boolean;
-    constructor(data: AllOberthurCerts, success: boolean);
+    constructor(data: OberthurAllCerts, success: boolean);
 }
-declare class AllOberthurCerts {
+declare class OberthurAllCerts {
     root_certificate: T1CCertificate;
     issuer_certificate: T1CCertificate;
     authentication_certificate: T1CCertificate;
     signing_certificate: T1CCertificate;
     encryption_certificate: T1CCertificate;
-    constructor(root_certificate: T1CCertificate, issuer_certificate: T1CCertificate, authentication_certificate: T1CCertificate, signing_certificate: T1CCertificate, encryption_certificate: T1CCertificate);
+    constructor(root_certificate?: T1CCertificate, issuer_certificate?: T1CCertificate, authentication_certificate?: T1CCertificate, signing_certificate?: T1CCertificate, encryption_certificate?: T1CCertificate);
 }
-declare class AllDataResponse extends AllCertsResponse {
-    data: AllOberthurCerts;
+declare class OberthurAllDataResponse extends OberthurAllCertsResponse {
+    data: OberthurAllCerts;
     success: boolean;
-    constructor(data: AllOberthurCerts, success: boolean);
+    constructor(data: OberthurAllCerts, success: boolean);
 }
 
-export { AbstractPiv, AllCertsResponse, AllDataResponse, PrintedInformation, PrintedInformationResponse, FacialImage, FacialImageResponse, AllPivCerts, AllPivData };
-interface AbstractPiv extends GenericSecuredCertCard {
+export { AbstractPiv, PivAllDataResponse, PivPrintedInformation, PivAllCertsResponse, PivPrintedInformationResponse, PivFacialImage, PivFacialImageResponse, PivAllCerts, PivAllData };
+interface AbstractPiv extends SecuredCertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allKeyRefs(): string[];
-    printedInformation(body: OptionalPin, callback?: (error: RestException, data: PrintedInformationResponse) => void): Promise<PrintedInformationResponse>;
-    facialImage(body: OptionalPin, callback?: (error: RestException, data: FacialImageResponse) => void): Promise<FacialImageResponse>;
-    allData(filters: string[], body: OptionalPin, callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
-    allCerts(filters: string[], body: OptionalPin, callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
+    printedInformation(body: OptionalPin, callback?: (error: RestException, data: PivPrintedInformationResponse) => void): Promise<PivPrintedInformationResponse>;
+    facialImage(body: OptionalPin, callback?: (error: RestException, data: PivFacialImageResponse) => void): Promise<PivFacialImageResponse>;
+    allData(filters: string[], body: OptionalPin, callback?: (error: RestException, data: PivAllDataResponse) => void): Promise<PivAllDataResponse>;
+    allCerts(filters: string[], body: OptionalPin, callback?: (error: RestException, data: PivAllCertsResponse) => void): Promise<PivAllCertsResponse>;
     authenticationCertificate(body: OptionalPin, options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     signingCertificate(body: OptionalPin, options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
-declare class PrintedInformationResponse extends DataObjectResponse {
-    data: PrintedInformation;
+declare class PivPrintedInformationResponse extends DataObjectResponse {
+    data: PivPrintedInformation;
     success: boolean;
-    constructor(data: PrintedInformation, success: boolean);
+    constructor(data: PivPrintedInformation, success: boolean);
 }
-declare class PrintedInformation {
+declare class PivAllCertsResponse extends DataObjectResponse {
+    data: PivAllCerts;
+    success: boolean;
+    constructor(data: PivAllCerts, success: boolean);
+}
+declare class PivPrintedInformation {
     name: string;
     employee_affiliation: string;
     expiration_date: string;
@@ -734,71 +738,66 @@ declare class PrintedInformation {
     organization_affiliation_line_2: string;
     constructor(name: string, employee_affiliation: string, expiration_date: string, agency_card_serial_number: any, issuer_identification: string, organization_affiliation_line_1: string, organization_affiliation_line_2: string);
 }
-declare class FacialImageResponse extends DataObjectResponse {
-    data: FacialImage;
+declare class PivFacialImageResponse extends DataObjectResponse {
+    data: PivFacialImage;
     success: boolean;
-    constructor(data: FacialImage, success: boolean);
+    constructor(data: PivFacialImage, success: boolean);
 }
-declare class FacialImage {
+declare class PivFacialImage {
     image: string;
     constructor(image: string);
 }
-declare class AllCertsResponse extends DataObjectResponse {
-    data: AllPivCerts;
-    success: boolean;
-    constructor(data: AllPivCerts, success: boolean);
-}
-declare class AllPivCerts {
+declare class PivAllCerts {
     authentication_certificate: T1CCertificate;
     signing_certificate: T1CCertificate;
-    constructor(authentication_certificate: T1CCertificate, signing_certificate: T1CCertificate);
+    constructor(authentication_certificate?: T1CCertificate, signing_certificate?: T1CCertificate);
 }
-declare class AllDataResponse extends AllCertsResponse {
-    data: AllPivData;
+declare class PivAllDataResponse extends DataObjectResponse {
+    data: PivAllData;
     success: boolean;
-    constructor(data: AllPivData, success: boolean);
+    constructor(data: PivAllData, success: boolean);
 }
-declare class AllPivData {
-    printed_information: PrintedInformation;
+declare class PivAllData {
+    printed_information: PivPrintedInformation;
     authentication_certificate: T1CCertificate;
     signing_certificate: T1CCertificate;
-    facial_image: FacialImage;
-    constructor(printed_information: PrintedInformation, authentication_certificate: T1CCertificate, signing_certificate: T1CCertificate, facial_image: FacialImage);
+    facial_image: PivFacialImage;
+    constructor(printed_information?: PivPrintedInformation, authentication_certificate?: T1CCertificate, signing_certificate?: T1CCertificate, facial_image?: PivFacialImage);
 }
 
-export { AbstractMobib, AllDataResponse, StatusResponse, CardIssuing, CardIssuingResponse, Contract, ContractsResponse };
+export { AbstractMobib, MobibAllDataResponse, MobibStatusResponse, MobibCardIssuing, MobibCardIssuingResponse, MobibContract, MobibContractsResponse };
 interface AbstractMobib extends Card {
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
-    cardIssuing(callback?: (error: RestException, data: CardIssuingResponse) => void): Promise<CardIssuingResponse>;
-    contracts(callback?: (error: RestException, data: ContractsResponse) => void): Promise<ContractsResponse>;
+    allData(filters: string[] | Options, callback?: (error: RestException, data: MobibAllDataResponse) => void): Promise<MobibAllDataResponse>;
+    cardIssuing(callback?: (error: RestException, data: MobibCardIssuingResponse) => void): Promise<MobibCardIssuingResponse>;
+    contracts(callback?: (error: RestException, data: MobibContractsResponse) => void): Promise<MobibContractsResponse>;
     picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    status(callback?: (error: RestException, data: StatusResponse) => void): Promise<StatusResponse>;
+    status(callback?: (error: RestException, data: MobibStatusResponse) => void): Promise<MobibStatusResponse>;
 }
-declare class AllDataResponse extends DataObjectResponse {
+declare class MobibAllDataResponse extends DataObjectResponse {
+    data: {
+        active?: boolean;
+        'card-issuing'?: MobibCardIssuing;
+        contracts?: MobibContract[];
+        picture?: string;
+    };
+    success: boolean;
+    constructor(data: {
+        active?: boolean;
+        'card-issuing'?: MobibCardIssuing;
+        contracts?: MobibContract[];
+        picture?: string;
+    }, success: boolean);
+}
+declare class MobibStatusResponse extends DataObjectResponse {
     data: {
         active: boolean;
-        'card-issuing': CardIssuing;
-        contracts: Contract[];
-        picture: string;
     };
     success: boolean;
     constructor(data: {
         active: boolean;
-        'card-issuing': CardIssuing;
-        contracts: Contract[];
-        picture: string;
     }, success: boolean);
 }
-declare class StatusResponse extends DataObjectResponse {
-    data: {
-        active: boolean;
-    };
-    success: boolean;
-    constructor(data: {
-        active: boolean;
-    }, success: boolean);
-}
-declare class CardIssuing {
+declare class MobibCardIssuing {
     card_expiration_date: string;
     card_holder_birth_date: string;
     card_holder_end_date: string;
@@ -811,21 +810,21 @@ declare class CardIssuing {
     gender: number;
     language: number;
     version: number;
-    constructor(card_expiration_date: string, card_holder_birth_date: string, card_holder_end_date: string, card_holder_id: string, card_holder_name: string, card_holder_start_date: string, card_revalidation_date: string, card_type: number, company_id: number, gender: number, language: number, version: number);
+    constructor(card_expiration_date?: string, card_holder_birth_date?: string, card_holder_end_date?: string, card_holder_id?: string, card_holder_name?: string, card_holder_start_date?: string, card_revalidation_date?: string, card_type?: number, company_id?: number, gender?: number, language?: number, version?: number);
 }
-declare class CardIssuingResponse extends DataObjectResponse {
-    data: CardIssuing;
+declare class MobibCardIssuingResponse extends DataObjectResponse {
+    data: MobibCardIssuing;
     success: boolean;
-    constructor(data: CardIssuing, success: boolean);
+    constructor(data: MobibCardIssuing, success: boolean);
 }
-declare class Contract {
+declare class MobibContract {
     authenticator_kvc: number;
     authenticator_value: number;
     journey_interchanges_allowed: boolean;
     passengers_max: number;
     period_journeys: {
-        max_number_of_trips: number;
-        period: number;
+        max_number_of_trips?: number;
+        period?: number;
     };
     price_amount: number;
     provider: number;
@@ -839,82 +838,82 @@ declare class Contract {
     }[];
     tariff: {
         counter: {
-            time: string;
-            type: number;
+            time?: string;
+            type?: number;
         };
-        multimodal: boolean;
-        nameref: number;
+        multimodal?: boolean;
+        nameref?: number;
     };
     validity_duration: {
-        unit: number;
-        value: number;
+        unit?: number;
+        value?: number;
     };
     validity_start_date: string;
     vehicle_class_allowed: number;
     version: number;
-    constructor(authenticator_kvc: number, authenticator_value: number, journey_interchanges_allowed: boolean, passengers_max: number, period_journeys: {
-        max_number_of_trips: number;
-        period: number;
-    }, price_amount: number, provider: number, restrict_code: number, restrict_time: number, sale_date: string, sale_sam_count: number, sale_sam_id: number, spatials: {
+    constructor(authenticator_kvc?: number, authenticator_value?: number, journey_interchanges_allowed?: boolean, passengers_max?: number, period_journeys?: {
+        max_number_of_trips?: number;
+        period?: number;
+    }, price_amount?: number, provider?: number, restrict_code?: number, restrict_time?: number, sale_date?: string, sale_sam_count?: number, sale_sam_id?: number, spatials?: {
         type: number;
-    }[], tariff: {
+    }[], tariff?: {
         counter: {
-            time: string;
-            type: number;
+            time?: string;
+            type?: number;
         };
-        multimodal: boolean;
-        nameref: number;
-    }, validity_duration: {
-        unit: number;
-        value: number;
-    }, validity_start_date: string, vehicle_class_allowed: number, version: number);
+        multimodal?: boolean;
+        nameref?: number;
+    }, validity_duration?: {
+        unit?: number;
+        value?: number;
+    }, validity_start_date?: string, vehicle_class_allowed?: number, version?: number);
 }
-declare class ContractsResponse extends DataObjectResponse {
-    data: Contract[];
+declare class MobibContractsResponse extends DataArrayResponse {
+    data: MobibContract[];
     success: boolean;
-    constructor(data: Contract[], success: boolean);
+    constructor(data: MobibContract[], success: boolean);
 }
 
-export { AbstractEidLUX, AllCertsResponse, AllDataResponse, Biometric, BiometricResponse, Picture, PictureResponse, SignatureImage, SignatureImageResponse, AllLuxData, AllLuxCerts };
-interface AbstractEidLUX extends SecuredCertCard {
+export { AbstractEidLUX, AllCertsResponse, LuxAllDataResponse, LuxidBiometric, LuxidBiometricResponse, LuxidPicture, LuxidPictureResponse, LuxidSignatureImage, LuxidSignatureImageResponse, LuxidAllData, LuxidAllCerts };
+interface AbstractEidLUX extends CertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
-    allData(options?: string[] | Options, callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+    allData(options?: string[] | Options, callback?: (error: RestException, data: LuxAllDataResponse) => void): Promise<LuxAllDataResponse>;
     allCerts(options?: string[] | Options, callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
-    biometric(callback?: (error: RestException, data: BiometricResponse) => void): Promise<BiometricResponse>;
-    picture(callback?: (error: RestException, data: PictureResponse) => void): Promise<PictureResponse>;
+    biometric(callback?: (error: RestException, data: LuxidBiometricResponse) => void): Promise<LuxidBiometricResponse>;
+    picture(callback?: (error: RestException, data: LuxidPictureResponse) => void): Promise<LuxidPictureResponse>;
     rootCertificate(options?: Options, callback?: (error: RestException, data: CertificatesResponse) => void): Promise<CertificatesResponse>;
     authenticationCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     nonRepudiationCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    signatureImage(callback?: (error: RestException, data: SignatureImageResponse) => void): Promise<SignatureImageResponse>;
+    signatureImage(callback?: (error: RestException, data: LuxidSignatureImageResponse) => void): Promise<LuxidSignatureImageResponse>;
 }
 declare class AllCertsResponse extends DataObjectResponse {
-    data: AllLuxCerts;
+    data: LuxidAllCerts;
     success: boolean;
-    constructor(data: AllLuxCerts, success: boolean);
+    constructor(data: LuxidAllCerts, success: boolean);
 }
-declare class AllLuxCerts {
+declare class LuxidAllCerts {
     authentication_certificate: T1CCertificate;
     non_repudiation_certificate: T1CCertificate;
     root_certificates: T1CCertificate[];
-    constructor(authentication_certificate: T1CCertificate, non_repudiation_certificate: T1CCertificate, root_certificates: T1CCertificate[]);
+    constructor(authentication_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, root_certificates?: T1CCertificate[]);
 }
-declare class AllDataResponse extends AllCertsResponse {
-    data: AllLuxData;
+declare class LuxAllDataResponse extends AllCertsResponse {
+    data: LuxidAllData;
     success: boolean;
-    constructor(data: AllLuxData, success: boolean);
+    constructor(data: LuxidAllData, success: boolean);
 }
-declare class AllLuxData extends AllLuxCerts {
+declare class LuxidAllData extends LuxidAllCerts {
     authentication_certificate: T1CCertificate;
     non_repudiation_certificate: T1CCertificate;
     root_certificates: T1CCertificate[];
-    biometric: Biometric;
-    picture: Picture;
-    signature_image: SignatureImage;
+    biometric: LuxidBiometric;
+    picture: LuxidPicture;
+    signature_image: LuxidSignatureImage;
     signature_object: string;
-    constructor(authentication_certificate: T1CCertificate, non_repudiation_certificate: T1CCertificate, root_certificates: T1CCertificate[], biometric: Biometric, picture: Picture, signature_image: SignatureImage, signature_object: string);
+    constructor(authentication_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, root_certificates?: T1CCertificate[], biometric?: LuxidBiometric, picture?: LuxidPicture, signature_image?: LuxidSignatureImage, signature_object?: string);
 }
-declare class Biometric {
+declare class LuxidBiometric {
     birthData: string;
     documentNumber: string;
     documentType: string;
@@ -925,74 +924,74 @@ declare class Biometric {
     nationality: string;
     validityEndData: string;
     validityStartData: string;
-    constructor(birthData: string, documentNumber: string, documentType: string, firstName: string, gender: string, issuingState: string, lastName: string, nationality: string, validityEndData: string, validityStartData: string);
+    constructor(birthData?: string, documentNumber?: string, documentType?: string, firstName?: string, gender?: string, issuingState?: string, lastName?: string, nationality?: string, validityEndData?: string, validityStartData?: string);
 }
-declare class BiometricResponse extends DataObjectResponse {
-    data: Biometric;
+declare class LuxidBiometricResponse extends DataObjectResponse {
+    data: LuxidBiometric;
     success: boolean;
-    constructor(data: Biometric, success: boolean);
+    constructor(data: LuxidBiometric, success: boolean);
 }
-declare class Picture {
+declare class LuxidPicture {
     height: number;
     width: number;
     image: string;
     raw_data: string;
     constructor(height: number, width: number, image: string, raw_data: string);
 }
-declare class PictureResponse extends DataObjectResponse {
-    data: Picture;
+declare class LuxidPictureResponse extends DataObjectResponse {
+    data: LuxidPicture;
     success: boolean;
-    constructor(data: Picture, success: boolean);
+    constructor(data: LuxidPicture, success: boolean);
 }
-declare class SignatureImage {
+declare class LuxidSignatureImage {
     image: string;
     raw_data: string;
     constructor(image: string, raw_data: string);
 }
-declare class SignatureImageResponse extends DataObjectResponse {
-    data: SignatureImage;
+declare class LuxidSignatureImageResponse extends DataObjectResponse {
+    data: LuxidSignatureImage;
     success: boolean;
-    constructor(data: SignatureImage, success: boolean);
+    constructor(data: LuxidSignatureImage, success: boolean);
 }
 
-export { AbstractDNIe, AllCertsResponse, AllDataResponse, InfoResponse, AllDNIeData, AllDNIeCerts, Info };
+export { AbstractDNIe, DNIeAllCertsResponse, DNIeAllDataResponse, DNIeInfoResponse, DNIeAllData, DNIeAllCerts, DNIeInfo };
 interface AbstractDNIe extends SecuredCertCard {
-    allData(options: Options, body: OptionalPin, callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
-    allCerts(options: Options, callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
-    info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>;
+    allData(filters: string[] | Options, body: OptionalPin, callback?: (error: RestException, data: DNIeAllDataResponse) => void): Promise<DNIeAllDataResponse>;
+    allCerts(options: Options, body: OptionalPin, callback?: (error: RestException, data: DNIeAllCertsResponse) => void): Promise<DNIeAllCertsResponse>;
+    info(callback?: (error: RestException, data: DNIeInfoResponse) => void): Promise<DNIeInfoResponse>;
     intermediateCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     authenticationCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     signingCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
-declare class AllCertsResponse extends DataObjectResponse {
-    data: AllDNIeCerts;
+declare class DNIeAllCertsResponse extends DataObjectResponse {
+    data: DNIeAllCerts;
     success: boolean;
-    constructor(data: AllDNIeCerts, success: boolean);
+    constructor(data: DNIeAllCerts, success: boolean);
 }
-declare class AllDNIeCerts {
+declare class DNIeAllCerts {
     authentication_certificate: T1CCertificate;
     intermediate_certificate: T1CCertificate;
     signing_certificate: T1CCertificate;
     constructor(authentication_certificate?: T1CCertificate, intermediate_certificate?: T1CCertificate, signing_certificate?: T1CCertificate);
 }
-declare class AllDataResponse extends AllCertsResponse {
-    data: AllDNIeData;
+declare class DNIeAllDataResponse extends DNIeAllCertsResponse {
+    data: DNIeAllData;
     success: boolean;
-    constructor(data: AllDNIeData, success: boolean);
+    constructor(data: DNIeAllData, success: boolean);
 }
-declare class AllDNIeData {
-    info: Info;
+declare class DNIeAllData {
+    info: DNIeInfo;
     authentication_certificate: T1CCertificate;
     intermediate_certificate: T1CCertificate;
     signing_certificate: T1CCertificate;
-    constructor(info: Info, authentication_certificate?: T1CCertificate, intermediate_certificate?: T1CCertificate, signing_certificate?: T1CCertificate);
+    constructor(info?: DNIeInfo, authentication_certificate?: T1CCertificate, intermediate_certificate?: T1CCertificate, signing_certificate?: T1CCertificate);
 }
-declare class InfoResponse extends DataObjectResponse {
-    data: Info;
+declare class DNIeInfoResponse extends DataObjectResponse {
+    data: DNIeInfo;
     success: boolean;
-    constructor(data: Info, success: boolean);
+    constructor(data: DNIeInfo, success: boolean);
 }
-declare class Info {
+declare class DNIeInfo {
     first_name: string;
     last_names: string;
     national_number: string;
@@ -1068,7 +1067,7 @@ declare class VerifyPinData extends OptionalPin {
     private_key_reference: string;
     pin: string;
     pace: string;
-    constructor(private_key_reference: string, pin: string, pace?: string);
+    constructor(private_key_reference?: string, pin?: string, pace?: string);
 }
 declare class ResetPinData {
     puk: string;
@@ -1144,12 +1143,12 @@ declare abstract class GenericSecuredCertCard extends GenericReaderContainer imp
     }): Promise<CertificatesResponse>;
 }
 
-export { AbstractEidPT, AllCertsResponse, AllDataResponse, IdDataResponse, PtAddressResponse, AllPtData, AllPtCerts, IdData, PtAddressData };
+export { AbstractEidPT, PtAllCertsResponse, PtAllDataResponse, PtIdDataResponse, PtAddressResponse, PtAllData, PtAllCerts, PtIdData, PtAddressData };
 interface AbstractEidPT extends CertCard {
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
-    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
-    idData(callback?: (error: RestException, data: IdDataResponse) => void): Promise<IdDataResponse>;
-    idDataWithOutPhoto(callback?: (error: RestException, data: IdDataResponse) => void): Promise<IdDataResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: PtAllDataResponse) => void): Promise<PtAllDataResponse>;
+    allCerts(filters: string[], callback?: (error: RestException, data: PtAllCertsResponse) => void): Promise<PtAllCertsResponse>;
+    idData(callback?: (error: RestException, data: PtIdDataResponse) => void): Promise<PtIdDataResponse>;
+    idDataWithOutPhoto(callback?: (error: RestException, data: PtIdDataResponse) => void): Promise<PtIdDataResponse>;
     address(data: OptionalPin, callback?: (error: RestException, data: PtAddressResponse) => void): Promise<PtAddressResponse>;
     photo(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     rootCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
@@ -1158,12 +1157,12 @@ interface AbstractEidPT extends CertCard {
     authenticationCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     nonRepudiationCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
-declare class AllCertsResponse extends DataObjectResponse {
-    data: AllPtCerts;
+declare class PtAllCertsResponse extends DataObjectResponse {
+    data: PtAllCerts;
     success: boolean;
-    constructor(data: AllPtCerts, success: boolean);
+    constructor(data: PtAllCerts, success: boolean);
 }
-declare class AllPtCerts {
+declare class PtAllCerts {
     authentication_certificate: T1CCertificate;
     non_repudiation_certificate: T1CCertificate;
     root_authentication_certificate: T1CCertificate;
@@ -1171,21 +1170,21 @@ declare class AllPtCerts {
     root_non_repudiation_certificate: T1CCertificate;
     constructor(authentication_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, root_authentication_certificate?: T1CCertificate, root_certificate?: T1CCertificate, root_non_repudiation_certificate?: T1CCertificate);
 }
-declare class AllDataResponse extends AllCertsResponse {
-    data: AllPtData;
+declare class PtAllDataResponse extends PtAllCertsResponse {
+    data: PtAllData;
     success: boolean;
-    constructor(data: AllPtData, success: boolean);
+    constructor(data: PtAllData, success: boolean);
 }
-declare class AllPtData {
-    id: IdData;
+declare class PtAllData {
+    id: PtIdData;
     authentication_certificate: T1CCertificate;
     non_repudiation_certificate: T1CCertificate;
     root_authentication_certificate: T1CCertificate;
     root_certificate: T1CCertificate;
     root_non_repudiaton_certificate: T1CCertificate;
-    constructor(id?: IdData, authentication_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, root_authentication_certificate?: T1CCertificate, root_certificate?: T1CCertificate, root_non_repudiaton_certificate?: T1CCertificate);
+    constructor(id?: PtIdData, authentication_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, root_authentication_certificate?: T1CCertificate, root_certificate?: T1CCertificate, root_non_repudiaton_certificate?: T1CCertificate);
 }
-declare class IdData {
+declare class PtIdData {
     accidental_indications: boolean;
     civilian_number: string;
     country: string;
@@ -1215,12 +1214,12 @@ declare class IdData {
     validity_begin_date: string;
     validity_end_date: string;
     photo: string;
-    constructor(accidental_indications: boolean, civilian_number: string, country: string, date_of_birth: string, document_number: string, document_number_pan: string, document_type: string, document_version: string, gender: string, given_name_father: string, given_name_mother: string, health_no: string, height: string, issuing_entity: string, local_of_request: string, mrz1: string, mrz2: string, mrz3: string, name: string, nationality: string, raw_data: string, social_security_no: string, surname: string, surname_father: string, surname_mother: string, tax_no: string, validity_begin_date: string, validity_end_date: string, photo?: string);
+    constructor(accidental_indications?: boolean, civilian_number?: string, country?: string, date_of_birth?: string, document_number?: string, document_number_pan?: string, document_type?: string, document_version?: string, gender?: string, given_name_father?: string, given_name_mother?: string, health_no?: string, height?: string, issuing_entity?: string, local_of_request?: string, mrz1?: string, mrz2?: string, mrz3?: string, name?: string, nationality?: string, raw_data?: string, social_security_no?: string, surname?: string, surname_father?: string, surname_mother?: string, tax_no?: string, validity_begin_date?: string, validity_end_date?: string, photo?: string);
 }
-declare class IdDataResponse extends DataObjectResponse {
-    data: IdData;
+declare class PtIdDataResponse extends DataObjectResponse {
+    data: PtIdData;
     success: boolean;
-    constructor(data: IdData, success: boolean);
+    constructor(data: PtIdData, success: boolean);
 }
 declare class PtAddressData {
     abbr_building_type: string;
@@ -1246,7 +1245,7 @@ declare class PtAddressData {
     type: string;
     zip3: string;
     zip4: string;
-    constructor(abbr_building_type: string, abbr_street_type: string, building_type: string, civil_parish: string, civil_parish_description: string, district: string, district_description: string, door_no: string, floor: string, gen_address_num: string, is_national: boolean, locality: string, municipality: string, municipality_description: string, place: string, postal_locality: string, raw_data: string, side: string, street_name: string, street_type: string, type: string, zip3: string, zip4: string);
+    constructor(abbr_building_type?: string, abbr_street_type?: string, building_type?: string, civil_parish?: string, civil_parish_description?: string, district?: string, district_description?: string, door_no?: string, floor?: string, gen_address_num?: string, is_national?: boolean, locality?: string, municipality?: string, municipality_description?: string, place?: string, postal_locality?: string, raw_data?: string, side?: string, street_name?: string, street_type?: string, type?: string, zip3?: string, zip4?: string);
 }
 declare class PtAddressResponse extends DataObjectResponse {
     data: PtAddressData;
@@ -1745,18 +1744,18 @@ declare class EMV extends GenericPinCard implements AbstractEMV {
     static APPLICATION_DATA: string;
     static ISSUER_PUBLIC_KEY_CERT: string;
     static ICC_PUBLIC_KEY_CERT: string;
-    applicationData(callback?: (error: RestException, data: ApplicationDataResponse) => void): Promise<ApplicationDataResponse>;
-    applications(callback?: (error: RestException, data: ApplicationsResponse) => void): Promise<ApplicationsResponse>;
+    applicationData(callback?: (error: RestException, data: EmvApplicationDataResponse) => void): Promise<EmvApplicationDataResponse>;
+    applications(callback?: (error: RestException, data: EmvApplicationsResponse) => void): Promise<EmvApplicationsResponse>;
     iccPublicKeyCertificate(aid: string, callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
     issuerPublicKeyCertificate(aid: string, callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
 }
 
 export { Mobib };
 declare class Mobib extends GenericSmartCard implements AbstractMobib {
-    cardIssuing(callback?: (error: RestException, data: CardIssuingResponse) => void): Promise<CardIssuingResponse>;
-    contracts(callback?: (error: RestException, data: ContractsResponse) => void): Promise<ContractsResponse>;
+    cardIssuing(callback?: (error: RestException, data: MobibCardIssuingResponse) => void): Promise<MobibCardIssuingResponse>;
+    contracts(callback?: (error: RestException, data: MobibContractsResponse) => void): Promise<MobibContractsResponse>;
     picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    status(callback?: (error: RestException, data: StatusResponse) => void): Promise<StatusResponse>;
+    status(callback?: (error: RestException, data: MobibStatusResponse) => void): Promise<MobibStatusResponse>;
 }
 
 export { LuxTrust };
@@ -1772,8 +1771,8 @@ export { Ocra };
 declare class Ocra extends GenericPinCard implements AbstractOcra {
     static CHALLENGE: string;
     static READ_COUNTER: string;
-    challenge(body: ChallengeData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    readCounter(body: OptionalPin, callback?: (error: RestException, data: ReadCounterResponse) => void): Promise<ReadCounterResponse>;
+    challenge(body: OcraChallenge, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    readCounter(body: OptionalPin, callback?: (error: RestException, data: OcraReadCounterResponse) => void): Promise<OcraReadCounterResponse>;
 }
 
 export { Aventra };
@@ -1812,8 +1811,8 @@ declare class PIV extends GenericSecuredCertCard implements AbstractPiv {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allKeyRefs(): string[];
-    printedInformation(body: OptionalPin, callback?: (error: RestException, data: PrintedInformationResponse) => void): Promise<PrintedInformationResponse>;
-    facialImage(body: OptionalPin, callback?: (error: RestException, data: FacialImageResponse) => void): Promise<FacialImageResponse>;
+    printedInformation(body: OptionalPin, callback?: (error: RestException, data: PivPrintedInformationResponse) => void): Promise<PivPrintedInformationResponse>;
+    facialImage(body: OptionalPin, callback?: (error: RestException, data: PivFacialImageResponse) => void): Promise<PivFacialImageResponse>;
     authenticationCertificate(body: OptionalPin, options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     signingCertificate(body: OptionalPin, options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
