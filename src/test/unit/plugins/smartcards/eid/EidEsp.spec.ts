@@ -30,11 +30,11 @@ describe('Spanish eID Container', () => {
     describe('info', function () {
         beforeEach(function () {
             mock.onGet('containers/dnie/123/info').reply(() => {
-                return [ 200, { data: 'Info Data', success: true }];
+                return [ 200, { data: 'DNIeInfo Data', success: true }];
             });
         });
 
-        it('makes the correct call for DNIe Info', () => {
+        it('makes the correct call for DNIe DNIeInfo', () => {
             return dnie.info().then(res => {
                 expect(res).to.have.property('success');
                 expect(res.success).to.be.a('boolean');
@@ -42,7 +42,7 @@ describe('Spanish eID Container', () => {
 
                 expect(res).to.have.property('data');
                 expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Info Data');
+                expect(res.data).to.eq('DNIeInfo Data');
             });
         });
     });
