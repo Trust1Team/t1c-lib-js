@@ -39109,7 +39109,7 @@ var GCLLib =
 	    }
 	    return InfoResponse;
 	}(T1CResponse));
-	exports.InfoResponse = InfoResponse;
+	exports.DNIeInfoResponse = InfoResponse;
 	var T1CInfo = (function () {
 	    function T1CInfo(activated, citrix, managed, arch, os, uid, containers, version) {
 	        this.activated = activated;

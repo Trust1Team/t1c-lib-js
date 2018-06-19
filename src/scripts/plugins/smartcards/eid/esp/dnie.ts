@@ -6,7 +6,7 @@
 import {RestException} from '../../../../core/exceptions/CoreExceptions';
 import {CertificateResponse} from '../../../../core/service/CoreModel';
 import {GenericSecuredCertCard} from '../../Card';
-import {AbstractDNIe, InfoResponse} from './dnieModel';
+import {AbstractDNIe, DNIeInfoResponse} from './dnieModel';
 import {Options, RequestHandler} from '../../../../util/RequestHandler';
 import {CertParser} from '../../../../util/CertParser';
 import {ResponseHandler} from '../../../../util/ResponseHandler';
@@ -18,7 +18,7 @@ class DNIe extends GenericSecuredCertCard implements AbstractDNIe {
     static INFO = '/info';
     static CERT_INTERMEDIATE = '/intermediate';
 
-    public info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse> {
+    public info(callback?: (error: RestException, data: DNIeInfoResponse) => void): Promise<DNIeInfoResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(DNIe.INFO), undefined, undefined, callback);
     }
 

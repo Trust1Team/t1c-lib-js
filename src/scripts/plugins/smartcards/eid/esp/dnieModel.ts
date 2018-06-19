@@ -7,15 +7,15 @@ import {OptionalPin, SecuredCertCard} from '../../Card';
 import {CertificateResponse, DataObjectResponse, T1CCertificate} from '../../../../core/service/CoreModel';
 import {Options} from '../../../../util/RequestHandler';
 
-export {AbstractDNIe, AllCertsResponse, AllDataResponse, InfoResponse, AllDNIeData, AllDNIeCerts, Info};
+export {AbstractDNIe, DNIeAllCertsResponse, DNIeAllDataResponse, DNIeInfoResponse, DNIeAllData, DNIeAllCerts, DNIeInfo};
 
 
 interface AbstractDNIe extends SecuredCertCard {
-    allData(filters: string[] | Options, body: OptionalPin, callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+    allData(filters: string[] | Options, body: OptionalPin, callback?: (error: RestException, data: DNIeAllDataResponse) => void): Promise<DNIeAllDataResponse>;
 
-    allCerts(options: Options, body: OptionalPin, callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
+    allCerts(options: Options, body: OptionalPin, callback?: (error: RestException, data: DNIeAllCertsResponse) => void): Promise<DNIeAllCertsResponse>;
 
-    info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>
+    info(callback?: (error: RestException, data: DNIeInfoResponse) => void): Promise<DNIeInfoResponse>
 
     intermediateCertificate(options: Options,
                             callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
@@ -27,40 +27,40 @@ interface AbstractDNIe extends SecuredCertCard {
                        callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
 
-class AllCertsResponse extends DataObjectResponse {
-    constructor(public data: AllDNIeCerts, public success: boolean) {
+class DNIeAllCertsResponse extends DataObjectResponse {
+    constructor(public data: DNIeAllCerts, public success: boolean) {
         super(data, success);
     }
 }
 
-class AllDNIeCerts {
+class DNIeAllCerts {
     constructor(public authentication_certificate?: T1CCertificate,
                 public intermediate_certificate?: T1CCertificate,
                 public signing_certificate?: T1CCertificate) {
     }
 }
 
-class AllDataResponse extends AllCertsResponse {
-    constructor(public data: AllDNIeData, public success: boolean) {
+class DNIeAllDataResponse extends DNIeAllCertsResponse {
+    constructor(public data: DNIeAllData, public success: boolean) {
         super(data, success);
     }
 }
 
-class AllDNIeData {
-    constructor(public info?: Info,
+class DNIeAllData {
+    constructor(public info?: DNIeInfo,
                 public authentication_certificate?: T1CCertificate,
                 public intermediate_certificate?: T1CCertificate,
                 public signing_certificate?: T1CCertificate) {
     }
 }
 
-class InfoResponse extends DataObjectResponse {
-    constructor(public data: Info, public success: boolean) {
+class DNIeInfoResponse extends DataObjectResponse {
+    constructor(public data: DNIeInfo, public success: boolean) {
         super(data, success);
     }
 }
 
-class Info {
+class DNIeInfo {
     constructor(public first_name: string,
                 public last_names: string,
                 public national_number: string,
