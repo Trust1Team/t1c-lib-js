@@ -50,29 +50,27 @@ class RestException {
 }
 export { RestException };
 
-export { GCLConfig, GCLConfigOptions };
-class GCLConfigOptions {
-    gclUrl: string;
-    gwOrProxyUrl: string;
-    apiKey: string;
-    gwJwt: string;
-    ocvContextPath: string;
-    dsContextPath: string;
-    dsFileContextPath: string;
-    pkcs11Config: ModuleConfig;
-    agentPort: number;
-    implicitDownload: boolean;
-    forceHardwarePinpad: boolean;
-    sessionTimeout: number;
-    consentDuration: number;
-    consentTimeout: number;
-    syncManaged: boolean;
-    osPinDialog: boolean;
-    containerDownloadTimeout: number;
-    localTestMode: boolean;
-    constructor(gclUrl?: string, gwOrProxyUrl?: string, apiKey?: string, gwJwt?: string, ocvContextPath?: string, dsContextPath?: string, dsFileContextPath?: string, pkcs11Config?: ModuleConfig, agentPort?: number, implicitDownload?: boolean, forceHardwarePinpad?: boolean, sessionTimeout?: number, consentDuration?: number, consentTimeout?: number, syncManaged?: boolean, osPinDialog?: boolean, containerDownloadTimeout?: number, localTestMode?: boolean);
+export class GCLConfigOptions {
+    gclUrl?: string;
+    gwOrProxyUrl?: string;
+    apiKey?: string;
+    gwJwt?: string;
+    ocvContextPath?: string;
+    dsContextPath?: string;
+    dsFileContextPath?: string;
+    pkcs11Config?: ModuleConfig;
+    agentPort?: number;
+    implicitDownload?: boolean;
+    forceHardwarePinpad?: boolean;
+    sessionTimeout?: number;
+    consentDuration?: number;
+    consentTimeout?: number;
+    syncManaged?: boolean;
+    osPinDialog?: boolean;
+    containerDownloadTimeout?: number;
+    localTestMode?: boolean;
 }
-class GCLConfig {
+export class GCLConfig {
     constructor(options: GCLConfigOptions);
     readonly authUrl: string;
     readonly ocvUrl: string;
@@ -108,17 +106,17 @@ class GCLConfig {
 export { CoreService };
 class CoreService implements AbstractCore {
     constructor(url: string, connection: LocalAuthConnection);
-    getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string, alertPosition?: string, type?: string, timeoutInSeconds?: number, callback?: (error: CoreExceptions.RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
-    getImplicitConsent(codeWord: string, durationInDays?: number, type?: string, callback?: (error: CoreExceptions.RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
-    info(callback?: (error: CoreExceptions.RestException, data: InfoResponse) => void): Promise<InfoResponse>;
-    infoBrowser(callback?: (error: CoreExceptions.RestException, data: BrowserInfoResponse) => void): Promise<BrowserInfoResponse>;
-    pollCardInserted(secondsToPollCard?: number, callback?: (error: CoreExceptions.RestException, data: CardReader) => void, connectReaderCb?: () => void, insertCardCb?: () => void, cardTimeoutCb?: () => void): Promise<CardReader>;
-    pollReadersWithCards(secondsToPollCard?: number, callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void, connectReaderCb?: () => void, insertCardCb?: () => void, cardTimeoutCb?: () => void): Promise<CardReadersResponse>;
-    pollReaders(secondsToPollReader?: number, callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void, connectReaderCb?: () => void, readerTimeoutCb?: () => void): Promise<CardReadersResponse>;
-    reader(reader_id: string, callback?: (error: CoreExceptions.RestException, data: SingleReaderResponse) => void): Promise<SingleReaderResponse>;
-    readers(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
-    readersCardAvailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
-    readersCardsUnavailable(callback?: (error: CoreExceptions.RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
+    getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string, alertPosition?: string, type?: string, timeoutInSeconds?: number, callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
+    getImplicitConsent(codeWord: string, durationInDays?: number, type?: string, callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
+    info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>;
+    infoBrowser(callback?: (error: RestException, data: BrowserInfoResponse) => void): Promise<BrowserInfoResponse>;
+    pollCardInserted(secondsToPollCard?: number, callback?: (error: RestException, data: CardReader) => void, connectReaderCb?: () => void, insertCardCb?: () => void, cardTimeoutCb?: () => void): Promise<CardReader>;
+    pollReadersWithCards(secondsToPollCard?: number, callback?: (error: RestException, data: CardReadersResponse) => void, connectReaderCb?: () => void, insertCardCb?: () => void, cardTimeoutCb?: () => void): Promise<CardReadersResponse>;
+    pollReaders(secondsToPollReader?: number, callback?: (error: RestException, data: CardReadersResponse) => void, connectReaderCb?: () => void, readerTimeoutCb?: () => void): Promise<CardReadersResponse>;
+    reader(reader_id: string, callback?: (error: RestException, data: SingleReaderResponse) => void): Promise<SingleReaderResponse>;
+    readers(callback?: (error: RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
+    readersCardAvailable(callback?: (error: RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
+    readersCardsUnavailable(callback?: (error: RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
     infoBrowserSync(): BrowserInfoResponse;
     getUrl(): string;
     version(): Promise<string>;

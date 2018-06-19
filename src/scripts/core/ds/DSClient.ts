@@ -31,22 +31,22 @@ class DSClient implements AbstractDSClient {
         return this.url;
     }
 
-    public getInfo(callback?: (error: CoreExceptions.RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse> {
+    public getInfo(callback?: (error: RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse> {
         return this.connection.get(this.url, SYS_INFO, undefined, undefined, callback);
     }
 
     public getDevice(uuid: string,
-                     callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse> {
+                     callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse> {
         return this.connection.get(this.url, DEVICE + SEPARATOR + uuid, undefined, undefined, callback);
     }
 
     public getPubKey(uuid: string,
-                     callback?: (error: CoreExceptions.RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse> {
+                     callback?: (error: RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse> {
         return this.connection.get(this.url, PUB_KEY + SEPARATOR + uuid, undefined, undefined, callback);
     }
 
     public downloadLink(downloadData: DSDownloadRequest,
-                        callback?: (error: CoreExceptions.RestException,
+                        callback?: (error: RestException,
                                     data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse> {
         let self = this;
         if (callback) {
@@ -81,12 +81,12 @@ class DSClient implements AbstractDSClient {
     }
 
     public register(registrationData: DSRegistrationOrSyncRequest,
-                    callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse> {
+                    callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse> {
         return this.connection.put(this.url, DEVICE + SEPARATOR + registrationData.uuid, registrationData, undefined, undefined, callback);
     }
 
     public sync(syncData: DSRegistrationOrSyncRequest,
-                callback?: (error: CoreExceptions.RestException, data: DeviceResponse) => void): Promise<DeviceResponse> {
+                callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse> {
         return this.connection.post(this.url, DEVICE + SEPARATOR + syncData.uuid, syncData, undefined, undefined, callback);
     }
 

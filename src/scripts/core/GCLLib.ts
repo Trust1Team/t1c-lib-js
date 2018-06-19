@@ -115,7 +115,7 @@ class GCLClient {
     }
 
     public static initialize(cfg: GCLConfig,
-                             callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): Promise<GCLClient> {
+                             callback?: (error: RestException, client: GCLClient) => void): Promise<GCLClient> {
         return new Promise((resolve, reject) => {
             const initTime = moment();
             let client = new GCLClient(cfg, true);
@@ -299,7 +299,7 @@ class GCLClient {
     // implicit download GCL instance when not found
     private implicitDownload() {
         let self = this;
-        this.core().info(function (error: CoreExceptions.RestException) {
+        this.core().info(function (error: RestException) {
             console.log('implicit error', JSON.stringify(error));
             if (error) {
                 // no gcl available - start download
@@ -308,7 +308,7 @@ class GCLClient {
                 let downloadData = new DSDownloadRequest(_info.data.browser,
                     _info.data.manufacturer, _info.data.os, _info.data.ua, self.config().gwUrl);
                 self.ds().downloadLink(downloadData,
-                    function (linkError: CoreExceptions.RestException, downloadResponse: DSDownloadLinkResponse) {
+                    function (linkError: RestException, downloadResponse: DSDownloadLinkResponse) {
                         if (linkError) {
                             console.error('could not download GCL package:', linkError.description);
                         }

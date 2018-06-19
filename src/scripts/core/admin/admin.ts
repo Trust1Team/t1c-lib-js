@@ -3,7 +3,6 @@
  * @since 2018
  */
 import { LocalAuthAdminConnection } from '../client/Connection';
-import * as CoreExceptions from '../exceptions/CoreExceptions';
 import {
     AbstractAdmin, AtrListRequest, ContainerSyncRequest, PubKeyResponse, ResolvedAgent, ResolvedAgentResponse,
     SetPubKeyRequest
@@ -46,35 +45,35 @@ class AdminService implements AbstractAdmin {
         }
     }
 
-    public activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+    public activate(callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.post(this.url, CORE_ACTIVATE, {}, callback);
     }
 
-    public atr(atrList: AtrListRequest, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+    public atr(atrList: AtrListRequest, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.post(this.url, CORE_ATR_LIST, atrList, callback);
     }
 
-    public getLogfile(name: string, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+    public getLogfile(name: string, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.getLogFile(this.url, CORE_LOGFILE + '/' + name, callback);
     }
 
-    public getLogfileList(callback?: (error: CoreExceptions.RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
+    public getLogfileList(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
         return this.getLogfiles(this.url, CORE_LOGFILE, callback);
     }
 
-    public getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse)
+    public getPubKey(callback?: (error: RestException, data: PubKeyResponse)
         => void): Promise<PubKeyResponse> {
         return this.getPubKeys(this.url, CORE_PUB_KEY, callback);
     }
 
     public setPubKey(keys: SetPubKeyRequest,
-                     callback?: (error: CoreExceptions.RestException, data: PubKeyResponse)
+                     callback?: (error: RestException, data: PubKeyResponse)
                          => void): Promise<PubKeyResponse> {
         return this.put(this.url, CORE_PUB_KEY, keys, callback);
     }
 
     public updateContainerConfig(containers: ContainerSyncRequest,
-                                 callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+                                 callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.post(this.url, CORE_CONTAINERS, containers, callback);
     }
 
