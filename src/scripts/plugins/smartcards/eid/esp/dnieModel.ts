@@ -4,20 +4,16 @@
  */
 import {RestException} from '../../../../core/exceptions/CoreExceptions';
 import {OptionalPin, SecuredCertCard} from '../../Card';
-import {
-    CertificateResponse, DataObjectResponse, DataResponse, T1CCertificate,
-    T1CResponse
-} from '../../../../core/service/CoreModel';
+import {CertificateResponse, DataObjectResponse, T1CCertificate} from '../../../../core/service/CoreModel';
 import {Options} from '../../../../util/RequestHandler';
 
 export {AbstractDNIe, AllCertsResponse, AllDataResponse, InfoResponse, AllDNIeData, AllDNIeCerts, Info};
 
 
 interface AbstractDNIe extends SecuredCertCard {
-    allData(options: Options, body: OptionalPin,
-            callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+    allData(filters: string[] | Options, body: OptionalPin, callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
 
-    allCerts(options: Options, callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
+    allCerts(options: Options, body: OptionalPin, callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
 
     info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>
 
@@ -51,7 +47,7 @@ class AllDataResponse extends AllCertsResponse {
 }
 
 class AllDNIeData {
-    constructor(public info: Info,
+    constructor(public info?: Info,
                 public authentication_certificate?: T1CCertificate,
                 public intermediate_certificate?: T1CCertificate,
                 public signing_certificate?: T1CCertificate) {

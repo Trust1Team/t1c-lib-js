@@ -3,18 +3,18 @@
  * @author Maarten Somers
  * @since 2016
  */
-import { RestException } from '../../../../core/exceptions/CoreExceptions';
-import { CertificateResponse } from '../../../../core/service/CoreModel';
-import { GenericCertCard } from '../../Card';
-import { AbstractDNIe, InfoResponse } from './dnieModel';
-import { Options, RequestHandler } from '../../../../util/RequestHandler';
-import { CertParser } from '../../../../util/CertParser';
-import { ResponseHandler } from '../../../../util/ResponseHandler';
+import {RestException} from '../../../../core/exceptions/CoreExceptions';
+import {CertificateResponse} from '../../../../core/service/CoreModel';
+import {GenericSecuredCertCard} from '../../Card';
+import {AbstractDNIe, InfoResponse} from './dnieModel';
+import {Options, RequestHandler} from '../../../../util/RequestHandler';
+import {CertParser} from '../../../../util/CertParser';
+import {ResponseHandler} from '../../../../util/ResponseHandler';
 
-export { DNIe };
+export {DNIe};
 
 
-class DNIe extends GenericCertCard implements AbstractDNIe {
+class DNIe extends GenericSecuredCertCard implements AbstractDNIe {
     static INFO = '/info';
     static CERT_INTERMEDIATE = '/intermediate';
 
@@ -34,13 +34,14 @@ class DNIe extends GenericCertCard implements AbstractDNIe {
         });
     }
 
-    public authenticationCertificate(options?: Options,
-                                     callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
-        return this.getCertificate(DNIe.CERT_AUTHENTICATION, RequestHandler.determineOptions(options, callback));
+    // TODO is optional pace/pin needed?
+    public authenticationCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
+        return this.getCertificate(DNIe.CERT_AUTHENTICATION, {}, RequestHandler.determineOptions(options, callback));
     }
 
+    // TODO is optional pace/pin needed?
     public signingCertificate(options?: Options,
                               callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
-        return this.getCertificate(DNIe.CERT_SIGNING, RequestHandler.determineOptions(options, callback));
+        return this.getCertificate(DNIe.CERT_SIGNING, {}, RequestHandler.determineOptions(options, callback));
     }
 }
