@@ -71,7 +71,7 @@ class DataResponse extends T1CResponse {
 }
 
 class DataArrayResponse extends T1CResponse {
-    constructor(public data: string[], public success: boolean) {
+    constructor(public data: any[], public success: boolean) {
         super(success, data);
     }
 }
