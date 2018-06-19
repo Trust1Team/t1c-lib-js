@@ -53,7 +53,7 @@ describe('Belgian eID Container', () => {
     describe('address', function () {
         beforeEach(function () {
             mock.onGet('containers/beid/123/address').reply(() => {
-                return [ 200, { data: 'Address Data', success: true }];
+                return [ 200, { data: 'BeidAddress Data', success: true }];
             });
         });
 
@@ -65,7 +65,7 @@ describe('Belgian eID Container', () => {
 
                 expect(res).to.have.property('data');
                 expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Address Data');
+                expect(res.data).to.eq('BeidAddress Data');
             });
         });
     });
