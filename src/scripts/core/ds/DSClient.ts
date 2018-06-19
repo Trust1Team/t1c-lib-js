@@ -9,6 +9,7 @@ import {
     AbstractDSClient, DeviceResponse, DSDownloadLinkResponse, DSDownloadRequest,
     DSInfoResponse, DSPubKeyResponse, DSRegistrationOrSyncRequest
 } from './DSClientModel';
+import {RestException} from '../exceptions/CoreExceptions';
 
 export {DSClient};
 
