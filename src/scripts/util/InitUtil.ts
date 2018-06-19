@@ -25,7 +25,7 @@ class InitUtil {
      * @param {GCLClient} client
      * @returns {Promise<any>}
      */
-    public static initializeLibrary(client: GCLClient) {
+    public static initializeLibrary(client: GCLClient): Promise<GCLClient> {
         return new Promise((finalResolve, finalReject) => {
             let initPromise = new Promise((resolve, reject) => {
                 let cfg = client.config();

@@ -55,7 +55,7 @@ class AuthenticateOrSignData extends OptionalPin {
 }
 
 class VerifyPinData extends OptionalPin {
-    constructor(public private_key_reference: string, public pin: string, public pace?: string) {
+    constructor(public private_key_reference?: string, public pin?: string, public pace?: string) {
         super(pin, pace);
     }
 }
