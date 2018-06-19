@@ -8,8 +8,6 @@ import {AbstractAuth} from './AuthModel';
 import {RestException} from '../exceptions/CoreExceptions';
 import {DSJWTResponse} from '../ds/DSClientModel';
 
-export {AuthClient};
-
 
 const TOKEN = '/login/application/token';
 const REFRESH = '/login/token/refresh';
@@ -17,7 +15,7 @@ const REFRESH = '/login/token/refresh';
 /**
  * Methods for API Gateway JWT token retrieval/refreshing
  */
-class AuthClient implements AbstractAuth {
+export class AuthClient implements AbstractAuth {
     private url;
 
     constructor(private cfg: GCLConfig, private connection: RemoteApiKeyConnection) {

@@ -9,8 +9,6 @@ import {
     ChallengeSignedHashResponse, OCVInfoResponse, SignatureValidationData, SignatureValidationResponse
 } from './OCVModel';
 
-export { OCVClient };
-
 
 const CHALLENGE = '/challenge';
 const CERTIFICATE = '/certs/validate-chain';
@@ -20,7 +18,7 @@ const SIGNATURE = '/signature/validate';
 /**
  * Provides access to OCV endpoints
  */
-class OCVClient implements AbstractOCVClient {
+export class OCVClient implements AbstractOCVClient {
 
     constructor(private url: string, private connection: RemoteJwtConnection) {}
 

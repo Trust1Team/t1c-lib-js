@@ -14,8 +14,6 @@ import { InitUtil } from '../../util/InitUtil';
 import { RestException } from '../exceptions/CoreExceptions';
 import { ClientService } from '../../util/ClientService';
 
-export { AdminService };
-
 
 const CORE_ACTIVATE = '/admin/activate';
 const CORE_ATR_LIST = '/admin/atr';
@@ -28,7 +26,7 @@ const CORE_AGENT_RESOLVE = '/agent/resolve';
  * Provides access to the /admin endpoints
  * All calls wil be automatically retried if a JWT related error is encountered
  */
-class AdminService implements AbstractAdmin {
+export class AdminService implements AbstractAdmin {
     static JWT_ERROR_CODES = [ '200', '201', '202', '203', '204', '205'];
 
     // constructor

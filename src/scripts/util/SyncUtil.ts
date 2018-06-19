@@ -13,9 +13,7 @@ import { T1CContainer } from '../core/service/CoreModel';
 import { ContainerSyncRequest } from '../core/admin/adminModel';
 import { ActivationUtil } from './ActivationUtil';
 
-export { SyncUtil };
-
-class SyncUtil {
+export class SyncUtil {
     static readonly DOWNLOAD_ERROR = 'DOWNLOAD_ERROR';
     static readonly GENERIC_ERROR = 'ERROR';
     static readonly ERROR_STATES = [ SyncUtil.DOWNLOAD_ERROR, SyncUtil.GENERIC_ERROR ];

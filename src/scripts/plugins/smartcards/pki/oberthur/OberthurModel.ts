@@ -10,10 +10,8 @@ import {
 import {CertCard, VerifyPinData} from '../../Card';
 import {Options} from '../../../../util/RequestHandler';
 
-export {AbstractOberthur, OberthurAllCertsResponse, OberthurAllDataResponse, OberthurAllCerts};
 
-
-interface AbstractOberthur extends CertCard {
+export interface AbstractOberthur extends CertCard {
     allDataFilters(): string[];
 
     allCertFilters(): string[];
@@ -45,13 +43,13 @@ interface AbstractOberthur extends CertCard {
 }
 
 
-class OberthurAllCertsResponse extends DataObjectResponse {
+export class OberthurAllCertsResponse extends DataObjectResponse {
     constructor(public data: OberthurAllCerts, public success: boolean) {
         super(data, success);
     }
 }
 
-class OberthurAllCerts {
+export class OberthurAllCerts {
     constructor(public root_certificate?: T1CCertificate,
                 public issuer_certificate?: T1CCertificate,
                 public authentication_certificate?: T1CCertificate,
@@ -60,7 +58,7 @@ class OberthurAllCerts {
     }
 }
 
-class OberthurAllDataResponse extends OberthurAllCertsResponse {
+export class OberthurAllDataResponse extends OberthurAllCertsResponse {
     constructor(public data: OberthurAllCerts, public success: boolean) {
         super(data, success);
     }

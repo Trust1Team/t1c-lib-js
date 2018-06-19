@@ -33,25 +33,25 @@ const defaults = {
 /**
  * GCL Config Options object. Contains all user-configurable configuration settings. Used to initialize GCLConfig.
  */
-export class GCLConfigOptions {
-    public gclUrl?: string;
-    public gwOrProxyUrl?: string;
-    public apiKey?: string;
-    public gwJwt?: string;
-    public ocvContextPath?: string;
-    public dsContextPath?: string;
-    public dsFileContextPath?: string;
-    public pkcs11Config?: Pkcs11ModuleConfig;
-    public agentPort?: number;
-    public implicitDownload?: boolean;
-    public forceHardwarePinpad?: boolean;
-    public sessionTimeout?: number;
-    public consentDuration?: number;
-    public consentTimeout?: number;
-    public syncManaged?: boolean;
-    public osPinDialog?: boolean;
-    public containerDownloadTimeout?: number;
-    public localTestMode?: boolean;
+export interface GCLConfigOptions {
+     gclUrl?: string;
+     gwOrProxyUrl?: string;
+     apiKey?: string;
+     gwJwt?: string;
+     ocvContextPath?: string;
+     dsContextPath?: string;
+     dsFileContextPath?: string;
+     pkcs11Config?: Pkcs11ModuleConfig;
+     agentPort?: number;
+     implicitDownload?: boolean;
+     forceHardwarePinpad?: boolean;
+     sessionTimeout?: number;
+     consentDuration?: number;
+     consentTimeout?: number;
+     syncManaged?: boolean;
+     osPinDialog?: boolean;
+     containerDownloadTimeout?: number;
+     localTestMode?: boolean;
 }
 
 /**
@@ -87,7 +87,7 @@ export class GCLConfig {
     private _isManaged: boolean;
 
     // constructor for DTO
-    constructor(options: GCLConfigOptions) {
+    public constructor(options: GCLConfigOptions) {
         this._gclUrl = options.gclUrl || defaults.gclUrl;
         this._gwUrl = options.gwOrProxyUrl || defaults.gwUrl;
         this._dsContextPath = options.dsContextPath || defaults.dsContextPath;

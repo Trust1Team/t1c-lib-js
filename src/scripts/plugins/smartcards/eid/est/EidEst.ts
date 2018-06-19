@@ -1,2 +1,1 @@
-interface AbstractEidEST {}
-export { AbstractEidEST }
+export interface AbstractEidEST {}

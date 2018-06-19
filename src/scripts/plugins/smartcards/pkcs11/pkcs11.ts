@@ -15,12 +15,10 @@ import { PinEnforcer } from '../../../util/PinEnforcer';
 
 /**
  * @author Maarten Somers
+ * @author Michallis Pashidis
  */
 
-
-export { PKCS11 };
-
-class PKCS11 implements AbstractPkcs11 {
+export class PKCS11 implements AbstractPkcs11 {
     static ALL_CERTIFICATES = '/certificates';
     static INFO = '/info';
     static SIGN = '/sign';

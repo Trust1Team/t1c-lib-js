@@ -14,9 +14,7 @@ import {Aventra} from '../../plugins/smartcards/pki/aventra/Aventra';
 import {Options} from '../../util/RequestHandler';
 import {SyncUtil} from '../../util/SyncUtil';
 
-export {GenericService};
-
-class Arguments {
+export class Arguments {
     constructor(public client: GCLClient,
                 public readerId: string,
                 public container: string,
@@ -28,7 +26,7 @@ class Arguments {
 }
 
 
-class GenericService {
+export class GenericService {
     static PKCS11_FLAGS = [1, 3, 5, 7];
 
     public static containerForReader(client: GCLClient,

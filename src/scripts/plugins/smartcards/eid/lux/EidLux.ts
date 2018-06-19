@@ -16,9 +16,7 @@ import { CertParser } from '../../../../util/CertParser';
 import { ResponseHandler } from '../../../../util/ResponseHandler';
 import { Options, RequestHandler, RequestOptions } from '../../../../util/RequestHandler';
 
-export { EidLux };
-
-class EidLux extends GenericCertCard implements AbstractEidLUX {
+export class EidLux extends GenericCertCard implements AbstractEidLUX {
     static BIOMETRIC = '/biometric';
     static ADDRESS = '/address';
     static PHOTO = '/picture';

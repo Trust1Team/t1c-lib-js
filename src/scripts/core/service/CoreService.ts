@@ -9,8 +9,6 @@ import { ResponseHandler } from '../../util/ResponseHandler';
 import {AbstractCore, BoolDataResponse, BrowserInfoResponse, CardReader, CardReadersResponse, InfoResponse, SingleReaderResponse} from './CoreModel';
 import {RestException} from '../exceptions/CoreExceptions';
 
-export { CoreService };
-
 
 const CORE_CONSENT = '/consent';
 const CORE_INFO = '/';
@@ -20,7 +18,7 @@ const CORE_CONSENT_IMPLICIT = '/consent/implicit';
 /**
  * Core service fucntions: GCL information, reader detection, consent, polling, etc.
  */
-class CoreService implements AbstractCore {
+export class CoreService implements AbstractCore {
     // constructor
     constructor(private url: string, private connection: LocalAuthConnection) {}
 

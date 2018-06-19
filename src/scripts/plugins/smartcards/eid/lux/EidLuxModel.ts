@@ -9,13 +9,8 @@ import {
 } from '../../../../core/service/CoreModel';
 import {Options} from '../../../../util/RequestHandler';
 
-export {
-    AbstractEidLUX, AllCertsResponse, LuxAllDataResponse, LuxidBiometric, LuxidBiometricResponse,
-    LuxidPicture, LuxidPictureResponse, LuxidSignatureImage, LuxidSignatureImageResponse, LuxidAllData, LuxidAllCerts
-};
 
-
-interface AbstractEidLUX extends CertCard {
+export interface AbstractEidLUX extends CertCard {
     allDataFilters(): string[];
 
     allCertFilters(): string[];
@@ -40,26 +35,26 @@ interface AbstractEidLUX extends CertCard {
     signatureImage(callback?: (error: RestException, data: LuxidSignatureImageResponse) => void): Promise<LuxidSignatureImageResponse>;
 }
 
-class AllCertsResponse extends DataObjectResponse {
+export class AllCertsResponse extends DataObjectResponse {
     constructor(public data: LuxidAllCerts, public success: boolean) {
         super(data, success);
     }
 }
 
-class LuxidAllCerts {
+export class LuxidAllCerts {
     constructor(public authentication_certificate?: T1CCertificate,
                 public non_repudiation_certificate?: T1CCertificate,
                 public root_certificates?: T1CCertificate[]) {
     }
 }
 
-class LuxAllDataResponse extends AllCertsResponse {
+export class LuxAllDataResponse extends AllCertsResponse {
     constructor(public data: LuxidAllData, public success: boolean) {
         super(data, success);
     }
 }
 
-class LuxidAllData extends LuxidAllCerts {
+export class LuxidAllData extends LuxidAllCerts {
     constructor(public authentication_certificate?: T1CCertificate,
                 public non_repudiation_certificate?: T1CCertificate,
                 public root_certificates?: T1CCertificate[],
@@ -71,7 +66,7 @@ class LuxidAllData extends LuxidAllCerts {
     }
 }
 
-class LuxidBiometric {
+export class LuxidBiometric {
     constructor(public birthData?: string,
                 public documentNumber?: string,
                 public documentType?: string,
@@ -85,13 +80,13 @@ class LuxidBiometric {
     }
 }
 
-class LuxidBiometricResponse extends DataObjectResponse {
+export class LuxidBiometricResponse extends DataObjectResponse {
     constructor(public data: LuxidBiometric, public success: boolean) {
         super(data, success);
     }
 }
 
-class LuxidPicture {
+export class LuxidPicture {
     constructor(public height: number,
                 public width: number,
                 public image: string,
@@ -99,18 +94,18 @@ class LuxidPicture {
     }
 }
 
-class LuxidPictureResponse extends DataObjectResponse {
+export class LuxidPictureResponse extends DataObjectResponse {
     constructor(public data: LuxidPicture, public success: boolean) {
         super(data, success);
     }
 }
 
-class LuxidSignatureImage {
+export class LuxidSignatureImage {
     constructor(public image: string, public raw_data: string) {
     }
 }
 
-class LuxidSignatureImageResponse extends DataObjectResponse {
+export class LuxidSignatureImageResponse extends DataObjectResponse {
     constructor(public data: LuxidSignatureImage, public success: boolean) {
         super(data, success);
     }

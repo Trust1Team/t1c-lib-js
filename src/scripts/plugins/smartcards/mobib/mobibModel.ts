@@ -7,10 +7,7 @@ import {DataArrayResponse, DataObjectResponse, DataResponse} from '../../../core
 import { Card } from '../Card';
 import {Options} from '../../../util/RequestHandler';
 
-export { AbstractMobib, MobibAllDataResponse, MobibStatusResponse, MobibCardIssuing, MobibCardIssuingResponse, MobibContract, MobibContractsResponse };
-
-
-interface AbstractMobib extends Card {
+export interface AbstractMobib extends Card {
     allData(filters: string[]| Options, callback?: (error: RestException, data: MobibAllDataResponse) => void): Promise<MobibAllDataResponse>;
     cardIssuing(callback?: (error: RestException, data: MobibCardIssuingResponse) => void): Promise<MobibCardIssuingResponse>;
     contracts(callback?: (error: RestException, data: MobibContractsResponse) => void): Promise<MobibContractsResponse>;
@@ -18,20 +15,20 @@ interface AbstractMobib extends Card {
     status(callback?: (error: RestException, data: MobibStatusResponse) => void): Promise<MobibStatusResponse>;
 }
 
-class MobibAllDataResponse extends DataObjectResponse {
+export class MobibAllDataResponse extends DataObjectResponse {
     constructor(public data: { active?: boolean, 'card-issuing'?: MobibCardIssuing, contracts?: MobibContract[], picture?: string },
                 public success: boolean) {
         super(data, success);
     }
 }
 
-class MobibStatusResponse extends DataObjectResponse {
+export class MobibStatusResponse extends DataObjectResponse {
     constructor(public data: { active: boolean }, public success: boolean) {
         super(data, success);
     }
 }
 
-class MobibCardIssuing {
+export class MobibCardIssuing {
     constructor(public card_expiration_date?: string,
                 public card_holder_birth_date?: string,
                 public card_holder_end_date?: string,
@@ -46,13 +43,13 @@ class MobibCardIssuing {
                 public version?: number) {}
 }
 
-class MobibCardIssuingResponse extends DataObjectResponse {
+export class MobibCardIssuingResponse extends DataObjectResponse {
     constructor(public data: MobibCardIssuing, public success: boolean) {
         super(data, success);
     }
 }
 
-class MobibContract {
+export class MobibContract {
     constructor(public authenticator_kvc?: number,
                 public authenticator_value?: number,
                 public journey_interchanges_allowed?: boolean,
@@ -86,7 +83,7 @@ class MobibContract {
                 public version?: number) {}
 }
 
-class MobibContractsResponse extends DataArrayResponse {
+export class MobibContractsResponse extends DataArrayResponse {
     constructor(public data: MobibContract[], public success: boolean) {
         super(data, success);
     }

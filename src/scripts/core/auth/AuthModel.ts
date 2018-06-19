@@ -6,16 +6,14 @@
 
 import {RestException} from '../exceptions/CoreExceptions';
 
-export {AbstractAuth, JWTResponse};
 
-
-interface AbstractAuth {
+export interface AbstractAuth {
     getJWT(callback?: (error: RestException, data: JWTResponse) => void): Promise<JWTResponse>;
 
     refreshJWT(currentJWT: string, callback?: (error: RestException, data: JWTResponse) => void): Promise<JWTResponse>;
 }
 
-class JWTResponse {
+export class JWTResponse {
     constructor(public token: string) {
     }
 }

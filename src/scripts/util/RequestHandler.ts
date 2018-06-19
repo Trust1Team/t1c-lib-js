@@ -3,17 +3,15 @@
  */
 import * as _ from 'lodash';
 
-export { RequestHandler, Options, RequestOptions };
-
-class Options {
+export class Options {
     constructor(public parseCerts: boolean, public filters?: string[]) {}
 }
 
-class RequestOptions {
+export class RequestOptions {
     constructor(public parseCerts: boolean, public params?: { [key: string]: string}, public callback?: () => void) {}
 }
 
-class RequestHandler {
+export class RequestHandler {
     // TODO deprecate for v3
     // maintains backward compatibility with the old request style
     public static determineOptions(firstParam: any, secondParam: any): RequestOptions {

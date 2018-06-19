@@ -22185,14 +22185,14 @@ var GCLLib =
 	    return BrowserInfo;
 	}());
 	exports.BrowserInfo = BrowserInfo;
-	var Card = (function () {
-	    function Card(atr, description) {
+	var SmartCard = (function () {
+	    function SmartCard(atr, description) {
 	        this.atr = atr;
 	        this.description = description;
 	    }
-	    return Card;
+	    return SmartCard;
 	}());
-	exports.Card = Card;
+	exports.SmartCard = SmartCard;
 	var CardReader = (function () {
 	    function CardReader(id, name, pinpad, card) {
 	        this.id = id;
@@ -46618,7 +46618,9 @@ var GCLLib =
 	            return new Promise(function (resolve, reject) {
 	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.reader_id, body).then(function () {
 	                    resolve(_this.connection.post(_this.baseUrl, _this.containerSuffix(Ocra.CHALLENGE), body, undefined));
-	                }, function (error) { reject(error); });
+	                }, function (error) {
+	                    reject(error);
+	                });
 	            });
 	        }
 	    };
@@ -46635,7 +46637,9 @@ var GCLLib =
 	            return new Promise(function (resolve, reject) {
 	                PinEnforcer_1.PinEnforcer.check(_this.connection, _this.reader_id, body).then(function () {
 	                    resolve(_this.connection.get(_this.baseUrl, _this.containerSuffix(Ocra.READ_COUNTER), { pin: body.pin }, undefined));
-	                }, function (error) { reject(error); });
+	                }, function (error) {
+	                    reject(error);
+	                });
 	            });
 	        }
 	    };
@@ -47509,16 +47513,14 @@ var GCLLib =
 	(function (TypeStatus) {
 	    TypeStatus[TypeStatus["MAPPED"] = 0] = "MAPPED";
 	    TypeStatus[TypeStatus["UNMAPPED"] = 1] = "UNMAPPED";
-	})(TypeStatus || (TypeStatus = {}));
-	exports.TypeStatus = TypeStatus;
+	})(TypeStatus = exports.TypeStatus || (exports.TypeStatus = {}));
 	var FileAction;
 	(function (FileAction) {
 	    FileAction[FileAction["UPLOAD"] = 0] = "UPLOAD";
 	    FileAction[FileAction["DOWNLOAD"] = 1] = "DOWNLOAD";
 	    FileAction[FileAction["COPY"] = 2] = "COPY";
 	    FileAction[FileAction["MOVE"] = 3] = "MOVE";
-	})(FileAction || (FileAction = {}));
-	exports.FileAction = FileAction;
+	})(FileAction = exports.FileAction || (exports.FileAction = {}));
 	var ModalType = (function () {
 	    function ModalType() {
 	    }
@@ -47713,6 +47715,7 @@ var GCLLib =
 	    }
 	    return Arguments;
 	}());
+	exports.Arguments = Arguments;
 	var GenericService = (function () {
 	    function GenericService() {
 	    }

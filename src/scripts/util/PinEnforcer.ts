@@ -7,11 +7,9 @@ import { PubKeyService } from './PubKeyService';
 import { RestException } from '../core/exceptions/CoreExceptions';
 import { GCLConfig } from '../core/GCLConfig';
 
-export { PinEnforcer, EncryptedOptionalPin };
-
 const CORE_READERS = '/card-readers';
 
-class PinEnforcer {
+export class PinEnforcer {
 
     // TODO figure out how to use generics to return a Promise with correct type
     public static check(connection: GenericConnection,
@@ -83,6 +81,6 @@ class PinEnforcer {
     }
 }
 
-class EncryptedOptionalPin {
+export class EncryptedOptionalPin {
     constructor(public os_dialog?: boolean, public pinpad?: boolean, public pin?: string, public pace?: string) {}
 }

@@ -14,9 +14,7 @@ import { GenericConnection } from '../core/client/Connection';
 import { AxiosError, AxiosResponse } from 'axios';
 import axios from 'axios';
 
-export { InitUtil };
-
-class InitUtil {
+export class InitUtil {
     // constructor
     constructor() {}
 

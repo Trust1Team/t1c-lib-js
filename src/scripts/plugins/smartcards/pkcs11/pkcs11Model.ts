@@ -10,11 +10,8 @@ import {
 import { Options } from '../../../util/RequestHandler';
 import { AuthenticateOrSignData } from '../Card';
 
-export { AbstractPkcs11, Pkcs11InfoResponse, Pkcs11Certificate, Pkcs11CertificatesResponse, Pkcs11Info,
-    Pkcs11SignData, Pkcs11VerifySignedData, Pkcs11Slot, Pkcs11SlotsResponse, Pkcs11TokenInfo, Pkcs11TokenResponse, Pkcs11ModuleConfig };
 
-
-interface AbstractPkcs11 {
+export interface AbstractPkcs11 {
     certificates(slotId: number,
                  options?: Options,
                  callback?: (error: RestException, data: Pkcs11CertificatesResponse) => void): Promise<Pkcs11CertificatesResponse>;
@@ -27,13 +24,13 @@ interface AbstractPkcs11 {
                      callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
 }
 
-class Pkcs11InfoResponse extends DataObjectResponse {
+export class Pkcs11InfoResponse extends DataObjectResponse {
     constructor(public data: Pkcs11Info, public success: boolean) {
         super(data, success);
     }
 }
 
-class Pkcs11Info {
+export class Pkcs11Info {
     constructor(public cryptoki_version: string,
                 public manufacturer_id: string,
                 public flags: string,
@@ -41,7 +38,7 @@ class Pkcs11Info {
                 public library_version: string) {}
 }
 
-class Pkcs11Slot {
+export class Pkcs11Slot {
     constructor(public slot_id: string,
                 public description: string,
                 public flags: number,
@@ -49,25 +46,25 @@ class Pkcs11Slot {
                 public firmware_version: string) {}
 }
 
-class Pkcs11SlotsResponse extends DataObjectResponse {
+export class Pkcs11SlotsResponse extends DataObjectResponse {
     constructor(public data: Pkcs11Slot[], public success: boolean) {
         super(data, success);
     }
 }
 
-class Pkcs11Certificate extends T1CCertificate {
+export class Pkcs11Certificate extends T1CCertificate {
     constructor(public id: string, public base64: string, public parsed?: object) {
         super(base64, id, parsed);
     }
 }
 
-class Pkcs11CertificatesResponse extends CertificatesResponse {
+export class Pkcs11CertificatesResponse extends CertificatesResponse {
     constructor(public data: Pkcs11Certificate[], public success: boolean) {
         super(data, success);
     }
 }
 
-class Pkcs11SignData extends AuthenticateOrSignData {
+export class Pkcs11SignData extends AuthenticateOrSignData {
     constructor(public slot_id: number,
                 public cert_id: string,
                 public algorithm_reference: string,
@@ -78,7 +75,7 @@ class Pkcs11SignData extends AuthenticateOrSignData {
     }
 }
 
-class Pkcs11VerifySignedData extends Pkcs11SignData {
+export class Pkcs11VerifySignedData extends Pkcs11SignData {
     constructor(public slot_id: number,
                 public cert_id: string,
                 public algorithm_reference: string,
@@ -90,7 +87,7 @@ class Pkcs11VerifySignedData extends Pkcs11SignData {
     }
 }
 
-class Pkcs11TokenInfo {
+export class Pkcs11TokenInfo {
     constructor(public slot_id: string,
                 public label: string,
                 public manufacturer_id: string,
@@ -111,12 +108,12 @@ class Pkcs11TokenInfo {
                 public firmware_version: string) {}
 }
 
-class Pkcs11TokenResponse extends DataObjectResponse {
+export class Pkcs11TokenResponse extends DataObjectResponse {
     constructor(public data: Pkcs11TokenInfo, public success: boolean) {
         super(data, success);
     }
 }
 
-class Pkcs11ModuleConfig {
+export class Pkcs11ModuleConfig {
     constructor(public linux: string, public mac: string, public win: string) {}
 }

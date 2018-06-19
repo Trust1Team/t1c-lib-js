@@ -77,22 +77,21 @@ export class PluginFactory implements AbstractFactory {
     public createEidLUX(reader_id?: string, pin?: string): AbstractEidLUX {
         return new EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin);
     }
-
     public createEidPT(reader_id?: string): AbstractEidPT { return new EidPt(this.url, CONTAINER_PTEID, this.connection, reader_id); }
 
-    public createEmv(reader_id?: string): EMV { return new EMV(this.url, CONTAINER_EMV, this.connection, reader_id); }
+    public createEmv(reader_id?: string): AbstractEMV { return new EMV(this.url, CONTAINER_EMV, this.connection, reader_id); }
 
-    public createLuxTrust(reader_id?: string): LuxTrust { return new LuxTrust(this.url, CONTAINER_LUXTRUST, this.connection, reader_id); }
+    public createLuxTrust(reader_id?: string): AbstractLuxTrust { return new LuxTrust(this.url, CONTAINER_LUXTRUST, this.connection, reader_id); }
 
-    public createMobib(reader_id?: string): Mobib { return new Mobib(this.url, CONTAINER_MOBIB, this.connection, reader_id); }
+    public createMobib(reader_id?: string): AbstractMobib { return new Mobib(this.url, CONTAINER_MOBIB, this.connection, reader_id); }
 
-    public createOcra(reader_id?: string): Ocra { return new Ocra(this.url, CONTAINER_OCRA, this.connection, reader_id); }
+    public createOcra(reader_id?: string): AbstractOcra { return new Ocra(this.url, CONTAINER_OCRA, this.connection, reader_id); }
 
-    public createAventraNO(reader_id?: string): Aventra { return new Aventra(this.url, CONTAINER_AVENTRA, this.connection, reader_id); }
+    public createAventraNO(reader_id?: string): AbstractAventra { return new Aventra(this.url, CONTAINER_AVENTRA, this.connection, reader_id); }
 
-    public createOberthurNO(reader_id?: string): Oberthur {return new Oberthur(this.url, CONTAINER_OBERTHUR, this.connection, reader_id); }
+    public createOberthurNO(reader_id?: string): AbstractOberthur {return new Oberthur(this.url, CONTAINER_OBERTHUR, this.connection, reader_id); }
 
-    public createPIV(reader_id?: string): PIV { return new PIV(this.url, CONTAINER_PIV, this.connection, reader_id); }
+    public createPIV(reader_id?: string): AbstractPiv { return new PIV(this.url, CONTAINER_PIV, this.connection, reader_id); }
 
     public createPKCS11(): AbstractPkcs11 {
         return new PKCS11(this.url, CONTAINER_PKCS11, this.connection);

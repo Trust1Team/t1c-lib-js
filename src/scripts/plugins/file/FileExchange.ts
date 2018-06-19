@@ -7,10 +7,8 @@ import {AbstractFileExchange, FileListResponse, FileResponse, FileSort, ModalTyp
 import {RestException} from '../../core/exceptions/CoreExceptions';
 import {BoolDataResponse, DataArrayResponse, DataResponse} from '../../core/service/CoreModel';
 
-export {FileExchange};
 
-
-class FileExchange extends GenericContainer implements AbstractFileExchange {
+export class FileExchange extends GenericContainer implements AbstractFileExchange {
     static DOWNLOAD = '/download';
     static UPLOAD = '/upload';
     static TYPE_CREATE = '/create-type';

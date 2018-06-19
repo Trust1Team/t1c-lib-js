@@ -13,13 +13,8 @@ import {BrowserFingerprint} from '../../util/BrowserFingerprint';
 import {ResponseHandler} from '../../util/ResponseHandler';
 import {DSJWTResponse} from '../ds/DSClientModel';
 
-export {
-    GenericConnection, LocalConnection, LocalAuthConnection, LocalAuthAdminConnection, RemoteApiKeyConnection,
-    RemoteJwtConnection, Connection, LocalTestConnection, RequestBody, RequestHeaders, RequestCallback, SecurityConfig, QueryParams
-};
 
-
-interface Connection {
+export interface Connection {
     get(basePath: string,
         suffix: string,
         queryParams?: QueryParams,
@@ -47,23 +42,23 @@ interface Connection {
            callback?: RequestCallback): Promise<any>;
 }
 
-interface RequestBody {
+export interface RequestBody {
     [key: string]: any
 }
 
-interface QueryParams {
+export interface QueryParams {
     [key: string]: any
 }
 
-interface RequestHeaders {
+export interface RequestHeaders {
     [key: string]: string
 }
 
-interface RequestCallback {
+export interface RequestCallback {
     (error: any, data: any): void
 }
 
-interface SecurityConfig {
+export interface SecurityConfig {
     sendGwJwt: boolean,
     sendGclJwt: boolean,
     sendApiKey: boolean,
@@ -74,7 +69,7 @@ interface SecurityConfig {
 /**
  * Base class for all connection types
  */
-abstract class GenericConnection implements Connection {
+export abstract class GenericConnection implements Connection {
     // consent token = browser fingerprint
     static readonly AUTH_TOKEN_HEADER = 'X-Authentication-Token';
     // key for localStorage for browser fingerprint
@@ -340,7 +335,7 @@ abstract class GenericConnection implements Connection {
 /**
  * Local connection with authorization token, used for protected endpoints
  */
-class LocalAuthAdminConnection extends GenericConnection implements Connection {
+export class LocalAuthAdminConnection extends GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) {
         super(cfg);
     }
@@ -395,7 +390,7 @@ class LocalAuthAdminConnection extends GenericConnection implements Connection {
 /**
  * Local connection with authorization token, used for protected endpoints
  */
-class LocalAuthConnection extends GenericConnection implements Connection {
+export class LocalAuthConnection extends GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) {
         super(cfg);
     }
@@ -471,7 +466,7 @@ class LocalAuthConnection extends GenericConnection implements Connection {
 /**
  * Local connection without security token or keys
  */
-class LocalConnection extends GenericConnection implements Connection {
+export class LocalConnection extends GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) {
         super(cfg);
     }
@@ -627,7 +622,7 @@ class LocalConnection extends GenericConnection implements Connection {
 /**
  * Remote connection which will set API key header
  */
-class RemoteApiKeyConnection extends GenericConnection implements Connection {
+export class RemoteApiKeyConnection extends GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) {
         super(cfg);
     }
@@ -640,7 +635,7 @@ class RemoteApiKeyConnection extends GenericConnection implements Connection {
 /**
  * Remote connection which will set Authorization: Bearer token
  */
-class RemoteJwtConnection extends GenericConnection implements Connection {
+export class RemoteJwtConnection extends GenericConnection implements Connection {
     constructor(public cfg: GCLConfig) {
         super(cfg);
     }
@@ -654,7 +649,7 @@ class RemoteJwtConnection extends GenericConnection implements Connection {
 /**
  * Local testing connection
  */
-class LocalTestConnection extends GenericConnection implements Connection {
+export class LocalTestConnection extends GenericConnection implements Connection {
     config = undefined;
 
     public get(basePath: string,

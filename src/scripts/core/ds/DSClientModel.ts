@@ -6,14 +6,7 @@
 import {BrowserInfo, T1CContainer} from '../service/CoreModel';
 import {RestException} from '../exceptions/CoreExceptions';
 
-export {
-    AbstractDSClient, DSInfoResponse, DSDownloadLinkResponse, DSJWTResponse, DSPubKeyResponse,
-    DeviceResponse, DSPlatformInfo, DSDownloadRequest, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem,
-    DSClientInfo, DSContainer, DSStorage
-};
-
-
-interface AbstractDSClient {
+export interface AbstractDSClient {
     getUrl(): string;
 
     getInfo(callback?: (error: RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
@@ -34,22 +27,22 @@ interface AbstractDSClient {
          callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
 }
 
-class DSBrowser {
+export class DSBrowser {
     constructor(public name: string, public version: string) {
     }
 }
 
-class DSOperatingSystem {
+export class DSOperatingSystem {
     constructor(public architecture: number, public name: string, public version: string) {
     }
 }
 
-class DSClientInfo {
+export class DSClientInfo {
     constructor(public type: string, public version: string) {
     }
 }
 
-class DSDownloadRequest {
+export class DSDownloadRequest {
     constructor(public browser: DSBrowser,
                 public manufacturer: string,
                 public os: DSOperatingSystem,
@@ -58,7 +51,7 @@ class DSDownloadRequest {
     }
 }
 
-class DSRegistrationOrSyncRequest {
+export class DSRegistrationOrSyncRequest {
     constructor(public managed: boolean,
                 public activated: boolean,
                 public uuid: string,
@@ -74,7 +67,7 @@ class DSRegistrationOrSyncRequest {
     }
 }
 
-class DSInfoResponse {
+export class DSInfoResponse {
     constructor(public configFile: string,
                 public build: string,
                 public version: string,
@@ -93,23 +86,23 @@ class DSInfoResponse {
     }
 }
 
-class DSDownloadLinkResponse {
+export class DSDownloadLinkResponse {
     constructor(public url: string, public success: boolean) {
 
     }
 }
 
-class DSJWTResponse {
+export class DSJWTResponse {
     constructor(public token: string) {
     }
 }
 
-class DSPubKeyResponse {
+export class DSPubKeyResponse {
     constructor(public encryptedPublicKey: string, public encryptedAesKey: string, public success: boolean) {
     }
 }
 
-class DeviceResponse {
+export class DeviceResponse {
     constructor(public uuid: string,
                 public activated: boolean,
                 public atrList: { hash: string, storagePath: string },
@@ -120,7 +113,7 @@ class DeviceResponse {
     }
 }
 
-class DSContainer {
+export class DSContainer {
     constructor(public id: string,
                 public name: string,
                 public version: string,
@@ -132,12 +125,12 @@ class DSContainer {
     }
 }
 
-class DSStorage {
+export class DSStorage {
     constructor(public hash: string, public storagePath: string, public os: string) {
     }
 }
 
-class DSPlatformInfo extends BrowserInfo {
+export class DSPlatformInfo extends BrowserInfo {
     constructor(public activated: boolean,
                 public managed: boolean,
                 public bi: BrowserInfo,
