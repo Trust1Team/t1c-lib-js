@@ -11,7 +11,7 @@ import {UrlUtil} from '../../util/UrlUtil';
 import * as store from 'store2';
 import {BrowserFingerprint} from '../../util/BrowserFingerprint';
 import {ResponseHandler} from '../../util/ResponseHandler';
-import {JWTResponse} from '../ds/DSClientModel';
+import {DSJWTResponse} from '../ds/DSClientModel';
 
 export {
     GenericConnection, LocalConnection, LocalAuthConnection, LocalAuthAdminConnection, RemoteApiKeyConnection,
@@ -90,7 +90,7 @@ abstract class GenericConnection implements Connection {
      * @param {(error: RestException, data: JWTResponse) => void} callback
      * @returns {Promise<never>}
      */
-    private static disabledWithoutApiKey(callback: (error: RestException, data: JWTResponse) => void) {
+    private static disabledWithoutApiKey(callback: (error: RestException, data: DSJWTResponse) => void) {
         return ResponseHandler.error(new RestException(412, '901', 'Configuration must contain API key to use this method'), callback);
     }
 

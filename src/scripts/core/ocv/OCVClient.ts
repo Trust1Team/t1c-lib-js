@@ -9,7 +9,7 @@ import {
     ChallengeSignedHashResponse, OCVInfoResponse, SignatureValidationData, SignatureValidationResponse
 } from './OCVModel';
 
-export { AbstractOCVClient, OCVClient };
+export { OCVClient };
 
 
 const CHALLENGE = '/challenge';
