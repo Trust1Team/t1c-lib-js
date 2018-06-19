@@ -4,7 +4,7 @@
  * @since 2016
  */
 
-import { AbstractEMV, ApplicationDataResponse, ApplicationsResponse, EmvCertificateResponse } from './EMVModel';
+import { AbstractEMV, EmvApplicationDataResponse, EmvApplicationsResponse, EmvCertificateResponse } from './EMVModel';
 import { RestException } from '../../../core/exceptions/CoreExceptions';
 import { GenericPinCard } from '../Card';
 
@@ -17,11 +17,11 @@ class EMV extends GenericPinCard implements AbstractEMV {
     static ISSUER_PUBLIC_KEY_CERT = '/issuer-public-key-certificate';
     static ICC_PUBLIC_KEY_CERT = '/icc-public-key-certificate';
 
-    public applicationData(callback?: (error: RestException, data: ApplicationDataResponse) => void): Promise<ApplicationDataResponse> {
+    public applicationData(callback?: (error: RestException, data: EmvApplicationDataResponse) => void): Promise<EmvApplicationDataResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(EMV.APPLICATION_DATA), undefined, undefined, callback);
     }
 
-    public applications(callback?: (error: RestException, data: ApplicationsResponse) => void): Promise<ApplicationsResponse> {
+    public applications(callback?: (error: RestException, data: EmvApplicationsResponse) => void): Promise<EmvApplicationsResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(EMV.APPLICATIONS), undefined, undefined, callback);
     }
 
