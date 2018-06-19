@@ -21995,13 +21995,13 @@ var GCLLib =
 	    return DSDownloadLinkResponse;
 	}());
 	exports.DSDownloadLinkResponse = DSDownloadLinkResponse;
-	var JWTResponse = (function () {
-	    function JWTResponse(token) {
+	var DSJWTResponse = (function () {
+	    function DSJWTResponse(token) {
 	        this.token = token;
 	    }
-	    return JWTResponse;
+	    return DSJWTResponse;
 	}());
-	exports.JWTResponse = JWTResponse;
+	exports.DSJWTResponse = DSJWTResponse;
 	var DSPubKeyResponse = (function () {
 	    function DSPubKeyResponse(encryptedPublicKey, encryptedAesKey, success) {
 	        this.encryptedPublicKey = encryptedPublicKey;

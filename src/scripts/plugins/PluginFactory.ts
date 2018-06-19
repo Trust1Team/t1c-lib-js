@@ -32,7 +32,7 @@ import { AbstractBelfius } from './remote-loading/belfius/BelfiusModel';
 import { Belfius } from './remote-loading/belfius/Belfius';
 import { AbstractFileExchange } from './file/FileExchangeModel';
 import { FileExchange } from './file/FileExchange';
-import { AbstractPkcs11, ModuleConfig } from './smartcards/pkcs11/pkcs11Model';
+import { AbstractPkcs11 } from './smartcards/pkcs11/pkcs11Model';
 import { PKCS11 } from './smartcards/pkcs11/pkcs11';
 import { AbstractDataContainer } from './data-container/DataContainerModel';
 import { DataContainer } from './data-container/DataContainer';

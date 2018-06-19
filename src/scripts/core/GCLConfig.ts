@@ -5,11 +5,11 @@
  * @since 2016
  */
 
-import { ModuleConfig } from '../plugins/smartcards/pkcs11/pkcs11Model';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import * as jwtDecode from 'jwt-decode';
 import * as moment from 'moment';
 import { RestException } from './exceptions/CoreExceptions';
+import {Pkcs11ModuleConfig} from '../plugins/smartcards/pkcs11/pkcs11Model';
 
 const defaults = {
     gclUrl: 'https://localhost:10443/v2',
@@ -41,7 +41,7 @@ export class GCLConfigOptions {
     public ocvContextPath?: string;
     public dsContextPath?: string;
     public dsFileContextPath?: string;
-    public pkcs11Config?: ModuleConfig;
+    public pkcs11Config?: Pkcs11ModuleConfig;
     public agentPort?: number;
     public implicitDownload?: boolean;
     public forceHardwarePinpad?: boolean;
@@ -80,7 +80,7 @@ export class GCLConfig {
     private _defaultConsentDuration: number;
     private _defaultConsentTimeout: number;
     private _syncManaged: boolean;
-    private _pkcs11Config: ModuleConfig;
+    private _pkcs11Config: Pkcs11ModuleConfig;
     private _osPinDialog: boolean;
     private _containerDownloadTimeout: number;
     private _contextToken: string;
@@ -271,11 +271,11 @@ export class GCLConfig {
         this._syncManaged = value;
     }
 
-    get pkcs11Config(): ModuleConfig {
+    get pkcs11Config(): Pkcs11ModuleConfig {
         return this._pkcs11Config;
     }
 
-    set pkcs11Config(value: ModuleConfig) {
+    set pkcs11Config(value: Pkcs11ModuleConfig) {
         this._pkcs11Config = value;
     }
 

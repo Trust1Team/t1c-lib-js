@@ -14,7 +14,7 @@ import {
 } from './client/Connection';
 import {DSDownloadLinkResponse, DSDownloadRequest} from './ds/DSClientModel';
 import {DSClient} from './ds/DSClient';
-import {AbstractOCVClient, OCVClient} from './ocv/OCVClient';
+import {OCVClient} from './ocv/OCVClient';
 import {CardReadersResponse, DataResponse} from './service/CoreModel';
 import {AbstractEidBE} from '../plugins/smartcards/eid/be/EidBeModel';
 import {AbstractEMV} from '../plugins/smartcards/emv/EMVModel';
@@ -44,6 +44,7 @@ import {ClientService} from '../util/ClientService';
 import {AuthClient} from './auth/Auth';
 import moment = require('moment');
 import {Polyfills} from '../util/Polyfills';
+import {AbstractOCVClient} from './ocv/OCVModel';
 
 // check if any polyfills are needed
 Polyfills.check();

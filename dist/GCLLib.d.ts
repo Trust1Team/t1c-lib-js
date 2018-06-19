@@ -49,7 +49,7 @@ export class GCLConfigOptions {
     ocvContextPath?: string;
     dsContextPath?: string;
     dsFileContextPath?: string;
-    pkcs11Config?: ModuleConfig;
+    pkcs11Config?: Pkcs11ModuleConfig;
     agentPort?: number;
     implicitDownload?: boolean;
     forceHardwarePinpad?: boolean;
@@ -85,7 +85,7 @@ export class GCLConfig {
     defaultConsentDuration: number;
     defaultConsentTimeout: number;
     syncManaged: boolean;
-    pkcs11Config: ModuleConfig;
+    pkcs11Config: Pkcs11ModuleConfig;
     osPinDialog: boolean;
     containerDownloadTimeout: number;
     readonly gwJwt: Promise<string>;
@@ -113,7 +113,7 @@ class CoreService implements AbstractCore {
     version(): Promise<string>;
 }
 
-export { AbstractDSClient, DSInfoResponse, DSDownloadLinkResponse, JWTResponse, DSPubKeyResponse, DeviceResponse, DSPlatformInfo, DSDownloadRequest, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem, DSClientInfo, DSContainer, DSStorage };
+export { AbstractDSClient, DSInfoResponse, DSDownloadLinkResponse, DSJWTResponse, DSPubKeyResponse, DeviceResponse, DSPlatformInfo, DSDownloadRequest, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem, DSClientInfo, DSContainer, DSStorage };
 interface AbstractDSClient {
     getUrl(): string;
     getInfo(callback?: (error: RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
@@ -185,7 +185,7 @@ class DSDownloadLinkResponse {
     success: boolean;
     constructor(url: string, success: boolean);
 }
-class JWTResponse {
+class DSJWTResponse {
     token: string;
     constructor(token: string);
 }
@@ -246,17 +246,6 @@ class DSClient implements AbstractDSClient {
     downloadLink(downloadData: DSDownloadRequest, callback?: (error: RestException, data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse>;
     register(registrationData: DSRegistrationOrSyncRequest, callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
     sync(syncData: DSRegistrationOrSyncRequest, callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
-}
-
-export { AbstractOCVClient, OCVClient };
-class OCVClient implements AbstractOCVClient {
-    constructor(url: string, connection: RemoteJwtConnection);
-    getUrl(): string;
-    validateSignature(data: SignatureValidationData, callback?: (error: RestException, data: SignatureValidationResponse) => void): void | Promise<SignatureValidationResponse>;
-    getInfo(callback?: (error: RestException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse>;
-    getChallenge(digestAlgorithm: string, callback?: (error: RestException, data: ChallengeResponse) => void): void | Promise<ChallengeResponse>;
-    validateChallengeSignedHash(data: ChallengeSignedHashData, callback?: (error: RestException, data: ChallengeSignedHashResponse) => void): void | Promise<ChallengeSignedHashResponse>;
-    validateCertificateChain(data: CertificateChainData, callback?: (error: RestException, data: CertificateChainResponse) => void): void | Promise<CertificateChainResponse>;
 }
 
 export { AbstractCore, T1CResponse, BoolDataResponse, DataResponse, DataArrayResponse, DataObjectResponse, InfoResponse, BrowserInfo, BrowserInfoResponse, Card, CardReader, CardReadersResponse, T1CCertificate, CertificateResponse, CertificatesResponse, SingleReaderResponse, T1CContainer, T1CInfo };
@@ -499,15 +488,15 @@ declare class BeidRnDataResponse extends DataObjectResponse {
     constructor(data: BeidRnData, success: boolean);
 }
 
-export { AbstractEMV, AllDataResponse, EmvApplicationDataResponse, EmvApplicationsResponse, EmvCertificateResponse, EmvApplicationData, EmvApplication, EmvCertificate };
+export { AbstractEMV, EmvAllDataResponse, EmvApplicationDataResponse, EmvApplicationsResponse, EmvCertificateResponse, EmvApplicationData, EmvApplication, EmvCertificate };
 interface AbstractEMV extends PinCard {
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: EmvAllDataResponse) => void): Promise<EmvAllDataResponse>;
     applications(callback?: (error: RestException, data: EmvApplicationsResponse) => void): Promise<EmvApplicationsResponse>;
     applicationData(callback?: (error: RestException, data: EmvApplicationDataResponse) => void): Promise<EmvApplicationDataResponse>;
     iccPublicKeyCertificate(aid: string, callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
     issuerPublicKeyCertificate(aid: string, callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
 }
-declare class AllDataResponse extends DataObjectResponse {
+declare class EmvAllDataResponse extends DataObjectResponse {
     data: {
         applications?: EmvApplication[];
         application_data?: EmvApplicationData;
@@ -556,13 +545,13 @@ declare class EmvCertificateResponse extends DataObjectResponse {
     constructor(data: EmvCertificate, success: boolean);
 }
 
-export { AbstractOcra, AllDataResponse, OcraChallenge, OcraReadCounterResponse, OcraAllData };
+export { AbstractOcra, OcraAllDataResponse, OcraChallenge, OcraReadCounterResponse, OcraAllData };
 interface AbstractOcra extends PinCard {
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: OcraAllDataResponse) => void): Promise<OcraAllDataResponse>;
     challenge(body: OcraChallenge, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     readCounter(body: OptionalPin, callback?: (error: RestException, data: OcraReadCounterResponse) => void): Promise<OcraReadCounterResponse>;
 }
-declare class AllDataResponse extends DataObjectResponse {
+declare class OcraAllDataResponse extends DataObjectResponse {
     data: OcraAllData;
     success: boolean;
     constructor(data: OcraAllData, success: boolean);
@@ -1441,17 +1430,17 @@ class AdminService implements AbstractAdmin {
     resolveAgent(challenge: string, callback?: (error: RestException, data: ResolvedAgentResponse) => void): Promise<ResolvedAgentResponse>;
 }
 
-export { AbstractPkcs11, InfoResponse, Pkcs11Certificate, Pkcs11CertificatesResponse, Pkcs11Info, Pkcs11SignData, Pkcs11VerifySignedData, Slot, SlotsResponse, TokenInfo, TokenResponse, ModuleConfig };
+export { AbstractPkcs11, Pkcs11InfoResponse, Pkcs11Certificate, Pkcs11CertificatesResponse, Pkcs11Info, Pkcs11SignData, Pkcs11VerifySignedData, Pkcs11Slot, Pkcs11SlotsResponse, Pkcs11TokenInfo, Pkcs11TokenResponse, Pkcs11ModuleConfig };
 interface AbstractPkcs11 {
     certificates(slotId: number, options?: Options, callback?: (error: RestException, data: Pkcs11CertificatesResponse) => void): Promise<Pkcs11CertificatesResponse>;
-    info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse>;
+    info(callback?: (error: RestException, data: Pkcs11InfoResponse) => void): Promise<Pkcs11InfoResponse>;
     signData(data: Pkcs11SignData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    slots(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
-    slotsWithTokenPresent(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse>;
-    token(slotId: number, callback?: (error: RestException, data: TokenResponse) => void): Promise<TokenResponse>;
+    slots(callback?: (error: RestException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse>;
+    slotsWithTokenPresent(callback?: (error: RestException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse>;
+    token(slotId: number, callback?: (error: RestException, data: Pkcs11TokenResponse) => void): Promise<Pkcs11TokenResponse>;
     verifySignedData(data: Pkcs11VerifySignedData, callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
 }
-declare class InfoResponse extends DataObjectResponse {
+declare class Pkcs11InfoResponse extends DataObjectResponse {
     data: Pkcs11Info;
     success: boolean;
     constructor(data: Pkcs11Info, success: boolean);
@@ -1464,7 +1453,7 @@ declare class Pkcs11Info {
     library_version: string;
     constructor(cryptoki_version: string, manufacturer_id: string, flags: string, library_description: string, library_version: string);
 }
-declare class Slot {
+declare class Pkcs11Slot {
     slot_id: string;
     description: string;
     flags: number;
@@ -1472,10 +1461,10 @@ declare class Slot {
     firmware_version: string;
     constructor(slot_id: string, description: string, flags: number, hardware_version: string, firmware_version: string);
 }
-declare class SlotsResponse extends DataObjectResponse {
-    data: Slot[];
+declare class Pkcs11SlotsResponse extends DataObjectResponse {
+    data: Pkcs11Slot[];
     success: boolean;
-    constructor(data: Slot[], success: boolean);
+    constructor(data: Pkcs11Slot[], success: boolean);
 }
 declare class Pkcs11Certificate extends T1CCertificate {
     id: string;
@@ -1507,7 +1496,7 @@ declare class Pkcs11VerifySignedData extends Pkcs11SignData {
     pace: string;
     constructor(slot_id: number, cert_id: string, algorithm_reference: string, data: string, signature: string, pin?: string, pace?: string);
 }
-declare class TokenInfo {
+declare class Pkcs11TokenInfo {
     slot_id: string;
     label: string;
     manufacturer_id: string;
@@ -1528,12 +1517,12 @@ declare class TokenInfo {
     firmware_version: string;
     constructor(slot_id: string, label: string, manufacturer_id: string, model: string, serial_number: string, flags: string, max_session_count: number, session_count: number, max_rw_session_count: number, rw_session_count: number, max_pin_length: number, min_pin_length: number, total_public_memory: number, free_public_memory: number, total_private_memory: number, free_private_memory: number, hardware_version: string, firmware_version: string);
 }
-declare class TokenResponse extends DataObjectResponse {
-    data: TokenInfo;
+declare class Pkcs11TokenResponse extends DataObjectResponse {
+    data: Pkcs11TokenInfo;
     success: boolean;
-    constructor(data: TokenInfo, success: boolean);
+    constructor(data: Pkcs11TokenInfo, success: boolean);
 }
-declare class ModuleConfig {
+declare class Pkcs11ModuleConfig {
     linux: string;
     mac: string;
     win: string;
@@ -1543,8 +1532,89 @@ declare class ModuleConfig {
 export { AuthClient };
 class AuthClient implements AbstractAuth {
     constructor(cfg: GCLConfig, connection: RemoteApiKeyConnection);
-    getJWT(callback?: (error: RestException, data: JWTResponse) => void): Promise<JWTResponse>;
-    refreshJWT(currentJWT: string, callback?: (error: RestException, data: JWTResponse) => void): Promise<JWTResponse>;
+    getJWT(callback?: (error: RestException, data: DSJWTResponse) => void): Promise<DSJWTResponse>;
+    refreshJWT(currentJWT: string, callback?: (error: RestException, data: DSJWTResponse) => void): Promise<DSJWTResponse>;
+}
+
+export { AbstractOCVClient, CertificateAndOrder, CertificateChainData, CertificateChainResponse, ChallengeResponse, ChallengeSignedHashResponse, ChallengeSignedHashData, SignatureValidationData, SignatureValidationResponse, OCVInfoResponse };
+interface AbstractOCVClient {
+    getChallenge(digestAlgorithm: string, callback?: (error: RestException, data: ChallengeResponse) => void): void | Promise<ChallengeResponse>;
+    validateChallengeSignedHash(data: ChallengeSignedHashData, callback?: (error: RestException, data: ChallengeSignedHashResponse) => void): void | Promise<ChallengeSignedHashResponse>;
+    validateCertificateChain(data: CertificateChainData, callback?: (error: RestException, data: CertificateChainResponse) => void): void | Promise<CertificateChainResponse>;
+    validateSignature(data: SignatureValidationData, callback?: (error: RestException, data: SignatureValidationResponse) => void): void | Promise<SignatureValidationResponse>;
+    getInfo(callback?: (error: RestException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse>;
+}
+class ChallengeSignedHashData {
+    base64Signature: string;
+    base64Certificate: string;
+    hash: string;
+    digestAlgorithm: string;
+    constructor(base64Signature: string, base64Certificate: string, hash: string, digestAlgorithm: string);
+}
+class SignatureValidationData {
+    rawData: string;
+    certificate: string;
+    signature: string;
+    constructor(rawData: string, certificate: string, signature: string);
+}
+class CertificateChainData {
+    certificateChain: CertificateAndOrder[];
+    constructor(certificateChain: CertificateAndOrder[]);
+}
+class CertificateChainResponse {
+    crlResponse: {
+        crlLocations: string[];
+        issuerCertificate: string;
+        productionData: string;
+        signatureAlgorithm: string;
+        status: boolean;
+        version: string;
+    };
+    ocspResponse: {
+        ocspLocation: string;
+        status: boolean;
+    };
+    constructor(crlResponse: {
+        crlLocations: string[];
+        issuerCertificate: string;
+        productionData: string;
+        signatureAlgorithm: string;
+        status: boolean;
+        version: string;
+    }, ocspResponse: {
+        ocspLocation: string;
+        status: boolean;
+    });
+}
+class CertificateAndOrder {
+    certificate: string;
+    order: number;
+    constructor(certificate: string, order: number);
+}
+class ChallengeResponse {
+    hash: string;
+    digestAlgorithm: string;
+    constructor(hash: string, digestAlgorithm: string);
+}
+class ChallengeSignedHashResponse extends ChallengeResponse {
+    result: boolean;
+    hash: string;
+    digestAlgorithm: string;
+    constructor(result: boolean, hash: string, digestAlgorithm: string);
+}
+class SignatureValidationResponse {
+    rawData: string;
+    signature: string;
+    digest: string;
+    signatureAlgorithm: string;
+    constructor(rawData: string, signature: string, digest: string, signatureAlgorithm: string, result: string);
+}
+class OCVInfoResponse {
+    configFile: string;
+    build: string;
+    version: string;
+    environemnt: string;
+    constructor(configFile: string, build: string, version: string, environemnt: string);
 }
 
 export { GenericConnection, LocalConnection, LocalAuthConnection, LocalAuthAdminConnection, RemoteApiKeyConnection, RemoteJwtConnection, Connection, LocalTestConnection, RequestBody, RequestHeaders, RequestCallback, SecurityConfig, QueryParams };
@@ -1632,87 +1702,6 @@ class LocalTestConnection extends GenericConnection implements Connection {
     put(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     delete(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     getRequestHeaders(headers: RequestHeaders): RequestHeaders;
-}
-
-export { AbstractOCVClient, CertificateAndOrder, CertificateChainData, CertificateChainResponse, ChallengeResponse, ChallengeSignedHashResponse, ChallengeSignedHashData, SignatureValidationData, SignatureValidationResponse, OCVInfoResponse };
-interface AbstractOCVClient {
-    getChallenge(digestAlgorithm: string, callback?: (error: RestException, data: ChallengeResponse) => void): void | Promise<ChallengeResponse>;
-    validateChallengeSignedHash(data: ChallengeSignedHashData, callback?: (error: RestException, data: ChallengeSignedHashResponse) => void): void | Promise<ChallengeSignedHashResponse>;
-    validateCertificateChain(data: CertificateChainData, callback?: (error: RestException, data: CertificateChainResponse) => void): void | Promise<CertificateChainResponse>;
-    validateSignature(data: SignatureValidationData, callback?: (error: RestException, data: SignatureValidationResponse) => void): void | Promise<SignatureValidationResponse>;
-    getInfo(callback?: (error: RestException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse>;
-}
-class ChallengeSignedHashData {
-    base64Signature: string;
-    base64Certificate: string;
-    hash: string;
-    digestAlgorithm: string;
-    constructor(base64Signature: string, base64Certificate: string, hash: string, digestAlgorithm: string);
-}
-class SignatureValidationData {
-    rawData: string;
-    certificate: string;
-    signature: string;
-    constructor(rawData: string, certificate: string, signature: string);
-}
-class CertificateChainData {
-    certificateChain: CertificateAndOrder[];
-    constructor(certificateChain: CertificateAndOrder[]);
-}
-class CertificateChainResponse {
-    crlResponse: {
-        crlLocations: string[];
-        issuerCertificate: string;
-        productionData: string;
-        signatureAlgorithm: string;
-        status: boolean;
-        version: string;
-    };
-    ocspResponse: {
-        ocspLocation: string;
-        status: boolean;
-    };
-    constructor(crlResponse: {
-        crlLocations: string[];
-        issuerCertificate: string;
-        productionData: string;
-        signatureAlgorithm: string;
-        status: boolean;
-        version: string;
-    }, ocspResponse: {
-        ocspLocation: string;
-        status: boolean;
-    });
-}
-class CertificateAndOrder {
-    certificate: string;
-    order: number;
-    constructor(certificate: string, order: number);
-}
-class ChallengeResponse {
-    hash: string;
-    digestAlgorithm: string;
-    constructor(hash: string, digestAlgorithm: string);
-}
-class ChallengeSignedHashResponse extends ChallengeResponse {
-    result: boolean;
-    hash: string;
-    digestAlgorithm: string;
-    constructor(result: boolean, hash: string, digestAlgorithm: string);
-}
-class SignatureValidationResponse {
-    rawData: string;
-    signature: string;
-    digest: string;
-    signatureAlgorithm: string;
-    constructor(rawData: string, signature: string, digest: string, signatureAlgorithm: string, result: string);
-}
-class OCVInfoResponse {
-    configFile: string;
-    build: string;
-    version: string;
-    environemnt: string;
-    constructor(configFile: string, build: string, version: string, environemnt: string);
 }
 
 export { RequestHandler, Options, RequestOptions };

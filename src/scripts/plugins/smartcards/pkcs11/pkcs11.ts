@@ -7,8 +7,8 @@ import { ResponseHandler } from '../../../util/ResponseHandler';
 import * as platform from 'platform';
 import { Options, RequestHandler } from '../../../util/RequestHandler';
 import {
-    AbstractPkcs11, InfoResponse, Pkcs11CertificatesResponse,
-    Pkcs11SignData, Pkcs11VerifySignedData, SlotsResponse, TokenResponse
+    AbstractPkcs11, Pkcs11CertificatesResponse, Pkcs11InfoResponse,
+    Pkcs11SignData, Pkcs11SlotsResponse, Pkcs11TokenResponse, Pkcs11VerifySignedData
 } from './pkcs11Model';
 import { PinEnforcer } from '../../../util/PinEnforcer';
 
@@ -63,7 +63,7 @@ class PKCS11 implements AbstractPkcs11 {
         });
     }
 
-    public info(callback?: (error: RestException, data: InfoResponse) => void): Promise<InfoResponse> {
+    public info(callback?: (error: RestException, data: Pkcs11InfoResponse) => void): Promise<Pkcs11InfoResponse> {
         let req = { module: this.modulePath };
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.INFO), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
@@ -90,7 +90,7 @@ class PKCS11 implements AbstractPkcs11 {
         });
     }
 
-    public slots(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse> {
+    public slots(callback?: (error: RestException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse> {
         let req = { module: this.modulePath };
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.SLOTS), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
@@ -99,7 +99,7 @@ class PKCS11 implements AbstractPkcs11 {
         });
     }
 
-    public slotsWithTokenPresent(callback?: (error: RestException, data: SlotsResponse) => void): Promise<SlotsResponse> {
+    public slotsWithTokenPresent(callback?: (error: RestException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse> {
         let req = { module: this.modulePath };
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.SLOTS), req, { 'token-present': 'true' }).then(data => {
             return ResponseHandler.response(data, callback);
@@ -108,7 +108,7 @@ class PKCS11 implements AbstractPkcs11 {
         });
     }
 
-    public token(slotId: number, callback: (error: RestException, data: TokenResponse) => void): Promise<TokenResponse> {
+    public token(slotId: number, callback: (error: RestException, data: Pkcs11TokenResponse) => void): Promise<Pkcs11TokenResponse> {
         let req = _.extend({ slot_id: slotId }, { module: this.modulePath });
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.TOKEN), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);

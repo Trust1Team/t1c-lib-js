@@ -3,8 +3,7 @@
  * @since 2018
  */
 import {
-    DeviceResponse, DSClientInfo, DSContainer, DSPlatformInfo, DSRegistrationOrSyncRequest,
-    JWTResponse
+    DeviceResponse, DSClientInfo, DSContainer, DSPlatformInfo, DSRegistrationOrSyncRequest
 } from '../core/ds/DSClientModel';
 import { DataContainerUtil } from './DataContainerUtil';
 import * as _ from 'lodash';
