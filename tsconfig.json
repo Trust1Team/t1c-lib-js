@@ -6,6 +6,7 @@
     "diagnostics": true,
     "removeComments": true,
     "sourceMap": true,
+    "outDir": "./dist/lib",
     "typeRoots": ["node_modules/@types"],
     "lib": [ "es2015", "dom" ]
   },
