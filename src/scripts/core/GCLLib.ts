@@ -48,8 +48,9 @@ import {AbstractOCVClient} from './ocv/OCVModel';
 // check if any polyfills are needed
 Polyfills.check();
 
+export {GCLClient};
 
-export class GCLClient {
+class GCLClient {
     public GCLInstalled: boolean;
     private cfg: GCLConfig;
     private pluginFactory: PluginFactory;
