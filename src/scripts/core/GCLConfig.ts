@@ -31,34 +31,10 @@ const defaults = {
 };
 
 /**
- * GCL Config Options object. Contains all user-configurable configuration settings. Used to initialize GCLConfig.
- */
-export interface GCLConfigOptions {
-     gclUrl?: string;
-     gwOrProxyUrl?: string;
-     apiKey?: string;
-     gwJwt?: string;
-     ocvContextPath?: string;
-     dsContextPath?: string;
-     dsFileContextPath?: string;
-     pkcs11Config?: Pkcs11ModuleConfig;
-     agentPort?: number;
-     implicitDownload?: boolean;
-     forceHardwarePinpad?: boolean;
-     sessionTimeout?: number;
-     consentDuration?: number;
-     consentTimeout?: number;
-     syncManaged?: boolean;
-     osPinDialog?: boolean;
-     containerDownloadTimeout?: number;
-     localTestMode?: boolean;
-}
-
-/**
  * GCL Configuration object. Represents the GCL Library configuration state.
  * Most settings are configurable by the user; some are set by the library itself.
  */
-export class GCLConfig {
+class GCLConfig {
     private _gwUrl: string;
     private _gclUrl: string;
     private _dsContextPath: string;
@@ -85,28 +61,30 @@ export class GCLConfig {
     private _isManaged: boolean;
 
     // constructor for DTO
-    public constructor(options?: GCLConfigOptions) {
-        this._gclUrl = options.gclUrl || defaults.gclUrl;
-        this._gwUrl = options.gwOrProxyUrl || defaults.gwUrl;
-        this._dsContextPath = options.dsContextPath || defaults.dsContextPath;
-        this._dsFileContextPath = options.dsFileContextPath || defaults.dsFileContextPath;
-        this._ocvContextPath = options.ocvContextPath || defaults.ocvContextPath;
-        this._apiKey = options.apiKey;
-        this._gwJwt = options.gwJwt;
-        this._citrix = false; // will be set to true during initialisation if Citrix environment is detected
-        this._isManaged = false; // will be set to true during initialisation if managed install is detected
-        this._agentPort = options.agentPort || -1;
-        this._implicitDownload = options.implicitDownload || defaults.implicitDownload;
-        this._localTestMode = options.localTestMode || defaults.localTestMode;
-        this._forceHardwarePinpad = options.forceHardwarePinpad || defaults.forceHardwarePinpad;
-        this._defaultSessionTimeout = options.sessionTimeout || defaults.sessionTimeout;
-        this._defaultConsentDuration = options.consentDuration || defaults.consentDuration;
-        this._defaultConsentTimeout = options.consentTimeout || defaults.consentTimeout;
-        this._syncManaged = options.syncManaged || defaults.syncManaged;
-        this._pkcs11Config = options.pkcs11Config;
-        this._osPinDialog = options.osPinDialog || defaults.osPinDialog;
-        this._containerDownloadTimeout = options.containerDownloadTimeout || defaults.containerDownloadTimeout;
-    };
+    public constructor(options?: any) {
+        if (options) {
+            if (options.gclUrl) { this._gclUrl = options.gclUrl; } else { this._gclUrl = defaults.gclUrl; }
+            if (options.gwOrProxyUrl) { this._gwUrl = options.gwOrProxyUrl; } else { this._gwUrl = defaults.gwUrl; }
+            if (options.dsContextPath) { this._dsContextPath = options.dsContextPath; } else { this._dsContextPath = defaults.dsContextPath; }
+            if (options.dsFileContextPath) { this._dsFileContextPath = options.dsFileContextPath; } else { this._dsFileContextPath = defaults.gclUrl; }
+            if (options.ocvContextPath) { this._ocvContextPath = options.ocvContextPath; } else { this._ocvContextPath = defaults.ocvContextPath; }
+            if (options.apiKey) { this._apiKey = options.apiKey; } else { this._apiKey = undefined; } // no default
+            if (options.gwJwt) { this._gwJwt = options.gwJwt; } else { this._gwJwt = undefined; } // no default
+            if (options.agentPort) { this._agentPort = options.agentPort; } else { this._agentPort = -1; }
+            if (options.implicitDownload) { this._implicitDownload = options.implicitDownload; } else { this._implicitDownload = defaults.implicitDownload; }
+            if (options.localTestMode) { this._localTestMode = options.localTestMode; } else { this._localTestMode = defaults.localTestMode; }
+            if (options.forceHardwarePinpad) { this._forceHardwarePinpad = options.forceHardwarePinpad; } else { this._forceHardwarePinpad = defaults.forceHardwarePinpad; }
+            if (options.sessionTimeout) { this._defaultSessionTimeout = options.sessionTimeout; } else { this._defaultSessionTimeout = defaults.sessionTimeout; }
+            if (options.consentDuration) { this._defaultConsentDuration = options.consentDuration; } else { this._defaultConsentDuration = defaults.consentDuration; }
+            if (options.consentTimeout) { this._defaultConsentTimeout = options.consentTimeout; } else { this._defaultConsentTimeout = defaults.consentTimeout; }
+            if (options.syncManaged) { this._syncManaged = options.syncManaged; } else { this._syncManaged = defaults.syncManaged; }
+            if (options.pkcs11Config) { this._pkcs11Config = options.pkcs11Config; } else { this._pkcs11Config = undefined; } // no default
+            if (options.osPinDialog) { this._osPinDialog = options.osPinDialog; } else { this._osPinDialog = defaults.osPinDialog; }
+            if (options.containerDownloadTimeout) { this._containerDownloadTimeout = options.containerDownloadTimeout; } else { this._containerDownloadTimeout = defaults.containerDownloadTimeout; }
+            this._citrix = false; // will be set to true during initialisation if Citrix environment is detected
+            this._isManaged = false; // will be set to true during initialisation if managed install is detected
+        }
+    }
 
     get authUrl(): string {
         return this.gwUrl + defaults.tokenExchangeContextPath;
@@ -365,3 +343,5 @@ export class GCLConfig {
         }
     }
 }
+
+export { GCLConfig };

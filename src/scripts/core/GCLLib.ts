@@ -5,7 +5,6 @@
  * @since 2016
  */
 
-import {GCLConfig} from './GCLConfig';
 import {CoreService} from './service/CoreService';
 import {
     LocalConnection, RemoteJwtConnection, LocalAuthConnection, LocalTestConnection,
@@ -38,20 +37,40 @@ import {AbstractAgent} from './agent/agentModel';
 import {AbstractFileExchange} from '../plugins/file/FileExchangeModel';
 import {AdminService} from './admin/admin';
 import {InitUtil} from '../util/InitUtil';
-import {AbstractPkcs11} from '../plugins/smartcards/pkcs11/pkcs11Model';
+import {AbstractPkcs11, Pkcs11ModuleConfig} from '../plugins/smartcards/pkcs11/pkcs11Model';
 import {ClientService} from '../util/ClientService';
 import {AuthClient} from './auth/Auth';
 import moment = require('moment');
 import {Polyfills} from '../util/Polyfills';
 import {AbstractOCVClient} from './ocv/OCVModel';
+import {GCLConfig} from './GCLConfig';
 
 // check if any polyfills are needed
 Polyfills.check();
 
+const defaults = {
+    gclUrl: 'https://localhost:10443/v2',
+    gwUrl: 'https://accapim.t1t.be:443',
+    dsContextPath: '/trust1team/gclds/v2',
+    ocvContextPath: '/trust1team/ocv-api/v1',
+    dsContextPathTestMode: '/gcl-ds-web/v2',
+    dsFileContextPath: '/trust1team/gclds-file/v1',
+    tokenExchangeContextPath: '/apiengineauth/v1',
+    implicitDownload: false,
+    localTestMode: false,
+    forceHardwarePinpad: false,
+    sessionTimeout: 5,
+    consentDuration: 1,
+    consentTimeout: 10,
+    syncManaged: true,
+    osPinDialog: false,
+    containerDownloadTimeout: 30
+};
 
-export class GCLClient {
-    public GCLInstalled: boolean;
-    private cfg: GCLConfig;
+
+class GCLClient {
+    private _gclInstalled: boolean;
+    private localConfig: GCLConfig;
     private pluginFactory: PluginFactory;
     private adminService: AdminService;
     private coreService: CoreService;
@@ -66,40 +85,40 @@ export class GCLClient {
     private ocvClient: OCVClient;
     private authClient: AuthClient;
 
-    constructor(cfg: GCLConfig, automatic: boolean) {
+    public constructor(cfg: GCLConfig, automatic: boolean) {
         // resolve config to singleton
-        this.cfg = cfg;
+        this.localConfig = cfg;
         // init communication
-        this.connection = new LocalConnection(this.cfg);
-        this.authConnection = new LocalAuthConnection(this.cfg);
-        this.authAdminConnection = new LocalAuthAdminConnection(this.cfg);
-        this.remoteConnection = new RemoteJwtConnection(this.cfg);
-        this.remoteApiKeyConnection = new RemoteApiKeyConnection(this.cfg);
-        this.localTestConnection = new LocalTestConnection(this.cfg);
-        this.pluginFactory = new PluginFactory(this.cfg.gclUrl, this.connection);
+        this.connection = new LocalConnection(this.localConfig);
+        this.authConnection = new LocalAuthConnection(this.localConfig);
+        this.authAdminConnection = new LocalAuthAdminConnection(this.localConfig);
+        this.remoteConnection = new RemoteJwtConnection(this.localConfig);
+        this.remoteApiKeyConnection = new RemoteApiKeyConnection(this.localConfig);
+        this.localTestConnection = new LocalTestConnection(this.localConfig);
+        this.pluginFactory = new PluginFactory(this.localConfig.gclUrl, this.connection);
         // in citrix mode the admin endpoint should not be called through the agent
-        this.adminService = new AdminService(this.cfg.gclUrl, this.authAdminConnection);
-        this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
-        this.agentClient = new AgentClient(this.cfg.gclUrl, this.authConnection);
-        if (this.cfg.localTestMode) {
-            this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg);
+        this.adminService = new AdminService(this.localConfig.gclUrl, this.authAdminConnection);
+        this.coreService = new CoreService(this.localConfig.gclUrl, this.authConnection);
+        this.agentClient = new AgentClient(this.localConfig.gclUrl, this.authConnection);
+        if (this.localConfig.localTestMode) {
+            this.dsClient = new DSClient(this.localConfig.dsUrl, this.localTestConnection, this.localConfig);
         }
         else {
-            this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg);
+            this.dsClient = new DSClient(this.localConfig.dsUrl, this.remoteConnection, this.localConfig);
         }
         // TODO don't init if OCV not enabled
         // check if initialised with API key or JWT to determine which to use
-        if (this.cfg.apiKey && this.cfg.apiKey.length) {
-            this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteApiKeyConnection);
+        if (this.localConfig.apiKey && this.localConfig.apiKey.length) {
+            this.ocvClient = new OCVClient(this.localConfig.ocvUrl, this.remoteApiKeyConnection);
         } else {
-            this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteConnection);
+            this.ocvClient = new OCVClient(this.localConfig.ocvUrl, this.remoteConnection);
         }
-        this.authClient = new AuthClient(this.cfg, this.remoteApiKeyConnection);
+        this.authClient = new AuthClient(this.localConfig, this.remoteApiKeyConnection);
         // keep reference to client in ClientService
         ClientService.setClient(this);
 
         // check if implicit download has been set
-        if (this.cfg.implicitDownload && true) {
+        if (this.localConfig.implicitDownload && true) {
             this.implicitDownload();
         }
 
@@ -123,7 +142,7 @@ export class GCLClient {
             ClientService.setClient(client);
 
             // will be set to false if init fails
-            client.GCLInstalled = true;
+            client.gclInstalled = true;
 
             GCLClient.initLibrary().then(() => {
                 if (callback && typeof callback === 'function') {
@@ -163,7 +182,7 @@ export class GCLClient {
     };
     // get core config
     public config = (): GCLConfig => {
-        return this.cfg;
+        return this.localConfig;
     };
     // get agent client services
     public agent = (): AbstractAgent => {
@@ -243,7 +262,16 @@ export class GCLClient {
         return this.pluginFactory.createFileExchange();
     };
 
-    // generic methods
+
+    get gclInstalled(): boolean {
+        return this._gclInstalled;
+    }
+
+    set gclInstalled(value: boolean) {
+        this._gclInstalled = value;
+    }
+
+// generic methods
     public containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void) {
         return GenericService.containerForReader(this, readerId, callback);
     }
@@ -322,4 +350,4 @@ export class GCLClient {
     }
 }
 
-
+export {GCLClient, GCLConfig};

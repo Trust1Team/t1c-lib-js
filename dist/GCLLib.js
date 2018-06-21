@@ -69,7 +69,27 @@ var GCLLib =
 	var Auth_1 = __webpack_require__(129);
 	var moment = __webpack_require__(130);
 	var Polyfills_1 = __webpack_require__(251);
+	var GCLConfig_1 = __webpack_require__(368);
+	exports.GCLConfig = GCLConfig_1.GCLConfig;
 	Polyfills_1.Polyfills.check();
+	var defaults = {
+	    gclUrl: 'https://localhost:10443/v2',
+	    gwUrl: 'https://accapim.t1t.be:443',
+	    dsContextPath: '/trust1team/gclds/v2',
+	    ocvContextPath: '/trust1team/ocv-api/v1',
+	    dsContextPathTestMode: '/gcl-ds-web/v2',
+	    dsFileContextPath: '/trust1team/gclds-file/v1',
+	    tokenExchangeContextPath: '/apiengineauth/v1',
+	    implicitDownload: false,
+	    localTestMode: false,
+	    forceHardwarePinpad: false,
+	    sessionTimeout: 5,
+	    consentDuration: 1,
+	    consentTimeout: 10,
+	    syncManaged: true,
+	    osPinDialog: false,
+	    containerDownloadTimeout: 30
+	};
 	var GCLClient = (function () {
 	    function GCLClient(cfg, automatic) {
 	        var _this = this;
@@ -83,7 +103,7 @@ var GCLLib =
 	            return _this.coreService;
 	        };
 	        this.config = function () {
-	            return _this.cfg;
+	            return _this.localConfig;
 	        };
 	        this.agent = function () {
 	            return _this.agentClient;
@@ -142,32 +162,32 @@ var GCLLib =
 	        this.filex = function () {
 	            return _this.pluginFactory.createFileExchange();
 	        };
-	        this.cfg = cfg;
-	        this.connection = new Connection_1.LocalConnection(this.cfg);
-	        this.authConnection = new Connection_1.LocalAuthConnection(this.cfg);
-	        this.authAdminConnection = new Connection_1.LocalAuthAdminConnection(this.cfg);
-	        this.remoteConnection = new Connection_1.RemoteJwtConnection(this.cfg);
-	        this.remoteApiKeyConnection = new Connection_1.RemoteApiKeyConnection(this.cfg);
-	        this.localTestConnection = new Connection_1.LocalTestConnection(this.cfg);
-	        this.pluginFactory = new PluginFactory_1.PluginFactory(this.cfg.gclUrl, this.connection);
-	        this.adminService = new admin_1.AdminService(this.cfg.gclUrl, this.authAdminConnection);
-	        this.coreService = new CoreService_1.CoreService(this.cfg.gclUrl, this.authConnection);
-	        this.agentClient = new agent_1.AgentClient(this.cfg.gclUrl, this.authConnection);
-	        if (this.cfg.localTestMode) {
-	            this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg);
+	        this.localConfig = cfg;
+	        this.connection = new Connection_1.LocalConnection(this.localConfig);
+	        this.authConnection = new Connection_1.LocalAuthConnection(this.localConfig);
+	        this.authAdminConnection = new Connection_1.LocalAuthAdminConnection(this.localConfig);
+	        this.remoteConnection = new Connection_1.RemoteJwtConnection(this.localConfig);
+	        this.remoteApiKeyConnection = new Connection_1.RemoteApiKeyConnection(this.localConfig);
+	        this.localTestConnection = new Connection_1.LocalTestConnection(this.localConfig);
+	        this.pluginFactory = new PluginFactory_1.PluginFactory(this.localConfig.gclUrl, this.connection);
+	        this.adminService = new admin_1.AdminService(this.localConfig.gclUrl, this.authAdminConnection);
+	        this.coreService = new CoreService_1.CoreService(this.localConfig.gclUrl, this.authConnection);
+	        this.agentClient = new agent_1.AgentClient(this.localConfig.gclUrl, this.authConnection);
+	        if (this.localConfig.localTestMode) {
+	            this.dsClient = new DSClient_1.DSClient(this.localConfig.dsUrl, this.localTestConnection, this.localConfig);
 	        }
 	        else {
-	            this.dsClient = new DSClient_1.DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg);
+	            this.dsClient = new DSClient_1.DSClient(this.localConfig.dsUrl, this.remoteConnection, this.localConfig);
 	        }
-	        if (this.cfg.apiKey && this.cfg.apiKey.length) {
-	            this.ocvClient = new OCVClient_1.OCVClient(this.cfg.ocvUrl, this.remoteApiKeyConnection);
+	        if (this.localConfig.apiKey && this.localConfig.apiKey.length) {
+	            this.ocvClient = new OCVClient_1.OCVClient(this.localConfig.ocvUrl, this.remoteApiKeyConnection);
 	        }
 	        else {
-	            this.ocvClient = new OCVClient_1.OCVClient(this.cfg.ocvUrl, this.remoteConnection);
+	            this.ocvClient = new OCVClient_1.OCVClient(this.localConfig.ocvUrl, this.remoteConnection);
 	        }
-	        this.authClient = new Auth_1.AuthClient(this.cfg, this.remoteApiKeyConnection);
+	        this.authClient = new Auth_1.AuthClient(this.localConfig, this.remoteApiKeyConnection);
 	        ClientService_1.ClientService.setClient(this);
-	        if (this.cfg.implicitDownload && true) {
+	        if (this.localConfig.implicitDownload && true) {
 	            this.implicitDownload();
 	        }
 	        if (!automatic) {
@@ -182,7 +202,7 @@ var GCLLib =
 	            var initTime = moment();
 	            var client = new GCLClient(cfg, true);
 	            ClientService_1.ClientService.setClient(client);
-	            client.GCLInstalled = true;
+	            client.gclInstalled = true;
 	            GCLClient.initLibrary().then(function () {
 	                if (callback && typeof callback === 'function') {
 	                    callback(null, client);
@@ -203,6 +223,16 @@ var GCLLib =
 	        return InitUtil_1.InitUtil.initializeLibrary(ClientService_1.ClientService.getClient());
 	    };
 	    ;
+	    Object.defineProperty(GCLClient.prototype, "gclInstalled", {
+	        get: function () {
+	            return this._gclInstalled;
+	        },
+	        set: function (value) {
+	            this._gclInstalled = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
 	    GCLClient.prototype.containerFor = function (readerId, callback) {
 	        return GenericService_1.GenericService.containerForReader(this, readerId, callback);
 	    };
@@ -48734,7 +48764,7 @@ var GCLLib =
 	                        reject(new CoreExceptions_1.RestException(400, '301', 'Installed GCL version is not v2 compatible. Please update to a compatible version.', client));
 	                    }
 	                }, function () {
-	                    client.GCLInstalled = false;
+	                    client.gclInstalled = false;
 	                    axios_1.default.get('https://localhost:10443/v1').then(function (response) {
 	                        reject(new CoreExceptions_1.RestException(400, '301', 'Installed GCL version is not v2 compatible. Please update to a compatible version.', client));
 	                    }).catch(function () {
@@ -70953,6 +70983,580 @@ var GCLLib =
 	
 		return to;
 	};
+
+
+/***/ }),
+/* 368 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
+	var axios_1 = __webpack_require__(8);
+	var jwtDecode = __webpack_require__(369);
+	var moment = __webpack_require__(130);
+	var CoreExceptions_1 = __webpack_require__(34);
+	var defaults = {
+	    gclUrl: 'https://localhost:10443/v2',
+	    gwUrl: 'https://accapim.t1t.be:443',
+	    dsContextPath: '/trust1team/gclds/v2',
+	    ocvContextPath: '/trust1team/ocv-api/v1',
+	    dsContextPathTestMode: '/gcl-ds-web/v2',
+	    dsFileContextPath: '/trust1team/gclds-file/v1',
+	    tokenExchangeContextPath: '/apiengineauth/v1',
+	    implicitDownload: false,
+	    localTestMode: false,
+	    forceHardwarePinpad: false,
+	    sessionTimeout: 5,
+	    consentDuration: 1,
+	    consentTimeout: 10,
+	    syncManaged: true,
+	    osPinDialog: false,
+	    containerDownloadTimeout: 30
+	};
+	var GCLConfig = (function () {
+	    function GCLConfig(options) {
+	        if (options) {
+	            if (options.gclUrl) {
+	                this._gclUrl = options.gclUrl;
+	            }
+	            else {
+	                this._gclUrl = defaults.gclUrl;
+	            }
+	            if (options.gwOrProxyUrl) {
+	                this._gwUrl = options.gwOrProxyUrl;
+	            }
+	            else {
+	                this._gwUrl = defaults.gwUrl;
+	            }
+	            if (options.dsContextPath) {
+	                this._dsContextPath = options.dsContextPath;
+	            }
+	            else {
+	                this._dsContextPath = defaults.dsContextPath;
+	            }
+	            if (options.dsFileContextPath) {
+	                this._dsFileContextPath = options.dsFileContextPath;
+	            }
+	            else {
+	                this._dsFileContextPath = defaults.gclUrl;
+	            }
+	            if (options.ocvContextPath) {
+	                this._ocvContextPath = options.ocvContextPath;
+	            }
+	            else {
+	                this._ocvContextPath = defaults.ocvContextPath;
+	            }
+	            if (options.apiKey) {
+	                this._apiKey = options.apiKey;
+	            }
+	            else {
+	                this._apiKey = undefined;
+	            }
+	            if (options.gwJwt) {
+	                this._gwJwt = options.gwJwt;
+	            }
+	            else {
+	                this._gwJwt = undefined;
+	            }
+	            if (options.agentPort) {
+	                this._agentPort = options.agentPort;
+	            }
+	            else {
+	                this._agentPort = -1;
+	            }
+	            if (options.implicitDownload) {
+	                this._implicitDownload = options.implicitDownload;
+	            }
+	            else {
+	                this._implicitDownload = defaults.implicitDownload;
+	            }
+	            if (options.localTestMode) {
+	                this._localTestMode = options.localTestMode;
+	            }
+	            else {
+	                this._localTestMode = defaults.localTestMode;
+	            }
+	            if (options.forceHardwarePinpad) {
+	                this._forceHardwarePinpad = options.forceHardwarePinpad;
+	            }
+	            else {
+	                this._forceHardwarePinpad = defaults.forceHardwarePinpad;
+	            }
+	            if (options.sessionTimeout) {
+	                this._defaultSessionTimeout = options.sessionTimeout;
+	            }
+	            else {
+	                this._defaultSessionTimeout = defaults.sessionTimeout;
+	            }
+	            if (options.consentDuration) {
+	                this._defaultConsentDuration = options.consentDuration;
+	            }
+	            else {
+	                this._defaultConsentDuration = defaults.consentDuration;
+	            }
+	            if (options.consentTimeout) {
+	                this._defaultConsentTimeout = options.consentTimeout;
+	            }
+	            else {
+	                this._defaultConsentTimeout = defaults.consentTimeout;
+	            }
+	            if (options.syncManaged) {
+	                this._syncManaged = options.syncManaged;
+	            }
+	            else {
+	                this._syncManaged = defaults.syncManaged;
+	            }
+	            if (options.pkcs11Config) {
+	                this._pkcs11Config = options.pkcs11Config;
+	            }
+	            else {
+	                this._pkcs11Config = undefined;
+	            }
+	            if (options.osPinDialog) {
+	                this._osPinDialog = options.osPinDialog;
+	            }
+	            else {
+	                this._osPinDialog = defaults.osPinDialog;
+	            }
+	            if (options.containerDownloadTimeout) {
+	                this._containerDownloadTimeout = options.containerDownloadTimeout;
+	            }
+	            else {
+	                this._containerDownloadTimeout = defaults.containerDownloadTimeout;
+	            }
+	            this._citrix = false;
+	            this._isManaged = false;
+	        }
+	    }
+	    Object.defineProperty(GCLConfig.prototype, "authUrl", {
+	        get: function () {
+	            return this.gwUrl + defaults.tokenExchangeContextPath;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "ocvUrl", {
+	        get: function () {
+	            return this.gwUrl + this.ocvContextPath;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "ocvContextPath", {
+	        get: function () {
+	            return this._ocvContextPath;
+	        },
+	        set: function (value) {
+	            this._ocvContextPath = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "gclUrl", {
+	        get: function () {
+	            return this._gclUrl;
+	        },
+	        set: function (value) {
+	            this._gclUrl = value || defaults.gclUrl;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "dsUrl", {
+	        get: function () {
+	            if (this._localTestMode) {
+	                return this.gwUrl + defaults.dsContextPathTestMode;
+	            }
+	            else {
+	                return this.gwUrl + this.dsContextPath;
+	            }
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "dsContextPath", {
+	        get: function () {
+	            return this._dsContextPath;
+	        },
+	        set: function (value) {
+	            this._dsContextPath = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "dsFileContextPath", {
+	        get: function () {
+	            return this._dsFileContextPath;
+	        },
+	        set: function (value) {
+	            this._dsFileContextPath = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "apiKey", {
+	        get: function () {
+	            return this._apiKey;
+	        },
+	        set: function (value) {
+	            this._apiKey = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "citrix", {
+	        get: function () {
+	            return this._citrix;
+	        },
+	        set: function (value) {
+	            this._citrix = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "isManaged", {
+	        get: function () {
+	            return this._isManaged;
+	        },
+	        set: function (value) {
+	            this._isManaged = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "agentPort", {
+	        get: function () {
+	            return this._agentPort;
+	        },
+	        set: function (value) {
+	            this._agentPort = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "implicitDownload", {
+	        get: function () {
+	            return this._implicitDownload;
+	        },
+	        set: function (value) {
+	            this._implicitDownload = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "dsFileDownloadUrl", {
+	        get: function () {
+	            return this.gwUrl + this.dsFileContextPath;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "gwUrl", {
+	        get: function () {
+	            return this._gwUrl;
+	        },
+	        set: function (value) {
+	            this._gwUrl = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "localTestMode", {
+	        get: function () {
+	            return this._localTestMode;
+	        },
+	        set: function (value) {
+	            this._localTestMode = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "forceHardwarePinpad", {
+	        get: function () {
+	            return this._forceHardwarePinpad;
+	        },
+	        set: function (value) {
+	            this._forceHardwarePinpad = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "defaultSessionTimeout", {
+	        get: function () {
+	            return this._defaultSessionTimeout;
+	        },
+	        set: function (value) {
+	            this._defaultSessionTimeout = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "tokenCompatible", {
+	        get: function () {
+	            return this._tokenCompatible;
+	        },
+	        set: function (value) {
+	            this._tokenCompatible = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "v2Compatible", {
+	        get: function () {
+	            return this._v2Compatible;
+	        },
+	        set: function (value) {
+	            this._v2Compatible = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "defaultConsentDuration", {
+	        get: function () {
+	            return this._defaultConsentDuration;
+	        },
+	        set: function (value) {
+	            this._defaultConsentDuration = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "defaultConsentTimeout", {
+	        get: function () {
+	            return this._defaultConsentTimeout;
+	        },
+	        set: function (value) {
+	            this._defaultConsentTimeout = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "syncManaged", {
+	        get: function () {
+	            return this._syncManaged;
+	        },
+	        set: function (value) {
+	            this._syncManaged = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "pkcs11Config", {
+	        get: function () {
+	            return this._pkcs11Config;
+	        },
+	        set: function (value) {
+	            this._pkcs11Config = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "osPinDialog", {
+	        get: function () {
+	            return this._osPinDialog;
+	        },
+	        set: function (value) {
+	            this._osPinDialog = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "containerDownloadTimeout", {
+	        get: function () {
+	            return this._containerDownloadTimeout;
+	        },
+	        set: function (value) {
+	            this._containerDownloadTimeout = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "gwJwt", {
+	        get: function () {
+	            var self = this;
+	            return new Promise(function (resolve, reject) {
+	                if (!self._gwJwt || !self._gwJwt.length) {
+	                    resolve(self.getGwJwt());
+	                }
+	                else {
+	                    var decoded = jwtDecode(self._gwJwt);
+	                    if (decoded.exp < moment(new Date()).format('X')) {
+	                        resolve(self.getGwJwt());
+	                    }
+	                    else {
+	                        resolve(self._gwJwt);
+	                    }
+	                }
+	            });
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "contextToken", {
+	        get: function () {
+	            return this._contextToken;
+	        },
+	        set: function (value) {
+	            this._contextToken = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "gclJwt", {
+	        get: function () {
+	            return this._gclJwt;
+	        },
+	        set: function (value) {
+	            this._gclJwt = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    GCLConfig.prototype.getGwJwt = function () {
+	        var _this = this;
+	        if (this.apiKey && this.apiKey.length) {
+	            var config_1 = {
+	                url: this.authUrl + '/login/application/token',
+	                method: 'GET',
+	                headers: { apikey: this.apiKey },
+	                responseType: 'json'
+	            };
+	            return new Promise(function (resolve, reject) {
+	                axios_1.default.request(config_1).then(function (response) {
+	                    _this._gwJwt = response.data.token;
+	                    resolve(response.data.token);
+	                }, function (err) {
+	                    reject(err);
+	                });
+	            });
+	        }
+	        else {
+	            if (this._gwJwt && this._gwJwt.length) {
+	                return Promise.reject(new CoreExceptions_1.RestException(412, '205', 'JWT expired'));
+	            }
+	            else {
+	                return Promise.reject(new CoreExceptions_1.RestException(412, '901', 'No JWT or API key found in configuration'));
+	            }
+	        }
+	    };
+	    return GCLConfig;
+	}());
+	exports.GCLConfig = GCLConfig;
+
+
+/***/ }),
+/* 369 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var base64_url_decode = __webpack_require__(370);
+	
+	function InvalidTokenError(message) {
+	  this.message = message;
+	}
+	
+	InvalidTokenError.prototype = new Error();
+	InvalidTokenError.prototype.name = 'InvalidTokenError';
+	
+	module.exports = function (token,options) {
+	  if (typeof token !== 'string') {
+	    throw new InvalidTokenError('Invalid token specified');
+	  }
+	
+	  options = options || {};
+	  var pos = options.header === true ? 0 : 1;
+	  try {
+	    return JSON.parse(base64_url_decode(token.split('.')[pos]));
+	  } catch (e) {
+	    throw new InvalidTokenError('Invalid token specified: ' + e.message);
+	  }
+	};
+	
+	module.exports.InvalidTokenError = InvalidTokenError;
+
+
+/***/ }),
+/* 370 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	var atob = __webpack_require__(371);
+	
+	function b64DecodeUnicode(str) {
+	  return decodeURIComponent(atob(str).replace(/(.)/g, function (m, p) {
+	    var code = p.charCodeAt(0).toString(16).toUpperCase();
+	    if (code.length < 2) {
+	      code = '0' + code;
+	    }
+	    return '%' + code;
+	  }));
+	}
+	
+	module.exports = function(str) {
+	  var output = str.replace(/-/g, "+").replace(/_/g, "/");
+	  switch (output.length % 4) {
+	    case 0:
+	      break;
+	    case 2:
+	      output += "==";
+	      break;
+	    case 3:
+	      output += "=";
+	      break;
+	    default:
+	      throw "Illegal base64url string!";
+	  }
+	
+	  try{
+	    return b64DecodeUnicode(output);
+	  } catch (err) {
+	    return atob(output);
+	  }
+	};
+
+
+/***/ }),
+/* 371 */
+/***/ (function(module, exports) {
+
+	/**
+	 * The code was extracted from:
+	 * https://github.com/davidchambers/Base64.js
+	 */
+	
+	var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+	
+	function InvalidCharacterError(message) {
+	  this.message = message;
+	}
+	
+	InvalidCharacterError.prototype = new Error();
+	InvalidCharacterError.prototype.name = 'InvalidCharacterError';
+	
+	function polyfill (input) {
+	  var str = String(input).replace(/=+$/, '');
+	  if (str.length % 4 == 1) {
+	    throw new InvalidCharacterError("'atob' failed: The string to be decoded is not correctly encoded.");
+	  }
+	  for (
+	    // initialize result and counters
+	    var bc = 0, bs, buffer, idx = 0, output = '';
+	    // get next character
+	    buffer = str.charAt(idx++);
+	    // character found in table? initialize bit storage and add its ascii value;
+	    ~buffer && (bs = bc % 4 ? bs * 64 + buffer : buffer,
+	      // and if not first of each 4 characters,
+	      // convert the first 8 bits to one ascii character
+	      bc++ % 4) ? output += String.fromCharCode(255 & bs >> (-2 * bc & 6)) : 0
+	  ) {
+	    // try to find character in table (0-63, not found => -1)
+	    buffer = chars.indexOf(buffer);
+	  }
+	  return output;
+	}
+	
+	
+	module.exports = typeof window !== 'undefined' && window.atob && window.atob.bind(window) || polyfill;
 
 
 /***/ })
