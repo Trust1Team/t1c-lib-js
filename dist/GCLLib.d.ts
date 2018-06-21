@@ -61,7 +61,7 @@ export interface GCLConfigOptions {
     localTestMode?: boolean;
 }
 export class GCLConfig {
-    constructor(options: any);
+    constructor(options?: GCLConfigOptions);
     readonly authUrl: string;
     readonly ocvUrl: string;
     ocvContextPath: string;

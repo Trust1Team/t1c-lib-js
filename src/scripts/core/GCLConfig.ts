@@ -59,8 +59,6 @@ export interface GCLConfigOptions {
  * Most settings are configurable by the user; some are set by the library itself.
  */
 export class GCLConfig {
-    // singleton pattern
-    private static instance: GCLConfig;
     private _gwUrl: string;
     private _gclUrl: string;
     private _dsContextPath: string;
@@ -87,7 +85,7 @@ export class GCLConfig {
     private _isManaged: boolean;
 
     // constructor for DTO
-    public constructor(options: any) {
+    public constructor(options?: GCLConfigOptions) {
         this._gclUrl = options.gclUrl || defaults.gclUrl;
         this._gwUrl = options.gwOrProxyUrl || defaults.gwUrl;
         this._dsContextPath = options.dsContextPath || defaults.dsContextPath;
@@ -108,7 +106,7 @@ export class GCLConfig {
         this._pkcs11Config = options.pkcs11Config;
         this._osPinDialog = options.osPinDialog || defaults.osPinDialog;
         this._containerDownloadTimeout = options.containerDownloadTimeout || defaults.containerDownloadTimeout;
-    }
+    };
 
     get authUrl(): string {
         return this.gwUrl + defaults.tokenExchangeContextPath;
