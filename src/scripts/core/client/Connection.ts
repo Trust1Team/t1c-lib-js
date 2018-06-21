@@ -420,6 +420,18 @@ export class LocalAuthConnection extends GenericConnection implements Connection
             undefined, queryParams, headers, callback);
     }
 
+    public postSkipCitrix(basePath: string,
+                         suffix: string,
+                         queryParams?: QueryParams,
+                         body?:RequestBody,
+                         headers?: RequestHeaders,
+                         callback?: RequestCallback): Promise<any> {
+        let securityConfig = this.getSecurityConfig();
+        securityConfig.skipCitrixCheck = true;
+        return this.handleRequest(basePath, suffix, 'POST', this.cfg, securityConfig,
+            body, queryParams, headers, callback);
+    }
+
     /**
      * Helper method for requesting log files. These are sent as arraybuffers and require special handling.
      * @param {string} basePath

@@ -61,7 +61,7 @@ export interface GCLConfigOptions {
     localTestMode?: boolean;
 }
 export class GCLConfig {
-    constructor(options: GCLConfigOptions);
+    constructor(options: any);
     readonly authUrl: string;
     readonly ocvUrl: string;
     ocvContextPath: string;
@@ -1269,9 +1269,7 @@ export interface AbstractBelfius {
 }
 
 export interface AbstractAgent {
-    get(filters?: {
-        [filterParam: string]: string;
-    }, callback?: (error: RestException, data: AgentResponse) => void): Promise<AgentResponse>;
+    get(username?: string, callback?: (error: RestException, data: AgentResponse) => void): Promise<AgentResponse>;
 }
 export interface AgentResponse extends T1CResponse {
     data: Agent[];
@@ -1641,6 +1639,7 @@ export class LocalAuthConnection extends GenericConnection implements Connection
     constructor(cfg: GCLConfig);
     getSecurityConfig(): SecurityConfig;
     getSkipCitrix(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
+    postSkipCitrix(basePath: string, suffix: string, queryParams?: QueryParams, body?: RequestBody, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     requestLogFile(basePath: string, suffix: string, callback?: RequestCallback): Promise<any>;
 }
 export class LocalConnection extends GenericConnection implements Connection {

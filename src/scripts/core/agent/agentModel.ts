@@ -8,8 +8,7 @@ import {RestException} from '../exceptions/CoreExceptions';
 
 
 export interface AbstractAgent {
-    get(filters?: { [filterParam: string]: string },
-        callback?: (error: RestException, data: AgentResponse) => void): Promise<AgentResponse>;
+    get(username?: string, callback?: (error: RestException, data: AgentResponse) => void): Promise<AgentResponse>;
 }
 
 export interface AgentResponse extends T1CResponse {
