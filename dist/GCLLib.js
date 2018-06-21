@@ -202,6 +202,7 @@ var GCLLib =
 	    GCLClient.initLibrary = function () {
 	        return InitUtil_1.InitUtil.initializeLibrary(ClientService_1.ClientService.getClient());
 	    };
+	    ;
 	    GCLClient.prototype.containerFor = function (readerId, callback) {
 	        return GenericService_1.GenericService.containerForReader(this, readerId, callback);
 	    };
@@ -19020,6 +19021,11 @@ var GCLLib =
 	        securityConfig.skipCitrixCheck = true;
 	        return this.handleRequest(basePath, suffix, 'GET', this.cfg, securityConfig, undefined, queryParams, headers, callback);
 	    };
+	    LocalAuthConnection.prototype.postSkipCitrix = function (basePath, suffix, queryParams, body, headers, callback) {
+	        var securityConfig = this.getSecurityConfig();
+	        securityConfig.skipCitrixCheck = true;
+	        return this.handleRequest(basePath, suffix, 'POST', this.cfg, securityConfig, body, queryParams, headers, callback);
+	    };
 	    LocalAuthConnection.prototype.requestLogFile = function (basePath, suffix, callback) {
 	        var _this = this;
 	        if (!callback || typeof callback !== 'function') {
@@ -21024,10 +21030,12 @@ var GCLLib =
 	    AgentClient.urlPrefix = function (port) {
 	        return AgentClient.AGENT_PATH + '/' + port;
 	    };
-	    AgentClient.prototype.get = function (filters, callback) {
-	        return this.connection.getSkipCitrix(this.url, AgentClient.AGENT_PATH, filters, undefined, callback);
+	    AgentClient.prototype.get = function (username, callback) {
+	        var body = { AGENT_MATCH_PARAM: username };
+	        return this.connection.postSkipCitrix(this.url, AgentClient.AGENT_PATH, undefined, body, undefined, callback);
 	    };
 	    AgentClient.AGENT_PATH = '/agent';
+	    AgentClient.AGENT_MATCH_PARAM = 'username';
 	    return AgentClient;
 	}());
 	exports.AgentClient = AgentClient;

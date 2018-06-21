@@ -52,7 +52,7 @@ DtsBundlePlugin.prototype.apply = function (compiler) {
 
         dts.bundle({
             name: libraryName,
-            main: 'src/scripts/core/GCLLib.ts',
+            main: 'src/scripts/core/GCLLib.d.ts',
             out: path.resolve(__dirname, "dist") + '/GCLLib.d.ts',
             removeSource: true,
             outputAsModuleFolder: true // to use npm in-package typings

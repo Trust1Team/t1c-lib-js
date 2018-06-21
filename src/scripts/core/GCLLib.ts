@@ -48,9 +48,8 @@ import {AbstractOCVClient} from './ocv/OCVModel';
 // check if any polyfills are needed
 Polyfills.check();
 
-export {GCLClient};
 
-class GCLClient {
+export class GCLClient {
     public GCLInstalled: boolean;
     private cfg: GCLConfig;
     private pluginFactory: PluginFactory;
@@ -148,7 +147,7 @@ class GCLClient {
      */
     private static initLibrary(): Promise<GCLClient> {
         return InitUtil.initializeLibrary(ClientService.getClient());
-    }
+    };
 
     // get admin services
     public admin = (): AdminService => {
@@ -157,92 +156,92 @@ class GCLClient {
     // get auth service
     public auth = (): AuthClient => {
         return this.authClient;
-    }
+    };
     // get core services
     public core = (): CoreService => {
         return this.coreService;
-    }
+    };
     // get core config
     public config = (): GCLConfig => {
         return this.cfg;
-    }
+    };
     // get agent client services
     public agent = (): AbstractAgent => {
         return this.agentClient;
-    }
+    };
     // get ds client services
     public ds = (): DSClient => {
         return this.dsClient;
-    }
+    };
     // get ocv client services
     public ocv = (): AbstractOCVClient => {
         return this.ocvClient;
-    }
+    };
     // get plugin factory
     public pf = (): PluginFactory => {
         return this.pluginFactory;
-    }
+    };
     // get instance for belgian eID card
     public beid = (reader_id?: string): AbstractEidBE => {
         return this.pluginFactory.createEidBE(reader_id);
-    }
+    };
     // get instance for spanish DNIe card
     public dnie = (reader_id?: string): AbstractDNIe => {
         return this.pluginFactory.createDNIe(reader_id);
-    }
+    };
     // get instance for luxemburg eID card
     public luxeid = (reader_id?: string, pin?: string): AbstractEidLUX => {
         return this.pluginFactory.createEidLUX(reader_id, pin);
-    }
+    };
     // get instance for luxtrust card
     public luxtrust = (reader_id?: string, pin?: string): AbstractLuxTrust => {
         return this.pluginFactory.createLuxTrust(reader_id);
-    }
+    };
     // get instance for EMV
     public emv = (reader_id?: string): AbstractEMV => {
         return this.pluginFactory.createEmv(reader_id);
-    }
+    };
     // get instance for MOBIB
     public mobib = (reader_id?: string): AbstractMobib => {
         return this.pluginFactory.createMobib(reader_id);
-    }
+    };
     // get instance for OCRA
     public ocra = (reader_id?: string): AbstractOcra => {
         return this.pluginFactory.createOcra(reader_id);
-    }
+    };
     // get instance for Aventra
     public aventra = (reader_id?: string): AbstractAventra => {
         return this.pluginFactory.createAventraNO(reader_id);
-    }
+    };
     // get instance for Oberthur
     public oberthur = (reader_id?: string): AbstractOberthur => {
         return this.pluginFactory.createOberthurNO(reader_id);
-    }
+    };
     // get instance for PIV
     public piv = (reader_id?: string): AbstractPiv => {
         return this.pluginFactory.createPIV(reader_id);
-    }
+    };
     // get instance for PT Eid
     public pteid = (reader_id?: string): AbstractEidPT => {
         return this.pluginFactory.createEidPT(reader_id);
-    }
+    };
     // get instance for PKCS11
     public pkcs11 = (): AbstractPkcs11 => {
         return this.pluginFactory.createPKCS11();
-    }
+    };
     // get instance for Remote Loading
     public readerapi = (reader_id: string): AbstractRemoteLoading => {
         return this.pluginFactory.createRemoteLoading(reader_id);
-    }
+    };
     // TODO change name
     // get instance for Belfius
     public belfius = (reader_id: string): AbstractBelfius => {
         return this.pluginFactory.createBelfius(reader_id);
-    }
+    };
     // get instance for File Exchange
     public filex = (): AbstractFileExchange => {
         return this.pluginFactory.createFileExchange();
-    }
+    };
 
     // generic methods
     public containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void) {

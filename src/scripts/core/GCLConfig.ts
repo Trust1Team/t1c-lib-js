@@ -87,7 +87,7 @@ export class GCLConfig {
     private _isManaged: boolean;
 
     // constructor for DTO
-    public constructor(options: GCLConfigOptions) {
+    public constructor(options: any) {
         this._gclUrl = options.gclUrl || defaults.gclUrl;
         this._gwUrl = options.gwOrProxyUrl || defaults.gwUrl;
         this._dsContextPath = options.dsContextPath || defaults.dsContextPath;
