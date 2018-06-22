@@ -25,7 +25,7 @@ export class FileExchange extends GenericContainer implements AbstractFileExchan
     static FILE_RENAME = '/rename-file';
     static MODAL_SHOW = '/show-modal';
     static ACCESS_MODE = '/access-mode';
-    static CONTAINERS_ENABLED = 'enabled-containers';
+    static CONTAINERS_ENABLED = '/enabled-containers';
     static DIR_CREATE = '/create-dir';
 
     copyFile(entity: string, from_type: string, to_type: string, filename: string, new_filename: string, from_rel_path?: [string], to_rel_path?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
