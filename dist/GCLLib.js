@@ -47399,7 +47399,7 @@ var GCLLib =
 	    FileExchange.FILE_RENAME = '/rename-file';
 	    FileExchange.MODAL_SHOW = '/show-modal';
 	    FileExchange.ACCESS_MODE = '/access-mode';
-	    FileExchange.CONTAINERS_ENABLED = 'enabled-containers';
+	    FileExchange.CONTAINERS_ENABLED = '/enabled-containers';
 	    FileExchange.DIR_CREATE = '/create-dir';
 	    return FileExchange;
 	}(Card_1.GenericContainer));
