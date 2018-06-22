@@ -47339,8 +47339,8 @@ var GCLLib =
 	    FileExchange.prototype.getEnabledContainers = function (callback) {
 	        return this.connection.get(this.baseUrl, this.containerSuffix(FileExchange.CONTAINERS_ENABLED), [], undefined, callback);
 	    };
-	    FileExchange.prototype.getFileInfo = function (entity, type, filename, relpath, callback) {
-	        return undefined;
+	    FileExchange.prototype.getFileInfo = function (entity, type, filename, rel_path, callback) {
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_INFO), { entity: entity, type: type, filename: filename, rel_path: rel_path }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.listContent = function (entity, page, callback) {
 	        return undefined;
@@ -47403,6 +47403,7 @@ var GCLLib =
 	    FileExchange.ACCESS_MODE = '/access-mode';
 	    FileExchange.CONTAINERS_ENABLED = '/enabled-containers';
 	    FileExchange.DIR_CREATE = '/create-dir';
+	    FileExchange.FILE_INFO = '/file-info';
 	    return FileExchange;
 	}(Card_1.GenericContainer));
 	exports.FileExchange = FileExchange;
