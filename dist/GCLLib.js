@@ -47354,7 +47354,7 @@ var GCLLib =
 	        else {
 	            paging = { start: 1, size: 10, sort: FileExchangeModel_1.FileSort.ASC };
 	        }
-	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CONTENT_LIST), { entity: entity, type: type, paging: paging }, undefined, undefined, callback);
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CONTENT_LIST), { entity: entity, type: type, relpath: relpath, paging: paging }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.listTypes = function (entity, page, callback) {
 	        var paging;
