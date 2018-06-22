@@ -102,7 +102,7 @@ export class FileExchange extends GenericContainer implements AbstractFileExchan
         } else {
             paging = {start: 1, size: 10, sort: FileSort.ASC};
         }
-        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CONTENT_LIST), {entity, type, paging}, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CONTENT_LIST), {entity, type, relpath, paging}, undefined, undefined, callback);
     }
 
     listTypes(entity: string, page?: Page, callback?: (error: RestException, data: TypeListResponse) => void): Promise<TypeListResponse> {
