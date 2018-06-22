@@ -1567,6 +1567,7 @@ class GCLConfig {
     readonly gwJwt: Promise<string>;
     contextToken: string;
     gclJwt: string;
+    lang: string;
     getGwJwt(): Promise<string>;
 }
 export { GCLConfig };
@@ -1601,6 +1602,7 @@ export abstract class GenericConnection implements Connection {
     static readonly AUTH_TOKEN_HEADER: string;
     static readonly BROWSER_AUTH_TOKEN: string;
     static readonly RELAY_STATE_HEADER_PREFIX: string;
+    static readonly HEADER_GCL_LANG: string;
     constructor(cfg: GCLConfig);
     get(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     post(basePath: string, suffix: string, body: RequestBody, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;

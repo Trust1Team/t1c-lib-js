@@ -76,6 +76,8 @@ export abstract class GenericConnection implements Connection {
     static readonly BROWSER_AUTH_TOKEN = 't1c-js-browser-id-token';
     // whitelist application id prefix
     static readonly RELAY_STATE_HEADER_PREFIX = 'X-Relay-State-';
+    // language header
+    static readonly HEADER_GCL_LANG = 'X-Language-Code';
 
     constructor(public cfg: GCLConfig) {
     }
@@ -207,6 +209,7 @@ export abstract class GenericConnection implements Connection {
     getRequestHeaders(headers: RequestHeaders): RequestHeaders {
         let reqHeaders = headers || {};
         reqHeaders['Accept-Language'] = 'en-US';
+        reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
         return reqHeaders;
     }
 
