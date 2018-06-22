@@ -19,6 +19,7 @@ const defaults = {
     dsContextPathTestMode: '/gcl-ds-web/v2',
     dsFileContextPath: '/trust1team/gclds-file/v1',
     tokenExchangeContextPath: '/apiengineauth/v1',
+    lang: 'en',
     implicitDownload: false,
     localTestMode: false,
     forceHardwarePinpad: false,
@@ -59,6 +60,7 @@ class GCLConfig {
     private _containerDownloadTimeout: number;
     private _contextToken: string;
     private _isManaged: boolean;
+    private _lang: string;
 
     // constructor for DTO
     public constructor(options?: any) {
@@ -81,6 +83,7 @@ class GCLConfig {
             if (options.pkcs11Config) { this._pkcs11Config = options.pkcs11Config; } else { this._pkcs11Config = undefined; } // no default
             if (options.osPinDialog) { this._osPinDialog = options.osPinDialog; } else { this._osPinDialog = defaults.osPinDialog; }
             if (options.containerDownloadTimeout) { this._containerDownloadTimeout = options.containerDownloadTimeout; } else { this._containerDownloadTimeout = defaults.containerDownloadTimeout; }
+            if (options.lang) { this._lang = options.lang; } else { this._lang = defaults.lang; }
             this._citrix = false; // will be set to true during initialisation if Citrix environment is detected
             this._isManaged = false; // will be set to true during initialisation if managed install is detected
         }
@@ -306,6 +309,14 @@ class GCLConfig {
 
     set gclJwt(value: string) {
         this._gclJwt = value;
+    }
+
+    get lang(): string {
+        return this._lang;
+    }
+
+    set lang(value: string) {
+        this._lang = value;
     }
 
     /**

@@ -18896,6 +18896,7 @@ var GCLLib =
 	    GenericConnection.prototype.getRequestHeaders = function (headers) {
 	        var reqHeaders = headers || {};
 	        reqHeaders['Accept-Language'] = 'en-US';
+	        reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
 	        return reqHeaders;
 	    };
 	    GenericConnection.prototype.getSecurityConfig = function () {
@@ -18985,6 +18986,7 @@ var GCLLib =
 	    GenericConnection.AUTH_TOKEN_HEADER = 'X-Authentication-Token';
 	    GenericConnection.BROWSER_AUTH_TOKEN = 't1c-js-browser-id-token';
 	    GenericConnection.RELAY_STATE_HEADER_PREFIX = 'X-Relay-State-';
+	    GenericConnection.HEADER_GCL_LANG = 'X-Language-Code';
 	    return GenericConnection;
 	}());
 	exports.GenericConnection = GenericConnection;
@@ -71003,6 +71005,7 @@ var GCLLib =
 	    dsContextPathTestMode: '/gcl-ds-web/v2',
 	    dsFileContextPath: '/trust1team/gclds-file/v1',
 	    tokenExchangeContextPath: '/apiengineauth/v1',
+	    lang: 'en',
 	    implicitDownload: false,
 	    localTestMode: false,
 	    forceHardwarePinpad: false,
@@ -71123,6 +71126,12 @@ var GCLLib =
 	            }
 	            else {
 	                this._containerDownloadTimeout = defaults.containerDownloadTimeout;
+	            }
+	            if (options.lang) {
+	                this._lang = options.lang;
+	            }
+	            else {
+	                this._lang = defaults.lang;
 	            }
 	            this._citrix = false;
 	            this._isManaged = false;
@@ -71408,6 +71417,16 @@ var GCLLib =
 	        },
 	        set: function (value) {
 	            this._gclJwt = value;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(GCLConfig.prototype, "lang", {
+	        get: function () {
+	            return this._lang;
+	        },
+	        set: function (value) {
+	            this._lang = value;
 	        },
 	        enumerable: true,
 	        configurable: true
