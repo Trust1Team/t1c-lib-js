@@ -27,6 +27,7 @@ export class FileExchange extends GenericContainer implements AbstractFileExchan
     static ACCESS_MODE = '/access-mode';
     static CONTAINERS_ENABLED = '/enabled-containers';
     static DIR_CREATE = '/create-dir';
+    static FILE_INFO = '/file-info';
 
     copyFile(entity: string, from_type: string, to_type: string, filename: string, new_filename: string, from_rel_path?: [string], to_rel_path?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
         return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_COPY), {entity, from_type, to_type, filename, new_filename, from_rel_path, to_rel_path}, undefined, undefined, callback);
@@ -83,8 +84,8 @@ export class FileExchange extends GenericContainer implements AbstractFileExchan
         return this.connection.get(this.baseUrl, this.containerSuffix(FileExchange.CONTAINERS_ENABLED), [], undefined, callback);
     }
 
-    getFileInfo(entity: string, type: string, filename: string, relpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
-        return undefined;
+    getFileInfo(entity: string, type: string, filename: string, rel_path?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_INFO), {entity, type, filename, rel_path}, undefined, undefined, callback);
     }
 
     listContent(entity: string, page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse> {
