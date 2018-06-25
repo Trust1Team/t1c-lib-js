@@ -1615,12 +1615,14 @@ export abstract class GenericConnection implements Connection {
 export class LocalAuthAdminConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;
     constructor(cfg: GCLConfig);
+    getRequestHeaders(headers: RequestHeaders): RequestHeaders;
     getSecurityConfig(): SecurityConfig;
     requestLogFile(basePath: string, suffix: string, callback?: RequestCallback): Promise<any>;
 }
 export class LocalAuthConnection extends GenericConnection implements Connection {
     cfg: GCLConfig;
     constructor(cfg: GCLConfig);
+    getRequestHeaders(headers: RequestHeaders): RequestHeaders;
     getSecurityConfig(): SecurityConfig;
     getSkipCitrix(basePath: string, suffix: string, queryParams?: QueryParams, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
     postSkipCitrix(basePath: string, suffix: string, queryParams?: QueryParams, body?: RequestBody, headers?: RequestHeaders, callback?: RequestCallback): Promise<any>;
