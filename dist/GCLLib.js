@@ -19138,6 +19138,7 @@ var GCLLib =
 	        }
 	        return new Promise(function (resolve, reject) {
 	            var headers = {};
+	            headers[GenericConnection.HEADER_GCL_LANG] = _this.cfg.lang;
 	            if (config.tokenCompatible && _this.getSecurityConfig().sendToken) {
 	                headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint_1.BrowserFingerprint.get();
 	            }
@@ -19188,6 +19189,7 @@ var GCLLib =
 	        if (config.tokenCompatible && this.getSecurityConfig().sendToken) {
 	            headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint_1.BrowserFingerprint.get();
 	        }
+	        headers[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
 	        return new Promise(function (resolve, reject) {
 	            axios_1.default.post(UrlUtil_1.UrlUtil.create(basePath, suffix, config, false), form, {
 	                headers: headers

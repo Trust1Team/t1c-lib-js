@@ -557,6 +557,7 @@ export class LocalConnection extends GenericConnection implements Connection {
 
         return new Promise((resolve, reject) => {
             let headers = {};
+            headers[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
             if (config.tokenCompatible && this.getSecurityConfig().sendToken) {
                 headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
             }
@@ -620,6 +621,7 @@ export class LocalConnection extends GenericConnection implements Connection {
         if (config.tokenCompatible && this.getSecurityConfig().sendToken) {
             headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
         }
+        headers[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
 
         return new Promise((resolve, reject) => {
             axios.post(UrlUtil.create(basePath, suffix, config, false), form, {
