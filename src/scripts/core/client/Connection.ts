@@ -547,8 +547,7 @@ export class LocalConnection extends GenericConnection implements Connection {
         type: string,
         filename: string,
         rel_path: string[],
-        notify_on_completion: boolean
-    }, callback?: RequestCallback): Promise<any> {
+        notify_on_completion: boolean }, callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         // init callback if necessary
         if (!callback || typeof callback !== 'function') {
@@ -562,10 +561,10 @@ export class LocalConnection extends GenericConnection implements Connection {
                 headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
             }
             axios.post(UrlUtil.create(basePath, suffix, config, false), body, {
-                responseType: 'blob', headers
+                responseType: 'arraybuffer', headers
             }).then(response => {
-                callback(null, response);
-                return resolve(response);
+                callback(null, response.data);
+                return resolve(response.data);
             }, error => {
                 if (error.response) {
                     if (error.response.data) {

@@ -19142,10 +19142,10 @@ var GCLLib =
 	                headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint_1.BrowserFingerprint.get();
 	            }
 	            axios_1.default.post(UrlUtil_1.UrlUtil.create(basePath, suffix, config, false), body, {
-	                responseType: 'blob', headers: headers
+	                responseType: 'arraybuffer', headers: headers
 	            }).then(function (response) {
-	                callback(null, response);
-	                return resolve(response);
+	                callback(null, response.data);
+	                return resolve(response.data);
 	            }, function (error) {
 	                if (error.response) {
 	                    if (error.response.data) {
