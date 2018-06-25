@@ -541,7 +541,7 @@ var GCLLib =
 	    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
 	    CoreService.prototype.getUrl = function () { return this.url; };
 	    CoreService.prototype.version = function () {
-	        return Promise.resolve('v2.1.7');
+	        return Promise.resolve('v2.1.8');
 	    };
 	    return CoreService;
 	}());
@@ -48302,7 +48302,7 @@ var GCLLib =
 	        });
 	    };
 	    SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
-	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.7'), containers));
+	        return client.ds().sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.managed, info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.8'), containers));
 	    };
 	    SyncUtil.doSyncFlow = function (client, mergedInfo, uuid, containers, isRetry) {
 	        return client.admin().getPubKey().then(function (pubKey) {
@@ -48549,7 +48549,7 @@ var GCLLib =
 	    };
 	    ActivationUtil.registerDevice = function (client, mergedInfo, uuid) {
 	        return client.admin().getPubKey().then(function (pubKey) {
-	            return client.ds().register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.managed, mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.7')));
+	            return client.ds().register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.managed, mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', 'v2.1.8')));
 	        });
 	    };
 	    ActivationUtil.activateDevice = function (args) {
