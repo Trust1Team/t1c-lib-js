@@ -3,7 +3,6 @@
  * @since 2018
  */
 import { LocalAuthAdminConnection } from '../client/Connection';
-import * as CoreExceptions from '../exceptions/CoreExceptions';
 import {
     AbstractAdmin, AtrListRequest, ContainerSyncRequest, PubKeyResponse, ResolvedAgent, ResolvedAgentResponse,
     SetPubKeyRequest
@@ -14,8 +13,6 @@ import * as _ from 'lodash';
 import { InitUtil } from '../../util/InitUtil';
 import { RestException } from '../exceptions/CoreExceptions';
 import { ClientService } from '../../util/ClientService';
-
-export { AdminService };
 
 
 const CORE_ACTIVATE = '/admin/activate';
@@ -29,7 +26,7 @@ const CORE_AGENT_RESOLVE = '/agent/resolve';
  * Provides access to the /admin endpoints
  * All calls wil be automatically retried if a JWT related error is encountered
  */
-class AdminService implements AbstractAdmin {
+export class AdminService implements AbstractAdmin {
     static JWT_ERROR_CODES = [ '200', '201', '202', '203', '204', '205'];
 
     // constructor
@@ -46,35 +43,35 @@ class AdminService implements AbstractAdmin {
         }
     }
 
-    public activate(callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+    public activate(callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.post(this.url, CORE_ACTIVATE, {}, callback);
     }
 
-    public atr(atrList: AtrListRequest, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+    public atr(atrList: AtrListRequest, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.post(this.url, CORE_ATR_LIST, atrList, callback);
     }
 
-    public getLogfile(name: string, callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+    public getLogfile(name: string, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.getLogFile(this.url, CORE_LOGFILE + '/' + name, callback);
     }
 
-    public getLogfileList(callback?: (error: CoreExceptions.RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
-        return this.get(this.url, CORE_LOGFILE, callback);
+    public getLogfileList(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
+        return this.getLogfiles(this.url, CORE_LOGFILE, callback);
     }
 
-    public getPubKey(callback?: (error: CoreExceptions.RestException, data: PubKeyResponse)
+    public getPubKey(callback?: (error: RestException, data: PubKeyResponse)
         => void): Promise<PubKeyResponse> {
-        return this.get(this.url, CORE_PUB_KEY, callback);
+        return this.getPubKeys(this.url, CORE_PUB_KEY, callback);
     }
 
     public setPubKey(keys: SetPubKeyRequest,
-                     callback?: (error: CoreExceptions.RestException, data: PubKeyResponse)
+                     callback?: (error: RestException, data: PubKeyResponse)
                          => void): Promise<PubKeyResponse> {
         return this.put(this.url, CORE_PUB_KEY, keys, callback);
     }
 
     public updateContainerConfig(containers: ContainerSyncRequest,
-                                 callback?: (error: CoreExceptions.RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+                                 callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.post(this.url, CORE_CONTAINERS, containers, callback);
     }
 
@@ -86,7 +83,7 @@ class AdminService implements AbstractAdmin {
 
     // private methods
     // ===============
-    private get(url: string, suffix: string, callback?: any) {
+    private getLogfiles(url: string, suffix: string, callback?: any): Promise<DataArrayResponse> {
         let self = this;
         return new Promise((resolve, reject) => {
             self.connection.get(url, suffix, undefined).then(result => {
@@ -106,7 +103,27 @@ class AdminService implements AbstractAdmin {
         });
     }
 
-    private getLogFile(url: string, suffix: string, callback?: any) {
+    private getPubKeys(url: string, suffix: string, callback?: any): Promise<PubKeyResponse> {
+        let self = this;
+        return new Promise((resolve, reject) => {
+            self.connection.get(url, suffix, undefined).then(result => {
+                resolve(ResponseHandler.response(result, callback));
+            }, err => {
+                AdminService.errorHandler(err).then(() => {
+                    // retry initial request
+                    self.connection.get(url, suffix, undefined).then(retryResult => {
+                        resolve(ResponseHandler.response(retryResult, callback));
+                    }, retryError => {
+                        resolve(ResponseHandler.error(retryError, callback));
+                    });
+                }, retryError => {
+                    resolve(ResponseHandler.error(retryError, callback));
+                });
+            });
+        });
+    }
+
+    private getLogFile(url: string, suffix: string, callback?: any): Promise<T1CResponse> {
         let self = this;
         return new Promise((resolve, reject) => {
             self.connection.requestLogFile(url, suffix).then(result => {
@@ -126,7 +143,7 @@ class AdminService implements AbstractAdmin {
         });
     }
 
-    private post(url: string, suffix: string, body: any, callback?: any) {
+    private post(url: string, suffix: string, body: any, callback?: any): Promise<T1CResponse> {
         let self = this;
         return new Promise((resolve, reject) => {
             self.connection.post(url, suffix, body, undefined).then(result => {
@@ -146,7 +163,7 @@ class AdminService implements AbstractAdmin {
         });
     }
 
-    private put(url: string, suffix: string, body: any, callback?: any) {
+    private put(url: string, suffix: string, body: any, callback?: any): Promise<T1CResponse> {
         let self = this;
         return new Promise((resolve, reject) => {
             self.connection.put(url, suffix, body, undefined).then(result => {

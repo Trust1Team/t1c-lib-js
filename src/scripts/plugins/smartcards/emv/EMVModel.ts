@@ -6,57 +6,54 @@ import { RestException } from '../../../core/exceptions/CoreExceptions';
 import { PinCard } from '../Card';
 import { DataObjectResponse } from '../../../core/service/CoreModel';
 
-export { AbstractEMV, AllDataResponse, ApplicationDataResponse, ApplicationsResponse,
-    EmvCertificateResponse, ApplicationData, Application, EmvCertificate };
 
-
-interface AbstractEMV extends PinCard {
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
-    applications(callback?: (error: RestException, data: ApplicationsResponse) => void): Promise<ApplicationsResponse>;
-    applicationData(callback?: (error: RestException, data: ApplicationDataResponse) => void): Promise<ApplicationDataResponse>;
+export interface AbstractEMV extends PinCard {
+    allData(filters: string[], callback?: (error: RestException, data: EmvAllDataResponse) => void): Promise<EmvAllDataResponse>;
+    applications(callback?: (error: RestException, data: EmvApplicationsResponse) => void): Promise<EmvApplicationsResponse>;
+    applicationData(callback?: (error: RestException, data: EmvApplicationDataResponse) => void): Promise<EmvApplicationDataResponse>;
     iccPublicKeyCertificate(aid: string,
                             callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
     issuerPublicKeyCertificate(aid: string,
                                callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
 }
 
-class AllDataResponse extends DataObjectResponse {
-    constructor(public data: { applications: Application[], application_data: ApplicationData }, public success: boolean) {
+export class EmvAllDataResponse extends DataObjectResponse {
+    constructor(public data: { applications?: EmvApplication[], application_data?: EmvApplicationData }, public success: boolean) {
         super(data, success);
     }
 }
 
-class Application {
+export class EmvApplication {
     constructor(public aid: string, public name: string, public priority: number) {}
 }
 
-class ApplicationsResponse extends DataObjectResponse {
-    constructor(public data: Application[], public success: boolean) {
+export class EmvApplicationsResponse extends DataObjectResponse {
+    constructor(public data: EmvApplication[], public success: boolean) {
         super(data, success);
     }
 }
 
-class ApplicationData {
-    constructor(public country: string,
-                public country_code: string,
-                public effective_data: string,
-                public expiration_date: string,
-                public language: string,
-                public pan: string,
+export class EmvApplicationData {
+    constructor(public country?: string,
+                public country_code?: string,
+                public effective_data?: string,
+                public expiration_date?: string,
+                public language?: string,
+                public pan?: string,
                 public name?: string) {}
 }
 
-class ApplicationDataResponse extends DataObjectResponse {
-    constructor(public data: ApplicationData, public success: boolean) {
+export class EmvApplicationDataResponse extends DataObjectResponse {
+    constructor(public data: EmvApplicationData, public success: boolean) {
         super(data, success);
     }
 }
 
-class EmvCertificate {
+export class EmvCertificate {
     constructor(public data: string, public exponent: string, public remainder: string) {}
 }
 
-class EmvCertificateResponse extends DataObjectResponse {
+export class EmvCertificateResponse extends DataObjectResponse {
     constructor(public data: EmvCertificate, public success: boolean) {
         super(data, success);
     }

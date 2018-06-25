@@ -10,17 +10,14 @@ import {
 import { CertCard, ResetPinData, VerifyPinData } from '../../Card';
 import { Options } from '../../../../util/RequestHandler';
 
-export { AbstractAventra, AllCertsResponse, AllDataResponse, AllAventraCerts, AllAventraData, AppletInfo};
-
-
-interface AbstractAventra extends CertCard {
+export interface AbstractAventra extends CertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allKeyRefs(): string[];
     allAlgoRefsForAuthentication(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
     allAlgoRefsForSigning(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
-    allData(filters: string[], callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
-    allCerts(filters: string[], callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
+    allData(filters: string[], callback?: (error: RestException, data: AventraAllDataResponse) => void): Promise<AventraAllDataResponse>;
+    allCerts(filters: string[], callback?: (error: RestException, data: AventraAllCertsResponse) => void): Promise<AventraAllCertsResponse>;
     rootCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     issuerCertificate(options?: Options,
                       callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
@@ -34,34 +31,34 @@ interface AbstractAventra extends CertCard {
     resetPin(body: ResetPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
 }
 
-class AllCertsResponse extends DataObjectResponse {
-    constructor(public data: AllAventraCerts, public success: boolean) {
+export class AventraAllCertsResponse extends DataObjectResponse {
+    constructor(public data: AventraAllCerts, public success: boolean) {
         super(data, success);
     }
 }
 
-class AllAventraCerts {
-    constructor(public authentication_certificate: T1CCertificate,
-                public encryption_certificate: T1CCertificate,
-                public issuer_certificate: T1CCertificate,
-                public signing_certificate: T1CCertificate,
-                public root_certificate: T1CCertificate) {}
+export class AventraAllCerts {
+    constructor(public authentication_certificate?: T1CCertificate,
+                public encryption_certificate?: T1CCertificate,
+                public issuer_certificate?: T1CCertificate,
+                public signing_certificate?: T1CCertificate,
+                public root_certificate?: T1CCertificate) {}
 }
 
-class AllDataResponse extends AllCertsResponse {
-    constructor(public data: AllAventraData, public success: boolean) {
+export class AventraAllDataResponse extends DataObjectResponse {
+    constructor(public data: AventraAllData, public success: boolean) {
         super(data, success);
     }
 }
 
-class AllAventraData {
-    constructor(public applet_info: AppletInfo,
-                public authentication_certificate: T1CCertificate,
-                public encryption_certificate: T1CCertificate,
-                public issuer_certificate: T1CCertificate,
-                public signing_certificate: T1CCertificate, public root_certificate: T1CCertificate) {}
+export class AventraAllData {
+    constructor(public applet_info?: AventraAppletInfo,
+                public authentication_certificate?: T1CCertificate,
+                public encryption_certificate?: T1CCertificate,
+                public issuer_certificate?: T1CCertificate,
+                public signing_certificate?: T1CCertificate, public root_certificate?: T1CCertificate) {}
 }
 
-class AppletInfo {
-    constructor(public change_counter: number, public name: string, public serial: string, public version: string) {}
+export class AventraAppletInfo {
+    constructor(public change_counter?: number, public name?: string, public serial?: string, public version?: string) {}
 }

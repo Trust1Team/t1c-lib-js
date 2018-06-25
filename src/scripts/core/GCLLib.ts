@@ -4,17 +4,15 @@
  * @author Maarten Somers
  * @since 2016
  */
-import * as CoreExceptions from './exceptions/CoreExceptions';
 
-import {GCLConfig, GCLConfigOptions} from './GCLConfig';
 import {CoreService} from './service/CoreService';
 import {
     LocalConnection, RemoteJwtConnection, LocalAuthConnection, LocalTestConnection,
     RemoteApiKeyConnection, LocalAuthAdminConnection
 } from './client/Connection';
-import {DownloadLinkResponse, DSDownloadRequest} from './ds/DSClientModel';
+import {DSDownloadLinkResponse, DSDownloadRequest} from './ds/DSClientModel';
 import {DSClient} from './ds/DSClient';
-import {AbstractOCVClient, OCVClient} from './ocv/OCVClient';
+import {OCVClient} from './ocv/OCVClient';
 import {CardReadersResponse, DataResponse} from './service/CoreModel';
 import {AbstractEidBE} from '../plugins/smartcards/eid/be/EidBeModel';
 import {AbstractEMV} from '../plugins/smartcards/emv/EMVModel';
@@ -39,19 +37,40 @@ import {AbstractAgent} from './agent/agentModel';
 import {AbstractFileExchange} from '../plugins/file/FileExchangeModel';
 import {AdminService} from './admin/admin';
 import {InitUtil} from '../util/InitUtil';
-import {AbstractPkcs11} from '../plugins/smartcards/pkcs11/pkcs11Model';
+import {AbstractPkcs11, Pkcs11ModuleConfig} from '../plugins/smartcards/pkcs11/pkcs11Model';
 import {ClientService} from '../util/ClientService';
 import {AuthClient} from './auth/Auth';
 import moment = require('moment');
 import {Polyfills} from '../util/Polyfills';
+import {AbstractOCVClient} from './ocv/OCVModel';
+import {GCLConfig} from './GCLConfig';
 
 // check if any polyfills are needed
 Polyfills.check();
 
+const defaults = {
+    gclUrl: 'https://localhost:10443/v2',
+    gwUrl: 'https://accapim.t1t.be:443',
+    dsContextPath: '/trust1team/gclds/v2',
+    ocvContextPath: '/trust1team/ocv-api/v1',
+    dsContextPathTestMode: '/gcl-ds-web/v2',
+    dsFileContextPath: '/trust1team/gclds-file/v1',
+    tokenExchangeContextPath: '/apiengineauth/v1',
+    implicitDownload: false,
+    localTestMode: false,
+    forceHardwarePinpad: false,
+    sessionTimeout: 5,
+    consentDuration: 1,
+    consentTimeout: 10,
+    syncManaged: true,
+    osPinDialog: false,
+    containerDownloadTimeout: 30
+};
+
 
 class GCLClient {
-    public GCLInstalled: boolean;
-    private cfg: GCLConfig;
+    private _gclInstalled: boolean;
+    private localConfig: GCLConfig;
     private pluginFactory: PluginFactory;
     private adminService: AdminService;
     private coreService: CoreService;
@@ -66,40 +85,40 @@ class GCLClient {
     private ocvClient: OCVClient;
     private authClient: AuthClient;
 
-    constructor(cfg: GCLConfig, automatic: boolean) {
+    public constructor(cfg: GCLConfig, automatic: boolean) {
         // resolve config to singleton
-        this.cfg = cfg;
+        this.localConfig = cfg;
         // init communication
-        this.connection = new LocalConnection(this.cfg);
-        this.authConnection = new LocalAuthConnection(this.cfg);
-        this.authAdminConnection = new LocalAuthAdminConnection(this.cfg);
-        this.remoteConnection = new RemoteJwtConnection(this.cfg);
-        this.remoteApiKeyConnection = new RemoteApiKeyConnection(this.cfg);
-        this.localTestConnection = new LocalTestConnection(this.cfg);
-        this.pluginFactory = new PluginFactory(this.cfg.gclUrl, this.connection);
+        this.connection = new LocalConnection(this.localConfig);
+        this.authConnection = new LocalAuthConnection(this.localConfig);
+        this.authAdminConnection = new LocalAuthAdminConnection(this.localConfig);
+        this.remoteConnection = new RemoteJwtConnection(this.localConfig);
+        this.remoteApiKeyConnection = new RemoteApiKeyConnection(this.localConfig);
+        this.localTestConnection = new LocalTestConnection(this.localConfig);
+        this.pluginFactory = new PluginFactory(this.localConfig.gclUrl, this.connection);
         // in citrix mode the admin endpoint should not be called through the agent
-        this.adminService = new AdminService(this.cfg.gclUrl, this.authAdminConnection);
-        this.coreService = new CoreService(this.cfg.gclUrl, this.authConnection);
-        this.agentClient = new AgentClient(this.cfg.gclUrl, this.authConnection);
-        if (this.cfg.localTestMode) {
-            this.dsClient = new DSClient(this.cfg.dsUrl, this.localTestConnection, this.cfg);
+        this.adminService = new AdminService(this.localConfig.gclUrl, this.authAdminConnection);
+        this.coreService = new CoreService(this.localConfig.gclUrl, this.authConnection);
+        this.agentClient = new AgentClient(this.localConfig.gclUrl, this.authConnection);
+        if (this.localConfig.localTestMode) {
+            this.dsClient = new DSClient(this.localConfig.dsUrl, this.localTestConnection, this.localConfig);
         }
         else {
-            this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg);
+            this.dsClient = new DSClient(this.localConfig.dsUrl, this.remoteConnection, this.localConfig);
         }
         // TODO don't init if OCV not enabled
         // check if initialised with API key or JWT to determine which to use
-        if (this.cfg.apiKey && this.cfg.apiKey.length) {
-            this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteApiKeyConnection);
+        if (this.localConfig.apiKey && this.localConfig.apiKey.length) {
+            this.ocvClient = new OCVClient(this.localConfig.ocvUrl, this.remoteApiKeyConnection);
         } else {
-            this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteConnection);
+            this.ocvClient = new OCVClient(this.localConfig.ocvUrl, this.remoteConnection);
         }
-        this.authClient = new AuthClient(this.cfg, this.remoteApiKeyConnection);
+        this.authClient = new AuthClient(this.localConfig, this.remoteApiKeyConnection);
         // keep reference to client in ClientService
         ClientService.setClient(this);
 
         // check if implicit download has been set
-        if (this.cfg.implicitDownload && true) {
+        if (this.localConfig.implicitDownload && true) {
             this.implicitDownload();
         }
 
@@ -115,7 +134,7 @@ class GCLClient {
     }
 
     public static initialize(cfg: GCLConfig,
-                             callback?: (error: CoreExceptions.RestException, client: GCLClient) => void): Promise<GCLClient> {
+                             callback?: (error: RestException, client: GCLClient) => void): Promise<GCLClient> {
         return new Promise((resolve, reject) => {
             const initTime = moment();
             let client = new GCLClient(cfg, true);
@@ -123,7 +142,7 @@ class GCLClient {
             ClientService.setClient(client);
 
             // will be set to false if init fails
-            client.GCLInstalled = true;
+            client.gclInstalled = true;
 
             GCLClient.initLibrary().then(() => {
                 if (callback && typeof callback === 'function') {
@@ -147,7 +166,7 @@ class GCLClient {
      */
     private static initLibrary(): Promise<GCLClient> {
         return InitUtil.initializeLibrary(ClientService.getClient());
-    }
+    };
 
     // get admin services
     public admin = (): AdminService => {
@@ -163,7 +182,7 @@ class GCLClient {
     };
     // get core config
     public config = (): GCLConfig => {
-        return this.cfg;
+        return this.localConfig;
     };
     // get agent client services
     public agent = (): AbstractAgent => {
@@ -243,12 +262,21 @@ class GCLClient {
         return this.pluginFactory.createFileExchange();
     };
 
-    // generic methods
+
+    get gclInstalled(): boolean {
+        return this._gclInstalled;
+    }
+
+    set gclInstalled(value: boolean) {
+        this._gclInstalled = value;
+    }
+
+// generic methods
     public containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void) {
         return GenericService.containerForReader(this, readerId, callback);
     }
 
-    public download(callback?: (error: RestException, data: DownloadLinkResponse) => void) {
+    public download(callback?: (error: RestException, data: DSDownloadLinkResponse) => void) {
         return this.core().infoBrowser().then(info => {
             let downloadData = new DSDownloadRequest(info.data.browser, info.data.manufacturer,
                 info.data.os, info.data.ua, this.config().gwUrl);
@@ -299,7 +327,7 @@ class GCLClient {
     // implicit download GCL instance when not found
     private implicitDownload() {
         let self = this;
-        this.core().info(function (error: CoreExceptions.RestException) {
+        this.core().info(function (error: RestException) {
             console.log('implicit error', JSON.stringify(error));
             if (error) {
                 // no gcl available - start download
@@ -308,7 +336,7 @@ class GCLClient {
                 let downloadData = new DSDownloadRequest(_info.data.browser,
                     _info.data.manufacturer, _info.data.os, _info.data.ua, self.config().gwUrl);
                 self.ds().downloadLink(downloadData,
-                    function (linkError: CoreExceptions.RestException, downloadResponse: DownloadLinkResponse) {
+                    function (linkError: RestException, downloadResponse: DSDownloadLinkResponse) {
                         if (linkError) {
                             console.error('could not download GCL package:', linkError.description);
                         }
@@ -323,4 +351,3 @@ class GCLClient {
 }
 
 export {GCLClient, GCLConfig};
-

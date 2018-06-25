@@ -3,50 +3,55 @@
  * @since 2017
  */
 
-import { BrowserInfo, T1CContainer, T1CResponse } from '../service/CoreModel';
-import { RestException } from '../exceptions/CoreExceptions';
+import {BrowserInfo, T1CContainer} from '../service/CoreModel';
+import {RestException} from '../exceptions/CoreExceptions';
 
-export { AbstractDSClient, DSInfoResponse, DownloadLinkResponse, JWTResponse, DSPubKeyResponse,
-    DeviceResponse, DSPlatformInfo, DSDownloadRequest, DSRegistrationOrSyncRequest, DSBrowser, DSOperatingSystem,
-    DSClientInfo, DSContainer, DSStorage };
-
-
-interface AbstractDSClient {
+export interface AbstractDSClient {
     getUrl(): string;
+
     getInfo(callback?: (error: RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
+
     getDevice(uuid: string, callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
+
     getPubKey(deviceId: string,
               callback?: (error: RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse>;
+
     downloadLink(downloadData: DSDownloadRequest,
                  callback?: (error: RestException,
-                             data: DownloadLinkResponse) => void): Promise<DownloadLinkResponse>;
+                             data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse>;
+
     register(registrationData: DSRegistrationOrSyncRequest,
              callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
+
     sync(syncData: DSRegistrationOrSyncRequest,
          callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
 }
 
-class DSBrowser {
-    constructor(public name: string, public version: string) {}
+export class DSBrowser {
+    constructor(public name: string, public version: string) {
+    }
 }
 
-class DSOperatingSystem {
-    constructor(public architecture: number, public name: string, public version: string) {}
+export class DSOperatingSystem {
+    constructor(public architecture: number, public name: string, public version: string) {
+    }
 }
 
-class DSClientInfo {
-    constructor(public type: string, public version: string) {}
+export class DSClientInfo {
+    constructor(public type: string, public version: string) {
+    }
 }
 
-class DSDownloadRequest {
+export class DSDownloadRequest {
     constructor(public browser: DSBrowser,
                 public manufacturer: string,
                 public os: DSOperatingSystem,
                 public ua: string,
-                public proxyDomain: string) {}
+                public proxyDomain: string) {
+    }
 }
 
-class DSRegistrationOrSyncRequest {
+export class DSRegistrationOrSyncRequest {
     constructor(public managed: boolean,
                 public activated: boolean,
                 public uuid: string,
@@ -58,10 +63,11 @@ class DSRegistrationOrSyncRequest {
                 public ua: string,
                 public proxyDomain: string,
                 public clientInfo: DSClientInfo,
-                public containerStates?: T1CContainer[]) {}
+                public containerStates?: T1CContainer[]) {
+    }
 }
 
-class DSInfoResponse {
+export class DSInfoResponse {
     constructor(public configFile: string,
                 public build: string,
                 public version: string,
@@ -76,32 +82,38 @@ class DSInfoResponse {
                 public fileWin64: string,
                 public fileDefaultVersion: string,
                 public securityEnabled: string, // TODO should really be a boolean, needs fix in DS!
-                public securityPrivateKeyAvailable: boolean) {}
+                public securityPrivateKeyAvailable: boolean) {
+    }
 }
 
-class DownloadLinkResponse implements T1CResponse {
-    constructor(public url: string, public success: boolean) {}
+export class DSDownloadLinkResponse {
+    constructor(public url: string, public success: boolean) {
+
+    }
 }
 
-class JWTResponse {
-    constructor(public token: string) {}
+export class DSJWTResponse {
+    constructor(public token: string) {
+    }
 }
 
-class DSPubKeyResponse implements T1CResponse {
-    constructor(public encryptedPublicKey: string, public encryptedAesKey: string, public success: boolean) {}
+export class DSPubKeyResponse {
+    constructor(public encryptedPublicKey: string, public encryptedAesKey: string, public success: boolean) {
+    }
 }
 
-class DeviceResponse {
+export class DeviceResponse {
     constructor(public uuid: string,
                 public activated: boolean,
                 public atrList: { hash: string, storagePath: string },
                 public managed: boolean,
                 public coreVersion: string,
                 public contextToken: string,
-                public containerResponses: DSContainer[]) {}
+                public containerResponses: DSContainer[]) {
+    }
 }
 
-class DSContainer {
+export class DSContainer {
     constructor(public id: string,
                 public name: string,
                 public version: string,
@@ -109,14 +121,16 @@ class DSContainer {
                 public language: string,
                 public availability: string,
                 public dependsOn: string[],
-                public status: string) {}
+                public status: string) {
+    }
 }
 
-class DSStorage {
-    constructor(public hash: string, public storagePath: string, public os: string) {}
+export class DSStorage {
+    constructor(public hash: string, public storagePath: string, public os: string) {
+    }
 }
 
-class DSPlatformInfo extends BrowserInfo {
+export class DSPlatformInfo extends BrowserInfo {
     constructor(public activated: boolean,
                 public managed: boolean,
                 public bi: BrowserInfo,

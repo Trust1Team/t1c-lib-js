@@ -3,10 +3,7 @@
  */
 import { RestException } from '../core/exceptions/CoreExceptions';
 
-export { ResponseHandler };
-
-
-class ResponseHandler {
+export class ResponseHandler {
     public static error(err: RestException, callback?: (error: RestException, data: any) => void) {
         if (callback && typeof callback === 'function') { callback(err, null); }
         return Promise.reject(err);

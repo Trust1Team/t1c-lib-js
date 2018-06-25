@@ -27,7 +27,7 @@ describe('EMV Container', () => {
         mock.restore();
     });
 
-    describe(':: Application Data ::', function () {
+    describe(':: EmvApplication Data ::', function () {
         beforeEach(function () {
             mock.onGet('containers/emv/123/application-data').reply(() => {
                 return [ 200, { data: { country: 'BE', country_code: '0056', effective_date: '091101', expiration_date: '141130',
