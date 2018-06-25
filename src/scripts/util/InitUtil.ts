@@ -10,13 +10,10 @@ import { ActivationUtil } from './ActivationUtil';
 import { DSPlatformInfo } from '../core/ds/DSClientModel';
 import { PubKeyService } from './PubKeyService';
 import { RestException } from '../core/exceptions/CoreExceptions';
-import { GenericConnection } from '../core/client/Connection';
 import { AxiosError, AxiosResponse } from 'axios';
 import axios from 'axios';
 
-export { InitUtil };
-
-class InitUtil {
+export class InitUtil {
     // constructor
     constructor() {}
 
@@ -25,7 +22,7 @@ class InitUtil {
      * @param {GCLClient} client
      * @returns {Promise<any>}
      */
-    public static initializeLibrary(client: GCLClient) {
+    public static initializeLibrary(client: GCLClient): Promise<GCLClient> {
         return new Promise((finalResolve, finalReject) => {
             let initPromise = new Promise((resolve, reject) => {
                 let cfg = client.config();
@@ -91,7 +88,7 @@ class InitUtil {
                     }
                 }, () => {
                     // failure probably because GCL is not installed
-                    client.GCLInstalled = false;
+                    client.gclInstalled = false;
                     // check if older GCL version is available at v1 endpoint
                     axios.get('https://localhost:10443/v1').then((response: AxiosResponse) => {
                         // response received, inform user that he needs to update

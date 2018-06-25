@@ -20,28 +20,28 @@ var FOLDER_JS_EXTERNAL = FOLDER_JS + "/external";
 
 gulp.task("tslint", function () {
     return gulp.src([FOLDER_TS + "/**/*.{ts,tsx}"])
-               .pipe(tslint({
-                   formatter: "verbose"
-               }))
-               .pipe(tslint.report());
+        .pipe(tslint({
+            formatter: "verbose"
+        }))
+        .pipe(tslint.report());
 });
 
 gulp.task('webpack-debug', function() {
     return gulp.src('src/scripts/GCLLib.ts')
-               .pipe(webpackstream( require('./webpack.config.js') ))
-               .pipe(injectVersion({
-                   replace: /%%GULP_INJECT_VERSION%%/g
-               }))
-               .pipe(gulp.dest('dist/'));
+        .pipe(webpackstream( require('./webpack.config.js') ))
+        .pipe(injectVersion({
+            replace: /%%GULP_INJECT_VERSION%%/g
+        }))
+        .pipe(gulp.dest('dist/'));
 });
 
 gulp.task('webpack', ['webpack-debug'], function () {
     return gulp.src('src/scripts/GCLLib.ts')
-               .pipe(webpackstream( require('./webpack.config.publish.js') ))
-               .pipe(injectVersion({
-                   replace: /%%GULP_INJECT_VERSION%%/g
-               }))
-               .pipe(gulp.dest('dist/'))
+        .pipe(webpackstream( require('./webpack.config.publish.js') ))
+        .pipe(injectVersion({
+            replace: /%%GULP_INJECT_VERSION%%/g
+        }))
+        .pipe(gulp.dest('dist/'))
 });
 
 

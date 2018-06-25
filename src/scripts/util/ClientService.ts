@@ -3,9 +3,7 @@
  */
 import { GCLClient } from '../core/GCLLib';
 
-export { ClientService };
-
-class ClientService {
+export class ClientService {
     private static client: GCLClient;
 
     public static getClient() {

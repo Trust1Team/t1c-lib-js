@@ -1,15 +1,13 @@
 /**
  * @author Maarten Somers
  */
-import { Card } from '../core/service/CoreModel';
 import * as _ from 'lodash';
 import { Options } from './RequestHandler';
+import {SmartCard} from '../core/service/CoreModel';
 
-export { CardUtil };
+export class CardUtil {
 
-class CardUtil {
-
-    public static canAuthenticate(card: Card): boolean {
+    public static canAuthenticate(card: SmartCard): boolean {
         let container = this.determineContainer(card);
 
         switch (container) {
@@ -30,7 +28,7 @@ class CardUtil {
         }
     }
 
-    public static canSign(card: Card): boolean {
+    public static canSign(card: SmartCard): boolean {
         let container = this.determineContainer(card);
 
         switch (container) {
@@ -52,7 +50,7 @@ class CardUtil {
         }
     }
 
-    public static canVerifyPin(card: Card): boolean {
+    public static canVerifyPin(card: SmartCard): boolean {
         let container = this.determineContainer(card);
 
         switch (container) {
@@ -73,7 +71,7 @@ class CardUtil {
         }
     }
 
-    public static determineContainer(card: Card): string {
+    public static determineContainer(card: SmartCard): string {
         if (!_.isEmpty(card) && !_.isEmpty(card.description)) {
             if (findDescription( card.description, 'Belgium Electronic ID card')) { return 'beid'; }
             else if (findDescription(card.description, 'DNI electronico')) {return 'dnie'; }

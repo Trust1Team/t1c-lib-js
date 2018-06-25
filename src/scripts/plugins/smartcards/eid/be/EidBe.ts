@@ -3,7 +3,7 @@
  * @author Maarten Somers
  * @since 2016
  */
-import { AbstractEidBE, AddressResponse, RnDataResponse, TokenDataResponse } from './EidBeModel';
+import { AbstractEidBE, BeidAddressResponse, BeidRnDataResponse, BeidTokenDataResponse } from './EidBeModel';
 import { RestException } from '../../../../core/exceptions/CoreExceptions';
 import { CertificateResponse, DataResponse, T1CResponse } from '../../../../core/service/CoreModel';
 import { GenericCertCard, OptionalPin, VerifyPinData } from '../../Card';
@@ -11,10 +11,7 @@ import { PinEnforcer } from '../../../../util/PinEnforcer';
 import { Options, RequestHandler } from '../../../../util/RequestHandler';
 import * as _ from 'lodash';
 
-export { EidBe };
-
-
-class EidBe extends GenericCertCard implements AbstractEidBE {
+export class EidBe extends GenericCertCard implements AbstractEidBE {
     static RN_DATA = '/rn';
     static ADDRESS = '/address';
     static PHOTO = '/picture';
@@ -22,15 +19,15 @@ class EidBe extends GenericCertCard implements AbstractEidBE {
     static VERIFY_PRIV_KEY_REF = 'non-repudiation';
 
 
-    public rnData(callback?: (error: RestException, data: RnDataResponse) => void): Promise<RnDataResponse> {
+    public rnData(callback?: (error: RestException, data: BeidRnDataResponse) => void): Promise<BeidRnDataResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.RN_DATA), undefined, undefined, callback);
     }
 
-    public address(callback?: (error: RestException, data: AddressResponse) => void): Promise<AddressResponse> {
+    public address(callback?: (error: RestException, data: BeidAddressResponse) => void): Promise<BeidAddressResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.ADDRESS), undefined, undefined, callback);
     }
 
-    public tokenData(callback?: (error: RestException, data: TokenDataResponse) => void): Promise<TokenDataResponse> {
+    public tokenData(callback?: (error: RestException, data: BeidTokenDataResponse) => void): Promise<BeidTokenDataResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.TOKEN), undefined, undefined, callback);
     }
 

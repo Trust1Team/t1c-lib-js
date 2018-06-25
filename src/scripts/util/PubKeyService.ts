@@ -1,9 +1,7 @@
 /**
  * @author Maarten Somers
  */
-export { PubKeyService };
-
-class PubKeyService {
+export class PubKeyService {
     private static pubKey: string;
 
     public static getPubKey() {

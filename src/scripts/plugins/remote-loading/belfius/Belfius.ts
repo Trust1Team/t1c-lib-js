@@ -11,10 +11,8 @@ import { APDU, CommandResponse } from '../RemoteLoadingModel';
 import { ResponseHandler } from '../../../util/ResponseHandler';
 import * as _ from 'lodash';
 
-export { Belfius };
 
-
-class Belfius extends RemoteLoading implements AbstractBelfius {
+export class Belfius extends RemoteLoading implements AbstractBelfius {
     static readonly NONCE_APDU: APDU = new APDU('F1', '95', 'F7', 'E4', 'FE0000040001300000');
 
     private static generateStxApdu(data: string, prefix?: string): APDU {

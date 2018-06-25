@@ -10,18 +10,14 @@ import {
 } from '../../../../core/service/CoreModel';
 import { Options } from '../../../../util/RequestHandler';
 
-export { AbstractEidBE, Address, AddressResponse, AllCertsResponse,
-    AllDataResponse, RnData, RnDataResponse, AllBeIDData, AllBeIDCerts, TokenData, TokenDataResponse };
-
-
-interface AbstractEidBE extends CertCard {
+export interface AbstractEidBE extends CertCard {
     allData(filters: string[] | Options,
-            callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse>;
+            callback?: (error: RestException, data: BeidAllDataResponse) => void): Promise<BeidAllDataResponse>;
     allCerts(filters: string[] | Options,
-             callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>;
-    rnData(callback?: (error: RestException, data: RnDataResponse) => void): Promise<RnDataResponse>;
-    tokenData(callback?: (error: RestException, data: TokenDataResponse) => void): Promise<TokenDataResponse>;
-    address(callback?: (error: RestException, data: AddressResponse) => void): Promise<AddressResponse>;
+             callback?: (error: RestException, data: BeidAllCertsResponse) => void): Promise<BeidAllCertsResponse>;
+    rnData(callback?: (error: RestException, data: BeidRnDataResponse) => void): Promise<BeidRnDataResponse>;
+    tokenData(callback?: (error: RestException, data: BeidTokenDataResponse) => void): Promise<BeidTokenDataResponse>;
+    address(callback?: (error: RestException, data: BeidAddressResponse) => void): Promise<BeidAddressResponse>;
     picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
     rootCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     citizenCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse)
@@ -32,17 +28,17 @@ interface AbstractEidBE extends CertCard {
         => void): Promise<CertificateResponse>;
     rrnCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
-    tokenData(callback?: (error: RestException, data: TokenDataResponse) => void): Promise<TokenDataResponse>;
+    tokenData(callback?: (error: RestException, data: BeidTokenDataResponse) => void): Promise<BeidTokenDataResponse>;
 
 }
 
-class AddressResponse extends DataObjectResponse {
-    constructor(public data: Address, public success: boolean) {
+export class BeidAddressResponse extends DataObjectResponse {
+    constructor(public data: BeidAddress, public success: boolean) {
         super(data, success);
     }
 }
 
-class Address {
+export class BeidAddress {
     constructor(public municipality: string,
                 public raw_data: string,
                 public signature: string,
@@ -51,13 +47,13 @@ class Address {
                 public zipcode: string) {}
 }
 
-class AllCertsResponse extends DataObjectResponse {
-    constructor(public data: AllBeIDCerts, public success: boolean) {
+export class BeidAllCertsResponse extends DataObjectResponse {
+    constructor(public data: BeidAllCerts, public success: boolean) {
         super(data, success);
     }
 }
 
-class AllBeIDCerts {
+export class BeidAllCerts {
     constructor(public authentication_certificate?: T1CCertificate,
                 public citizen_certificate?: T1CCertificate,
                 public non_repudiation_certificate?: T1CCertificate,
@@ -65,25 +61,25 @@ class AllBeIDCerts {
                 public rrn_certificate?: T1CCertificate) {}
 }
 
-class AllDataResponse extends AllCertsResponse {
-    constructor(public data: AllBeIDData, public success: boolean) {
+export class BeidAllDataResponse extends BeidAllCertsResponse {
+    constructor(public data: BeidAllData, public success: boolean) {
         super(data, success);
     }
 }
 
-class AllBeIDData {
-    constructor(public address?: Address,
+export class BeidAllData {
+    constructor(public address?: BeidAddress,
                 public authentication_certificate?: T1CCertificate,
                 public citizen_certificate?: T1CCertificate,
                 public non_repudiation_certificate?: T1CCertificate,
                 public picture?: string,
-                public rn?: RnData,
+                public rn?: BeidRnData,
                 public root_certificate?: T1CCertificate,
                 public rrn_certificate?: T1CCertificate,
-                public token_data?: TokenData) {}
+                public token_data?: BeidTokenData) {}
 }
 
-class TokenData {
+export class BeidTokenData {
     constructor(
         public eid_compliant?: number,
         public electrical_perso_interface_version?: number,
@@ -97,14 +93,14 @@ class TokenData {
         public version_rfu?: number) {}
 }
 
-class TokenDataResponse extends DataObjectResponse {
-    constructor( public data: TokenData, public success: boolean) {
+export class BeidTokenDataResponse extends DataObjectResponse {
+    constructor(public data: BeidTokenData, public success: boolean) {
         super(data, success);
     }
 }
 
 
-class RnData {
+export class BeidRnData {
     constructor(public birth_date: string,
                 public birth_location: string,
                 public card_delivery_municipality: string,
@@ -127,8 +123,8 @@ class RnData {
                 public version: number) {}
 }
 
-class RnDataResponse extends DataObjectResponse {
-    constructor(public data: RnData, public success: boolean) {
+export class BeidRnDataResponse extends DataObjectResponse {
+    constructor(public data: BeidRnData, public success: boolean) {
         super(data, success);
     }
 }
