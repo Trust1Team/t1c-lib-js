@@ -209,7 +209,7 @@ export abstract class GenericConnection implements Connection {
     getRequestHeaders(headers: RequestHeaders): RequestHeaders {
         let reqHeaders = headers || {};
         reqHeaders['Accept-Language'] = 'en-US';
-        reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
+        /*reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;*/
         return reqHeaders;
     }
 
@@ -343,6 +343,16 @@ export class LocalAuthAdminConnection extends GenericConnection implements Conne
         super(cfg);
     }
 
+    getRequestHeaders(headers: RequestHeaders): RequestHeaders {
+        let reqHeaders = super.getRequestHeaders(headers);
+        reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
+        reqHeaders.Authorization = 'Bearer ' + this.cfg.gclJwt;
+        if (this.cfg.tokenCompatible && this.getSecurityConfig().sendToken) {
+            reqHeaders[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
+        }
+        return reqHeaders;
+    }
+
     getSecurityConfig(): SecurityConfig {
         return {sendGwJwt: false, sendGclJwt: true, sendApiKey: false, sendToken: true, skipCitrixCheck: true};
     }
@@ -360,13 +370,8 @@ export class LocalAuthAdminConnection extends GenericConnection implements Conne
             callback = function () { /* no-op */
             };
         }
-
+        let headers = this.getRequestHeaders({});
         return new Promise((resolve, reject) => {
-            let headers: RequestHeaders = {};
-            headers.Authorization = 'Bearer ' + this.cfg.gclJwt;
-            if (this.cfg.tokenCompatible && this.getSecurityConfig().sendToken) {
-                headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
-            }
             axios.get(UrlUtil.create(basePath, suffix, this.cfg, true), {
                 responseType: 'blob', headers
             }).then(response => {
@@ -398,6 +403,16 @@ export class LocalAuthConnection extends GenericConnection implements Connection
         super(cfg);
     }
 
+    getRequestHeaders(headers: RequestHeaders): RequestHeaders {
+        let reqHeaders = super.getRequestHeaders(headers);
+        reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
+        reqHeaders.Authorization = 'Bearer ' + this.cfg.gclJwt;
+        if (this.cfg.tokenCompatible && this.getSecurityConfig().sendToken) {
+            reqHeaders[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
+        }
+        return reqHeaders;
+    }
+
     getSecurityConfig(): SecurityConfig {
         return {sendGwJwt: false, sendGclJwt: true, sendApiKey: false, sendToken: true, skipCitrixCheck: false};
     }
@@ -420,19 +435,19 @@ export class LocalAuthConnection extends GenericConnection implements Connection
         let securityConfig = this.getSecurityConfig();
         securityConfig.skipCitrixCheck = true;
         return this.handleRequest(basePath, suffix, 'GET', this.cfg, securityConfig,
-            undefined, queryParams, headers, callback);
+            undefined, queryParams, this.getRequestHeaders(headers), callback);
     }
 
     public postSkipCitrix(basePath: string,
-                         suffix: string,
-                         queryParams?: QueryParams,
-                         body?:RequestBody,
-                         headers?: RequestHeaders,
-                         callback?: RequestCallback): Promise<any> {
+                          suffix: string,
+                          queryParams?: QueryParams,
+                          body?: RequestBody,
+                          headers?: RequestHeaders,
+                          callback?: RequestCallback): Promise<any> {
         let securityConfig = this.getSecurityConfig();
         securityConfig.skipCitrixCheck = true;
         return this.handleRequest(basePath, suffix, 'POST', this.cfg, securityConfig,
-            body, queryParams, headers, callback);
+            body, queryParams, this.getRequestHeaders(headers), callback);
     }
 
     /**
@@ -450,11 +465,7 @@ export class LocalAuthConnection extends GenericConnection implements Connection
         }
 
         return new Promise((resolve, reject) => {
-            let headers: RequestHeaders = {};
-            headers.Authorization = 'Bearer ' + this.cfg.gclJwt;
-            if (this.cfg.tokenCompatible && this.getSecurityConfig().sendToken) {
-                headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
-            }
+            let headers: RequestHeaders = this.getRequestHeaders({});
             axios.get(UrlUtil.create(basePath, suffix, this.cfg, false), {
                 responseType: 'blob', headers
             }).then(response => {
@@ -488,6 +499,7 @@ export class LocalConnection extends GenericConnection implements Connection {
 
     getRequestHeaders(headers: RequestHeaders): RequestHeaders {
         let reqHeaders = super.getRequestHeaders(headers);
+        reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
         // contextToken = application id (ex. 26)
         let contextToken = this.cfg.contextToken;
         // only send the relay state header for unmanaged installs

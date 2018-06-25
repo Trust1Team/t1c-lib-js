@@ -18896,7 +18896,6 @@ var GCLLib =
 	    GenericConnection.prototype.getRequestHeaders = function (headers) {
 	        var reqHeaders = headers || {};
 	        reqHeaders['Accept-Language'] = 'en-US';
-	        reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
 	        return reqHeaders;
 	    };
 	    GenericConnection.prototype.getSecurityConfig = function () {
@@ -18997,6 +18996,15 @@ var GCLLib =
 	        _this.cfg = cfg;
 	        return _this;
 	    }
+	    LocalAuthAdminConnection.prototype.getRequestHeaders = function (headers) {
+	        var reqHeaders = _super.prototype.getRequestHeaders.call(this, headers);
+	        reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
+	        reqHeaders.Authorization = 'Bearer ' + this.cfg.gclJwt;
+	        if (this.cfg.tokenCompatible && this.getSecurityConfig().sendToken) {
+	            reqHeaders[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint_1.BrowserFingerprint.get();
+	        }
+	        return reqHeaders;
+	    };
 	    LocalAuthAdminConnection.prototype.getSecurityConfig = function () {
 	        return { sendGwJwt: false, sendGclJwt: true, sendApiKey: false, sendToken: true, skipCitrixCheck: true };
 	    };
@@ -19006,12 +19014,8 @@ var GCLLib =
 	            callback = function () {
 	            };
 	        }
+	        var headers = this.getRequestHeaders({});
 	        return new Promise(function (resolve, reject) {
-	            var headers = {};
-	            headers.Authorization = 'Bearer ' + _this.cfg.gclJwt;
-	            if (_this.cfg.tokenCompatible && _this.getSecurityConfig().sendToken) {
-	                headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint_1.BrowserFingerprint.get();
-	            }
 	            axios_1.default.get(UrlUtil_1.UrlUtil.create(basePath, suffix, _this.cfg, true), {
 	                responseType: 'blob', headers: headers
 	            }).then(function (response) {
@@ -19045,18 +19049,27 @@ var GCLLib =
 	        _this.cfg = cfg;
 	        return _this;
 	    }
+	    LocalAuthConnection.prototype.getRequestHeaders = function (headers) {
+	        var reqHeaders = _super.prototype.getRequestHeaders.call(this, headers);
+	        reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
+	        reqHeaders.Authorization = 'Bearer ' + this.cfg.gclJwt;
+	        if (this.cfg.tokenCompatible && this.getSecurityConfig().sendToken) {
+	            reqHeaders[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint_1.BrowserFingerprint.get();
+	        }
+	        return reqHeaders;
+	    };
 	    LocalAuthConnection.prototype.getSecurityConfig = function () {
 	        return { sendGwJwt: false, sendGclJwt: true, sendApiKey: false, sendToken: true, skipCitrixCheck: false };
 	    };
 	    LocalAuthConnection.prototype.getSkipCitrix = function (basePath, suffix, queryParams, headers, callback) {
 	        var securityConfig = this.getSecurityConfig();
 	        securityConfig.skipCitrixCheck = true;
-	        return this.handleRequest(basePath, suffix, 'GET', this.cfg, securityConfig, undefined, queryParams, headers, callback);
+	        return this.handleRequest(basePath, suffix, 'GET', this.cfg, securityConfig, undefined, queryParams, this.getRequestHeaders(headers), callback);
 	    };
 	    LocalAuthConnection.prototype.postSkipCitrix = function (basePath, suffix, queryParams, body, headers, callback) {
 	        var securityConfig = this.getSecurityConfig();
 	        securityConfig.skipCitrixCheck = true;
-	        return this.handleRequest(basePath, suffix, 'POST', this.cfg, securityConfig, body, queryParams, headers, callback);
+	        return this.handleRequest(basePath, suffix, 'POST', this.cfg, securityConfig, body, queryParams, this.getRequestHeaders(headers), callback);
 	    };
 	    LocalAuthConnection.prototype.requestLogFile = function (basePath, suffix, callback) {
 	        var _this = this;
@@ -19065,11 +19078,7 @@ var GCLLib =
 	            };
 	        }
 	        return new Promise(function (resolve, reject) {
-	            var headers = {};
-	            headers.Authorization = 'Bearer ' + _this.cfg.gclJwt;
-	            if (_this.cfg.tokenCompatible && _this.getSecurityConfig().sendToken) {
-	                headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint_1.BrowserFingerprint.get();
-	            }
+	            var headers = _this.getRequestHeaders({});
 	            axios_1.default.get(UrlUtil_1.UrlUtil.create(basePath, suffix, _this.cfg, false), {
 	                responseType: 'blob', headers: headers
 	            }).then(function (response) {
@@ -19105,6 +19114,7 @@ var GCLLib =
 	    }
 	    LocalConnection.prototype.getRequestHeaders = function (headers) {
 	        var reqHeaders = _super.prototype.getRequestHeaders.call(this, headers);
+	        reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
 	        var contextToken = this.cfg.contextToken;
 	        if (!this.cfg.isManaged && contextToken && !_.isNil(contextToken)) {
 	            reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
