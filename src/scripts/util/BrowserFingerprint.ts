@@ -2,16 +2,13 @@
  * @author Michallis Pashidis
  * @since 2018
  */
-import * as bases from 'bases';
-import * as _ from 'lodash';
 import * as store from 'store2';
 import * as Base64 from 'Base64';
 import { v4 as uuid } from 'uuid';
 import * as sha from 'sha256';
 
-export { BrowserFingerprint };
 
-class BrowserFingerprint {
+export class BrowserFingerprint {
     static readonly BROWSER_AUTH_TOKEN_LOCATION = 't1c-js-browser-id-token';
 
     public static get(): string {

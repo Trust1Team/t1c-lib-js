@@ -5,10 +5,8 @@
 
 import { RestException } from '../../core/exceptions/CoreExceptions';
 
-export { AbstractDataContainer };
 
-
-interface AbstractDataContainer {
+export interface AbstractDataContainer {
     // support all CRUD operations
     create(data: any, callback?: (error: RestException, data: any) => void): Promise<any>;
     read(id?: string, callback?: (error: RestException, data: any) => void): Promise<any>;

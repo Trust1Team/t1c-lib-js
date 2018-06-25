@@ -6,9 +6,7 @@
 import { ClientService } from './ClientService';
 import { DSContainer } from '../core/ds/DSClientModel';
 
-export { DataContainerUtil };
-
-class DataContainerUtil {
+export class DataContainerUtil {
     // constructor
     constructor() {}
 

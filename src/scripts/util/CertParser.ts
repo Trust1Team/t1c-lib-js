@@ -10,9 +10,7 @@ import { RestException } from '../core/exceptions/CoreExceptions';
 import { T1CCertificate, T1CResponse } from '../core/service/CoreModel';
 import { ResponseHandler } from './ResponseHandler';
 
-export { CertParser };
-
-class CertParser {
+export class CertParser {
 
     public static process(response: any,
                           parseCerts: boolean,

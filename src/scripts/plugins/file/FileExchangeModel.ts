@@ -5,10 +5,7 @@
 import { RestException } from '../../core/exceptions/CoreExceptions';
 import {BoolDataResponse, DataArrayResponse, DataResponse, T1CResponse} from '../../core/service/CoreModel';
 
-export { AbstractFileExchange, FileListResponse, ListFilesRequest, File, FileList, Page, AccessMode, FileAction, FileSort, TypeStatus, TypeResponse, Type, TypeList, TypeListResponse, FileResponse, ModalType };
-
-
-interface AbstractFileExchange {
+export interface AbstractFileExchange {
     download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], implicitCreationType?: boolean, notifyOnCompletion?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>; // implicit
     upload(entity: string, type: string, filename: string, rel_path?: [string], notifyOnCompletion?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<ArrayBuffer>;
     // getProgress(entity: string, type: String, filename?: String, action?: FileAction, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
@@ -33,11 +30,11 @@ interface AbstractFileExchange {
 }
 
 /* Model */
-class ListFilesRequest {
+export class ListFilesRequest {
     constructor(public path: string, public extensions: string[]) {}
 }
 
-class File {
+export class File {
     constructor(public extension: string,
                 public name: string,
                 public path: string,
@@ -49,54 +46,54 @@ class File {
                 public access_mode: AccessMode) {}
 }
 
-class FileListResponse extends T1CResponse {
+export class FileListResponse extends T1CResponse {
     constructor(public data: FileList, public success: boolean) {
         super(success, data);
     }
 }
 
-class FileList {
+export class FileList {
     constructor(public files: File[], public total: number) {}
 }
 
-class FileResponse extends T1CResponse {
+export class FileResponse extends T1CResponse {
     constructor(public data: File, public success: boolean) {
         super(success, data);
     }
 }
 
-class TypeListResponse extends T1CResponse {
+export class TypeListResponse extends T1CResponse {
     constructor(public data: TypeList, public success: boolean) {
         super(success, data);
     }
 }
 
-class TypeResponse extends T1CResponse {
+export class TypeResponse extends T1CResponse {
     constructor(public data: Type, public success: boolean){
         super(success, data);
     }
 }
 
-class Type {
+export class Type {
     constructor(public appid?: string, public entity?: string, public type?: string, public abs_path?: string, access_mode?: AccessMode, status?: string, public files?: number) {}
 }
 
-class TypeList {
+export class TypeList {
     constructor(public types: Type[], public total: number) {}
 }
 
-class Page {
+export class Page {
     constructor (public start: number, public size: number, public sort: FileSort) {}
 }
 
 /* Enumerations */
 
-class FileSort {
+export class FileSort {
     static ASC = 'asc';
     static DESC = 'desc';
 }
 
-class AccessMode {
+export class AccessMode {
     static READ = 'r';
     static WRITE = 'w';
     static EXEC = 'x';
@@ -106,16 +103,16 @@ class AccessMode {
     static READ_WRITE_EXEC = 'rwx';
 }
 
-enum TypeStatus {
+export enum TypeStatus {
     MAPPED,
     UNMAPPED
 }
 
-enum FileAction {
+export enum FileAction {
     UPLOAD, DOWNLOAD, COPY, MOVE
 }
 
-class ModalType {
+export class ModalType {
     static INFO = 'info';
     static CHOICE = 'choice';
 }

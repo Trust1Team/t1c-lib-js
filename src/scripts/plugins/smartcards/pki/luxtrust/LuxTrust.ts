@@ -8,10 +8,8 @@ import { GenericCertCard } from '../../Card';
 import { AbstractLuxTrust } from './LuxTrustModel';
 import { Options, RequestHandler } from '../../../../util/RequestHandler';
 
-export { LuxTrust };
 
-
-class LuxTrust extends GenericCertCard implements AbstractLuxTrust {
+export class LuxTrust extends GenericCertCard implements AbstractLuxTrust {
     static ACTIVATED = '/activated';
 
     public activated(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
