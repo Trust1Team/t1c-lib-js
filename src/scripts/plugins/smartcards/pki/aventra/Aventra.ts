@@ -3,32 +3,29 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from '../../../../core/exceptions/CoreExceptions';
-import { CertificateResponse, T1CResponse } from '../../../../core/service/CoreModel';
-import { GenericCertCard, ResetPinData, VerifyPinData } from '../../Card';
-import { AbstractAventra} from './AventraModel';
-import { PinEnforcer } from '../../../../util/PinEnforcer';
-import { Options, RequestHandler } from '../../../../util/RequestHandler';
+import {RestException} from '../../../../core/exceptions/CoreExceptions';
+import {CertificateResponse, T1CResponse} from '../../../../core/service/CoreModel';
+import {GenericCertCard, ResetPinData, VerifyPinData} from '../../Card';
+import {AbstractAventra} from './AventraModel';
+import {PinEnforcer} from '../../../../util/PinEnforcer';
+import {Options, RequestHandler} from '../../../../util/RequestHandler';
 
-export { Aventra };
-
-
-class Aventra extends GenericCertCard implements AbstractAventra {
+export class Aventra extends GenericCertCard implements AbstractAventra {
     static DEFAULT_VERIFY_PIN = 'sign';
     static RESET_PIN = '/reset-pin';
 
     // filters
     public allDataFilters() {
-        return [ 'applet-info', 'root_certificate', 'authentication-certificate',
-                 'encryption_certificate', 'issuer_certificate', 'signing_certificate' ];
+        return ['applet-info', 'root_certificate', 'authentication-certificate',
+            'encryption_certificate', 'issuer_certificate', 'signing_certificate'];
     }
 
     public allCertFilters() {
-        return [ 'root_certificate', 'authentication-certificate', 'encryption_certificate', 'issuer_certificate', 'signing_certificate' ];
+        return ['root_certificate', 'authentication-certificate', 'encryption_certificate', 'issuer_certificate', 'signing_certificate'];
     }
 
     public allKeyRefs() {
-        return [ 'authenticate', 'sign', 'encrypt' ];
+        return ['authenticate', 'sign', 'encrypt'];
     }
 
     public rootCertificate(options?: Options,

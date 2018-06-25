@@ -3,11 +3,9 @@
  * @since 2018
  */
 
-export { Polyfills };
 
 declare function require(name: string);
-
-class Polyfills {
+export class Polyfills {
     // utility to check browser compatibility with Promise, Array.from, Symbol
 
     public static check() {
@@ -31,6 +29,10 @@ class Polyfills {
         if (!windowToCheck.Symbol) {
             console.log('T1C-JS Lib: applying polyfill for ES6 Symbol');
             require('core-js/es6/symbol');
+        }
+
+        if (typeof Object.assign !== 'function') {
+            require('object-assign');
         }
     }
 }

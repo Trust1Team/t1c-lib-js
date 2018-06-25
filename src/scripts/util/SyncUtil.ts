@@ -3,8 +3,7 @@
  * @since 2018
  */
 import {
-    DeviceResponse, DSClientInfo, DSContainer, DSPlatformInfo, DSRegistrationOrSyncRequest,
-    JWTResponse
+    DeviceResponse, DSClientInfo, DSContainer, DSPlatformInfo, DSRegistrationOrSyncRequest
 } from '../core/ds/DSClientModel';
 import { DataContainerUtil } from './DataContainerUtil';
 import * as _ from 'lodash';
@@ -14,9 +13,7 @@ import { T1CContainer } from '../core/service/CoreModel';
 import { ContainerSyncRequest } from '../core/admin/adminModel';
 import { ActivationUtil } from './ActivationUtil';
 
-export { SyncUtil };
-
-class SyncUtil {
+export class SyncUtil {
     static readonly DOWNLOAD_ERROR = 'DOWNLOAD_ERROR';
     static readonly GENERIC_ERROR = 'ERROR';
     static readonly ERROR_STATES = [ SyncUtil.DOWNLOAD_ERROR, SyncUtil.GENERIC_ERROR ];

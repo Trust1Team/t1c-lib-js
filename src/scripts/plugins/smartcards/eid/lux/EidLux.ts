@@ -5,20 +5,18 @@
  */
 import { LocalConnection, QueryParams, RequestHeaders } from '../../../../core/client/Connection';
 import { RestException } from '../../../../core/exceptions/CoreExceptions';
-import { AuthenticateOrSignData, GenericSecuredCertCard, OptionalPin } from '../../Card';
+import {AuthenticateOrSignData, GenericCertCard, GenericSecuredCertCard, OptionalPin} from '../../Card';
 import { CertificateResponse, CertificatesResponse, DataResponse, T1CResponse } from '../../../../core/service/CoreModel';
 import {
-    AbstractEidLUX, AllCertsResponse, AllDataResponse,
-    BiometricResponse, PictureResponse, SignatureImageResponse
+    AbstractEidLUX, AllCertsResponse, LuxAllDataResponse,
+    LuxidBiometricResponse, LuxidPictureResponse, LuxidSignatureImageResponse
 } from './EidLuxModel';
 import { PinEnforcer } from '../../../../util/PinEnforcer';
 import { CertParser } from '../../../../util/CertParser';
 import { ResponseHandler } from '../../../../util/ResponseHandler';
 import { Options, RequestHandler, RequestOptions } from '../../../../util/RequestHandler';
 
-export { EidLux };
-
-class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
+export class EidLux extends GenericCertCard implements AbstractEidLUX {
     static BIOMETRIC = '/biometric';
     static ADDRESS = '/address';
     static PHOTO = '/picture';
@@ -49,7 +47,7 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
     }
 
     public allData(options?: string[] | Options,
-                   callback?: (error: RestException, data: AllDataResponse) => void): Promise<AllDataResponse> {
+                   callback?: (error: RestException, data: LuxAllDataResponse) => void): Promise<LuxAllDataResponse> {
         const reqOptions = RequestHandler.determineOptionsWithFilter(options);
         return this.connection.get(this.baseUrl, this.containerSuffix(), reqOptions.params,
             EidLux.EncryptedPinHeader(this.pin)).then(data => {
@@ -70,7 +68,7 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
         });
     }
 
-    public biometric(callback?: (error: RestException, data: BiometricResponse) => void): Promise<BiometricResponse> {
+    public biometric(callback?: (error: RestException, data: LuxidBiometricResponse) => void): Promise<LuxidBiometricResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidLux.BIOMETRIC),
             undefined, EidLux.EncryptedPinHeader(this.pin), callback);
     }
@@ -78,7 +76,7 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
     // in order to access the address information, we need different keys, and on Lux gov level this is protected
     /*address(callback) {this.connection.get(this.baseUrl, this.containerSuffix(LUX_ADDRESS, callback, createPinQueryParam(this.pin));}*/
 
-    public picture(callback?: (error: RestException, data: PictureResponse) => void): Promise<PictureResponse> {
+    public picture(callback?: (error: RestException, data: LuxidPictureResponse) => void): Promise<LuxidPictureResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidLux.PHOTO),
             undefined, EidLux.EncryptedPinHeader(this.pin), callback);
     }
@@ -123,7 +121,7 @@ class EidLux extends GenericSecuredCertCard implements AbstractEidLUX {
         });
     }
 
-    public signatureImage(callback?: (error: RestException, data: SignatureImageResponse) => void | Promise<SignatureImageResponse>) {
+    public signatureImage(callback?: (error: RestException, data: LuxidSignatureImageResponse) => void | Promise<LuxidSignatureImageResponse>) {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidLux.SIGNATURE_IMAGE),
             undefined, EidLux.EncryptedPinHeader(this.pin), callback);
     }

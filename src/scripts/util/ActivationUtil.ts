@@ -6,9 +6,7 @@ import { DSClientInfo, DSPlatformInfo, DSRegistrationOrSyncRequest } from '../co
 import { SetPubKeyRequest } from '../core/admin/adminModel';
 import { GCLClient } from '../core/GCLLib';
 
-export { ActivationUtil };
-
-class ActivationUtil {
+export class ActivationUtil {
     // constructor
     constructor() {}
 
