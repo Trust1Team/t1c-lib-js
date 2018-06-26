@@ -47341,9 +47341,9 @@ var GCLLib =
 	    FileExchange.prototype.existsType = function (entity, type, callback) {
 	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_EXISTS), { entity: entity, type: type }, undefined, undefined, callback);
 	    };
-	    FileExchange.prototype.getAccessMode = function (entity, type, filename, relpath, callback) {
+	    FileExchange.prototype.getAccessMode = function (entity, type, relpath, callback) {
 	        var rel_path = (relpath == null) ? undefined : relpath;
-	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.ACCESS_MODE), { entity: entity, type: type, filename: filename, rel_path: rel_path }, undefined, undefined, callback);
+	        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.ACCESS_MODE), { entity: entity, type: type, rel_path: rel_path }, undefined, undefined, callback);
 	    };
 	    FileExchange.prototype.getEnabledContainers = function (callback) {
 	        return this.connection.get(this.baseUrl, this.containerSuffix(FileExchange.CONTAINERS_ENABLED), [], undefined, callback);
