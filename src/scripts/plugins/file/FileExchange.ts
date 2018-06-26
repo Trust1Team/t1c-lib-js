@@ -75,9 +75,9 @@ export class FileExchange extends GenericContainer implements AbstractFileExchan
         return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_EXISTS), {entity, type}, undefined, undefined, callback);
     }
 
-    getAccessMode(entity: string, type: string, filename?: string, relpath?: [string], callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+    getAccessMode(entity: string, type: string, relpath?: [string], callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         const rel_path = (relpath == null) ? undefined : relpath;
-        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.ACCESS_MODE), {entity, type, filename, rel_path}, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.ACCESS_MODE), {entity, type, rel_path}, undefined, undefined, callback);
     }
 
     getEnabledContainers(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {

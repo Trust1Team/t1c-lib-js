@@ -7,12 +7,12 @@ import { expect } from 'chai';
 import * as axios from 'axios';
 import * as MockAdapter from 'axios-mock-adapter';
 import { GCLConfig } from '../../../scripts/core/GCLConfig';
-import { LocalConnection } from '../../../scripts/core/client/Connection';
 import { AdminService } from '../../../scripts/core/admin/admin';
+import {LocalAuthAdminConnection} from "../../../scripts/core/client/Connection";
 
 describe('Admin Services', () => {
     let gclConfig = new GCLConfig({});
-    const connection: LocalConnection = new LocalConnection(gclConfig);
+    const connection: LocalAuthAdminConnection = new LocalAuthAdminConnection(gclConfig);
     let admin = new AdminService('', connection);
     let mock: MockAdapter;
 
