@@ -67,8 +67,8 @@ export class FileExchange extends GenericContainer implements AbstractFileExchan
         return this.connection.postFile(this.baseUrl, this.containerSuffix(FileExchange.DOWNLOAD), {entity, type, file, filename, relPathInput, implicit_creation_type, notify_on_completion}, undefined, callback);
     }
 
-    existsFile(entity: string, type: string, relpath: [string], callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_EXISTS), {entity, type, relpath}, undefined, undefined, callback);
+    existsFile(entity: string, type: string, rel_path: [string], callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_EXISTS), {entity, type, rel_path}, undefined, undefined, callback);
     }
 
     existsType(entity: string, type: string, callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
@@ -96,14 +96,14 @@ export class FileExchange extends GenericContainer implements AbstractFileExchan
         return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_LIST), {entity, type}, undefined, undefined, callback);
     }
 
-    listTypeContent(entity: string, type: string, relpath?: [string], page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse> {
+    listTypeContent(entity: string, type: string, rel_path?: [string], page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse> {
         let paging: Page;
         if (page) {
             paging = page;
         } else {
             paging = {start: 1, size: 10, sort: FileSort.ASC};
         }
-        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CONTENT_LIST), {entity, type, relpath, paging}, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CONTENT_LIST), {entity, type, rel_path, paging}, undefined, undefined, callback);
     }
 
     listTypes(entity: string, page?: Page, callback?: (error: RestException, data: TypeListResponse) => void): Promise<TypeListResponse> {
