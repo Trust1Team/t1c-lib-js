@@ -9,12 +9,12 @@ import * as MockAdapter from 'axios-mock-adapter';
 import { GCLConfig } from '../../../../../scripts/core/GCLConfig';
 import { LocalConnection } from '../../../../../scripts/core/client/Connection';
 import { PluginFactory } from '../../../../../scripts/plugins/PluginFactory';
-import { ModuleConfig } from '../../../../../scripts/plugins/smartcards/pkcs11/pkcs11Model';
+import { Pkcs11ModuleConfig } from '../../../../../scripts/plugins/smartcards/pkcs11/pkcs11Model';
 import { PubKeyService } from '../../../../../scripts/util/PubKeyService';
 
 describe('PKCS#11 Container', () => {
-    const gclConfig = new GCLConfig({ pkcs11Config: new ModuleConfig('linux', 'mac', 'win ') });
-    const failConfig = new GCLConfig({ pkcs11Config:  new ModuleConfig('fail', 'not there', 'wrong ') });
+    const gclConfig = new GCLConfig({ pkcs11Config: new Pkcs11ModuleConfig('linux', 'mac', 'win ') });
+    const failConfig = new GCLConfig({ pkcs11Config:  new Pkcs11ModuleConfig('fail', 'not there', 'wrong ') });
     const connection: LocalConnection = new LocalConnection(gclConfig);
     const failConnection: LocalConnection = new LocalConnection(failConfig);
     const pkcs11 = new PluginFactory('', connection).createPKCS11();
