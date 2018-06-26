@@ -32,8 +32,8 @@ export class Polyfills {
         }
 
         if (typeof Object.assign !== 'function') {
-            console.log('T1C-JS Lib: applying polyfill for object assign');
-            require('object-assign');
+            console.log('T1C-JS Lib: applying polyfill for ES6 Object Assign');
+            require('es6-object-assign').polyfill();
         }
     }
 }
