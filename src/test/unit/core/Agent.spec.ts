@@ -32,7 +32,7 @@ describe('Agents', () => {
         });
     });
 
-    describe('Agent filtering', () => {
+/*    describe('Agent filtering', () => {
         beforeEach(() => {
             mock.onGet('/agent').reply(config => {
                 return [ 200, { success: true, data: config.params }];
@@ -62,5 +62,5 @@ describe('Agents', () => {
                 expect(res.data).to.be.have.property('customFilter').eq('some id');
             });
         });
-    });
+    });*/
 });

@@ -66787,6 +66787,12 @@ var GCLLib =
 	            console.log('T1C-JS Lib: applying polyfill for ES6 Object Assign');
 	            __webpack_require__(370).polyfill();
 	        }
+	        if (!String.prototype.startsWith) {
+	            console.log('T1C-JS Lib: applying polyfill for IE11 String.startsWith');
+	            String.prototype.startsWith = function (search, pos) {
+	                return this.substr(!pos || pos < 0 ? 0 : +pos, search.length) === search;
+	            };
+	        }
 	    };
 	    return Polyfills;
 	}());
