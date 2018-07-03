@@ -1725,6 +1725,10 @@ error-ex@^1.2.0:
   dependencies:
     is-arrayish "^0.2.1"
 
+es6-object-assign@^1.1.0:
+  version "1.1.0"
+  resolved "https://repo.t1t.be/repository/npm-group/es6-object-assign/-/es6-object-assign-1.1.0.tgz#c2c3582656247c39ea107cb1e6652b6f9f24523c"
+
 es6-promise@*, es6-promise@^4.0.3:
   version "4.2.4"
   resolved "https://repo.t1t.be/repository/npm-group/es6-promise/-/es6-promise-4.2.4.tgz#dc4221c2b16518760bd8c39a52d8f356fc00ed29"
