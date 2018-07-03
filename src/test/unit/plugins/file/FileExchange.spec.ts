@@ -23,10 +23,14 @@ describe('File Exchange', () => {
         mock.restore();
     });
     describe('can create a new Type for an Entity', function () {
-        it('opens a session with default timeout', () => {
+        it('create a new type and verifies response', () => {
             filex.createType('testent', 'testtype').then(res => {
-                console.log('result:' + res.success);
+                console.log('result:' + res);
                expect(res).to.have.property('success');
+               expect(res).to.have.property('data');
+               expect(res.data).to.have.property('entity');
+               expect(res.data.entity).to.be.a('string');
+               expect(rest.data.entity).to.eq('testent');
             });
         });
     });
