@@ -33,6 +33,8 @@ export interface AbstractEidLUX extends CertCard {
                               callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
     signatureImage(callback?: (error: RestException, data: LuxidSignatureImageResponse) => void): Promise<LuxidSignatureImageResponse>;
+
+    pinReset(callback?: (error: RestException, data: string) => void): Promise<string>;
 }
 
 export class AllCertsResponse extends DataObjectResponse {
