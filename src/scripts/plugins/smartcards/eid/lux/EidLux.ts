@@ -21,6 +21,11 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
     static ADDRESS = '/address';
     static PHOTO = '/picture';
     static SIGNATURE_IMAGE = '/signature-image';
+    static PIN_CHANGE = '/change-pin';
+    static PIN_RESET = '/reset-pin';
+    static PIN_TRY_COUNTER = '/pin-try-counter';
+
+
 
 
     // constructor
@@ -150,6 +155,13 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
                 params, headers).then(certData => {
                 return CertParser.process(certData, options.parseCerts, options.callback);
             }, err => { return ResponseHandler.error(err, options.callback); });
+        });
+    }
+
+    pinReset(callback?: (error: RestException, data: string) => void): Promise<string> {
+        return new Promise((resolve, reject) => {
+            callback(null,'malakia');
+            resolve('malakia')
         });
     }
 }

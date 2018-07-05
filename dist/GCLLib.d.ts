@@ -104,7 +104,7 @@ export class DSRegistrationOrSyncRequest {
     ua: string;
     proxyDomain: string;
     clientInfo: DSClientInfo;
-    containerStates?: T1CContainer[];
+    containerStates: T1CContainer[];
     constructor(managed: boolean, activated: boolean, uuid: string, version: string, derEncodedPublicKey: string, manufacturer: string, browser: DSBrowser, os: DSOperatingSystem, ua: string, proxyDomain: string, clientInfo: DSClientInfo, containerStates?: T1CContainer[]);
 }
 export class DSInfoResponse {
@@ -286,15 +286,15 @@ export class BrowserInfo {
     }, ua: string);
 }
 export class SmartCard {
-    atr?: string;
-    description?: string[];
+    atr: string;
+    description: string[];
     constructor(atr?: string, description?: string[]);
 }
 export class CardReader {
     id: string;
     name: string;
     pinpad: boolean;
-    card?: SmartCard;
+    card: SmartCard;
     constructor(id: string, name: string, pinpad: boolean, card?: SmartCard);
 }
 export class CardReadersResponse extends T1CResponse {
@@ -314,8 +314,8 @@ export class CertificatesResponse extends T1CResponse {
 }
 export class T1CCertificate {
     base64: string;
-    id?: string;
-    parsed?: object;
+    id: string;
+    parsed: object;
     constructor(base64: string, id?: string, parsed?: object);
 }
 export class SingleReaderResponse extends T1CResponse {
@@ -359,11 +359,11 @@ export declare class BeidAllCertsResponse extends DataObjectResponse {
     constructor(data: BeidAllCerts, success: boolean);
 }
 export declare class BeidAllCerts {
-    authentication_certificate?: T1CCertificate;
-    citizen_certificate?: T1CCertificate;
-    non_repudiation_certificate?: T1CCertificate;
-    root_certificate?: T1CCertificate;
-    rrn_certificate?: T1CCertificate;
+    authentication_certificate: T1CCertificate;
+    citizen_certificate: T1CCertificate;
+    non_repudiation_certificate: T1CCertificate;
+    root_certificate: T1CCertificate;
+    rrn_certificate: T1CCertificate;
     constructor(authentication_certificate?: T1CCertificate, citizen_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, root_certificate?: T1CCertificate, rrn_certificate?: T1CCertificate);
 }
 export declare class BeidAllDataResponse extends BeidAllCertsResponse {
@@ -372,28 +372,28 @@ export declare class BeidAllDataResponse extends BeidAllCertsResponse {
     constructor(data: BeidAllData, success: boolean);
 }
 export declare class BeidAllData {
-    address?: BeidAddress;
-    authentication_certificate?: T1CCertificate;
-    citizen_certificate?: T1CCertificate;
-    non_repudiation_certificate?: T1CCertificate;
-    picture?: string;
-    rn?: BeidRnData;
-    root_certificate?: T1CCertificate;
-    rrn_certificate?: T1CCertificate;
-    token_data?: BeidTokenData;
+    address: BeidAddress;
+    authentication_certificate: T1CCertificate;
+    citizen_certificate: T1CCertificate;
+    non_repudiation_certificate: T1CCertificate;
+    picture: string;
+    rn: BeidRnData;
+    root_certificate: T1CCertificate;
+    rrn_certificate: T1CCertificate;
+    token_data: BeidTokenData;
     constructor(address?: BeidAddress, authentication_certificate?: T1CCertificate, citizen_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, picture?: string, rn?: BeidRnData, root_certificate?: T1CCertificate, rrn_certificate?: T1CCertificate, token_data?: BeidTokenData);
 }
 export declare class BeidTokenData {
-    eid_compliant?: number;
-    electrical_perso_interface_version?: number;
-    electrical_perso_version?: number;
-    graphical_perso_version?: number;
-    label?: string;
-    prn_generation?: string;
-    raw_data?: string;
-    serial_number?: string;
-    version?: number;
-    version_rfu?: number;
+    eid_compliant: number;
+    electrical_perso_interface_version: number;
+    electrical_perso_version: number;
+    graphical_perso_version: number;
+    label: string;
+    prn_generation: string;
+    raw_data: string;
+    serial_number: string;
+    version: number;
+    version_rfu: number;
     constructor(eid_compliant?: number, electrical_perso_interface_version?: number, electrical_perso_version?: number, graphical_perso_version?: number, label?: string, prn_generation?: string, raw_data?: string, serial_number?: string, version?: number, version_rfu?: number);
 }
 export declare class BeidTokenDataResponse extends DataObjectResponse {
@@ -460,13 +460,13 @@ export declare class EmvApplicationsResponse extends DataObjectResponse {
     constructor(data: EmvApplication[], success: boolean);
 }
 export declare class EmvApplicationData {
-    country?: string;
-    country_code?: string;
-    effective_data?: string;
-    expiration_date?: string;
-    language?: string;
-    pan?: string;
-    name?: string;
+    country: string;
+    country_code: string;
+    effective_data: string;
+    expiration_date: string;
+    language: string;
+    pan: string;
+    name: string;
     constructor(country?: string, country_code?: string, effective_data?: string, expiration_date?: string, language?: string, pan?: string, name?: string);
 }
 export declare class EmvApplicationDataResponse extends DataObjectResponse {
@@ -497,18 +497,18 @@ export declare class OcraAllDataResponse extends DataObjectResponse {
     constructor(data: OcraAllData, success: boolean);
 }
 export declare class OcraAllData {
-    counter?: string;
+    counter: string;
     constructor(counter?: string);
 }
 export declare class OcraChallenge extends OptionalPin {
     challenge: string;
-    pin?: string;
-    pace?: string;
+    pin: string;
+    pace: string;
     constructor(challenge: string, pin?: string, pace?: string);
 }
 export declare class OcraReadCounterResponse {
-    counter?: string;
-    success?: boolean;
+    counter: string;
+    success: boolean;
     constructor(counter?: string, success?: boolean);
 }
 
@@ -534,11 +534,11 @@ export declare class AventraAllCertsResponse extends DataObjectResponse {
     constructor(data: AventraAllCerts, success: boolean);
 }
 export declare class AventraAllCerts {
-    authentication_certificate?: T1CCertificate;
-    encryption_certificate?: T1CCertificate;
-    issuer_certificate?: T1CCertificate;
-    signing_certificate?: T1CCertificate;
-    root_certificate?: T1CCertificate;
+    authentication_certificate: T1CCertificate;
+    encryption_certificate: T1CCertificate;
+    issuer_certificate: T1CCertificate;
+    signing_certificate: T1CCertificate;
+    root_certificate: T1CCertificate;
     constructor(authentication_certificate?: T1CCertificate, encryption_certificate?: T1CCertificate, issuer_certificate?: T1CCertificate, signing_certificate?: T1CCertificate, root_certificate?: T1CCertificate);
 }
 export declare class AventraAllDataResponse extends DataObjectResponse {
@@ -547,19 +547,19 @@ export declare class AventraAllDataResponse extends DataObjectResponse {
     constructor(data: AventraAllData, success: boolean);
 }
 export declare class AventraAllData {
-    applet_info?: AventraAppletInfo;
-    authentication_certificate?: T1CCertificate;
-    encryption_certificate?: T1CCertificate;
-    issuer_certificate?: T1CCertificate;
-    signing_certificate?: T1CCertificate;
-    root_certificate?: T1CCertificate;
+    applet_info: AventraAppletInfo;
+    authentication_certificate: T1CCertificate;
+    encryption_certificate: T1CCertificate;
+    issuer_certificate: T1CCertificate;
+    signing_certificate: T1CCertificate;
+    root_certificate: T1CCertificate;
     constructor(applet_info?: AventraAppletInfo, authentication_certificate?: T1CCertificate, encryption_certificate?: T1CCertificate, issuer_certificate?: T1CCertificate, signing_certificate?: T1CCertificate, root_certificate?: T1CCertificate);
 }
 export declare class AventraAppletInfo {
-    change_counter?: number;
-    name?: string;
-    serial?: string;
-    version?: string;
+    change_counter: number;
+    name: string;
+    serial: string;
+    version: string;
     constructor(change_counter?: number, name?: string, serial?: string, version?: string);
 }
 
@@ -577,9 +577,9 @@ export declare class LuxtrustAllCertsResponse extends DataObjectResponse {
     constructor(data: LuxtrustAllCerts, success: boolean);
 }
 export declare class LuxtrustAllCerts {
-    authentication_certificate?: T1CCertificate;
-    non_repudiation_certificate?: T1CCertificate;
-    root_certificate?: T1CCertificate[];
+    authentication_certificate: T1CCertificate;
+    non_repudiation_certificate: T1CCertificate;
+    root_certificate: T1CCertificate[];
     constructor(authentication_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, root_certificate?: T1CCertificate[]);
 }
 export declare class LuxtrustAllDataResponse extends LuxtrustAllCertsResponse {
@@ -608,11 +608,11 @@ export declare class OberthurAllCertsResponse extends DataObjectResponse {
     constructor(data: OberthurAllCerts, success: boolean);
 }
 export declare class OberthurAllCerts {
-    root_certificate?: T1CCertificate;
-    issuer_certificate?: T1CCertificate;
-    authentication_certificate?: T1CCertificate;
-    signing_certificate?: T1CCertificate;
-    encryption_certificate?: T1CCertificate;
+    root_certificate: T1CCertificate;
+    issuer_certificate: T1CCertificate;
+    authentication_certificate: T1CCertificate;
+    signing_certificate: T1CCertificate;
+    encryption_certificate: T1CCertificate;
     constructor(root_certificate?: T1CCertificate, issuer_certificate?: T1CCertificate, authentication_certificate?: T1CCertificate, signing_certificate?: T1CCertificate, encryption_certificate?: T1CCertificate);
 }
 export declare class OberthurAllDataResponse extends OberthurAllCertsResponse {
@@ -662,8 +662,8 @@ export declare class PivFacialImage {
     constructor(image: string);
 }
 export declare class PivAllCerts {
-    authentication_certificate?: T1CCertificate;
-    signing_certificate?: T1CCertificate;
+    authentication_certificate: T1CCertificate;
+    signing_certificate: T1CCertificate;
     constructor(authentication_certificate?: T1CCertificate, signing_certificate?: T1CCertificate);
 }
 export declare class PivAllDataResponse extends DataObjectResponse {
@@ -672,10 +672,10 @@ export declare class PivAllDataResponse extends DataObjectResponse {
     constructor(data: PivAllData, success: boolean);
 }
 export declare class PivAllData {
-    printed_information?: PivPrintedInformation;
-    authentication_certificate?: T1CCertificate;
-    signing_certificate?: T1CCertificate;
-    facial_image?: PivFacialImage;
+    printed_information: PivPrintedInformation;
+    authentication_certificate: T1CCertificate;
+    signing_certificate: T1CCertificate;
+    facial_image: PivFacialImage;
     constructor(printed_information?: PivPrintedInformation, authentication_certificate?: T1CCertificate, signing_certificate?: T1CCertificate, facial_image?: PivFacialImage);
 }
 
@@ -711,18 +711,18 @@ export declare class MobibStatusResponse extends DataObjectResponse {
     }, success: boolean);
 }
 export declare class MobibCardIssuing {
-    card_expiration_date?: string;
-    card_holder_birth_date?: string;
-    card_holder_end_date?: string;
-    card_holder_id?: string;
-    card_holder_name?: string;
-    card_holder_start_date?: string;
-    card_revalidation_date?: string;
-    card_type?: number;
-    company_id?: number;
-    gender?: number;
-    language?: number;
-    version?: number;
+    card_expiration_date: string;
+    card_holder_birth_date: string;
+    card_holder_end_date: string;
+    card_holder_id: string;
+    card_holder_name: string;
+    card_holder_start_date: string;
+    card_revalidation_date: string;
+    card_type: number;
+    company_id: number;
+    gender: number;
+    language: number;
+    version: number;
     constructor(card_expiration_date?: string, card_holder_birth_date?: string, card_holder_end_date?: string, card_holder_id?: string, card_holder_name?: string, card_holder_start_date?: string, card_revalidation_date?: string, card_type?: number, company_id?: number, gender?: number, language?: number, version?: number);
 }
 export declare class MobibCardIssuingResponse extends DataObjectResponse {
@@ -731,25 +731,25 @@ export declare class MobibCardIssuingResponse extends DataObjectResponse {
     constructor(data: MobibCardIssuing, success: boolean);
 }
 export declare class MobibContract {
-    authenticator_kvc?: number;
-    authenticator_value?: number;
-    journey_interchanges_allowed?: boolean;
-    passengers_max?: number;
-    period_journeys?: {
+    authenticator_kvc: number;
+    authenticator_value: number;
+    journey_interchanges_allowed: boolean;
+    passengers_max: number;
+    period_journeys: {
         max_number_of_trips?: number;
         period?: number;
     };
-    price_amount?: number;
-    provider?: number;
-    restrict_code?: number;
-    restrict_time?: number;
-    sale_date?: string;
-    sale_sam_count?: number;
-    sale_sam_id?: number;
-    spatials?: {
+    price_amount: number;
+    provider: number;
+    restrict_code: number;
+    restrict_time: number;
+    sale_date: string;
+    sale_sam_count: number;
+    sale_sam_id: number;
+    spatials: {
         type: number;
     }[];
-    tariff?: {
+    tariff: {
         counter: {
             time?: string;
             type?: number;
@@ -757,13 +757,13 @@ export declare class MobibContract {
         multimodal?: boolean;
         nameref?: number;
     };
-    validity_duration?: {
+    validity_duration: {
         unit?: number;
         value?: number;
     };
-    validity_start_date?: string;
-    vehicle_class_allowed?: number;
-    version?: number;
+    validity_start_date: string;
+    vehicle_class_allowed: number;
+    version: number;
     constructor(authenticator_kvc?: number, authenticator_value?: number, journey_interchanges_allowed?: boolean, passengers_max?: number, period_journeys?: {
         max_number_of_trips?: number;
         period?: number;
@@ -798,6 +798,7 @@ export interface AbstractEidLUX extends CertCard {
     authenticationCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     nonRepudiationCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     signatureImage(callback?: (error: RestException, data: LuxidSignatureImageResponse) => void): Promise<LuxidSignatureImageResponse>;
+    pinReset(callback?: (error: RestException, data: string) => void): Promise<string>;
 }
 export declare class AllCertsResponse extends DataObjectResponse {
     data: LuxidAllCerts;
@@ -805,9 +806,9 @@ export declare class AllCertsResponse extends DataObjectResponse {
     constructor(data: LuxidAllCerts, success: boolean);
 }
 export declare class LuxidAllCerts {
-    authentication_certificate?: T1CCertificate;
-    non_repudiation_certificate?: T1CCertificate;
-    root_certificates?: T1CCertificate[];
+    authentication_certificate: T1CCertificate;
+    non_repudiation_certificate: T1CCertificate;
+    root_certificates: T1CCertificate[];
     constructor(authentication_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, root_certificates?: T1CCertificate[]);
 }
 export declare class LuxAllDataResponse extends AllCertsResponse {
@@ -816,26 +817,26 @@ export declare class LuxAllDataResponse extends AllCertsResponse {
     constructor(data: LuxidAllData, success: boolean);
 }
 export declare class LuxidAllData extends LuxidAllCerts {
-    authentication_certificate?: T1CCertificate;
-    non_repudiation_certificate?: T1CCertificate;
-    root_certificates?: T1CCertificate[];
-    biometric?: LuxidBiometric;
-    picture?: LuxidPicture;
-    signature_image?: LuxidSignatureImage;
-    signature_object?: string;
+    authentication_certificate: T1CCertificate;
+    non_repudiation_certificate: T1CCertificate;
+    root_certificates: T1CCertificate[];
+    biometric: LuxidBiometric;
+    picture: LuxidPicture;
+    signature_image: LuxidSignatureImage;
+    signature_object: string;
     constructor(authentication_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, root_certificates?: T1CCertificate[], biometric?: LuxidBiometric, picture?: LuxidPicture, signature_image?: LuxidSignatureImage, signature_object?: string);
 }
 export declare class LuxidBiometric {
-    birthData?: string;
-    documentNumber?: string;
-    documentType?: string;
-    firstName?: string;
-    gender?: string;
-    issuingState?: string;
-    lastName?: string;
-    nationality?: string;
-    validityEndData?: string;
-    validityStartData?: string;
+    birthData: string;
+    documentNumber: string;
+    documentType: string;
+    firstName: string;
+    gender: string;
+    issuingState: string;
+    lastName: string;
+    nationality: string;
+    validityEndData: string;
+    validityStartData: string;
     constructor(birthData?: string, documentNumber?: string, documentType?: string, firstName?: string, gender?: string, issuingState?: string, lastName?: string, nationality?: string, validityEndData?: string, validityStartData?: string);
 }
 export declare class LuxidBiometricResponse extends DataObjectResponse {
@@ -880,9 +881,9 @@ export declare class DNIeAllCertsResponse extends DataObjectResponse {
     constructor(data: DNIeAllCerts, success: boolean);
 }
 export declare class DNIeAllCerts {
-    authentication_certificate?: T1CCertificate;
-    intermediate_certificate?: T1CCertificate;
-    signing_certificate?: T1CCertificate;
+    authentication_certificate: T1CCertificate;
+    intermediate_certificate: T1CCertificate;
+    signing_certificate: T1CCertificate;
     constructor(authentication_certificate?: T1CCertificate, intermediate_certificate?: T1CCertificate, signing_certificate?: T1CCertificate);
 }
 export declare class DNIeAllDataResponse extends DNIeAllCertsResponse {
@@ -891,10 +892,10 @@ export declare class DNIeAllDataResponse extends DNIeAllCertsResponse {
     constructor(data: DNIeAllData, success: boolean);
 }
 export declare class DNIeAllData {
-    info?: DNIeInfo;
-    authentication_certificate?: T1CCertificate;
-    intermediate_certificate?: T1CCertificate;
-    signing_certificate?: T1CCertificate;
+    info: DNIeInfo;
+    authentication_certificate: T1CCertificate;
+    intermediate_certificate: T1CCertificate;
+    signing_certificate: T1CCertificate;
     constructor(info?: DNIeInfo, authentication_certificate?: T1CCertificate, intermediate_certificate?: T1CCertificate, signing_certificate?: T1CCertificate);
 }
 export declare class DNIeInfoResponse extends DataObjectResponse {
@@ -962,21 +963,21 @@ export interface SecuredCertCard {
     verifyPin: (body: OptionalPin, callback?: () => void) => Promise<T1CResponse>;
 }
 export declare class OptionalPin {
-    pin?: string;
-    pace?: string;
+    pin: string;
+    pace: string;
     constructor(pin?: string, pace?: string);
 }
 export declare class AuthenticateOrSignData extends OptionalPin {
     algorithm_reference: string;
     data: string;
-    pin?: string;
-    pace?: string;
+    pin: string;
+    pace: string;
     constructor(algorithm_reference: string, data: string, pin?: string, pace?: string);
 }
 export declare class VerifyPinData extends OptionalPin {
-    private_key_reference?: string;
-    pin?: string;
-    pace?: string;
+    private_key_reference: string;
+    pin: string;
+    pace: string;
     constructor(private_key_reference?: string, pin?: string, pace?: string);
 }
 export declare class ResetPinData {
@@ -1057,7 +1058,7 @@ export class RestException {
     status: number;
     code: string;
     description: string;
-    client?: GCLClient;
+    client: GCLClient;
     constructor(status: number, code: string, description: string, client?: GCLClient);
 }
 
@@ -1080,11 +1081,11 @@ export declare class PtAllCertsResponse extends DataObjectResponse {
     constructor(data: PtAllCerts, success: boolean);
 }
 export declare class PtAllCerts {
-    authentication_certificate?: T1CCertificate;
-    non_repudiation_certificate?: T1CCertificate;
-    root_authentication_certificate?: T1CCertificate;
-    root_certificate?: T1CCertificate;
-    root_non_repudiation_certificate?: T1CCertificate;
+    authentication_certificate: T1CCertificate;
+    non_repudiation_certificate: T1CCertificate;
+    root_authentication_certificate: T1CCertificate;
+    root_certificate: T1CCertificate;
+    root_non_repudiation_certificate: T1CCertificate;
     constructor(authentication_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, root_authentication_certificate?: T1CCertificate, root_certificate?: T1CCertificate, root_non_repudiation_certificate?: T1CCertificate);
 }
 export declare class PtAllDataResponse extends DataObjectResponse {
@@ -1093,44 +1094,44 @@ export declare class PtAllDataResponse extends DataObjectResponse {
     constructor(data: PtAllData, success: boolean);
 }
 export declare class PtAllData {
-    id?: PtIdData;
-    authentication_certificate?: T1CCertificate;
-    non_repudiation_certificate?: T1CCertificate;
-    root_authentication_certificate?: T1CCertificate;
-    root_certificate?: T1CCertificate;
-    root_non_repudiaton_certificate?: T1CCertificate;
+    id: PtIdData;
+    authentication_certificate: T1CCertificate;
+    non_repudiation_certificate: T1CCertificate;
+    root_authentication_certificate: T1CCertificate;
+    root_certificate: T1CCertificate;
+    root_non_repudiaton_certificate: T1CCertificate;
     constructor(id?: PtIdData, authentication_certificate?: T1CCertificate, non_repudiation_certificate?: T1CCertificate, root_authentication_certificate?: T1CCertificate, root_certificate?: T1CCertificate, root_non_repudiaton_certificate?: T1CCertificate);
 }
 export declare class PtIdData {
-    accidental_indications?: boolean;
-    civilian_number?: string;
-    country?: string;
-    date_of_birth?: string;
-    document_number?: string;
-    document_number_pan?: string;
-    document_type?: string;
-    document_version?: string;
-    gender?: string;
-    given_name_father?: string;
-    given_name_mother?: string;
-    health_no?: string;
-    height?: string;
-    issuing_entity?: string;
-    local_of_request?: string;
-    mrz1?: string;
-    mrz2?: string;
-    mrz3?: string;
-    name?: string;
-    nationality?: string;
-    raw_data?: string;
-    social_security_no?: string;
-    surname?: string;
-    surname_father?: string;
-    surname_mother?: string;
-    tax_no?: string;
-    validity_begin_date?: string;
-    validity_end_date?: string;
-    photo?: string;
+    accidental_indications: boolean;
+    civilian_number: string;
+    country: string;
+    date_of_birth: string;
+    document_number: string;
+    document_number_pan: string;
+    document_type: string;
+    document_version: string;
+    gender: string;
+    given_name_father: string;
+    given_name_mother: string;
+    health_no: string;
+    height: string;
+    issuing_entity: string;
+    local_of_request: string;
+    mrz1: string;
+    mrz2: string;
+    mrz3: string;
+    name: string;
+    nationality: string;
+    raw_data: string;
+    social_security_no: string;
+    surname: string;
+    surname_father: string;
+    surname_mother: string;
+    tax_no: string;
+    validity_begin_date: string;
+    validity_end_date: string;
+    photo: string;
     constructor(accidental_indications?: boolean, civilian_number?: string, country?: string, date_of_birth?: string, document_number?: string, document_number_pan?: string, document_type?: string, document_version?: string, gender?: string, given_name_father?: string, given_name_mother?: string, health_no?: string, height?: string, issuing_entity?: string, local_of_request?: string, mrz1?: string, mrz2?: string, mrz3?: string, name?: string, nationality?: string, raw_data?: string, social_security_no?: string, surname?: string, surname_father?: string, surname_mother?: string, tax_no?: string, validity_begin_date?: string, validity_end_date?: string, photo?: string);
 }
 export declare class PtIdDataResponse extends DataObjectResponse {
@@ -1139,29 +1140,29 @@ export declare class PtIdDataResponse extends DataObjectResponse {
     constructor(data: PtIdData, success: boolean);
 }
 export declare class PtAddressData {
-    abbr_building_type?: string;
-    abbr_street_type?: string;
-    building_type?: string;
-    civil_parish?: string;
-    civil_parish_description?: string;
-    district?: string;
-    district_description?: string;
-    door_no?: string;
-    floor?: string;
-    gen_address_num?: string;
-    is_national?: boolean;
-    locality?: string;
-    municipality?: string;
-    municipality_description?: string;
-    place?: string;
-    postal_locality?: string;
-    raw_data?: string;
-    side?: string;
-    street_name?: string;
-    street_type?: string;
-    type?: string;
-    zip3?: string;
-    zip4?: string;
+    abbr_building_type: string;
+    abbr_street_type: string;
+    building_type: string;
+    civil_parish: string;
+    civil_parish_description: string;
+    district: string;
+    district_description: string;
+    door_no: string;
+    floor: string;
+    gen_address_num: string;
+    is_national: boolean;
+    locality: string;
+    municipality: string;
+    municipality_description: string;
+    place: string;
+    postal_locality: string;
+    raw_data: string;
+    side: string;
+    street_name: string;
+    street_type: string;
+    type: string;
+    zip3: string;
+    zip4: string;
     constructor(abbr_building_type?: string, abbr_street_type?: string, building_type?: string, civil_parish?: string, civil_parish_description?: string, district?: string, district_description?: string, door_no?: string, floor?: string, gen_address_num?: string, is_national?: boolean, locality?: string, municipality?: string, municipality_description?: string, place?: string, postal_locality?: string, raw_data?: string, side?: string, street_name?: string, street_type?: string, type?: string, zip3?: string, zip4?: string);
 }
 export declare class PtAddressResponse extends DataObjectResponse {
@@ -1187,8 +1188,8 @@ export declare class APDU {
     ins: string;
     p1: string;
     p2: string;
-    data?: string;
-    le?: string;
+    data: string;
+    le: string;
     constructor(cla: string, ins: string, p1: string, p2: string, data?: string, le?: string);
 }
 export declare class CommandResponse extends T1CResponse {
@@ -1204,7 +1205,7 @@ export declare class CommandsResponse extends T1CResponse {
 export declare class Command {
     sw: string;
     tx: string;
-    rx?: string;
+    rx: string;
     constructor(sw: string, tx: string, rx?: string);
 }
 
@@ -1294,11 +1295,11 @@ export declare class TypeResponse extends T1CResponse {
     constructor(data: Type, success: boolean);
 }
 export declare class Type {
-    appid?: string;
-    entity?: string;
-    type?: string;
-    abs_path?: string;
-    files?: number;
+    appid: string;
+    entity: string;
+    type: string;
+    abs_path: string;
+    files: number;
     constructor(appid?: string, entity?: string, type?: string, abs_path?: string, access_mode?: AccessMode, status?: string, files?: number);
 }
 export declare class TypeList {
@@ -1327,13 +1328,13 @@ export declare class AccessMode {
 }
 export declare enum TypeStatus {
     MAPPED = 0,
-    UNMAPPED = 1
+    UNMAPPED = 1,
 }
 export declare enum FileAction {
     UPLOAD = 0,
     DOWNLOAD = 1,
     COPY = 2,
-    MOVE = 3
+    MOVE = 3,
 }
 export declare class ModalType {
     static INFO: string;
@@ -1391,7 +1392,7 @@ export declare class Pkcs11SlotsResponse extends DataObjectResponse {
 export declare class Pkcs11Certificate extends T1CCertificate {
     id: string;
     base64: string;
-    parsed?: object;
+    parsed: object;
     constructor(id: string, base64: string, parsed?: object);
 }
 export declare class Pkcs11CertificatesResponse extends CertificatesResponse {
@@ -1404,8 +1405,8 @@ export declare class Pkcs11SignData extends AuthenticateOrSignData {
     cert_id: string;
     algorithm_reference: string;
     data: string;
-    pin?: string;
-    pace?: string;
+    pin: string;
+    pace: string;
     constructor(slot_id: number, cert_id: string, algorithm_reference: string, data: string, pin?: string, pace?: string);
 }
 export declare class Pkcs11VerifySignedData extends Pkcs11SignData {
@@ -1414,8 +1415,8 @@ export declare class Pkcs11VerifySignedData extends Pkcs11SignData {
     algorithm_reference: string;
     data: string;
     signature: string;
-    pin?: string;
-    pace?: string;
+    pin: string;
+    pace: string;
     constructor(slot_id: number, cert_id: string, algorithm_reference: string, data: string, signature: string, pin?: string, pace?: string);
 }
 export declare class Pkcs11TokenInfo {
@@ -1664,15 +1665,15 @@ export class LocalTestConnection extends GenericConnection implements Connection
 
 export declare class Options {
     parseCerts: boolean;
-    filters?: string[];
+    filters: string[];
     constructor(parseCerts: boolean, filters?: string[]);
 }
 export declare class RequestOptions {
     parseCerts: boolean;
-    params?: {
+    params: {
         [key: string]: string;
     };
-    callback?: () => void;
+    callback: () => void;
     constructor(parseCerts: boolean, params?: {
         [key: string]: string;
     }, callback?: () => void);
@@ -1717,7 +1718,7 @@ export class PubKeyResponse implements T1CResponse {
 export class PubKeys {
     device: string;
     ssl: string;
-    ds?: string;
+    ds: string;
     constructor(device: string, ssl: string, ds?: string);
 }
 export class ContainerSyncRequest {
@@ -1725,13 +1726,13 @@ export class ContainerSyncRequest {
     constructor(containerResponses: DSContainer[]);
 }
 export class ResolvedAgent {
-    hostname?: string;
-    challenge?: string;
-    last_update?: string;
-    metadata?: any;
-    port?: number;
-    type?: string;
-    username?: string;
+    hostname: string;
+    challenge: string;
+    last_update: string;
+    metadata: any;
+    port: number;
+    type: string;
+    username: string;
     constructor(hostname?: string, challenge?: string, last_update?: string, metadata?: any, port?: number, type?: string, username?: string);
 }
 export interface ResolvedAgentResponse extends T1CResponse {
