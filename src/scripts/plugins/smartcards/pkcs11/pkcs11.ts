@@ -48,7 +48,7 @@ export class PKCS11 implements AbstractPkcs11 {
         if (moduleConfig && moduleConfig[this.os]) { this.modulePath = moduleConfig[this.os]; }
     }
 
-    public certificates(slotId: number,
+    public certificates(slotId: string,
                         options?: Options,
                         callback?: (error: RestException, data: Pkcs11CertificatesResponse)
                             => void): Promise<Pkcs11CertificatesResponse> {
@@ -106,7 +106,7 @@ export class PKCS11 implements AbstractPkcs11 {
         });
     }
 
-    public token(slotId: number, callback: (error: RestException, data: Pkcs11TokenResponse) => void): Promise<Pkcs11TokenResponse> {
+    public token(slotId: string, callback: (error: RestException, data: Pkcs11TokenResponse) => void): Promise<Pkcs11TokenResponse> {
         let req = _.extend({ slot_id: slotId }, { module: this.modulePath });
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.TOKEN), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
