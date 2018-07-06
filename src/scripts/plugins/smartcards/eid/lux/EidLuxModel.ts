@@ -3,9 +3,9 @@
  * @since 2017
  */
 import {RestException} from '../../../../core/exceptions/CoreExceptions';
-import {CertCard, OptionalPin, SecuredCertCard} from '../../Card';
+import {CertCard, OptionalPin, PinTryCounterData, SecuredCertCard} from '../../Card';
 import {
-    CertificateResponse, CertificatesResponse, DataObjectResponse, T1CCertificate
+    CertificateResponse, CertificatesResponse, DataObjectResponse, T1CCertificate, T1CResponse
 } from '../../../../core/service/CoreModel';
 import {Options} from '../../../../util/RequestHandler';
 
@@ -34,7 +34,7 @@ export interface AbstractEidLUX extends CertCard {
 
     signatureImage(callback?: (error: RestException, data: LuxidSignatureImageResponse) => void): Promise<LuxidSignatureImageResponse>;
 
-    pinReset(callback?: (error: RestException, data: string) => void): Promise<string>;
+    pinTryCounter(pin_reference: PinTryCounterData, callback?: (error: RestException, data: LuxPinTryCounterResponse) => void): Promise<LuxPinTryCounterResponse>;
 }
 
 export class AllCertsResponse extends DataObjectResponse {
@@ -53,6 +53,12 @@ export class LuxidAllCerts {
 export class LuxAllDataResponse extends AllCertsResponse {
     constructor(public data: LuxidAllData, public success: boolean) {
         super(data, success);
+    }
+}
+
+export class LuxPinTryCounterResponse extends T1CResponse {
+    constructor(public data: number , public success: boolean) {
+        super(success, data);
     }
 }
 
