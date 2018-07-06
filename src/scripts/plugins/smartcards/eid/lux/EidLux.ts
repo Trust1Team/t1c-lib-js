@@ -5,11 +5,11 @@
  */
 import { LocalConnection, QueryParams, RequestHeaders } from '../../../../core/client/Connection';
 import { RestException } from '../../../../core/exceptions/CoreExceptions';
-import {AuthenticateOrSignData, GenericCertCard, GenericSecuredCertCard, OptionalPin} from '../../Card';
+import {AuthenticateOrSignData, GenericCertCard, GenericSecuredCertCard, OptionalPin, PinTryCounterData} from '../../Card';
 import { CertificateResponse, CertificatesResponse, DataResponse, T1CResponse } from '../../../../core/service/CoreModel';
 import {
     AbstractEidLUX, AllCertsResponse, LuxAllDataResponse,
-    LuxidBiometricResponse, LuxidPictureResponse, LuxidSignatureImageResponse
+    LuxidBiometricResponse, LuxidPictureResponse, LuxidSignatureImageResponse, LuxPinTryCounterResponse
 } from './EidLuxModel';
 import { PinEnforcer } from '../../../../util/PinEnforcer';
 import { CertParser } from '../../../../util/CertParser';
@@ -23,7 +23,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
     static SIGNATURE_IMAGE = '/signature-image';
     static PIN_CHANGE = '/change-pin';
     static PIN_RESET = '/reset-pin';
-    static PIN_TRY_COUNTER = '/pin-try-counter';
+    static PIN_TRY_COUNTER = '/verify-pin';
 
 
 
@@ -131,6 +131,10 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
             undefined, EidLux.EncryptedPinHeader(this.pin), callback);
     }
 
+    public pinTryCounter(pin_reference: PinTryCounterData, callback?: (error: RestException, data: LuxPinTryCounterResponse) => void): Promise<LuxPinTryCounterResponse> {
+        return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_TRY_COUNTER), pin_reference, undefined, undefined, callback);
+    }
+
     protected getCertificate(certUrl: string,
                              options: RequestOptions,
                              params?: QueryParams,
@@ -158,10 +162,12 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
         });
     }
 
-    pinReset(callback?: (error: RestException, data: string) => void): Promise<string> {
-        return new Promise((resolve, reject) => {
-            callback(null,'malakia');
-            resolve('malakia')
-        });
-    }
+    // pinReset(callback?: (error: RestException, data: string) => void): Promise<string> {
+    //     return new Promise((resolve, reject) => {
+    //         callback(null,'malakia');
+    //         resolve('malakia')
+    //     });
+    // }
+
+
 }

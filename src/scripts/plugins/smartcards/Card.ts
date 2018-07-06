@@ -60,6 +60,10 @@ export class ResetPinData {
     constructor(public puk: string, public new_pin: string, public private_key_reference: string) {}
 }
 
+export class PinTryCounterData {
+    constructor(public pin_reference: string) {}
+}
+
 export abstract class GenericContainer {
 
     constructor(protected baseUrl: string,
