@@ -4,7 +4,7 @@ node_js:
 before_install:
   - echo "registry=https://repo.t1t.be/repository/npm-group\n_auth=\${NPM_TOKEN}\nemail=development@trust1team.com\nalways-auth=true" > .npmrc
 install:
-  - yarn install
+  - yarn
 script:
   - ./node_modules/karma-cli/bin/karma start --single-run --colors false
   - npm build
