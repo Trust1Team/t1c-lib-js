@@ -9,7 +9,7 @@ import {AuthenticateOrSignData, GenericCertCard, GenericSecuredCertCard, Optiona
 import { CertificateResponse, CertificatesResponse, DataResponse, T1CResponse } from '../../../../core/service/CoreModel';
 import {
     AbstractEidLUX, AllCertsResponse, LuxAllDataResponse,
-    LuxidBiometricResponse, LuxidPictureResponse, LuxidSignatureImageResponse
+    LuxidBiometricResponse, LuxidPictureResponse, LuxidSignatureImageResponse, LuxPinResetData
 } from './EidLuxModel';
 import { PinEnforcer } from '../../../../util/PinEnforcer';
 import { CertParser } from '../../../../util/CertParser';
@@ -21,6 +21,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
     static ADDRESS = '/address';
     static PHOTO = '/picture';
     static SIGNATURE_IMAGE = '/signature-image';
+    static PIN_RESET = 'reset-pin';
 
 
     // constructor
@@ -126,6 +127,10 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
             undefined, EidLux.EncryptedPinHeader(this.pin), callback);
     }
 
+    public pinReset(body: LuxPinResetData, callback?: (error: RestException, data: T1CResponse) => (void | Promise<T1CResponse>)) {
+        return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_RESET), body, undefined, undefined, callback);
+    }
+
     protected getCertificate(certUrl: string,
                              options: RequestOptions,
                              params?: QueryParams,
@@ -152,4 +157,6 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
             }, err => { return ResponseHandler.error(err, options.callback); });
         });
     }
+
+
 }
