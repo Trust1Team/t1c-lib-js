@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Trust1Team/t1c-lib-js.svg?branch=develop)](https://travis-ci.org/Trust1Team/t1c-lib-js) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0ee9b878274c401da8d25d1ae4680277)](https://www.codacy.com/app/maaso/t1c-lib-js?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Trust1Team/t1c-lib-js&amp;utm_campaign=Badge_Grade)
+[![Build Status](https://travis-ci.com/Trust1Team/t1c-lib-js.svg?branch=master)](https://travis-ci.org/Trust1Team/t1c-lib-js) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/0ee9b878274c401da8d25d1ae4680277)](https://www.codacy.com/app/maaso/t1c-lib-js?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Trust1Team/t1c-lib-js&amp;utm_campaign=Badge_Grade)
 # Trust1Connector JavaScript Library
 [![][t1c-logo]][Trust1Connector-url]
 
