@@ -39,6 +39,8 @@ export interface AbstractEidLUX extends CertCard {
 
     pinReset(body: LuxPinResetData, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>)
 
+    pinUnblock(body: LuxPinUnblockData, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>)
+
 }
 
 export class AllCertsResponse extends DataObjectResponse {
@@ -124,5 +126,13 @@ export class LuxidSignatureImageResponse extends DataObjectResponse {
 }
 
 export class LuxPinResetData {
-    constructor(public os_dialog: boolean, public reset_only: boolean, public puk?: string, public pin?: string) {}
+    constructor(public os_dialog: boolean, public reset_only: boolean, public puk: string, public pin: string) {
+        this.reset_only = false;
+    }
+}
+
+export class LuxPinUnblockData {
+    constructor(public os_dialog: boolean, public reset_only: boolean, public puk?: string) {
+        this.reset_only = true;
+    }
 }
