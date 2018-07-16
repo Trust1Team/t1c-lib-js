@@ -25,8 +25,6 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
     static PIN_TRY_COUNTER = '/verify-pin';
     static PIN_RESET = 'reset-pin';
 
-
-
     // constructor
     constructor(protected baseUrl: string,
                 protected containerUrl: string,
@@ -133,6 +131,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
 
     public pinTryCounter(pin_reference: PinTryCounterData, callback?: (error: RestException, data: LuxPinTryCounterResponse) => void): Promise<LuxPinTryCounterResponse> {
         return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_TRY_COUNTER), pin_reference, undefined, undefined, callback);
+    }
 
     public pinReset(body: LuxPinResetData, callback?: (error: RestException, data: T1CResponse) => (void | Promise<T1CResponse>)) {
         return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_RESET), body, undefined, undefined, callback);
