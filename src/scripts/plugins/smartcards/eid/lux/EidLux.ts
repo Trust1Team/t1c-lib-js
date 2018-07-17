@@ -8,7 +8,7 @@ import { RestException } from '../../../../core/exceptions/CoreExceptions';
 import {AuthenticateOrSignData, GenericCertCard, GenericSecuredCertCard, OptionalPin, PinTryCounterData} from '../../Card';
 import { CertificateResponse, CertificatesResponse, DataResponse, T1CResponse } from '../../../../core/service/CoreModel';
 import {
-    AbstractEidLUX, AllCertsResponse, LuxAllDataResponse, LuxidBiometricResponse, LuxidPictureResponse, LuxidSignatureImageResponse, LuxPinTryCounterResponse, LuxPinResetData, LuxPinChangeData
+    AbstractEidLUX, AllCertsResponse, LuxAllDataResponse, LuxidBiometricResponse, LuxidPictureResponse, LuxidSignatureImageResponse, LuxPinTryCounterResponse, LuxPinResetData, LuxPinUnblockData, LuxPinChangeData
 } from './EidLuxModel';
 import { PinEnforcer } from '../../../../util/PinEnforcer';
 import { CertParser } from '../../../../util/CertParser';
@@ -138,6 +138,10 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
 
     public pinChange(body: LuxPinChangeData, callback?: (error: RestException, data: T1CResponse) => (void | Promise<T1CResponse>)) {
         return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_CHANGE), body, undefined, undefined, callback);
+    }
+
+    public pinUnblock(body: LuxPinUnblockData, callback?: (error: RestException, data: T1CResponse) => (void | Promise<T1CResponse>)) {
+        return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_RESET), body, undefined, undefined, callback);
     }
 
     protected getCertificate(certUrl: string,

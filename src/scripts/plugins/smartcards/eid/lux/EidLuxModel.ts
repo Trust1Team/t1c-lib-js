@@ -3,7 +3,7 @@
  * @since 2017
  */
 import {RestException} from '../../../../core/exceptions/CoreExceptions';
-import {CertCard, OptionalPin, PinTryCounterData, ResetPinData, SecuredCertCard} from '../../Card';
+import {CertCard, PinTryCounterData} from '../../Card';
 import {
     CertificateResponse, CertificatesResponse, DataObjectResponse, T1CCertificate, T1CResponse
 } from '../../../../core/service/CoreModel';
@@ -40,6 +40,8 @@ export interface AbstractEidLUX extends CertCard {
     pinReset(body: LuxPinResetData, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>)
 
     pinChange(body: LuxPinChangeData, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>)
+
+    pinUnblock(body: LuxPinUnblockData, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>)
 
 }
 
@@ -126,7 +128,15 @@ export class LuxidSignatureImageResponse extends DataObjectResponse {
 }
 
 export class LuxPinResetData {
-    constructor(public os_dialog: boolean, public reset_only: boolean, public puk?: string, public pin?: string) {}
+    constructor(public os_dialog: boolean, public reset_only: boolean, public puk: string, public pin: string) {
+        this.reset_only = false;
+    }
+}
+
+export class LuxPinUnblockData {
+    constructor(public os_dialog: boolean, public reset_only: boolean, public puk?: string) {
+        this.reset_only = true;
+    }
 }
 
 export class LuxPinChangeData {
