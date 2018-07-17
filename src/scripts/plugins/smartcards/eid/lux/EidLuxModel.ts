@@ -39,6 +39,8 @@ export interface AbstractEidLUX extends CertCard {
 
     pinReset(body: LuxPinResetData, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>)
 
+    pinChange(body: LuxPinChangeData, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>)
+
 }
 
 export class AllCertsResponse extends DataObjectResponse {
@@ -126,3 +128,8 @@ export class LuxidSignatureImageResponse extends DataObjectResponse {
 export class LuxPinResetData {
     constructor(public os_dialog: boolean, public reset_only: boolean, public puk?: string, public pin?: string) {}
 }
+
+export class LuxPinChangeData {
+    constructor(os_dialog: boolean, old_pin?: string, new_pin?: string) {}
+}
+

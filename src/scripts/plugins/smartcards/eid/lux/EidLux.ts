@@ -8,7 +8,7 @@ import { RestException } from '../../../../core/exceptions/CoreExceptions';
 import {AuthenticateOrSignData, GenericCertCard, GenericSecuredCertCard, OptionalPin, PinTryCounterData} from '../../Card';
 import { CertificateResponse, CertificatesResponse, DataResponse, T1CResponse } from '../../../../core/service/CoreModel';
 import {
-    AbstractEidLUX, AllCertsResponse, LuxAllDataResponse, LuxidBiometricResponse, LuxidPictureResponse, LuxidSignatureImageResponse, LuxPinTryCounterResponse, LuxPinResetData
+    AbstractEidLUX, AllCertsResponse, LuxAllDataResponse, LuxidBiometricResponse, LuxidPictureResponse, LuxidSignatureImageResponse, LuxPinTryCounterResponse, LuxPinResetData, LuxPinChangeData
 } from './EidLuxModel';
 import { PinEnforcer } from '../../../../util/PinEnforcer';
 import { CertParser } from '../../../../util/CertParser';
@@ -23,9 +23,6 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
     static PIN_CHANGE = '/change-pin';
     static PIN_RESET = '/reset-pin';
     static PIN_TRY_COUNTER = '/verify-pin';
-    static PIN_RESET = 'reset-pin';
-
-
 
     // constructor
     constructor(protected baseUrl: string,
@@ -133,9 +130,14 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
 
     public pinTryCounter(pin_reference: PinTryCounterData, callback?: (error: RestException, data: LuxPinTryCounterResponse) => void): Promise<LuxPinTryCounterResponse> {
         return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_TRY_COUNTER), pin_reference, undefined, undefined, callback);
+    }
 
     public pinReset(body: LuxPinResetData, callback?: (error: RestException, data: T1CResponse) => (void | Promise<T1CResponse>)) {
         return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_RESET), body, undefined, undefined, callback);
+    }
+
+    public pinChange(body: LuxPinChangeData, callback?: (error: RestException, data: T1CResponse) => (void | Promise<T1CResponse>)) {
+        return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_CHANGE), body, undefined, undefined, callback);
     }
 
     protected getCertificate(certUrl: string,
