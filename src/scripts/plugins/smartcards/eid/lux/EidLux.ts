@@ -29,7 +29,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
                 protected containerUrl: string,
                 protected connection: LocalConnection,
                 protected reader_id: string,
-                private can: string) {
+                protected can: string) {
         super(baseUrl, containerUrl, connection, reader_id);
         // this.pin = PinEnforcer.encryptPin(pin);
         this.can = PinEnforcer.encryptPin(can);
@@ -129,7 +129,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
 
     public signatureImage(callback?: (error: RestException, data: LuxidSignatureImageResponse) => void | Promise<LuxidSignatureImageResponse>) {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidLux.SIGNATURE_IMAGE),
-            undefined, EidLux.EncryptedCanHeader(this.pin), callback);
+            undefined, EidLux.EncryptedCanHeader(this.can), callback);
     }
 
 
@@ -162,7 +162,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
                              headers?: RequestHeaders): Promise<CertificateResponse> {
         let self = this;
 
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, this.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, this.can).then(() => {
             return self.connection.get(self.baseUrl, self.containerSuffix(EidLux.ALL_CERTIFICATES + certUrl),
                 params, headers).then(certData => {
                 return CertParser.process(certData, options.parseCerts, options.callback);
@@ -175,7 +175,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
                                   params?: QueryParams, headers?: RequestHeaders): Promise<CertificatesResponse> {
         let self = this;
 
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, this.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, this.can).then(() => {
             return self.connection.get(self.baseUrl, self.containerSuffix(EidLux.ALL_CERTIFICATES + certUrl),
                 params, headers).then(certData => {
                 return CertParser.process(certData, options.parseCerts, options.callback);
