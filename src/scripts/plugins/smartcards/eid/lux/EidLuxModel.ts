@@ -8,6 +8,7 @@ import {
     CertificateResponse, CertificatesResponse, DataObjectResponse, T1CCertificate, T1CResponse
 } from '../../../../core/service/CoreModel';
 import {Options} from '../../../../util/RequestHandler';
+import {PinEnforcer} from '../../../../util/PinEnforcer';
 
 
 export interface AbstractEidLUX extends CertCard {
@@ -140,6 +141,7 @@ export class LuxPinUnblockData {
 }
 
 export class LuxPinChangeData {
-    constructor(os_dialog: boolean, old_pin?: string, new_pin?: string) {}
+    constructor(public os_dialog: boolean, public old_pin?: string, public new_pin?: string) {;
+    }
 }
 
