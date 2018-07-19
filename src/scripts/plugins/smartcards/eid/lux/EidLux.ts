@@ -22,7 +22,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
     static SIGNATURE_IMAGE = '/signature-image';
     static PIN_CHANGE = '/change-pin';
     static PIN_RESET = '/reset-pin';
-    static PIN_TRY_COUNTER = '/verify-pin';
+    static PIN_TRY_COUNTER = '/pin-try-counter';
 
     // constructor
     constructor(protected baseUrl: string,
@@ -132,27 +132,24 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
             undefined, EidLux.EncryptedCanHeader(this.can), callback);
     }
 
-
     public pinTryCounter(pin_reference: PinTryCounterData, callback?: (error: RestException, data: LuxPinTryCounterResponse) => void): Promise<LuxPinTryCounterResponse> {
-        // get CAN for in the header
         return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_TRY_COUNTER), pin_reference, undefined, EidLux.EncryptedCanHeader(this.can), callback);
     }
 
     public pinReset(body: LuxPinResetData, callback?: (error: RestException, data: T1CResponse) => (void | Promise<T1CResponse>)) {
         body.pin = PinEnforcer.encryptPin(body.pin);
         body.puk = PinEnforcer.encryptPin(body.puk);
-        return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_RESET), body, undefined, EidLux.EncryptedPinHeader(body.pin), callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_RESET), body, undefined, EidLux.EncryptedCanHeader(this.can), callback);
     }
 
     public pinChange(body: LuxPinChangeData, callback?: (error: RestException, data: T1CResponse) => (void | Promise<T1CResponse>)) {
         body.old_pin = PinEnforcer.encryptPin(body.old_pin);
         body.new_pin = PinEnforcer.encryptPin(body.new_pin);
-        return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_CHANGE), body, undefined, EidLux.EncryptedPinHeader(body.old_pin), callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_CHANGE), body, undefined, EidLux.EncryptedCanHeader(this.can), callback);
     }
 
     public pinUnblock(body: LuxPinUnblockData, callback?: (error: RestException, data: T1CResponse) => (void | Promise<T1CResponse>)) {
         body.puk = PinEnforcer.encryptPin(body.puk);
-        // get CAN for in the header
         return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_RESET), body, undefined, EidLux.EncryptedCanHeader(this.can), callback);
     }
 
