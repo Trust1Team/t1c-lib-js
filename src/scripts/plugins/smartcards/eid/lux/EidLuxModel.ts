@@ -8,7 +8,6 @@ import {
     CertificateResponse, CertificatesResponse, DataObjectResponse, T1CCertificate, T1CResponse
 } from '../../../../core/service/CoreModel';
 import {Options} from '../../../../util/RequestHandler';
-import {PinEnforcer} from '../../../../util/PinEnforcer';
 
 
 export interface AbstractEidLUX extends CertCard {
