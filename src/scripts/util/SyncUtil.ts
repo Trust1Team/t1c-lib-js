@@ -25,33 +25,6 @@ export class SyncUtil {
     // constructor
     constructor() {}
 
-    public static managedSynchronisation(client: GCLClient,
-                                         mergedInfo: DSPlatformInfo,
-                                         uuid: string,
-                                         containers: T1CContainer[]) {
-        // this is NON-BLOCKING and will always resolve!
-        return new Promise((resolve) => {
-            // make sure the DS pub key is set
-            client.admin().getPubKey().then(keys => {
-                let keyPromise: Promise<any>;
-                if (keys.data.ds && keys.data.ds.length) {
-                    // ds key is available, we can continue
-                    keyPromise = Promise.resolve();
-                } else {
-                    // ds key not set, perform managed init
-                    keyPromise = ActivationUtil.managedInitialization(client, mergedInfo, uuid);
-                }
-                // execute sync flow
-                return keyPromise.then(() => SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, false).then(() => {
-                    resolve();
-                }));
-            }).catch(() => {
-                // error occurred, but non-blocking so we resolve
-                resolve();
-            });
-        });
-    }
-
     public static unManagedSynchronization(client: GCLClient,
                                            mergedInfo: DSPlatformInfo,
                                            uuid: string,
@@ -72,7 +45,7 @@ export class SyncUtil {
                              info: DSPlatformInfo,
                              deviceId: string,
                              containers: T1CContainer[]): Promise<DeviceResponse> {
-        return client.ds().sync(new DSRegistrationOrSyncRequest(info.managed,
+        return client.ds().sync(new DSRegistrationOrSyncRequest(
             info.activated,
             deviceId,
             info.core_version,
@@ -83,6 +56,7 @@ export class SyncUtil {
             info.ua,
             client.config().gwUrl,
             new DSClientInfo('JAVASCRIPT', '%%GULP_INJECT_VERSION%%'),
+            info.namespace,
             containers)
         );
     }
