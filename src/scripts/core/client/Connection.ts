@@ -503,7 +503,7 @@ export class LocalConnection extends GenericConnection implements Connection {
         // contextToken = application id (ex. 26)
         let contextToken = this.cfg.contextToken;
         // only send the relay state header for unmanaged installs
-        if (!this.cfg.isManaged && contextToken && !_.isNil(contextToken)) {
+        if (contextToken && !_.isNil(contextToken)) {
             reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
         }
         return reqHeaders;
@@ -547,7 +547,8 @@ export class LocalConnection extends GenericConnection implements Connection {
         type: string,
         filename: string,
         rel_path: string[],
-        notify_on_completion: boolean }, callback?: RequestCallback): Promise<any> {
+        notify_on_completion: boolean
+    }, callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         // init callback if necessary
         if (!callback || typeof callback !== 'function') {
