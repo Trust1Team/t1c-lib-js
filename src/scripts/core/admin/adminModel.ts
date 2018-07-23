@@ -28,7 +28,7 @@ export class AtrListRequest {
 }
 
 export class SetPubKeyRequest {
-    constructor(public encryptedPublicKey: string, public encryptedAesKey: string) {}
+    constructor(public encryptedPublicKey: string, public encryptedAesKey: string, public ns: string) {}
 }
 
 export class PubKeyResponse implements T1CResponse {

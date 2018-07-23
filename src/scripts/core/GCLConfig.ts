@@ -59,7 +59,6 @@ class GCLConfig {
     private _osPinDialog: boolean;
     private _containerDownloadTimeout: number;
     private _contextToken: string;
-    private _isManaged: boolean;
     private _lang: string;
 
     // constructor for DTO
@@ -85,7 +84,6 @@ class GCLConfig {
             if (options.containerDownloadTimeout) { this._containerDownloadTimeout = options.containerDownloadTimeout; } else { this._containerDownloadTimeout = defaults.containerDownloadTimeout; }
             if (options.lang) { this._lang = options.lang; } else { this._lang = defaults.lang; }
             this._citrix = false; // will be set to true during initialisation if Citrix environment is detected
-            this._isManaged = false; // will be set to true during initialisation if managed install is detected
         }
     }
 
@@ -148,14 +146,6 @@ class GCLConfig {
 
     set citrix(value: boolean) {
         this._citrix = value;
-    }
-
-    get isManaged(): boolean {
-        return this._isManaged;
-    }
-
-    set isManaged(value: boolean) {
-        this._isManaged = value;
     }
 
     get agentPort(): number {

@@ -52,8 +52,7 @@ export class DSDownloadRequest {
 }
 
 export class DSRegistrationOrSyncRequest {
-    constructor(public managed: boolean,
-                public activated: boolean,
+    constructor(public activated: boolean,
                 public uuid: string,
                 public version: string,
                 public derEncodedPublicKey: string,
@@ -63,6 +62,7 @@ export class DSRegistrationOrSyncRequest {
                 public ua: string,
                 public proxyDomain: string,
                 public clientInfo: DSClientInfo,
+                public namespace: string,
                 public containerStates?: T1CContainer[]) {
     }
 }
@@ -98,7 +98,7 @@ export class DSJWTResponse {
 }
 
 export class DSPubKeyResponse {
-    constructor(public encryptedPublicKey: string, public encryptedAesKey: string, public success: boolean) {
+    constructor(public encryptedPublicKey: string, public encryptedAesKey: string, public ns: string, public success: boolean) {
     }
 }
 
@@ -106,7 +106,6 @@ export class DeviceResponse {
     constructor(public uuid: string,
                 public activated: boolean,
                 public atrList: { hash: string, storagePath: string },
-                public managed: boolean,
                 public coreVersion: string,
                 public contextToken: string,
                 public containerResponses: DSContainer[]) {
@@ -132,9 +131,9 @@ export class DSStorage {
 
 export class DSPlatformInfo extends BrowserInfo {
     constructor(public activated: boolean,
-                public managed: boolean,
                 public bi: BrowserInfo,
-                public core_version: string) {
+                public core_version: string,
+                public namespace: string) {
         super(bi.browser, bi.manufacturer, bi.os, bi.ua);
     }
 }
