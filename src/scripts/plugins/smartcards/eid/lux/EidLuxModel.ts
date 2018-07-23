@@ -140,6 +140,7 @@ export class LuxPinUnblockData {
 }
 
 export class LuxPinChangeData {
-    constructor(os_dialog: boolean, old_pin?: string, new_pin?: string) {}
+    constructor(public os_dialog: boolean, public old_pin?: string, public new_pin?: string) {;
+    }
 }
 
