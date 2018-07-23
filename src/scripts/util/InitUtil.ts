@@ -37,13 +37,12 @@ export class InitUtil {
                     if (cfg.v2Compatible) {
                         // console.log('v2 compatible');
                         let activated = infoResponse.data.activated;
-                        let managed = infoResponse.data.managed;
                         let core_version = infoResponse.data.version;
                         let uuid = infoResponse.data.uid;
                         let ns = this.extractHostname(cfg.dsUrl);
                         // compose info
                         let info = client.core().infoBrowserSync();
-                        let mergedInfo = new DSPlatformInfo(activated, managed, info.data, core_version, ns);
+                        let mergedInfo = new DSPlatformInfo(activated, info.data, core_version, ns);
 
                         // console.log('unmanaged');
                         let activationPromise;
