@@ -106,7 +106,6 @@ export class DeviceResponse {
     constructor(public uuid: string,
                 public activated: boolean,
                 public atrList: { hash: string, storagePath: string },
-                public managed: boolean,
                 public coreVersion: string,
                 public contextToken: string,
                 public containerResponses: DSContainer[]) {
@@ -132,7 +131,6 @@ export class DSStorage {
 
 export class DSPlatformInfo extends BrowserInfo {
     constructor(public activated: boolean,
-                public managed: boolean,
                 public bi: BrowserInfo,
                 public core_version: string,
                 public namespace: string) {
