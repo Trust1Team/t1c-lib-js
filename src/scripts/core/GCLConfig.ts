@@ -10,6 +10,7 @@ import * as jwtDecode from 'jwt-decode';
 import * as moment from 'moment';
 import { RestException } from './exceptions/CoreExceptions';
 import {Pkcs11ModuleConfig} from '../plugins/smartcards/pkcs11/pkcs11Model';
+import {T1CContainer} from './service/CoreModel';
 
 const defaults = {
     gclUrl: 'https://localhost:10443/v2',
@@ -60,6 +61,8 @@ class GCLConfig {
     private _containerDownloadTimeout: number;
     private _contextToken: string;
     private _lang: string;
+    private _overrideContainers: T1CContainer[];
+    private _containers: Map<string, string[]>;
 
     // constructor for DTO
     public constructor(options?: any) {
@@ -83,6 +86,7 @@ class GCLConfig {
             if (options.osPinDialog) { this._osPinDialog = options.osPinDialog; } else { this._osPinDialog = defaults.osPinDialog; }
             if (options.containerDownloadTimeout) { this._containerDownloadTimeout = options.containerDownloadTimeout; } else { this._containerDownloadTimeout = defaults.containerDownloadTimeout; }
             if (options.lang) { this._lang = options.lang; } else { this._lang = defaults.lang; }
+            if (options.overrideContainers) { this._overrideContainers = options.overrideContainers; } else { this._overrideContainers = undefined; }
             this._citrix = false; // will be set to true during initialisation if Citrix environment is detected
         }
     }
@@ -307,6 +311,22 @@ class GCLConfig {
 
     set lang(value: string) {
         this._lang = value;
+    }
+
+    get overrideContainers(): T1CContainer[] {
+        return this._overrideContainers;
+    }
+
+    set overrideContainers(value: T1CContainer[]) {
+        this._overrideContainers = value;
+    }
+
+    get containers(): Map<string, string[]> {
+        return this._containers;
+    }
+
+    set containers(value: Map<string, string[]>) {
+        this._containers = value;
     }
 
     /**

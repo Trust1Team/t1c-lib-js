@@ -5,7 +5,8 @@
 
 import { AbstractDataContainer } from './DataContainerModel';
 import { RestException } from '../../core/exceptions/CoreExceptions';
-import { GenericContainer } from '../smartcards/Card';
+import {GenericContainer} from '../GenericContainer';
+
 
 export class DataContainer extends GenericContainer implements AbstractDataContainer {
     // constructor

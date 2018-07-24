@@ -39,26 +39,30 @@ export class InitUtil {
                         let activated = infoResponse.data.activated;
                         let core_version = infoResponse.data.version;
                         let uuid = infoResponse.data.uid;
-                        let ns = this.extractHostname(cfg.dsUrl);
                         // compose info
                         let info = client.core().infoBrowserSync();
-                        let mergedInfo = new DSPlatformInfo(activated, info.data, core_version, ns);
 
-                        // console.log('unmanaged');
+                        let mergedInfo;
+
+                        if (cfg.dsUrl) {
+                            let ns = this.extractHostname(cfg.dsUrl);
+                            mergedInfo = new DSPlatformInfo(activated, info.data, core_version, ns);
+                        }
+                        else {
+                            mergedInfo = new DSPlatformInfo(activated, info.data, core_version);
+                        }
+
                         let activationPromise;
                         if (activated) {
-                            // console.log('already activated');
                             // already activated, only need to sync device
                             activationPromise = Promise.resolve();
                         } else {
                             // not yet activated, do this now
-                            // console.log('need to activate');
                             activationPromise = ActivationUtil.unManagedInitialization(client, mergedInfo, uuid);
                         }
                         activationPromise.then(() => {
                             // update core service
                             client.updateAuthConnection(cfg);
-                            // device is activated, sync it
                             resolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, infoResponse.data.containers));
                         }, err => {
                             reject(err);

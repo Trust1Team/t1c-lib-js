@@ -2,10 +2,10 @@
  * @author Michallis Pashidis
  * @since 2017
  */
-import {GenericContainer} from '../smartcards/Card';
 import {AbstractFileExchange, FileListResponse, FileResponse, FileSort, ModalType, Page, TypeListResponse, TypeResponse} from './FileExchangeModel';
 import {RestException} from '../../core/exceptions/CoreExceptions';
 import {BoolDataResponse, DataArrayResponse, DataResponse} from '../../core/service/CoreModel';
+import {GenericContainer} from '../GenericContainer';
 
 
 export class FileExchange extends GenericContainer implements AbstractFileExchange {

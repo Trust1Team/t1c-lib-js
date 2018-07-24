@@ -133,7 +133,7 @@ export class DSPlatformInfo extends BrowserInfo {
     constructor(public activated: boolean,
                 public bi: BrowserInfo,
                 public core_version: string,
-                public namespace: string) {
+                public namespace?: string) {
         super(bi.browser, bi.manufacturer, bi.os, bi.ua);
     }
 }
