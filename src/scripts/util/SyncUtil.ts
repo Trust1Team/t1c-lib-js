@@ -78,8 +78,8 @@ export class SyncUtil {
                 // update container config
                 return client.admin().updateContainerConfig(new ContainerSyncRequest(device.containerResponses)).then(() => {
                     // setup data container paths
-                    // TODO
-                    DataContainerUtil.setupDataContainers(device.containerResponses);
+                    client.config().containers = GCLClient.getSortedContainers(device.containerResponses);
+                    // DataContainerUtil.setupDataContainers(device.containerResponses);
 
                     return SyncUtil.pollDownloadCompletion(client,
                         device.containerResponses, isRetry).then((finalContainerList) => {

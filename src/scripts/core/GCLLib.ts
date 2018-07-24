@@ -13,7 +13,7 @@ import {
 import {DSDownloadLinkResponse, DSDownloadRequest} from './ds/DSClientModel';
 import {DSClient} from './ds/DSClient';
 import {OCVClient} from './ocv/OCVClient';
-import {CardReadersResponse, DataResponse} from './service/CoreModel';
+import {CardReadersResponse, DataResponse, T1CContainer} from './service/CoreModel';
 import {AbstractEidBE} from '../plugins/smartcards/eid/be/EidBeModel';
 import {AbstractEMV} from '../plugins/smartcards/emv/EMVModel';
 import {AbstractOcra} from '../plugins/smartcards/ocra/ocraModel';
@@ -37,7 +37,7 @@ import {AbstractAgent} from './agent/agentModel';
 import {AbstractFileExchange} from '../plugins/file/FileExchangeModel';
 import {AdminService} from './admin/admin';
 import {InitUtil} from '../util/InitUtil';
-import {AbstractPkcs11, Pkcs11ModuleConfig} from '../plugins/smartcards/pkcs11/pkcs11Model';
+import {AbstractPkcs11} from '../plugins/smartcards/pkcs11/pkcs11Model';
 import {ClientService} from '../util/ClientService';
 import {AuthClient} from './auth/Auth';
 import moment = require('moment');
@@ -122,11 +122,58 @@ class GCLClient {
             this.implicitDownload();
         }
 
+        if (this.localConfig.overrideContainers && !this.localConfig.dsUrl) {
+            // values from overrideContainers should be sorted and available when there is no DS available but the containers are provided in the constructor
+            const containers = this.localConfig.overrideContainers;
+            this.localConfig.containers = GCLClient.getSortedContainers(containers);
+        }
+        else if (!this.localConfig.overrideContainers && !this.localConfig.dsUrl) {
+            // if there is no DS available and the containers arent provided in the constructor turn to the GCL v2 info endpoint to fetch the containers
+            this.core().info().then( infoResponse => {
+                this.localConfig.containers = GCLClient.getSortedContainers(infoResponse.data.containers);
+            });
+        }
+
 
         if (!automatic) {
             // setup security - fail safe
             GCLClient.initLibrary();
         }
+    }
+
+    public static getContainerFor(cfg: GCLConfig, containerName: string): string {
+        return cfg.containers.get(containerName)[0];
+    }
+
+    /*
+    // static function that receives a list of containers and returns a hashmap with all the containers grouped with their versions
+    // this sorts the versions so the 1st is the latest version
+    */
+    public static getSortedContainers(containers: T1CContainer[]): Map<string, string[]> {
+        let containerHashmap = new Map<string, string[]>();
+        for (let i = 0; i < containers.length; i++) {
+            let name = containers[i].name;
+            let version = containers[i].version.replace(/\./g, '-');
+
+            let container = containerHashmap.get(name);
+            if (container) {
+                container.push(...[name + '-' + version]);
+                container.sort(function(first: string, last: string) {
+                    if (first > last) {
+                        return -1;
+                    }
+                    if (first < last) {
+                        return 1;
+                    }
+                    return 0;
+                });
+            }
+            else {
+                containerHashmap.set(name, [name + '-' + version]);
+            }
+        }
+
+        return containerHashmap;
     }
 
     public static checkPolyfills() {
@@ -271,7 +318,7 @@ class GCLClient {
         this._gclInstalled = value;
     }
 
-// generic methods
+    // generic methods
     public containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void) {
         return GenericService.containerForReader(this, readerId, callback);
     }

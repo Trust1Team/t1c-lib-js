@@ -9,6 +9,8 @@ import { CertParser } from '../../util/CertParser';
 import { ResponseHandler } from '../../util/ResponseHandler';
 import { Options, RequestHandler, RequestOptions } from '../../util/RequestHandler';
 import * as _ from 'lodash';
+import {GenericContainer} from '../GenericContainer';
+import {GCLClient} from '../../core/GCLLib';
 /**
  * @author Michallis Pashidis
  * @author Maarten Somers
@@ -64,19 +66,6 @@ export class PinTryCounterData {
     constructor(public pin_reference: string) {}
 }
 
-export abstract class GenericContainer {
-
-    constructor(protected baseUrl: string,
-                protected containerUrl: string,
-                protected connection: LocalConnection) {}
-
-    // resolves the reader_id in the base URL
-    protected containerSuffix(path?: string): string {
-        if (path && path.length) { return this.containerUrl + path; }
-        else { return this.containerUrl; }
-    }
-}
-
 export abstract class GenericReaderContainer extends GenericContainer {
 
     constructor(protected baseUrl: string,
@@ -88,6 +77,7 @@ export abstract class GenericReaderContainer extends GenericContainer {
 
     // resolves the reader_id in the base URL
     protected containerSuffix(path?: string): string {
+        super.containerSuffix(path);
         let suffix = this.containerUrl;
         if (this.reader_id && this.reader_id.length) { suffix += '/' + this.reader_id; }
         if (path && path.length) { suffix += _.startsWith(path, '/') ? path : '/' + path; }
