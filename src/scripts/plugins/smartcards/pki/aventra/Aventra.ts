@@ -9,12 +9,19 @@ import {GenericCertCard, ResetPinData, VerifyPinData} from '../../Card';
 import {AbstractAventra} from './AventraModel';
 import {PinEnforcer} from '../../../../util/PinEnforcer';
 import {Options, RequestHandler} from '../../../../util/RequestHandler';
+import {LocalConnection} from '../../../../core/client/Connection';
 
 export class Aventra extends GenericCertCard implements AbstractAventra {
+    static CONTAINER_PREFIX = 'aventra';
     static DEFAULT_VERIFY_PIN = 'sign';
     static RESET_PIN = '/reset-pin';
 
-    // filters
+
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string) {
+        super(baseUrl, containerUrl, connection, reader_id, Aventra.CONTAINER_PREFIX);
+    }
+
+// filters
     public allDataFilters() {
         return ['applet-info', 'root_certificate', 'authentication-certificate',
             'encryption_certificate', 'issuer_certificate', 'signing_certificate'];

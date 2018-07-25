@@ -7,12 +7,19 @@
 import { AbstractEMV, EmvApplicationDataResponse, EmvApplicationsResponse, EmvCertificateResponse } from './EMVModel';
 import { RestException } from '../../../core/exceptions/CoreExceptions';
 import { GenericPinCard } from '../Card';
+import {LocalConnection} from '../../../core/client/Connection';
 
 export class EMV extends GenericPinCard implements AbstractEMV {
+    static CONTAINER_PREFIX = 'emv';
     static APPLICATIONS = '/applications';
     static APPLICATION_DATA = '/application-data';
     static ISSUER_PUBLIC_KEY_CERT = '/issuer-public-key-certificate';
     static ICC_PUBLIC_KEY_CERT = '/icc-public-key-certificate';
+
+
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string) {
+        super(baseUrl, containerUrl, connection, reader_id, EMV.CONTAINER_PREFIX);
+    }
 
     public applicationData(callback?: (error: RestException, data: EmvApplicationDataResponse) => void): Promise<EmvApplicationDataResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(EMV.APPLICATION_DATA), undefined, undefined, callback);

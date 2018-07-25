@@ -9,11 +9,18 @@ import {GenericCertCard, VerifyPinData} from '../../Card';
 import {AbstractOberthur} from './OberthurModel';
 import {PinEnforcer} from '../../../../util/PinEnforcer';
 import {Options, RequestHandler} from '../../../../util/RequestHandler';
+import {LocalConnection} from '../../../../core/client/Connection';
 
 
 export class Oberthur extends GenericCertCard implements AbstractOberthur {
+    static CONTAINER_PREFIX = 'oberthur';
 
-    // filters
+
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string) {
+        super(baseUrl, containerUrl, connection, reader_id, Oberthur.CONTAINER_PREFIX);
+    }
+
+// filters
     public allDataFilters() {
         return ['root_certificate', 'authentication-certificate',
             'encryption_certificate', 'issuer_certificate', 'signing_certificate'];

@@ -11,7 +11,7 @@ import { GCLClient } from '../core/GCLLib';
 import { RestException } from '../core/exceptions/CoreExceptions';
 import { T1CContainer } from '../core/service/CoreModel';
 import { ContainerSyncRequest } from '../core/admin/adminModel';
-import { ActivationUtil } from './ActivationUtil';
+import {ActivatedContainerUtil} from './ActivatedContainerUtil';
 
 export class SyncUtil {
     static readonly DOWNLOAD_ERROR = 'DOWNLOAD_ERROR';
@@ -78,8 +78,8 @@ export class SyncUtil {
                 // update container config
                 return client.admin().updateContainerConfig(new ContainerSyncRequest(device.containerResponses)).then(() => {
                     // setup data container paths
-                    client.config().containers = GCLClient.getSortedContainers(device.containerResponses);
-                    // DataContainerUtil.setupDataContainers(device.containerResponses);
+                    client.config().activeContainers = ActivatedContainerUtil.getSortedContainers(device.containerResponses);
+                    DataContainerUtil.setupDataContainers(device.containerResponses);
 
                     return SyncUtil.pollDownloadCompletion(client,
                         device.containerResponses, isRetry).then((finalContainerList) => {

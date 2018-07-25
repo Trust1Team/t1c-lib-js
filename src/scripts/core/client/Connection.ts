@@ -503,8 +503,7 @@ export class LocalConnection extends GenericConnection implements Connection {
         // contextToken = application id (ex. 26)
         let contextToken = this.cfg.contextToken;
         // only send relay-state header when a DS is available
-        if (contextToken && !_.isNil(contextToken) && this.cfg.dsUrl) {
-            console.log(LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken);
+        if (contextToken && !_.isNil(contextToken)) {
             reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
         }
         return reqHeaders;

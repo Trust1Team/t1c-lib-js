@@ -98,6 +98,10 @@ export class T1CContainer {
     constructor(public name: string, public version: string, public status: string) {}
 }
 
+export class T1CContainerid {
+    constructor(public name: string) {}
+}
+
 export class BrowserInfoResponse extends T1CResponse {
     constructor(public data: BrowserInfo, public success: boolean) {
         super(success, data);

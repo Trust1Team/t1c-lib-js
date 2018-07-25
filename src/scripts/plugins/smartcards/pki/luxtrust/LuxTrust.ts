@@ -7,10 +7,17 @@ import { CertificateResponse, DataResponse } from '../../../../core/service/Core
 import { GenericCertCard } from '../../Card';
 import { AbstractLuxTrust } from './LuxTrustModel';
 import { Options, RequestHandler } from '../../../../util/RequestHandler';
+import {LocalConnection} from '../../../../core/client/Connection';
 
 
 export class LuxTrust extends GenericCertCard implements AbstractLuxTrust {
+    static CONTAINER_PREFIX = 'luxtrust';
     static ACTIVATED = '/activated';
+
+
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string) {
+        super(baseUrl, containerUrl, connection, reader_id, LuxTrust.CONTAINER_PREFIX);
+    }
 
     public activated(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(LuxTrust.ACTIVATED), undefined, undefined, callback);

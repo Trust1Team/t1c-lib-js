@@ -7,14 +7,20 @@ import {CertificateResponse, DataResponse} from '../../../../core/service/CoreMo
 import {GenericCertCard, OptionalPin} from '../../Card';
 import {Options, RequestHandler} from '../../../../util/RequestHandler';
 import {AbstractEidPT, PtIdDataResponse, PtAddressResponse} from './EidPtModel';
+import {LocalConnection} from '../../../../core/client/Connection';
 
 export class EidPt extends GenericCertCard implements AbstractEidPT {
+    static CONTAINER_PREFIX = 'pteid';
     static ADDRESS = '/address';
     static CERT_ROOT_AUTH = '/root-authentication';
     static CERT_ROOT_NON_REP = '/root-non-repudiation';
     static ID_DATA = '/id';
     static PHOTO = '/photo';
 
+
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string) {
+        super(baseUrl, containerUrl, connection, reader_id, EidPt.CONTAINER_PREFIX);
+    }
 
     public idData(callback?: (error: RestException, data: PtIdDataResponse) => void): Promise<PtIdDataResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidPt.ID_DATA), undefined, undefined, callback);

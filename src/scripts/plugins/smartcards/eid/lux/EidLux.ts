@@ -17,6 +17,7 @@ import { ResponseHandler } from '../../../../util/ResponseHandler';
 import { Options, RequestHandler, RequestOptions } from '../../../../util/RequestHandler';
 
 export class EidLux extends GenericCertCard implements AbstractEidLUX {
+    static CONTAINER_PREFIX = 'luxeid';
     static BIOMETRIC = '/biometric';
     static ADDRESS = '/address';
     static PHOTO = '/picture';
@@ -31,7 +32,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
                 protected connection: LocalConnection,
                 protected reader_id: string,
                 protected can: string) {
-        super(baseUrl, containerUrl, connection, reader_id);
+        super(baseUrl, containerUrl, connection, reader_id, EidLux.CONTAINER_PREFIX);
         // this.pin = PinEnforcer.encryptPin(pin);
         this.can = PinEnforcer.encryptPin(can);
     }
