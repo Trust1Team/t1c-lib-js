@@ -5,6 +5,7 @@
  * @since 2016
  */
 
+
 import {CoreService} from './service/CoreService';
 import {
     LocalConnection, RemoteJwtConnection, LocalAuthConnection, LocalTestConnection,
@@ -45,8 +46,8 @@ import {Polyfills} from '../util/Polyfills';
 import {AbstractOCVClient} from './ocv/OCVModel';
 import {GCLConfig} from './GCLConfig';
 
+
 // check if any polyfills are needed
-Polyfills.check();
 
 const defaults = {
     gclUrl: 'https://localhost:10443/v2',

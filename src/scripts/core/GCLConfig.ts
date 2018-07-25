@@ -274,7 +274,7 @@ class GCLConfig {
             } else {
                 let decoded = jwtDecode(self._gwJwt);
                 // check JWT expired
-                if (decoded.exp < moment(new Date()).format('X')) {
+                if (decoded < moment(new Date()).format('X')) {
                     // refresh if we have an API key
                     resolve(self.getGwJwt());
                 } else {
