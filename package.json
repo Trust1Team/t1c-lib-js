@@ -5,11 +5,9 @@
   "main": "dist/GCLLib.js",
   "types": "dist/lib/index.d.ts",
   "scripts": {
-    "ts": "tsc && tsc -m es6 --outDir lib-esm && webpack",
-    "prepublishOnly": "webpack",
     "localTest": "./node_modules/karma-cli/bin/karma start --single-run",
     "test": "./node_modules/karma-cli/bin/karma start --single-run --colors true",
-    "build": "webpack"
+    "build": "tsc && tsc -m es6 --outDir lib-esm && webpack"
   },
   "repository": {
     "type": "git",
