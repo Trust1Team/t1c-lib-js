@@ -41,7 +41,7 @@ import {InitUtil} from '../util/InitUtil';
 import {AbstractPkcs11, Pkcs11ModuleConfig} from '../plugins/smartcards/pkcs11/pkcs11Model';
 import {ClientService} from '../util/ClientService';
 import {AuthClient} from './auth/Auth';
-import moment = require('moment');
+import * as moment from 'moment';
 import {Polyfills} from '../util/Polyfills';
 import {AbstractOCVClient} from './ocv/OCVModel';
 import {GCLConfig} from './GCLConfig';
@@ -69,7 +69,7 @@ const defaults = {
 };
 
 
-class GCLClient {
+export class GCLClient {
     private _gclInstalled: boolean;
     private localConfig: GCLConfig;
     private pluginFactory: PluginFactory;
@@ -350,5 +350,3 @@ class GCLClient {
         });
     }
 }
-
-export {GCLClient, GCLConfig};

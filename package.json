@@ -2,9 +2,10 @@
   "name": "trust1connector",
   "version": "2.2.0",
   "description": "The Trust1Connector library (T1C-Lib), is a javascript library to communicate with the Trust1Connector. The library simplifies the execution to the connector and works asynchronously.",
-  "main": "dist/GCLLib.min.js",
-  "types": "dist/GCLLib.d.ts",
+  "main": "dist/GCLLib.js",
+  "types": "dist/lib/index.d.ts",
   "scripts": {
+    "ts": "tsc && tsc -m es6 --outDir lib-esm && webpack",
     "prepublishOnly": "webpack",
     "localTest": "./node_modules/karma-cli/bin/karma start --single-run",
     "test": "./node_modules/karma-cli/bin/karma start --single-run --colors true",
@@ -64,6 +65,7 @@
     "typescript": "^2.9.2",
     "uglify-js": "^3.4.5",
     "webpack": "^4.16.2",
+    "webpack-cli": "^3.1.0",
     "webpack-dev-server": "^3.1.5",
     "webpack-stream": "^5.0.0"
   },

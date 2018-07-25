@@ -1,15 +1,20 @@
 const path = require('path');
 
 module.exports = {
-    entry: ["./src/scripts/core/GCLLib.ts"],
+    entry: {
+        'GCLLib': './src/index.ts',
+        'GCLLib.min': './src/index.ts'
+    },
     devtool: "source-map",
     output: {
         path: path.resolve(__dirname, "dist"),
-        filename: 'GCLLib.min.js',
-        library: 'GCLLib'
+        filename: '[name].js',
+        library: 'GCLLib',
+        libraryTarget: "umd",
+        umdNamedDefine: true
     },
     optimization: {
-        minimize: true
+        minimize: false
     },
     resolve: {
         extensions: [".ts", ".js", ".tsx", ".jsx"]
