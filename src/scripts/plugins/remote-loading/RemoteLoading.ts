@@ -7,9 +7,11 @@ import { RestException } from '../../core/exceptions/CoreExceptions';
 import * as _ from 'lodash';
 import { BoolDataResponse, DataResponse, T1CResponse } from '../../core/service/CoreModel';
 import { GenericReaderContainer } from '../smartcards/Card';
+import {LocalConnection} from '../../core/client/Connection';
 
 
 export class RemoteLoading extends GenericReaderContainer implements AbstractRemoteLoading {
+    static CONTAINER_PREFIX = 'readerapi';
     static ATR = '/atr';
     static APDU = '/apdu';
     static APDUS = '/apdus';
@@ -20,6 +22,11 @@ export class RemoteLoading extends GenericReaderContainer implements AbstractRem
     static CLOSE_SESSION = '/close-session';
     static IS_PRESENT = '/is-present';
     static OPEN_SESSION = '/open-session';
+
+
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string) {
+        super(baseUrl, containerUrl, connection, reader_id, RemoteLoading.CONTAINER_PREFIX);
+    }
 
     private static optionalSessionIdParam(sessionId?: string): { 'session-id': string } | undefined {
         if (sessionId && sessionId.length) { return { 'session-id': sessionId }; }

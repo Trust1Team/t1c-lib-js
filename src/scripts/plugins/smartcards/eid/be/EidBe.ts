@@ -10,14 +10,20 @@ import { GenericCertCard, OptionalPin, VerifyPinData } from '../../Card';
 import { PinEnforcer } from '../../../../util/PinEnforcer';
 import { Options, RequestHandler } from '../../../../util/RequestHandler';
 import * as _ from 'lodash';
+import {LocalConnection} from '../../../../core/client/Connection';
 
 export class EidBe extends GenericCertCard implements AbstractEidBE {
+    static CONTAINER_PREFIX = 'beid';
     static RN_DATA = '/rn';
     static ADDRESS = '/address';
     static PHOTO = '/picture';
     static TOKEN = '/token';
     static VERIFY_PRIV_KEY_REF = 'non-repudiation';
 
+
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string) {
+        super(baseUrl, containerUrl, connection, reader_id, EidBe.CONTAINER_PREFIX);
+    }
 
     public rnData(callback?: (error: RestException, data: BeidRnDataResponse) => void): Promise<BeidRnDataResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidBe.RN_DATA), undefined, undefined, callback);

@@ -10,10 +10,17 @@ import {AbstractDNIe, DNIeInfoResponse} from './dnieModel';
 import {Options, RequestHandler} from '../../../../util/RequestHandler';
 import {CertParser} from '../../../../util/CertParser';
 import {ResponseHandler} from '../../../../util/ResponseHandler';
+import {LocalConnection} from '../../../../core/client/Connection';
 
 export class DNIe extends GenericSecuredCertCard implements AbstractDNIe {
+    static CONTAINER_PREFIX = 'dnie';
     static INFO = '/info';
     static CERT_INTERMEDIATE = '/intermediate';
+
+
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string) {
+        super(baseUrl, containerUrl, connection, reader_id, DNIe.CONTAINER_PREFIX);
+    }
 
     public info(callback?: (error: RestException, data: DNIeInfoResponse) => void): Promise<DNIeInfoResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(DNIe.INFO), undefined, undefined, callback);

@@ -71,8 +71,9 @@ export abstract class GenericReaderContainer extends GenericContainer {
     constructor(protected baseUrl: string,
                 protected containerUrl: string,
                 protected connection: LocalConnection,
-                protected reader_id: string) {
-        super(baseUrl, containerUrl, connection);
+                protected reader_id: string,
+                protected containerPrefix: string) {
+        super(baseUrl, containerUrl, connection, containerPrefix);
     }
 
     // resolves the reader_id in the base URL

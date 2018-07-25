@@ -6,10 +6,16 @@
 import { AbstractDataContainer } from './DataContainerModel';
 import { RestException } from '../../core/exceptions/CoreExceptions';
 import {GenericContainer} from '../GenericContainer';
+import {LocalConnection} from '../../core/client/Connection';
 
 
 export class DataContainer extends GenericContainer implements AbstractDataContainer {
     // constructor
+
+
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection) {
+        super(baseUrl, containerUrl, connection, containerUrl);
+    }
 
     public create(data: any, callback?: (error: RestException, data: any) => void): Promise<any> {
         // put

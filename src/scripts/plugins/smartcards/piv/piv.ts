@@ -8,12 +8,19 @@ import { CertificateResponse } from '../../../core/service/CoreModel';
 import { AbstractPiv, PivFacialImageResponse, PivPrintedInformationResponse } from './pivModel';
 import { PinEnforcer } from '../../../util/PinEnforcer';
 import { Options, RequestHandler } from '../../../util/RequestHandler';
+import {LocalConnection} from '../../../core/client/Connection';
 
 export class PIV extends GenericSecuredCertCard implements AbstractPiv {
+    static CONTAINER_PREFIX = 'piv';
     static PRINTED_INFORMATION = '/printed-information';
     static FACIAL_IMAGE = '/facial-image';
 
-    // filters
+
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string) {
+        super(baseUrl, containerUrl, connection, reader_id, PIV.CONTAINER_PREFIX);
+    }
+
+// filters
     public allDataFilters() {
         return [ 'applet-info', 'root_certificate', 'authentication-certificate',
                  'encryption_certificate', 'issuer_certificate', 'signing_certificate' ];

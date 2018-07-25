@@ -7,10 +7,17 @@ import {DataResponse} from '../../../core/service/CoreModel';
 import {RestException} from '../../../core/exceptions/CoreExceptions';
 import {AbstractOcra, OcraChallenge, OcraReadCounterResponse} from './ocraModel';
 import {PinEnforcer} from '../../../util/PinEnforcer';
+import {LocalConnection} from '../../../core/client/Connection';
 
 export class Ocra extends GenericPinCard implements AbstractOcra {
+    static CONTAINER_PREFIX = 'ocra';
     static CHALLENGE = '/challenge';
     static READ_COUNTER = '/counter';
+
+
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string) {
+        super(baseUrl, containerUrl, connection, reader_id, Ocra.CONTAINER_PREFIX);
+    }
 
     public challenge(body: OcraChallenge, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
         if (callback && typeof callback === 'function') {

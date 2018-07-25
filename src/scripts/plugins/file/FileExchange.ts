@@ -6,9 +6,11 @@ import {AbstractFileExchange, FileListResponse, FileResponse, FileSort, ModalTyp
 import {RestException} from '../../core/exceptions/CoreExceptions';
 import {BoolDataResponse, DataArrayResponse, DataResponse} from '../../core/service/CoreModel';
 import {GenericContainer} from '../GenericContainer';
+import {LocalConnection} from '../../core/client/Connection';
 
 
 export class FileExchange extends GenericContainer implements AbstractFileExchange {
+    static CONTAINER_PREFIX = 'file-exchange';
     static DOWNLOAD = '/download';
     static UPLOAD = '/upload';
     static TYPE_CREATE = '/create-type';
@@ -28,6 +30,11 @@ export class FileExchange extends GenericContainer implements AbstractFileExchan
     static CONTAINERS_ENABLED = '/enabled-containers';
     static DIR_CREATE = '/create-dir';
     static FILE_INFO = '/file-info';
+
+
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection) {
+        super(baseUrl, containerUrl, connection, FileExchange.CONTAINER_PREFIX);
+    }
 
     copyFile(entity: string, from_type: string, to_type: string, filename: string, new_filename: string, from_rel_path?: [string], to_rel_path?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse> {
         return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_COPY), {entity, from_type, to_type, filename, new_filename, from_rel_path, to_rel_path}, undefined, undefined, callback);

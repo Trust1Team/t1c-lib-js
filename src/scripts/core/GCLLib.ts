@@ -13,7 +13,7 @@ import {
 import {DSDownloadLinkResponse, DSDownloadRequest} from './ds/DSClientModel';
 import {DSClient} from './ds/DSClient';
 import {OCVClient} from './ocv/OCVClient';
-import {CardReadersResponse, DataResponse, T1CContainer} from './service/CoreModel';
+import {CardReadersResponse, DataResponse, T1CContainer, T1CContainerid} from './service/CoreModel';
 import {AbstractEidBE} from '../plugins/smartcards/eid/be/EidBeModel';
 import {AbstractEMV} from '../plugins/smartcards/emv/EMVModel';
 import {AbstractOcra} from '../plugins/smartcards/ocra/ocraModel';
@@ -44,28 +44,29 @@ import moment = require('moment');
 import {Polyfills} from '../util/Polyfills';
 import {AbstractOCVClient} from './ocv/OCVModel';
 import {GCLConfig} from './GCLConfig';
+import {ActivatedContainerUtil} from '../util/ActivatedContainerUtil';
 
 // check if any polyfills are needed
 Polyfills.check();
 
-const defaults = {
-    gclUrl: 'https://localhost:10443/v2',
-    gwUrl: 'https://accapim.t1t.be:443',
-    dsContextPath: '/trust1team/gclds/v2',
-    ocvContextPath: '/trust1team/ocv-api/v1',
-    dsContextPathTestMode: '/gcl-ds-web/v2',
-    dsFileContextPath: '/trust1team/gclds-file/v1',
-    tokenExchangeContextPath: '/apiengineauth/v1',
-    implicitDownload: false,
-    localTestMode: false,
-    forceHardwarePinpad: false,
-    sessionTimeout: 5,
-    consentDuration: 1,
-    consentTimeout: 10,
-    syncManaged: true,
-    osPinDialog: false,
-    containerDownloadTimeout: 30
-};
+// TODO: to be removed
+// const defaults = {
+//     gclUrl: 'https://localhost:10443/v2',
+//     gwUrl: 'https://accapim.t1t.be:443',
+//     dsContextPath: '/trust1team/gclds/v2',
+//     ocvContextPath: '/trust1team/ocv-api/v1',
+//     dsContextPathTestMode: '/gcl-ds-web/v2',
+//     dsFileContextPath: '/trust1team/gclds-file/v1',
+//     tokenExchangeContextPath: '/apiengineauth/v1',
+//     localTestMode: false,
+//     forceHardwarePinpad: false,
+//     sessionTimeout: 5,
+//     consentDuration: 1,
+//     consentTimeout: 10,
+//     syncManaged: true,
+//     osPinDialog: false,
+//     containerDownloadTimeout: 30
+// };
 
 
 class GCLClient {
@@ -88,6 +89,7 @@ class GCLClient {
     public constructor(cfg: GCLConfig, automatic: boolean) {
         // resolve config to singleton
         this.localConfig = cfg;
+        console.log(cfg);
         // init communication
         this.connection = new LocalConnection(this.localConfig);
         this.authConnection = new LocalAuthConnection(this.localConfig);
@@ -100,80 +102,33 @@ class GCLClient {
         this.adminService = new AdminService(this.localConfig.gclUrl, this.authAdminConnection);
         this.coreService = new CoreService(this.localConfig.gclUrl, this.authConnection);
         this.agentClient = new AgentClient(this.localConfig.gclUrl, this.authConnection);
-        if (this.localConfig.localTestMode) {
-            this.dsClient = new DSClient(this.localConfig.dsUrl, this.localTestConnection, this.localConfig);
+        if (this.localConfig.dsUrl) {
+            if (this.localConfig.localTestMode) {
+                this.dsClient = new DSClient(this.localConfig.dsUrl, this.localTestConnection, this.localConfig);
+            }
+            else {
+                this.dsClient = new DSClient(this.localConfig.dsUrl, this.remoteConnection, this.localConfig);
+            }
         }
-        else {
-            this.dsClient = new DSClient(this.localConfig.dsUrl, this.remoteConnection, this.localConfig);
-        }
-        // TODO don't init if OCV not enabled
+
         // check if initialised with API key or JWT to determine which to use
-        if (this.localConfig.apiKey && this.localConfig.apiKey.length) {
-            this.ocvClient = new OCVClient(this.localConfig.ocvUrl, this.remoteApiKeyConnection);
-        } else {
-            this.ocvClient = new OCVClient(this.localConfig.ocvUrl, this.remoteConnection);
+        if (this.localConfig.ocvUrl) {
+            if (this.localConfig.apiKey && this.localConfig.apiKey.length) {
+                this.ocvClient = new OCVClient(this.localConfig.ocvUrl, this.remoteApiKeyConnection);
+            } else {
+                this.ocvClient = new OCVClient(this.localConfig.ocvUrl, this.remoteConnection);
+            }
         }
+
         this.authClient = new AuthClient(this.localConfig, this.remoteApiKeyConnection);
         // keep reference to client in ClientService
         ClientService.setClient(this);
-
-        // check if implicit download has been set
-        if (this.localConfig.implicitDownload && true) {
-            this.implicitDownload();
-        }
-
-        if (this.localConfig.overrideContainers && !this.localConfig.dsUrl) {
-            // values from overrideContainers should be sorted and available when there is no DS available but the containers are provided in the constructor
-            const containers = this.localConfig.overrideContainers;
-            this.localConfig.containers = GCLClient.getSortedContainers(containers);
-        }
-        else if (!this.localConfig.overrideContainers && !this.localConfig.dsUrl) {
-            // if there is no DS available and the containers arent provided in the constructor turn to the GCL v2 info endpoint to fetch the containers
-            this.core().info().then( infoResponse => {
-                this.localConfig.containers = GCLClient.getSortedContainers(infoResponse.data.containers);
-            });
-        }
 
 
         if (!automatic) {
             // setup security - fail safe
             GCLClient.initLibrary();
         }
-    }
-
-    public static getContainerFor(cfg: GCLConfig, containerName: string): string {
-        return cfg.containers.get(containerName)[0];
-    }
-
-    /*
-    // static function that receives a list of containers and returns a hashmap with all the containers grouped with their versions
-    // this sorts the versions so the 1st is the latest version
-    */
-    public static getSortedContainers(containers: T1CContainer[]): Map<string, string[]> {
-        let containerHashmap = new Map<string, string[]>();
-        for (let i = 0; i < containers.length; i++) {
-            let name = containers[i].name;
-            let version = containers[i].version.replace(/\./g, '-');
-
-            let container = containerHashmap.get(name);
-            if (container) {
-                container.push(...[name + '-' + version]);
-                container.sort(function(first: string, last: string) {
-                    if (first > last) {
-                        return -1;
-                    }
-                    if (first < last) {
-                        return 1;
-                    }
-                    return 0;
-                });
-            }
-            else {
-                containerHashmap.set(name, [name + '-' + version]);
-            }
-        }
-
-        return containerHashmap;
     }
 
     public static checkPolyfills() {
@@ -368,32 +323,6 @@ class GCLClient {
         this.authConnection = new LocalAuthConnection(cfg);
         this.adminService = new AdminService(cfg.gclUrl, this.authConnection);
         this.coreService = new CoreService(cfg.gclUrl, this.authConnection);
-    }
-
-    // TODO review
-    // implicit download GCL instance when not found
-    private implicitDownload() {
-        let self = this;
-        this.core().info(function (error: RestException) {
-            console.log('implicit error', JSON.stringify(error));
-            if (error) {
-                // no gcl available - start download
-                let _info = self.core().infoBrowserSync();
-                console.log('implicit error', JSON.stringify(_info));
-                let downloadData = new DSDownloadRequest(_info.data.browser,
-                    _info.data.manufacturer, _info.data.os, _info.data.ua, self.config().gwUrl);
-                self.ds().downloadLink(downloadData,
-                    function (linkError: RestException, downloadResponse: DSDownloadLinkResponse) {
-                        if (linkError) {
-                            console.error('could not download GCL package:', linkError.description);
-                        }
-                        window.open(downloadResponse.url);
-                        return;
-                    });
-            } else {
-                return;
-            }
-        });
     }
 }
 
