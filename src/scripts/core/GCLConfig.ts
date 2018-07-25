@@ -31,11 +31,33 @@ const defaults = {
     containerDownloadTimeout: 30
 };
 
+export class GCLConfigOptions {
+    constructor(public gclUrl?: string,
+                public gwOrProxyUrl?: string,
+                public apiKey?: string,
+                public gwJwt?: string,
+                public ocvContextPath?: string,
+                public dsContextPath?: string,
+                public dsFileContextPath?: string,
+                public pkcs11Config?: Pkcs11ModuleConfig,
+                public agentPort?: number,
+                public implicitDownload?: boolean,
+                public forceHardwarePinpad?: boolean,
+                public sessionTimeout?: number,
+                public consentDuration?: number,
+                public consentTimeout?: number,
+                public syncManaged?: boolean,
+                public osPinDialog?: boolean,
+                public containerDownloadTimeout?: number,
+                public localTestMode?: boolean,
+                public lang?: string) {}
+}
+
 /**
  * GCL Configuration object. Represents the GCL Library configuration state.
  * Most settings are configurable by the user; some are set by the library itself.
  */
-class GCLConfig {
+export class GCLConfig {
     private _gwUrl: string;
     private _gclUrl: string;
     private _dsContextPath: string;
@@ -62,7 +84,7 @@ class GCLConfig {
     private _lang: string;
 
     // constructor for DTO
-    public constructor(options?: any) {
+    public constructor(options: GCLConfigOptions) {
         if (options) {
             if (options.gclUrl) { this._gclUrl = options.gclUrl; } else { this._gclUrl = defaults.gclUrl; }
             if (options.gwOrProxyUrl) { this._gwUrl = options.gwOrProxyUrl; } else { this._gwUrl = defaults.gwUrl; }
@@ -344,5 +366,3 @@ class GCLConfig {
         }
     }
 }
-
-export { GCLConfig };
