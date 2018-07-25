@@ -13,6 +13,7 @@ import { ClientService } from '../util/ClientService';
 import { AuthClient } from './auth/Auth';
 import * as moment from 'moment';
 import { Polyfills } from '../util/Polyfills';
+Polyfills.check();
 var defaults = {
     gclUrl: 'https://localhost:10443/v2',
     gwUrl: 'https://accapim.t1t.be:443',

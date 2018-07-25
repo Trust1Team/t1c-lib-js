@@ -48,6 +48,7 @@ import {GCLConfig} from './GCLConfig';
 
 
 // check if any polyfills are needed
+Polyfills.check();
 
 const defaults = {
     gclUrl: 'https://localhost:10443/v2',

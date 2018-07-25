@@ -15,7 +15,7 @@ import { FileExchange } from './file/FileExchange';
 import { PKCS11 } from './smartcards/pkcs11/pkcs11';
 import { DataContainer } from './data-container/DataContainer';
 var CONTAINER_NEW_CONTEXT_PATH = '/containers/';
-var CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
+var CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid-v2-1-1';
 var CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid-v2-1-1';
 var CONTAINER_DNIE = CONTAINER_NEW_CONTEXT_PATH + 'dnie';
 var CONTAINER_EMV = CONTAINER_NEW_CONTEXT_PATH + 'emv';
