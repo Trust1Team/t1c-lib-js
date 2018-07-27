@@ -14,7 +14,7 @@ module.exports = {
         umdNamedDefine: true
     },
     optimization: {
-        minimize: false
+        minimize: true
     },
     resolve: {
         extensions: [".ts", ".js", ".tsx", ".jsx"]
@@ -26,11 +26,11 @@ module.exports = {
                 exclude: /node_modules/,
                 use: 'ts-loader'
             },
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                use: "babel-loader"
-            }
+            // {
+            //     test: /\.js$/,
+            //     exclude: /node_modules/,
+            //     use: "babel-loader"
+            // }
         ]
     }
 };
