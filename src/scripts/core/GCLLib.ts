@@ -23,7 +23,7 @@ import {AbstractLuxTrust} from '../plugins/smartcards/pki/luxtrust/LuxTrustModel
 import {AbstractOberthur} from '../plugins/smartcards/pki/oberthur/OberthurModel';
 import {AbstractPiv} from '../plugins/smartcards/piv/pivModel';
 import {AbstractMobib} from '../plugins/smartcards/mobib/mobibModel';
-import {AbstractEidLUX} from '../plugins/smartcards/eid/lux/EidLuxModel';
+import {AbstractEidLUX, PinType} from '../plugins/smartcards/eid/lux/EidLuxModel';
 import {AbstractDNIe} from '../plugins/smartcards/eid/esp/dnieModel';
 import {PluginFactory} from '../plugins/PluginFactory';
 import {AuthenticateOrSignData, OptionalPin} from '../plugins/smartcards/Card';
@@ -209,8 +209,8 @@ export class GCLClient {
         return this.pluginFactory.createDNIe(reader_id);
     };
     // get instance for luxemburg eID card
-    public luxeid = (reader_id?: string, pin?: string): AbstractEidLUX => {
-        return this.pluginFactory.createEidLUX(reader_id, pin);
+    public luxeid = (reader_id?: string, pin?: string, pinType?: PinType): AbstractEidLUX => {
+        return this.pluginFactory.createEidLUX(reader_id, pin, pinType);
     };
     // get instance for luxtrust card
     public luxtrust = (reader_id?: string, pin?: string): AbstractLuxTrust => {
