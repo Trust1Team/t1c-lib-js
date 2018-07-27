@@ -45,6 +45,11 @@ export interface AbstractEidLUX extends CertCard {
 
 }
 
+export class PinType {
+    static PIN = 'Pin';
+    static CAN = 'Can';
+}
+
 export class AllCertsResponse extends DataObjectResponse {
     constructor(public data: LuxidAllCerts, public success: boolean) {
         super(data, success);
