@@ -40,12 +40,13 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
         this.pin = PinEnforcer.encryptPin(pin);
     }
 
+    // by default using Pace-PIN
     private static EncryptedHeader(code: string, pinType: PinType) {
-        if (pinType === PinType.PIN) {
-            return { 'X-Encrypted-Pin': code };
+        if (pinType === PinType.CAN) {
+            return { 'X-Encrypted-Can': code };
         }
         else {
-            return { 'X-Encrypted-Can': code };
+            return { 'X-Encrypted-Pin': code };
         }
     }
     // filters
