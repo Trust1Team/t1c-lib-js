@@ -48,8 +48,6 @@ import {GCLConfig} from './GCLConfig';
 
 
 // check if any polyfills are needed
-Polyfills.check();
-
 const defaults = {
     gclUrl: 'https://localhost:10443/v2',
     gwUrl: 'https://accapim.t1t.be:443',
