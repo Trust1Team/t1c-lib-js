@@ -5,6 +5,7 @@
  * @since 2016
  */
 
+
 import {CoreService} from './service/CoreService';
 import {
     LocalConnection, RemoteJwtConnection, LocalAuthConnection, LocalTestConnection,
@@ -22,7 +23,7 @@ import {AbstractLuxTrust} from '../plugins/smartcards/pki/luxtrust/LuxTrustModel
 import {AbstractOberthur} from '../plugins/smartcards/pki/oberthur/OberthurModel';
 import {AbstractPiv} from '../plugins/smartcards/piv/pivModel';
 import {AbstractMobib} from '../plugins/smartcards/mobib/mobibModel';
-import {AbstractEidLUX} from '../plugins/smartcards/eid/lux/EidLuxModel';
+import {AbstractEidLUX, PinType} from '../plugins/smartcards/eid/lux/EidLuxModel';
 import {AbstractDNIe} from '../plugins/smartcards/eid/esp/dnieModel';
 import {PluginFactory} from '../plugins/PluginFactory';
 import {AuthenticateOrSignData, OptionalPin} from '../plugins/smartcards/Card';
@@ -40,36 +41,36 @@ import {InitUtil} from '../util/InitUtil';
 import {AbstractPkcs11} from '../plugins/smartcards/pkcs11/pkcs11Model';
 import {ClientService} from '../util/ClientService';
 import {AuthClient} from './auth/Auth';
-import moment = require('moment');
+import * as moment from 'moment';
 import {Polyfills} from '../util/Polyfills';
 import {AbstractOCVClient} from './ocv/OCVModel';
 import {GCLConfig} from './GCLConfig';
-import {ActivatedContainerUtil} from '../util/ActivatedContainerUtil';
+import {DSException} from './exceptions/DSException';
+
+
 
 // check if any polyfills are needed
-Polyfills.check();
-
-// TODO: to be removed
-// const defaults = {
-//     gclUrl: 'https://localhost:10443/v2',
-//     gwUrl: 'https://accapim.t1t.be:443',
-//     dsContextPath: '/trust1team/gclds/v2',
-//     ocvContextPath: '/trust1team/ocv-api/v1',
-//     dsContextPathTestMode: '/gcl-ds-web/v2',
-//     dsFileContextPath: '/trust1team/gclds-file/v1',
-//     tokenExchangeContextPath: '/apiengineauth/v1',
-//     localTestMode: false,
-//     forceHardwarePinpad: false,
-//     sessionTimeout: 5,
-//     consentDuration: 1,
-//     consentTimeout: 10,
-//     syncManaged: true,
-//     osPinDialog: false,
-//     containerDownloadTimeout: 30
-// };
+const defaults = {
+    gclUrl: 'https://localhost:10443/v2',
+    gwUrl: 'https://accapim.t1t.be:443',
+    dsContextPath: '/trust1team/gclds/v2',
+    ocvContextPath: '/trust1team/ocv-api/v1',
+    dsContextPathTestMode: '/gcl-ds-web/v2',
+    dsFileContextPath: '/trust1team/gclds-file/v1',
+    tokenExchangeContextPath: '/apiengineauth/v1',
+    implicitDownload: false,
+    localTestMode: false,
+    forceHardwarePinpad: false,
+    sessionTimeout: 5,
+    consentDuration: 1,
+    consentTimeout: 10,
+    syncManaged: true,
+    osPinDialog: false,
+    containerDownloadTimeout: 30
+};
 
 
-class GCLClient {
+export class GCLClient {
     private _gclInstalled: boolean;
     private localConfig: GCLConfig;
     private pluginFactory: PluginFactory;
@@ -89,7 +90,6 @@ class GCLClient {
     public constructor(cfg: GCLConfig, automatic: boolean) {
         // resolve config to singleton
         this.localConfig = cfg;
-        console.log(cfg);
         // init communication
         this.connection = new LocalConnection(this.localConfig);
         this.authConnection = new LocalAuthConnection(this.localConfig);
@@ -191,8 +191,16 @@ class GCLClient {
         return this.agentClient;
     };
     // get ds client services
-    public ds = (): DSClient => {
-        return this.dsClient;
+    public ds = (): Promise<DSClient> => {
+        // als ds niet geconfigureerd is moet je hier een exception geven
+        return new Promise((resolve, reject) => {
+            if (this.dsClient) {
+                resolve(this.dsClient);
+            }
+            else {
+                reject(new DSException('Distribution server is not configured'));
+            }
+        });
     };
     // get ocv client services
     public ocv = (): AbstractOCVClient => {
@@ -211,8 +219,8 @@ class GCLClient {
         return this.pluginFactory.createDNIe(reader_id);
     };
     // get instance for luxemburg eID card
-    public luxeid = (reader_id?: string, pin?: string): AbstractEidLUX => {
-        return this.pluginFactory.createEidLUX(reader_id, pin);
+    public luxeid = (reader_id?: string, pin?: string, pinType?: PinType): AbstractEidLUX => {
+        return this.pluginFactory.createEidLUX(reader_id, pin, pinType);
     };
     // get instance for luxtrust card
     public luxtrust = (reader_id?: string, pin?: string): AbstractLuxTrust => {
@@ -282,7 +290,11 @@ class GCLClient {
         return this.core().infoBrowser().then(info => {
             let downloadData = new DSDownloadRequest(info.data.browser, info.data.manufacturer,
                 info.data.os, info.data.ua, this.config().gwUrl);
-            return this.ds().downloadLink(downloadData, callback);
+            return this.ds().then(ds => {
+                return ds.downloadLink(downloadData, callback);
+            }, err => {
+                return ResponseHandler.error(err, callback);
+            });
         }, error => {
             return ResponseHandler.error(error, callback);
         });
@@ -325,5 +337,3 @@ class GCLClient {
         this.coreService = new CoreService(cfg.gclUrl, this.authConnection);
     }
 }
-
-export {GCLClient, GCLConfig};

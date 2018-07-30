@@ -2,7 +2,7 @@
  * @author Maarten Somers
  * @since 2018
  */
-import {GCLClient, GCLConfig} from '../core/GCLLib';
+import {GCLClient} from '../core/GCLLib';
 import * as _ from 'lodash';
 import * as semver from 'semver';
 import {SyncUtil} from './SyncUtil';
@@ -14,6 +14,7 @@ import {AxiosError, AxiosResponse} from 'axios';
 import axios from 'axios';
 import {ActivatedContainerUtil} from './ActivatedContainerUtil';
 import {BrowserInfo, InfoResponse} from '../core/service/CoreModel';
+import {GCLConfig} from '../..';
 
 export class InitUtil {
     // constructor
@@ -42,14 +43,14 @@ export class InitUtil {
                         this.containerHandler(cfg, infoResponse);
                         // triggers activation if needed and syncs
                         this.activateAndSync(infoResponse, mergedInfo, client, cfg, resolve, reject);
-                        console.log(infoResponse, mergedInfo, cfg);
                     } else {
                         // installed version is not compatible, reject initialization
                         // return the client in the error so a new version can be downloaded!
                         reject(new RestException(400, '301',
                             'Installed GCL version is not v2 compatible. Please update to a compatible version.', client));
                     }
-                }, () => {
+                }, (err) => {
+                    console.error('init', err);
                     // failure probably because GCL is not installed
                     client.gclInstalled = false;
                     // check if older GCL version is available at v1 endpoint
@@ -68,11 +69,12 @@ export class InitUtil {
             initPromise.then(() => {
                 // store device PubKey
                 client.admin().getPubKey().then(pubKey => {
-                    // console.log(pubKey);
+                    console.log(pubKey);
                     PubKeyService.setPubKey(pubKey.data.device);
                     finalResolve();
                 });
             }, err => {
+                console.log('finalreject', err)
                 finalReject(err);
             });
 
@@ -108,7 +110,7 @@ export class InitUtil {
             client.updateAuthConnection(config);
             initResolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, infoResponse.data.containers));
         }, err => {
-            initReject(err);
+            // initReject(err);
             // resolve(SyncUtil.unManagedSynchronization(client.admin(), client.ds(), cfg, mergedInfo, uuid));
         });
     }

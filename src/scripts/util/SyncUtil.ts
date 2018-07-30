@@ -32,11 +32,17 @@ export class SyncUtil {
         // do core v2 sync flow
         // unmanaged sync is blocking, so reject if an error occurs
         return new Promise((resolve, reject) => {
-            SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, false).then(() => {
+            console.log(client);
+            if (client.ds()) {
+                SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, false).then(() => {
+                    resolve();
+                }).catch(err => {
+                    reject(err);
+                });
+            }
+            else {
                 resolve();
-            }).catch(err => {
-                reject(err);
-            });
+            }
         });
     }
 
@@ -45,20 +51,22 @@ export class SyncUtil {
                              info: DSPlatformInfo,
                              deviceId: string,
                              containers: T1CContainer[]): Promise<DeviceResponse> {
-        return client.ds().sync(new DSRegistrationOrSyncRequest(
-            info.activated,
-            deviceId,
-            info.core_version,
-            pubKey,
-            info.manufacturer,
-            info.browser,
-            info.os,
-            info.ua,
-            client.config().gwUrl,
-            new DSClientInfo('JAVASCRIPT', '%%GULP_INJECT_VERSION%%'),
-            info.namespace,
-            containers)
-        );
+        return client.ds().then(ds => {
+          return ds.sync(new DSRegistrationOrSyncRequest(
+              info.activated,
+              deviceId,
+              info.core_version,
+              pubKey,
+              info.manufacturer,
+              info.browser,
+              info.os,
+              info.ua,
+              client.config().gwUrl,
+              new DSClientInfo('JAVASCRIPT', '%%GULP_INJECT_VERSION%%'),
+              info.namespace,
+              containers)
+          );
+        });
     }
 
     private static doSyncFlow(client: GCLClient, mergedInfo: DSPlatformInfo, uuid: string, containers: T1CContainer[], isRetry: boolean) {

@@ -4,7 +4,7 @@
  */
 import * as store from 'store2';
 import * as Base64 from 'Base64';
-import { v4 as uuid } from 'uuid';
+import * as uuid from 'uuid/v4';
 import * as sha from 'sha256';
 
 
