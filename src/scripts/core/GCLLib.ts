@@ -73,9 +73,6 @@ class GCLClient {
         else { this.dsClient = new DSClient(this.cfg.dsUrl, this.remoteConnection, this.cfg); }
         this.ocvClient = new OCVClient(this.cfg.ocvUrl, this.remoteConnection);
 
-        // check if implicit download has been set
-        if (this.cfg.implicitDownload && true) { this.implicitDownload(); }
-
 
         if (!automatic) {
             // setup security - fail safe
@@ -274,6 +271,8 @@ class GCLClient {
                     resolve();
                     return;
                 }
+                // if version == 1.2.5 force download -> v1.2.5 is only valid for 1 year related to cert
+                if(infoResponse.data.version == '1.2.5') { resolve(); return; }
                 self_cfg.citrix = infoResponse.data.citrix;
                 self_cfg.tokenCompatible = GCLClient.checkTokenCompatible(infoResponse.data.version);
                 let activated = infoResponse.data.activated;
@@ -337,24 +336,6 @@ class GCLClient {
                     }
                 }
             });
-        });
-    }
-
-    // implicit download GCL instance when not found
-    private implicitDownload() {
-        let self = this;
-        this.core().info(function(error: CoreExceptions.RestException) {
-            console.log('implicit error', JSON.stringify(error));
-            if (error) {
-                // no gcl available - start download
-                let _info = self.core().infoBrowserSync();
-                console.log('implicit error', JSON.stringify(_info));
-                self.ds().downloadLink(_info.data,
-                    function(linkError: CoreExceptions.RestException, downloadResponse: DownloadLinkResponse) {
-                        if (linkError) { console.error('could not download GCL package:', linkError.description); }
-                        window.open(downloadResponse.url); return;
-                    });
-            } else { return; }
         });
     }
 }
