@@ -4,6 +4,7 @@
  */
 
 import {T1CLibException} from '../exceptions/CoreExceptions';
+import Certificate from 'pkijs/build/Certificate';
 
 export interface AbstractCore {
     // async
@@ -142,7 +143,7 @@ export class CertificatesResponse extends T1CResponse {
 }
 
 export class T1CCertificate {
-    constructor(public base64: string, public id?: string, public parsed?: object ) {}
+    constructor(public base64: string, public id?: string, public parsed?: Certificate ) {}
 }
 
 export class SingleReaderResponse extends T1CResponse {

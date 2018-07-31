@@ -1,4 +1,5 @@
 import { T1CLibException } from '../exceptions/CoreExceptions';
+import Certificate from 'pkijs/build/Certificate';
 export interface AbstractCore {
     getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string, alertPosition?: string, type?: string, timeoutInSeconds?: number, callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
     getImplicitConsent(codeWord: string, durationInDays?: number, type?: string, callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
@@ -126,8 +127,8 @@ export declare class CertificatesResponse extends T1CResponse {
 export declare class T1CCertificate {
     base64: string;
     id?: string;
-    parsed?: object;
-    constructor(base64: string, id?: string, parsed?: object);
+    parsed?: Certificate;
+    constructor(base64: string, id?: string, parsed?: Certificate);
 }
 export declare class SingleReaderResponse extends T1CResponse {
     data: CardReader;
