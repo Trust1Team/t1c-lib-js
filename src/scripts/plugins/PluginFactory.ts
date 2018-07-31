@@ -21,7 +21,7 @@ import { AbstractLuxTrust } from './smartcards/pki/luxtrust/LuxTrustModel';
 import { AbstractOberthur } from './smartcards/pki/oberthur/OberthurModel';
 import { AbstractPiv } from './smartcards/piv/pivModel';
 import { AbstractMobib } from './smartcards/mobib/mobibModel';
-import { AbstractEidLUX } from './smartcards/eid/lux/EidLuxModel';
+import {AbstractEidLUX, PinType} from './smartcards/eid/lux/EidLuxModel';
 import { DNIe } from './smartcards/eid/esp/dnie';
 import { AbstractDNIe } from './smartcards/eid/esp/dnieModel';
 import { AbstractEidPT } from './smartcards/eid/pt/EidPtModel';
@@ -51,8 +51,8 @@ export interface AbstractFactory {
 }
 
 const CONTAINER_NEW_CONTEXT_PATH = '/containers/';
-const CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
-const CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
+const CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid-v2-1-1';
+const CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid-v2-1-1';
 const CONTAINER_DNIE = CONTAINER_NEW_CONTEXT_PATH + 'dnie';
 const CONTAINER_EMV = CONTAINER_NEW_CONTEXT_PATH + 'emv';
 const CONTAINER_FILE_EXCHANGE = CONTAINER_NEW_CONTEXT_PATH + 'file-exchange';
@@ -74,8 +74,8 @@ export class PluginFactory implements AbstractFactory {
 
     public createEidBE(reader_id?: string): AbstractEidBE { return new EidBe(this.url, CONTAINER_BEID, this.connection, reader_id); }
 
-    public createEidLUX(reader_id?: string, pin?: string): AbstractEidLUX {
-        return new EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin);
+    public createEidLUX(reader_id?: string, pin?: string, pinType?: PinType): AbstractEidLUX {
+        return new EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin, pinType);
     }
     public createEidPT(reader_id?: string): AbstractEidPT { return new EidPt(this.url, CONTAINER_PTEID, this.connection, reader_id); }
 

@@ -9,9 +9,12 @@ import {SyncUtil} from './SyncUtil';
 import {ActivationUtil} from './ActivationUtil';
 import {DSPlatformInfo} from '../core/ds/DSClientModel';
 import {PubKeyService} from './PubKeyService';
-import {RestException} from '../core/exceptions/CoreExceptions';
+import {T1CLibException} from '../core/exceptions/CoreExceptions';
 import {AxiosError, AxiosResponse} from 'axios';
 import axios from 'axios';
+import {ActivatedContainerUtil} from './ActivatedContainerUtil';
+import {BrowserInfo, InfoResponse} from '../core/service/CoreModel';
+import {GCLConfig} from '../..';
 
 export class InitUtil {
     // constructor
@@ -35,53 +38,31 @@ export class InitUtil {
                     cfg.v2Compatible = InitUtil.coreV2Compatible(infoResponse.data.version);
 
                     if (cfg.v2Compatible) {
-                        // console.log('v2 compatible');
-                        let activated = infoResponse.data.activated;
-                        let core_version = infoResponse.data.version;
-                        let uuid = infoResponse.data.uid;
-                        let ns = this.extractHostname(cfg.dsUrl);
-                        // compose info
-                        let info = client.core().infoBrowserSync();
-                        let mergedInfo = new DSPlatformInfo(activated, info.data, core_version, ns);
-
-                        // console.log('unmanaged');
-                        let activationPromise;
-                        if (activated) {
-                            // console.log('already activated');
-                            // already activated, only need to sync device
-                            activationPromise = Promise.resolve();
-                        } else {
-                            // not yet activated, do this now
-                            // console.log('need to activate');
-                            activationPromise = ActivationUtil.unManagedInitialization(client, mergedInfo, uuid);
+                        let mergedInfo = this.getMergedInfo(cfg, client.core().infoBrowserSync().data, infoResponse);
+                        this.containerHandler(cfg, infoResponse);
+                        // triggers activation if needed and syncs
+                        if (cfg.gwUrl) {
+                            this.activateAndSync(infoResponse, mergedInfo, client, cfg, resolve, reject);
                         }
-                        activationPromise.then(() => {
-                            // update core service
-                            client.updateAuthConnection(cfg);
-                            // device is activated, sync it
-                            resolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, infoResponse.data.containers));
-                        }, err => {
-                            reject(err);
-                            // resolve(SyncUtil.unManagedSynchronization(client.admin(), client.ds(), cfg, mergedInfo, uuid));
-                        });
                     } else {
                         // installed version is not compatible, reject initialization
                         // return the client in the error so a new version can be downloaded!
-                        reject(new RestException(400, '301',
+                        reject(new T1CLibException(400, '301',
                             'Installed GCL version is not v2 compatible. Please update to a compatible version.', client));
                     }
-                }, () => {
+                }, (err) => {
+                    console.error('initializeLibrary - getInfoError', err);
                     // failure probably because GCL is not installed
                     client.gclInstalled = false;
                     // check if older GCL version is available at v1 endpoint
                     axios.get('https://localhost:10443/v1').then((response: AxiosResponse) => {
                         // response received, inform user that he needs to update
-                        reject(new RestException(400, '301',
+                        reject(new T1CLibException(400, '301',
                             'Installed GCL version is not v2 compatible. Please update to a compatible version.', client));
                     }).catch(() => {
                         // no response, no older GCL version installed
                         // return the client in the error so a new version can be downloaded!
-                        reject(new RestException(400, '302',
+                        reject(new T1CLibException(400, '302',
                             'No installed GCL component found. Please download and install the GCL.', client));
                     });
                 });
@@ -89,15 +70,61 @@ export class InitUtil {
             initPromise.then(() => {
                 // store device PubKey
                 client.admin().getPubKey().then(pubKey => {
-                    // console.log(pubKey);
                     PubKeyService.setPubKey(pubKey.data.device);
                     finalResolve();
                 });
             }, err => {
+                console.log('Initialization error', err)
                 finalReject(err);
             });
 
         });
+    }
+
+    private static containerHandler(config: GCLConfig, infoResponse: InfoResponse) {
+        if (!config.dsUrl && config.overrideContainers) {
+            // values from overrideContainers should be sorted and available when there is no DS available but the containers are provided in the constructor
+            config.activeContainers = ActivatedContainerUtil.getSortedProvidedContainers(config.overrideContainers);
+        }
+        else if (!config.dsUrl && !config.overrideContainers) {
+            // if there is no DS available and the containers arent provided in the constructor turn to the GCL v2 info endpoint to fetch the containers
+            config.activeContainers = ActivatedContainerUtil.getSortedContainers(infoResponse.data.containers);
+        }
+    }
+
+
+    private static activateAndSync(infoResponse: InfoResponse, mergedInfo: DSPlatformInfo, client: GCLClient, config: GCLConfig, initResolve: any, initReject: any) {
+        const activated = infoResponse.data.activated;
+        const uuid = infoResponse.data.uid;
+        let activationPromise = new Promise((resolve, reject) => {
+            if (!config.dsUrl && activated) {
+                // already activated, only need to sync device
+                resolve();
+            } else {
+                // not yet activated, do this now
+                resolve(ActivationUtil.unManagedInitialization(client, mergedInfo, uuid));
+            }
+        });
+        activationPromise.then(() => {
+            // update core service
+            client.updateAuthConnection(config);
+            initResolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, infoResponse.data.containers));
+        }, err => {
+            // initReject(err);
+            // resolve(SyncUtil.unManagedSynchronization(client.admin(), client.ds(), cfg, mergedInfo, uuid));
+        });
+    }
+
+    private static getMergedInfo(config: GCLConfig, info: BrowserInfo, infoResponse: InfoResponse): DSPlatformInfo {
+        const core_version = infoResponse.data.version;
+        const activated = infoResponse.data.activated;
+        if (config.dsUrl) {
+            let ns = this.extractHostname(config.dsUrl);
+            return new DSPlatformInfo(activated, info, core_version, ns);
+        }
+        else {
+            return new DSPlatformInfo(activated, info, core_version);
+        }
     }
 
     private static extractHostname(url: string): string {

@@ -1,7 +1,7 @@
 /**
  * @author Maarten Somers
  */
-import {RestException} from '../exceptions/CoreExceptions';
+import {T1CLibException} from '../exceptions/CoreExceptions';
 import {AbstractAgent, AgentResponse} from './agentModel';
 import {LocalAuthConnection, RequestBody} from '../client/Connection';
 
@@ -21,7 +21,7 @@ export class AgentClient implements AbstractAgent {
         return AgentClient.AGENT_PATH + '/' + port;
     }
 
-    public get(username?: string, callback?: (error: RestException, data: AgentResponse) => void): Promise<any> {
+    public get(username?: string, callback?: (error: T1CLibException, data: AgentResponse) => void): Promise<any> {
         let body: RequestBody = { AGENT_MATCH_PARAM:  username};
         return this.connection.postSkipCitrix(this.url, AgentClient.AGENT_PATH, undefined, body, undefined, callback);
     }

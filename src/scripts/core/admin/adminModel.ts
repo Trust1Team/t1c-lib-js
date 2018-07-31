@@ -5,22 +5,22 @@
 
 import {DataArrayResponse, T1CResponse} from '../service/CoreModel';
 import { DSContainer } from '../ds/DSClientModel';
-import { RestException } from '../exceptions/CoreExceptions';
+import { T1CLibException } from '../exceptions/CoreExceptions';
 import {Agent} from '../agent/agentModel';
 
 
 export interface AbstractAdmin {
-    activate(callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
-    atr(atrList: AtrListRequest, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
-    getLogfile(name: string, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
-    getLogfileList(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
-    getPubKey(callback?: (error: RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
+    activate(callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse>;
+    atr(atrList: AtrListRequest, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse>;
+    getLogfile(name: string, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse>;
+    getLogfileList(callback?: (error: T1CLibException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
+    getPubKey(callback?: (error: T1CLibException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     setPubKey(keys: SetPubKeyRequest,
-              callback?: (error: RestException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
+              callback?: (error: T1CLibException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
     updateContainerConfig(containers: ContainerSyncRequest,
-                          callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+                          callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse>;
     // resolve agent
-    resolveAgent(challenge: string, callback?: (error: RestException, data: ResolvedAgentResponse) => void): Promise<ResolvedAgentResponse>;
+    resolveAgent(challenge: string, callback?: (error: T1CLibException, data: ResolvedAgentResponse) => void): Promise<ResolvedAgentResponse>;
 }
 
 export class AtrListRequest {

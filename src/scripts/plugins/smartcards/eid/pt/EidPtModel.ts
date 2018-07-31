@@ -2,27 +2,27 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from '../../../../core/exceptions/CoreExceptions';
+import { T1CLibException } from '../../../../core/exceptions/CoreExceptions';
 import { CertCard, OptionalPin } from '../../Card';
 import { CertificateResponse, DataObjectResponse, DataResponse, T1CCertificate } from '../../../../core/service/CoreModel';
 import { Options } from '../../../../util/RequestHandler';
 
 export interface AbstractEidPT extends CertCard {
-    allData(filters: string[], callback?: (error: RestException, data: PtAllDataResponse) => void): Promise<PtAllDataResponse>;
-    allCerts(filters: string[], callback?: (error: RestException, data: PtAllCertsResponse) => void): Promise<PtAllCertsResponse>;
-    idData(callback?: (error: RestException, data: PtIdDataResponse) => void): Promise<PtIdDataResponse>;
-    idDataWithOutPhoto(callback?: (error: RestException, data: PtIdDataResponse) => void): Promise<PtIdDataResponse>;
-    address(data: OptionalPin, callback?: (error: RestException, data: PtAddressResponse) => void): Promise<PtAddressResponse>;
-    photo(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    rootCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    allData(filters: string[], callback?: (error: T1CLibException, data: PtAllDataResponse) => void): Promise<PtAllDataResponse>;
+    allCerts(filters: string[], callback?: (error: T1CLibException, data: PtAllCertsResponse) => void): Promise<PtAllCertsResponse>;
+    idData(callback?: (error: T1CLibException, data: PtIdDataResponse) => void): Promise<PtIdDataResponse>;
+    idDataWithOutPhoto(callback?: (error: T1CLibException, data: PtIdDataResponse) => void): Promise<PtIdDataResponse>;
+    address(data: OptionalPin, callback?: (error: T1CLibException, data: PtAddressResponse) => void): Promise<PtAddressResponse>;
+    photo(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    rootCertificate(options: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     rootAuthenticationCertificate(options: Options,
-                                  callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                                  callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     rootNonRepudiationCertificate(options: Options,
-                                  callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                                  callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     authenticationCertificate(options: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                              callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     nonRepudiationCertificate(options: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                              callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
 
 export class PtAllCertsResponse extends DataObjectResponse {

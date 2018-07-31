@@ -4,12 +4,12 @@
  * @since 2017
  */
 import { LocalConnection, QueryParams, RequestHeaders } from '../../../../core/client/Connection';
-import { RestException } from '../../../../core/exceptions/CoreExceptions';
+import { T1CLibException } from '../../../../core/exceptions/CoreExceptions';
 import {AuthenticateOrSignData, GenericCertCard, GenericSecuredCertCard, OptionalPin, PinTryCounterData} from '../../Card';
 import { CertificateResponse, CertificatesResponse, DataResponse, T1CResponse } from '../../../../core/service/CoreModel';
 import {
     AbstractEidLUX, AllCertsResponse, LuxAllDataResponse, LuxidBiometricResponse, LuxidPictureResponse, LuxidSignatureImageResponse,
-    LuxPinTryCounterResponse, LuxPinResetData, LuxPinUnblockData, LuxPinChangeData
+    LuxPinTryCounterResponse, LuxPinResetData, LuxPinUnblockData, LuxPinChangeData, PinType
 } from './EidLuxModel';
 import { PinEnforcer } from '../../../../util/PinEnforcer';
 import { CertParser } from '../../../../util/CertParser';
@@ -17,6 +17,7 @@ import { ResponseHandler } from '../../../../util/ResponseHandler';
 import { Options, RequestHandler, RequestOptions } from '../../../../util/RequestHandler';
 
 export class EidLux extends GenericCertCard implements AbstractEidLUX {
+    static CONTAINER_PREFIX = 'luxeid';
     static BIOMETRIC = '/biometric';
     static ADDRESS = '/address';
     static PHOTO = '/picture';
@@ -25,25 +26,30 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
     static PIN_RESET = '/reset-pin';
     static PIN_TRY_COUNTER = '/pin-try-counter';
 
+
     // constructor
     constructor(protected baseUrl: string,
                 protected containerUrl: string,
                 protected connection: LocalConnection,
                 protected reader_id: string,
-                protected can: string) {
-        super(baseUrl, containerUrl, connection, reader_id);
-        // this.pin = PinEnforcer.encryptPin(pin);
-        this.can = PinEnforcer.encryptPin(can);
+                protected pin: string,
+                protected pinType: PinType) {
+        super(baseUrl, containerUrl, connection, reader_id, EidLux.CONTAINER_PREFIX);
+        if (!pinType) {
+            this.pinType = PinType.PIN;
+        }
+        this.pin = PinEnforcer.encryptPin(pin);
     }
 
-    private static EncryptedPinHeader(pin: string) {
-        return { 'X-Encrypted-Pin': pin };
+    // by default using Pace-PIN
+    private static EncryptedHeader(code: string, pinType: PinType) {
+        if (pinType === PinType.CAN) {
+            return { 'X-Encrypted-Can': code };
+        }
+        else {
+            return { 'X-Encrypted-Pin': code };
+        }
     }
-
-    private static EncryptedCanHeader(can: string) {
-        return { 'X-Encrypted-Can': can };
-    }
-
     // filters
     public allDataFilters() {
         return [ 'authentication-certificate', 'biometric', 'non-repudiation-certificate', 'picture', 'root-certificates' ];
@@ -54,10 +60,10 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
     }
 
     public allData(options?: string[] | Options,
-                   callback?: (error: RestException, data: LuxAllDataResponse) => void): Promise<LuxAllDataResponse> {
+                   callback?: (error: T1CLibException, data: LuxAllDataResponse) => void): Promise<LuxAllDataResponse> {
         const reqOptions = RequestHandler.determineOptionsWithFilter(options);
         return this.connection.get(this.baseUrl, this.containerSuffix(), reqOptions.params,
-            EidLux.EncryptedCanHeader(this.can)).then(data => {
+            EidLux.EncryptedHeader(this.pin, this.pinType)).then(data => {
             return CertParser.process(data, reqOptions.parseCerts, callback);
         }, err => {
             return ResponseHandler.error(err, callback);
@@ -65,94 +71,94 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
     }
 
     public allCerts(options?: string[] | Options,
-                    callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse> {
+                    callback?: (error: T1CLibException, data: AllCertsResponse) => void): Promise<AllCertsResponse> {
         const reqOptions = RequestHandler.determineOptionsWithFilter(options);
         return this.connection.get(this.baseUrl, this.containerSuffix(EidLux.ALL_CERTIFICATES), reqOptions.params,
-            EidLux.EncryptedCanHeader(this.can)).then(data => {
+            EidLux.EncryptedHeader(this.pin, this.pinType)).then(data => {
             return CertParser.process(data, reqOptions.parseCerts, callback);
         }, err => {
             return ResponseHandler.error(err, callback);
         });
     }
 
-    public biometric(callback?: (error: RestException, data: LuxidBiometricResponse) => void): Promise<LuxidBiometricResponse> {
+    public biometric(callback?: (error: T1CLibException, data: LuxidBiometricResponse) => void): Promise<LuxidBiometricResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidLux.BIOMETRIC),
-            undefined, EidLux.EncryptedCanHeader(this.can), callback);
+            undefined, EidLux.EncryptedHeader(this.pin, this.pinType), callback);
     }
 
     // in order to access the address information, we need different keys, and on Lux gov level this is protected
     /*address(callback) {this.connection.get(this.baseUrl, this.containerSuffix(LUX_ADDRESS, callback, createPinQueryParam(this.pin));}*/
 
-    public picture(callback?: (error: RestException, data: LuxidPictureResponse) => void): Promise<LuxidPictureResponse> {
+    public picture(callback?: (error: T1CLibException, data: LuxidPictureResponse) => void): Promise<LuxidPictureResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidLux.PHOTO),
-            undefined, EidLux.EncryptedCanHeader(this.can), callback);
+            undefined, EidLux.EncryptedHeader(this.pin, this.pinType), callback);
     }
 
     public rootCertificate(options?: Options,
-                           callback?: (error: RestException, data: CertificatesResponse) => void): Promise<CertificatesResponse> {
+                           callback?: (error: T1CLibException, data: CertificatesResponse) => void): Promise<CertificatesResponse> {
         return this.getCertificateArray(EidLux.CERT_ROOT,
-            RequestHandler.determineOptions(options, callback), undefined, EidLux.EncryptedCanHeader(this.can));
+            RequestHandler.determineOptions(options, callback), undefined, EidLux.EncryptedHeader(this.pin, this.pinType));
     }
 
     public authenticationCertificate(options?: Options,
-                                     callback?: (error: RestException, data: CertificateResponse) => void | Promise<CertificateResponse>) {
+                                     callback?: (error: T1CLibException, data: CertificateResponse) => void | Promise<CertificateResponse>) {
         return this.getCertificate(EidLux.CERT_AUTHENTICATION,
-            RequestHandler.determineOptions(options, callback), undefined, EidLux.EncryptedCanHeader(this.can));
+            RequestHandler.determineOptions(options, callback), undefined, EidLux.EncryptedHeader(this.pin, this.pinType));
     }
 
     public nonRepudiationCertificate(options?: Options,
-                                     callback?: (error: RestException, data: CertificateResponse) => void | Promise<CertificateResponse>) {
+                                     callback?: (error: T1CLibException, data: CertificateResponse) => void | Promise<CertificateResponse>) {
         return this.getCertificate(EidLux.CERT_NON_REPUDIATION,
-            RequestHandler.determineOptions(options, callback), undefined, EidLux.EncryptedCanHeader(this.can));
+            RequestHandler.determineOptions(options, callback), undefined, EidLux.EncryptedHeader(this.pin, this.pinType));
     }
 
-    public verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>) {
+    public verifyPin(body: OptionalPin, callback?: (error: T1CLibException, data: T1CResponse) => void | Promise<T1CResponse>) {
         return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl,
-                this.containerSuffix(EidLux.VERIFY_PIN), body, undefined, EidLux.EncryptedCanHeader(this.can), callback);
+                this.containerSuffix(EidLux.VERIFY_PIN), body, undefined, EidLux.EncryptedHeader(this.pin, this.pinType), callback);
         });
     }
 
-    public signData(body: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+    public signData(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void | Promise<DataResponse>) {
         return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl,
-                this.containerSuffix(EidLux.SIGN_DATA), body, undefined, EidLux.EncryptedCanHeader(this.can), callback);
+                this.containerSuffix(EidLux.SIGN_DATA), body, undefined, EidLux.EncryptedHeader(this.pin, this.pinType), callback);
         });
     }
 
     public authenticate(body: AuthenticateOrSignData,
-                        callback?: (error: RestException, data: DataResponse) => void | Promise<DataResponse>) {
+                        callback?: (error: T1CLibException, data: DataResponse) => void | Promise<DataResponse>) {
         return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl,
-                this.containerSuffix(EidLux.AUTHENTICATE), body, undefined, EidLux.EncryptedCanHeader(this.can), callback);
+                this.containerSuffix(EidLux.AUTHENTICATE), body, undefined, EidLux.EncryptedHeader(this.pin, this.pinType), callback);
         });
     }
 
-    public signatureImage(callback?: (error: RestException, data: LuxidSignatureImageResponse) => void | Promise<LuxidSignatureImageResponse>) {
+    public signatureImage(callback?: (error: T1CLibException, data: LuxidSignatureImageResponse) => void | Promise<LuxidSignatureImageResponse>) {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidLux.SIGNATURE_IMAGE),
-            undefined, EidLux.EncryptedCanHeader(this.can), callback);
+            undefined, EidLux.EncryptedHeader(this.pin, this.pinType), callback);
     }
 
-    public pinTryCounter(pin_reference: PinTryCounterData, callback?: (error: RestException, data: LuxPinTryCounterResponse) => void): Promise<LuxPinTryCounterResponse> {
+    public pinTryCounter(pin_reference: PinTryCounterData, callback?: (error: T1CLibException, data: LuxPinTryCounterResponse) => void): Promise<LuxPinTryCounterResponse> {
         return this.connection.post(this.baseUrl,
-            this.containerSuffix(EidLux.PIN_TRY_COUNTER), pin_reference, undefined, EidLux.EncryptedCanHeader(this.can), callback);
+            this.containerSuffix(EidLux.PIN_TRY_COUNTER), pin_reference, undefined, EidLux.EncryptedHeader(this.pin, this.pinType), callback);
     }
 
-    public pinReset(body: LuxPinResetData, callback?: (error: RestException, data: T1CResponse) => (void | Promise<T1CResponse>)) {
+    public pinReset(body: LuxPinResetData, callback?: (error: T1CLibException, data: T1CResponse) => (void | Promise<T1CResponse>)) {
         body.pin = PinEnforcer.encryptPin(body.pin);
         body.puk = PinEnforcer.encryptPin(body.puk);
-        return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_RESET), body, undefined, EidLux.EncryptedCanHeader(this.can), callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_RESET), body, undefined, EidLux.EncryptedHeader(this.pin, this.pinType), callback);
     }
 
-    public pinChange(body: LuxPinChangeData, callback?: (error: RestException, data: T1CResponse) => (void | Promise<T1CResponse>)) {
+    public pinChange(body: LuxPinChangeData, callback?: (error: T1CLibException, data: T1CResponse) => (void | Promise<T1CResponse>)) {
         body.old_pin = PinEnforcer.encryptPin(body.old_pin);
         body.new_pin = PinEnforcer.encryptPin(body.new_pin);
-        return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_CHANGE), body, undefined, EidLux.EncryptedCanHeader(this.can), callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_CHANGE), body, undefined, EidLux.EncryptedHeader(this.pin, this.pinType), callback);
     }
 
-    public pinUnblock(body: LuxPinUnblockData, callback?: (error: RestException, data: T1CResponse) => (void | Promise<T1CResponse>)) {
+    public pinUnblock(body: LuxPinUnblockData, callback?: (error: T1CLibException, data: T1CResponse) => (void | Promise<T1CResponse>)) {
         body.puk = PinEnforcer.encryptPin(body.puk);
-        return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_RESET), body, undefined, EidLux.EncryptedCanHeader(this.can), callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(EidLux.PIN_RESET), body, undefined, EidLux.EncryptedHeader(this.pin, this.pinType), callback);
     }
 
     protected getCertificate(certUrl: string,
@@ -161,7 +167,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
                              headers?: RequestHeaders): Promise<CertificateResponse> {
         let self = this;
 
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, this.can).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, this.pin).then(() => {
             return self.connection.get(self.baseUrl, self.containerSuffix(EidLux.ALL_CERTIFICATES + certUrl),
                 params, headers).then(certData => {
                 return CertParser.process(certData, options.parseCerts, options.callback);
@@ -174,7 +180,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
                                   params?: QueryParams, headers?: RequestHeaders): Promise<CertificatesResponse> {
         let self = this;
 
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, this.can).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, this.pin).then(() => {
             return self.connection.get(self.baseUrl, self.containerSuffix(EidLux.ALL_CERTIFICATES + certUrl),
                 params, headers).then(certData => {
                 return CertParser.process(certData, options.parseCerts, options.callback);
