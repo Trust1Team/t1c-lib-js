@@ -53,20 +53,10 @@ $ npm run localTest
 
 tsconfig.js  "types": [ "node", "mocha", "chai", "sinon" ]
 
-#### Linting
-To lint the code,
-```bash
-$ gulp tslint
-```
-
 ### Build and package
 To build the Javascript library, compressed:
 ```bash
-$ gulp webpack
-```
-Alternatively, if you want to keep debug statements, run
-```bash
-$ gulp webpack-debug
+$ npm run build
 ```
 
 ### Publish to NPM
