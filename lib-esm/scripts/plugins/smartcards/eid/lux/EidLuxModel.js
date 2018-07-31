@@ -143,21 +143,21 @@ var LuxidSignatureImageResponse = (function (_super) {
 }(DataObjectResponse));
 export { LuxidSignatureImageResponse };
 var LuxPinResetData = (function () {
-    function LuxPinResetData(os_dialog, reset_only, puk, pin) {
+    function LuxPinResetData(os_dialog, puk, pin, reset_only) {
         this.os_dialog = os_dialog;
-        this.reset_only = reset_only;
         this.puk = puk;
         this.pin = pin;
+        this.reset_only = reset_only;
         this.reset_only = false;
     }
     return LuxPinResetData;
 }());
 export { LuxPinResetData };
 var LuxPinUnblockData = (function () {
-    function LuxPinUnblockData(os_dialog, reset_only, puk) {
+    function LuxPinUnblockData(os_dialog, puk, reset_only) {
         this.os_dialog = os_dialog;
-        this.reset_only = reset_only;
         this.puk = puk;
+        this.reset_only = reset_only;
         this.reset_only = true;
     }
     return LuxPinUnblockData;
@@ -168,7 +168,6 @@ var LuxPinChangeData = (function () {
         this.os_dialog = os_dialog;
         this.old_pin = old_pin;
         this.new_pin = new_pin;
-        ;
     }
     return LuxPinChangeData;
 }());
