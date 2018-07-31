@@ -5,7 +5,7 @@
 import {RemoteApiKeyConnection} from '../client/Connection';
 import {GCLConfig} from '../GCLConfig';
 import {AbstractAuth} from './AuthModel';
-import {RestException} from '../exceptions/CoreExceptions';
+import {T1CLibException} from '../exceptions/CoreExceptions';
 import {DSJWTResponse} from '../ds/DSClientModel';
 
 
@@ -22,12 +22,12 @@ export class AuthClient implements AbstractAuth {
         this.url = cfg.authUrl;
     }
 
-    public getJWT(callback?: (error: RestException, data: DSJWTResponse) => void): Promise<DSJWTResponse> {
+    public getJWT(callback?: (error: T1CLibException, data: DSJWTResponse) => void): Promise<DSJWTResponse> {
         return this.connection.get(this.url, TOKEN, undefined, undefined, callback);
     }
 
     public refreshJWT(currentJWT: string,
-                      callback?: (error: RestException, data: DSJWTResponse) => void): Promise<DSJWTResponse> {
+                      callback?: (error: T1CLibException, data: DSJWTResponse) => void): Promise<DSJWTResponse> {
         return this.connection.post(this.url, REFRESH, {token: currentJWT}, undefined, undefined, callback);
     }
 }

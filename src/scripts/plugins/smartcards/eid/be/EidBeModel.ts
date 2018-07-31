@@ -2,7 +2,7 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from '../../../../core/exceptions/CoreExceptions';
+import { T1CLibException } from '../../../../core/exceptions/CoreExceptions';
 import { CertCard, OptionalPin } from '../../Card';
 import {
     CertificateResponse, DataObjectResponse, DataResponse, T1CCertificate,
@@ -12,23 +12,23 @@ import { Options } from '../../../../util/RequestHandler';
 
 export interface AbstractEidBE extends CertCard {
     allData(filters: string[] | Options,
-            callback?: (error: RestException, data: BeidAllDataResponse) => void): Promise<BeidAllDataResponse>;
+            callback?: (error: T1CLibException, data: BeidAllDataResponse) => void): Promise<BeidAllDataResponse>;
     allCerts(filters: string[] | Options,
-             callback?: (error: RestException, data: BeidAllCertsResponse) => void): Promise<BeidAllCertsResponse>;
-    rnData(callback?: (error: RestException, data: BeidRnDataResponse) => void): Promise<BeidRnDataResponse>;
-    tokenData(callback?: (error: RestException, data: BeidTokenDataResponse) => void): Promise<BeidTokenDataResponse>;
-    address(callback?: (error: RestException, data: BeidAddressResponse) => void): Promise<BeidAddressResponse>;
-    picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    rootCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    citizenCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse)
+             callback?: (error: T1CLibException, data: BeidAllCertsResponse) => void): Promise<BeidAllCertsResponse>;
+    rnData(callback?: (error: T1CLibException, data: BeidRnDataResponse) => void): Promise<BeidRnDataResponse>;
+    tokenData(callback?: (error: T1CLibException, data: BeidTokenDataResponse) => void): Promise<BeidTokenDataResponse>;
+    address(callback?: (error: T1CLibException, data: BeidAddressResponse) => void): Promise<BeidAddressResponse>;
+    picture(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    rootCertificate(options: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    citizenCertificate(options: Options, callback?: (error: T1CLibException, data: CertificateResponse)
         => void): Promise<CertificateResponse>;
-    authenticationCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse)
+    authenticationCertificate(options: Options, callback?: (error: T1CLibException, data: CertificateResponse)
         => void): Promise<CertificateResponse>;
-    nonRepudiationCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse)
+    nonRepudiationCertificate(options: Options, callback?: (error: T1CLibException, data: CertificateResponse)
         => void): Promise<CertificateResponse>;
-    rrnCertificate(options: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    verifyPin(body: OptionalPin, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
-    tokenData(callback?: (error: RestException, data: BeidTokenDataResponse) => void): Promise<BeidTokenDataResponse>;
+    rrnCertificate(options: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    verifyPin(body: OptionalPin, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse>;
+    tokenData(callback?: (error: T1CLibException, data: BeidTokenDataResponse) => void): Promise<BeidTokenDataResponse>;
 
 }
 

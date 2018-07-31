@@ -2,26 +2,26 @@
  * @author Maarten Somers
  * @since 2017
  */
-import {RestException} from '../../../../core/exceptions/CoreExceptions';
+import {T1CLibException} from '../../../../core/exceptions/CoreExceptions';
 import {OptionalPin, SecuredCertCard} from '../../Card';
 import {CertificateResponse, DataObjectResponse, T1CCertificate} from '../../../../core/service/CoreModel';
 import {Options} from '../../../../util/RequestHandler';
 
 export interface AbstractDNIe extends SecuredCertCard {
-    allData(filters: string[] | Options, body: OptionalPin, callback?: (error: RestException, data: DNIeAllDataResponse) => void): Promise<DNIeAllDataResponse>;
+    allData(filters: string[] | Options, body: OptionalPin, callback?: (error: T1CLibException, data: DNIeAllDataResponse) => void): Promise<DNIeAllDataResponse>;
 
-    allCerts(options: Options, body: OptionalPin, callback?: (error: RestException, data: DNIeAllCertsResponse) => void): Promise<DNIeAllCertsResponse>;
+    allCerts(options: Options, body: OptionalPin, callback?: (error: T1CLibException, data: DNIeAllCertsResponse) => void): Promise<DNIeAllCertsResponse>;
 
-    info(callback?: (error: RestException, data: DNIeInfoResponse) => void): Promise<DNIeInfoResponse>
+    info(callback?: (error: T1CLibException, data: DNIeInfoResponse) => void): Promise<DNIeInfoResponse>
 
     intermediateCertificate(options: Options,
-                            callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                            callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
     authenticationCertificate(options: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                              callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
     signingCertificate(options: Options,
-                       callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                       callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
 
 export class DNIeAllCertsResponse extends DataObjectResponse {
