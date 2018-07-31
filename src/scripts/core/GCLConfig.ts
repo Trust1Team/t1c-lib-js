@@ -8,12 +8,12 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import * as jwtDecode from 'jwt-decode';
 import * as moment from 'moment';
-import { RestException } from './exceptions/CoreExceptions';
+import { T1CLibException } from './exceptions/CoreExceptions';
 import {Pkcs11ModuleConfig} from '../plugins/smartcards/pkcs11/pkcs11Model';
+import {T1CContainer, T1CContainerid} from './service/CoreModel';
 
 const defaults = {
     gclUrl: 'https://localhost:10443/v2',
-    gwUrl: 'https://accapim.t1t.be:443',
     dsContextPath: '/trust1team/gclds/v2',
     ocvContextPath: '/trust1team/ocv-api/v1',
     dsContextPathTestMode: '/gcl-ds-web/v2',
@@ -26,16 +26,38 @@ const defaults = {
     sessionTimeout: 5,
     consentDuration: 1,
     consentTimeout: 10,
-    syncManaged: true,
     osPinDialog: false,
     containerDownloadTimeout: 30
 };
+
+export class GCLConfigOptions {
+    constructor(public gclUrl?: string,
+                public gwOrProxyUrl?: string,
+                public apiKey?: string,
+                public gwJwt?: string,
+                public ocvContextPath?: string,
+                public dsContextPath?: string,
+                public dsFileContextPath?: string,
+                public pkcs11Config?: Pkcs11ModuleConfig,
+                public agentPort?: number,
+                public implicitDownload?: boolean,
+                public forceHardwarePinpad?: boolean,
+                public sessionTimeout?: number,
+                public consentDuration?: number,
+                public consentTimeout?: number,
+                public syncManaged?: boolean,
+                public osPinDialog?: boolean,
+                public containerDownloadTimeout?: number,
+                public localTestMode?: boolean,
+                public lang?: string,
+                public providedContainers?: T1CContainerid[]) {}
+}
 
 /**
  * GCL Configuration object. Represents the GCL Library configuration state.
  * Most settings are configurable by the user; some are set by the library itself.
  */
-class GCLConfig {
+export class GCLConfig {
     private _gwUrl: string;
     private _gclUrl: string;
     private _dsContextPath: string;
@@ -46,7 +68,6 @@ class GCLConfig {
     private _gclJwt: string;
     private _citrix: boolean;
     private _agentPort: number;
-    private _implicitDownload: boolean;
     private _localTestMode: boolean;
     private _forceHardwarePinpad: boolean;
     private _defaultSessionTimeout: number;
@@ -54,36 +75,63 @@ class GCLConfig {
     private _v2Compatible: boolean;
     private _defaultConsentDuration: number;
     private _defaultConsentTimeout: number;
-    private _syncManaged: boolean;
     private _pkcs11Config: Pkcs11ModuleConfig;
     private _osPinDialog: boolean;
     private _containerDownloadTimeout: number;
     private _contextToken: string;
     private _lang: string;
+    private _providedContainers: T1CContainerid[]; // force to use specific containerversion
+    private _activeContainers: Map<string, string[]>; // hashmap with active application containers
 
     // constructor for DTO
-    public constructor(options?: any) {
+    public constructor(options: GCLConfigOptions) {
         if (options) {
             if (options.gclUrl) { this._gclUrl = options.gclUrl; } else { this._gclUrl = defaults.gclUrl; }
-            if (options.gwOrProxyUrl) { this._gwUrl = options.gwOrProxyUrl; } else { this._gwUrl = defaults.gwUrl; }
-            if (options.dsContextPath) { this._dsContextPath = options.dsContextPath; } else { this._dsContextPath = defaults.dsContextPath; }
-            if (options.dsFileContextPath) { this._dsFileContextPath = options.dsFileContextPath; } else { this._dsFileContextPath = defaults.gclUrl; }
-            if (options.ocvContextPath) { this._ocvContextPath = options.ocvContextPath; } else { this._ocvContextPath = defaults.ocvContextPath; }
+            if (options.gwOrProxyUrl) { this._gwUrl = options.gwOrProxyUrl; } else { this._gwUrl = undefined; }
             if (options.apiKey) { this._apiKey = options.apiKey; } else { this._apiKey = undefined; } // no default
             if (options.gwJwt) { this._gwJwt = options.gwJwt; } else { this._gwJwt = undefined; } // no default
             if (options.agentPort) { this._agentPort = options.agentPort; } else { this._agentPort = -1; }
-            if (options.implicitDownload) { this._implicitDownload = options.implicitDownload; } else { this._implicitDownload = defaults.implicitDownload; }
-            if (options.localTestMode) { this._localTestMode = options.localTestMode; } else { this._localTestMode = defaults.localTestMode; }
+            if (options.localTestMode) { this._localTestMode = options.localTestMode; } else { this._localTestMode = defaults.localTestMode; } // TODO: review
             if (options.forceHardwarePinpad) { this._forceHardwarePinpad = options.forceHardwarePinpad; } else { this._forceHardwarePinpad = defaults.forceHardwarePinpad; }
             if (options.sessionTimeout) { this._defaultSessionTimeout = options.sessionTimeout; } else { this._defaultSessionTimeout = defaults.sessionTimeout; }
             if (options.consentDuration) { this._defaultConsentDuration = options.consentDuration; } else { this._defaultConsentDuration = defaults.consentDuration; }
             if (options.consentTimeout) { this._defaultConsentTimeout = options.consentTimeout; } else { this._defaultConsentTimeout = defaults.consentTimeout; }
-            if (options.syncManaged) { this._syncManaged = options.syncManaged; } else { this._syncManaged = defaults.syncManaged; }
             if (options.pkcs11Config) { this._pkcs11Config = options.pkcs11Config; } else { this._pkcs11Config = undefined; } // no default
             if (options.osPinDialog) { this._osPinDialog = options.osPinDialog; } else { this._osPinDialog = defaults.osPinDialog; }
             if (options.containerDownloadTimeout) { this._containerDownloadTimeout = options.containerDownloadTimeout; } else { this._containerDownloadTimeout = defaults.containerDownloadTimeout; }
             if (options.lang) { this._lang = options.lang; } else { this._lang = defaults.lang; }
-            this._citrix = false; // will be set to true during initialisation if Citrix environment is detected
+            if (options.providedContainers) { this._providedContainers = options.providedContainers; } else { this._providedContainers = undefined; }
+            this._citrix = false; // will be set to true during initialisation if Shared environment is detected
+            // resolve DS file context path
+            if (this.gwUrl) {
+                if (options.dsFileContextPath) {
+                    this._dsFileContextPath = options.dsFileContextPath;
+                } else {
+                    this._dsFileContextPath = defaults.dsFileContextPath;
+                }
+            } else {
+                this._dsFileContextPath = undefined;
+            }
+            // resolve DS context path
+            if (this.gwUrl) {
+                if (options.dsContextPath) {
+                    this._dsContextPath = options.dsContextPath;
+                } else {
+                    this._dsContextPath = defaults.dsContextPath;
+                }
+            } else {
+                this._dsContextPath = undefined;
+            }
+            // resolve OCV context path
+            if (this.gwUrl) {
+                if (options.ocvContextPath) {
+                    this._ocvContextPath = options.ocvContextPath;
+                } else {
+                    this._ocvContextPath = defaults.ocvContextPath;
+                }
+            } else {
+                this._ocvContextPath = undefined;
+            }
         }
     }
 
@@ -92,7 +140,11 @@ class GCLConfig {
     }
 
     get ocvUrl(): string {
-        return this.gwUrl + this.ocvContextPath;
+        if (!this.gwUrl) {
+            return undefined;
+        } else {
+            return this.gwUrl + this.ocvContextPath;
+        }
     }
 
     get ocvContextPath(): string {
@@ -112,8 +164,11 @@ class GCLConfig {
     }
 
     get dsUrl(): string {
-        if (this._localTestMode) { return this.gwUrl + defaults.dsContextPathTestMode; }
-        else { return this.gwUrl + this.dsContextPath; }
+        if (! this.gwUrl) {
+            return undefined;
+        } else {
+            return this.gwUrl + this.dsContextPath;
+        }
     }
 
     get dsContextPath(): string {
@@ -156,16 +211,12 @@ class GCLConfig {
         this._agentPort = value;
     }
 
-    get implicitDownload(): boolean {
-        return this._implicitDownload;
-    }
-
-    set implicitDownload(value: boolean) {
-        this._implicitDownload = value;
-    }
-
     get dsFileDownloadUrl(): string {
-        return this.gwUrl + this.dsFileContextPath;
+        if (!this.gwUrl) {
+            return undefined;
+        } else {
+            return this.gwUrl + this.dsFileContextPath;
+        }
     }
 
     get gwUrl() {
@@ -232,14 +283,6 @@ class GCLConfig {
         this._defaultConsentTimeout = value;
     }
 
-    get syncManaged(): boolean {
-        return this._syncManaged;
-    }
-
-    set syncManaged(value: boolean) {
-        this._syncManaged = value;
-    }
-
     get pkcs11Config(): Pkcs11ModuleConfig {
         return this._pkcs11Config;
     }
@@ -265,7 +308,13 @@ class GCLConfig {
     }
 
     // TODO should we refresh if expires < x time?
+    // if no gwUrl -> skip JWT and return placeholder
     get gwJwt(): Promise<string> {
+        if (!this.gwUrl) {
+            return new Promise<string>((resolve, reject) => {
+                resolve('none');
+            });
+        }
         let self = this;
         return new Promise<string>((resolve, reject) => {
             if (!self._gwJwt || !self._gwJwt.length) {
@@ -274,7 +323,7 @@ class GCLConfig {
             } else {
                 let decoded = jwtDecode(self._gwJwt);
                 // check JWT expired
-                if (decoded.exp < moment(new Date()).format('X')) {
+                if (decoded < moment(new Date()).format('X')) {
                     // refresh if we have an API key
                     resolve(self.getGwJwt());
                 } else {
@@ -309,6 +358,22 @@ class GCLConfig {
         this._lang = value;
     }
 
+    get overrideContainers(): T1CContainerid[] {
+        return this._providedContainers;
+    }
+
+    set overrideContainers(value: T1CContainerid[]) {
+        this._providedContainers = value;
+    }
+
+    get activeContainers(): Map<string, string[]> {
+        return this._activeContainers;
+    }
+
+    set activeContainers(value: Map<string, string[]>) {
+        this._activeContainers = value;
+    }
+
     /**
      * Returns Gateway JWT promise.
      * If JWT is available and valid, it is immediately returned;
@@ -337,12 +402,10 @@ class GCLConfig {
             });
         } else {
             if (this._gwJwt && this._gwJwt.length) {
-                return Promise.reject(new RestException(412, '205', 'JWT expired'));
+                return Promise.reject(new T1CLibException(412, '205', 'JWT expired'));
             } else {
-                return Promise.reject(new RestException(412, '901', 'No JWT or API key found in configuration'));
+                return Promise.reject(new T1CLibException(412, '901', 'No JWT or API key found in configuration'));
             }
         }
     }
 }
-
-export { GCLConfig };

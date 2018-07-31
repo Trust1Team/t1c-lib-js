@@ -6,7 +6,7 @@
 import { RemoteLoading } from '../RemoteLoading';
 import { AbstractBelfius } from './BelfiusModel';
 import { BoolDataResponse } from '../../../core/service/CoreModel';
-import { RestException } from '../../../core/exceptions/CoreExceptions';
+import { T1CLibException } from '../../../core/exceptions/CoreExceptions';
 import { APDU, CommandResponse } from '../RemoteLoadingModel';
 import { ResponseHandler } from '../../../util/ResponseHandler';
 import * as _ from 'lodash';
@@ -21,7 +21,7 @@ export class Belfius extends RemoteLoading implements AbstractBelfius {
     }
 
     public isBelfiusReader(sessionId: string,
-                           callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
+                           callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
         if (sessionId && sessionId.length) {
             return this.connection.get(this.baseUrl, '/card-readers/' + this.reader_id, undefined).then(reader => {
                 // check Nonce command works
@@ -36,7 +36,7 @@ export class Belfius extends RemoteLoading implements AbstractBelfius {
         }
     }
 
-    public nonce(sessionId: string, callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse> {
+    public nonce(sessionId: string, callback?: (error: T1CLibException, data: CommandResponse) => void): Promise<CommandResponse> {
         return this.isBelfiusReader(sessionId).then(compatibleReader => {
             if (compatibleReader.data) {
                 return this.apdu(Belfius.NONCE_APDU, sessionId, callback);
@@ -48,7 +48,7 @@ export class Belfius extends RemoteLoading implements AbstractBelfius {
     }
 
     public stx(command: string, sessionId: string,
-               callback?: (error: RestException, data: CommandResponse) => void): Promise<CommandResponse> {
+               callback?: (error: T1CLibException, data: CommandResponse) => void): Promise<CommandResponse> {
         return this.isBelfiusReader(sessionId).then(compatibleReader => {
             if (compatibleReader.data) {
                 if (command.length <= 500) {

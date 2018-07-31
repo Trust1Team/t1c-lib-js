@@ -2,7 +2,7 @@
  * @author Michallis Pashidis
  * @since 2018
  */
-import { LocalAuthAdminConnection } from '../client/Connection';
+import {LocalAdminConnection, LocalAuthAdminConnection} from '../client/Connection';
 import {
     AbstractAdmin, AtrListRequest, ContainerSyncRequest, PubKeyResponse, ResolvedAgent, ResolvedAgentResponse,
     SetPubKeyRequest
@@ -11,7 +11,7 @@ import {DataArrayResponse, T1CResponse} from '../service/CoreModel';
 import { ResponseHandler } from '../../util/ResponseHandler';
 import * as _ from 'lodash';
 import { InitUtil } from '../../util/InitUtil';
-import { RestException } from '../exceptions/CoreExceptions';
+import { T1CLibException } from '../exceptions/CoreExceptions';
 import { ClientService } from '../../util/ClientService';
 
 
@@ -29,10 +29,16 @@ const CORE_AGENT_RESOLVE = '/agent/resolve';
 export class AdminService implements AbstractAdmin {
     static JWT_ERROR_CODES = [ '200', '201', '202', '203', '204', '205'];
 
-    // constructor
-    constructor(private url: string, private connection: LocalAuthAdminConnection) {}
+    /**
+     * Constructor
+     * The noAuthConnection's only purpose is to get the device certificates, which are unprotected
+     * @param url
+     * @param connection
+     * @param noAuthConnection
+     */
+    constructor(private url: string, private connection: LocalAuthAdminConnection, private noAuthConnection: LocalAdminConnection) {}
 
-    private static errorHandler(error: RestException) {
+    private static errorHandler(error: T1CLibException) {
         // check if the error is JWT related
         if (error && error.status === 401 && _.includes(AdminService.JWT_ERROR_CODES, error.code)) {
             // error is JWT related, re-run the authorisation flow
@@ -43,40 +49,40 @@ export class AdminService implements AbstractAdmin {
         }
     }
 
-    public activate(callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+    public activate(callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.post(this.url, CORE_ACTIVATE, {}, callback);
     }
 
-    public atr(atrList: AtrListRequest, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+    public atr(atrList: AtrListRequest, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.post(this.url, CORE_ATR_LIST, atrList, callback);
     }
 
-    public getLogfile(name: string, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+    public getLogfile(name: string, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.getLogFile(this.url, CORE_LOGFILE + '/' + name, callback);
     }
 
-    public getLogfileList(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
+    public getLogfileList(callback?: (error: T1CLibException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
         return this.getLogfiles(this.url, CORE_LOGFILE, callback);
     }
 
-    public getPubKey(callback?: (error: RestException, data: PubKeyResponse)
+    public getPubKey(callback?: (error: T1CLibException, data: PubKeyResponse)
         => void): Promise<PubKeyResponse> {
         return this.getPubKeys(this.url, CORE_PUB_KEY, callback);
     }
 
     public setPubKey(keys: SetPubKeyRequest,
-                     callback?: (error: RestException, data: PubKeyResponse)
+                     callback?: (error: T1CLibException, data: PubKeyResponse)
                          => void): Promise<PubKeyResponse> {
         return this.put(this.url, CORE_PUB_KEY, keys, callback);
     }
 
     public updateContainerConfig(containers: ContainerSyncRequest,
-                                 callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse> {
+                                 callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse> {
         return this.post(this.url, CORE_CONTAINERS, containers, callback);
     }
 
     // resolve Agent for citrix environment
-    public resolveAgent (challenge: string, callback?: (error: RestException, data: ResolvedAgentResponse) => void): Promise<ResolvedAgentResponse> {
+    public resolveAgent (challenge: string, callback?: (error: T1CLibException, data: ResolvedAgentResponse) => void): Promise<ResolvedAgentResponse> {
         console.log('resolve agent url: ' + this.url);
         return this.connection.post(this.url, CORE_AGENT_RESOLVE, { challenge }, [], undefined, callback);
     }
@@ -106,7 +112,7 @@ export class AdminService implements AbstractAdmin {
     private getPubKeys(url: string, suffix: string, callback?: any): Promise<PubKeyResponse> {
         let self = this;
         return new Promise((resolve, reject) => {
-            self.connection.get(url, suffix, undefined).then(result => {
+            self.noAuthConnection.get(url, suffix, undefined).then(result => {
                 resolve(ResponseHandler.response(result, callback));
             }, err => {
                 AdminService.errorHandler(err).then(() => {

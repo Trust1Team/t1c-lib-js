@@ -2,22 +2,22 @@
  * @author Maarten Somers
  * @since 2017
  */
-import {RestException} from '../exceptions/CoreExceptions';
+import {T1CLibException} from '../exceptions/CoreExceptions';
 
 
 export interface AbstractOCVClient {
     getChallenge(digestAlgorithm: string,
-                 callback?: (error: RestException, data: ChallengeResponse) => void): void | Promise<ChallengeResponse>;
+                 callback?: (error: T1CLibException, data: ChallengeResponse) => void): void | Promise<ChallengeResponse>;
     validateChallengeSignedHash(data: ChallengeSignedHashData,
-                                callback?: (error: RestException, data: ChallengeSignedHashResponse)
+                                callback?: (error: T1CLibException, data: ChallengeSignedHashResponse)
                                     => void): void | Promise<ChallengeSignedHashResponse>;
     validateCertificateChain(data: CertificateChainData,
-                             callback?: (error: RestException, data: CertificateChainResponse)
+                             callback?: (error: T1CLibException, data: CertificateChainResponse)
                                  => void): void | Promise<CertificateChainResponse>;
     validateSignature(data: SignatureValidationData,
-                      callback?: (error: RestException, data: SignatureValidationResponse)
+                      callback?: (error: T1CLibException, data: SignatureValidationResponse)
                           => void): void | Promise<SignatureValidationResponse>;
-    getInfo(callback?: (error: RestException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse>;
+    getInfo(callback?: (error: T1CLibException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse>;
 }
 
 export class ChallengeSignedHashData {

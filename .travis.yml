@@ -8,3 +8,5 @@ install:
 script:
   - ./node_modules/karma-cli/bin/karma start --single-run --colors false
   - npm build
+notifications:
+  slack: trust1team:b6NFLueV7BtxzxOhUrFs9RBT
