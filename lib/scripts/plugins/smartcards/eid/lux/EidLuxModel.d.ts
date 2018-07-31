@@ -95,20 +95,20 @@ export declare class LuxidSignatureImageResponse extends DataObjectResponse {
 }
 export declare class LuxPinResetData {
     os_dialog: boolean;
-    reset_only: boolean;
     puk: string;
     pin: string;
-    constructor(os_dialog: boolean, reset_only: boolean, puk: string, pin: string);
+    reset_only?: boolean;
+    constructor(os_dialog: boolean, puk: string, pin: string, reset_only?: boolean);
 }
 export declare class LuxPinUnblockData {
     os_dialog: boolean;
-    reset_only: boolean;
-    puk?: string;
-    constructor(os_dialog: boolean, reset_only: boolean, puk?: string);
+    puk: string;
+    reset_only?: boolean;
+    constructor(os_dialog: boolean, puk: string, reset_only?: boolean);
 }
 export declare class LuxPinChangeData {
     os_dialog: boolean;
-    old_pin?: string;
-    new_pin?: string;
-    constructor(os_dialog: boolean, old_pin?: string, new_pin?: string);
+    old_pin: string;
+    new_pin: string;
+    constructor(os_dialog: boolean, old_pin: string, new_pin: string);
 }

@@ -1,13 +1,13 @@
 import {expect} from 'chai';
 import {LocalAuthConnection} from '../../scripts/core/client/Connection';
 import {CoreService} from '../../scripts/core/service/CoreService';
-import {GCLConfig} from '../../scripts/core/GCLConfig';
+import {GCLConfig, GCLConfigOptions} from '../../scripts/core/GCLConfig';
 
 describe('GCLClient', () => {
     let gclUnderTest = 'https://localhost:10443/v1';
     let localAuthConnection: LocalAuthConnection;
     let core: CoreService;
-    let config = new GCLConfig('https://dist.t1t.be/v1', 'someapikey');
+    let config = new GCLConfig(new GCLConfigOptions());
 
     beforeEach(() => {
         localAuthConnection = new LocalAuthConnection(config);
