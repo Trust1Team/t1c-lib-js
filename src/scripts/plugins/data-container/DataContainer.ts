@@ -4,7 +4,7 @@
  */
 
 import { AbstractDataContainer } from './DataContainerModel';
-import { RestException } from '../../core/exceptions/CoreExceptions';
+import { T1CLibException } from '../../core/exceptions/CoreExceptions';
 import {GenericContainer} from '../GenericContainer';
 import {LocalConnection} from '../../core/client/Connection';
 
@@ -17,22 +17,22 @@ export class DataContainer extends GenericContainer implements AbstractDataConta
         super(baseUrl, containerUrl, connection, containerUrl);
     }
 
-    public create(data: any, callback?: (error: RestException, data: any) => void): Promise<any> {
+    public create(data: any, callback?: (error: T1CLibException, data: any) => void): Promise<any> {
         // put
         return this.connection.put(this.baseUrl, this.containerSuffix(), data, undefined, undefined, callback);
     }
 
-    public read(id?: string, callback?: (error: RestException, data: any) => void): Promise<any> {
+    public read(id?: string, callback?: (error: T1CLibException, data: any) => void): Promise<any> {
         // get
         return this.connection.get(this.baseUrl, this.containerSuffix(id), undefined, undefined, callback);
     }
 
-    public update(id: string, data: any, callback?: (error: RestException, data: any) => void): Promise<any> {
+    public update(id: string, data: any, callback?: (error: T1CLibException, data: any) => void): Promise<any> {
         // post
         return this.connection.post(this.baseUrl, this.containerSuffix(), data, undefined, undefined, callback);
     }
 
-    public delete(id: string, callback?: (error: RestException, data: any) => void): Promise<any> {
+    public delete(id: string, callback?: (error: T1CLibException, data: any) => void): Promise<any> {
         // delete
         return this.connection.delete(this.baseUrl, this.containerSuffix(id), undefined, undefined, callback);
     }

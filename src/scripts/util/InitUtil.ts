@@ -9,7 +9,7 @@ import {SyncUtil} from './SyncUtil';
 import {ActivationUtil} from './ActivationUtil';
 import {DSPlatformInfo} from '../core/ds/DSClientModel';
 import {PubKeyService} from './PubKeyService';
-import {RestException} from '../core/exceptions/CoreExceptions';
+import {T1CLibException} from '../core/exceptions/CoreExceptions';
 import {AxiosError, AxiosResponse} from 'axios';
 import axios from 'axios';
 import {ActivatedContainerUtil} from './ActivatedContainerUtil';
@@ -39,29 +39,30 @@ export class InitUtil {
 
                     if (cfg.v2Compatible) {
                         let mergedInfo = this.getMergedInfo(cfg, client.core().infoBrowserSync().data, infoResponse);
-                        //
                         this.containerHandler(cfg, infoResponse);
                         // triggers activation if needed and syncs
-                        this.activateAndSync(infoResponse, mergedInfo, client, cfg, resolve, reject);
+                        if (cfg.gwUrl) {
+                            this.activateAndSync(infoResponse, mergedInfo, client, cfg, resolve, reject);
+                        }
                     } else {
                         // installed version is not compatible, reject initialization
                         // return the client in the error so a new version can be downloaded!
-                        reject(new RestException(400, '301',
+                        reject(new T1CLibException(400, '301',
                             'Installed GCL version is not v2 compatible. Please update to a compatible version.', client));
                     }
                 }, (err) => {
-                    console.error('init', err);
+                    console.error('initializeLibrary - getInfoError', err);
                     // failure probably because GCL is not installed
                     client.gclInstalled = false;
                     // check if older GCL version is available at v1 endpoint
                     axios.get('https://localhost:10443/v1').then((response: AxiosResponse) => {
                         // response received, inform user that he needs to update
-                        reject(new RestException(400, '301',
+                        reject(new T1CLibException(400, '301',
                             'Installed GCL version is not v2 compatible. Please update to a compatible version.', client));
                     }).catch(() => {
                         // no response, no older GCL version installed
                         // return the client in the error so a new version can be downloaded!
-                        reject(new RestException(400, '302',
+                        reject(new T1CLibException(400, '302',
                             'No installed GCL component found. Please download and install the GCL.', client));
                     });
                 });
@@ -69,12 +70,11 @@ export class InitUtil {
             initPromise.then(() => {
                 // store device PubKey
                 client.admin().getPubKey().then(pubKey => {
-                    console.log(pubKey);
                     PubKeyService.setPubKey(pubKey.data.device);
                     finalResolve();
                 });
             }, err => {
-                console.log('finalreject', err)
+                console.log('Initialization error', err)
                 finalReject(err);
             });
 

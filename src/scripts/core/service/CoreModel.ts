@@ -3,7 +3,7 @@
  * @since 2017
  */
 
-import {RestException} from '../exceptions/CoreExceptions';
+import {T1CLibException} from '../exceptions/CoreExceptions';
 
 export interface AbstractCore {
     // async
@@ -14,30 +14,30 @@ export interface AbstractCore {
                alertPosition?: string,
                type?: string,
                timeoutInSeconds?: number,
-               callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>
-    getImplicitConsent(codeWord: string, durationInDays?: number, type?: string, callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>
-    info(callback?: (error: RestException, data: InfoResponse) => void): void | Promise<InfoResponse>;
-    infoBrowser(callback?: (error: RestException, data: BrowserInfoResponse) => void): Promise<BrowserInfoResponse>;
+               callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse>
+    getImplicitConsent(codeWord: string, durationInDays?: number, type?: string, callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse>
+    info(callback?: (error: T1CLibException, data: InfoResponse) => void): void | Promise<InfoResponse>;
+    infoBrowser(callback?: (error: T1CLibException, data: BrowserInfoResponse) => void): Promise<BrowserInfoResponse>;
     pollCardInserted(secondsToPollCard?: number,
-                     callback?: (error: RestException, data: CardReader) => void,
+                     callback?: (error: T1CLibException, data: CardReader) => void,
                      connectReader?: () => void,
                      insertCard?: () => void,
                      cardTimeout?: () => void): Promise<CardReader>;
     pollReadersWithCards(secondsToPollCard?: number,
-                         callback?: (error: RestException, data: CardReadersResponse) => void,
+                         callback?: (error: T1CLibException, data: CardReadersResponse) => void,
                          connectReader?: () => void,
                          insertCard?: () => void,
                          cardTimeout?: () => void): Promise<CardReadersResponse>;
     pollReaders(secondsToPollReader?: number,
-                callback?: (error: RestException, data: CardReadersResponse) => void,
+                callback?: (error: T1CLibException, data: CardReadersResponse) => void,
                 connectReader?: () => void,
                 readerTimeout?: () => void): Promise<CardReadersResponse>;
     reader(reader_id: string,
-           callback?: (error: RestException, data: SingleReaderResponse) => void): Promise<SingleReaderResponse>;
-    readers(callback?: (error: RestException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
-    readersCardAvailable(callback?: (error: RestException, data: CardReadersResponse)
+           callback?: (error: T1CLibException, data: SingleReaderResponse) => void): Promise<SingleReaderResponse>;
+    readers(callback?: (error: T1CLibException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
+    readersCardAvailable(callback?: (error: T1CLibException, data: CardReadersResponse)
         => void): Promise<CardReadersResponse>;
-    readersCardsUnavailable(callback?: (error: RestException, data: CardReadersResponse)
+    readersCardsUnavailable(callback?: (error: T1CLibException, data: CardReadersResponse)
         => void): Promise<CardReadersResponse>;
 
     // sync

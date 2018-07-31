@@ -2,7 +2,7 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from '../../../core/exceptions/CoreExceptions';
+import { T1CLibException } from '../../../core/exceptions/CoreExceptions';
 import { GenericSecuredCertCard, OptionalPin } from '../Card';
 import { CertificateResponse } from '../../../core/service/CoreModel';
 import { AbstractPiv, PivFacialImageResponse, PivPrintedInformationResponse } from './pivModel';
@@ -35,7 +35,7 @@ export class PIV extends GenericSecuredCertCard implements AbstractPiv {
     }
 
     public printedInformation(body: OptionalPin,
-                              callback?: (error: RestException,
+                              callback?: (error: T1CLibException,
                                           data: PivPrintedInformationResponse) => void): Promise<PivPrintedInformationResponse> {
         if (callback && typeof callback === 'function') {
             PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
@@ -54,7 +54,7 @@ export class PIV extends GenericSecuredCertCard implements AbstractPiv {
     }
 
     public facialImage(body: OptionalPin,
-                       callback?: (error: RestException, data: PivFacialImageResponse) => void): Promise<PivFacialImageResponse> {
+                       callback?: (error: T1CLibException, data: PivFacialImageResponse) => void): Promise<PivFacialImageResponse> {
         if (callback && typeof callback === 'function') {
             PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
                 return this.connection.post(this.baseUrl, this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined, undefined, callback);
@@ -72,13 +72,13 @@ export class PIV extends GenericSecuredCertCard implements AbstractPiv {
 
     public authenticationCertificate(body: OptionalPin,
                                      options?: Options,
-                                     callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
+                                     callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(PIV.CERT_AUTHENTICATION, body, RequestHandler.determineOptions(options, callback), undefined);
     }
 
     public signingCertificate(body: OptionalPin,
                               options?: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
+                              callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(PIV.CERT_SIGNING, body, RequestHandler.determineOptions(options, callback));
     }
 }

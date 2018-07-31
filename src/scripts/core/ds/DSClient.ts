@@ -9,7 +9,7 @@ import {
     AbstractDSClient, DeviceResponse, DSDownloadLinkResponse, DSDownloadRequest,
     DSInfoResponse, DSPubKeyResponse, DSRegistrationOrSyncRequest
 } from './DSClientModel';
-import {RestException} from '../exceptions/CoreExceptions';
+import {T1CLibException} from '../exceptions/CoreExceptions';
 
 
 const SEPARATOR = '/';
@@ -30,22 +30,22 @@ export class DSClient implements AbstractDSClient {
         return this.url;
     }
 
-    public getInfo(callback?: (error: RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse> {
+    public getInfo(callback?: (error: T1CLibException, data: DSInfoResponse) => void): Promise<DSInfoResponse> {
         return this.connection.get(this.url, SYS_INFO, undefined, undefined, callback);
     }
 
     public getDevice(uuid: string,
-                     callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse> {
+                     callback?: (error: T1CLibException, data: DeviceResponse) => void): Promise<DeviceResponse> {
         return this.connection.get(this.url, DEVICE + SEPARATOR + uuid, undefined, undefined, callback);
     }
 
     public getPubKey(uuid: string,
-                     callback?: (error: RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse> {
+                     callback?: (error: T1CLibException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse> {
         return this.connection.get(this.url, PUB_KEY + SEPARATOR + uuid, undefined, undefined, callback);
     }
 
     public downloadLink(downloadData: DSDownloadRequest,
-                        callback?: (error: RestException,
+                        callback?: (error: T1CLibException,
                                     data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse> {
         let self = this;
         if (callback) {
@@ -80,12 +80,12 @@ export class DSClient implements AbstractDSClient {
     }
 
     public register(registrationData: DSRegistrationOrSyncRequest,
-                    callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse> {
+                    callback?: (error: T1CLibException, data: DeviceResponse) => void): Promise<DeviceResponse> {
         return this.connection.put(this.url, DEVICE + SEPARATOR + registrationData.uuid, registrationData, undefined, undefined, callback);
     }
 
     public sync(syncData: DSRegistrationOrSyncRequest,
-                callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse> {
+                callback?: (error: T1CLibException, data: DeviceResponse) => void): Promise<DeviceResponse> {
         return this.connection.post(this.url, DEVICE + SEPARATOR + syncData.uuid, syncData, undefined, undefined, callback);
     }
 

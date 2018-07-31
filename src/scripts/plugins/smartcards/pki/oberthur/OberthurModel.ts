@@ -2,7 +2,7 @@
  * @author Maarten Somers
  * @since 2017
  */
-import {RestException} from '../../../../core/exceptions/CoreExceptions';
+import {T1CLibException} from '../../../../core/exceptions/CoreExceptions';
 import {
     CertificateResponse, DataArrayResponse, DataObjectResponse, T1CCertificate,
     T1CResponse
@@ -18,28 +18,28 @@ export interface AbstractOberthur extends CertCard {
 
     allKeyRefs(): string[];
 
-    allAlgoRefsForAuthentication(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
+    allAlgoRefsForAuthentication(callback?: (error: T1CLibException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
 
-    allAlgoRefsForSigning(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
+    allAlgoRefsForSigning(callback?: (error: T1CLibException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
 
-    allData(filters: string[], callback?: (error: RestException, data: OberthurAllDataResponse) => void): Promise<OberthurAllDataResponse>;
+    allData(filters: string[], callback?: (error: T1CLibException, data: OberthurAllDataResponse) => void): Promise<OberthurAllDataResponse>;
 
-    allCerts(filters: string[], callback?: (error: RestException, data: OberthurAllCertsResponse) => void): Promise<OberthurAllCertsResponse>;
+    allCerts(filters: string[], callback?: (error: T1CLibException, data: OberthurAllCertsResponse) => void): Promise<OberthurAllCertsResponse>;
 
     rootCertificate(options?: Options,
-                    callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                    callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
     issuerCertificate(options?: Options,
-                      callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                      callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
     authenticationCertificate(options?: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                              callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
     signingCertificate(options?: Options,
-                       callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                       callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
     encryptionCertificate(options?: Options,
-                          callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                          callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
 
 

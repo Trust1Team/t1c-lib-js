@@ -9,7 +9,7 @@
 import {CoreService} from './service/CoreService';
 import {
     LocalConnection, RemoteJwtConnection, LocalAuthConnection, LocalTestConnection,
-    RemoteApiKeyConnection, LocalAuthAdminConnection
+    RemoteApiKeyConnection, LocalAuthAdminConnection, LocalAdminConnection
 } from './client/Connection';
 import {DSDownloadLinkResponse, DSDownloadRequest} from './ds/DSClientModel';
 import {DSClient} from './ds/DSClient';
@@ -27,7 +27,7 @@ import {AbstractEidLUX, PinType} from '../plugins/smartcards/eid/lux/EidLuxModel
 import {AbstractDNIe} from '../plugins/smartcards/eid/esp/dnieModel';
 import {PluginFactory} from '../plugins/PluginFactory';
 import {AuthenticateOrSignData, OptionalPin} from '../plugins/smartcards/Card';
-import {RestException} from './exceptions/CoreExceptions';
+import {T1CLibException} from './exceptions/CoreExceptions';
 import {GenericService} from './generic/GenericService';
 import {ResponseHandler} from '../util/ResponseHandler';
 import {AbstractEidPT} from '../plugins/smartcards/eid/pt/EidPtModel';
@@ -46,7 +46,6 @@ import {Polyfills} from '../util/Polyfills';
 import {AbstractOCVClient} from './ocv/OCVModel';
 import {GCLConfig} from './GCLConfig';
 import {DSException} from './exceptions/DSException';
-
 
 
 // check if any polyfills are needed
@@ -79,6 +78,7 @@ export class GCLClient {
     private connection: LocalConnection;
     private authConnection: LocalAuthConnection;
     private authAdminConnection: LocalAuthAdminConnection;
+    private adminConnection: LocalAdminConnection;
     private remoteConnection: RemoteJwtConnection;
     private remoteApiKeyConnection: RemoteApiKeyConnection;
     private localTestConnection: LocalTestConnection;
@@ -94,14 +94,16 @@ export class GCLClient {
         this.connection = new LocalConnection(this.localConfig);
         this.authConnection = new LocalAuthConnection(this.localConfig);
         this.authAdminConnection = new LocalAuthAdminConnection(this.localConfig);
+        this.adminConnection = new LocalAdminConnection(this.localConfig);
         this.remoteConnection = new RemoteJwtConnection(this.localConfig);
         this.remoteApiKeyConnection = new RemoteApiKeyConnection(this.localConfig);
         this.localTestConnection = new LocalTestConnection(this.localConfig);
         this.pluginFactory = new PluginFactory(this.localConfig.gclUrl, this.connection);
         // in citrix mode the admin endpoint should not be called through the agent
-        this.adminService = new AdminService(this.localConfig.gclUrl, this.authAdminConnection);
+        this.adminService = new AdminService(this.localConfig.gclUrl, this.authAdminConnection, this.adminConnection);
         this.coreService = new CoreService(this.localConfig.gclUrl, this.authConnection);
         this.agentClient = new AgentClient(this.localConfig.gclUrl, this.authConnection);
+        // init DS if DS url is provided
         if (this.localConfig.dsUrl) {
             if (this.localConfig.localTestMode) {
                 this.dsClient = new DSClient(this.localConfig.dsUrl, this.localTestConnection, this.localConfig);
@@ -109,15 +111,19 @@ export class GCLClient {
             else {
                 this.dsClient = new DSClient(this.localConfig.dsUrl, this.remoteConnection, this.localConfig);
             }
+        } else {
+            this.dsClient = undefined;
         }
 
-        // check if initialised with API key or JWT to determine which to use
+        // init OCV if OCV url is provided - check if initialised with API key or JWT to determine which to use
         if (this.localConfig.ocvUrl) {
             if (this.localConfig.apiKey && this.localConfig.apiKey.length) {
                 this.ocvClient = new OCVClient(this.localConfig.ocvUrl, this.remoteApiKeyConnection);
             } else {
                 this.ocvClient = new OCVClient(this.localConfig.ocvUrl, this.remoteConnection);
             }
+        } else {
+            this.ocvClient = undefined;
         }
 
         this.authClient = new AuthClient(this.localConfig, this.remoteApiKeyConnection);
@@ -135,8 +141,7 @@ export class GCLClient {
         Polyfills.check();
     }
 
-    public static initialize(cfg: GCLConfig,
-                             callback?: (error: RestException, client: GCLClient) => void): Promise<GCLClient> {
+    public static initialize(cfg: GCLConfig, callback?: (error: T1CLibException, client: GCLClient) => void): Promise<GCLClient> {
         return new Promise((resolve, reject) => {
             const initTime = moment();
             let client = new GCLClient(cfg, true);
@@ -282,11 +287,11 @@ export class GCLClient {
     }
 
     // generic methods
-    public containerFor(readerId: string, callback?: (error: RestException, data: DataResponse) => void) {
+    public containerFor(readerId: string, callback?: (error: T1CLibException, data: DataResponse) => void) {
         return GenericService.containerForReader(this, readerId, callback);
     }
 
-    public download(callback?: (error: RestException, data: DSDownloadLinkResponse) => void) {
+    public download(callback?: (error: T1CLibException, data: DSDownloadLinkResponse) => void) {
         return this.core().infoBrowser().then(info => {
             let downloadData = new DSDownloadRequest(info.data.browser, info.data.manufacturer,
                 info.data.os, info.data.ua, this.config().gwUrl);
@@ -300,31 +305,31 @@ export class GCLClient {
         });
     }
 
-    public dumpData(readerId: string, data: OptionalPin, callback?: (error: RestException, data: DataResponse) => void) {
+    public dumpData(readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void) {
         return GenericService.dumpData(this, readerId, data, callback);
     }
 
-    public readersCanAuthenticate(callback?: (error: RestException, data: CardReadersResponse) => void) {
+    public readersCanAuthenticate(callback?: (error: T1CLibException, data: CardReadersResponse) => void) {
         return GenericService.authenticateCapable(this, callback);
     }
 
-    public authenticate(readerId: string, data: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void) {
+    public authenticate(readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void) {
         return GenericService.authenticate(this, readerId, data, callback);
     }
 
-    public readersCanSign(callback?: (error: RestException, data: CardReadersResponse) => void) {
+    public readersCanSign(callback?: (error: T1CLibException, data: CardReadersResponse) => void) {
         return GenericService.signCapable(this, callback);
     }
 
-    public sign(readerId: string, data: AuthenticateOrSignData, callback?: (error: RestException, data: DataResponse) => void) {
+    public sign(readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void) {
         return GenericService.sign(this, readerId, data, callback);
     }
 
-    public readersCanVerifyPin(callback?: (error: RestException, data: CardReadersResponse) => void) {
+    public readersCanVerifyPin(callback?: (error: T1CLibException, data: CardReadersResponse) => void) {
         return GenericService.verifyPinCapable(this, callback);
     }
 
-    public verifyPin(readerId: string, data: OptionalPin, callback?: (error: RestException, data: DataResponse) => void) {
+    public verifyPin(readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void) {
         return GenericService.verifyPin(this, readerId, data, callback);
     }
 
@@ -333,7 +338,7 @@ export class GCLClient {
      */
     public updateAuthConnection(cfg: GCLConfig) {
         this.authConnection = new LocalAuthConnection(cfg);
-        this.adminService = new AdminService(cfg.gclUrl, this.authConnection);
+        this.adminService = new AdminService(cfg.gclUrl, this.authConnection, this.adminConnection); // TODO check if authConnection or LocalAuthAdminConnection should be passed
         this.coreService = new CoreService(cfg.gclUrl, this.authConnection);
     }
 }

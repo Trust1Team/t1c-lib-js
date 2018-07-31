@@ -3,7 +3,7 @@
  * @author Maarten Somers
  */
 import { RemoteJwtConnection } from '../client/Connection';
-import { RestException } from '../exceptions/CoreExceptions';
+import { T1CLibException } from '../exceptions/CoreExceptions';
 import {
     AbstractOCVClient, CertificateChainData, CertificateChainResponse, ChallengeResponse, ChallengeSignedHashData,
     ChallengeSignedHashResponse, OCVInfoResponse, SignatureValidationData, SignatureValidationResponse
@@ -25,28 +25,28 @@ export class OCVClient implements AbstractOCVClient {
     public getUrl() { return this.url; }
 
     public validateSignature(data: SignatureValidationData,
-                             callback?: (error: RestException, data: SignatureValidationResponse)
+                             callback?: (error: T1CLibException, data: SignatureValidationResponse)
                                  => void): void | Promise<SignatureValidationResponse> {
         return this.connection.post(this.url, SIGNATURE, data, undefined, undefined, callback);
     }
 
-    public getInfo(callback?: (error: RestException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse> {
+    public getInfo(callback?: (error: T1CLibException, data: OCVInfoResponse) => void): void | Promise<OCVInfoResponse> {
         return this.connection.get(this.getUrl(), SYSTEM_STATUS, undefined, undefined, callback);
     }
 
     public getChallenge(digestAlgorithm: string,
-                        callback?: (error: RestException, data: ChallengeResponse) => void): void | Promise<ChallengeResponse> {
+                        callback?: (error: T1CLibException, data: ChallengeResponse) => void): void | Promise<ChallengeResponse> {
         return this.connection.get(this.url, CHALLENGE, { digest:  digestAlgorithm }, undefined, callback);
     }
 
     public validateChallengeSignedHash(data: ChallengeSignedHashData,
-                                       callback?: (error: RestException, data: ChallengeSignedHashResponse)
+                                       callback?: (error: T1CLibException, data: ChallengeSignedHashResponse)
                                            => void): void | Promise<ChallengeSignedHashResponse> {
         return this.connection.post(this.url, CHALLENGE, data, undefined, undefined, callback);
     }
 
     public validateCertificateChain(data: CertificateChainData,
-                                    callback?: (error: RestException, data: CertificateChainResponse)
+                                    callback?: (error: T1CLibException, data: CertificateChainResponse)
                                         => void): void | Promise<CertificateChainResponse> {
         return this.connection.post(this.url, CERTIFICATE, data, undefined, undefined, callback);
     }

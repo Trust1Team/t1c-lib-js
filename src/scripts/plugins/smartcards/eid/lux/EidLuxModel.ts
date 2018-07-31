@@ -2,7 +2,7 @@
  * @author Maarten Somers
  * @since 2017
  */
-import {RestException} from '../../../../core/exceptions/CoreExceptions';
+import {T1CLibException} from '../../../../core/exceptions/CoreExceptions';
 import {CertCard, PinTryCounterData} from '../../Card';
 import {
     CertificateResponse, CertificatesResponse, DataObjectResponse, T1CCertificate, T1CResponse
@@ -15,33 +15,33 @@ export interface AbstractEidLUX extends CertCard {
 
     allCertFilters(): string[];
 
-    allData(options?: string[] | Options, callback?: (error: RestException, data: LuxAllDataResponse) => void): Promise<LuxAllDataResponse>;
+    allData(options?: string[] | Options, callback?: (error: T1CLibException, data: LuxAllDataResponse) => void): Promise<LuxAllDataResponse>;
 
-    allCerts(options?: string[] | Options, callback?: (error: RestException, data: AllCertsResponse) => void): Promise<AllCertsResponse>
+    allCerts(options?: string[] | Options, callback?: (error: T1CLibException, data: AllCertsResponse) => void): Promise<AllCertsResponse>
 
-    biometric(callback?: (error: RestException, data: LuxidBiometricResponse) => void): Promise<LuxidBiometricResponse>;
+    biometric(callback?: (error: T1CLibException, data: LuxidBiometricResponse) => void): Promise<LuxidBiometricResponse>;
 
-    picture(callback?: (error: RestException, data: LuxidPictureResponse) => void): Promise<LuxidPictureResponse>;
+    picture(callback?: (error: T1CLibException, data: LuxidPictureResponse) => void): Promise<LuxidPictureResponse>;
 
     rootCertificate(options?: Options,
-                    callback?: (error: RestException, data: CertificatesResponse) => void): Promise<CertificatesResponse>;
+                    callback?: (error: T1CLibException, data: CertificatesResponse) => void): Promise<CertificatesResponse>;
 
     authenticationCertificate(options?: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                              callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
     nonRepudiationCertificate(options?: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                              callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
-    signatureImage(callback?: (error: RestException, data: LuxidSignatureImageResponse) => void): Promise<LuxidSignatureImageResponse>;
+    signatureImage(callback?: (error: T1CLibException, data: LuxidSignatureImageResponse) => void): Promise<LuxidSignatureImageResponse>;
 
 
-    pinTryCounter(pin_reference: PinTryCounterData, callback?: (error: RestException, data: LuxPinTryCounterResponse) => void): Promise<LuxPinTryCounterResponse>;
+    pinTryCounter(pin_reference: PinTryCounterData, callback?: (error: T1CLibException, data: LuxPinTryCounterResponse) => void): Promise<LuxPinTryCounterResponse>;
 
-    pinReset(body: LuxPinResetData, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>)
+    pinReset(body: LuxPinResetData, callback?: (error: T1CLibException, data: T1CResponse) => void | Promise<T1CResponse>)
 
-    pinChange(body: LuxPinChangeData, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>)
+    pinChange(body: LuxPinChangeData, callback?: (error: T1CLibException, data: T1CResponse) => void | Promise<T1CResponse>)
 
-    pinUnblock(body: LuxPinUnblockData, callback?: (error: RestException, data: T1CResponse) => void | Promise<T1CResponse>)
+    pinUnblock(body: LuxPinUnblockData, callback?: (error: T1CLibException, data: T1CResponse) => void | Promise<T1CResponse>)
 
 }
 

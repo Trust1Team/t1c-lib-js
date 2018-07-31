@@ -1,4 +1,4 @@
-import { RestException } from '../../../core/exceptions/CoreExceptions';
+import { T1CLibException } from '../../../core/exceptions/CoreExceptions';
 import { BoolDataResponse, DataResponse } from '../../../core/service/CoreModel';
 import { LocalConnection } from '../../../core/client/Connection';
 import * as _ from 'lodash';
@@ -50,7 +50,7 @@ export class PKCS11 implements AbstractPkcs11 {
 
     public certificates(slotId: string,
                         options?: Options,
-                        callback?: (error: RestException, data: Pkcs11CertificatesResponse)
+                        callback?: (error: T1CLibException, data: Pkcs11CertificatesResponse)
                             => void): Promise<Pkcs11CertificatesResponse> {
         let req = _.extend({ slot_id: slotId }, { module: this.modulePath });
         const reqOptions = RequestHandler.determineOptions(options, callback);
@@ -61,7 +61,7 @@ export class PKCS11 implements AbstractPkcs11 {
         });
     }
 
-    public info(callback?: (error: RestException, data: Pkcs11InfoResponse) => void): Promise<Pkcs11InfoResponse> {
+    public info(callback?: (error: T1CLibException, data: Pkcs11InfoResponse) => void): Promise<Pkcs11InfoResponse> {
         let req = { module: this.modulePath };
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.INFO), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
@@ -70,7 +70,7 @@ export class PKCS11 implements AbstractPkcs11 {
         });
     }
 
-    public signData(signData: Pkcs11SignData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+    public signData(signData: Pkcs11SignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
         let req = {
             module: this.modulePath,
             id: signData.cert_id,
@@ -88,7 +88,7 @@ export class PKCS11 implements AbstractPkcs11 {
         });
     }
 
-    public slots(callback?: (error: RestException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse> {
+    public slots(callback?: (error: T1CLibException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse> {
         let req = { module: this.modulePath };
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.SLOTS), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
@@ -97,7 +97,7 @@ export class PKCS11 implements AbstractPkcs11 {
         });
     }
 
-    public slotsWithTokenPresent(callback?: (error: RestException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse> {
+    public slotsWithTokenPresent(callback?: (error: T1CLibException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse> {
         let req = { module: this.modulePath };
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.SLOTS), req, { 'token-present': 'true' }).then(data => {
             return ResponseHandler.response(data, callback);
@@ -106,7 +106,7 @@ export class PKCS11 implements AbstractPkcs11 {
         });
     }
 
-    public token(slotId: string, callback: (error: RestException, data: Pkcs11TokenResponse) => void): Promise<Pkcs11TokenResponse> {
+    public token(slotId: string, callback: (error: T1CLibException, data: Pkcs11TokenResponse) => void): Promise<Pkcs11TokenResponse> {
         let req = _.extend({ slot_id: slotId }, { module: this.modulePath });
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.TOKEN), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
@@ -116,7 +116,7 @@ export class PKCS11 implements AbstractPkcs11 {
     }
 
     public verifySignedData(verifyData: Pkcs11VerifySignedData,
-                            callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
+                            callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
         let req = {
             module: this.modulePath,
             id: verifyData.cert_id,

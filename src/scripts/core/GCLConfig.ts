@@ -8,17 +8,16 @@
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import * as jwtDecode from 'jwt-decode';
 import * as moment from 'moment';
-import { RestException } from './exceptions/CoreExceptions';
+import { T1CLibException } from './exceptions/CoreExceptions';
 import {Pkcs11ModuleConfig} from '../plugins/smartcards/pkcs11/pkcs11Model';
 import {T1CContainer, T1CContainerid} from './service/CoreModel';
 
 const defaults = {
     gclUrl: 'https://localhost:10443/v2',
-    // gwUrl: 'https://accapim.t1t.be:443',
-    // dsContextPath: '/trust1team/gclds/v2',
-    // ocvContextPath: '/trust1team/ocv-api/v1',
-    // dsContextPathTestMode: '/gcl-ds-web/v2',
-    // dsFileContextPath: '/trust1team/gclds-file/v1',
+    dsContextPath: '/trust1team/gclds/v2',
+    ocvContextPath: '/trust1team/ocv-api/v1',
+    dsContextPathTestMode: '/gcl-ds-web/v2',
+    dsFileContextPath: '/trust1team/gclds-file/v1',
     tokenExchangeContextPath: '/apiengineauth/v1',
     lang: 'en',
     implicitDownload: false,
@@ -89,9 +88,6 @@ export class GCLConfig {
         if (options) {
             if (options.gclUrl) { this._gclUrl = options.gclUrl; } else { this._gclUrl = defaults.gclUrl; }
             if (options.gwOrProxyUrl) { this._gwUrl = options.gwOrProxyUrl; } else { this._gwUrl = undefined; }
-            if (this.gwUrl && options.dsContextPath) { this._dsContextPath = options.dsContextPath; } else { this._dsContextPath = undefined; }
-            if (this.gwUrl && options.dsFileContextPath) { this._dsFileContextPath = options.dsFileContextPath; } else { this._dsFileContextPath = defaults.gclUrl; }
-            if (this.gwUrl && options.ocvContextPath) { this._ocvContextPath = options.ocvContextPath; } else { this._ocvContextPath = undefined; }
             if (options.apiKey) { this._apiKey = options.apiKey; } else { this._apiKey = undefined; } // no default
             if (options.gwJwt) { this._gwJwt = options.gwJwt; } else { this._gwJwt = undefined; } // no default
             if (options.agentPort) { this._agentPort = options.agentPort; } else { this._agentPort = -1; }
@@ -105,7 +101,37 @@ export class GCLConfig {
             if (options.containerDownloadTimeout) { this._containerDownloadTimeout = options.containerDownloadTimeout; } else { this._containerDownloadTimeout = defaults.containerDownloadTimeout; }
             if (options.lang) { this._lang = options.lang; } else { this._lang = defaults.lang; }
             if (options.providedContainers) { this._providedContainers = options.providedContainers; } else { this._providedContainers = undefined; }
-            this._citrix = false; // will be set to true during initialisation if Citrix environment is detected
+            this._citrix = false; // will be set to true during initialisation if Shared environment is detected
+            // resolve DS file context path
+            if (this.gwUrl) {
+                if (options.dsFileContextPath) {
+                    this._dsFileContextPath = options.dsFileContextPath;
+                } else {
+                    this._dsFileContextPath = defaults.dsFileContextPath;
+                }
+            } else {
+                this._dsFileContextPath = undefined;
+            }
+            // resolve DS context path
+            if (this.gwUrl) {
+                if (options.dsContextPath) {
+                    this._dsContextPath = options.dsContextPath;
+                } else {
+                    this._dsContextPath = defaults.dsContextPath;
+                }
+            } else {
+                this._dsContextPath = undefined;
+            }
+            // resolve OCV context path
+            if (this.gwUrl) {
+                if (options.ocvContextPath) {
+                    this._ocvContextPath = options.ocvContextPath;
+                } else {
+                    this._ocvContextPath = defaults.ocvContextPath;
+                }
+            } else {
+                this._ocvContextPath = undefined;
+            }
         }
     }
 
@@ -114,7 +140,11 @@ export class GCLConfig {
     }
 
     get ocvUrl(): string {
-        return this.gwUrl + this.ocvContextPath;
+        if (!this.gwUrl) {
+            return undefined;
+        } else {
+            return this.gwUrl + this.ocvContextPath;
+        }
     }
 
     get ocvContextPath(): string {
@@ -134,7 +164,11 @@ export class GCLConfig {
     }
 
     get dsUrl(): string {
-        return this.gwUrl + this.dsContextPath;
+        if (! this.gwUrl) {
+            return undefined;
+        } else {
+            return this.gwUrl + this.dsContextPath;
+        }
     }
 
     get dsContextPath(): string {
@@ -178,7 +212,11 @@ export class GCLConfig {
     }
 
     get dsFileDownloadUrl(): string {
-        return this.gwUrl + this.dsFileContextPath;
+        if (!this.gwUrl) {
+            return undefined;
+        } else {
+            return this.gwUrl + this.dsFileContextPath;
+        }
     }
 
     get gwUrl() {
@@ -270,7 +308,13 @@ export class GCLConfig {
     }
 
     // TODO should we refresh if expires < x time?
+    // if no gwUrl -> skip JWT and return placeholder
     get gwJwt(): Promise<string> {
+        if (!this.gwUrl) {
+            return new Promise<string>((resolve, reject) => {
+                resolve('none');
+            });
+        }
         let self = this;
         return new Promise<string>((resolve, reject) => {
             if (!self._gwJwt || !self._gwJwt.length) {
@@ -358,9 +402,9 @@ export class GCLConfig {
             });
         } else {
             if (this._gwJwt && this._gwJwt.length) {
-                return Promise.reject(new RestException(412, '205', 'JWT expired'));
+                return Promise.reject(new T1CLibException(412, '205', 'JWT expired'));
             } else {
-                return Promise.reject(new RestException(412, '901', 'No JWT or API key found in configuration'));
+                return Promise.reject(new T1CLibException(412, '901', 'No JWT or API key found in configuration'));
             }
         }
     }
