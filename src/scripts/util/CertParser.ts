@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import * as asn1js from 'asn1js';
 import * as Base64 from 'Base64';
 import Certificate from 'pkijs/build/Certificate';
-import { RestException } from '../core/exceptions/CoreExceptions';
+import { T1CLibException } from '../core/exceptions/CoreExceptions';
 import { T1CCertificate, T1CResponse } from '../core/service/CoreModel';
 import { ResponseHandler } from './ResponseHandler';
 
@@ -14,7 +14,7 @@ export class CertParser {
 
     public static process(response: any,
                           parseCerts: boolean,
-                          callback?: (error: RestException, data: T1CResponse) => void):  Promise<any> {
+                          callback?: (error: T1CLibException, data: T1CResponse) => void):  Promise<any> {
         // check if data has properties
         if (response && response.data && typeof response.data === 'object' && !_.isArray(response.data)) {
             _.forEach(response.data, (value, key) => {

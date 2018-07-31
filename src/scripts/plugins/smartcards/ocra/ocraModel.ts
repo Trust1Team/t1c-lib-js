@@ -4,15 +4,15 @@
  */
 import {OptionalPin, PinCard} from '../Card';
 import {DataObjectResponse, DataResponse} from '../../../core/service/CoreModel';
-import {RestException} from '../../../core/exceptions/CoreExceptions';
+import {T1CLibException} from '../../../core/exceptions/CoreExceptions';
 
 export interface AbstractOcra extends PinCard {
-    allData(filters: string[], callback?: (error: RestException, data: OcraAllDataResponse) => void): Promise<OcraAllDataResponse>;
+    allData(filters: string[], callback?: (error: T1CLibException, data: OcraAllDataResponse) => void): Promise<OcraAllDataResponse>;
 
-    challenge(body: OcraChallenge, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    challenge(body: OcraChallenge, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
 
     readCounter(body: OptionalPin,
-                callback?: (error: RestException, data: OcraReadCounterResponse) => void): Promise<OcraReadCounterResponse>;
+                callback?: (error: T1CLibException, data: OcraReadCounterResponse) => void): Promise<OcraReadCounterResponse>;
 }
 
 export class OcraAllDataResponse extends DataObjectResponse {

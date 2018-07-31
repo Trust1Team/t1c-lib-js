@@ -4,15 +4,22 @@
  */
 import {GenericPinCard, OptionalPin} from '../Card';
 import {DataResponse} from '../../../core/service/CoreModel';
-import {RestException} from '../../../core/exceptions/CoreExceptions';
+import {T1CLibException} from '../../../core/exceptions/CoreExceptions';
 import {AbstractOcra, OcraChallenge, OcraReadCounterResponse} from './ocraModel';
 import {PinEnforcer} from '../../../util/PinEnforcer';
+import {LocalConnection} from '../../../core/client/Connection';
 
 export class Ocra extends GenericPinCard implements AbstractOcra {
+    static CONTAINER_PREFIX = 'ocra';
     static CHALLENGE = '/challenge';
     static READ_COUNTER = '/counter';
 
-    public challenge(body: OcraChallenge, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string) {
+        super(baseUrl, containerUrl, connection, reader_id, Ocra.CONTAINER_PREFIX);
+    }
+
+    public challenge(body: OcraChallenge, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
         if (callback && typeof callback === 'function') {
             PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
                 return this.connection.post(this.baseUrl, this.containerSuffix(Ocra.CHALLENGE), body, undefined, undefined, callback);
@@ -31,7 +38,7 @@ export class Ocra extends GenericPinCard implements AbstractOcra {
     }
 
     public readCounter(body: OptionalPin,
-                       callback?: (error: RestException, data: OcraReadCounterResponse) => void): Promise<OcraReadCounterResponse> {
+                       callback?: (error: T1CLibException, data: OcraReadCounterResponse) => void): Promise<OcraReadCounterResponse> {
         if (callback && typeof callback === 'function') {
             PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
                 return this.connection.get(this.baseUrl, this.containerSuffix(Ocra.READ_COUNTER), {pin: body.pin}, undefined, callback);

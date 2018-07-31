@@ -2,19 +2,19 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from '../../../core/exceptions/CoreExceptions';
+import { T1CLibException } from '../../../core/exceptions/CoreExceptions';
 import { PinCard } from '../Card';
 import { DataObjectResponse } from '../../../core/service/CoreModel';
 
 
 export interface AbstractEMV extends PinCard {
-    allData(filters: string[], callback?: (error: RestException, data: EmvAllDataResponse) => void): Promise<EmvAllDataResponse>;
-    applications(callback?: (error: RestException, data: EmvApplicationsResponse) => void): Promise<EmvApplicationsResponse>;
-    applicationData(callback?: (error: RestException, data: EmvApplicationDataResponse) => void): Promise<EmvApplicationDataResponse>;
+    allData(filters: string[], callback?: (error: T1CLibException, data: EmvAllDataResponse) => void): Promise<EmvAllDataResponse>;
+    applications(callback?: (error: T1CLibException, data: EmvApplicationsResponse) => void): Promise<EmvApplicationsResponse>;
+    applicationData(callback?: (error: T1CLibException, data: EmvApplicationDataResponse) => void): Promise<EmvApplicationDataResponse>;
     iccPublicKeyCertificate(aid: string,
-                            callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
+                            callback?: (error: T1CLibException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
     issuerPublicKeyCertificate(aid: string,
-                               callback?: (error: RestException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
+                               callback?: (error: T1CLibException, data: EmvCertificateResponse) => void): Promise<EmvCertificateResponse>;
 }
 
 export class EmvAllDataResponse extends DataObjectResponse {

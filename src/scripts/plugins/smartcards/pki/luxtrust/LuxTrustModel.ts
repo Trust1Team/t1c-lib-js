@@ -2,7 +2,7 @@
  * @author Maarten Somers
  * @since 2017
  */
-import {RestException} from '../../../../core/exceptions/CoreExceptions';
+import {T1CLibException} from '../../../../core/exceptions/CoreExceptions';
 import {
     CertificateResponse, DataObjectResponse, DataResponse,
     T1CCertificate
@@ -12,19 +12,19 @@ import {Options} from '../../../../util/RequestHandler';
 
 
 export interface AbstractLuxTrust extends CertCard {
-    activated(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
+    activated(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
 
-    allData(filters: string[], callback?: (error: RestException, data: LuxtrustAllDataResponse) => void): Promise<LuxtrustAllDataResponse>;
+    allData(filters: string[], callback?: (error: T1CLibException, data: LuxtrustAllDataResponse) => void): Promise<LuxtrustAllDataResponse>;
 
-    allCerts(filters: string[], callback?: (error: RestException, data: LuxtrustAllCertsResponse) => void): Promise<LuxtrustAllCertsResponse>;
+    allCerts(filters: string[], callback?: (error: T1CLibException, data: LuxtrustAllCertsResponse) => void): Promise<LuxtrustAllCertsResponse>;
 
-    rootCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    rootCertificate(options?: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
     authenticationCertificate(options?: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                              callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
     signingCertificate(options?: Options,
-                       callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                       callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
 
 export class LuxtrustAllCertsResponse extends DataObjectResponse {

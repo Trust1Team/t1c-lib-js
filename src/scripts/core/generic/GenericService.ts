@@ -5,7 +5,7 @@
 import {GCLClient} from '../GCLLib';
 import {AuthenticateOrSignData, OptionalPin, VerifyPinData} from '../../plugins/smartcards/Card';
 import {EidBe} from '../../plugins/smartcards/eid/be/EidBe';
-import {RestException} from '../exceptions/CoreExceptions';
+import {T1CLibException} from '../exceptions/CoreExceptions';
 import {CardReader, CardReadersResponse, DataResponse} from '../service/CoreModel';
 import {ResponseHandler} from '../../util/ResponseHandler';
 import * as _ from 'lodash';
@@ -31,7 +31,7 @@ export class GenericService {
 
     public static containerForReader(client: GCLClient,
                                      readerId: string,
-                                     callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse> {
+                                     callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
         return this.checkPrerequisites(client, readerId, {}).then(res => {
             return ResponseHandler.response({data: res.container, success: true}, callback);
         }).catch(err => {
@@ -54,7 +54,7 @@ export class GenericService {
             });
     }
 
-    public static authenticateCapable(client: GCLClient, callback?: (error: RestException, data: CardReadersResponse) => void) {
+    public static authenticateCapable(client: GCLClient, callback?: (error: T1CLibException, data: CardReadersResponse) => void) {
         return client.core().readersCardAvailable()
             .then(this.checkCanAuthenticate)
             .then(res => {
@@ -69,7 +69,7 @@ export class GenericService {
             });
     }
 
-    public static signCapable(client: GCLClient, callback?: (error: RestException, data: CardReadersResponse) => void) {
+    public static signCapable(client: GCLClient, callback?: (error: T1CLibException, data: CardReadersResponse) => void) {
         return client.core().readersCardAvailable()
             .then(this.checkCanSign)
             .then(res => {
@@ -84,7 +84,7 @@ export class GenericService {
             });
     }
 
-    public static verifyPinCapable(client: GCLClient, callback?: (error: RestException, data: CardReadersResponse) => void) {
+    public static verifyPinCapable(client: GCLClient, callback?: (error: T1CLibException, data: CardReadersResponse) => void) {
         return client.core().readersCardAvailable()
             .then(this.checkCanVerifyPin)
             .then(res => {
@@ -102,7 +102,7 @@ export class GenericService {
     public static authenticate(client: GCLClient,
                                readerId: string,
                                data: AuthenticateOrSignData,
-                               callback?: (error: RestException, data: DataResponse) => void) {
+                               callback?: (error: T1CLibException, data: DataResponse) => void) {
 
         return this.checkPrerequisites(client, readerId, data)
             .then(this.determineAlgorithm)
@@ -118,7 +118,7 @@ export class GenericService {
     public static sign(client: GCLClient,
                        readerId: string,
                        data: AuthenticateOrSignData,
-                       callback?: (error: RestException, data: DataResponse) => void) {
+                       callback?: (error: T1CLibException, data: DataResponse) => void) {
 
         return this.checkPrerequisites(client, readerId, data)
             .then(this.determineAlgorithm)
@@ -134,7 +134,7 @@ export class GenericService {
     public static verifyPin(client: GCLClient,
                             readerId: string,
                             data: OptionalPin,
-                            callback?: (error: RestException, data: DataResponse) => void) {
+                            callback?: (error: T1CLibException, data: DataResponse) => void) {
 
         return this.checkPrerequisites(client, readerId, data)
             .then(GenericService.doVerifyPin)

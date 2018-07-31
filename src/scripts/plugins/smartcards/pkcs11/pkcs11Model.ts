@@ -2,7 +2,7 @@
  * @author Maarten Somers
  */
 
-import { RestException } from '../../../core/exceptions/CoreExceptions';
+import { T1CLibException } from '../../../core/exceptions/CoreExceptions';
 import {
     BoolDataResponse,
     CertificatesResponse, DataObjectResponse, DataResponse, T1CCertificate
@@ -12,16 +12,16 @@ import { AuthenticateOrSignData } from '../Card';
 
 
 export interface AbstractPkcs11 {
-    certificates(slotId: number,
+    certificates(slotId: string,
                  options?: Options,
-                 callback?: (error: RestException, data: Pkcs11CertificatesResponse) => void): Promise<Pkcs11CertificatesResponse>;
-    info(callback?: (error: RestException, data: Pkcs11InfoResponse) => void): Promise<Pkcs11InfoResponse>;
-    signData(data: Pkcs11SignData, callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    slots(callback?: (error: RestException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse>;
-    slotsWithTokenPresent(callback?: (error: RestException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse>;
-    token(slotId: number, callback?: (error: RestException, data: Pkcs11TokenResponse) => void): Promise<Pkcs11TokenResponse>;
+                 callback?: (error: T1CLibException, data: Pkcs11CertificatesResponse) => void): Promise<Pkcs11CertificatesResponse>;
+    info(callback?: (error: T1CLibException, data: Pkcs11InfoResponse) => void): Promise<Pkcs11InfoResponse>;
+    signData(data: Pkcs11SignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    slots(callback?: (error: T1CLibException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse>;
+    slotsWithTokenPresent(callback?: (error: T1CLibException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse>;
+    token(slotId: string, callback?: (error: T1CLibException, data: Pkcs11TokenResponse) => void): Promise<Pkcs11TokenResponse>;
     verifySignedData(data: Pkcs11VerifySignedData,
-                     callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
+                     callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
 }
 
 export class Pkcs11InfoResponse extends DataObjectResponse {
@@ -65,7 +65,7 @@ export class Pkcs11CertificatesResponse extends CertificatesResponse {
 }
 
 export class Pkcs11SignData extends AuthenticateOrSignData {
-    constructor(public slot_id: number,
+    constructor(public slot_id: string,
                 public cert_id: string,
                 public algorithm_reference: string,
                 public data: string,
@@ -76,7 +76,7 @@ export class Pkcs11SignData extends AuthenticateOrSignData {
 }
 
 export class Pkcs11VerifySignedData extends Pkcs11SignData {
-    constructor(public slot_id: number,
+    constructor(public slot_id: string,
                 public cert_id: string,
                 public algorithm_reference: string,
                 public data: string,

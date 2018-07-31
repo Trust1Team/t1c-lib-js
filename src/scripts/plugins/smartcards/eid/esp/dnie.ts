@@ -3,24 +3,31 @@
  * @author Maarten Somers
  * @since 2016
  */
-import {RestException} from '../../../../core/exceptions/CoreExceptions';
+import {T1CLibException} from '../../../../core/exceptions/CoreExceptions';
 import {CertificateResponse} from '../../../../core/service/CoreModel';
 import {GenericSecuredCertCard} from '../../Card';
 import {AbstractDNIe, DNIeInfoResponse} from './dnieModel';
 import {Options, RequestHandler} from '../../../../util/RequestHandler';
 import {CertParser} from '../../../../util/CertParser';
 import {ResponseHandler} from '../../../../util/ResponseHandler';
+import {LocalConnection} from '../../../../core/client/Connection';
 
 export class DNIe extends GenericSecuredCertCard implements AbstractDNIe {
+    static CONTAINER_PREFIX = 'dnie';
     static INFO = '/info';
     static CERT_INTERMEDIATE = '/intermediate';
 
-    public info(callback?: (error: RestException, data: DNIeInfoResponse) => void): Promise<DNIeInfoResponse> {
+
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string) {
+        super(baseUrl, containerUrl, connection, reader_id, DNIe.CONTAINER_PREFIX);
+    }
+
+    public info(callback?: (error: T1CLibException, data: DNIeInfoResponse) => void): Promise<DNIeInfoResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(DNIe.INFO), undefined, undefined, callback);
     }
 
     public intermediateCertificate(options?: Options,
-                                   callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
+                                   callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         const reqOptions = RequestHandler.determineOptions(options, callback);
         let self = this;
         return self.connection.get(self.baseUrl,
@@ -32,13 +39,13 @@ export class DNIe extends GenericSecuredCertCard implements AbstractDNIe {
     }
 
     // TODO is optional pace/pin needed?
-    public authenticationCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
+    public authenticationCertificate(options?: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(DNIe.CERT_AUTHENTICATION, {}, RequestHandler.determineOptions(options, callback));
     }
 
     // TODO is optional pace/pin needed?
     public signingCertificate(options?: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse> {
+                              callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(DNIe.CERT_SIGNING, {}, RequestHandler.determineOptions(options, callback));
     }
 }

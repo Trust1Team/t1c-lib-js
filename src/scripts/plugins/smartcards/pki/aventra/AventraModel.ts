@@ -2,7 +2,7 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from '../../../../core/exceptions/CoreExceptions';
+import { T1CLibException } from '../../../../core/exceptions/CoreExceptions';
 import {
     CertificateResponse, DataArrayResponse, DataObjectResponse, T1CCertificate,
     T1CResponse
@@ -14,21 +14,21 @@ export interface AbstractAventra extends CertCard {
     allDataFilters(): string[];
     allCertFilters(): string[];
     allKeyRefs(): string[];
-    allAlgoRefsForAuthentication(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
-    allAlgoRefsForSigning(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
-    allData(filters: string[], callback?: (error: RestException, data: AventraAllDataResponse) => void): Promise<AventraAllDataResponse>;
-    allCerts(filters: string[], callback?: (error: RestException, data: AventraAllCertsResponse) => void): Promise<AventraAllCertsResponse>;
-    rootCertificate(options?: Options, callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    allAlgoRefsForAuthentication(callback?: (error: T1CLibException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
+    allAlgoRefsForSigning(callback?: (error: T1CLibException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
+    allData(filters: string[], callback?: (error: T1CLibException, data: AventraAllDataResponse) => void): Promise<AventraAllDataResponse>;
+    allCerts(filters: string[], callback?: (error: T1CLibException, data: AventraAllCertsResponse) => void): Promise<AventraAllCertsResponse>;
+    rootCertificate(options?: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     issuerCertificate(options?: Options,
-                      callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                      callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     authenticationCertificate(options?: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                              callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     signingCertificate(options?: Options,
-                       callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                       callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     encryptionCertificate(options?: Options,
-                          callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
-    verifyPin(body: VerifyPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
-    resetPin(body: ResetPinData, callback?: (error: RestException, data: T1CResponse) => void): Promise<T1CResponse>;
+                          callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    verifyPin(body: VerifyPinData, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse>;
+    resetPin(body: ResetPinData, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse>;
 }
 
 export class AventraAllCertsResponse extends DataObjectResponse {

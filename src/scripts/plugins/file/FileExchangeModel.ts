@@ -2,31 +2,31 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from '../../core/exceptions/CoreExceptions';
+import { T1CLibException } from '../../core/exceptions/CoreExceptions';
 import {BoolDataResponse, DataArrayResponse, DataResponse, T1CResponse} from '../../core/service/CoreModel';
 
 export interface AbstractFileExchange {
-    download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], implicitCreationType?: boolean, notifyOnCompletion?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>; // implicit
-    upload(entity: string, type: string, filename: string, rel_path?: [string], notifyOnCompletion?: boolean, callback?: (error: RestException, data: FileListResponse) => void): Promise<ArrayBuffer>;
-    // getProgress(entity: string, type: String, filename?: String, action?: FileAction, callback?: (error: RestException, data: FileListResponse) => void): Promise<DataResponse>;
-    showModal(title: string, text: string, modal: ModalType, timeoutInSeconds?: number, callback?: (error: RestException, data: FileListResponse) => void): Promise<boolean>;
-    listTypes(entity?: string, page?: Page, callback?: (error: RestException, data: TypeListResponse) => void): Promise<TypeListResponse>;
-    listType(entity: string, type: string, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse>;
-    listTypeContent(entity: string, type: string, relpath?: [string], page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>; // should add total files
-    listContent(entity: string, page?: Page, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>;
-    existsType(entity: string, type: string, callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
-    existsFile(entity: string, type: string, relpath: [string], callback?: (error: RestException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
-    getAccessMode(entity: string, type: string, relpath?: [string], callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    createDir(entity: string, type: string, relpath: [string], recursive?: boolean, callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
-    copyFile(entity: string, fromType: string, toType: string, filename: string, newfilename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
-    moveFile(entity: string, fromType: string, toType: string, filename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
-    renameFile(entity: string, type: string, filename: string, newfilename: string, relpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
-    getFileInfo(entity: string, type: string, filename: string, relpath?: [string], callback?: (error: RestException, data: FileResponse) => void): Promise<FileResponse>;
-    createType(entity: string, type: string, initabspath?: [string], showModal?: boolean, timeoutInSeconds?: number, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse>; // if not valid => show file chooser
-    createTypeDirs(entity: string, type: string, rel_path: [string], show_modal?: boolean, timeoutInSeconds?: number, callback?: (error: RestException, data: FileListResponse) => void): Promise<FileListResponse>; // implicit type creation
-    updateType(entity: string, type: string, timeoutInSeconds?: number, callback?: (error: RestException, data: TypeResponse) => void): Promise<TypeResponse>;
-    deleteType(entity: string, type: string, callback?: (error: RestException, data: boolean) => void): Promise<boolean>;
-    getEnabledContainers(callback?: (error: RestException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
+    download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], implicitCreationType?: boolean, notifyOnCompletion?: boolean, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<DataResponse>; // implicit
+    upload(entity: string, type: string, filename: string, rel_path?: [string], notifyOnCompletion?: boolean, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<ArrayBuffer>;
+    // getProgress(entity: string, type: String, filename?: String, action?: FileAction, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<DataResponse>;
+    showModal(title: string, text: string, modal: ModalType, timeoutInSeconds?: number, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<boolean>;
+    listTypes(entity?: string, page?: Page, callback?: (error: T1CLibException, data: TypeListResponse) => void): Promise<TypeListResponse>;
+    listType(entity: string, type: string, callback?: (error: T1CLibException, data: TypeResponse) => void): Promise<TypeResponse>;
+    listTypeContent(entity: string, type: string, relpath?: [string], page?: Page, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<FileListResponse>; // should add total files
+    listContent(entity: string, page?: Page, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<FileListResponse>;
+    existsType(entity: string, type: string, callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
+    existsFile(entity: string, type: string, relpath: [string], callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
+    getAccessMode(entity: string, type: string, relpath?: [string], callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    createDir(entity: string, type: string, relpath: [string], recursive?: boolean, callback?: (error: T1CLibException, data: FileResponse) => void): Promise<FileResponse>;
+    copyFile(entity: string, fromType: string, toType: string, filename: string, newfilename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: T1CLibException, data: FileResponse) => void): Promise<FileResponse>;
+    moveFile(entity: string, fromType: string, toType: string, filename: string, fromrelpath?: [string], torelpath?: [string], callback?: (error: T1CLibException, data: FileResponse) => void): Promise<FileResponse>;
+    renameFile(entity: string, type: string, filename: string, newfilename: string, relpath?: [string], callback?: (error: T1CLibException, data: FileResponse) => void): Promise<FileResponse>;
+    getFileInfo(entity: string, type: string, filename: string, relpath?: [string], callback?: (error: T1CLibException, data: FileResponse) => void): Promise<FileResponse>;
+    createType(entity: string, type: string, initabspath?: [string], showModal?: boolean, timeoutInSeconds?: number, callback?: (error: T1CLibException, data: TypeResponse) => void): Promise<TypeResponse>; // if not valid => show file chooser
+    createTypeDirs(entity: string, type: string, rel_path: [string], show_modal?: boolean, timeoutInSeconds?: number, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<FileListResponse>; // implicit type creation
+    updateType(entity: string, type: string, timeoutInSeconds?: number, callback?: (error: T1CLibException, data: TypeResponse) => void): Promise<TypeResponse>;
+    deleteType(entity: string, type: string, callback?: (error: T1CLibException, data: boolean) => void): Promise<boolean>;
+    getEnabledContainers(callback?: (error: T1CLibException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
 }
 
 /* Model */

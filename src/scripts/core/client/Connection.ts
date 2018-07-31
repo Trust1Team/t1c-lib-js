@@ -6,7 +6,7 @@
 import {GCLConfig} from '../GCLConfig';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import * as _ from 'lodash';
-import {RestException} from '../exceptions/CoreExceptions';
+import {T1CLibException} from '../exceptions/CoreExceptions';
 import {UrlUtil} from '../../util/UrlUtil';
 import * as store from 'store2';
 import {BrowserFingerprint} from '../../util/BrowserFingerprint';
@@ -84,11 +84,11 @@ export abstract class GenericConnection implements Connection {
 
     /**
      * Returns relevant error for requests that cannot be completed without an API key
-     * @param {(error: RestException, data: JWTResponse) => void} callback
+     * @param {(error: T1CLibException, data: JWTResponse) => void} callback
      * @returns {Promise<never>}
      */
-    private static disabledWithoutApiKey(callback: (error: RestException, data: DSJWTResponse) => void) {
-        return ResponseHandler.error(new RestException(412, '901', 'Configuration must contain API key to use this method'), callback);
+    private static disabledWithoutApiKey(callback: (error: T1CLibException, data: DSJWTResponse) => void) {
+        return ResponseHandler.error(new T1CLibException(412, '901', 'Configuration must contain API key to use this method'), callback);
     }
 
     /**
@@ -300,7 +300,7 @@ export abstract class GenericConnection implements Connection {
                     }).catch(function (error: AxiosError) {
                         // check for generic network error
                         if (!error.code && !error.response) {
-                            const thrownError = new RestException(500, '999', 'Network error occurred. Request could not be completed');
+                            const thrownError = new T1CLibException(500, '999', 'Network error occurred. Request could not be completed');
                             callback(thrownError, null);
                             return reject(thrownError);
                         } else {
@@ -324,7 +324,7 @@ export abstract class GenericConnection implements Connection {
                 });
             });
         } else {
-            let agentPortError: RestException = {
+            let agentPortError: T1CLibException = {
                 description: 'Running in Citrix environment but no Agent port was defined in config.',
                 status: 400,
                 code: '801'
@@ -332,6 +332,19 @@ export abstract class GenericConnection implements Connection {
             callback(agentPortError, null);
             return Promise.reject(agentPortError);
         }
+    }
+}
+
+/**
+ * Local connection with authorization token, used for protected endpoints
+ */
+export class LocalAdminConnection extends GenericConnection implements Connection {
+    constructor(public cfg: GCLConfig) {
+        super(cfg);
+    }
+
+    getSecurityConfig(): SecurityConfig {
+        return {sendGwJwt: false, sendGclJwt: false, sendApiKey: false, sendToken: true, skipCitrixCheck: true};
     }
 }
 
@@ -502,8 +515,8 @@ export class LocalConnection extends GenericConnection implements Connection {
         reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
         // contextToken = application id (ex. 26)
         let contextToken = this.cfg.contextToken;
-        // only send the relay state header for unmanaged installs
-        if (!this.cfg.isManaged && contextToken && !_.isNil(contextToken)) {
+        // only send relay-state header when a DS is available
+        if (contextToken && !_.isNil(contextToken)) {
             reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
         }
         return reqHeaders;
@@ -547,7 +560,8 @@ export class LocalConnection extends GenericConnection implements Connection {
         type: string,
         filename: string,
         rel_path: string[],
-        notify_on_completion: boolean }, callback?: RequestCallback): Promise<any> {
+        notify_on_completion: boolean
+    }, callback?: RequestCallback): Promise<any> {
         let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
         // init callback if necessary
         if (!callback || typeof callback !== 'function') {
@@ -743,7 +757,7 @@ export class LocalTestConnection extends GenericConnection implements Connection
 
         // if Citrix environment, check that agentPort was defined in config
         if (gclConfig.citrix && gclConfig.agentPort === -1) {
-            let agentPortError: RestException = {
+            let agentPortError: T1CLibException = {
                 description: 'Running in Citrix environment but no Agent port was defined in config.',
                 status: 400,
                 code: '801'
