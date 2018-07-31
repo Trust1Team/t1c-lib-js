@@ -133,19 +133,19 @@ export class LuxidSignatureImageResponse extends DataObjectResponse {
 }
 
 export class LuxPinResetData {
-    constructor(public os_dialog: boolean, public reset_only: boolean, public puk: string, public pin: string) {
+    constructor(public os_dialog: boolean, public puk: string, public pin: string, public reset_only?: boolean) {
         this.reset_only = false;
     }
 }
 
 export class LuxPinUnblockData {
-    constructor(public os_dialog: boolean, public reset_only: boolean, public puk?: string) {
+    constructor(public os_dialog: boolean, public puk: string, public reset_only?: boolean) {
         this.reset_only = true;
     }
 }
 
 export class LuxPinChangeData {
-    constructor(public os_dialog: boolean, public old_pin?: string, public new_pin?: string) {;
+    constructor(public os_dialog: boolean, public old_pin: string, public new_pin: string) {
     }
 }
 
