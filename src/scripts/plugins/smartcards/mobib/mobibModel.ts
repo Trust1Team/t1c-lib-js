@@ -2,17 +2,17 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { RestException } from '../../../core/exceptions/CoreExceptions';
+import { T1CLibException } from '../../../core/exceptions/CoreExceptions';
 import {DataArrayResponse, DataObjectResponse, DataResponse} from '../../../core/service/CoreModel';
 import { Card } from '../Card';
 import {Options} from '../../../util/RequestHandler';
 
 export interface AbstractMobib extends Card {
-    allData(filters: string[]| Options, callback?: (error: RestException, data: MobibAllDataResponse) => void): Promise<MobibAllDataResponse>;
-    cardIssuing(callback?: (error: RestException, data: MobibCardIssuingResponse) => void): Promise<MobibCardIssuingResponse>;
-    contracts(callback?: (error: RestException, data: MobibContractsResponse) => void): Promise<MobibContractsResponse>;
-    picture(callback?: (error: RestException, data: DataResponse) => void): Promise<DataResponse>;
-    status(callback?: (error: RestException, data: MobibStatusResponse) => void): Promise<MobibStatusResponse>;
+    allData(filters: string[]| Options, callback?: (error: T1CLibException, data: MobibAllDataResponse) => void): Promise<MobibAllDataResponse>;
+    cardIssuing(callback?: (error: T1CLibException, data: MobibCardIssuingResponse) => void): Promise<MobibCardIssuingResponse>;
+    contracts(callback?: (error: T1CLibException, data: MobibContractsResponse) => void): Promise<MobibContractsResponse>;
+    picture(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    status(callback?: (error: T1CLibException, data: MobibStatusResponse) => void): Promise<MobibStatusResponse>;
 }
 
 export class MobibAllDataResponse extends DataObjectResponse {

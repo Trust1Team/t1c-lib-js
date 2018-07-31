@@ -8,7 +8,7 @@ import {
 import { DataContainerUtil } from './DataContainerUtil';
 import * as _ from 'lodash';
 import { GCLClient } from '../core/GCLLib';
-import { RestException } from '../core/exceptions/CoreExceptions';
+import { T1CLibException } from '../core/exceptions/CoreExceptions';
 import { T1CContainer } from '../core/service/CoreModel';
 import { ContainerSyncRequest } from '../core/admin/adminModel';
 import {ActivatedContainerUtil} from './ActivatedContainerUtil';
@@ -127,7 +127,7 @@ export class SyncUtil {
                         if (ready) { resolve(containers); }
                         else {
                             if (remainingTries === 0) {
-                                reject( new RestException(408, '904', 'Container download did not complete before timeout.', null));
+                                reject( new T1CLibException(408, '904', 'Container download did not complete before timeout.', null));
                             } else { poll(resolve, reject); }
                         }
                     }, error => {
@@ -146,7 +146,7 @@ export class SyncUtil {
                 if (containerMissing(cfg, containerStatus) || downloadErrored(cfg, containerStatus)) {
                     // check if we were already retrying
                     if (isRetry) {
-                        reject(new RestException(500, '903', 'Container download failed'));
+                        reject(new T1CLibException(500, '903', 'Container download failed'));
                     } else {
                         // trigger retry
                         reject(false);

@@ -4,27 +4,27 @@
  */
 
 import {BrowserInfo, T1CContainer} from '../service/CoreModel';
-import {RestException} from '../exceptions/CoreExceptions';
+import {T1CLibException} from '../exceptions/CoreExceptions';
 
 export interface AbstractDSClient {
     getUrl(): string;
 
-    getInfo(callback?: (error: RestException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
+    getInfo(callback?: (error: T1CLibException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
 
-    getDevice(uuid: string, callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
+    getDevice(uuid: string, callback?: (error: T1CLibException, data: DeviceResponse) => void): Promise<DeviceResponse>;
 
     getPubKey(deviceId: string,
-              callback?: (error: RestException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse>;
+              callback?: (error: T1CLibException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse>;
 
     downloadLink(downloadData: DSDownloadRequest,
-                 callback?: (error: RestException,
+                 callback?: (error: T1CLibException,
                              data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse>;
 
     register(registrationData: DSRegistrationOrSyncRequest,
-             callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
+             callback?: (error: T1CLibException, data: DeviceResponse) => void): Promise<DeviceResponse>;
 
     sync(syncData: DSRegistrationOrSyncRequest,
-         callback?: (error: RestException, data: DeviceResponse) => void): Promise<DeviceResponse>;
+         callback?: (error: T1CLibException, data: DeviceResponse) => void): Promise<DeviceResponse>;
 }
 
 export class DSBrowser {

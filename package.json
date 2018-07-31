@@ -6,7 +6,7 @@
   "types": "dist/lib/index.d.ts",
   "scripts": {
     "clean": "shx rm -rf dist lib lib-esm",
-    "ts": "tsc && tsc -m es6 --outDir lib-esm && webpack",
+    "ts": "tsc && tsc -m es6 --outDir lib-esm && webpack --mode=none",
     "localTest": "./node_modules/karma-cli/bin/karma start --single-run",
     "test": "./node_modules/karma-cli/bin/karma start --single-run --colors true",
     "build": "npm run clean && npm run ts"
@@ -59,6 +59,7 @@
     "karma-webpack": "^3.0.0",
     "mocha": "^5.2.0",
     "phantomjs-prebuilt": "^2.1.16",
+    "shx": "^0.3.2",
     "sinon": "^6.1.4",
     "sinon-chai": "^3.2.0",
     "ts-loader": "^4.4.2",

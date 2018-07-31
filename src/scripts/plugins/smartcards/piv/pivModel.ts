@@ -2,7 +2,7 @@
  * @author Maarten Somers
  * @since 2017
  */
-import {RestException} from '../../../core/exceptions/CoreExceptions';
+import {T1CLibException} from '../../../core/exceptions/CoreExceptions';
 import {GenericSecuredCertCard, OptionalPin, SecuredCertCard} from '../Card';
 import {
     CertificateResponse, DataObjectResponse,
@@ -19,25 +19,25 @@ export interface AbstractPiv extends SecuredCertCard {
 
     // callback-based
     printedInformation(body: OptionalPin,
-                       callback?: (error: RestException,
+                       callback?: (error: T1CLibException,
                                    data: PivPrintedInformationResponse) => void): Promise<PivPrintedInformationResponse>;
 
     facialImage(body: OptionalPin,
-                callback?: (error: RestException, data: PivFacialImageResponse) => void): Promise<PivFacialImageResponse>;
+                callback?: (error: T1CLibException, data: PivFacialImageResponse) => void): Promise<PivFacialImageResponse>;
 
     allData(filters: string[], body: OptionalPin,
-            callback?: (error: RestException, data: PivAllDataResponse) => void): Promise<PivAllDataResponse>;
+            callback?: (error: T1CLibException, data: PivAllDataResponse) => void): Promise<PivAllDataResponse>;
 
     allCerts(filters: string[], body: OptionalPin,
-             callback?: (error: RestException, data: PivAllCertsResponse) => void): Promise<PivAllCertsResponse>;
+             callback?: (error: T1CLibException, data: PivAllCertsResponse) => void): Promise<PivAllCertsResponse>;
 
     authenticationCertificate(body: OptionalPin,
                               options?: Options,
-                              callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                              callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
     signingCertificate(body: OptionalPin,
                        options?: Options,
-                       callback?: (error: RestException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+                       callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }
 
 export class PivPrintedInformationResponse extends DataObjectResponse {

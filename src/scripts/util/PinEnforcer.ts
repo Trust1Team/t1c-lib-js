@@ -4,7 +4,7 @@
 import { GenericConnection, LocalAuthConnection } from '../core/client/Connection';
 import { JSEncrypt} from 'jsencrypt';
 import { PubKeyService } from './PubKeyService';
-import { RestException } from '../core/exceptions/CoreExceptions';
+import { T1CLibException } from '../core/exceptions/CoreExceptions';
 import { GCLConfig } from '../core/GCLConfig';
 
 const CORE_READERS = '/card-readers';
@@ -52,14 +52,14 @@ export class PinEnforcer {
                     if (body.pinpad) {
                         // if true, check that no pin was sent
                         if (body.pin) {
-                            reject({ data: new RestException(400, '600', 'Strict pinpad enforcement is enabled.' +
+                            reject({ data: new T1CLibException(400, '600', 'Strict pinpad enforcement is enabled.' +
                                                               ' This request was sent with a PIN,' +
                                                                          ' but the reader has a pinpad.' ), success: false });
                         } else { resolve(); }
                     } else {
                         // check if a pin was sent, or if we are using OS pin dialog
                         if (!body.pin && !body.os_dialog) {
-                            reject({ data: new RestException(400, '601', 'Strict pinpad enforcement is enabled.' +
+                            reject({ data: new T1CLibException(400, '601', 'Strict pinpad enforcement is enabled.' +
                                                               ' This request was sent without a PIN,' +
                                                               ' but the reader does not have a pinpad and' +
                                                                          ' OS PIN dialog is not enabled.'), success: false });
