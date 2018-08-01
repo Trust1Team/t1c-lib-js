@@ -1,46 +1,36 @@
-var AtrListRequest = (function () {
-    function AtrListRequest(hash, storagePath) {
+export class AtrListRequest {
+    constructor(hash, storagePath) {
         this.hash = hash;
         this.storagePath = storagePath;
     }
-    return AtrListRequest;
-}());
-export { AtrListRequest };
-var SetPubKeyRequest = (function () {
-    function SetPubKeyRequest(encryptedPublicKey, encryptedAesKey, ns) {
+}
+export class SetPubKeyRequest {
+    constructor(encryptedPublicKey, encryptedAesKey, ns) {
         this.encryptedPublicKey = encryptedPublicKey;
         this.encryptedAesKey = encryptedAesKey;
         this.ns = ns;
     }
-    return SetPubKeyRequest;
-}());
-export { SetPubKeyRequest };
-var PubKeyResponse = (function () {
-    function PubKeyResponse(data, success) {
+}
+export class PubKeyResponse {
+    constructor(data, success) {
         this.data = data;
         this.success = success;
     }
-    return PubKeyResponse;
-}());
-export { PubKeyResponse };
-var PubKeys = (function () {
-    function PubKeys(device, ssl, ds) {
+}
+export class PubKeys {
+    constructor(device, ssl, ds) {
         this.device = device;
         this.ssl = ssl;
         this.ds = ds;
     }
-    return PubKeys;
-}());
-export { PubKeys };
-var ContainerSyncRequest = (function () {
-    function ContainerSyncRequest(containerResponses) {
+}
+export class ContainerSyncRequest {
+    constructor(containerResponses) {
         this.containerResponses = containerResponses;
     }
-    return ContainerSyncRequest;
-}());
-export { ContainerSyncRequest };
-var ResolvedAgent = (function () {
-    function ResolvedAgent(hostname, challenge, last_update, metadata, port, type, username) {
+}
+export class ResolvedAgent {
+    constructor(hostname, challenge, last_update, metadata, port, type, username) {
         this.hostname = hostname;
         this.challenge = challenge;
         this.last_update = last_update;
@@ -49,7 +39,5 @@ var ResolvedAgent = (function () {
         this.type = type;
         this.username = username;
     }
-    return ResolvedAgent;
-}());
-export { ResolvedAgent };
+}
 //# sourceMappingURL=adminModel.js.map

@@ -2,34 +2,32 @@ import { LocalAuthConnection } from '../core/client/Connection';
 import { JSEncrypt } from 'jsencrypt';
 import { PubKeyService } from './PubKeyService';
 import { T1CLibException } from '../core/exceptions/CoreExceptions';
-var CORE_READERS = '/card-readers';
-var PinEnforcer = (function () {
-    function PinEnforcer() {
-    }
-    PinEnforcer.check = function (connection, readerId, body) {
-        return PinEnforcer.doPinCheck(connection.cfg, readerId, body).then(function () {
+const CORE_READERS = '/card-readers';
+export class PinEnforcer {
+    static check(connection, readerId, body) {
+        return PinEnforcer.doPinCheck(connection.cfg, readerId, body).then(() => {
             return PinEnforcer.updateBodyWithEncryptedPin(body);
         });
-    };
-    PinEnforcer.checkAlreadyEncryptedPin = function (connection, readerId, pin) {
-        return PinEnforcer.doPinCheck(connection.cfg, readerId, { pin: pin });
-    };
-    PinEnforcer.encryptPin = function (pin) {
+    }
+    static checkAlreadyEncryptedPin(connection, readerId, pin) {
+        return PinEnforcer.doPinCheck(connection.cfg, readerId, { pin });
+    }
+    static encryptPin(pin) {
         if (pin && pin.length) {
-            var pubKey = PubKeyService.getPubKey();
-            var crypt = new JSEncrypt();
+            let pubKey = PubKeyService.getPubKey();
+            let crypt = new JSEncrypt();
             crypt.setKey(pubKey);
             return crypt.encrypt(pin);
         }
         else {
             return undefined;
         }
-    };
-    PinEnforcer.doPinCheck = function (cfg, readerId, body) {
-        return new Promise(function (resolve, reject) {
-            var connection = new LocalAuthConnection(cfg);
+    }
+    static doPinCheck(cfg, readerId, body) {
+        return new Promise((resolve, reject) => {
+            let connection = new LocalAuthConnection(cfg);
             body.os_dialog = connection.cfg.osPinDialog;
-            connection.get(connection.cfg.gclUrl, CORE_READERS + '/' + readerId, undefined).then(function (reader) {
+            connection.get(connection.cfg.gclUrl, CORE_READERS + '/' + readerId, undefined).then(reader => {
                 body.pinpad = reader.data.pinpad || false;
                 if (connection.cfg.forceHardwarePinpad) {
                     if (body.pinpad) {
@@ -57,26 +55,22 @@ var PinEnforcer = (function () {
                 else {
                     resolve();
                 }
-            }, function (error) {
+            }, error => {
                 reject(error);
             });
         });
-    };
-    PinEnforcer.updateBodyWithEncryptedPin = function (body) {
+    }
+    static updateBodyWithEncryptedPin(body) {
         body.pin = PinEnforcer.encryptPin(body.pin);
         return body;
-    };
-    return PinEnforcer;
-}());
-export { PinEnforcer };
-var EncryptedOptionalPin = (function () {
-    function EncryptedOptionalPin(os_dialog, pinpad, pin, pace) {
+    }
+}
+export class EncryptedOptionalPin {
+    constructor(os_dialog, pinpad, pin, pace) {
         this.os_dialog = os_dialog;
         this.pinpad = pinpad;
         this.pin = pin;
         this.pace = pace;
     }
-    return EncryptedOptionalPin;
-}());
-export { EncryptedOptionalPin };
+}
 //# sourceMappingURL=PinEnforcer.js.map

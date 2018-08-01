@@ -4,12 +4,12 @@
  */
 
 import { expect } from 'chai';
-import * as axios from 'axios';
-import * as MockAdapter from 'axios-mock-adapter';
+import MockAdapter from 'axios-mock-adapter';
+import axios from 'axios';
 import { GCLConfig } from '../../../../../scripts/core/GCLConfig';
 import { LocalConnection } from '../../../../../scripts/core/client/Connection';
 import { PluginFactory } from '../../../../../scripts/plugins/PluginFactory';
-import { Pkcs11ModuleConfig } from '../../../../../scripts/plugins/smartcards/pkcs11/pkcs11Model';
+import {Pkcs11ModuleConfig, Pkcs11SignData} from '../../../../../scripts/plugins/smartcards/pkcs11/pkcs11Model';
 import { PubKeyService } from '../../../../../scripts/util/PubKeyService';
 
 describe('PKCS#11 Container', () => {
@@ -51,7 +51,7 @@ describe('PKCS#11 Container', () => {
         });
 
         it('makes the correct call for certificates data', () => {
-            return pkcs11.certificates( 1, { parseCerts: false }).then(res => {
+            return pkcs11.certificates( '1', { parseCerts: false }).then(res => {
                 expect(res).to.have.property('success');
                 expect(res.success).to.be.a('boolean');
                 expect(res.success).to.eq(true);
@@ -113,9 +113,9 @@ describe('PKCS#11 Container', () => {
             const pin = '1234';
             const data = 'thedata';
             const algo = 'sha1';
-            const slotId = 1;
+            const slotId = '1';
 
-            return pkcs11.signData({ pin, slot_id: slotId, cert_id: certId, data, algorithm_reference: algo }).then(res => {
+            return pkcs11.signData(new Pkcs11SignData(slotId, certId, algo, data, pin)).then(res => {
                 expect(res).to.have.property('success');
                 expect(res.success).to.be.a('boolean');
                 expect(res.success).to.eq(true);
@@ -224,7 +224,7 @@ describe('PKCS#11 Container', () => {
         });
 
         it('makes the correct call for token data', () => {
-            return pkcs11.token(1).then(res => {
+            return pkcs11.token('1').then(res => {
                 expect(res).to.have.property('success');
                 expect(res.success).to.be.a('boolean');
                 expect(res.success).to.eq(true);

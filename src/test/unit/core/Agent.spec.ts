@@ -3,18 +3,19 @@
  * @since 2017
  */
 import { expect } from 'chai';
-import * as axios from 'axios';
-import * as MockAdapter from 'axios-mock-adapter';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 import { AgentClient } from '../../../scripts/core/agent/agent';
 import { GCLConfig } from '../../../scripts/core/GCLConfig';
-import {LocalAuthConnection} from "../../../scripts/core/client/Connection";
+import {LocalAuthConnection} from '../../..';
+
 
 describe('Agents', () => {
     const gclConfig = new GCLConfig({});
     const connection: LocalAuthConnection = new LocalAuthConnection(gclConfig);
     const agent = new AgentClient('', connection);
 
-    let mock: MockAdapter;
+    let mock;
 
     beforeEach(() => {
         mock = new MockAdapter(axios);

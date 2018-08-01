@@ -1,34 +1,34 @@
-var SEPARATOR = '/';
-var SECURITY = '/security';
-var SYS_INFO = '/system/status';
-var DOWNLOAD = '/download/gcl';
-var PUB_KEY = SECURITY + '/keys/public';
-var DEVICE = '/devices';
-var DSClient = (function () {
-    function DSClient(url, connection, cfg) {
+const SEPARATOR = '/';
+const SECURITY = '/security';
+const SYS_INFO = '/system/status';
+const DOWNLOAD = '/download/gcl';
+const PUB_KEY = SECURITY + '/keys/public';
+const DEVICE = '/devices';
+export class DSClient {
+    constructor(url, connection, cfg) {
         this.url = url;
         this.connection = connection;
         this.cfg = cfg;
     }
-    DSClient.prototype.getUrl = function () {
+    getUrl() {
         return this.url;
-    };
-    DSClient.prototype.getInfo = function (callback) {
+    }
+    getInfo(callback) {
         return this.connection.get(this.url, SYS_INFO, undefined, undefined, callback);
-    };
-    DSClient.prototype.getDevice = function (uuid, callback) {
+    }
+    getDevice(uuid, callback) {
         return this.connection.get(this.url, DEVICE + SEPARATOR + uuid, undefined, undefined, callback);
-    };
-    DSClient.prototype.getPubKey = function (uuid, callback) {
+    }
+    getPubKey(uuid, callback) {
         return this.connection.get(this.url, PUB_KEY + SEPARATOR + uuid, undefined, undefined, callback);
-    };
-    DSClient.prototype.downloadLink = function (downloadData, callback) {
-        var self = this;
+    }
+    downloadLink(downloadData, callback) {
+        let self = this;
         if (callback) {
             doGetDownloadLink();
         }
         else {
-            return new Promise(function (resolve, reject) {
+            return new Promise((resolve, reject) => {
                 doGetDownloadLink(resolve, reject);
             });
         }
@@ -43,7 +43,7 @@ var DSClient = (function () {
                     }
                 }
                 else {
-                    var returnObject = { url: data.link, success: true };
+                    let returnObject = { url: data.link, success: true };
                     if (callback) {
                         return callback(null, returnObject);
                     }
@@ -53,14 +53,12 @@ var DSClient = (function () {
                 }
             });
         }
-    };
-    DSClient.prototype.register = function (registrationData, callback) {
+    }
+    register(registrationData, callback) {
         return this.connection.put(this.url, DEVICE + SEPARATOR + registrationData.uuid, registrationData, undefined, undefined, callback);
-    };
-    DSClient.prototype.sync = function (syncData, callback) {
+    }
+    sync(syncData, callback) {
         return this.connection.post(this.url, DEVICE + SEPARATOR + syncData.uuid, syncData, undefined, undefined, callback);
-    };
-    return DSClient;
-}());
-export { DSClient };
+    }
+}
 //# sourceMappingURL=DSClient.js.map

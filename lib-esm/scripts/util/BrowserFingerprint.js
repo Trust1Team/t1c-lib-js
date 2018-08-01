@@ -2,14 +2,12 @@ import * as store from 'store2';
 import * as Base64 from 'Base64';
 import * as uuid from 'uuid/v4';
 import * as sha from 'sha256';
-var BrowserFingerprint = (function () {
-    function BrowserFingerprint() {
-    }
-    BrowserFingerprint.get = function () {
+export class BrowserFingerprint {
+    static get() {
         return BrowserFingerprint.checkValidFingerprint();
-    };
-    BrowserFingerprint.checkValidFingerprint = function () {
-        var fingerPrint;
+    }
+    static checkValidFingerprint() {
+        let fingerPrint;
         try {
             fingerPrint = store(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION);
         }
@@ -23,26 +21,24 @@ var BrowserFingerprint = (function () {
         else {
             return BrowserFingerprint.generateFingerprint();
         }
-    };
-    BrowserFingerprint.validateFingerprint = function (print) {
-        var resolvedToken = Base64.atob(print);
-        var checkbits = resolvedToken.substring(resolvedToken.length - 8, resolvedToken.length);
-        var initUuid = resolvedToken.substring(0, resolvedToken.length - 9);
-        var initUuidSha = sha(initUuid);
-        var tobeverifiedbits = initUuidSha.substring(initUuidSha.length - 8, initUuidSha.length);
+    }
+    static validateFingerprint(print) {
+        const resolvedToken = Base64.atob(print);
+        const checkbits = resolvedToken.substring(resolvedToken.length - 8, resolvedToken.length);
+        const initUuid = resolvedToken.substring(0, resolvedToken.length - 9);
+        const initUuidSha = sha(initUuid);
+        const tobeverifiedbits = initUuidSha.substring(initUuidSha.length - 8, initUuidSha.length);
         return tobeverifiedbits === checkbits;
-    };
-    BrowserFingerprint.generateFingerprint = function () {
-        var browserId = uuid();
-        var sha256BrowserId = sha(browserId);
-        var checkbits = sha256BrowserId.substring(sha256BrowserId.length - 8, sha256BrowserId.length);
-        var resolvedToken = browserId + '-' + checkbits;
-        var token = Base64.btoa(browserId + '-' + checkbits);
+    }
+    static generateFingerprint() {
+        const browserId = uuid();
+        const sha256BrowserId = sha(browserId);
+        const checkbits = sha256BrowserId.substring(sha256BrowserId.length - 8, sha256BrowserId.length);
+        const resolvedToken = browserId + '-' + checkbits;
+        const token = Base64.btoa(browserId + '-' + checkbits);
         store(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION, token);
         return token;
-    };
-    BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION = 't1c-js-browser-id-token';
-    return BrowserFingerprint;
-}());
-export { BrowserFingerprint };
+    }
+}
+BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION = 't1c-js-browser-id-token';
 //# sourceMappingURL=BrowserFingerprint.js.map

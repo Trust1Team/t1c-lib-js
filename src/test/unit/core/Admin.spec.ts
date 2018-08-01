@@ -4,19 +4,22 @@
  */
 
 import { expect } from 'chai';
-import * as axios from 'axios';
-import * as MockAdapter from 'axios-mock-adapter';
 import { GCLConfig } from '../../../scripts/core/GCLConfig';
 import { AdminService } from '../../../scripts/core/admin/admin';
-import {LocalAuthAdminConnection} from "../../../scripts/core/client/Connection";
+import {LocalAdminConnection, LocalAuthAdminConnection} from '../../../scripts/core/client/Connection';
+import {ContainerSyncRequest} from '../../..';
+import MockAdapter from 'axios-mock-adapter';
+import axios from 'axios';
 
 describe('Admin Services', () => {
     let gclConfig = new GCLConfig({});
     const connection: LocalAuthAdminConnection = new LocalAuthAdminConnection(gclConfig);
-    let admin = new AdminService('', connection);
-    let mock: MockAdapter;
+    const noAuthConnection: LocalAdminConnection = new LocalAdminConnection(gclConfig);
+    let admin = new AdminService('', connection, noAuthConnection);
+    let mock;
 
     beforeEach(() => {
+
         mock = new MockAdapter(axios);
     });
 
@@ -77,7 +80,7 @@ describe('Admin Services', () => {
         });
 
         it('makes the correct call to set pub key', () => {
-            return admin.setPubKey({ encryptedAesKey: 'aeskey', encryptedPublicKey: 'pubkey' }).then(res => {
+            return admin.setPubKey({ encryptedAesKey: 'aeskey', encryptedPublicKey: 'pubkey', ns: '' }).then(res => {
                 expect(res).to.have.property('success');
                 expect(res.success).to.be.a('boolean');
                 expect(res.success).to.eq(true);
@@ -97,7 +100,7 @@ describe('Admin Services', () => {
         });
 
         it('makes the correct call to set pub key', () => {
-            return admin.updateContainerConfig('containerConfig').then(res => {
+            return admin.updateContainerConfig(new ContainerSyncRequest(undefined)).then(res => {
                 expect(res).to.have.property('success');
                 expect(res.success).to.be.a('boolean');
                 expect(res.success).to.eq(true);

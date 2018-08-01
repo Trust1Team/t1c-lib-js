@@ -1,26 +1,20 @@
 import * as _ from 'lodash';
-var Options = (function () {
-    function Options(parseCerts, filters) {
+export class Options {
+    constructor(parseCerts, filters) {
         this.parseCerts = parseCerts;
         this.filters = filters;
     }
-    return Options;
-}());
-export { Options };
-var RequestOptions = (function () {
-    function RequestOptions(parseCerts, params, callback) {
+}
+export class RequestOptions {
+    constructor(parseCerts, params, callback) {
         this.parseCerts = parseCerts;
         this.params = params;
         this.callback = callback;
     }
-    return RequestOptions;
-}());
-export { RequestOptions };
-var RequestHandler = (function () {
-    function RequestHandler() {
-    }
-    RequestHandler.determineOptions = function (firstParam, secondParam) {
-        var result = new RequestOptions(false);
+}
+export class RequestHandler {
+    static determineOptions(firstParam, secondParam) {
+        let result = new RequestOptions(false);
         if (firstParam) {
             if (typeof firstParam === 'function') {
                 result.callback = firstParam;
@@ -38,9 +32,9 @@ var RequestHandler = (function () {
             }
         }
         return result;
-    };
-    RequestHandler.determineOptionsWithFilter = function (firstParam) {
-        var result = new RequestOptions(false, {});
+    }
+    static determineOptionsWithFilter(firstParam) {
+        let result = new RequestOptions(false, {});
         if (_.isArray(firstParam)) {
             if (firstParam.length) {
                 result.params.filter = firstParam.join(',');
@@ -57,8 +51,6 @@ var RequestHandler = (function () {
             }
         }
         return result;
-    };
-    return RequestHandler;
-}());
-export { RequestHandler };
+    }
+}
 //# sourceMappingURL=RequestHandler.js.map
