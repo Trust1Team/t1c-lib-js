@@ -4,8 +4,8 @@
  */
 
 import { expect } from 'chai';
-import * as axios from 'axios';
-import * as MockAdapter from 'axios-mock-adapter';
+import MockAdapter from 'axios-mock-adapter';
+import axios from 'axios';
 import { GCLConfig } from '../../../../scripts/core/GCLConfig';
 import { LocalConnection } from '../../../../scripts/core/client/Connection';
 import { PluginFactory } from '../../../../scripts/plugins/PluginFactory';
@@ -80,7 +80,7 @@ describe('Generic cards and containers', () => {
                 expect(res).to.have.property('data');
                 expect(res.data).to.be.a('object');
                 expect(res.data, 'Filter property not found when expected').to.have.property('filter');
-                expect(res.data.filter).to.eq('test1,test2');
+                expect(res.data.contracts).to.eq('test1,test2');
             });
         });
     });
@@ -186,7 +186,7 @@ describe('Generic cards and containers', () => {
         });
 
         it('can get a filtered subset of the certificates', () => {
-            return aventra.allCerts({ filters: [ 'cert1', 'cert2' ], parseCerts: false }).then(res => {
+            return aventra.allCerts(['cert1', 'cert2']).then(res => {
                 expect(res).to.have.property('success');
                 expect(res.success).to.be.a('boolean');
                 expect(res.success).to.eq(true);
@@ -194,7 +194,7 @@ describe('Generic cards and containers', () => {
                 expect(res).to.have.property('data');
                 expect(res.data).to.be.a('object');
                 expect(res.data, 'Filter property not found when expected').to.have.property('filter');
-                expect(res.data.filter, 'Incorrect filter parameter').to.eq('cert1,cert2');
+                expect(res.data.authentication_certificate, 'Incorrect filter parameter').to.eq('cert1,cert2');
             });
         });
 
@@ -298,27 +298,27 @@ describe('Generic cards and containers', () => {
             });
         });
 
-        it('can get algo refs for authentication', () => {
-            return piv.allAlgoRefsForAuthentication().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
-
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.an('array').of.length(3).contains('algo').contains('refs').contains('authentication');
-            });
-        });
-
-        it('can get algo refs for signing', () => {
-            return piv.allAlgoRefsForSigning().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
-
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.an('array').of.length(3).contains('algo').contains('refs').contains('signing');
-            });
-        });
+        // it('can get algo refs for authentication', () => {
+        //     return piv.allAlgoRefsForAuthentication().then(res => {
+        //         expect(res).to.have.property('success');
+        //         expect(res.success).to.be.a('boolean');
+        //         expect(res.success).to.eq(true);
+        //
+        //         expect(res).to.have.property('data');
+        //         expect(res.data).to.be.an('array').of.length(3).contains('algo').contains('refs').contains('authentication');
+        //     });
+        // });
+        //
+        // it('can get algo refs for signing', () => {
+        //     return piv.allAlgoRefsForSigning().then(res => {
+        //         expect(res).to.have.property('success');
+        //         expect(res.success).to.be.a('boolean');
+        //         expect(res.success).to.eq(true);
+        //
+        //         expect(res).to.have.property('data');
+        //         expect(res.data).to.be.an('array').of.length(3).contains('algo').contains('refs').contains('signing');
+        //     });
+        // });
 
         it('can get all certificates', () => {
             return piv.allCerts([], { pin: '0000' }).then(res => {
@@ -333,7 +333,7 @@ describe('Generic cards and containers', () => {
         });
 
         it('makes get a filtered subset of the certificates', () => {
-            return piv.allCerts({ filters: [ 'cert1', 'cert2' ], parseCerts: false }, { pin: '0000' }).then(res => {
+            return piv.allCerts(['cert1', 'cert2'], { pin: '0000' }).then(res => {
                 expect(res).to.have.property('success');
                 expect(res.success).to.be.a('boolean');
                 expect(res.success).to.eq(true);
@@ -341,7 +341,7 @@ describe('Generic cards and containers', () => {
                 expect(res).to.have.property('data');
                 expect(res.data).to.be.a('object');
                 expect(res.data, 'Filter property not found when expected').to.have.property('filter');
-                expect(res.data.filter, 'Incorrect filter parameter').to.eq('cert1,cert2');
+                expect(res.data.signing_certificate, 'Incorrect filter parameter').to.eq('cert1,cert2');
             });
         });
 

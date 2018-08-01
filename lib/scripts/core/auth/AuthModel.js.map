@@ -1,1 +1,1 @@
-{"version":3,"file":"AuthModel.js","sourceRoot":"","sources":["../../../../src/scripts/core/auth/AuthModel.ts"],"names":[],"mappings":";;AAeA;IACI,qBAAmB,KAAa;QAAb,UAAK,GAAL,KAAK,CAAQ;IAChC,CAAC;IACL,kBAAC;AAAD,CAAC,AAHD,IAGC;AAHY,kCAAW"}
+{"version":3,"file":"AuthModel.js","sourceRoot":"","sources":["../../../../src/scripts/core/auth/AuthModel.ts"],"names":[],"mappings":";;AAeA;IACI,YAAmB,KAAa;QAAb,UAAK,GAAL,KAAK,CAAQ;IAChC,CAAC;CACJ;AAHD,kCAGC"}

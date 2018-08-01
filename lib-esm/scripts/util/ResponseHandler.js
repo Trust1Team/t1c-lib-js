@@ -1,19 +1,15 @@
-var ResponseHandler = (function () {
-    function ResponseHandler() {
-    }
-    ResponseHandler.error = function (err, callback) {
+export class ResponseHandler {
+    static error(err, callback) {
         if (callback && typeof callback === 'function') {
             callback(err, null);
         }
         return Promise.reject(err);
-    };
-    ResponseHandler.response = function (data, callback) {
+    }
+    static response(data, callback) {
         if (callback && typeof callback === 'function') {
             callback(null, data);
         }
         return Promise.resolve(data);
-    };
-    return ResponseHandler;
-}());
-export { ResponseHandler };
+    }
+}
 //# sourceMappingURL=ResponseHandler.js.map

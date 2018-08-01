@@ -1,27 +1,13 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 import { DataObjectResponse } from '../../../../core/service/CoreModel';
-var BeidAddressResponse = (function (_super) {
-    __extends(BeidAddressResponse, _super);
-    function BeidAddressResponse(data, success) {
-        var _this = _super.call(this, data, success) || this;
-        _this.data = data;
-        _this.success = success;
-        return _this;
+export class BeidAddressResponse extends DataObjectResponse {
+    constructor(data, success) {
+        super(data, success);
+        this.data = data;
+        this.success = success;
     }
-    return BeidAddressResponse;
-}(DataObjectResponse));
-export { BeidAddressResponse };
-var BeidAddress = (function () {
-    function BeidAddress(municipality, raw_data, signature, street_and_number, version, zipcode) {
+}
+export class BeidAddress {
+    constructor(municipality, raw_data, signature, street_and_number, version, zipcode) {
         this.municipality = municipality;
         this.raw_data = raw_data;
         this.signature = signature;
@@ -29,44 +15,32 @@ var BeidAddress = (function () {
         this.version = version;
         this.zipcode = zipcode;
     }
-    return BeidAddress;
-}());
-export { BeidAddress };
-var BeidAllCertsResponse = (function (_super) {
-    __extends(BeidAllCertsResponse, _super);
-    function BeidAllCertsResponse(data, success) {
-        var _this = _super.call(this, data, success) || this;
-        _this.data = data;
-        _this.success = success;
-        return _this;
+}
+export class BeidAllCertsResponse extends DataObjectResponse {
+    constructor(data, success) {
+        super(data, success);
+        this.data = data;
+        this.success = success;
     }
-    return BeidAllCertsResponse;
-}(DataObjectResponse));
-export { BeidAllCertsResponse };
-var BeidAllCerts = (function () {
-    function BeidAllCerts(authentication_certificate, citizen_certificate, non_repudiation_certificate, root_certificate, rrn_certificate) {
+}
+export class BeidAllCerts {
+    constructor(authentication_certificate, citizen_certificate, non_repudiation_certificate, root_certificate, rrn_certificate) {
         this.authentication_certificate = authentication_certificate;
         this.citizen_certificate = citizen_certificate;
         this.non_repudiation_certificate = non_repudiation_certificate;
         this.root_certificate = root_certificate;
         this.rrn_certificate = rrn_certificate;
     }
-    return BeidAllCerts;
-}());
-export { BeidAllCerts };
-var BeidAllDataResponse = (function (_super) {
-    __extends(BeidAllDataResponse, _super);
-    function BeidAllDataResponse(data, success) {
-        var _this = _super.call(this, data, success) || this;
-        _this.data = data;
-        _this.success = success;
-        return _this;
+}
+export class BeidAllDataResponse extends BeidAllCertsResponse {
+    constructor(data, success) {
+        super(data, success);
+        this.data = data;
+        this.success = success;
     }
-    return BeidAllDataResponse;
-}(BeidAllCertsResponse));
-export { BeidAllDataResponse };
-var BeidAllData = (function () {
-    function BeidAllData(address, authentication_certificate, citizen_certificate, non_repudiation_certificate, picture, rn, root_certificate, rrn_certificate, token_data) {
+}
+export class BeidAllData {
+    constructor(address, authentication_certificate, citizen_certificate, non_repudiation_certificate, picture, rn, root_certificate, rrn_certificate, token_data) {
         this.address = address;
         this.authentication_certificate = authentication_certificate;
         this.citizen_certificate = citizen_certificate;
@@ -77,11 +51,9 @@ var BeidAllData = (function () {
         this.rrn_certificate = rrn_certificate;
         this.token_data = token_data;
     }
-    return BeidAllData;
-}());
-export { BeidAllData };
-var BeidTokenData = (function () {
-    function BeidTokenData(eid_compliant, electrical_perso_interface_version, electrical_perso_version, graphical_perso_version, label, prn_generation, raw_data, serial_number, version, version_rfu) {
+}
+export class BeidTokenData {
+    constructor(eid_compliant, electrical_perso_interface_version, electrical_perso_version, graphical_perso_version, label, prn_generation, raw_data, serial_number, version, version_rfu) {
         this.eid_compliant = eid_compliant;
         this.electrical_perso_interface_version = electrical_perso_interface_version;
         this.electrical_perso_version = electrical_perso_version;
@@ -93,22 +65,16 @@ var BeidTokenData = (function () {
         this.version = version;
         this.version_rfu = version_rfu;
     }
-    return BeidTokenData;
-}());
-export { BeidTokenData };
-var BeidTokenDataResponse = (function (_super) {
-    __extends(BeidTokenDataResponse, _super);
-    function BeidTokenDataResponse(data, success) {
-        var _this = _super.call(this, data, success) || this;
-        _this.data = data;
-        _this.success = success;
-        return _this;
+}
+export class BeidTokenDataResponse extends DataObjectResponse {
+    constructor(data, success) {
+        super(data, success);
+        this.data = data;
+        this.success = success;
     }
-    return BeidTokenDataResponse;
-}(DataObjectResponse));
-export { BeidTokenDataResponse };
-var BeidRnData = (function () {
-    function BeidRnData(birth_date, birth_location, card_delivery_municipality, card_number, card_validity_date_begin, card_validity_date_end, chip_number, document_type, first_names, name, national_number, nationality, noble_condition, picture_hash, raw_data, sex, signature, special_status, third_name, version) {
+}
+export class BeidRnData {
+    constructor(birth_date, birth_location, card_delivery_municipality, card_number, card_validity_date_begin, card_validity_date_end, chip_number, document_type, first_names, name, national_number, nationality, noble_condition, picture_hash, raw_data, sex, signature, special_status, third_name, version) {
         this.birth_date = birth_date;
         this.birth_location = birth_location;
         this.card_delivery_municipality = card_delivery_municipality;
@@ -130,18 +96,12 @@ var BeidRnData = (function () {
         this.third_name = third_name;
         this.version = version;
     }
-    return BeidRnData;
-}());
-export { BeidRnData };
-var BeidRnDataResponse = (function (_super) {
-    __extends(BeidRnDataResponse, _super);
-    function BeidRnDataResponse(data, success) {
-        var _this = _super.call(this, data, success) || this;
-        _this.data = data;
-        _this.success = success;
-        return _this;
+}
+export class BeidRnDataResponse extends DataObjectResponse {
+    constructor(data, success) {
+        super(data, success);
+        this.data = data;
+        this.success = success;
     }
-    return BeidRnDataResponse;
-}(DataObjectResponse));
-export { BeidRnDataResponse };
+}
 //# sourceMappingURL=EidBeModel.js.map

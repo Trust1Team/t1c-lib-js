@@ -1,17 +1,18 @@
 
-import { expect } from "chai";
-import { LocalConnection, LocalAuthConnection } from "../../../scripts/core/client/Connection";
-import { GCLConfig } from "../../../scripts/core/GCLConfig";
-import { CoreService } from "../../../scripts/core/service/CoreService";
-import { PluginFactory } from "../../../scripts/plugins/PluginFactory";
+import { expect } from 'chai';
+import { LocalConnection, LocalAuthConnection } from '../../../scripts/core/client/Connection';
+import {GCLConfig, GCLConfigOptions} from '../../../scripts/core/GCLConfig';
+import { CoreService } from '../../../scripts/core/service/CoreService';
+import { PluginFactory } from '../../../scripts/plugins/PluginFactory';
 
-describe("Plugin-Belgian eID", () => {
-    let gclUnderTest = "https://localhost:10443/v1";
+describe('Plugin-Belgian eID', () => {
+    let gclUnderTest = 'https://localhost:10443/v2';
     let localAuthConnection: LocalAuthConnection;
     let coreService;
     let cardFactory;
     let beidPlugin;
-    let config = new GCLConfig("https://dist.t1t.be/v1", "someapikey");
+    let configOptions = new GCLConfigOptions(gclUnderTest, 'https://dist.t1t.be/');
+    let config = new GCLConfig(configOptions);
 
 
     beforeEach(() => {
@@ -21,25 +22,24 @@ describe("Plugin-Belgian eID", () => {
         beidPlugin = cardFactory.createEidBE();
     });
 
-    describe("Belgian eID Test Cases", () => {
+    describe('Belgian eID Test Cases', () => {
 
-        it("should verify an existing local authentication connection instance", () => {
+        it('should verify an existing local authentication connection instance', () => {
             expect(localAuthConnection).not.undefined;
         });
 
-        it("should verify an existing core service instance", () => {
+        it('should verify an existing core service instance', () => {
             expect(coreService).not.undefined;
         });
 
-        it("should verify an existing card factory instance", () => {
+        it('should verify an existing card factory instance', () => {
             expect(cardFactory).not.undefined;
         });
 
-        it("should return a belgian eid instance", () => {
+        it('should return a belgian eid instance', () => {
             expect(beidPlugin).not.undefined;
         });
 
     });
 });
-
 

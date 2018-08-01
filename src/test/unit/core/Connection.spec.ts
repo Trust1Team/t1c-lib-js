@@ -4,8 +4,8 @@
  */
 
 import { expect } from 'chai';
-import * as axios from 'axios';
-import * as MockAdapter from 'axios-mock-adapter';
+import MockAdapter from 'axios-mock-adapter';
+import axios from 'axios';
 import { GCLConfig } from '../../../scripts/core/GCLConfig';
 import { GenericConnection, LocalConnection } from '../../../scripts/core/client/Connection';
 import * as store from 'store2';

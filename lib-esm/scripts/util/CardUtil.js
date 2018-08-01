@@ -1,10 +1,8 @@
 import * as _ from 'lodash';
 import { Options } from './RequestHandler';
-var CardUtil = (function () {
-    function CardUtil() {
-    }
-    CardUtil.canAuthenticate = function (card) {
-        var container = this.determineContainer(card);
+export class CardUtil {
+    static canAuthenticate(card) {
+        let container = this.determineContainer(card);
         switch (container) {
             case 'aventra':
             case 'beid':
@@ -21,9 +19,9 @@ var CardUtil = (function () {
             default:
                 return false;
         }
-    };
-    CardUtil.canSign = function (card) {
-        var container = this.determineContainer(card);
+    }
+    static canSign(card) {
+        let container = this.determineContainer(card);
         switch (container) {
             case 'aventra':
             case 'beid':
@@ -41,9 +39,9 @@ var CardUtil = (function () {
             default:
                 return false;
         }
-    };
-    CardUtil.canVerifyPin = function (card) {
-        var container = this.determineContainer(card);
+    }
+    static canVerifyPin(card) {
+        let container = this.determineContainer(card);
         switch (container) {
             case 'aventra':
             case 'beid':
@@ -60,8 +58,8 @@ var CardUtil = (function () {
             default:
                 return false;
         }
-    };
-    CardUtil.determineContainer = function (card) {
+    }
+    static determineContainer(card) {
         if (!_.isEmpty(card) && !_.isEmpty(card.description)) {
             if (findDescription(card.description, 'Belgium Electronic ID card')) {
                 return 'beid';
@@ -109,14 +107,14 @@ var CardUtil = (function () {
             return undefined;
         }
         function findDescription(descriptions, toFind) {
-            return !!_.find(descriptions, function (desc) {
-                var lowercaseDesc = desc.toLowerCase();
-                var lowercaseToFind = toFind.toLowerCase();
+            return !!_.find(descriptions, desc => {
+                const lowercaseDesc = desc.toLowerCase();
+                const lowercaseToFind = toFind.toLowerCase();
                 return lowercaseDesc.indexOf(lowercaseToFind) > -1;
             });
         }
-    };
-    CardUtil.defaultAlgo = function (container) {
+    }
+    static defaultAlgo(container) {
         switch (container) {
             case 'aventra':
             case 'beid':
@@ -131,8 +129,8 @@ var CardUtil = (function () {
             default:
                 return undefined;
         }
-    };
-    CardUtil.dumpMethod = function (container) {
+    }
+    static dumpMethod(container) {
         switch (container) {
             case 'aventra':
             case 'beid':
@@ -151,8 +149,8 @@ var CardUtil = (function () {
             default:
                 return undefined;
         }
-    };
-    CardUtil.dumpOptions = function (container) {
+    }
+    static dumpOptions(container) {
         switch (container) {
             case 'aventra':
             case 'beid':
@@ -172,8 +170,6 @@ var CardUtil = (function () {
             default:
                 return undefined;
         }
-    };
-    return CardUtil;
-}());
-export { CardUtil };
+    }
+}
 //# sourceMappingURL=CardUtil.js.map

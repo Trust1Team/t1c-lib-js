@@ -2,7 +2,7 @@ import axios from 'axios';
 import * as jwtDecode from 'jwt-decode';
 import * as moment from 'moment';
 import { T1CLibException } from './exceptions/CoreExceptions';
-var defaults = {
+const defaults = {
     gclUrl: 'https://localhost:10443/v2',
     dsContextPath: '/trust1team/gclds/v2',
     ocvContextPath: '/trust1team/ocv-api/v1',
@@ -19,8 +19,8 @@ var defaults = {
     osPinDialog: false,
     containerDownloadTimeout: 30
 };
-var GCLConfigOptions = (function () {
-    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, gwJwt, ocvContextPath, dsContextPath, dsFileContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode, lang, providedContainers) {
+export class GCLConfigOptions {
+    constructor(gclUrl, gwOrProxyUrl, apiKey, gwJwt, ocvContextPath, dsContextPath, dsFileContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode, lang, providedContainers) {
         this.gclUrl = gclUrl;
         this.gwOrProxyUrl = gwOrProxyUrl;
         this.apiKey = apiKey;
@@ -42,11 +42,9 @@ var GCLConfigOptions = (function () {
         this.lang = lang;
         this.providedContainers = providedContainers;
     }
-    return GCLConfigOptions;
-}());
-export { GCLConfigOptions };
-var GCLConfig = (function () {
-    function GCLConfig(options) {
+}
+export class GCLConfig {
+    constructor(options) {
         if (options) {
             if (options.gclUrl) {
                 this._gclUrl = options.gclUrl;
@@ -174,319 +172,206 @@ var GCLConfig = (function () {
             }
         }
     }
-    Object.defineProperty(GCLConfig.prototype, "authUrl", {
-        get: function () {
-            return this.gwUrl + defaults.tokenExchangeContextPath;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "ocvUrl", {
-        get: function () {
-            if (!this.gwUrl) {
-                return undefined;
+    get authUrl() {
+        return this.gwUrl + defaults.tokenExchangeContextPath;
+    }
+    get ocvUrl() {
+        if (!this.gwUrl) {
+            return undefined;
+        }
+        else {
+            return this.gwUrl + this.ocvContextPath;
+        }
+    }
+    get ocvContextPath() {
+        return this._ocvContextPath;
+    }
+    set ocvContextPath(value) {
+        this._ocvContextPath = value;
+    }
+    get gclUrl() {
+        return this._gclUrl;
+    }
+    set gclUrl(value) {
+        this._gclUrl = value || defaults.gclUrl;
+    }
+    get dsUrl() {
+        if (!this.gwUrl) {
+            return undefined;
+        }
+        else {
+            return this.gwUrl + this.dsContextPath;
+        }
+    }
+    get dsContextPath() {
+        return this._dsContextPath;
+    }
+    set dsContextPath(value) {
+        this._dsContextPath = value;
+    }
+    get dsFileContextPath() {
+        return this._dsFileContextPath;
+    }
+    set dsFileContextPath(value) {
+        this._dsFileContextPath = value;
+    }
+    get apiKey() {
+        return this._apiKey;
+    }
+    set apiKey(value) {
+        this._apiKey = value;
+    }
+    get citrix() {
+        return this._citrix;
+    }
+    set citrix(value) {
+        this._citrix = value;
+    }
+    get agentPort() {
+        return this._agentPort;
+    }
+    set agentPort(value) {
+        this._agentPort = value;
+    }
+    get dsFileDownloadUrl() {
+        if (!this.gwUrl) {
+            return undefined;
+        }
+        else {
+            return this.gwUrl + this.dsFileContextPath;
+        }
+    }
+    get gwUrl() {
+        return this._gwUrl;
+    }
+    set gwUrl(value) {
+        this._gwUrl = value;
+    }
+    get localTestMode() {
+        return this._localTestMode;
+    }
+    set localTestMode(value) {
+        this._localTestMode = value;
+    }
+    get forceHardwarePinpad() {
+        return this._forceHardwarePinpad;
+    }
+    set forceHardwarePinpad(value) {
+        this._forceHardwarePinpad = value;
+    }
+    get defaultSessionTimeout() {
+        return this._defaultSessionTimeout;
+    }
+    set defaultSessionTimeout(value) {
+        this._defaultSessionTimeout = value;
+    }
+    get tokenCompatible() {
+        return this._tokenCompatible;
+    }
+    set tokenCompatible(value) {
+        this._tokenCompatible = value;
+    }
+    get v2Compatible() {
+        return this._v2Compatible;
+    }
+    set v2Compatible(value) {
+        this._v2Compatible = value;
+    }
+    get defaultConsentDuration() {
+        return this._defaultConsentDuration;
+    }
+    set defaultConsentDuration(value) {
+        this._defaultConsentDuration = value;
+    }
+    get defaultConsentTimeout() {
+        return this._defaultConsentTimeout;
+    }
+    set defaultConsentTimeout(value) {
+        this._defaultConsentTimeout = value;
+    }
+    get pkcs11Config() {
+        return this._pkcs11Config;
+    }
+    set pkcs11Config(value) {
+        this._pkcs11Config = value;
+    }
+    get osPinDialog() {
+        return this._osPinDialog;
+    }
+    set osPinDialog(value) {
+        this._osPinDialog = value;
+    }
+    get containerDownloadTimeout() {
+        return this._containerDownloadTimeout;
+    }
+    set containerDownloadTimeout(value) {
+        this._containerDownloadTimeout = value;
+    }
+    get gwJwt() {
+        if (!this.gwUrl) {
+            return new Promise((resolve, reject) => {
+                resolve('none');
+            });
+        }
+        let self = this;
+        return new Promise((resolve, reject) => {
+            if (!self._gwJwt || !self._gwJwt.length) {
+                resolve(self.getGwJwt());
             }
             else {
-                return this.gwUrl + this.ocvContextPath;
-            }
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "ocvContextPath", {
-        get: function () {
-            return this._ocvContextPath;
-        },
-        set: function (value) {
-            this._ocvContextPath = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "gclUrl", {
-        get: function () {
-            return this._gclUrl;
-        },
-        set: function (value) {
-            this._gclUrl = value || defaults.gclUrl;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "dsUrl", {
-        get: function () {
-            if (!this.gwUrl) {
-                return undefined;
-            }
-            else {
-                return this.gwUrl + this.dsContextPath;
-            }
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "dsContextPath", {
-        get: function () {
-            return this._dsContextPath;
-        },
-        set: function (value) {
-            this._dsContextPath = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "dsFileContextPath", {
-        get: function () {
-            return this._dsFileContextPath;
-        },
-        set: function (value) {
-            this._dsFileContextPath = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "apiKey", {
-        get: function () {
-            return this._apiKey;
-        },
-        set: function (value) {
-            this._apiKey = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "citrix", {
-        get: function () {
-            return this._citrix;
-        },
-        set: function (value) {
-            this._citrix = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "agentPort", {
-        get: function () {
-            return this._agentPort;
-        },
-        set: function (value) {
-            this._agentPort = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "dsFileDownloadUrl", {
-        get: function () {
-            if (!this.gwUrl) {
-                return undefined;
-            }
-            else {
-                return this.gwUrl + this.dsFileContextPath;
-            }
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "gwUrl", {
-        get: function () {
-            return this._gwUrl;
-        },
-        set: function (value) {
-            this._gwUrl = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "localTestMode", {
-        get: function () {
-            return this._localTestMode;
-        },
-        set: function (value) {
-            this._localTestMode = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "forceHardwarePinpad", {
-        get: function () {
-            return this._forceHardwarePinpad;
-        },
-        set: function (value) {
-            this._forceHardwarePinpad = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "defaultSessionTimeout", {
-        get: function () {
-            return this._defaultSessionTimeout;
-        },
-        set: function (value) {
-            this._defaultSessionTimeout = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "tokenCompatible", {
-        get: function () {
-            return this._tokenCompatible;
-        },
-        set: function (value) {
-            this._tokenCompatible = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "v2Compatible", {
-        get: function () {
-            return this._v2Compatible;
-        },
-        set: function (value) {
-            this._v2Compatible = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "defaultConsentDuration", {
-        get: function () {
-            return this._defaultConsentDuration;
-        },
-        set: function (value) {
-            this._defaultConsentDuration = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "defaultConsentTimeout", {
-        get: function () {
-            return this._defaultConsentTimeout;
-        },
-        set: function (value) {
-            this._defaultConsentTimeout = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "pkcs11Config", {
-        get: function () {
-            return this._pkcs11Config;
-        },
-        set: function (value) {
-            this._pkcs11Config = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "osPinDialog", {
-        get: function () {
-            return this._osPinDialog;
-        },
-        set: function (value) {
-            this._osPinDialog = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "containerDownloadTimeout", {
-        get: function () {
-            return this._containerDownloadTimeout;
-        },
-        set: function (value) {
-            this._containerDownloadTimeout = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "gwJwt", {
-        get: function () {
-            if (!this.gwUrl) {
-                return new Promise(function (resolve, reject) {
-                    resolve('none');
-                });
-            }
-            var self = this;
-            return new Promise(function (resolve, reject) {
-                if (!self._gwJwt || !self._gwJwt.length) {
+                let decoded = jwtDecode(self._gwJwt);
+                if (decoded < moment(new Date()).format('X')) {
                     resolve(self.getGwJwt());
                 }
                 else {
-                    var decoded = jwtDecode(self._gwJwt);
-                    if (decoded < moment(new Date()).format('X')) {
-                        resolve(self.getGwJwt());
-                    }
-                    else {
-                        resolve(self._gwJwt);
-                    }
+                    resolve(self._gwJwt);
                 }
-            });
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "contextToken", {
-        get: function () {
-            return this._contextToken;
-        },
-        set: function (value) {
-            this._contextToken = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "gclJwt", {
-        get: function () {
-            return this._gclJwt;
-        },
-        set: function (value) {
-            this._gclJwt = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "lang", {
-        get: function () {
-            return this._lang;
-        },
-        set: function (value) {
-            this._lang = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "overrideContainers", {
-        get: function () {
-            return this._providedContainers;
-        },
-        set: function (value) {
-            this._providedContainers = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(GCLConfig.prototype, "activeContainers", {
-        get: function () {
-            return this._activeContainers;
-        },
-        set: function (value) {
-            this._activeContainers = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    GCLConfig.prototype.getGwJwt = function () {
-        var _this = this;
+            }
+        });
+    }
+    get contextToken() {
+        return this._contextToken;
+    }
+    set contextToken(value) {
+        this._contextToken = value;
+    }
+    get gclJwt() {
+        return this._gclJwt;
+    }
+    set gclJwt(value) {
+        this._gclJwt = value;
+    }
+    get lang() {
+        return this._lang;
+    }
+    set lang(value) {
+        this._lang = value;
+    }
+    get overrideContainers() {
+        return this._providedContainers;
+    }
+    set overrideContainers(value) {
+        this._providedContainers = value;
+    }
+    get activeContainers() {
+        return this._activeContainers;
+    }
+    set activeContainers(value) {
+        this._activeContainers = value;
+    }
+    getGwJwt() {
         if (this.apiKey && this.apiKey.length) {
-            var config_1 = {
+            let config = {
                 url: this.authUrl + '/login/application/token',
                 method: 'GET',
                 headers: { apikey: this.apiKey },
                 responseType: 'json'
             };
-            return new Promise(function (resolve, reject) {
-                axios.request(config_1).then(function (response) {
-                    _this._gwJwt = response.data.token;
+            return new Promise((resolve, reject) => {
+                axios.request(config).then((response) => {
+                    this._gwJwt = response.data.token;
                     resolve(response.data.token);
-                }, function (err) {
+                }, err => {
                     reject(err);
                 });
             });
@@ -499,8 +384,6 @@ var GCLConfig = (function () {
                 return Promise.reject(new T1CLibException(412, '901', 'No JWT or API key found in configuration'));
             }
         }
-    };
-    return GCLConfig;
-}());
-export { GCLConfig };
+    }
+}
 //# sourceMappingURL=GCLConfig.js.map

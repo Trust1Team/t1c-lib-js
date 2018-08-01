@@ -1,8 +1,6 @@
-var JWTResponse = (function () {
-    function JWTResponse(token) {
+export class JWTResponse {
+    constructor(token) {
         this.token = token;
     }
-    return JWTResponse;
-}());
-export { JWTResponse };
+}
 //# sourceMappingURL=AuthModel.js.map

@@ -1,29 +1,27 @@
-var CHALLENGE = '/challenge';
-var CERTIFICATE = '/certs/validate-chain';
-var SYSTEM_STATUS = '/system/status';
-var SIGNATURE = '/signature/validate';
-var OCVClient = (function () {
-    function OCVClient(url, connection) {
+const CHALLENGE = '/challenge';
+const CERTIFICATE = '/certs/validate-chain';
+const SYSTEM_STATUS = '/system/status';
+const SIGNATURE = '/signature/validate';
+export class OCVClient {
+    constructor(url, connection) {
         this.url = url;
         this.connection = connection;
     }
-    OCVClient.prototype.getUrl = function () { return this.url; };
-    OCVClient.prototype.validateSignature = function (data, callback) {
+    getUrl() { return this.url; }
+    validateSignature(data, callback) {
         return this.connection.post(this.url, SIGNATURE, data, undefined, undefined, callback);
-    };
-    OCVClient.prototype.getInfo = function (callback) {
+    }
+    getInfo(callback) {
         return this.connection.get(this.getUrl(), SYSTEM_STATUS, undefined, undefined, callback);
-    };
-    OCVClient.prototype.getChallenge = function (digestAlgorithm, callback) {
+    }
+    getChallenge(digestAlgorithm, callback) {
         return this.connection.get(this.url, CHALLENGE, { digest: digestAlgorithm }, undefined, callback);
-    };
-    OCVClient.prototype.validateChallengeSignedHash = function (data, callback) {
+    }
+    validateChallengeSignedHash(data, callback) {
         return this.connection.post(this.url, CHALLENGE, data, undefined, undefined, callback);
-    };
-    OCVClient.prototype.validateCertificateChain = function (data, callback) {
+    }
+    validateCertificateChain(data, callback) {
         return this.connection.post(this.url, CERTIFICATE, data, undefined, undefined, callback);
-    };
-    return OCVClient;
-}());
-export { OCVClient };
+    }
+}
 //# sourceMappingURL=OCVClient.js.map

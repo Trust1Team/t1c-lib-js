@@ -1,18 +1,16 @@
-var AgentClient = (function () {
-    function AgentClient(url, connection) {
+export class AgentClient {
+    constructor(url, connection) {
         this.url = url;
         this.connection = connection;
     }
-    AgentClient.urlPrefix = function (port) {
+    static urlPrefix(port) {
         return AgentClient.AGENT_PATH + '/' + port;
-    };
-    AgentClient.prototype.get = function (username, callback) {
-        var body = { AGENT_MATCH_PARAM: username };
+    }
+    get(username, callback) {
+        let body = { AGENT_MATCH_PARAM: username };
         return this.connection.postSkipCitrix(this.url, AgentClient.AGENT_PATH, undefined, body, undefined, callback);
-    };
-    AgentClient.AGENT_PATH = '/agent';
-    AgentClient.AGENT_MATCH_PARAM = 'username';
-    return AgentClient;
-}());
-export { AgentClient };
+    }
+}
+AgentClient.AGENT_PATH = '/agent';
+AgentClient.AGENT_MATCH_PARAM = 'username';
 //# sourceMappingURL=agent.js.map

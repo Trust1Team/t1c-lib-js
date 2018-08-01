@@ -1,13 +1,9 @@
-var ClientService = (function () {
-    function ClientService() {
-    }
-    ClientService.getClient = function () {
+export class ClientService {
+    static getClient() {
         return ClientService.client;
-    };
-    ClientService.setClient = function (newClient) {
+    }
+    static setClient(newClient) {
         ClientService.client = newClient;
-    };
-    return ClientService;
-}());
-export { ClientService };
+    }
+}
 //# sourceMappingURL=ClientService.js.map

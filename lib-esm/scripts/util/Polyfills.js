@@ -1,8 +1,6 @@
-var Polyfills = (function () {
-    function Polyfills() {
-    }
-    Polyfills.check = function () {
-        var windowToCheck = window;
+export class Polyfills {
+    static check() {
+        let windowToCheck = window;
         if (!windowToCheck.Promise) {
             console.log('T1C-JS Lib: applying polyfill for ES6 Promise');
             require('es6-promise').polyfill();
@@ -35,8 +33,6 @@ var Polyfills = (function () {
                 return this.substring(this_len - search.length, this_len) === search;
             };
         }
-    };
-    return Polyfills;
-}());
-export { Polyfills };
+    }
+}
 //# sourceMappingURL=Polyfills.js.map

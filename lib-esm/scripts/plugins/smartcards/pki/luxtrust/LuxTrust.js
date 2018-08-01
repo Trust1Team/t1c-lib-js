@@ -1,35 +1,22 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 import { GenericCertCard } from '../../Card';
 import { RequestHandler } from '../../../../util/RequestHandler';
-var LuxTrust = (function (_super) {
-    __extends(LuxTrust, _super);
-    function LuxTrust(baseUrl, containerUrl, connection, reader_id) {
-        return _super.call(this, baseUrl, containerUrl, connection, reader_id, LuxTrust.CONTAINER_PREFIX) || this;
+export class LuxTrust extends GenericCertCard {
+    constructor(baseUrl, containerUrl, connection, reader_id) {
+        super(baseUrl, containerUrl, connection, reader_id, LuxTrust.CONTAINER_PREFIX);
     }
-    LuxTrust.prototype.activated = function (callback) {
+    activated(callback) {
         return this.connection.get(this.baseUrl, this.containerSuffix(LuxTrust.ACTIVATED), undefined, undefined, callback);
-    };
-    LuxTrust.prototype.rootCertificate = function (options, callback) {
+    }
+    rootCertificate(options, callback) {
         return this.getCertificate(LuxTrust.CERT_ROOT, RequestHandler.determineOptions(options, callback));
-    };
-    LuxTrust.prototype.authenticationCertificate = function (options, callback) {
+    }
+    authenticationCertificate(options, callback) {
         return this.getCertificate(LuxTrust.CERT_AUTHENTICATION, RequestHandler.determineOptions(options, callback));
-    };
-    LuxTrust.prototype.signingCertificate = function (options, callback) {
+    }
+    signingCertificate(options, callback) {
         return this.getCertificate(LuxTrust.CERT_SIGNING, RequestHandler.determineOptions(options, callback));
-    };
-    LuxTrust.CONTAINER_PREFIX = 'luxtrust';
-    LuxTrust.ACTIVATED = '/activated';
-    return LuxTrust;
-}(GenericCertCard));
-export { LuxTrust };
+    }
+}
+LuxTrust.CONTAINER_PREFIX = 'luxtrust';
+LuxTrust.ACTIVATED = '/activated';
 //# sourceMappingURL=LuxTrust.js.map

@@ -3,8 +3,8 @@
  * @since 2017
  */
 import { expect } from 'chai';
-import * as axios from 'axios';
-import * as MockAdapter from 'axios-mock-adapter';
+import MockAdapter from 'axios-mock-adapter';
+import axios from 'axios';
 import { GCLConfig } from '../../../../scripts/core/GCLConfig';
 import { LocalConnection } from '../../../../scripts/core/client/Connection';
 import { PluginFactory } from '../../../../scripts/plugins/PluginFactory';

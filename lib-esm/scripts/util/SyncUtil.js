@@ -4,16 +4,15 @@ import * as _ from 'lodash';
 import { T1CLibException } from '../core/exceptions/CoreExceptions';
 import { ContainerSyncRequest } from '../core/admin/adminModel';
 import { ActivatedContainerUtil } from './ActivatedContainerUtil';
-var SyncUtil = (function () {
-    function SyncUtil() {
-    }
-    SyncUtil.unManagedSynchronization = function (client, mergedInfo, uuid, containers) {
-        return new Promise(function (resolve, reject) {
+export class SyncUtil {
+    constructor() { }
+    static unManagedSynchronization(client, mergedInfo, uuid, containers) {
+        return new Promise((resolve, reject) => {
             console.log(client);
             if (client.ds()) {
-                SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, false).then(function () {
+                SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, false).then(() => {
                     resolve();
-                }).catch(function (err) {
+                }).catch(err => {
                     reject(err);
                 });
             }
@@ -21,23 +20,23 @@ var SyncUtil = (function () {
                 resolve();
             }
         });
-    };
-    SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
-        return client.ds().then(function (ds) {
+    }
+    static syncDevice(client, pubKey, info, deviceId, containers) {
+        return client.ds().then(ds => {
             return ds.sync(new DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientInfo('JAVASCRIPT', '%%GULP_INJECT_VERSION%%'), info.namespace, containers));
         });
-    };
-    SyncUtil.doSyncFlow = function (client, mergedInfo, uuid, containers, isRetry) {
-        return client.admin().getPubKey().then(function (pubKey) {
-            return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, containers).then(function (device) {
+    }
+    static doSyncFlow(client, mergedInfo, uuid, containers, isRetry) {
+        return client.admin().getPubKey().then(pubKey => {
+            return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, containers).then(device => {
                 client.config().contextToken = device.contextToken;
                 client.admin().atr(device.atrList);
-                return client.admin().updateContainerConfig(new ContainerSyncRequest(device.containerResponses)).then(function () {
+                return client.admin().updateContainerConfig(new ContainerSyncRequest(device.containerResponses)).then(() => {
                     client.config().activeContainers = ActivatedContainerUtil.getSortedContainers(device.containerResponses);
                     DataContainerUtil.setupDataContainers(device.containerResponses);
-                    return SyncUtil.pollDownloadCompletion(client, device.containerResponses, isRetry).then(function (finalContainerList) {
+                    return SyncUtil.pollDownloadCompletion(client, device.containerResponses, isRetry).then((finalContainerList) => {
                         return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, finalContainerList);
-                    }, function (error) {
+                    }, (error) => {
                         if (typeof error === 'boolean' && !isRetry) {
                             console.log('download error, retrying');
                             return Promise.resolve(SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, true));
@@ -49,20 +48,20 @@ var SyncUtil = (function () {
                 });
             });
         });
-    };
-    SyncUtil.pollDownloadCompletion = function (client, containerConfig, isRetry) {
-        var maxSeconds = client.config().containerDownloadTimeout || 30;
-        var pollInterval = 250;
-        var remainingTries = (maxSeconds * 1000) / pollInterval;
-        return new Promise(function (resolve, reject) {
+    }
+    static pollDownloadCompletion(client, containerConfig, isRetry) {
+        const maxSeconds = client.config().containerDownloadTimeout || 30;
+        const pollInterval = 250;
+        let remainingTries = (maxSeconds * 1000) / pollInterval;
+        return new Promise((resolve, reject) => {
             poll(resolve, reject);
         });
         function poll(resolve, reject) {
-            _.delay(function () {
+            _.delay(() => {
                 --remainingTries;
-                client.core().info().then(function (infoData) {
-                    var containers = infoData.data.containers;
-                    checkDownloadsComplete(containerConfig, containers).then(function (ready) {
+                client.core().info().then(infoData => {
+                    let containers = infoData.data.containers;
+                    checkDownloadsComplete(containerConfig, containers).then((ready) => {
                         if (ready) {
                             resolve(containers);
                         }
@@ -74,14 +73,14 @@ var SyncUtil = (function () {
                                 poll(resolve, reject);
                             }
                         }
-                    }, function (error) {
+                    }, error => {
                         reject(error);
                     });
                 });
             }, pollInterval);
         }
         function checkDownloadsComplete(cfg, containerStatus) {
-            return new Promise(function (resolve, reject) {
+            return new Promise((resolve, reject) => {
                 if (containerMissing(cfg, containerStatus) || downloadErrored(cfg, containerStatus)) {
                     if (isRetry) {
                         reject(new T1CLibException(500, '903', 'Container download failed'));
@@ -99,35 +98,33 @@ var SyncUtil = (function () {
             });
         }
         function containerMissing(config, status) {
-            return _.find(config, function (cfgCt) {
-                return !_.find(status, function (statusCt) { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
+            return _.find(config, cfgCt => {
+                return !_.find(status, statusCt => { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
             });
         }
         function downloadErrored(config, status) {
-            return _.find(config, function (cfgCt) {
-                return _.find(status, function (statusCt) {
+            return _.find(config, cfgCt => {
+                return _.find(status, statusCt => {
                     return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
                         && _.includes(SyncUtil.ERROR_STATES, statusCt.status);
                 });
             });
         }
         function downloadOngoing(config, status) {
-            return _.find(config, function (cfgCt) {
-                return _.find(status, function (statusCt) {
+            return _.find(config, cfgCt => {
+                return _.find(status, statusCt => {
                     return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
                         && _.includes(SyncUtil.ONGOING_STATES, statusCt.status);
                 });
             });
         }
-    };
-    SyncUtil.DOWNLOAD_ERROR = 'DOWNLOAD_ERROR';
-    SyncUtil.GENERIC_ERROR = 'ERROR';
-    SyncUtil.ERROR_STATES = [SyncUtil.DOWNLOAD_ERROR, SyncUtil.GENERIC_ERROR];
-    SyncUtil.INIT = 'INIT';
-    SyncUtil.DOWNLOADING = 'DOWNLOADING';
-    SyncUtil.ONGOING_STATES = [SyncUtil.INIT, SyncUtil.DOWNLOADING];
-    SyncUtil.INSTALLED = 'INSTALLED';
-    return SyncUtil;
-}());
-export { SyncUtil };
+    }
+}
+SyncUtil.DOWNLOAD_ERROR = 'DOWNLOAD_ERROR';
+SyncUtil.GENERIC_ERROR = 'ERROR';
+SyncUtil.ERROR_STATES = [SyncUtil.DOWNLOAD_ERROR, SyncUtil.GENERIC_ERROR];
+SyncUtil.INIT = 'INIT';
+SyncUtil.DOWNLOADING = 'DOWNLOADING';
+SyncUtil.ONGOING_STATES = [SyncUtil.INIT, SyncUtil.DOWNLOADING];
+SyncUtil.INSTALLED = 'INSTALLED';
 //# sourceMappingURL=SyncUtil.js.map

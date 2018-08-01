@@ -4,17 +4,17 @@
  */
 
 import { expect } from 'chai';
-import * as axios from 'axios';
-import * as MockAdapter from 'axios-mock-adapter';
+import MockAdapter from 'axios-mock-adapter';
+import axios from 'axios';
 import { CoreService } from '../../../scripts/core/service/CoreService';
 import { GCLConfig } from '../../../scripts/core/GCLConfig';
-import { LocalConnection } from '../../../scripts/core/client/Connection';
+import {LocalAuthConnection, LocalConnection} from '../../../scripts/core/client/Connection';
 
 describe('Core Services', () => {
     let gclConfig = new GCLConfig({});
-    const connection: LocalConnection = new LocalConnection(gclConfig);
+    const connection: LocalAuthConnection = new LocalAuthConnection(gclConfig);
     let gclConfigModified = new GCLConfig({ consentDuration: 5});
-    const connectionModified: LocalConnection = new LocalConnection(gclConfigModified);
+    const connectionModified: LocalAuthConnection = new LocalAuthConnection(gclConfigModified);
     let core = new CoreService('', connection);
     let coreModified = new CoreService('', connectionModified);
     let mock: MockAdapter;

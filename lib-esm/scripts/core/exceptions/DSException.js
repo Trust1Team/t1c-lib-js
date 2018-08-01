@@ -1,8 +1,6 @@
-var DSException = (function () {
-    function DSException(description) {
+export class DSException {
+    constructor(description) {
         this.description = description;
     }
-    return DSException;
-}());
-export { DSException };
+}
 //# sourceMappingURL=DSException.js.map

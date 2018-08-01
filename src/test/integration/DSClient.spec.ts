@@ -1,11 +1,7 @@
 import {expect} from 'chai';
-import {DSClient} from '../../scripts/core/ds/DSClient';
-import {RemoteJwtConnection} from '../../scripts/core/client/Connection';
-import {GCLClient} from '../../scripts/core/GCLLib';
-import {GCLConfig} from '../../scripts/core/GCLConfig';
-// workaround in order to use require for non available module in DefinitlyTyped
-declare var require: any;
-var jwtDecode = require('jwt-decode');
+import * as jwtDecode from 'jwt-decode';
+import {DSClient, GCLConfig, RemoteJwtConnection} from '../../../lib';
+
 
 describe('DSClient', () => {
     let dsUnderTest = 'http://localhost:8080/gcl-ds-web/v1';

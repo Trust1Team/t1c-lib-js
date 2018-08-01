@@ -1,54 +1,41 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 import { GenericCertCard } from '../../Card';
 import { RequestHandler } from '../../../../util/RequestHandler';
-var EidPt = (function (_super) {
-    __extends(EidPt, _super);
-    function EidPt(baseUrl, containerUrl, connection, reader_id) {
-        return _super.call(this, baseUrl, containerUrl, connection, reader_id, EidPt.CONTAINER_PREFIX) || this;
+export class EidPt extends GenericCertCard {
+    constructor(baseUrl, containerUrl, connection, reader_id) {
+        super(baseUrl, containerUrl, connection, reader_id, EidPt.CONTAINER_PREFIX);
     }
-    EidPt.prototype.idData = function (callback) {
+    idData(callback) {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidPt.ID_DATA), undefined, undefined, callback);
-    };
-    EidPt.prototype.idDataWithOutPhoto = function (callback) {
+    }
+    idDataWithOutPhoto(callback) {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidPt.ID_DATA), { photo: 'false' }, undefined, callback);
-    };
-    EidPt.prototype.address = function (data, callback) {
+    }
+    address(data, callback) {
         return this.connection.post(this.baseUrl, this.containerSuffix(EidPt.ADDRESS), data, undefined, undefined, callback);
-    };
-    EidPt.prototype.photo = function (callback) {
+    }
+    photo(callback) {
         return this.connection.get(this.baseUrl, this.containerSuffix(EidPt.PHOTO), undefined, undefined, callback);
-    };
-    EidPt.prototype.rootCertificate = function (options, callback) {
+    }
+    rootCertificate(options, callback) {
         return this.getCertificate(EidPt.CERT_ROOT, RequestHandler.determineOptions(options, callback));
-    };
-    EidPt.prototype.rootAuthenticationCertificate = function (options, callback) {
+    }
+    rootAuthenticationCertificate(options, callback) {
         return this.getCertificate(EidPt.CERT_ROOT_AUTH, RequestHandler.determineOptions(options, callback));
-    };
-    EidPt.prototype.rootNonRepudiationCertificate = function (options, callback) {
+    }
+    rootNonRepudiationCertificate(options, callback) {
         return this.getCertificate(EidPt.CERT_ROOT_NON_REP, RequestHandler.determineOptions(options, callback));
-    };
-    EidPt.prototype.authenticationCertificate = function (options, callback) {
+    }
+    authenticationCertificate(options, callback) {
         return this.getCertificate(EidPt.CERT_AUTHENTICATION, RequestHandler.determineOptions(options, callback));
-    };
-    EidPt.prototype.nonRepudiationCertificate = function (options, callback) {
+    }
+    nonRepudiationCertificate(options, callback) {
         return this.getCertificate(EidPt.CERT_NON_REPUDIATION, RequestHandler.determineOptions(options, callback));
-    };
-    EidPt.CONTAINER_PREFIX = 'pteid';
-    EidPt.ADDRESS = '/address';
-    EidPt.CERT_ROOT_AUTH = '/root-authentication';
-    EidPt.CERT_ROOT_NON_REP = '/root-non-repudiation';
-    EidPt.ID_DATA = '/id';
-    EidPt.PHOTO = '/photo';
-    return EidPt;
-}(GenericCertCard));
-export { EidPt };
+    }
+}
+EidPt.CONTAINER_PREFIX = 'pteid';
+EidPt.ADDRESS = '/address';
+EidPt.CERT_ROOT_AUTH = '/root-authentication';
+EidPt.CERT_ROOT_NON_REP = '/root-non-repudiation';
+EidPt.ID_DATA = '/id';
+EidPt.PHOTO = '/photo';
 //# sourceMappingURL=EidPt.js.map

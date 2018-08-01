@@ -1,44 +1,31 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 import { GenericSecuredCertCard } from '../../Card';
 import { RequestHandler } from '../../../../util/RequestHandler';
 import { CertParser } from '../../../../util/CertParser';
 import { ResponseHandler } from '../../../../util/ResponseHandler';
-var DNIe = (function (_super) {
-    __extends(DNIe, _super);
-    function DNIe(baseUrl, containerUrl, connection, reader_id) {
-        return _super.call(this, baseUrl, containerUrl, connection, reader_id, DNIe.CONTAINER_PREFIX) || this;
+export class DNIe extends GenericSecuredCertCard {
+    constructor(baseUrl, containerUrl, connection, reader_id) {
+        super(baseUrl, containerUrl, connection, reader_id, DNIe.CONTAINER_PREFIX);
     }
-    DNIe.prototype.info = function (callback) {
+    info(callback) {
         return this.connection.get(this.baseUrl, this.containerSuffix(DNIe.INFO), undefined, undefined, callback);
-    };
-    DNIe.prototype.intermediateCertificate = function (options, callback) {
-        var reqOptions = RequestHandler.determineOptions(options, callback);
-        var self = this;
-        return self.connection.get(self.baseUrl, self.containerSuffix(DNIe.ALL_CERTIFICATES + DNIe.CERT_INTERMEDIATE), undefined).then(function (data) {
+    }
+    intermediateCertificate(options, callback) {
+        const reqOptions = RequestHandler.determineOptions(options, callback);
+        let self = this;
+        return self.connection.get(self.baseUrl, self.containerSuffix(DNIe.ALL_CERTIFICATES + DNIe.CERT_INTERMEDIATE), undefined).then(data => {
             return CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
-        }, function (err) {
+        }, err => {
             return ResponseHandler.error(err, reqOptions.callback);
         });
-    };
-    DNIe.prototype.authenticationCertificate = function (options, callback) {
+    }
+    authenticationCertificate(options, callback) {
         return this.getCertificate(DNIe.CERT_AUTHENTICATION, {}, RequestHandler.determineOptions(options, callback));
-    };
-    DNIe.prototype.signingCertificate = function (options, callback) {
+    }
+    signingCertificate(options, callback) {
         return this.getCertificate(DNIe.CERT_SIGNING, {}, RequestHandler.determineOptions(options, callback));
-    };
-    DNIe.CONTAINER_PREFIX = 'dnie';
-    DNIe.INFO = '/info';
-    DNIe.CERT_INTERMEDIATE = '/intermediate';
-    return DNIe;
-}(GenericSecuredCertCard));
-export { DNIe };
+    }
+}
+DNIe.CONTAINER_PREFIX = 'dnie';
+DNIe.INFO = '/info';
+DNIe.CERT_INTERMEDIATE = '/intermediate';
 //# sourceMappingURL=dnie.js.map
