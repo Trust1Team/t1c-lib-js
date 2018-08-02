@@ -35,7 +35,7 @@
       "/src/test/"
     ],
     "verbose": true,
-    "testURL": "http://localhost"
+    "testURL": "https://localhost"
   },
   "author": "Trust1Team",
   "license": "SEE LICENSE IN license.txt",

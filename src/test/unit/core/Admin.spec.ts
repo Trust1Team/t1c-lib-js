@@ -29,7 +29,7 @@ describe('Admin Services', () => {
 
     describe('activate', () => {
         beforeEach(function () {
-            mock.onPost('admin/activate').reply(() => {
+            mock.onPost('https://localhost:10443/admin/activate').reply(() => {
                 return [ 200, { data: 'Activation Data', success: true }];
             });
         });
