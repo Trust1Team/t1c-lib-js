@@ -11,7 +11,6 @@ import {LocalAuthConnection, RequestBody} from '../client/Connection';
  */
 export class AgentClient implements AbstractAgent {
     static AGENT_PATH = '/agent';
-    static AGENT_MATCH_PARAM = 'username';
 
     // constructor
     constructor(private url: string, private connection: LocalAuthConnection) {
@@ -22,7 +21,7 @@ export class AgentClient implements AbstractAgent {
     }
 
     public get(username?: string, callback?: (error: T1CLibException, data: AgentResponse) => void): Promise<any> {
-        let body: RequestBody = { AGENT_MATCH_PARAM:  username};
+        let body: RequestBody = { 'username' :  username};
         return this.connection.postSkipCitrix(this.url, AgentClient.AGENT_PATH, undefined, body, undefined, callback);
     }
 
