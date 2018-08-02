@@ -3,30 +3,10 @@ import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
 
 describe('AdminService', () => {
-    const defaults = {
-        gclUrl: 'https://localhost:10443/v2',
-        gwOrProxyUrl: 'https://accapim.t1t.be:443',
-        dsContextPath: '/trust1team/gclds/v2',
-        ocvContextPath: '/trust1team/ocv-api/v1',
-        dsContextPathTestMode: '/gcl-ds-web/v2',
-        dsFileContextPath: '/trust1team/gclds-file/v1',
-        tokenExchangeContextPath: '/apiengineauth/v1',
-        lang: 'en',
-        implicitDownload: false,
-        localTestMode: false,
-        forceHardwarePinpad: false,
-        sessionTimeout: 5,
-        consentDuration: 1,
-        consentTimeout: 10,
-        osPinDialog: false,
-        containerDownloadTimeout: 30
-    };
-    let gclconfigoptions = new GCLConfigOptions(defaults.gclUrl, defaults.gwOrProxyUrl, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, defaults.sessionTimeout, defaults.consentDuration, defaults.consentTimeout, undefined,
-        defaults.osPinDialog, defaults.containerDownloadTimeout, undefined, undefined, undefined);
-    let gclConfig = new GCLConfig(gclconfigoptions);
+    let gclConfig = new GCLConfig({});
     const connection: LocalAuthAdminConnection = new LocalAuthAdminConnection(gclConfig);
     const noAuthConnection: LocalAdminConnection = new LocalAdminConnection(gclConfig);
-    let admin = new AdminService('https://localhost:10443/v2', connection, noAuthConnection);
+    let admin = new AdminService('', connection, noAuthConnection);
     let mock;
 
 
@@ -39,6 +19,12 @@ describe('AdminService', () => {
     });
 
     test('activate', done => {
+        const mockresponse = {
+            data: 'Activation Data',
+            success: true
+        };
+        mock.onPost('/admin/activate').reply(200, mockresponse);
+
         return admin.activate().then(res => {
             expect(res).toHaveProperty('success', true);
             expect(res).toHaveProperty('data', 'Activation Data');
@@ -48,20 +34,24 @@ describe('AdminService', () => {
 
 
     test('makes the correct call to get pub key', () => {
-        beforeEach(function () {
-            mock.onGet('/admin/certificate').reply(() => {
-                return [200, {data: {device: 'Device Pub Key', ssl: 'SSL Pub Key'}, success: true}];
-            });
-        });
+        const mockresponse = {
+            data:
+                {
+                    device: 'Device Pub Key',
+                    ssl: 'SSL Pub Key'
+                },
+            success: true
+        };
+        mock.onGet('/admin/certificate').reply(200, mockresponse);
 
         return admin.getPubKey().then(res => {
             expect(res).toHaveProperty('success', true);
 
             expect(res).toHaveProperty('data');
-            expect(res.success).toBe('object');
+            expect(res.success).toBe(true);
 
-            expect(res).toHaveProperty('device', 'Device Pub Key');
-            expect(res).toHaveProperty('ssl', 'Device Pub Key');
+            expect(res).toHaveProperty('data.device', 'Device Pub Key');
+            expect(res).toHaveProperty('data.ssl', 'SSL Pub Key');
         });
     });
 
