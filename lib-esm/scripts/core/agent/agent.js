@@ -7,11 +7,10 @@ var AgentClient = (function () {
         return AgentClient.AGENT_PATH + '/' + port;
     };
     AgentClient.prototype.get = function (username, callback) {
-        var body = { AGENT_MATCH_PARAM: username };
+        var body = { 'username': username };
         return this.connection.postSkipCitrix(this.url, AgentClient.AGENT_PATH, undefined, body, undefined, callback);
     };
     AgentClient.AGENT_PATH = '/agent';
-    AgentClient.AGENT_MATCH_PARAM = 'username';
     return AgentClient;
 }());
 export { AgentClient };
