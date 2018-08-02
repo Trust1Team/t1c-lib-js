@@ -7,7 +7,8 @@
   "scripts": {
     "clean": "shx rm -rf dist lib lib-esm",
     "ts": "tsc && tsc -m es6 --outDir lib-esm && webpack --mode=none",
-    "test": "./node_modules/karma-cli/bin/karma start --single-run --colors true",
+    "test-karma": "./node_modules/karma-cli/bin/karma start --single-run --colors true",
+    "test": "jest",
     "build": "npm run clean && npm run ts"
   },
   "repository": {
@@ -16,6 +17,25 @@
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx"
+    ],
+    "setupTestFrameworkScriptFile": "<rootDir>/src/setupJest.ts",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/src/test/"
+    ],
+    "verbose": true,
+    "testURL": "http://localhost"
   },
   "author": "Trust1Team",
   "license": "SEE LICENSE IN license.txt",
@@ -27,6 +47,7 @@
     "@types/debug": "^0.0.30",
     "@types/es6-promise": "^3.3.0",
     "@types/form-data": "^2.2.1",
+    "@types/jest": "^23.3.1",
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.104",
     "@types/mocha": "^2.2.48",
@@ -34,33 +55,19 @@
     "@types/platform": "^1.3.1",
     "@types/sinon": "^4.1.3",
     "asn1js": "^2.0.21",
-    "axios-mock-adapter": "^1.9.0",
+    "axios-mock-adapter": "^1.15.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
     "chai": "^4.1.2",
     "del": "^3.0.0",
     "dts-bundle": "^0.7.3",
-    "karma": "^2.0.5",
-    "karma-chai": "^0.1.0",
-    "karma-chrome-launcher": "^2.2.0",
-    "karma-cli": "^1.0.1",
-    "karma-firefox-launcher": "^1.1.0",
-    "karma-htmlfile-reporter": "^0.3.5",
-    "karma-ie-launcher": "^1.0.0",
-    "karma-mocha": "^1.3.0",
-    "karma-opera-launcher": "^1.0.0",
-    "karma-phantomjs-launcher": "^1.0.4",
-    "karma-safari-launcher": "^1.0.0",
-    "karma-sinon": "^1.0.5",
-    "karma-sinon-chai": "^2.0.2",
-    "karma-typescript": "^3.0.13",
-    "karma-typescript-es6-transform": "^1.0.4",
-    "mocha": "^5.2.0",
-    "phantomjs-prebuilt": "^2.1.16",
+    "jest": "^23.4.2",
+    "jest-extended": "^0.8.1",
     "shx": "^0.3.2",
     "sinon": "^6.1.4",
     "sinon-chai": "^3.2.0",
+    "ts-jest": "^23.0.1",
     "ts-loader": "^4.4.2",
     "tslint": "^5.11.0",
     "tslint-loader": "^3.6.0",
