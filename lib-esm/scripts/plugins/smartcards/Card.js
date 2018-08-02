@@ -147,7 +147,6 @@ var GenericCertCard = (function (_super) {
     };
     GenericCertCard.prototype.signData = function (body, callback) {
         var _this = this;
-        console.log('signdata body: ', body);
         if (body.algorithm_reference) {
             body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
         }
