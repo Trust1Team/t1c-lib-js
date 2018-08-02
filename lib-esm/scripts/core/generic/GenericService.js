@@ -278,7 +278,6 @@ var GenericService = (function () {
         }
     };
     GenericService.doSign = function (args) {
-        console.log('signdata args: ', args);
         if (args.container === 'luxeid') {
             return args.client.luxeid(args.readerId, args.data.pin).signData(args.data);
         }
