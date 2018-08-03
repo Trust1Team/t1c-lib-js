@@ -34,8 +34,7 @@
       "/node_modules/",
       "/src/test/"
     ],
-    "verbose": true,
-    "testURL": "https://localhost"
+    "verbose": true
   },
   "author": "Trust1Team",
   "license": "SEE LICENSE IN license.txt",
