@@ -30,8 +30,8 @@ export declare class PubKeyResponse implements T1CResponse {
 export declare class PubKeys {
     device: string;
     ssl: string;
-    ds?: string;
-    constructor(device: string, ssl: string, ds?: string);
+    ds?: any;
+    constructor(device: string, ssl: string, ds?: any);
 }
 export declare class ContainerSyncRequest {
     containerResponses: DSContainer[];
