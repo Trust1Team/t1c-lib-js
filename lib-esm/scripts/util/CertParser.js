@@ -62,16 +62,10 @@ var CertParser = (function () {
         return ResponseHandler.response(response, callback);
     };
     CertParser.processCert = function (certificate) {
-        console.log('trying --> ', certificate);
         var rawCert = Base64.atob(certificate);
-        console.log('trying rawCert --> ', rawCert);
         var buffer = CertParser.str2ab(rawCert);
-        console.log('trying buffer --> ', buffer);
         var asn1 = asn1js.fromBER(buffer);
-        console.log('trying asn1 --> ', asn1);
-        var tempCert = new Certificate({ schema: asn1.result });
-        console.log('trying tempCert --> ', tempCert);
-        return tempCert;
+        return new Certificate({ schema: asn1.result });
     };
     CertParser.str2ab = function (str) {
         var buf = new ArrayBuffer(str.length);
