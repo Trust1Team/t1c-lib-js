@@ -35,8 +35,9 @@ export class PubKeyResponse implements T1CResponse {
     constructor(public data: PubKeys, public success: boolean) {}
 }
 
+// TODO typings for ds
 export class PubKeys {
-    constructor(public device: string, public ssl: string, public ds?: string) {}
+    constructor(public device: string, public ssl: string, public ds?: any) {}
 }
 
 export class ContainerSyncRequest {
