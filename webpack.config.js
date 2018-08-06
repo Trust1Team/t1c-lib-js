@@ -1,3 +1,4 @@
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const path = require('path');
 
 module.exports = {
@@ -14,7 +15,10 @@ module.exports = {
         umdNamedDefine: true
     },
     optimization: {
-        minimize: true
+        minimize: true,
+        minimizer: [new UglifyJsPlugin({
+            include: /\.min\.js$/
+        })]
     },
     resolve: {
         extensions: [".ts", ".js", ".tsx", ".jsx"]
