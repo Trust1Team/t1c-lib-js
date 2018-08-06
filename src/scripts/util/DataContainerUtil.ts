@@ -4,7 +4,7 @@
  */
 
 import { ClientService } from './ClientService';
-import { DSContainer } from '../core/ds/DSClientModel';
+
 
 export class DataContainerUtil {
     // constructor

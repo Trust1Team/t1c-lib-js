@@ -1,18 +1,23 @@
-/**
- * @author Maarten Somers
- * @since 2017
- */
-
-import { expect } from 'chai';
-import MockAdapter from 'axios-mock-adapter';
+import { LocalConnection } from './../../../../../scripts/core/client/Connection';
+import { GCLConfig } from './../../../../../scripts/core/GCLConfig';
 import axios from 'axios';
-import { GCLConfig } from '../../../../../scripts/core/GCLConfig';
-import { LocalConnection } from '../../../../../scripts/core/client/Connection';
+import MockAdapter from 'axios-mock-adapter';
 import { PluginFactory } from '../../../../../scripts/plugins/PluginFactory';
 
+
+/**
+ *
+ * @author Gilles Platteeuw
+ * @since  2018
+ */
+
+
 describe('Mobib Container', () => {
-    const gclConfig = new GCLConfig({});
-    const connection: LocalConnection = new LocalConnection(gclConfig);
+    let gclconfig = new GCLConfig({});
+    let activecontainers = new Map<string, string[]>();
+    activecontainers.set('mobib', ['mobib-v2-1-1']);
+    gclconfig.activeContainers = activecontainers;
+    const connection: LocalConnection = new LocalConnection(gclconfig);
     const mobib = new PluginFactory('', connection).createMobib('123');
     let mock: MockAdapter;
 
@@ -26,76 +31,68 @@ describe('Mobib Container', () => {
 
     describe('cardIssuing', function () {
         beforeEach(function () {
-            mock.onGet('containers/mobib/123/card-issuing').reply(() => {
+            mock.onGet('containers/mobib-v2-1-1/123/card-issuing').reply(() => {
                 return [ 200, { data: 'Card Issuing Data', success: true }];
             });
         });
 
-        it('makes the correct call for card issuing data', () => {
+        test('makes the correct call for card issuing data', () => {
             return mobib.cardIssuing().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string').eq('Card Issuing Data');
+                expect(res).toHaveProperty('data');
             });
         });
     });
 
     describe('contracts', function () {
         beforeEach(function () {
-            mock.onGet('containers/mobib/123/contracts').reply(() => {
+            mock.onGet('containers/mobib-v2-1-1/123/contracts').reply(() => {
                 return [ 200, { data: 'Contracts Data', success: true }];
             });
         });
 
-        it('makes the correct call for contracts data', () => {
+        test('makes the correct call for contracts data', () => {
             return mobib.contracts().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string').eq('Contracts Data');
+                expect(res).toHaveProperty('data');
             });
         });
     });
 
     describe('picture', function () {
         beforeEach(function () {
-            mock.onGet('containers/mobib/123/picture').reply(() => {
+            mock.onGet('containers/mobib-v2-1-1/123/picture').reply(() => {
                 return [ 200, { data: 'Picture Data', success: true }];
             });
         });
 
-        it('makes the correct call for picture data', () => {
+        test('makes the correct call for picture data', () => {
             return mobib.picture().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string').eq('Picture Data');
+                expect(res).toHaveProperty('data');
             });
         });
     });
 
     describe('status', function () {
         beforeEach(function () {
-            mock.onGet('containers/mobib/123/status').reply(() => {
+            mock.onGet('containers/mobib-v2-1-1/123/status').reply(() => {
                 return [ 200, { data: 'Status Data', success: true }];
             });
         });
 
-        it('makes the correct call for picture data', () => {
+        test('makes the correct call for picture data', () => {
             return mobib.status().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string').eq('Status Data');
+                expect(res).toHaveProperty('data');
             });
         });
     });

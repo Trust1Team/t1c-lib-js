@@ -1,1 +1,0 @@
-{"version":3,"file":"PubKeyService.js","sourceRoot":"","sources":["../../../src/scripts/util/PubKeyService.ts"],"names":[],"mappings":"AAGA,MAAM;IAGK,MAAM,CAAC,SAAS;QACnB,OAAO,aAAa,CAAC,MAAM,CAAC;IAChC,CAAC;IAEM,MAAM,CAAC,SAAS,CAAC,GAAW;QAC/B,aAAa,CAAC,MAAM,GAAG,8BAA8B,GAAG,GAAG,GAAG,4BAA4B,CAAC;IAC/F,CAAC;CACJ"}

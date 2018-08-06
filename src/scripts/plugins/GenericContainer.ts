@@ -1,5 +1,4 @@
 import {LocalConnection} from '../core/client/Connection';
-import {GCLClient} from '../core/GCLLib';
 import {ActivatedContainerUtil} from '../util/ActivatedContainerUtil';
 
 export abstract class GenericContainer {

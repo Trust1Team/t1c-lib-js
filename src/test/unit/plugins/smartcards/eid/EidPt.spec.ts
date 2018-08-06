@@ -1,18 +1,21 @@
-/**
- * @author Maarten Somers
- * @since 2017
- */
-
-import { expect } from 'chai';
-import MockAdapter from 'axios-mock-adapter';
+import { LocalConnection } from './../../../../../scripts/core/client/Connection';
+import { GCLConfig } from './../../../../../scripts/core/GCLConfig';
 import axios from 'axios';
-import { GCLConfig } from '../../../../../scripts/core/GCLConfig';
-import { LocalConnection } from '../../../../../scripts/core/client/Connection';
+import MockAdapter from 'axios-mock-adapter';
 import { PluginFactory } from '../../../../../scripts/plugins/PluginFactory';
 
+/**
+ *
+ * @author Gilles Platteeuw
+ * @since  2018
+ */
+
 describe('Portuguese eID Container', () => {
-    const gclConfig = new GCLConfig({});
-    const connection: LocalConnection = new LocalConnection(gclConfig);
+    let gclconfig = new GCLConfig({});
+    let activecontainers = new Map<string, string[]>();
+    activecontainers.set('pteid', ['pteid-v2-1-1']);
+    gclconfig.activeContainers = activecontainers;
+    const connection: LocalConnection = new LocalConnection(gclconfig);
     const pt = new PluginFactory('', connection).createEidPT('123');
     let mock: MockAdapter;
 
@@ -29,7 +32,7 @@ describe('Portuguese eID Container', () => {
 
     describe('idData', function () {
         beforeEach(function () {
-            mock.onGet('containers/pteid/123/id').reply((config) => {
+            mock.onGet('containers/pteid-v2-1-1/123/id').reply((config) => {
                 if (config.params && config.params.photo === 'false') {
                     return [ 200, { data: 'ID Data without photo', success: true }];
                 } else {
@@ -38,44 +41,38 @@ describe('Portuguese eID Container', () => {
             });
         });
 
-        it('makes the correct call for ID Data', () => {
+        test('makes the correct call for ID Data', () => {
             return pt.idData().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string').eq('ID Data');
+                expect(res).toHaveProperty('data');
             });
         });
 
-        it('makes the correct call for ID Data without photo', () => {
+        test('makes the correct call for ID Data without photo', () => {
             return pt.idDataWithOutPhoto().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string').eq('ID Data without photo');
+                expect(res).toHaveProperty('data');
             });
         });
     });
 
     describe('photo', function () {
         beforeEach(function () {
-            mock.onGet('containers/pteid/123/photo').reply(() => {
+            mock.onGet('containers/pteid-v2-1-1/123/photo').reply(() => {
                 return [ 200, { data: 'Photo Data', success: true }];
             });
         });
 
-        it('makes the correct call for Photo Data', () => {
+        test('makes the correct call for Photo Data', () => {
             return pt.photo().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string').eq('Photo Data');
+                expect(res).toHaveProperty('data');
             });
         });
     });

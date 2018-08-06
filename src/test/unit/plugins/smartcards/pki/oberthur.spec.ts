@@ -1,19 +1,25 @@
-/**
- * @author Maarten Somers
- * @since 2017
- */
-
-import { expect } from 'chai';
-import MockAdapter from 'axios-mock-adapter';
+import { LocalConnection } from './../../../../../scripts/core/client/Connection';
+import { GCLConfig } from './../../../../../scripts/core/GCLConfig';
 import axios from 'axios';
-import { GCLConfig } from '../../../../../scripts/core/GCLConfig';
-import { LocalConnection } from '../../../../../scripts/core/client/Connection';
+import MockAdapter from 'axios-mock-adapter';
 import { PluginFactory } from '../../../../../scripts/plugins/PluginFactory';
 import { PubKeyService } from '../../../../../scripts/util/PubKeyService';
 
+
+
+/**
+ *
+ * @author Gilles Platteeuw
+ * @since  2018
+ */
+
+
 describe('Oberthur Container', () => {
-    const gclConfig = new GCLConfig({});
-    const connection: LocalConnection = new LocalConnection(gclConfig);
+    let gclconfig = new GCLConfig({});
+    let activecontainers = new Map<string, string[]>();
+    activecontainers.set('oberthur', ['oberthur-v2-1-1']);
+    gclconfig.activeContainers = activecontainers;
+    const connection: LocalConnection = new LocalConnection(gclconfig);
     const oberthur = new PluginFactory('', connection).createOberthurNO('123');
     let mock: MockAdapter;
 
@@ -23,9 +29,9 @@ describe('Oberthur Container', () => {
             return [ 200, { data: { pinpad: false }, success: true }];
         });
         PubKeyService.setPubKey('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlOJu6TyygqxfWT7eLtGDwajtN\n' +
-                                'FOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76\n' +
-                                'xFxdU6jE0NQ+Z+zEdhUTooNRaY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4\n' +
-                                'gwQco1KRMDSmXSMkDwIDAQAB\n');
+            'FOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76\n' +
+            'xFxdU6jE0NQ+Z+zEdhUTooNRaY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4\n' +
+            'gwQco1KRMDSmXSMkDwIDAQAB\n');
     });
 
     afterEach(() => {
@@ -34,7 +40,7 @@ describe('Oberthur Container', () => {
 
     describe('verifyPin', function () {
         beforeEach(function () {
-            mock.onPost('containers/oberthur/123/verify-pin').reply((config) => {
+            mock.onPost('containers/oberthur-v2-1-1/123/verify-pin').reply((config) => {
                 let data = JSON.parse(config.data);
                 if (data && data.private_key_reference === 'key' && data.pin && data.pin.length) {
                     return [ 200, { data: 'Verify Pin Data', success: true }];
@@ -44,12 +50,11 @@ describe('Oberthur Container', () => {
 
         it('makes the correct call for activated data', () => {
             return oberthur.verifyPin({ private_key_reference: 'key', pin: '1234' }).then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string').eq('Verify Pin Data');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toEqual('Verify Pin Data');
             });
         });
     });

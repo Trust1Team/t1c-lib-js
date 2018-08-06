@@ -1,14 +1,7 @@
-/**
- * @author Maarten Somers
- * @since 2017
- */
-
-import { expect } from 'chai';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
-import { GCLConfig } from '../../../scripts/core/GCLConfig';
-import { GenericConnection, LocalConnection } from '../../../scripts/core/client/Connection';
-import * as store from 'store2';
+import store = require('store2');
+import {GenericConnection, LocalConnection, GCLConfig} from '../../..';
 
 describe('Connection', () => {
     const gclConfig = new GCLConfig({});
@@ -35,23 +28,23 @@ describe('Connection', () => {
             });
         });
 
-        it('returns correct body', () => {
+        test('returns correct body', () => {
             return connection.get('', '/hello', undefined, undefined).then(res => {
-                expect(res.hello).to.be.eq('world');
+                expect(res.hello).toBe('world');
             });
         });
 
-        it('sends the correct headers for regular connections', () => {
+        test('sends the correct headers for regular connections', () => {
             return connection.get('', '/hello', undefined).then(res => {
-                expect(res.headers).to.be.an('object');
-                expect(res.headers).to.not.have.property(GenericConnection.AUTH_TOKEN_HEADER);
+                expect(res.headers).toBeObject();
+                expect(res.headers).not.toHaveProperty(GenericConnection.AUTH_TOKEN_HEADER);
             });
         });
 
-        it('sends the X-Authentication-Token header for compatible connections', () => {
+        test('sends the X-Authentication-Token header for compatible connections', () => {
             return tokenConnection.get('', '/hello', undefined).then(res => {
-                expect(res.headers).to.be.an('object');
-                expect(res.headers).to.have.property(GenericConnection.AUTH_TOKEN_HEADER).eq('ZGRlMjk3YjktNzVkNi00MjhlLWExZDMtM2I0ZDUyMDExMGU5LTAwNWRkYTVk');
+                expect(res.headers).toBeObject();
+                expect(res.headers).toHaveProperty(GenericConnection.AUTH_TOKEN_HEADER, 'ZGRlMjk3YjktNzVkNi00MjhlLWExZDMtM2I0ZDUyMDExMGU5LTAwNWRkYTVk');
             });
         });
     });
@@ -63,24 +56,24 @@ describe('Connection', () => {
             });
         });
 
-        it('correct payload was sent', () => {
+        test('correct payload was sent', () => {
             return connection.post('', '/hello', { payload: 'some string' }, undefined).then(res => {
-                expect(res).to.have.property('data');
-                expect(res.data).to.have.property('payload').with.lengthOf(11).eq('some string');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toHaveProperty('payload', 'some string');
             });
         });
 
-        it('sends the correct headers for regular connections', () => {
+        test('sends the correct headers for regular connections', () => {
             return connection.post('', '/hello', { payload: 'some string' }, undefined).then(res => {
-                expect(res.headers).to.be.an('object');
-                expect(res.headers).to.not.have.property(GenericConnection.AUTH_TOKEN_HEADER);
+                expect(res.headers).toBeObject();
+                expect(res.headers).not.toHaveProperty(GenericConnection.AUTH_TOKEN_HEADER);
             });
         });
 
-        it('sends the X-Authentication-Token header for compatible connections', () => {
+        test('sends the X-Authentication-Token header for compatible connections', () => {
             return tokenConnection.post('', '/hello', { payload: 'some string' }, undefined).then(res => {
-                expect(res.headers).to.be.an('object');
-                expect(res.headers).to.have.property(GenericConnection.AUTH_TOKEN_HEADER).eq('ZGRlMjk3YjktNzVkNi00MjhlLWExZDMtM2I0ZDUyMDExMGU5LTAwNWRkYTVk');
+                expect(res.headers).toBeObject();
+                expect(res.headers).toHaveProperty(GenericConnection.AUTH_TOKEN_HEADER, 'ZGRlMjk3YjktNzVkNi00MjhlLWExZDMtM2I0ZDUyMDExMGU5LTAwNWRkYTVk');
             });
         });
     });
@@ -92,24 +85,24 @@ describe('Connection', () => {
             });
         });
 
-        it('correct payload was sent', () => {
+        test('correct payload was sent', () => {
             return connection.put('', '/hello', { payload: 'some string' }, undefined).then(res => {
-                expect(res).to.have.property('data');
-                expect(res.data).to.have.property('payload').with.lengthOf(11).eq('some string');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toHaveProperty('payload', 'some string');
             });
         });
 
-        it('sends the correct headers for regular connections', () => {
+        test('sends the correct headers for regular connections', () => {
             return connection.put('', '/hello', { payload: 'some string' }, undefined).then(res => {
-                expect(res.headers).to.be.an('object');
-                expect(res.headers).to.not.have.property(GenericConnection.AUTH_TOKEN_HEADER);
+                expect(res.headers).toBeObject();
+                expect(res.headers).not.toHaveProperty(GenericConnection.AUTH_TOKEN_HEADER);
             });
         });
 
-        it('sends the X-Authentication-Token header for compatible connections', () => {
+        test('sends the X-Authentication-Token header for compatible connections', () => {
             return tokenConnection.put('', '/hello', { payload: 'some string' }, undefined).then(res => {
-                expect(res.headers).to.be.an('object');
-                expect(res.headers).to.have.property(GenericConnection.AUTH_TOKEN_HEADER).eq('ZGRlMjk3YjktNzVkNi00MjhlLWExZDMtM2I0ZDUyMDExMGU5LTAwNWRkYTVk');
+                expect(res.headers).toBeObject();
+                expect(res.headers).toHaveProperty(GenericConnection.AUTH_TOKEN_HEADER, 'ZGRlMjk3YjktNzVkNi00MjhlLWExZDMtM2I0ZDUyMDExMGU5LTAwNWRkYTVk');
             });
         });
     });

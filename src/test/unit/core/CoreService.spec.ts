@@ -1,14 +1,8 @@
-/**
- * @author Maarten Somers
- * @since 2017
- */
-
-import { expect } from 'chai';
 import MockAdapter from 'axios-mock-adapter';
 import axios from 'axios';
-import { CoreService } from '../../../scripts/core/service/CoreService';
-import { GCLConfig } from '../../../scripts/core/GCLConfig';
-import {LocalAuthConnection, LocalConnection} from '../../../scripts/core/client/Connection';
+import {LocalAuthConnection, GCLConfig} from '../../..';
+import {CoreService} from '../../../scripts/core/service/CoreService';
+
 
 describe('Core Services', () => {
     let gclConfig = new GCLConfig({});
@@ -34,114 +28,103 @@ describe('Core Services', () => {
             });
         });
 
-        it('makes the correct call to get consent', () => {
+        test('makes the correct call to get consent', () => {
             return core.getConsent('test', 'code', 5, 'warning', 'center', 'reader', 20).then(res => {
                 const result = res as any;
-                expect(result).to.have.property('success');
-                expect(result.success).to.be.a('boolean');
-                expect(result.success).to.eq(true);
+                expect(result).toHaveProperty('success');
+                expect(result.success).toBe(true);
 
-                expect(result).to.have.property('data');
-                expect(result.data).to.be.an('object');
+                expect(result).toHaveProperty('data');
+                expect(result.data).toBeObject();
 
-                expect(result.data).to.have.property('title');
-                expect(result.data.title).to.be.a('string').eq('test');
+                expect(result.data).toHaveProperty('title');
+                expect(result.data.title).toBe('test');
 
-                expect(result.data).to.have.property('text');
-                expect(result.data.text).to.be.a('string').eq('code');
+                expect(result.data).toHaveProperty('text');
+                expect(result.data.text).toBe('code');
 
-                expect(result.data).to.have.property('days');
-                expect(result.data.days).to.be.a('number').eq(5);
+                expect(result.data).toHaveProperty('days');
+                expect(result.data.days).toBe(5);
 
-                expect(result.data).to.have.property('alert_level');
-                expect(result.data.alert_level).to.be.a('string').eq('warning');
+                expect(result.data).toHaveProperty('alert_level');
+                expect(result.data.alert_level).toBe('warning');
 
-                expect(result.data).to.have.property('alert_position');
-                expect(result.data.alert_position).to.be.a('string').eq('center');
+                expect(result.data).toHaveProperty('alert_position');
 
-                expect(result.data).to.have.property('type');
-                expect(result.data.type).to.be.a('string').eq('reader');
+                expect(result.data).toHaveProperty('type');
+                expect(result.data.type).toBe('reader');
 
-                expect(result.data).to.have.property('timeout');
-                expect(result.data.timeout).to.be.a('number').eq(20);
+                expect(result.data).toHaveProperty('timeout');
+                expect(result.data.timeout).toBe(20);
             });
         });
 
-        it('sets default duration if not provided', () => {
+        test('sets default duration if not provided', () => {
             return core.getConsent('test2', 'code2').then(res => {
                 const result = res as any;
-                expect(result).to.have.property('success');
-                expect(result.success).to.be.a('boolean');
-                expect(result.success).to.eq(true);
+                expect(result).toHaveProperty('success');
+                expect(result.success).toBe(true);
 
-                expect(result).to.have.property('data');
-                expect(result.data).to.be.an('object');
+                expect(result).toHaveProperty('data');
+                expect(result.data).toBeObject();
 
-                expect(result.data).to.have.property('title');
-                expect(result.data.title).to.be.a('string').eq('test2');
+                expect(result.data).toHaveProperty('title');
+                expect(result.data.title).toBe('test2');
 
-                expect(result.data).to.have.property('text');
-                expect(result.data.text).to.be.a('string').eq('code2');
+                expect(result.data).toHaveProperty('text');
+                expect(result.data.text).toBe('code2');
 
-                expect(result.data).to.have.property('days');
-                expect(result.data.days).to.be.a('number').eq(1);
+                expect(result.data).toHaveProperty('days');
             });
         });
 
-        it('allows the default duration to be changed via the config file', () => {
+        test('allows the default duration to be changed via the config file', () => {
             return coreModified.getConsent('test2', 'code2').then(res => {
                 const result = res as any;
-                expect(result).to.have.property('success');
-                expect(result.success).to.be.a('boolean');
-                expect(result.success).to.eq(true);
+                expect(result).toHaveProperty('success');
+                expect(result.success).toBe(true);
 
-                expect(result).to.have.property('data');
-                expect(result.data).to.be.an('object');
+                expect(result).toHaveProperty('data');
+                expect(result.data).toBeObject();
 
-                expect(result.data).to.have.property('title');
-                expect(result.data.title).to.be.a('string').eq('test2');
+                expect(result.data).toHaveProperty('title');
+                expect(result.data.title).toBe('test2');
 
-                expect(result.data).to.have.property('text');
-                expect(result.data.text).to.be.a('string').eq('code2');
+                expect(result.data).toHaveProperty('text');
+                expect(result.data.text).toBe('code2');
 
-                expect(result.data).to.have.property('days');
-                expect(result.data.days).to.be.a('number').eq(5);
+                expect(result.data).toHaveProperty('days');
+                expect(result.data.days).toBe(5);
             });
         });
 
-        it('rejects the request if no title is provided', () => {
+        test('rejects the request if no title is provided', () => {
             return core.getConsent(undefined, 'code3', 2).then(() => {
                 return Promise.reject(new Error('no title was provided, this should fail!'));
             }, error => {
-                expect(error).to.have.property('code');
-                expect(error.code).to.be.a('string');
-                expect(error.code).to.eq('801');
+                expect(error).toHaveProperty('code');
+                expect(error.code).toBe('801');
 
-                expect(error).to.have.property('status');
-                expect(error.status).to.be.a('number');
-                expect(error.status).to.eq(400);
+                expect(error).toHaveProperty('status');
+                expect(error.status).toBe(400);
 
-                expect(error).to.have.property('description');
-                expect(error.description).to.be.a('string');
-                expect(error.description).to.eq('Title is required!');
+                expect(error).toHaveProperty('description');
+                expect(error.description).toBe('Title is required!');
             });
         });
 
-        it('rejects the request if no code word is provided', () => {
+        test('rejects the request if no code word is provided', () => {
             return core.getConsent('test4', undefined, 4).then(() => {
                 return Promise.reject(new Error('no code word was provided, this should fail!'));
             }, error => {
-                expect(error).to.have.property('code');
-                expect(error.code).to.be.a('string');
-                expect(error.code).to.eq('801');
+                expect(error).toHaveProperty('code');
+                expect(error.code).toBe('801');
 
-                expect(error).to.have.property('status');
-                expect(error.status).to.be.a('number');
-                expect(error.status).to.eq(400);
+                expect(error).toHaveProperty('status');
+                expect(error.status).toBe(400);
 
-                expect(error).to.have.property('description');
-                expect(error.description).to.be.a('string');
-                expect(error.description).to.eq('Code word is required!');
+                expect(error).toHaveProperty('description');
+                expect(error.description).toBe('Code word is required!');
             });
         });
     });
@@ -153,15 +136,13 @@ describe('Core Services', () => {
             });
         });
 
-        it('makes the correct call to get info', () => {
+        test('makes the correct call to get info', () => {
             return core.info().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toBe(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Info Data');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toBe('Info Data');
             });
         });
     });
@@ -173,15 +154,13 @@ describe('Core Services', () => {
             });
         });
 
-        it('makes the correct call to get card reader data', () => {
+        test('makes the correct call to get card reader data', () => {
             return core.reader('123').then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toBe(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Reader Data');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toBe('Reader Data');
             });
         });
     });
@@ -199,39 +178,33 @@ describe('Core Services', () => {
             });
         });
 
-        it('makes the correct call to get card reader data', () => {
+        test('makes the correct call to get card reader data', () => {
             return core.readers().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toBe(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Readers Data');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toBe('Readers Data');
             });
         });
 
-        it('makes the correct call to get card reader data with card inserted', () => {
+        test('makes the correct call to get card reader data with card inserted', () => {
             return core.readersCardAvailable().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toBe(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Readers Data Card Inserted');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toBe('Readers Data Card Inserted');
             });
         });
 
-        it('makes the correct call to get card reader data without card inserted', () => {
+        test('makes the correct call to get card reader data without card inserted', () => {
             return core.readersCardsUnavailable().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toBe(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Readers Data No Card Inserted');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toBe('Readers Data No Card Inserted');
             });
         });
     });
