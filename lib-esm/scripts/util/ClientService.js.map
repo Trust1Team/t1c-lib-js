@@ -1,1 +1,0 @@
-{"version":3,"file":"ClientService.js","sourceRoot":"","sources":["../../../src/scripts/util/ClientService.ts"],"names":[],"mappings":"AAKA,MAAM;IAGK,MAAM,CAAC,SAAS;QACnB,OAAO,aAAa,CAAC,MAAM,CAAC;IAChC,CAAC;IAEM,MAAM,CAAC,SAAS,CAAC,SAAoB;QACxC,aAAa,CAAC,MAAM,GAAG,SAAS,CAAC;IACrC,CAAC;CACJ"}

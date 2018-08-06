@@ -1,15 +1,14 @@
-/**
- * @author Maarten Somers
- * @since 2017
- */
-
-import { expect } from 'chai';
-import MockAdapter from 'axios-mock-adapter';
+import { PinEnforcer } from './../../../scripts/util/PinEnforcer';
+import { LocalConnection } from './../../../scripts/core/client/Connection';
+import { GCLConfig } from './../../../scripts/core/GCLConfig';
 import axios from 'axios';
-import { GCLConfig } from '../../../scripts/core/GCLConfig';
-import { LocalConnection } from '../../../scripts/core/client/Connection';
-import { PinEnforcer } from '../../../scripts/util/PinEnforcer';
+import MockAdapter from 'axios-mock-adapter';
 
+/**
+ *
+ * @author Gilles Platteeuw
+ * @since  2018
+ */
 
 describe('PinEnforcer Utility', () => {
     const gclConfig = new GCLConfig({});
@@ -35,17 +34,16 @@ describe('PinEnforcer Utility', () => {
                 });
         });
 
-        it('will not intervene if the config does not enable checking', () => {
+        test('will not intervene if the config does not enable checking', () => {
             return PinEnforcer.check(connection, '123', { pin: '1234' });
         });
 
-        it('will intervene if pin checking is enabled in the config', () => {
+        test('will intervene if pin checking is enabled in the config', () => {
             return PinEnforcer.check(enforcingConnection, '123', { pin: '1234'}).catch(err => {
-                expect(err).to.be.an('object');
-                expect(err).to.have.property('data');
-                expect(err.data).to.have.property('description');
-                expect(err.data.description).to.be.a('string').eq('Strict pinpad enforcement is enabled.' +
-                                                                  ' This request was sent with a PIN, but the reader has a pinpad.');
+                expect(err).toHaveProperty('data');
+                expect(err.data).toHaveProperty('description');
+                expect(err.data.description).toEqual('Strict pinpad enforcement is enabled.' +
+                    ' This request was sent with a PIN, but the reader has a pinpad.');
             });
         });
     });
@@ -62,34 +60,30 @@ describe('PinEnforcer Utility', () => {
                 });
         });
 
-        it('will reject a request that needs a pin', () => {
+        test('will reject a request that needs a pin', () => {
             return PinEnforcer.check(enforcingConnection, '321', {}).then(() => {
-                expect.fail(0, 1, 'PinEnforcer should block execution of this call');
             }, err => {
-                expect(err).to.be.an('object');
-                expect(err).to.have.property('data');
-                expect(err.data).to.have.property('status').eq(400);
-                expect(err.data).to.have.property('code').eq('601');
-                expect(err.data).to.have.property('description');
-                expect(err.data.description).to.be.a('string').eq('Strict pinpad enforcement is enabled.' +
-                                                                  ' This request was sent without a PIN, but the reader does not have' +
-                                                                  ' a pinpad and OS PIN dialog is not enabled.');
+                expect(err).toHaveProperty('data');
+                expect(err.data).toHaveProperty('status', 400);
+                expect(err.data).toHaveProperty('code', '601');
+                expect(err.data).toHaveProperty('description');
+                expect(err.data.description).toEqual('Strict pinpad enforcement is enabled.' +
+                    ' This request was sent without a PIN, but the reader does not have' +
+                    ' a pinpad and OS PIN dialog is not enabled.');
             });
         });
 
-        it('will reject a request that has pin but should not have one', () => {
+        test('will reject a request that has pin but should not have one', () => {
             return PinEnforcer.check(enforcingConnection, '123',  { pin: '1234' }).then(() => {
-                expect.fail(0, 1, 'PinEnforcer should block execution of this call');
             }, err => {
                 // console.log(err);
                 // console.log(err.data);
-                expect(err).to.be.an('object');
-                expect(err).to.have.property('data');
-                expect(err.data).to.have.property('status').eq(400);
-                expect(err.data).to.have.property('code').eq('600');
-                expect(err.data).to.have.property('description');
-                expect(err.data.description).to.be.a('string').eq('Strict pinpad enforcement is enabled.' +
-                                                                  ' This request was sent with a PIN, but the reader has a pinpad.');
+                expect(err).toHaveProperty('data');
+                expect(err.data).toHaveProperty('status', 400);
+                expect(err.data).toHaveProperty('code', '600');
+                expect(err.data).toHaveProperty('description');
+                expect(err.data.description).toEqual('Strict pinpad enforcement is enabled.' +
+                    ' This request was sent with a PIN, but the reader has a pinpad.');
             });
         });
     });

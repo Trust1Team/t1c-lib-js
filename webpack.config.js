@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
     entry: {
@@ -11,7 +12,7 @@ module.exports = {
         filename: '[name].js',
         library: 'GCLLib',
         libraryTarget: "umd",
-        umdNamedDefine: true
+        umdNamedDefine: true,
     },
     optimization: {
         minimize: true
@@ -26,11 +27,22 @@ module.exports = {
                 exclude: /node_modules/,
                 use: 'ts-loader'
             },
+            {
+                test: /\.ts$/,
+                loader: 'lodash-ts-imports-loader',
+                exclude: /node_modules/,
+                enforce: "pre"
+            },
             // {
             //     test: /\.js$/,
             //     exclude: /node_modules/,
             //     use: "babel-loader"
             // }
         ]
-    }
+    },
+    plugins: [
+        new webpack.ProvidePlugin({
+            _: 'lodash'
+        })
+    ]
 };

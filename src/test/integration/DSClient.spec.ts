@@ -1,4 +1,4 @@
-import {expect} from 'chai';
+
 import * as jwtDecode from 'jwt-decode';
 import {DSClient, GCLConfig, RemoteJwtConnection} from '../../../lib';
 
@@ -17,15 +17,15 @@ describe('DSClient', () => {
     describe('DSClient Service Expectations', () => {
 
         it('should verify that a ds client has been instantiated', () => {
-            expect(dsClient).not.undefined;
+            expect(dsClient).not.toBeDefined;
         });
 
         it('should verify that jwt decoder has been instantiated', () => {
-            expect(jwtDecode).not.undefined;
+            expect(jwtDecode).not.toBeDefined;
         });
 
         it('should return the url for DS under test', () => {
-            expect(dsClient.getUrl()).to.equals(dsUnderTest);
+            expect(dsClient.getUrl()).toEqual(dsUnderTest);
         });
 
         it('should return information for the distribution service', (done) => {

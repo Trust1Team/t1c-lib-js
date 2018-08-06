@@ -1,5 +1,3 @@
-
-import { expect } from 'chai';
 import { LocalConnection, LocalAuthConnection } from '../../../scripts/core/client/Connection';
 import {GCLConfig, GCLConfigOptions} from '../../../scripts/core/GCLConfig';
 import { CoreService } from '../../../scripts/core/service/CoreService';
@@ -24,20 +22,20 @@ describe('Plugin-Belgian eID', () => {
 
     describe('Belgian eID Test Cases', () => {
 
-        it('should verify an existing local authentication connection instance', () => {
-            expect(localAuthConnection).not.undefined;
+        test('should verify an existing local authentication connection instance', () => {
+            expect(localAuthConnection).not.toBeDefined;
         });
 
-        it('should verify an existing core service instance', () => {
-            expect(coreService).not.undefined;
+        test('should verify an existing core service instance', () => {
+            expect(coreService).not.toBeDefined;
         });
 
-        it('should verify an existing card factory instance', () => {
-            expect(cardFactory).not.undefined;
+        test('should verify an existing card factory instance', () => {
+            expect(cardFactory).not.toBeDefined;
         });
 
-        it('should return a belgian eid instance', () => {
-            expect(beidPlugin).not.undefined;
+        test('should return a belgian eid instance', () => {
+            expect(beidPlugin).not.toBeDefined;
         });
 
     });
