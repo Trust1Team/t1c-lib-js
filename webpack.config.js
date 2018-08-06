@@ -13,6 +13,14 @@ module.exports = {
         libraryTarget: "umd",
         umdNamedDefine: true
     },
+    externals: {
+        lodash: {
+            commonjs: 'lodash',
+            commonjs2: 'lodash',
+            amd: '_',
+            root: '_'
+        }
+    },
     optimization: {
         minimize: true
     },
