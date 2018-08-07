@@ -10,7 +10,6 @@ import { ResponseHandler } from '../../util/ResponseHandler';
 import { Options, RequestHandler, RequestOptions } from '../../util/RequestHandler';
 import * as _ from 'lodash';
 import {GenericContainer} from '../GenericContainer';
-import {GCLClient} from '../../core/GCLLib';
 /**
  * @author Michallis Pashidis
  * @author Maarten Somers

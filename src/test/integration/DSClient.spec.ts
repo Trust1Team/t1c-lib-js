@@ -1,11 +1,10 @@
-import {expect} from 'chai';
-import {DSClient} from '../../scripts/core/ds/DSClient';
-import {RemoteJwtConnection} from '../../scripts/core/client/Connection';
-import {GCLClient} from '../../scripts/core/GCLLib';
-import {GCLConfig} from '../../scripts/core/GCLConfig';
-// workaround in order to use require for non available module in DefinitlyTyped
-declare var require: any;
-var jwtDecode = require('jwt-decode');
+import { GCLConfig } from './../../scripts/core/GCLConfig';
+import { DSClient } from './../../scripts/core/ds/DSClient';
+import { RemoteJwtConnection } from './../../scripts/core/client/Connection';
+
+import * as jwtDecode from 'jwt-decode';
+
+
 
 describe('DSClient', () => {
     let dsUnderTest = 'http://localhost:8080/gcl-ds-web/v1';
@@ -21,15 +20,15 @@ describe('DSClient', () => {
     describe('DSClient Service Expectations', () => {
 
         it('should verify that a ds client has been instantiated', () => {
-            expect(dsClient).not.undefined;
+            expect(dsClient).not.toBeDefined;
         });
 
         it('should verify that jwt decoder has been instantiated', () => {
-            expect(jwtDecode).not.undefined;
+            expect(jwtDecode).not.toBeDefined;
         });
 
         it('should return the url for DS under test', () => {
-            expect(dsClient.getUrl()).to.equals(dsUnderTest);
+            expect(dsClient.getUrl()).toEqual(dsUnderTest);
         });
 
         it('should return information for the distribution service', (done) => {

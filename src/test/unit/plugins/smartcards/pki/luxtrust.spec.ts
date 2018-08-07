@@ -1,18 +1,23 @@
-/**
- * @author Maarten Somers
- * @since 2017
- */
-
-import { expect } from 'chai';
-import * as axios from 'axios';
-import * as MockAdapter from 'axios-mock-adapter';
-import { GCLConfig } from '../../../../../scripts/core/GCLConfig';
-import { LocalConnection } from '../../../../../scripts/core/client/Connection';
+import { LocalConnection } from './../../../../../scripts/core/client/Connection';
+import { GCLConfig } from './../../../../../scripts/core/GCLConfig';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 import { PluginFactory } from '../../../../../scripts/plugins/PluginFactory';
 
+
+
+/**
+ *
+ * @author Gilles Platteeuw
+ * @since  2018
+ */
+
 describe('LuxTrust Container', () => {
-    const gclConfig = new GCLConfig({});
-    const connection: LocalConnection = new LocalConnection(gclConfig);
+    let gclconfig = new GCLConfig({});
+    let activecontainers = new Map<string, string[]>();
+    activecontainers.set('luxtrust', ['luxtrust-v2-1-1']);
+    gclconfig.activeContainers = activecontainers;
+    const connection: LocalConnection = new LocalConnection(gclconfig);
     const luxtrust = new PluginFactory('', connection).createLuxTrust('123');
     let mock: MockAdapter;
 
@@ -26,19 +31,18 @@ describe('LuxTrust Container', () => {
 
     describe('activated', function () {
         beforeEach(function () {
-            mock.onGet('containers/luxtrust/123/activated').reply(() => {
+            mock.onGet('containers/luxtrust-v2-1-1/123/activated').reply(() => {
                 return [ 200, { data: 'Activated Data', success: true }];
             });
         });
 
-        it('makes the correct call for activated data', () => {
+        test('makes the correct call for activated data', () => {
             return luxtrust.activated().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string').eq('Activated Data');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toEqual('Activated Data');
             });
         });
     });

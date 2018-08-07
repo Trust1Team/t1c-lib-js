@@ -10,7 +10,7 @@ import {ActivationUtil} from './ActivationUtil';
 import {DSPlatformInfo} from '../core/ds/DSClientModel';
 import {PubKeyService} from './PubKeyService';
 import {T1CLibException} from '../core/exceptions/CoreExceptions';
-import {AxiosError, AxiosResponse} from 'axios';
+import {AxiosResponse} from 'axios';
 import axios from 'axios';
 import {ActivatedContainerUtil} from './ActivatedContainerUtil';
 import {BrowserInfo, InfoResponse} from '../core/service/CoreModel';
