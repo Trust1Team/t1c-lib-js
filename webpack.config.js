@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
     entry: {
@@ -11,7 +12,7 @@ module.exports = {
         filename: '[name].js',
         library: 'GCLLib',
         libraryTarget: "umd",
-        umdNamedDefine: true
+        umdNamedDefine: true,
     },
     optimization: {
         minimize: true
@@ -25,7 +26,7 @@ module.exports = {
                 test: /\.ts$/,
                 exclude: /node_modules/,
                 use: 'ts-loader'
-            },
+            }
             // {
             //     test: /\.js$/,
             //     exclude: /node_modules/,

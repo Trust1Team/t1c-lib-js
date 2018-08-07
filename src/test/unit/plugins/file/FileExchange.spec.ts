@@ -1,37 +1,40 @@
-/**
- * @author Michallis Pashidis
- * @since 2018
- */
-import {expect} from 'chai';
-import * as axios from 'axios';
-import * as MockAdapter from 'axios-mock-adapter';
-import {GCLConfig} from '../../../../scripts/core/GCLConfig';
-import {LocalConnection} from '../../../../scripts/core/client/Connection';
-import {PluginFactory} from '../../../../scripts/plugins/PluginFactory';
+import MockAdapter from 'axios-mock-adapter';
+import axios from 'axios';
+import {AbstractFileExchange, GCLConfig, LocalConnection, PluginFactory, Type} from '../../../..';
+
+
+let mock: MockAdapter;
+let gclconfig: GCLConfig;
+let connection: LocalConnection;
+let filex: AbstractFileExchange;
+
+gclconfig = new GCLConfig({});
+let activecontainers = new Map<string, string[]>();
+activecontainers.set('file-exchange', ['file-exchange-v1-1-0']);
+gclconfig.activeContainers = activecontainers;
+connection = new LocalConnection(gclconfig);
+filex = new PluginFactory('', connection).createFileExchange();
 
 describe('File Exchange', () => {
-    const gclConfig = new GCLConfig({});
-    const connection: LocalConnection = new LocalConnection(gclConfig);
-    const filex = new PluginFactory('', connection).createFileExchange();
-    let mock: MockAdapter;
-
     beforeEach(() => {
         mock = new MockAdapter(axios);
+        const mockresponse = {
+            data: new Type('1', 'testent', 'type', '/'),
+            success: true
+        };
+        mock.onPost('/file-exchange-v1-1-0/create-type', {entity: 'testent', type: 'testtype'}).reply(200, mockresponse);
+
     });
 
     afterEach(() => {
         mock.restore();
     });
-    describe('can create a new Type for an Entity', function () {
-        it('create a new type and verifies response', () => {
-            filex.createType('testent', 'testtype').then(res => {
-                console.log('result:' + res);
-               expect(res).to.have.property('success');
-               expect(res).to.have.property('data');
-               expect(res.data).to.have.property('entity');
-               expect(res.data.entity).to.be.a('string');
-               expect(rest.data.entity).to.eq('testent');
-            });
+    test('create a new type and verifies response', () => {
+        filex.createType('testent', 'testtype').then(res => {
+            expect(res).toHaveProperty('success');
+            expect(res).toHaveProperty('data');
+            expect(res.data).toHaveProperty('entity');
+            expect(res.data.entity).toBe('testent');
         });
     });
 });
