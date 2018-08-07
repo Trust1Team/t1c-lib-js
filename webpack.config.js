@@ -15,6 +15,15 @@ module.exports = {
         libraryTarget: "umd",
         umdNamedDefine: true,
     },
+    externals: {
+        lodash: {
+            commonjs: 'lodash',
+            commonjs2: 'lodash',
+            amd: 'lodash',
+            root: 'lodash',
+            umd: 'lodash'
+        }
+    },
     optimization: {
         minimize: true,
         minimizer: [new UglifyJsPlugin({
