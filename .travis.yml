@@ -6,7 +6,7 @@ before_install:
 install:
   - yarn
 script:
-  - ./node_modules/jest-cli/bin/jest
+  - node ./packages/jest-cli/bin/jest.js
   - npm build
 notifications:
   slack: trust1team:b6NFLueV7BtxzxOhUrFs9RBT
