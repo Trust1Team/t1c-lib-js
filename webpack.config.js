@@ -17,8 +17,9 @@ module.exports = {
         lodash: {
             commonjs: 'lodash',
             commonjs2: 'lodash',
-            amd: '_',
-            root: '_'
+            amd: 'lodash',
+            root: 'lodash',
+            umd: 'lodash'
         }
     },
     optimization: {
