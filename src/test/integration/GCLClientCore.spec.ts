@@ -1,4 +1,4 @@
-import {expect} from 'chai';
+
 import {LocalAuthConnection} from '../../scripts/core/client/Connection';
 import {CoreService} from '../../scripts/core/service/CoreService';
 import {GCLConfig, GCLConfigOptions} from '../../scripts/core/GCLConfig';
@@ -17,29 +17,28 @@ describe('GCLClient', () => {
     describe('GCL Core Service', () => {
 
         it('should verify that a connection has been instantiated', () => {
-            expect(localAuthConnection).not.undefined;
+            expect(localAuthConnection).not.toBeDefined;
         });
 
         it('should verify that a core service instance is available', () => {
-            expect(core).not.undefined;
+            expect(core).not.toBeDefined;
         });
 
         it('should verify that the URL has been set correctly', () => {
-            expect(core.getUrl()).to.equals(gclUnderTest);
+            expect(core.getUrl()).toEqual(gclUnderTest);
         });
 
         it('should return information about the client browser', (done) => {
             core.infoBrowser((err, data) => {
-                expect(err).to.be.null;
-                expect(data).exist;
+                expect(err).toBeNull;
+                expect(data).toBe;
                 done();
             });
         });
 
         it('should return the T1C-Lib version', () => {
             return core.version().then(version => {
-                expect(version).to.be.a('string');
-                expect(version).to.equal('%%GULP_INJECT_VERSION%%');
+                expect(version).toEqual('%%GULP_INJECT_VERSION%%');
             });
         });
     });

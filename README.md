@@ -48,10 +48,8 @@ $ npm install
 #### Run tests
 Use npm run the test suite of the project
 ```bash
-$ npm run localTest
+$ npm run test
 ```
-
-tsconfig.js  "types": [ "node", "mocha", "chai", "sinon" ]
 
 ### Build and package
 To build the Javascript library, compressed:

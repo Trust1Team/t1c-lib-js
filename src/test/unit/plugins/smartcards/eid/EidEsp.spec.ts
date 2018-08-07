@@ -1,18 +1,20 @@
 /**
- * @author Maarten Somers
- * @since 2017
+ *
+ * @author Gilles Platteeuw
+ * @since  2018
  */
 
-import { expect } from 'chai';
-import * as axios from 'axios';
-import * as MockAdapter from 'axios-mock-adapter';
-import { GCLConfig } from '../../../../../scripts/core/GCLConfig';
-import { LocalConnection } from '../../../../../scripts/core/client/Connection';
-import { PluginFactory } from '../../../../../scripts/plugins/PluginFactory';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import {LocalConnection, PluginFactory, GCLConfig} from '../../../../..';
+
 
 describe('Spanish eID Container', () => {
-    const gclConfig = new GCLConfig({});
-    const connection: LocalConnection = new LocalConnection(gclConfig);
+    let gclconfig = new GCLConfig({});
+    let activecontainers = new Map<string, string[]>();
+    activecontainers.set('dnie', ['dnie-v2-1-1']);
+    gclconfig.activeContainers = activecontainers;
+    const connection: LocalConnection = new LocalConnection(gclconfig);
     const dnie = new PluginFactory('', connection).createDNIe('123');
     let mock: MockAdapter;
 
@@ -29,20 +31,18 @@ describe('Spanish eID Container', () => {
 
     describe('info', function () {
         beforeEach(function () {
-            mock.onGet('containers/dnie/123/info').reply(() => {
+            mock.onGet('containers/dnie-v2-1-1/123/info').reply(() => {
                 return [ 200, { data: 'DNIeInfo Data', success: true }];
             });
         });
 
-        it('makes the correct call for DNIe DNIeInfo', () => {
+        test('makes the correct call for DNIe DNIeInfo', () => {
             return dnie.info().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('DNIeInfo Data');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toEqual('DNIeInfo Data');
             });
         });
     });

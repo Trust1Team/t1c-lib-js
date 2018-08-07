@@ -1,11 +1,12 @@
-/**
- * @author Maarten Somers
- * @since 2017
- */
+import { BrowserFingerprint } from './../../../scripts/util/BrowserFingerprint';
 
-import { expect } from 'chai';
-import { BrowserFingerprint } from '../../../scripts/util/BrowserFingerprint';
 import * as store from 'store2';
+
+/**
+ *
+ * @author Gilles Platteeuw
+ * @since  2018
+ */
 
 describe('Browser Fingerprint Utility', () => {
 
@@ -14,29 +15,23 @@ describe('Browser Fingerprint Utility', () => {
             store.clear();
         });
 
-        it('can generate a valid token', () => {
+        test('can generate a valid token', () => {
             let token = BrowserFingerprint.get();
-            expect(token).to.be.a('string');
         });
 
-        it('returns the same token for each call after generating one', () => {
+        test('returns the same token for each call after generating one', () => {
             let token = BrowserFingerprint.get();
             setTimeout(function () {
                 let newToken = BrowserFingerprint.get();
-                expect(token).to.be.a('string');
-                expect(newToken).to.be.a('string');
-                expect(token).to.eq(newToken);
+                expect(token).toEqual(newToken);
             }, 1000);
         });
 
-        it('adds a new token if the previous one disappears for whatever reason', () => {
+        test('adds a new token if the previous one disappears for whatever reason', () => {
             let token = BrowserFingerprint.get();
             store.remove(BrowserFingerprint.BROWSER_AUTH_TOKEN_LOCATION);
             let newToken = BrowserFingerprint.get();
-
-            expect(token).to.be.a('string');
-            expect(newToken).to.be.a('string');
-            expect(token).to.not.eq(newToken);
+            expect(token).not.toEqual(newToken);
         });
     });
 

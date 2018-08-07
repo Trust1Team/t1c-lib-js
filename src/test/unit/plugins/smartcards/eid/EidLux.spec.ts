@@ -1,24 +1,28 @@
+import { LocalConnection } from './../../../../../scripts/core/client/Connection';
+import { GCLConfig } from './../../../../../scripts/core/GCLConfig';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import { PubKeyService } from '../../../../../scripts/util/PubKeyService';
+import { AbstractEidLUX } from '../../../../../scripts/plugins/smartcards/eid/lux/EidLuxModel';
+import { PluginFactory } from '../../../../../scripts/plugins/PluginFactory';
+
+
 /**
- * @author Maarten Somers
- * @since 2017
+ *
+ * @author Gilles Platteeuw
+ * @since  2018
  */
 
-import { expect } from 'chai';
-import * as axios from 'axios';
-import * as MockAdapter from 'axios-mock-adapter';
-import { GCLConfig } from '../../../../../scripts/core/GCLConfig';
-import { LocalConnection } from '../../../../../scripts/core/client/Connection';
-import { PluginFactory } from '../../../../../scripts/plugins/PluginFactory';
-import { AbstractEidLUX } from '../../../../../scripts/plugins/smartcards/eid/lux/EidLuxModel';
-import { PubKeyService } from '../../../../../scripts/util/PubKeyService';
-
 describe('Luxembourg eID Container', () => {
-    const gclConfig = new GCLConfig({});
-    const connection: LocalConnection = new LocalConnection(gclConfig);
+    let gclconfig = new GCLConfig({});
+    let activecontainers = new Map<string, string[]>();
+    activecontainers.set('luxeid', ['luxeid-v2-1-1']);
+    gclconfig.activeContainers = activecontainers;
+    const connection: LocalConnection = new LocalConnection(gclconfig);
     PubKeyService.setPubKey('MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDlOJu6TyygqxfWT7eLtGDwajtN\n' +
-                            'FOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76\n' +
-                            'xFxdU6jE0NQ+Z+zEdhUTooNRaY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4\n' +
-                            'gwQco1KRMDSmXSMkDwIDAQAB\n');
+        'FOb9I5XRb6khyfD1Yt3YiCgQWMNW649887VGJiGr/L5i2osbl8C9+WJTeucF+S76\n' +
+        'xFxdU6jE0NQ+Z+zEdhUTooNRaY5nZiu5PgDB0ED/ZKBUSLKL7eibMxZtMlUDHjm4\n' +
+        'gwQco1KRMDSmXSMkDwIDAQAB\n');
     const lux: AbstractEidLUX = new PluginFactory('', connection).createEidLUX('123', '1234');
     let mock: MockAdapter;
 
@@ -35,7 +39,7 @@ describe('Luxembourg eID Container', () => {
 
     describe('allData', function () {
         beforeEach(function () {
-            mock.onGet('containers/luxeid/123').reply((config) => {
+            mock.onGet('containers/luxeid-v2-1-1/123').reply((config) => {
                 let headers = config.headers;
                 if (headers['X-Encrypted-Pin'] && headers['X-Encrypted-Pin'].length) {
                     return [ 200, { data: { authentication_certificate: 'All Data' }, success: true }];
@@ -45,24 +49,22 @@ describe('Luxembourg eID Container', () => {
             });
         });
 
-        it('makes the correct call for allData', () => {
+        test('makes the correct call for allData', () => {
             return lux.allData({ filters: [], parseCerts: false }).then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.have.property('authentication_certificate');
-                expect(res.data.authentication_certificate).to.have.property('base64');
-                expect(res.data.authentication_certificate.base64).to.be.a('string');
-                expect(res.data.authentication_certificate.base64).to.eq('All Data');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toHaveProperty('authentication_certificate');
+                expect(res.data.authentication_certificate).toHaveProperty('base64');
+                expect(res.data.authentication_certificate.base64).toEqual('All Data');
             });
         });
     });
 
     describe('allCerts', function () {
         beforeEach(function () {
-            mock.onGet('containers/luxeid/123/certificates').reply((config) => {
+            mock.onGet('containers/luxeid-v2-1-1/123/certificates').reply((config) => {
                 let headers = config.headers;
                 if (headers['X-Encrypted-Pin'] && headers['X-Encrypted-Pin'].length) {
                     return [ 200, { data: { authentication_certificate: 'AllCert Data' }, success: true }];
@@ -72,24 +74,22 @@ describe('Luxembourg eID Container', () => {
             });
         });
 
-        it('makes the correct call for allData', () => {
+        test('makes the correct call for allData', () => {
             return lux.allCerts({ filters: [], parseCerts: false }).then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.have.property('authentication_certificate');
-                expect(res.data.authentication_certificate).to.have.property('base64');
-                expect(res.data.authentication_certificate.base64).to.be.a('string');
-                expect(res.data.authentication_certificate.base64).to.eq('AllCert Data');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toHaveProperty('authentication_certificate');
+                expect(res.data.authentication_certificate).toHaveProperty('base64');
+                expect(res.data.authentication_certificate.base64).toEqual('AllCert Data');
             });
         });
     });
 
     describe('biometric', function () {
         beforeEach(function () {
-            mock.onGet('containers/luxeid/123/biometric').reply((config) => {
+            mock.onGet('containers/luxeid-v2-1-1/123/biometric').reply((config) => {
                 let headers = config.headers;
                 if (headers['X-Encrypted-Pin'] && headers['X-Encrypted-Pin'].length) {
                     return [ 200, { data: 'Biometric Data', success: true }];
@@ -99,22 +99,20 @@ describe('Luxembourg eID Container', () => {
             });
         });
 
-        it('makes the correct call for biometric data', () => {
+        test('makes the correct call for biometric data', () => {
             return lux.biometric().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Biometric Data');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toEqual('Biometric Data');
             });
         });
     });
 
     describe('picture', function () {
         beforeEach(function () {
-            mock.onGet('containers/luxeid/123/picture').reply((config) => {
+            mock.onGet('containers/luxeid-v2-1-1/123/picture').reply((config) => {
                 let headers = config.headers;
                 if (headers['X-Encrypted-Pin'] && headers['X-Encrypted-Pin'].length) {
                     return [ 200, { data: 'Picture Data', success: true }];
@@ -124,22 +122,20 @@ describe('Luxembourg eID Container', () => {
             });
         });
 
-        it('makes the correct call for picture data', () => {
+        test('makes the correct call for picture data', () => {
             return lux.picture().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Picture Data');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toEqual('Picture Data');
             });
         });
     });
 
     describe('getCertificate', function () {
         beforeEach(function () {
-            mock.onGet('containers/luxeid/123/certificates/authentication').reply((config) => {
+            mock.onGet('containers/luxeid-v2-1-1/123/certificates/authentication').reply((config) => {
                 let headers = config.headers;
                 if (headers['X-Encrypted-Pin'] && headers['X-Encrypted-Pin'].length) {
                     return [ 200, { data: 'Auth Cert Data', success: true }];
@@ -149,21 +145,20 @@ describe('Luxembourg eID Container', () => {
             });
         });
 
-        it('makes the correct call for a certificate', () => {
+        test('makes the correct call for a certificate', () => {
             return lux.authenticationCertificate({ parseCerts: false }).then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.have.property('base64').eq('Auth Cert Data');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toHaveProperty('base64', 'Auth Cert Data');
             });
         });
     });
 
     describe('getCertificateArray', function () {
         beforeEach(function () {
-            mock.onGet('containers/luxeid/123/certificates/root').reply((config) => {
+            mock.onGet('containers/luxeid-v2-1-1/123/certificates/root').reply((config) => {
                 let headers = config.headers;
                 if (headers['X-Encrypted-Pin'] && headers['X-Encrypted-Pin'].length) {
                     return [ 200, { data: ['Cert 1', 'Cert 2'], success: true }];
@@ -173,23 +168,21 @@ describe('Luxembourg eID Container', () => {
             });
         });
 
-        it('makes the correct call for a certificate array data', () => {
+        test('makes the correct call for a certificate array data', () => {
             return lux.rootCertificate({ parseCerts: false }).then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('array');
-                expect(res.data[0]).to.have.property('base64').eq('Cert 1');
-                expect(res.data[1]).to.have.property('base64').eq('Cert 2');
+                expect(res).toHaveProperty('data');
+                expect(res.data[0]).toHaveProperty('base64', 'Cert 1');
+                expect(res.data[1]).toHaveProperty('base64', 'Cert 2');
             });
         });
     });
 
     describe('signatureImage', function () {
         beforeEach(function () {
-            mock.onGet('containers/luxeid/123/signature-image').reply((config) => {
+            mock.onGet('containers/luxeid-v2-1-1/123/signature-image').reply((config) => {
                 let headers = config.headers;
                 if (headers['X-Encrypted-Pin'] && headers['X-Encrypted-Pin'].length) {
                     return [ 200, { data: 'Signature Image Data', success: true }];
@@ -199,22 +192,20 @@ describe('Luxembourg eID Container', () => {
             });
         });
 
-        it('makes the correct call for signature image data', () => {
+        test('makes the correct call for signature image data', () => {
             return lux.signatureImage().then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Signature Image Data');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toEqual('Signature Image Data');
             });
         });
     });
 
     describe('verifyPin', function () {
         beforeEach(function () {
-            mock.onPost('containers/luxeid/123/verify-pin').reply((config) => {
+            mock.onPost('containers/luxeid-v2-1-1/123/verify-pin').reply((config) => {
                 let data = JSON.parse(config.data);
                 let headers = config.headers;
                 if (headers['X-Encrypted-Pin'] && headers['X-Encrypted-Pin'].length && data && data.pin && data.pin.length) {
@@ -225,15 +216,13 @@ describe('Luxembourg eID Container', () => {
             });
         });
 
-        it('makes the correct call to verify pin', () => {
+        test('makes the correct call to verify pin', () => {
             return lux.verifyPin({ pin: '1234' }).then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Verify Pin Data');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toEqual('Verify Pin Data');
             });
         });
     });
@@ -241,7 +230,7 @@ describe('Luxembourg eID Container', () => {
 
     describe('authenticate', function () {
         beforeEach(function () {
-            mock.onPost('containers/luxeid/123/authenticate').reply((config) => {
+            mock.onPost('containers/luxeid-v2-1-1/123/authenticate').reply((config) => {
                 let data = JSON.parse(config.data);
                 let headers = config.headers;
                 if (headers['X-Encrypted-Pin'] && headers['X-Encrypted-Pin'].length && data && data.pin && data.pin.length) {
@@ -252,22 +241,20 @@ describe('Luxembourg eID Container', () => {
             });
         });
 
-        it('makes the correct call to authenticate', () => {
+        test('makes the correct call to authenticate', () => {
             return lux.authenticate({ pin: '1234' }).then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Authenticate Data');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toEqual('Authenticate Data');
             });
         });
     });
 
     describe('signData', function () {
         beforeEach(function () {
-            mock.onPost('containers/luxeid/123/sign').reply((config) => {
+            mock.onPost('containers/luxeid-v2-1-1/123/sign').reply((config) => {
                 let data = JSON.parse(config.data);
                 let headers = config.headers;
                 if (headers['X-Encrypted-Pin'] && headers['X-Encrypted-Pin'].length && data && data.pin && data.pin.length) {
@@ -278,15 +265,13 @@ describe('Luxembourg eID Container', () => {
             });
         });
 
-        it('makes the correct call to sign data', () => {
+        test('makes the correct call to sign data', () => {
             return lux.signData({ pin: '1234' }).then(res => {
-                expect(res).to.have.property('success');
-                expect(res.success).to.be.a('boolean');
-                expect(res.success).to.eq(true);
+                expect(res).toHaveProperty('success');
+                expect(res.success).toEqual(true);
 
-                expect(res).to.have.property('data');
-                expect(res.data).to.be.a('string');
-                expect(res.data).to.eq('Sign Data');
+                expect(res).toHaveProperty('data');
+                expect(res.data).toEqual('Sign Data');
             });
         });
     });

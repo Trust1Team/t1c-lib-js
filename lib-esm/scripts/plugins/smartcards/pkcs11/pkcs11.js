@@ -9,14 +9,19 @@ var PKCS11 = (function () {
         this.baseUrl = baseUrl;
         this.containerUrl = containerUrl;
         this.connection = connection;
-        if (platform.os.family.indexOf('Win') > -1) {
+        if (platform.os.family) {
+            if (platform.os.family.indexOf('Win') > -1) {
+                this.os = 'win';
+            }
+            if (platform.os.family.indexOf('OS X') > -1) {
+                this.os = 'mac';
+            }
+            if (!this.os) {
+                this.os = 'linux';
+            }
+        }
+        else {
             this.os = 'win';
-        }
-        if (platform.os.family.indexOf('OS X') > -1) {
-            this.os = 'mac';
-        }
-        if (!this.os) {
-            this.os = 'linux';
         }
         var moduleConfig = connection.cfg.pkcs11Config;
         if (moduleConfig && moduleConfig[this.os]) {
