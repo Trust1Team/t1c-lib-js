@@ -7,7 +7,6 @@
   "scripts": {
     "clean": "shx rm -rf dist lib lib-esm",
     "ts": "tsc && tsc -m es6 --outDir lib-esm && webpack --mode=none",
-    "test-karma": "./node_modules/karma-cli/bin/karma start --single-run --colors true",
     "test": "jest",
     "build": "npm run clean && npm run ts"
   },
