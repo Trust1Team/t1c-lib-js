@@ -1,12 +1,14 @@
 language: node_js
 node_js:
-  - "6"
+  - "8"
 before_install:
   - echo "registry=https://registry.npmjs.org\n_auth=\${NPM_TOKEN}\nemail=michallis@trust1team.com\nalways-auth=true" > .npmrc
-install:
-  - yarn
+  - curl -o- -L https://yarnpkg.com/install.sh | bash
+  - export PATH="$HOME/.yarn/bin:$PATH"
+cache:
+  yarn: true
 script:
-  - node ./packages/jest-cli/bin/jest.js
-  - npm build
+  - yarn test
+  - yarn build
 notifications:
   slack: trust1team:b6NFLueV7BtxzxOhUrFs9RBT
