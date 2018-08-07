@@ -1,6 +1,9 @@
+import { GCLConfig } from './../../scripts/core/GCLConfig';
+import { DSClient } from './../../scripts/core/ds/DSClient';
+import { RemoteJwtConnection } from './../../scripts/core/client/Connection';
 
 import * as jwtDecode from 'jwt-decode';
-import {DSClient, GCLConfig, RemoteJwtConnection} from '../../../lib';
+
 
 
 describe('DSClient', () => {
