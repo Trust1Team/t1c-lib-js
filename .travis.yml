@@ -2,11 +2,11 @@ language: node_js
 node_js:
   - "6"
 before_install:
-  - echo "registry=https://repo.t1t.be/repository/npm-group\n_auth=\${NPM_TOKEN}\nemail=development@trust1team.com\nalways-auth=true" > .npmrc
+  - echo "registry=https://registry.npmjs.org\n_auth=\${NPM_TOKEN}\nemail=michallis@trust1team.com\nalways-auth=true" > .npmrc
 install:
-  - yarn install
+  - yarn
 script:
-  - ./node_modules/karma-cli/bin/karma start --single-run --colors false
+  - ./node_modules/jest-cli/bin/jest
   - npm build
 notifications:
   slack: trust1team:b6NFLueV7BtxzxOhUrFs9RBT
