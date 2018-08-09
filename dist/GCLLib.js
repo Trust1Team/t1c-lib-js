@@ -1,12 +1,12 @@
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("lodash"));
+		module.exports = factory(require("_"));
 	else if(typeof define === 'function' && define.amd)
-		define("GCLLib", ["lodash"], factory);
+		define("GCLLib", ["_"], factory);
 	else if(typeof exports === 'object')
-		exports["GCLLib"] = factory(require("lodash"));
+		exports["GCLLib"] = factory(require("_"));
 	else
-		root["GCLLib"] = factory(root["lodash"]);
+		root["GCLLib"] = factory(root["_"]);
 })(window, function(__WEBPACK_EXTERNAL_MODULE__123__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
