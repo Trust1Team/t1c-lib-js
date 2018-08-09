@@ -1,6 +1,5 @@
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const path = require('path');
-const webpack = require('webpack');
 
 module.exports = {
     entry: {
@@ -17,11 +16,11 @@ module.exports = {
     },
     externals: {
         lodash: {
-            commonjs: 'lodash',
-            commonjs2: 'lodash',
-            amd: 'lodash',
-            root: 'lodash',
-            umd: 'lodash'
+            commonjs: '_',
+            commonjs2: '_',
+            amd: '_',
+            root: '_',
+            umd: '_'
         }
     },
     optimization: {
