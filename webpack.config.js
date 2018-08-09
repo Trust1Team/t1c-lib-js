@@ -1,5 +1,6 @@
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
     entry: {
@@ -16,13 +17,18 @@ module.exports = {
     },
     externals: {
         lodash: {
-            commonjs: '_',
-            commonjs2: '_',
-            amd: '_',
+            commonjs: 'lodash',
+            commonjs2: 'lodash',
+            amd: 'lodash',
             root: '_',
-            umd: '_'
+            umd: 'lodash'
         }
     },
+    plugins: [
+        new webpack.DefinePlugin({
+            VERSION: JSON.stringify(require("./package.json").version)
+        })
+    ],
     optimization: {
         minimize: true,
         minimizer: [new UglifyJsPlugin({
