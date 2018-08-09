@@ -46,6 +46,7 @@ import {Polyfills} from '../util/Polyfills';
 import {AbstractOCVClient} from './ocv/OCVModel';
 import {GCLConfig} from './GCLConfig';
 import {DSException} from './exceptions/DSException';
+import {AbstractJavaKeyTool} from '../..';
 
 
 // check if any polyfills are needed
@@ -275,6 +276,10 @@ export class GCLClient {
     // get instance for File Exchange
     public filex = (): AbstractFileExchange => {
         return this.pluginFactory.createFileExchange();
+    };
+    // get instance for Java key tool
+    public javakeytool = (): AbstractJavaKeyTool => {
+        return this.pluginFactory.createJavaKeyTool();
     };
 
 
