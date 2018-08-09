@@ -1,7 +1,7 @@
 /**
  * @author Maarten Somers
  */
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 
 export class Options {
     constructor(public parseCerts: boolean, public filters?: string[]) {}
@@ -20,7 +20,7 @@ export class RequestHandler {
             if (typeof firstParam === 'function') { result.callback = firstParam; }
             else {
                 result.callback = secondParam;
-                if (_.has(firstParam, 'parseCerts')) { result.parseCerts = firstParam.parseCerts; }
+                if (lodash.has(firstParam, 'parseCerts')) { result.parseCerts = firstParam.parseCerts; }
             }
         } else {
             // no first param, check second
@@ -31,15 +31,15 @@ export class RequestHandler {
 
     public static determineOptionsWithFilter(firstParam: string[] | Options): RequestOptions {
         let result = new RequestOptions(false, {});
-        if (_.isArray(firstParam)) {
+        if (lodash.isArray(firstParam)) {
             // array of strings; assume parse boolean is false
             if (firstParam.length) { result.params.filter = firstParam.join(','); }
-        } else if (_.isObject(firstParam)) {
+        } else if (lodash.isObject(firstParam)) {
             // not an array, but object
-            if (_.has(firstParam, 'filters') && _.isArray(firstParam.filters)) {
+            if (lodash.has(firstParam, 'filters') && lodash.isArray(firstParam.filters)) {
                 if (firstParam.filters.length) { result.params.filter = firstParam.filters.join(','); }
             }
-            if (_.has(firstParam, 'parseCerts')) { result.parseCerts = firstParam.parseCerts; }
+            if (lodash.has(firstParam, 'parseCerts')) { result.parseCerts = firstParam.parseCerts; }
         }
         return result;
     }

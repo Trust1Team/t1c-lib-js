@@ -11,7 +11,7 @@ var __extends = (this && this.__extends) || (function () {
 import { RemoteLoading } from '../RemoteLoading';
 import { APDU } from '../RemoteLoadingModel';
 import { ResponseHandler } from '../../../util/ResponseHandler';
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 var Belfius = (function (_super) {
     __extends(Belfius, _super);
     function Belfius() {
@@ -66,7 +66,7 @@ var Belfius = (function (_super) {
                     }
                     return _this.apdu(_this.generateStxApdus(commandStringArray), sessionId).then(function (res) {
                         var totalRx = '';
-                        _.forEach(res.data, function (partialRes) {
+                        lodash.forEach(res.data, function (partialRes) {
                             if (partialRes.rx) {
                                 totalRx += partialRes.rx;
                             }
@@ -91,7 +91,7 @@ var Belfius = (function (_super) {
     Belfius.prototype.generateStxApdus = function (commands) {
         var apduArray = [];
         var totalCommands = commands.length - 1;
-        _.forEach(commands, function (cmd, idx) {
+        lodash.forEach(commands, function (cmd, idx) {
             if (idx === 0) {
                 apduArray.push(Belfius.generateStxApdu(cmd, '01'));
             }

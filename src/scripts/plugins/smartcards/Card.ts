@@ -8,7 +8,7 @@ import { PinEnforcer } from '../../util/PinEnforcer';
 import { CertParser } from '../../util/CertParser';
 import { ResponseHandler } from '../../util/ResponseHandler';
 import { Options, RequestHandler, RequestOptions } from '../../util/RequestHandler';
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 import {GenericContainer} from '../GenericContainer';
 /**
  * @author Michallis Pashidis
@@ -80,7 +80,7 @@ export abstract class GenericReaderContainer extends GenericContainer {
         super.containerSuffix(path);
         let suffix = this.containerUrl;
         if (this.reader_id && this.reader_id.length) { suffix += '/' + this.reader_id; }
-        if (path && path.length) { suffix += _.startsWith(path, '/') ? path : '/' + path; }
+        if (path && path.length) { suffix += lodash.startsWith(path, '/') ? path : '/' + path; }
         return suffix;
     }
 }
