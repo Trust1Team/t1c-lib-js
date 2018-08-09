@@ -3,6 +3,7 @@ import {LocalAuthConnection} from '../../scripts/core/client/Connection';
 import {CoreService} from '../../scripts/core/service/CoreService';
 import {GCLConfig, GCLConfigOptions} from '../../scripts/core/GCLConfig';
 
+
 describe('GCLClient', () => {
     let gclUnderTest = 'https://localhost:10443/v1';
     let localAuthConnection: LocalAuthConnection;
@@ -33,12 +34,6 @@ describe('GCLClient', () => {
                 expect(err).toBeNull;
                 expect(data).toBe;
                 done();
-            });
-        });
-
-        it('should return the T1C-Lib version', () => {
-            return core.version().then(version => {
-                expect(version).toEqual('%%GULP_INJECT_VERSION%%');
             });
         });
     });

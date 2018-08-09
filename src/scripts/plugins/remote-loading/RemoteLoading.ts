@@ -4,7 +4,7 @@
  */
 import { AbstractRemoteLoading, APDU, CommandResponse, CommandsResponse } from './RemoteLoadingModel';
 import { T1CLibException } from '../../core/exceptions/CoreExceptions';
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 import { BoolDataResponse, DataResponse, T1CResponse } from '../../core/service/CoreModel';
 import { GenericReaderContainer } from '../smartcards/Card';
 import {LocalConnection} from '../../core/client/Connection';
@@ -45,7 +45,7 @@ export class RemoteLoading extends GenericReaderContainer implements AbstractRem
     public apdu(apdu: APDU | APDU[], sessionId?: string,
                 callback?: (error: T1CLibException, data: any) => void): Promise<any> {
         let suffix = this.containerSuffix(RemoteLoading.APDU);
-        if (_.isArray(apdu)) { suffix = this.containerSuffix(RemoteLoading.APDUS); }
+        if (lodash.isArray(apdu)) { suffix = this.containerSuffix(RemoteLoading.APDUS); }
         return this.connection.post(this.baseUrl, suffix, apdu, RemoteLoading.optionalSessionIdParam(sessionId), undefined, callback);
     }
 
@@ -65,9 +65,9 @@ export class RemoteLoading extends GenericReaderContainer implements AbstractRem
     public command(tx: string[], sessionId?: string,
                    callback?: (error: T1CLibException, data: CommandsResponse) => void): Promise<CommandsResponse>;
     public command(tx: string | string[], sessionId?: string, callback?: (error: T1CLibException, data: any) => void): Promise<any> {
-        if (_.isArray(tx)) {
+        if (lodash.isArray(tx)) {
             let body = [];
-            _.forEach(tx, txElem => { body.push({ tx: txElem }); });
+            lodash.forEach(tx, txElem => { body.push({ tx: txElem }); });
             return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.CMDS), body,
                 RemoteLoading.optionalSessionIdParam(sessionId), undefined, callback);
         } else {

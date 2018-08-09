@@ -10,7 +10,7 @@ import * as jwtDecode from 'jwt-decode';
 import * as moment from 'moment';
 import { T1CLibException } from './exceptions/CoreExceptions';
 import {Pkcs11ModuleConfig} from '../plugins/smartcards/pkcs11/pkcs11Model';
-import {T1CContainer, T1CContainerid} from './service/CoreModel';
+import {T1CContainerid} from './service/CoreModel';
 
 const defaults = {
     gclUrl: 'https://localhost:10443/v2',

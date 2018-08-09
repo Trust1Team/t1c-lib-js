@@ -1,5 +1,5 @@
 import { ResponseHandler } from '../../util/ResponseHandler';
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 import { InitUtil } from '../../util/InitUtil';
 import { ClientService } from '../../util/ClientService';
 var CORE_ACTIVATE = '/admin/activate';
@@ -15,7 +15,7 @@ var AdminService = (function () {
         this.noAuthConnection = noAuthConnection;
     }
     AdminService.errorHandler = function (error) {
-        if (error && error.status === 401 && _.includes(AdminService.JWT_ERROR_CODES, error.code)) {
+        if (error && error.status === 401 && lodash.includes(AdminService.JWT_ERROR_CODES, error.code)) {
             return InitUtil.initializeLibrary(ClientService.getClient());
         }
         else {

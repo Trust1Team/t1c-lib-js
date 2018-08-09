@@ -1,6 +1,6 @@
 import { DSClientInfo, DSRegistrationOrSyncRequest } from '../core/ds/DSClientModel';
 import { DataContainerUtil } from './DataContainerUtil';
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 import { T1CLibException } from '../core/exceptions/CoreExceptions';
 import { ContainerSyncRequest } from '../core/admin/adminModel';
 import { ActivatedContainerUtil } from './ActivatedContainerUtil';
@@ -58,7 +58,7 @@ var SyncUtil = (function () {
             poll(resolve, reject);
         });
         function poll(resolve, reject) {
-            _.delay(function () {
+            lodash.delay(function () {
                 --remainingTries;
                 client.core().info().then(function (infoData) {
                     var containers = infoData.data.containers;
@@ -99,23 +99,23 @@ var SyncUtil = (function () {
             });
         }
         function containerMissing(config, status) {
-            return _.find(config, function (cfgCt) {
-                return !_.find(status, function (statusCt) { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
+            return lodash.find(config, function (cfgCt) {
+                return !lodash.find(status, function (statusCt) { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
             });
         }
         function downloadErrored(config, status) {
-            return _.find(config, function (cfgCt) {
-                return _.find(status, function (statusCt) {
+            return lodash.find(config, function (cfgCt) {
+                return lodash.find(status, function (statusCt) {
                     return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-                        && _.includes(SyncUtil.ERROR_STATES, statusCt.status);
+                        && lodash.includes(SyncUtil.ERROR_STATES, statusCt.status);
                 });
             });
         }
         function downloadOngoing(config, status) {
-            return _.find(config, function (cfgCt) {
-                return _.find(status, function (statusCt) {
+            return lodash.find(config, function (cfgCt) {
+                return lodash.find(status, function (statusCt) {
                     return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-                        && _.includes(SyncUtil.ONGOING_STATES, statusCt.status);
+                        && lodash.includes(SyncUtil.ONGOING_STATES, statusCt.status);
                 });
             });
         }
