@@ -6,7 +6,7 @@ import {
     DeviceResponse, DSClientInfo, DSContainer, DSPlatformInfo, DSRegistrationOrSyncRequest
 } from '../core/ds/DSClientModel';
 import { DataContainerUtil } from './DataContainerUtil';
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 import { GCLClient } from '../core/GCLLib';
 import { T1CLibException } from '../core/exceptions/CoreExceptions';
 import { T1CContainer } from '../core/service/CoreModel';
@@ -119,7 +119,7 @@ export class SyncUtil {
 
         function poll(resolve?: (containers: T1CContainer[]) => void, reject?: (error: any) => void) {
             // monitor status for each container in config
-            _.delay(() => {
+            lodash.delay(() => {
                 --remainingTries;
                 client.core().info().then(infoData => {
                     let containers = infoData.data.containers;
@@ -158,25 +158,25 @@ export class SyncUtil {
         }
 
         function containerMissing(config: { name: string, version: string}[], status: { name: string, version: string, status: string }[]) {
-            return _.find(config, cfgCt => {
-                return !_.find(status, statusCt => { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
+            return lodash.find(config, cfgCt => {
+                return !lodash.find(status, statusCt => { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
             });
         }
 
         function downloadErrored(config: { name: string, version: string }[], status: { name: string, version: string, status: string }[]) {
-            return _.find(config, cfgCt => {
-                return _.find(status, statusCt => {
+            return lodash.find(config, cfgCt => {
+                return lodash.find(status, statusCt => {
                     return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-                           && _.includes(SyncUtil.ERROR_STATES, statusCt.status);
+                           && lodash.includes(SyncUtil.ERROR_STATES, statusCt.status);
                 });
             });
         }
 
         function downloadOngoing(config: { name: string, version: string }[], status: { name: string, version: string, status: string }[]) {
-            return _.find(config, cfgCt => {
-                return _.find(status, statusCt => {
+            return lodash.find(config, cfgCt => {
+                return lodash.find(status, statusCt => {
                     return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-                           && _.includes(SyncUtil.ONGOING_STATES, statusCt.status);
+                           && lodash.includes(SyncUtil.ONGOING_STATES, statusCt.status);
                 });
             });
         }

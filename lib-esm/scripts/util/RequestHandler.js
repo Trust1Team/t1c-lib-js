@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 var Options = (function () {
     function Options(parseCerts, filters) {
         this.parseCerts = parseCerts;
@@ -27,7 +27,7 @@ var RequestHandler = (function () {
             }
             else {
                 result.callback = secondParam;
-                if (_.has(firstParam, 'parseCerts')) {
+                if (lodash.has(firstParam, 'parseCerts')) {
                     result.parseCerts = firstParam.parseCerts;
                 }
             }
@@ -41,18 +41,18 @@ var RequestHandler = (function () {
     };
     RequestHandler.determineOptionsWithFilter = function (firstParam) {
         var result = new RequestOptions(false, {});
-        if (_.isArray(firstParam)) {
+        if (lodash.isArray(firstParam)) {
             if (firstParam.length) {
                 result.params.filter = firstParam.join(',');
             }
         }
-        else if (_.isObject(firstParam)) {
-            if (_.has(firstParam, 'filters') && _.isArray(firstParam.filters)) {
+        else if (lodash.isObject(firstParam)) {
+            if (lodash.has(firstParam, 'filters') && lodash.isArray(firstParam.filters)) {
                 if (firstParam.filters.length) {
                     result.params.filter = firstParam.filters.join(',');
                 }
             }
-            if (_.has(firstParam, 'parseCerts')) {
+            if (lodash.has(firstParam, 'parseCerts')) {
                 result.parseCerts = firstParam.parseCerts;
             }
         }

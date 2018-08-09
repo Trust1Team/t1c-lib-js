@@ -4836,7 +4836,7 @@ exports.ResolvedAgent = ResolvedAgent;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var ResponseHandler_1 = __webpack_require__(122);
-var _ = __webpack_require__(123);
+var lodash = __webpack_require__(123);
 var InitUtil_1 = __webpack_require__(124);
 var ClientService_1 = __webpack_require__(130);
 var CORE_ACTIVATE = '/admin/activate';
@@ -4852,7 +4852,7 @@ var AdminService = (function () {
         this.noAuthConnection = noAuthConnection;
     }
     AdminService.errorHandler = function (error) {
-        if (error && error.status === 401 && _.includes(AdminService.JWT_ERROR_CODES, error.code)) {
+        if (error && error.status === 401 && lodash.includes(AdminService.JWT_ERROR_CODES, error.code)) {
             return InitUtil_1.InitUtil.initializeLibrary(ClientService_1.ClientService.getClient());
         }
         else {
@@ -5020,7 +5020,7 @@ module.exports = __WEBPACK_EXTERNAL_MODULE__123__;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var _ = __webpack_require__(123);
+var lodash = __webpack_require__(123);
 var semver = __webpack_require__(125);
 var SyncUtil_1 = __webpack_require__(126);
 var ActivationUtil_1 = __webpack_require__(134);
@@ -5132,11 +5132,11 @@ var InitUtil = (function () {
         return hostname;
     };
     InitUtil.coreV2Compatible = function (version) {
-        var sanitized = _.split(version, '-')[0];
+        var sanitized = lodash.split(version, '-')[0];
         return semver.satisfies(sanitized, '>=2.0.0');
     };
     InitUtil.checkTokenCompatible = function (version) {
-        var sanitized = _.split(version, '-')[0];
+        var sanitized = lodash.split(version, '-')[0];
         return semver.satisfies(sanitized, '>=1.4.0');
     };
     return InitUtil;
@@ -6484,7 +6484,7 @@ function coerce(version) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var DSClientModel_1 = __webpack_require__(127);
 var DataContainerUtil_1 = __webpack_require__(129);
-var _ = __webpack_require__(123);
+var lodash = __webpack_require__(123);
 var CoreExceptions_1 = __webpack_require__(131);
 var adminModel_1 = __webpack_require__(120);
 var ActivatedContainerUtil_1 = __webpack_require__(133);
@@ -6542,7 +6542,7 @@ var SyncUtil = (function () {
             poll(resolve, reject);
         });
         function poll(resolve, reject) {
-            _.delay(function () {
+            lodash.delay(function () {
                 --remainingTries;
                 client.core().info().then(function (infoData) {
                     var containers = infoData.data.containers;
@@ -6583,23 +6583,23 @@ var SyncUtil = (function () {
             });
         }
         function containerMissing(config, status) {
-            return _.find(config, function (cfgCt) {
-                return !_.find(status, function (statusCt) { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
+            return lodash.find(config, function (cfgCt) {
+                return !lodash.find(status, function (statusCt) { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
             });
         }
         function downloadErrored(config, status) {
-            return _.find(config, function (cfgCt) {
-                return _.find(status, function (statusCt) {
+            return lodash.find(config, function (cfgCt) {
+                return lodash.find(status, function (statusCt) {
                     return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-                        && _.includes(SyncUtil.ERROR_STATES, statusCt.status);
+                        && lodash.includes(SyncUtil.ERROR_STATES, statusCt.status);
                 });
             });
         }
         function downloadOngoing(config, status) {
-            return _.find(config, function (cfgCt) {
-                return _.find(status, function (statusCt) {
+            return lodash.find(config, function (cfgCt) {
+                return lodash.find(status, function (statusCt) {
                     return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-                        && _.includes(SyncUtil.ONGOING_STATES, statusCt.status);
+                        && lodash.includes(SyncUtil.ONGOING_STATES, statusCt.status);
                 });
             });
         }
@@ -8882,7 +8882,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = __webpack_require__(136);
-var _ = __webpack_require__(123);
+var lodash = __webpack_require__(123);
 var CoreExceptions_1 = __webpack_require__(131);
 var UrlUtil_1 = __webpack_require__(167);
 var store = __webpack_require__(168);
@@ -9172,7 +9172,7 @@ var LocalConnection = (function (_super) {
         var reqHeaders = _super.prototype.getRequestHeaders.call(this, headers);
         reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
         var contextToken = this.cfg.contextToken;
-        if (contextToken && !_.isNil(contextToken)) {
+        if (contextToken && !lodash.isNil(contextToken)) {
             reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
         }
         return reqHeaders;
@@ -9187,7 +9187,7 @@ var LocalConnection = (function (_super) {
     };
     LocalConnection.prototype.requestFile = function (basePath, suffix, body, callback) {
         var _this = this;
-        var config = _.omit(this.cfg, ['apiKey', 'jwt']);
+        var config = lodash.omit(this.cfg, ['apiKey', 'jwt']);
         if (!callback || typeof callback !== 'function') {
             callback = function () {
             };
@@ -9222,7 +9222,7 @@ var LocalConnection = (function (_super) {
         });
     };
     LocalConnection.prototype.postFile = function (basePath, suffix, body, queryParams, callback) {
-        var config = _.omit(this.cfg, ['apiKey', 'jwt']);
+        var config = lodash.omit(this.cfg, ['apiKey', 'jwt']);
         if (!callback || typeof callback !== 'function') {
             callback = function () {
             };
@@ -10220,7 +10220,7 @@ exports.DSClient = DSClient;
 Object.defineProperty(exports, "__esModule", { value: true });
 var EidBe_1 = __webpack_require__(179);
 var ResponseHandler_1 = __webpack_require__(122);
-var _ = __webpack_require__(123);
+var lodash = __webpack_require__(123);
 var CardUtil_1 = __webpack_require__(227);
 var Aventra_1 = __webpack_require__(228);
 var SyncUtil_1 = __webpack_require__(126);
@@ -10337,8 +10337,8 @@ var GenericService = (function () {
         return new Promise(function (resolve, reject) {
             client.pkcs11().slotsWithTokenPresent().then(function (slots) {
                 if (slots && slots.data && slots.data.length) {
-                    var validToken = _.find(slots.data, function (slot) {
-                        return _.includes(_this.PKCS11_FLAGS, slot.flags);
+                    var validToken = lodash.find(slots.data, function (slot) {
+                        return lodash.includes(_this.PKCS11_FLAGS, slot.flags);
                     });
                     resolve(!!validToken);
                 }
@@ -10352,7 +10352,7 @@ var GenericService = (function () {
     };
     GenericService.checkCanAuthenticate = function (data) {
         return new Promise(function (resolve) {
-            data.data = _.filter(data.data, function (reader) {
+            data.data = lodash.filter(data.data, function (reader) {
                 return CardUtil_1.CardUtil.canAuthenticate(reader.card);
             });
             resolve(data);
@@ -10360,7 +10360,7 @@ var GenericService = (function () {
     };
     GenericService.checkCanSign = function (data) {
         return new Promise(function (resolve) {
-            data.data = _.filter(data.data, function (reader) {
+            data.data = lodash.filter(data.data, function (reader) {
                 return CardUtil_1.CardUtil.canSign(reader.card);
             });
             resolve(data);
@@ -10368,7 +10368,7 @@ var GenericService = (function () {
     };
     GenericService.checkCanVerifyPin = function (data) {
         return new Promise(function (resolve) {
-            data.data = _.filter(data.data, function (reader) {
+            data.data = lodash.filter(data.data, function (reader) {
                 return CardUtil_1.CardUtil.canVerifyPin(reader.card);
             });
             resolve(data);
@@ -10377,8 +10377,8 @@ var GenericService = (function () {
     GenericService.filterByAvailableContainers = function (args) {
         return args.client.core().info().then(function (info) {
             return new Promise(function (resolve) {
-                args.readers.data = _.filter(args.readers.data, function (reader) {
-                    return _.find(info.data.containers, function (ct) {
+                args.readers.data = lodash.filter(args.readers.data, function (reader) {
+                    return lodash.find(info.data.containers, function (ct) {
                         return ct.name === CardUtil_1.CardUtil.determineContainer(reader.card);
                     });
                 });
@@ -10406,7 +10406,7 @@ var GenericService = (function () {
     };
     GenericService.checkReaderPresent = function (args) {
         return new Promise(function (resolve, reject) {
-            var reader = _.find(args.readers.data, function (rd) {
+            var reader = lodash.find(args.readers.data, function (rd) {
                 return rd.id === args.readerId;
             });
             if (reader) {
@@ -10426,7 +10426,7 @@ var GenericService = (function () {
         return new Promise(function (resolve, reject) {
             if (args && args.container) {
                 args.client.core().info().then(function (res) {
-                    if (_.find(res.data.containers, function (ct) {
+                    if (lodash.find(res.data.containers, function (ct) {
                         return ct.name === args.container && ct.status === SyncUtil_1.SyncUtil.INSTALLED;
                     })) {
                         resolve(args);
@@ -10561,7 +10561,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Card_1 = __webpack_require__(180);
 var PinEnforcer_1 = __webpack_require__(181);
 var RequestHandler_1 = __webpack_require__(225);
-var _ = __webpack_require__(123);
+var lodash = __webpack_require__(123);
 var EidBe = (function (_super) {
     __extends(EidBe, _super);
     function EidBe(baseUrl, containerUrl, connection, reader_id) {
@@ -10597,7 +10597,7 @@ var EidBe = (function (_super) {
     EidBe.prototype.verifyPin = function (body, callback) {
         var _this = this;
         return PinEnforcer_1.PinEnforcer.check(this.connection, this.reader_id, body).then(function () {
-            var encryptedBody = _.extend({ private_key_reference: EidBe.VERIFY_PRIV_KEY_REF }, body);
+            var encryptedBody = lodash.extend({ private_key_reference: EidBe.VERIFY_PRIV_KEY_REF }, body);
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(Card_1.GenericCertCard.VERIFY_PIN), encryptedBody, undefined, undefined, callback);
         });
     };
@@ -10633,7 +10633,7 @@ var PinEnforcer_1 = __webpack_require__(181);
 var CertParser_1 = __webpack_require__(183);
 var ResponseHandler_1 = __webpack_require__(122);
 var RequestHandler_1 = __webpack_require__(225);
-var _ = __webpack_require__(123);
+var lodash = __webpack_require__(123);
 var GenericContainer_1 = __webpack_require__(226);
 var OptionalPin = (function () {
     function OptionalPin(pin, pace) {
@@ -10702,7 +10702,7 @@ var GenericReaderContainer = (function (_super) {
             suffix += '/' + this.reader_id;
         }
         if (path && path.length) {
-            suffix += _.startsWith(path, '/') ? path : '/' + path;
+            suffix += lodash.startsWith(path, '/') ? path : '/' + path;
         }
         return suffix;
     };
@@ -16354,7 +16354,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var _ = __webpack_require__(123);
+var lodash = __webpack_require__(123);
 var asn1js = __webpack_require__(184);
 var Base64 = __webpack_require__(170);
 var Certificate_1 = __webpack_require__(186);
@@ -16364,23 +16364,23 @@ var CertParser = (function () {
     function CertParser() {
     }
     CertParser.process = function (response, parseCerts, callback) {
-        if (response && response.data && typeof response.data === 'object' && !_.isArray(response.data)) {
-            _.forEach(response.data, function (value, key) {
+        if (response && response.data && typeof response.data === 'object' && !lodash.isArray(response.data)) {
+            lodash.forEach(response.data, function (value, key) {
                 if (key.indexOf('certificate') > -1) {
                     if (typeof value === 'string') {
                         response.data[key] = { base64: value };
                         CertParser.setParsed(response.data[key], value, parseCerts);
                     }
-                    else if (_.isArray(value)) {
+                    else if (lodash.isArray(value)) {
                         var newData_1 = [];
-                        _.forEach(value, function (certificate) {
+                        lodash.forEach(value, function (certificate) {
                             var cert = new CoreModel_1.T1CCertificate(certificate);
                             CertParser.setParsed(cert, certificate, parseCerts);
                             newData_1.push(cert);
                         });
                         response.data[key] = newData_1;
                     }
-                    else if (_.isObject(value)) {
+                    else if (lodash.isObject(value)) {
                         response.data[key] = { base64: value.base64 };
                         if (value.id) {
                             response.data[key].id = value.id;
@@ -16393,9 +16393,9 @@ var CertParser = (function () {
             });
         }
         else {
-            if (_.isArray(response.data)) {
+            if (lodash.isArray(response.data)) {
                 var newData_2 = [];
-                _.forEach(response.data, function (certificate) {
+                lodash.forEach(response.data, function (certificate) {
                     if (typeof certificate === 'string') {
                         var cert = new CoreModel_1.T1CCertificate(certificate);
                         CertParser.setParsed(cert, certificate, parseCerts);
@@ -34213,7 +34213,7 @@ exports.default = Extensions;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var _ = __webpack_require__(123);
+var lodash = __webpack_require__(123);
 var Options = (function () {
     function Options(parseCerts, filters) {
         this.parseCerts = parseCerts;
@@ -34242,7 +34242,7 @@ var RequestHandler = (function () {
             }
             else {
                 result.callback = secondParam;
-                if (_.has(firstParam, 'parseCerts')) {
+                if (lodash.has(firstParam, 'parseCerts')) {
                     result.parseCerts = firstParam.parseCerts;
                 }
             }
@@ -34256,18 +34256,18 @@ var RequestHandler = (function () {
     };
     RequestHandler.determineOptionsWithFilter = function (firstParam) {
         var result = new RequestOptions(false, {});
-        if (_.isArray(firstParam)) {
+        if (lodash.isArray(firstParam)) {
             if (firstParam.length) {
                 result.params.filter = firstParam.join(',');
             }
         }
-        else if (_.isObject(firstParam)) {
-            if (_.has(firstParam, 'filters') && _.isArray(firstParam.filters)) {
+        else if (lodash.isObject(firstParam)) {
+            if (lodash.has(firstParam, 'filters') && lodash.isArray(firstParam.filters)) {
                 if (firstParam.filters.length) {
                     result.params.filter = firstParam.filters.join(',');
                 }
             }
-            if (_.has(firstParam, 'parseCerts')) {
+            if (lodash.has(firstParam, 'parseCerts')) {
                 result.parseCerts = firstParam.parseCerts;
             }
         }
@@ -34316,7 +34316,7 @@ exports.GenericContainer = GenericContainer;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var _ = __webpack_require__(123);
+var lodash = __webpack_require__(123);
 var RequestHandler_1 = __webpack_require__(225);
 var CardUtil = (function () {
     function CardUtil() {
@@ -34380,7 +34380,7 @@ var CardUtil = (function () {
         }
     };
     CardUtil.determineContainer = function (card) {
-        if (!_.isEmpty(card) && !_.isEmpty(card.description)) {
+        if (!lodash.isEmpty(card) && !lodash.isEmpty(card.description)) {
             if (findDescription(card.description, 'Belgium Electronic ID card')) {
                 return 'beid';
             }
@@ -34427,7 +34427,7 @@ var CardUtil = (function () {
             return undefined;
         }
         function findDescription(descriptions, toFind) {
-            return !!_.find(descriptions, function (desc) {
+            return !!lodash.find(descriptions, function (desc) {
                 var lowercaseDesc = desc.toLowerCase();
                 var lowercaseToFind = toFind.toLowerCase();
                 return lowercaseDesc.indexOf(lowercaseToFind) > -1;
@@ -35064,7 +35064,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var RemoteLoading_1 = __webpack_require__(235);
 var RemoteLoadingModel_1 = __webpack_require__(236);
 var ResponseHandler_1 = __webpack_require__(122);
-var _ = __webpack_require__(123);
+var lodash = __webpack_require__(123);
 var Belfius = (function (_super) {
     __extends(Belfius, _super);
     function Belfius() {
@@ -35119,7 +35119,7 @@ var Belfius = (function (_super) {
                     }
                     return _this.apdu(_this.generateStxApdus(commandStringArray), sessionId).then(function (res) {
                         var totalRx = '';
-                        _.forEach(res.data, function (partialRes) {
+                        lodash.forEach(res.data, function (partialRes) {
                             if (partialRes.rx) {
                                 totalRx += partialRes.rx;
                             }
@@ -35144,7 +35144,7 @@ var Belfius = (function (_super) {
     Belfius.prototype.generateStxApdus = function (commands) {
         var apduArray = [];
         var totalCommands = commands.length - 1;
-        _.forEach(commands, function (cmd, idx) {
+        lodash.forEach(commands, function (cmd, idx) {
             if (idx === 0) {
                 apduArray.push(Belfius.generateStxApdu(cmd, '01'));
             }
@@ -35180,7 +35180,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var _ = __webpack_require__(123);
+var lodash = __webpack_require__(123);
 var Card_1 = __webpack_require__(180);
 var RemoteLoading = (function (_super) {
     __extends(RemoteLoading, _super);
@@ -35200,7 +35200,7 @@ var RemoteLoading = (function (_super) {
     };
     RemoteLoading.prototype.apdu = function (apdu, sessionId, callback) {
         var suffix = this.containerSuffix(RemoteLoading.APDU);
-        if (_.isArray(apdu)) {
+        if (lodash.isArray(apdu)) {
             suffix = this.containerSuffix(RemoteLoading.APDUS);
         }
         return this.connection.post(this.baseUrl, suffix, apdu, RemoteLoading.optionalSessionIdParam(sessionId), undefined, callback);
@@ -35212,9 +35212,9 @@ var RemoteLoading = (function (_super) {
         return this.connection.get(this.baseUrl, this.containerSuffix(RemoteLoading.CCID_FEATURES), RemoteLoading.optionalSessionIdParam(sessionId), undefined, callback);
     };
     RemoteLoading.prototype.command = function (tx, sessionId, callback) {
-        if (_.isArray(tx)) {
+        if (lodash.isArray(tx)) {
             var body_1 = [];
-            _.forEach(tx, function (txElem) { body_1.push({ tx: txElem }); });
+            lodash.forEach(tx, function (txElem) { body_1.push({ tx: txElem }); });
             return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.CMDS), body_1, RemoteLoading.optionalSessionIdParam(sessionId), undefined, callback);
         }
         else {
@@ -36763,7 +36763,7 @@ exports.PivAllData = PivAllData;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var _ = __webpack_require__(123);
+var lodash = __webpack_require__(123);
 var CertParser_1 = __webpack_require__(183);
 var ResponseHandler_1 = __webpack_require__(122);
 var platform = __webpack_require__(253);
@@ -36794,7 +36794,7 @@ var PKCS11 = (function () {
         }
     }
     PKCS11.prototype.certificates = function (slotId, options, callback) {
-        var req = _.extend({ slot_id: slotId }, { module: this.modulePath });
+        var req = lodash.extend({ slot_id: slotId }, { module: this.modulePath });
         var reqOptions = RequestHandler_1.RequestHandler.determineOptions(options, callback);
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.ALL_CERTIFICATES), req, undefined).then(function (data) {
             return CertParser_1.CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
@@ -36844,7 +36844,7 @@ var PKCS11 = (function () {
         });
     };
     PKCS11.prototype.token = function (slotId, callback) {
-        var req = _.extend({ slot_id: slotId }, { module: this.modulePath });
+        var req = lodash.extend({ slot_id: slotId }, { module: this.modulePath });
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.TOKEN), req, undefined).then(function (data) {
             return ResponseHandler_1.ResponseHandler.response(data, callback);
         }, function (err) {
