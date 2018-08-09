@@ -6,7 +6,7 @@
 	else if(typeof exports === 'object')
 		exports["GCLLib"] = factory(require("lodash"));
 	else
-		root["GCLLib"] = factory(root["lodash"]);
+		root["GCLLib"] = factory(root["_"]);
 })(window, function(__WEBPACK_EXTERNAL_MODULE__123__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -56123,7 +56123,7 @@ var CoreService = (function () {
     CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
     CoreService.prototype.getUrl = function () { return this.url; };
     CoreService.prototype.version = function () {
-        return Promise.resolve('%%GULP_INJECT_VERSION%%');
+        return Promise.resolve("2.2.4");
     };
     return CoreService;
 }());
