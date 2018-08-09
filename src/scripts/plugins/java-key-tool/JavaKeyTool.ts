@@ -1,7 +1,6 @@
 import {AbstractJavaKeyTool, GenerateKeyPairData, GenerateKeyPairResponse} from './JavaKeyToolModel';
 import {DataResponse, T1CLibException} from '../../..';
 import {LocalConnection} from '../../core/client/Connection';
-import {FileExchange} from '../file/FileExchange';
 import {GenericContainer} from '../GenericContainer';
 
 /**

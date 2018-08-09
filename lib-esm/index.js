@@ -47,6 +47,8 @@ export * from './scripts/plugins/smartcards/pki/oberthur/Oberthur';
 export * from './scripts/plugins/smartcards/pki/oberthur/OberthurModel';
 export * from './scripts/plugins/smartcards/Card';
 export * from './scripts/plugins/PluginFactory';
+export * from './scripts/plugins/java-key-tool/JavaKeyTool';
+export * from './scripts/plugins/java-key-tool/JavaKeyToolModel';
 export * from './scripts/util/ActivationUtil';
 export * from './scripts/util/BrowserFingerprint';
 export * from './scripts/util/CardUtil';
