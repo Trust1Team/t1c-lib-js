@@ -111,6 +111,9 @@ var GCLClient = (function () {
         this.filex = function () {
             return _this.pluginFactory.createFileExchange();
         };
+        this.javakeytool = function () {
+            return _this.pluginFactory.createJavaKeyTool();
+        };
         this.localConfig = cfg;
         this.connection = new LocalConnection(this.localConfig);
         this.authConnection = new LocalAuthConnection(this.localConfig);
