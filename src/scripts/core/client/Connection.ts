@@ -5,7 +5,7 @@
 
 import {GCLConfig} from '../GCLConfig';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 import {T1CLibException} from '../exceptions/CoreExceptions';
 import {UrlUtil} from '../../util/UrlUtil';
 import * as store from 'store2';
@@ -516,7 +516,7 @@ export class LocalConnection extends GenericConnection implements Connection {
         // contextToken = application id (ex. 26)
         let contextToken = this.cfg.contextToken;
         // only send relay-state header when a DS is available
-        if (contextToken && !_.isNil(contextToken)) {
+        if (contextToken && !lodash.isNil(contextToken)) {
             reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
         }
         return reqHeaders;
@@ -562,7 +562,7 @@ export class LocalConnection extends GenericConnection implements Connection {
         rel_path: string[],
         notify_on_completion: boolean
     }, callback?: RequestCallback): Promise<any> {
-        let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
+        let config: any = lodash.omit(this.cfg, ['apiKey', 'jwt']);
         // init callback if necessary
         if (!callback || typeof callback !== 'function') {
             callback = function () { /* no-op */
@@ -607,7 +607,7 @@ export class LocalConnection extends GenericConnection implements Connection {
      * @returns {Promise<any>}
      */
     public postFile(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any> {
-        let config: any = _.omit(this.cfg, ['apiKey', 'jwt']);
+        let config: any = lodash.omit(this.cfg, ['apiKey', 'jwt']);
         // init callback if necessary
         if (!callback || typeof callback !== 'function') {
             callback = function () { /* no-op */

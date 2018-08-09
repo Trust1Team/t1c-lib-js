@@ -1,7 +1,7 @@
 /**
  * @author Maarten Somers
  */
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 import { Options } from './RequestHandler';
 import {SmartCard} from '../core/service/CoreModel';
 
@@ -72,7 +72,7 @@ export class CardUtil {
     }
 
     public static determineContainer(card: SmartCard): string {
-        if (!_.isEmpty(card) && !_.isEmpty(card.description)) {
+        if (!lodash.isEmpty(card) && !lodash.isEmpty(card.description)) {
             if (findDescription( card.description, 'Belgium Electronic ID card')) { return 'beid'; }
             else if (findDescription(card.description, 'DNI electronico')) {return 'dnie'; }
             else if (findDescription(card.description, 'Grand Duchy of Luxembourg / Identity card with LuxTrust certificate (eID)')) {
@@ -95,7 +95,7 @@ export class CardUtil {
         }
 
         function findDescription(descriptions: string[], toFind: string) {
-            return !!_.find(descriptions, desc => {
+            return !!lodash.find(descriptions, desc => {
                 // make sure there are no casing issues with our search strings
                 const lowercaseDesc = desc.toLowerCase();
                 const lowercaseToFind = toFind.toLowerCase();

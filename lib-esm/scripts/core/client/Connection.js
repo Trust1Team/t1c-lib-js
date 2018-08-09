@@ -9,7 +9,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 import axios from 'axios';
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 import { T1CLibException } from '../exceptions/CoreExceptions';
 import { UrlUtil } from '../../util/UrlUtil';
 import * as store from 'store2';
@@ -299,7 +299,7 @@ var LocalConnection = (function (_super) {
         var reqHeaders = _super.prototype.getRequestHeaders.call(this, headers);
         reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
         var contextToken = this.cfg.contextToken;
-        if (contextToken && !_.isNil(contextToken)) {
+        if (contextToken && !lodash.isNil(contextToken)) {
             reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
         }
         return reqHeaders;
@@ -314,7 +314,7 @@ var LocalConnection = (function (_super) {
     };
     LocalConnection.prototype.requestFile = function (basePath, suffix, body, callback) {
         var _this = this;
-        var config = _.omit(this.cfg, ['apiKey', 'jwt']);
+        var config = lodash.omit(this.cfg, ['apiKey', 'jwt']);
         if (!callback || typeof callback !== 'function') {
             callback = function () {
             };
@@ -349,7 +349,7 @@ var LocalConnection = (function (_super) {
         });
     };
     LocalConnection.prototype.postFile = function (basePath, suffix, body, queryParams, callback) {
-        var config = _.omit(this.cfg, ['apiKey', 'jwt']);
+        var config = lodash.omit(this.cfg, ['apiKey', 'jwt']);
         if (!callback || typeof callback !== 'function') {
             callback = function () {
             };
