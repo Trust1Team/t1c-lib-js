@@ -13,6 +13,8 @@ import { T1CContainer } from '../core/service/CoreModel';
 import { ContainerSyncRequest } from '../core/admin/adminModel';
 import {ActivatedContainerUtil} from './ActivatedContainerUtil';
 
+declare var VERSION;
+
 export class SyncUtil {
     static readonly DOWNLOAD_ERROR = 'DOWNLOAD_ERROR';
     static readonly GENERIC_ERROR = 'ERROR';
@@ -62,7 +64,7 @@ export class SyncUtil {
               info.os,
               info.ua,
               client.config().gwUrl,
-              new DSClientInfo('JAVASCRIPT', '%%GULP_INJECT_VERSION%%'),
+              new DSClientInfo('JAVASCRIPT', VERSION),
               info.namespace,
               containers)
           );
