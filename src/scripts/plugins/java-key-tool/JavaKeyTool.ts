@@ -12,7 +12,7 @@ import {GenericContainer} from '../GenericContainer';
 export class JavaKeyTool extends GenericContainer implements AbstractJavaKeyTool {
 
     static CONTAINER_PREFIX = 'java-keytool';
-    static GENERATE_KEY_PAIR = 'genkeypair';
+    static GENERATE_KEY_PAIR = '/genkeypair';
 
     constructor(baseUrl: string, containerUrl: string, connection: LocalConnection) {
         super(baseUrl, containerUrl, connection, JavaKeyTool.CONTAINER_PREFIX);
