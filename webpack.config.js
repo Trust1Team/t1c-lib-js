@@ -20,10 +20,15 @@ module.exports = {
             commonjs: 'lodash',
             commonjs2: 'lodash',
             amd: 'lodash',
-            root: 'lodash',
+            root: '_',
             umd: 'lodash'
         }
     },
+    plugins: [
+        new webpack.DefinePlugin({
+            VERSION: JSON.stringify(require("./package.json").version)
+        })
+    ],
     optimization: {
         minimize: true,
         minimizer: [new UglifyJsPlugin({

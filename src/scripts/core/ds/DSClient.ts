@@ -4,7 +4,6 @@
  */
 import {Connection} from '../client/Connection';
 import {GCLConfig} from '../GCLConfig';
-import * as CoreExceptions from '../exceptions/CoreExceptions';
 import {
     AbstractDSClient, DeviceResponse, DSDownloadLinkResponse, DSDownloadRequest,
     DSInfoResponse, DSPubKeyResponse, DSRegistrationOrSyncRequest

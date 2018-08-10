@@ -9,7 +9,7 @@ import {
 } from './adminModel';
 import {DataArrayResponse, T1CResponse} from '../service/CoreModel';
 import { ResponseHandler } from '../../util/ResponseHandler';
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 import { InitUtil } from '../../util/InitUtil';
 import { T1CLibException } from '../exceptions/CoreExceptions';
 import { ClientService } from '../../util/ClientService';
@@ -40,7 +40,7 @@ export class AdminService implements AbstractAdmin {
 
     private static errorHandler(error: T1CLibException) {
         // check if the error is JWT related
-        if (error && error.status === 401 && _.includes(AdminService.JWT_ERROR_CODES, error.code)) {
+        if (error && error.status === 401 && lodash.includes(AdminService.JWT_ERROR_CODES, error.code)) {
             // error is JWT related, re-run the authorisation flow
             return InitUtil.initializeLibrary(ClientService.getClient());
         } else {

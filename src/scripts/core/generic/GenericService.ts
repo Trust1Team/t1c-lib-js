@@ -8,7 +8,7 @@ import {EidBe} from '../../plugins/smartcards/eid/be/EidBe';
 import {T1CLibException} from '../exceptions/CoreExceptions';
 import {CardReader, CardReadersResponse, DataResponse} from '../service/CoreModel';
 import {ResponseHandler} from '../../util/ResponseHandler';
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 import {CardUtil} from '../../util/CardUtil';
 import {Aventra} from '../../plugins/smartcards/pki/aventra/Aventra';
 import {Options} from '../../util/RequestHandler';
@@ -152,8 +152,8 @@ export class GenericService {
             client.pkcs11().slotsWithTokenPresent().then(slots => {
                 if (slots && slots.data && slots.data.length) {
                     // check if valid token present
-                    let validToken = _.find(slots.data, slot => {
-                        return _.includes(this.PKCS11_FLAGS, slot.flags);
+                    let validToken = lodash.find(slots.data, slot => {
+                        return lodash.includes(this.PKCS11_FLAGS, slot.flags);
                     });
                     resolve(!!validToken);
                 } else {
@@ -167,7 +167,7 @@ export class GenericService {
 
     private static checkCanAuthenticate(data: CardReadersResponse) {
         return new Promise((resolve) => {
-            data.data = _.filter(data.data, reader => {
+            data.data = lodash.filter(data.data, reader => {
                 return CardUtil.canAuthenticate(reader.card);
             });
             resolve(data);
@@ -176,7 +176,7 @@ export class GenericService {
 
     private static checkCanSign(data: CardReadersResponse) {
         return new Promise((resolve) => {
-            data.data = _.filter(data.data, reader => {
+            data.data = lodash.filter(data.data, reader => {
                 return CardUtil.canSign(reader.card);
             });
             resolve(data);
@@ -185,7 +185,7 @@ export class GenericService {
 
     private static checkCanVerifyPin(data: CardReadersResponse) {
         return new Promise((resolve) => {
-            data.data = _.filter(data.data, reader => {
+            data.data = lodash.filter(data.data, reader => {
                 return CardUtil.canVerifyPin(reader.card);
             });
             resolve(data);
@@ -195,8 +195,8 @@ export class GenericService {
     private static filterByAvailableContainers(args: { client: GCLClient, readers: CardReadersResponse }): Promise<CardReadersResponse> {
         return args.client.core().info().then(info => {
             return new Promise<CardReadersResponse>((resolve) => {
-                args.readers.data = _.filter(args.readers.data, reader => {
-                    return _.find(info.data.containers, ct => {
+                args.readers.data = lodash.filter(args.readers.data, reader => {
+                    return lodash.find(info.data.containers, ct => {
                         return ct.name === CardUtil.determineContainer(reader.card);
                     });
                 });
@@ -226,7 +226,7 @@ export class GenericService {
 
     private static checkReaderPresent(args: { readerId: string, certificateId: string, readers: CardReadersResponse }) {
         return new Promise((resolve, reject) => {
-            let reader = _.find(args.readers.data, rd => {
+            let reader = lodash.find(args.readers.data, rd => {
                 return rd.id === args.readerId;
             });
             if (reader) {
@@ -246,7 +246,7 @@ export class GenericService {
         return new Promise((resolve, reject) => {
             if (args && args.container) {
                 args.client.core().info().then(res => {
-                    if (_.find(res.data.containers, ct => {
+                    if (lodash.find(res.data.containers, ct => {
                         return ct.name === args.container && ct.status === SyncUtil.INSTALLED;
                     })) {
                         resolve(args);

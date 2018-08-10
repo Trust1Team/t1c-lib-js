@@ -1,7 +1,7 @@
 import {T1CLibException} from '../../../core/exceptions/CoreExceptions';
 import {BoolDataResponse, DataResponse} from '../../../core/service/CoreModel';
 import {LocalConnection} from '../../../core/client/Connection';
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 import {CertParser} from '../../../util/CertParser';
 import {ResponseHandler} from '../../../util/ResponseHandler';
 import * as platform from 'platform';
@@ -67,7 +67,7 @@ export class PKCS11 implements AbstractPkcs11 {
                         options?: Options,
                         callback?: (error: T1CLibException, data: Pkcs11CertificatesResponse)
                             => void): Promise<Pkcs11CertificatesResponse> {
-        let req = _.extend({slot_id: slotId}, {module: this.modulePath});
+        let req = lodash.extend({slot_id: slotId}, {module: this.modulePath});
         const reqOptions = RequestHandler.determineOptions(options, callback);
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.ALL_CERTIFICATES), req, undefined).then(data => {
             return CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
@@ -122,7 +122,7 @@ export class PKCS11 implements AbstractPkcs11 {
     }
 
     public token(slotId: string, callback: (error: T1CLibException, data: Pkcs11TokenResponse) => void): Promise<Pkcs11TokenResponse> {
-        let req = _.extend({slot_id: slotId}, {module: this.modulePath});
+        let req = lodash.extend({slot_id: slotId}, {module: this.modulePath});
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.TOKEN), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
         }, err => {
