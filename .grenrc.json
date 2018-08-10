@@ -1,0 +1,10 @@
+{
+    "dataSource": "milestones",
+    "prefix": "v",
+    "groupBy": "label",
+    "milestoneMatch": "Release {{tag_name}}",
+    "changelogFilename": "CHANGELOG.md",
+    "template": {
+        "issue": "- {{name}} [{{text}}]({{url}})"
+    }
+}

@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 import { CertParser } from '../../../util/CertParser';
 import { ResponseHandler } from '../../../util/ResponseHandler';
 import * as platform from 'platform';
@@ -29,7 +29,7 @@ var PKCS11 = (function () {
         }
     }
     PKCS11.prototype.certificates = function (slotId, options, callback) {
-        var req = _.extend({ slot_id: slotId }, { module: this.modulePath });
+        var req = lodash.extend({ slot_id: slotId }, { module: this.modulePath });
         var reqOptions = RequestHandler.determineOptions(options, callback);
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.ALL_CERTIFICATES), req, undefined).then(function (data) {
             return CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
@@ -79,7 +79,7 @@ var PKCS11 = (function () {
         });
     };
     PKCS11.prototype.token = function (slotId, callback) {
-        var req = _.extend({ slot_id: slotId }, { module: this.modulePath });
+        var req = lodash.extend({ slot_id: slotId }, { module: this.modulePath });
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.TOKEN), req, undefined).then(function (data) {
             return ResponseHandler.response(data, callback);
         }, function (err) {

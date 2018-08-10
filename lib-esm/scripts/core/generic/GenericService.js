@@ -1,6 +1,6 @@
 import { EidBe } from '../../plugins/smartcards/eid/be/EidBe';
 import { ResponseHandler } from '../../util/ResponseHandler';
-import * as _ from 'lodash';
+import * as lodash from 'lodash';
 import { CardUtil } from '../../util/CardUtil';
 import { Aventra } from '../../plugins/smartcards/pki/aventra/Aventra';
 import { SyncUtil } from '../../util/SyncUtil';
@@ -117,8 +117,8 @@ var GenericService = (function () {
         return new Promise(function (resolve, reject) {
             client.pkcs11().slotsWithTokenPresent().then(function (slots) {
                 if (slots && slots.data && slots.data.length) {
-                    var validToken = _.find(slots.data, function (slot) {
-                        return _.includes(_this.PKCS11_FLAGS, slot.flags);
+                    var validToken = lodash.find(slots.data, function (slot) {
+                        return lodash.includes(_this.PKCS11_FLAGS, slot.flags);
                     });
                     resolve(!!validToken);
                 }
@@ -132,7 +132,7 @@ var GenericService = (function () {
     };
     GenericService.checkCanAuthenticate = function (data) {
         return new Promise(function (resolve) {
-            data.data = _.filter(data.data, function (reader) {
+            data.data = lodash.filter(data.data, function (reader) {
                 return CardUtil.canAuthenticate(reader.card);
             });
             resolve(data);
@@ -140,7 +140,7 @@ var GenericService = (function () {
     };
     GenericService.checkCanSign = function (data) {
         return new Promise(function (resolve) {
-            data.data = _.filter(data.data, function (reader) {
+            data.data = lodash.filter(data.data, function (reader) {
                 return CardUtil.canSign(reader.card);
             });
             resolve(data);
@@ -148,7 +148,7 @@ var GenericService = (function () {
     };
     GenericService.checkCanVerifyPin = function (data) {
         return new Promise(function (resolve) {
-            data.data = _.filter(data.data, function (reader) {
+            data.data = lodash.filter(data.data, function (reader) {
                 return CardUtil.canVerifyPin(reader.card);
             });
             resolve(data);
@@ -157,8 +157,8 @@ var GenericService = (function () {
     GenericService.filterByAvailableContainers = function (args) {
         return args.client.core().info().then(function (info) {
             return new Promise(function (resolve) {
-                args.readers.data = _.filter(args.readers.data, function (reader) {
-                    return _.find(info.data.containers, function (ct) {
+                args.readers.data = lodash.filter(args.readers.data, function (reader) {
+                    return lodash.find(info.data.containers, function (ct) {
                         return ct.name === CardUtil.determineContainer(reader.card);
                     });
                 });
@@ -186,7 +186,7 @@ var GenericService = (function () {
     };
     GenericService.checkReaderPresent = function (args) {
         return new Promise(function (resolve, reject) {
-            var reader = _.find(args.readers.data, function (rd) {
+            var reader = lodash.find(args.readers.data, function (rd) {
                 return rd.id === args.readerId;
             });
             if (reader) {
@@ -206,7 +206,7 @@ var GenericService = (function () {
         return new Promise(function (resolve, reject) {
             if (args && args.container) {
                 args.client.core().info().then(function (res) {
-                    if (_.find(res.data.containers, function (ct) {
+                    if (lodash.find(res.data.containers, function (ct) {
                         return ct.name === args.container && ct.status === SyncUtil.INSTALLED;
                     })) {
                         resolve(args);

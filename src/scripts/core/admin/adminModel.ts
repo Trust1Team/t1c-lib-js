@@ -6,7 +6,6 @@
 import {DataArrayResponse, T1CResponse} from '../service/CoreModel';
 import { DSContainer } from '../ds/DSClientModel';
 import { T1CLibException } from '../exceptions/CoreExceptions';
-import {Agent} from '../agent/agentModel';
 
 
 export interface AbstractAdmin {

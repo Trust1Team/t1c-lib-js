@@ -9,11 +9,14 @@ import { ResponseHandler } from '../../util/ResponseHandler';
 import {AbstractCore, BoolDataResponse, BrowserInfoResponse, CardReader, CardReadersResponse, InfoResponse, SingleReaderResponse} from './CoreModel';
 import {T1CLibException} from '../exceptions/CoreExceptions';
 
-
 const CORE_CONSENT = '/consent';
 const CORE_INFO = '/';
 const CORE_READERS = '/card-readers';
 const CORE_CONSENT_IMPLICIT = '/consent/implicit';
+
+
+declare var VERSION: string;
+
 
 /**
  * Core service fucntions: GCL information, reader detection, consent, polling, etc.
@@ -264,6 +267,6 @@ export class CoreService implements AbstractCore {
 
     // get Lib version
     public version(): Promise<string> {
-        return Promise.resolve('%%GULP_INJECT_VERSION%%');
+        return Promise.resolve(VERSION);
     }
 }
