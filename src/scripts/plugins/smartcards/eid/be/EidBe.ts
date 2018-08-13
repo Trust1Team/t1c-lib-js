@@ -9,7 +9,6 @@ import { CertificateResponse, DataResponse, T1CResponse } from '../../../../core
 import { GenericCertCard, OptionalPin, VerifyPinData } from '../../Card';
 import { PinEnforcer } from '../../../../util/PinEnforcer';
 import { Options, RequestHandler } from '../../../../util/RequestHandler';
-import * as lodash from 'lodash';
 import {LocalConnection} from '../../../../core/client/Connection';
 
 export class EidBe extends GenericCertCard implements AbstractEidBE {
@@ -69,7 +68,7 @@ export class EidBe extends GenericCertCard implements AbstractEidBE {
     public verifyPin(body: OptionalPin,
                      callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse> {
         return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
-            let encryptedBody = lodash.extend({ private_key_reference: EidBe.VERIFY_PRIV_KEY_REF }, body);
+            let encryptedBody = Object.assign({ private_key_reference: EidBe.VERIFY_PRIV_KEY_REF }, body);
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericCertCard.VERIFY_PIN),
                 encryptedBody, undefined, undefined, callback);
         });

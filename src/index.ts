@@ -1,7 +1,5 @@
 import {Polyfills} from './scripts/util/Polyfills';
 
-import * as _ from 'lodash';
-
 export * from './scripts/core/admin/adminModel';
 export * from './scripts/core/admin/admin';
 
