@@ -1,4 +1,3 @@
-import * as lodash from 'lodash';
 import * as semver from 'semver';
 import { SyncUtil } from './SyncUtil';
 import { ActivationUtil } from './ActivationUtil';
@@ -110,11 +109,11 @@ var InitUtil = (function () {
         return hostname;
     };
     InitUtil.coreV2Compatible = function (version) {
-        var sanitized = lodash.split(version, '-')[0];
+        var sanitized = version.split('_')[0];
         return semver.satisfies(sanitized, '>=2.0.0');
     };
     InitUtil.checkTokenCompatible = function (version) {
-        var sanitized = lodash.split(version, '-')[0];
+        var sanitized = version.split('_')[0];
         return semver.satisfies(sanitized, '>=1.4.0');
     };
     return InitUtil;

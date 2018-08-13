@@ -24,7 +24,7 @@ export interface SecuredCertCard {
 export declare class OptionalPin {
     pin?: string;
     pace?: string;
-    constructor(pin?: string, pace?: string);
+    constructor(pin?: string, pace?: string, private_key_reference?: string);
 }
 export declare class AuthenticateOrSignData extends OptionalPin {
     algorithm_reference: string;

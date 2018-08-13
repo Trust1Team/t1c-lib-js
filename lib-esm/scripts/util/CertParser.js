@@ -1,4 +1,3 @@
-import * as lodash from 'lodash';
 import * as asn1js from 'asn1js';
 import * as Base64 from 'Base64';
 import Certificate from 'pkijs/build/Certificate';
@@ -8,23 +7,24 @@ var CertParser = (function () {
     function CertParser() {
     }
     CertParser.process = function (response, parseCerts, callback) {
-        if (response && response.data && typeof response.data === 'object' && !lodash.isArray(response.data)) {
-            lodash.forEach(response.data, function (value, key) {
+        if (response && response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
+            var _loop_1 = function (key) {
+                var value = response.data[key];
                 if (key.indexOf('certificate') > -1) {
                     if (typeof value === 'string') {
                         response.data[key] = { base64: value };
                         CertParser.setParsed(response.data[key], value, parseCerts);
                     }
-                    else if (lodash.isArray(value)) {
+                    else if (Array.isArray(value)) {
                         var newData_1 = [];
-                        lodash.forEach(value, function (certificate) {
+                        value.forEach(function (certificate) {
                             var cert = new T1CCertificate(certificate);
                             CertParser.setParsed(cert, certificate, parseCerts);
                             newData_1.push(cert);
                         });
                         response.data[key] = newData_1;
                     }
-                    else if (lodash.isObject(value)) {
+                    else if (typeof value === 'object') {
                         response.data[key] = { base64: value.base64 };
                         if (value.id) {
                             response.data[key].id = value.id;
@@ -34,12 +34,15 @@ var CertParser = (function () {
                         }
                     }
                 }
-            });
+            };
+            for (var key in response.data) {
+                _loop_1(key);
+            }
         }
         else {
-            if (lodash.isArray(response.data)) {
+            if (Array.isArray(response.data)) {
                 var newData_2 = [];
-                lodash.forEach(response.data, function (certificate) {
+                response.data.forEach(function (certificate) {
                     if (typeof certificate === 'string') {
                         var cert = new T1CCertificate(certificate);
                         CertParser.setParsed(cert, certificate, parseCerts);
