@@ -1,5 +1,5 @@
-import * as lodash from 'lodash';
 import { Options } from './RequestHandler';
+import { Util } from './Utils';
 var CardUtil = (function () {
     function CardUtil() {
     }
@@ -62,7 +62,7 @@ var CardUtil = (function () {
         }
     };
     CardUtil.determineContainer = function (card) {
-        if (!lodash.isEmpty(card) && !lodash.isEmpty(card.description)) {
+        if (!Util.isEmpty(card) && !Util.isEmpty(card.description)) {
             if (findDescription(card.description, 'Belgium Electronic ID card')) {
                 return 'beid';
             }
@@ -109,7 +109,7 @@ var CardUtil = (function () {
             return undefined;
         }
         function findDescription(descriptions, toFind) {
-            return !!lodash.find(descriptions, function (desc) {
+            return !!descriptions.find(function (desc) {
                 var lowercaseDesc = desc.toLowerCase();
                 var lowercaseToFind = toFind.toLowerCase();
                 return lowercaseDesc.indexOf(lowercaseToFind) > -1;

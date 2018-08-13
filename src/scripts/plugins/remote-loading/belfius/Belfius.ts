@@ -9,7 +9,6 @@ import { BoolDataResponse } from '../../../core/service/CoreModel';
 import { T1CLibException } from '../../../core/exceptions/CoreExceptions';
 import { APDU, CommandResponse } from '../RemoteLoadingModel';
 import { ResponseHandler } from '../../../util/ResponseHandler';
-import * as lodash from 'lodash';
 
 
 export class Belfius extends RemoteLoading implements AbstractBelfius {
@@ -63,7 +62,7 @@ export class Belfius extends RemoteLoading implements AbstractBelfius {
                     return this.apdu(this.generateStxApdus(commandStringArray), sessionId).then(res => {
                         let totalRx = '';
                         // join rx's to get total rx
-                        lodash.forEach(res.data, partialRes => {
+                        res.data.forEach(partialRes => {
                             if (partialRes.rx) { totalRx += partialRes.rx; }
                         });
                         let finalResponse: CommandResponse = {
@@ -84,7 +83,7 @@ export class Belfius extends RemoteLoading implements AbstractBelfius {
     private generateStxApdus(commands: string[]): APDU[] {
         let apduArray = [];
         let totalCommands = commands.length - 1;
-        lodash.forEach(commands, (cmd, idx) => {
+        commands.forEach((cmd, idx) => {
             if (idx === 0) {
                 apduArray.push(Belfius.generateStxApdu(cmd, '01'));
             } else if (idx === totalCommands) {

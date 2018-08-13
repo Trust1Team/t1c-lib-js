@@ -11,7 +11,6 @@ var __extends = (this && this.__extends) || (function () {
 import { GenericCertCard } from '../../Card';
 import { PinEnforcer } from '../../../../util/PinEnforcer';
 import { RequestHandler } from '../../../../util/RequestHandler';
-import * as lodash from 'lodash';
 var EidBe = (function (_super) {
     __extends(EidBe, _super);
     function EidBe(baseUrl, containerUrl, connection, reader_id) {
@@ -47,7 +46,7 @@ var EidBe = (function (_super) {
     EidBe.prototype.verifyPin = function (body, callback) {
         var _this = this;
         return PinEnforcer.check(this.connection, this.reader_id, body).then(function () {
-            var encryptedBody = lodash.extend({ private_key_reference: EidBe.VERIFY_PRIV_KEY_REF }, body);
+            var encryptedBody = Object.assign({ private_key_reference: EidBe.VERIFY_PRIV_KEY_REF }, body);
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(GenericCertCard.VERIFY_PIN), encryptedBody, undefined, undefined, callback);
         });
     };
