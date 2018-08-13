@@ -1,3 +1,4 @@
 exclude_paths:
-- 'dist/**/*'
-- '*.min.js'
+  - 'dist/**/*'
+  - '*.min.js'
+  - 'spec/**/*'
