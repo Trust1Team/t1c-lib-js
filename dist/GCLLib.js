@@ -7,7 +7,7 @@
 		exports["GCLLib"] = factory(require("lodash"));
 	else
 		root["GCLLib"] = factory(root["_"]);
-})(window, function(__WEBPACK_EXTERNAL_MODULE__123__) {
+})(window, function(__WEBPACK_EXTERNAL_MODULE__389__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -113,12 +113,12 @@ __export(__webpack_require__(164));
 __export(__webpack_require__(165));
 __export(__webpack_require__(166));
 __export(__webpack_require__(177));
-__export(__webpack_require__(127));
-__export(__webpack_require__(131));
+__export(__webpack_require__(126));
+__export(__webpack_require__(130));
 __export(__webpack_require__(178));
 __export(__webpack_require__(229));
 __export(__webpack_require__(230));
-__export(__webpack_require__(128));
+__export(__webpack_require__(127));
 __export(__webpack_require__(231));
 __export(__webpack_require__(232));
 __export(__webpack_require__(233));
@@ -157,16 +157,16 @@ __export(__webpack_require__(134));
 __export(__webpack_require__(169));
 __export(__webpack_require__(227));
 __export(__webpack_require__(183));
-__export(__webpack_require__(130));
 __export(__webpack_require__(129));
-__export(__webpack_require__(124));
-__export(__webpack_require__(132));
+__export(__webpack_require__(128));
+__export(__webpack_require__(123));
+__export(__webpack_require__(131));
 __export(__webpack_require__(181));
 __export(__webpack_require__(1));
 __export(__webpack_require__(135));
 __export(__webpack_require__(225));
 __export(__webpack_require__(122));
-__export(__webpack_require__(126));
+__export(__webpack_require__(125));
 __export(__webpack_require__(167));
 __export(__webpack_require__(262));
 __export(__webpack_require__(387));
@@ -4836,9 +4836,9 @@ exports.ResolvedAgent = ResolvedAgent;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var ResponseHandler_1 = __webpack_require__(122);
-var lodash = __webpack_require__(123);
-var InitUtil_1 = __webpack_require__(124);
-var ClientService_1 = __webpack_require__(130);
+var InitUtil_1 = __webpack_require__(123);
+var ClientService_1 = __webpack_require__(129);
+var Utils_1 = __webpack_require__(133);
 var CORE_ACTIVATE = '/admin/activate';
 var CORE_ATR_LIST = '/admin/atr';
 var CORE_PUB_KEY = '/admin/certificate';
@@ -4852,7 +4852,7 @@ var AdminService = (function () {
         this.noAuthConnection = noAuthConnection;
     }
     AdminService.errorHandler = function (error) {
-        if (error && error.status === 401 && lodash.includes(AdminService.JWT_ERROR_CODES, error.code)) {
+        if (error && error.status === 401 && Utils_1.Util.includes(AdminService.JWT_ERROR_CODES, error.code)) {
             return InitUtil_1.InitUtil.initializeLibrary(ClientService_1.ClientService.getClient());
         }
         else {
@@ -5009,26 +5009,19 @@ exports.ResponseHandler = ResponseHandler;
 
 /***/ }),
 /* 123 */
-/***/ (function(module, exports) {
-
-module.exports = __WEBPACK_EXTERNAL_MODULE__123__;
-
-/***/ }),
-/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var lodash = __webpack_require__(123);
-var semver = __webpack_require__(125);
-var SyncUtil_1 = __webpack_require__(126);
+var semver = __webpack_require__(124);
+var SyncUtil_1 = __webpack_require__(125);
 var ActivationUtil_1 = __webpack_require__(134);
-var DSClientModel_1 = __webpack_require__(127);
+var DSClientModel_1 = __webpack_require__(126);
 var PubKeyService_1 = __webpack_require__(135);
-var CoreExceptions_1 = __webpack_require__(131);
+var CoreExceptions_1 = __webpack_require__(130);
 var axios_1 = __webpack_require__(136);
-var ActivatedContainerUtil_1 = __webpack_require__(133);
+var ActivatedContainerUtil_1 = __webpack_require__(132);
 var InitUtil = (function () {
     function InitUtil() {
     }
@@ -5132,11 +5125,11 @@ var InitUtil = (function () {
         return hostname;
     };
     InitUtil.coreV2Compatible = function (version) {
-        var sanitized = lodash.split(version, '-')[0];
+        var sanitized = version.split('_')[0];
         return semver.satisfies(sanitized, '>=2.0.0');
     };
     InitUtil.checkTokenCompatible = function (version) {
-        var sanitized = lodash.split(version, '-')[0];
+        var sanitized = version.split('_')[0];
         return semver.satisfies(sanitized, '>=1.4.0');
     };
     return InitUtil;
@@ -5145,7 +5138,7 @@ exports.InitUtil = InitUtil;
 
 
 /***/ }),
-/* 125 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process) {exports = module.exports = SemVer;
@@ -6476,18 +6469,18 @@ function coerce(version) {
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(3)))
 
 /***/ }),
-/* 126 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var DSClientModel_1 = __webpack_require__(127);
-var DataContainerUtil_1 = __webpack_require__(129);
-var lodash = __webpack_require__(123);
-var CoreExceptions_1 = __webpack_require__(131);
+var DSClientModel_1 = __webpack_require__(126);
+var DataContainerUtil_1 = __webpack_require__(128);
+var CoreExceptions_1 = __webpack_require__(130);
 var adminModel_1 = __webpack_require__(120);
-var ActivatedContainerUtil_1 = __webpack_require__(133);
+var ActivatedContainerUtil_1 = __webpack_require__(132);
+var Utils_1 = __webpack_require__(133);
 var SyncUtil = (function () {
     function SyncUtil() {
     }
@@ -6508,7 +6501,7 @@ var SyncUtil = (function () {
     };
     SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
         return client.ds().then(function (ds) {
-            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', '%%GULP_INJECT_VERSION%%'), info.namespace, containers));
+            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.5"), info.namespace, containers));
         });
     };
     SyncUtil.doSyncFlow = function (client, mergedInfo, uuid, containers, isRetry) {
@@ -6542,7 +6535,7 @@ var SyncUtil = (function () {
             poll(resolve, reject);
         });
         function poll(resolve, reject) {
-            lodash.delay(function () {
+            setTimeout(function () {
                 --remainingTries;
                 client.core().info().then(function (infoData) {
                     var containers = infoData.data.containers;
@@ -6583,23 +6576,21 @@ var SyncUtil = (function () {
             });
         }
         function containerMissing(config, status) {
-            return lodash.find(config, function (cfgCt) {
-                return !lodash.find(status, function (statusCt) { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
+            return config.find(function (cfgCt) {
+                return !status.find(function (statusCt) { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
             });
         }
         function downloadErrored(config, status) {
-            return lodash.find(config, function (cfgCt) {
-                return lodash.find(status, function (statusCt) {
-                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-                        && lodash.includes(SyncUtil.ERROR_STATES, statusCt.status);
+            config.forEach(function (cfg) {
+                status.forEach(function (sts) {
+                    return !!(cfg.name === sts.name && cfg.version === sts.version && Utils_1.Util.includes(SyncUtil.ERROR_STATES, sts.status));
                 });
             });
         }
         function downloadOngoing(config, status) {
-            return lodash.find(config, function (cfgCt) {
-                return lodash.find(status, function (statusCt) {
-                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-                        && lodash.includes(SyncUtil.ONGOING_STATES, statusCt.status);
+            config.forEach(function (cfg) {
+                status.forEach(function (sts) {
+                    return !!(cfg.name === sts.name && cfg.version === sts.version && Utils_1.Util.includes(SyncUtil.ONGOING_STATES, sts.status));
                 });
             });
         }
@@ -6617,7 +6608,7 @@ exports.SyncUtil = SyncUtil;
 
 
 /***/ }),
-/* 127 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6633,7 +6624,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var DSBrowser = (function () {
     function DSBrowser(name, version) {
         this.name = name;
@@ -6785,7 +6776,7 @@ exports.DSPlatformInfo = DSPlatformInfo;
 
 
 /***/ }),
-/* 128 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6989,13 +6980,13 @@ exports.SingleReaderResponse = SingleReaderResponse;
 
 
 /***/ }),
-/* 129 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ClientService_1 = __webpack_require__(130);
+var ClientService_1 = __webpack_require__(129);
 var DataContainerUtil = (function () {
     function DataContainerUtil() {
     }
@@ -7014,7 +7005,7 @@ exports.DataContainerUtil = DataContainerUtil;
 
 
 /***/ }),
-/* 130 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7035,13 +7026,13 @@ exports.ClientService = ClientService;
 
 
 /***/ }),
-/* 131 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ObjectUtil_1 = __webpack_require__(132);
+var ObjectUtil_1 = __webpack_require__(131);
 var T1CLibException = (function () {
     function T1CLibException(status, code, description, client) {
         this.status = status;
@@ -7056,7 +7047,7 @@ exports.T1CLibException = T1CLibException;
 
 
 /***/ }),
-/* 132 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7074,7 +7065,7 @@ exports.ObjectUtil = ObjectUtil;
 
 
 /***/ }),
-/* 133 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7140,13 +7131,67 @@ exports.ActivatedContainerUtil = ActivatedContainerUtil;
 
 
 /***/ }),
+/* 133 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var Util = (function () {
+    function Util() {
+    }
+    Util.includes = function (array, searchElement, fromIndex) {
+        if (array == null) {
+            throw new TypeError('array is null or not defined');
+        }
+        var o = Object(array);
+        var len = o.length >>> 0;
+        if (len === 0) {
+            return false;
+        }
+        var n = fromIndex | 0;
+        var k = Math.max(n >= 0 ? n : len - Math.abs(n), 0);
+        function sameValueZero(x, y) {
+            return x === y || (typeof x === 'number' && typeof y === 'number' && isNaN(x) && isNaN(y));
+        }
+        while (k < len) {
+            if (sameValueZero(o[k], searchElement)) {
+                return true;
+            }
+            k++;
+        }
+        return false;
+    };
+    Util.isEmpty = function (value) {
+        if (Array.isArray(value)) {
+            return value.length <= 0;
+        }
+        else if (typeof value === 'object' && value !== null) {
+            return Object.keys(value).length <= 0;
+        }
+        else if (value instanceof Set && value !== null) {
+            return value.size <= 0;
+        }
+        else if (value instanceof Map && value !== null) {
+            return value.size <= 0;
+        }
+        else {
+            return true;
+        }
+    };
+    return Util;
+}());
+exports.Util = Util;
+
+
+/***/ }),
 /* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var DSClientModel_1 = __webpack_require__(127);
+var DSClientModel_1 = __webpack_require__(126);
 var adminModel_1 = __webpack_require__(120);
 var ActivationUtil = (function () {
     function ActivationUtil() {
@@ -7166,7 +7211,7 @@ var ActivationUtil = (function () {
     ActivationUtil.registerDevice = function (client, mergedInfo, uuid) {
         return client.admin().getPubKey().then(function (pubKey) {
             return client.ds().then(function (ds) {
-                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', '%%GULP_INJECT_VERSION%%'), mergedInfo.namespace));
+                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.5"), mergedInfo.namespace));
             });
         });
     };
@@ -8882,8 +8927,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = __webpack_require__(136);
-var lodash = __webpack_require__(123);
-var CoreExceptions_1 = __webpack_require__(131);
+var CoreExceptions_1 = __webpack_require__(130);
 var UrlUtil_1 = __webpack_require__(167);
 var store = __webpack_require__(168);
 var BrowserFingerprint_1 = __webpack_require__(169);
@@ -9172,7 +9216,7 @@ var LocalConnection = (function (_super) {
         var reqHeaders = _super.prototype.getRequestHeaders.call(this, headers);
         reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
         var contextToken = this.cfg.contextToken;
-        if (contextToken && !lodash.isNil(contextToken)) {
+        if (contextToken && contextToken != null) {
             reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
         }
         return reqHeaders;
@@ -9187,7 +9231,6 @@ var LocalConnection = (function (_super) {
     };
     LocalConnection.prototype.requestFile = function (basePath, suffix, body, callback) {
         var _this = this;
-        var config = lodash.omit(this.cfg, ['apiKey', 'jwt']);
         if (!callback || typeof callback !== 'function') {
             callback = function () {
             };
@@ -9195,10 +9238,10 @@ var LocalConnection = (function (_super) {
         return new Promise(function (resolve, reject) {
             var headers = {};
             headers[GenericConnection.HEADER_GCL_LANG] = _this.cfg.lang;
-            if (config.tokenCompatible && _this.getSecurityConfig().sendToken) {
+            if (_this.cfg.tokenCompatible && _this.getSecurityConfig().sendToken) {
                 headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint_1.BrowserFingerprint.get();
             }
-            axios_1.default.post(UrlUtil_1.UrlUtil.create(basePath, suffix, config, false), body, {
+            axios_1.default.post(UrlUtil_1.UrlUtil.create(basePath, suffix, _this.cfg, false), body, {
                 responseType: 'arraybuffer', headers: headers
             }).then(function (response) {
                 callback(null, response.data);
@@ -9222,7 +9265,7 @@ var LocalConnection = (function (_super) {
         });
     };
     LocalConnection.prototype.postFile = function (basePath, suffix, body, queryParams, callback) {
-        var config = lodash.omit(this.cfg, ['apiKey', 'jwt']);
+        var _this = this;
         if (!callback || typeof callback !== 'function') {
             callback = function () {
             };
@@ -9242,12 +9285,12 @@ var LocalConnection = (function (_super) {
         }
         form.append('file', body.file);
         var headers = { 'Content-Type': 'multipart/form-data' };
-        if (config.tokenCompatible && this.getSecurityConfig().sendToken) {
+        if (this.cfg.tokenCompatible && this.getSecurityConfig().sendToken) {
             headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint_1.BrowserFingerprint.get();
         }
         headers[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
         return new Promise(function (resolve, reject) {
-            axios_1.default.post(UrlUtil_1.UrlUtil.create(basePath, suffix, config, false), form, {
+            axios_1.default.post(UrlUtil_1.UrlUtil.create(basePath, suffix, _this.cfg, false), form, {
                 headers: headers
             }).then(function (response) {
                 callback(null, response.data);
@@ -10160,6 +10203,7 @@ var DSClient = (function () {
         return this.url;
     };
     DSClient.prototype.getInfo = function (callback) {
+        console.log(this.url);
         return this.connection.get(this.url, SYS_INFO, undefined, undefined, callback);
     };
     DSClient.prototype.getDevice = function (uuid, callback) {
@@ -10220,10 +10264,10 @@ exports.DSClient = DSClient;
 Object.defineProperty(exports, "__esModule", { value: true });
 var EidBe_1 = __webpack_require__(179);
 var ResponseHandler_1 = __webpack_require__(122);
-var lodash = __webpack_require__(123);
 var CardUtil_1 = __webpack_require__(227);
 var Aventra_1 = __webpack_require__(228);
-var SyncUtil_1 = __webpack_require__(126);
+var SyncUtil_1 = __webpack_require__(125);
+var Utils_1 = __webpack_require__(133);
 var Arguments = (function () {
     function Arguments(client, readerId, container, data, dumpMethod, dumpOptions, reader) {
         this.client = client;
@@ -10337,8 +10381,8 @@ var GenericService = (function () {
         return new Promise(function (resolve, reject) {
             client.pkcs11().slotsWithTokenPresent().then(function (slots) {
                 if (slots && slots.data && slots.data.length) {
-                    var validToken = lodash.find(slots.data, function (slot) {
-                        return lodash.includes(_this.PKCS11_FLAGS, slot.flags);
+                    var validToken = slots.data.find(function (slot) {
+                        return Utils_1.Util.includes(_this.PKCS11_FLAGS, slot.flags);
                     });
                     resolve(!!validToken);
                 }
@@ -10352,7 +10396,7 @@ var GenericService = (function () {
     };
     GenericService.checkCanAuthenticate = function (data) {
         return new Promise(function (resolve) {
-            data.data = lodash.filter(data.data, function (reader) {
+            data.data = data.data.filter(function (reader) {
                 return CardUtil_1.CardUtil.canAuthenticate(reader.card);
             });
             resolve(data);
@@ -10360,7 +10404,7 @@ var GenericService = (function () {
     };
     GenericService.checkCanSign = function (data) {
         return new Promise(function (resolve) {
-            data.data = lodash.filter(data.data, function (reader) {
+            data.data = data.data.filter(function (reader) {
                 return CardUtil_1.CardUtil.canSign(reader.card);
             });
             resolve(data);
@@ -10368,7 +10412,7 @@ var GenericService = (function () {
     };
     GenericService.checkCanVerifyPin = function (data) {
         return new Promise(function (resolve) {
-            data.data = lodash.filter(data.data, function (reader) {
+            data.data = data.data.filter(function (reader) {
                 return CardUtil_1.CardUtil.canVerifyPin(reader.card);
             });
             resolve(data);
@@ -10377,8 +10421,8 @@ var GenericService = (function () {
     GenericService.filterByAvailableContainers = function (args) {
         return args.client.core().info().then(function (info) {
             return new Promise(function (resolve) {
-                args.readers.data = lodash.filter(args.readers.data, function (reader) {
-                    return lodash.find(info.data.containers, function (ct) {
+                args.readers.data = args.readers.data.filter(function (reader) {
+                    return info.data.containers.find(function (ct) {
                         return ct.name === CardUtil_1.CardUtil.determineContainer(reader.card);
                     });
                 });
@@ -10406,7 +10450,7 @@ var GenericService = (function () {
     };
     GenericService.checkReaderPresent = function (args) {
         return new Promise(function (resolve, reject) {
-            var reader = lodash.find(args.readers.data, function (rd) {
+            var reader = args.readers.data.find(function (rd) {
                 return rd.id === args.readerId;
             });
             if (reader) {
@@ -10426,7 +10470,7 @@ var GenericService = (function () {
         return new Promise(function (resolve, reject) {
             if (args && args.container) {
                 args.client.core().info().then(function (res) {
-                    if (lodash.find(res.data.containers, function (ct) {
+                    if (res.data.containers.find(function (ct) {
                         return ct.name === args.container && ct.status === SyncUtil_1.SyncUtil.INSTALLED;
                     })) {
                         resolve(args);
@@ -10561,7 +10605,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Card_1 = __webpack_require__(180);
 var PinEnforcer_1 = __webpack_require__(181);
 var RequestHandler_1 = __webpack_require__(225);
-var lodash = __webpack_require__(123);
 var EidBe = (function (_super) {
     __extends(EidBe, _super);
     function EidBe(baseUrl, containerUrl, connection, reader_id) {
@@ -10597,7 +10640,7 @@ var EidBe = (function (_super) {
     EidBe.prototype.verifyPin = function (body, callback) {
         var _this = this;
         return PinEnforcer_1.PinEnforcer.check(this.connection, this.reader_id, body).then(function () {
-            var encryptedBody = lodash.extend({ private_key_reference: EidBe.VERIFY_PRIV_KEY_REF }, body);
+            var encryptedBody = Object.assign({ private_key_reference: EidBe.VERIFY_PRIV_KEY_REF }, body);
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(Card_1.GenericCertCard.VERIFY_PIN), encryptedBody, undefined, undefined, callback);
         });
     };
@@ -10633,10 +10676,9 @@ var PinEnforcer_1 = __webpack_require__(181);
 var CertParser_1 = __webpack_require__(183);
 var ResponseHandler_1 = __webpack_require__(122);
 var RequestHandler_1 = __webpack_require__(225);
-var lodash = __webpack_require__(123);
 var GenericContainer_1 = __webpack_require__(226);
 var OptionalPin = (function () {
-    function OptionalPin(pin, pace) {
+    function OptionalPin(pin, pace, private_key_reference) {
         this.pin = pin;
         this.pace = pace;
     }
@@ -10702,7 +10744,7 @@ var GenericReaderContainer = (function (_super) {
             suffix += '/' + this.reader_id;
         }
         if (path && path.length) {
-            suffix += lodash.startsWith(path, '/') ? path : '/' + path;
+            suffix += path.startsWith('/') ? path : '/' + path;
         }
         return suffix;
     };
@@ -10892,7 +10934,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Connection_1 = __webpack_require__(166);
 var jsencrypt_1 = __webpack_require__(182);
 var PubKeyService_1 = __webpack_require__(135);
-var CoreExceptions_1 = __webpack_require__(131);
+var CoreExceptions_1 = __webpack_require__(130);
 var CORE_READERS = '/card-readers';
 var PinEnforcer = (function () {
     function PinEnforcer() {
@@ -16354,33 +16396,33 @@ Object.defineProperty(exports, '__esModule', { value: true });
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var lodash = __webpack_require__(123);
 var asn1js = __webpack_require__(184);
 var Base64 = __webpack_require__(170);
 var Certificate_1 = __webpack_require__(186);
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var ResponseHandler_1 = __webpack_require__(122);
 var CertParser = (function () {
     function CertParser() {
     }
     CertParser.process = function (response, parseCerts, callback) {
-        if (response && response.data && typeof response.data === 'object' && !lodash.isArray(response.data)) {
-            lodash.forEach(response.data, function (value, key) {
+        if (response && response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
+            var _loop_1 = function (key) {
+                var value = response.data[key];
                 if (key.indexOf('certificate') > -1) {
                     if (typeof value === 'string') {
                         response.data[key] = { base64: value };
                         CertParser.setParsed(response.data[key], value, parseCerts);
                     }
-                    else if (lodash.isArray(value)) {
+                    else if (Array.isArray(value)) {
                         var newData_1 = [];
-                        lodash.forEach(value, function (certificate) {
+                        value.forEach(function (certificate) {
                             var cert = new CoreModel_1.T1CCertificate(certificate);
                             CertParser.setParsed(cert, certificate, parseCerts);
                             newData_1.push(cert);
                         });
                         response.data[key] = newData_1;
                     }
-                    else if (lodash.isObject(value)) {
+                    else if (typeof value === 'object') {
                         response.data[key] = { base64: value.base64 };
                         if (value.id) {
                             response.data[key].id = value.id;
@@ -16390,12 +16432,15 @@ var CertParser = (function () {
                         }
                     }
                 }
-            });
+            };
+            for (var key in response.data) {
+                _loop_1(key);
+            }
         }
         else {
-            if (lodash.isArray(response.data)) {
+            if (Array.isArray(response.data)) {
                 var newData_2 = [];
-                lodash.forEach(response.data, function (certificate) {
+                response.data.forEach(function (certificate) {
                     if (typeof certificate === 'string') {
                         var cert = new CoreModel_1.T1CCertificate(certificate);
                         CertParser.setParsed(cert, certificate, parseCerts);
@@ -34213,7 +34258,6 @@ exports.default = Extensions;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var lodash = __webpack_require__(123);
 var Options = (function () {
     function Options(parseCerts, filters) {
         this.parseCerts = parseCerts;
@@ -34242,7 +34286,7 @@ var RequestHandler = (function () {
             }
             else {
                 result.callback = secondParam;
-                if (lodash.has(firstParam, 'parseCerts')) {
+                if (firstParam.parseCerts) {
                     result.parseCerts = firstParam.parseCerts;
                 }
             }
@@ -34256,18 +34300,18 @@ var RequestHandler = (function () {
     };
     RequestHandler.determineOptionsWithFilter = function (firstParam) {
         var result = new RequestOptions(false, {});
-        if (lodash.isArray(firstParam)) {
+        if (Array.isArray(firstParam)) {
             if (firstParam.length) {
                 result.params.filter = firstParam.join(',');
             }
         }
-        else if (lodash.isObject(firstParam)) {
-            if (lodash.has(firstParam, 'filters') && lodash.isArray(firstParam.filters)) {
+        else if (typeof firstParam === 'object') {
+            if (firstParam.filters && Array.isArray(firstParam.filters)) {
                 if (firstParam.filters.length) {
                     result.params.filter = firstParam.filters.join(',');
                 }
             }
-            if (lodash.has(firstParam, 'parseCerts')) {
+            if (firstParam.parseCerts) {
                 result.parseCerts = firstParam.parseCerts;
             }
         }
@@ -34285,7 +34329,7 @@ exports.RequestHandler = RequestHandler;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ActivatedContainerUtil_1 = __webpack_require__(133);
+var ActivatedContainerUtil_1 = __webpack_require__(132);
 var GenericContainer = (function () {
     function GenericContainer(baseUrl, containerUrl, connection, containerPrefix) {
         this.baseUrl = baseUrl;
@@ -34316,8 +34360,8 @@ exports.GenericContainer = GenericContainer;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var lodash = __webpack_require__(123);
 var RequestHandler_1 = __webpack_require__(225);
+var Utils_1 = __webpack_require__(133);
 var CardUtil = (function () {
     function CardUtil() {
     }
@@ -34380,7 +34424,7 @@ var CardUtil = (function () {
         }
     };
     CardUtil.determineContainer = function (card) {
-        if (!lodash.isEmpty(card) && !lodash.isEmpty(card.description)) {
+        if (!Utils_1.Util.isEmpty(card) && !Utils_1.Util.isEmpty(card.description)) {
             if (findDescription(card.description, 'Belgium Electronic ID card')) {
                 return 'beid';
             }
@@ -34427,7 +34471,7 @@ var CardUtil = (function () {
             return undefined;
         }
         function findDescription(descriptions, toFind) {
-            return !!lodash.find(descriptions, function (desc) {
+            return !!descriptions.find(function (desc) {
                 var lowercaseDesc = desc.toLowerCase();
                 var lowercaseToFind = toFind.toLowerCase();
                 return lowercaseDesc.indexOf(lowercaseToFind) > -1;
@@ -34897,7 +34941,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var ListFilesRequest = (function () {
     function ListFilesRequest(path, extensions) {
         this.path = path;
@@ -35064,7 +35108,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var RemoteLoading_1 = __webpack_require__(235);
 var RemoteLoadingModel_1 = __webpack_require__(236);
 var ResponseHandler_1 = __webpack_require__(122);
-var lodash = __webpack_require__(123);
 var Belfius = (function (_super) {
     __extends(Belfius, _super);
     function Belfius() {
@@ -35119,7 +35162,7 @@ var Belfius = (function (_super) {
                     }
                     return _this.apdu(_this.generateStxApdus(commandStringArray), sessionId).then(function (res) {
                         var totalRx = '';
-                        lodash.forEach(res.data, function (partialRes) {
+                        res.data.forEach(function (partialRes) {
                             if (partialRes.rx) {
                                 totalRx += partialRes.rx;
                             }
@@ -35144,7 +35187,7 @@ var Belfius = (function (_super) {
     Belfius.prototype.generateStxApdus = function (commands) {
         var apduArray = [];
         var totalCommands = commands.length - 1;
-        lodash.forEach(commands, function (cmd, idx) {
+        commands.forEach(function (cmd, idx) {
             if (idx === 0) {
                 apduArray.push(Belfius.generateStxApdu(cmd, '01'));
             }
@@ -35180,7 +35223,6 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var lodash = __webpack_require__(123);
 var Card_1 = __webpack_require__(180);
 var RemoteLoading = (function (_super) {
     __extends(RemoteLoading, _super);
@@ -35200,7 +35242,7 @@ var RemoteLoading = (function (_super) {
     };
     RemoteLoading.prototype.apdu = function (apdu, sessionId, callback) {
         var suffix = this.containerSuffix(RemoteLoading.APDU);
-        if (lodash.isArray(apdu)) {
+        if (Array.isArray(apdu)) {
             suffix = this.containerSuffix(RemoteLoading.APDUS);
         }
         return this.connection.post(this.baseUrl, suffix, apdu, RemoteLoading.optionalSessionIdParam(sessionId), undefined, callback);
@@ -35212,9 +35254,9 @@ var RemoteLoading = (function (_super) {
         return this.connection.get(this.baseUrl, this.containerSuffix(RemoteLoading.CCID_FEATURES), RemoteLoading.optionalSessionIdParam(sessionId), undefined, callback);
     };
     RemoteLoading.prototype.command = function (tx, sessionId, callback) {
-        if (lodash.isArray(tx)) {
+        if (Array.isArray(tx)) {
             var body_1 = [];
-            lodash.forEach(tx, function (txElem) { body_1.push({ tx: txElem }); });
+            tx.forEach(function (txElem) { body_1.push({ tx: txElem }); });
             return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.CMDS), body_1, RemoteLoading.optionalSessionIdParam(sessionId), undefined, callback);
         }
         else {
@@ -35268,7 +35310,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var APDU = (function () {
     function APDU(cla, ins, p1, p2, data, le) {
         this.cla = cla;
@@ -35331,7 +35373,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var BeidAddressResponse = (function (_super) {
     __extends(BeidAddressResponse, _super);
     function BeidAddressResponse(data, success) {
@@ -35538,7 +35580,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var DNIeAllCertsResponse = (function (_super) {
     __extends(DNIeAllCertsResponse, _super);
     function DNIeAllCertsResponse(data, success) {
@@ -35772,7 +35814,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var PinType = (function () {
     function PinType() {
     }
@@ -36017,7 +36059,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var PtAllCertsResponse = (function (_super) {
     __extends(PtAllCertsResponse, _super);
     function PtAllCertsResponse(data, success) {
@@ -36213,7 +36255,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var EmvAllDataResponse = (function (_super) {
     __extends(EmvAllDataResponse, _super);
     function EmvAllDataResponse(data, success) {
@@ -36353,7 +36395,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var MobibAllDataResponse = (function (_super) {
     __extends(MobibAllDataResponse, _super);
     function MobibAllDataResponse(data, success) {
@@ -36530,7 +36572,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var Card_1 = __webpack_require__(180);
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var OcraAllDataResponse = (function (_super) {
     __extends(OcraAllDataResponse, _super);
     function OcraAllDataResponse(data, success) {
@@ -36671,7 +36713,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var PivPrintedInformationResponse = (function (_super) {
     __extends(PivPrintedInformationResponse, _super);
     function PivPrintedInformationResponse(data, success) {
@@ -36763,7 +36805,6 @@ exports.PivAllData = PivAllData;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var lodash = __webpack_require__(123);
 var CertParser_1 = __webpack_require__(183);
 var ResponseHandler_1 = __webpack_require__(122);
 var platform = __webpack_require__(253);
@@ -36794,7 +36835,7 @@ var PKCS11 = (function () {
         }
     }
     PKCS11.prototype.certificates = function (slotId, options, callback) {
-        var req = lodash.extend({ slot_id: slotId }, { module: this.modulePath });
+        var req = Object.assign({ slot_id: slotId }, { module: this.modulePath });
         var reqOptions = RequestHandler_1.RequestHandler.determineOptions(options, callback);
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.ALL_CERTIFICATES), req, undefined).then(function (data) {
             return CertParser_1.CertParser.process(data, reqOptions.parseCerts, reqOptions.callback);
@@ -36844,7 +36885,7 @@ var PKCS11 = (function () {
         });
     };
     PKCS11.prototype.token = function (slotId, callback) {
-        var req = lodash.extend({ slot_id: slotId }, { module: this.modulePath });
+        var req = Object.assign({ slot_id: slotId }, { module: this.modulePath });
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.TOKEN), req, undefined).then(function (data) {
             return ResponseHandler_1.ResponseHandler.response(data, callback);
         }, function (err) {
@@ -38144,7 +38185,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var Card_1 = __webpack_require__(180);
 var Pkcs11InfoResponse = (function (_super) {
     __extends(Pkcs11InfoResponse, _super);
@@ -38307,7 +38348,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var AventraAllCertsResponse = (function (_super) {
     __extends(AventraAllCertsResponse, _super);
     function AventraAllCertsResponse(data, success) {
@@ -38425,7 +38466,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var LuxtrustAllCertsResponse = (function (_super) {
     __extends(LuxtrustAllCertsResponse, _super);
     function LuxtrustAllCertsResponse(data, success) {
@@ -38538,7 +38579,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreModel_1 = __webpack_require__(128);
+var CoreModel_1 = __webpack_require__(127);
 var OberthurAllCertsResponse = (function (_super) {
     __extends(OberthurAllCertsResponse, _super);
     function OberthurAllCertsResponse(data, success) {
@@ -38663,7 +38704,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = __webpack_require__(136);
 var jwtDecode = __webpack_require__(263);
 var moment = __webpack_require__(266);
-var CoreExceptions_1 = __webpack_require__(131);
+var CoreExceptions_1 = __webpack_require__(130);
 var defaults = {
     gclUrl: 'https://localhost:10443/v2',
     dsContextPath: '/trust1team/gclds/v2',
@@ -55641,7 +55682,7 @@ return zhTw;
 Object.defineProperty(exports, "__esModule", { value: true });
 var CoreService_1 = __webpack_require__(388);
 var Connection_1 = __webpack_require__(166);
-var DSClientModel_1 = __webpack_require__(127);
+var DSClientModel_1 = __webpack_require__(126);
 var DSClient_1 = __webpack_require__(177);
 var OCVClient_1 = __webpack_require__(229);
 var PluginFactory_1 = __webpack_require__(261);
@@ -55649,12 +55690,12 @@ var GenericService_1 = __webpack_require__(178);
 var ResponseHandler_1 = __webpack_require__(122);
 var agent_1 = __webpack_require__(162);
 var admin_1 = __webpack_require__(121);
-var InitUtil_1 = __webpack_require__(124);
-var ClientService_1 = __webpack_require__(130);
+var InitUtil_1 = __webpack_require__(123);
+var ClientService_1 = __webpack_require__(129);
 var Auth_1 = __webpack_require__(164);
 var moment = __webpack_require__(266);
 var Polyfills_1 = __webpack_require__(1);
-var DSException_1 = __webpack_require__(389);
+var DSException_1 = __webpack_require__(390);
 var defaults = {
     gclUrl: 'https://localhost:10443/v2',
     gwUrl: 'https://accapim.t1t.be:443',
@@ -55885,7 +55926,7 @@ exports.GCLClient = GCLClient;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var _ = __webpack_require__(123);
+var _ = __webpack_require__(389);
 var platform = __webpack_require__(253);
 var ResponseHandler_1 = __webpack_require__(122);
 var CORE_CONSENT = '/consent';
@@ -56132,6 +56173,12 @@ exports.CoreService = CoreService;
 
 /***/ }),
 /* 389 */
+/***/ (function(module, exports) {
+
+module.exports = __WEBPACK_EXTERNAL_MODULE__389__;
+
+/***/ }),
+/* 390 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

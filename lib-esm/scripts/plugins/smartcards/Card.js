@@ -12,10 +12,9 @@ import { PinEnforcer } from '../../util/PinEnforcer';
 import { CertParser } from '../../util/CertParser';
 import { ResponseHandler } from '../../util/ResponseHandler';
 import { RequestHandler } from '../../util/RequestHandler';
-import * as lodash from 'lodash';
 import { GenericContainer } from '../GenericContainer';
 var OptionalPin = (function () {
-    function OptionalPin(pin, pace) {
+    function OptionalPin(pin, pace, private_key_reference) {
         this.pin = pin;
         this.pace = pace;
     }
@@ -81,7 +80,7 @@ var GenericReaderContainer = (function (_super) {
             suffix += '/' + this.reader_id;
         }
         if (path && path.length) {
-            suffix += lodash.startsWith(path, '/') ? path : '/' + path;
+            suffix += path.startsWith('/') ? path : '/' + path;
         }
         return suffix;
     };
