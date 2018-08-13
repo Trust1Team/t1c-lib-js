@@ -1,7 +1,7 @@
 import { ResponseHandler } from '../../util/ResponseHandler';
-import * as lodash from 'lodash';
 import { InitUtil } from '../../util/InitUtil';
 import { ClientService } from '../../util/ClientService';
+import { Util } from '../../util/Utils';
 var CORE_ACTIVATE = '/admin/activate';
 var CORE_ATR_LIST = '/admin/atr';
 var CORE_PUB_KEY = '/admin/certificate';
@@ -15,7 +15,7 @@ var AdminService = (function () {
         this.noAuthConnection = noAuthConnection;
     }
     AdminService.errorHandler = function (error) {
-        if (error && error.status === 401 && lodash.includes(AdminService.JWT_ERROR_CODES, error.code)) {
+        if (error && error.status === 401 && Util.includes(AdminService.JWT_ERROR_CODES, error.code)) {
             return InitUtil.initializeLibrary(ClientService.getClient());
         }
         else {

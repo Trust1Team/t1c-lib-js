@@ -3,11 +3,11 @@
  * @author Maarten Somers
  */
 import { LocalAuthConnection } from '../client/Connection';
-import * as _ from 'lodash';
 import * as platform from 'platform';
 import { ResponseHandler } from '../../util/ResponseHandler';
 import {AbstractCore, BoolDataResponse, BrowserInfoResponse, CardReader, CardReadersResponse, InfoResponse, SingleReaderResponse} from './CoreModel';
 import {T1CLibException} from '../exceptions/CoreExceptions';
+import {Util} from '../../util/Utils';
 
 const CORE_CONSENT = '/consent';
 const CORE_INFO = '/';
@@ -107,8 +107,8 @@ export class CoreService implements AbstractCore {
         });
 
         function poll(resolve?: (data: any) => void, reject?: (error: any) => void) {
-            _.delay(() => {
-                // console.debug('seconds left:', maxSeconds);
+
+            setTimeout(() => {
                 --maxSeconds;
                 self.readers((error: T1CLibException, data: CardReadersResponse) => {
                     if (error) {
@@ -126,8 +126,8 @@ export class CoreService implements AbstractCore {
                         if (connectReaderCb) { connectReaderCb(); } // ask to connect reader
                         poll(resolve, reject);
                     } else {
-                        let readerWithCard = _.find(data.data, (reader: CardReader) => {
-                            return _.has(reader, 'card');
+                        let readerWithCard = data.data.find((reader: CardReader) => {
+                            return !!reader.card;
                         });
                         if (readerWithCard != null) {
                             callback(null, readerWithCard);
@@ -159,7 +159,7 @@ export class CoreService implements AbstractCore {
         });
 
         function poll(resolve?: (data: any) => void, reject?: (error: any) => void) {
-            _.delay(() => {
+            setTimeout(() => {
                 --maxSeconds;
                 self.readers((error: T1CLibException, data: CardReadersResponse) => {
                     if (error) {
@@ -172,10 +172,10 @@ export class CoreService implements AbstractCore {
                             if (reject) { reject({ success: false, message: 'Timed out' }); }
                         }
                     } // reader timeout
-                    else if (!_.isEmpty(data) && !_.isEmpty(data.data)) {
+                    else if (!Util.isEmpty(data) && !Util.isEmpty(data.data)) {
                         // there are some readers, check if one of them has a card
-                        let readersWithCards = _.filter(data.data, (reader: CardReader) => {
-                            return _.has(reader, 'card');
+                        let readersWithCards = data.data.filter((reader: CardReader) => {
+                            return !!reader.card;
                         });
                         if (readersWithCards.length) {
                             // reader with card found (at least one), return data
@@ -213,7 +213,7 @@ export class CoreService implements AbstractCore {
         });
 
         function poll(resolve?: (data: any) => void, reject?: (error: any) => void) {
-            _.delay(function () {
+            setTimeout(() => {
                 --maxSeconds;
                 self.readers(function(error: T1CLibException, data: CardReadersResponse): void {
                     if (error) {
@@ -227,7 +227,7 @@ export class CoreService implements AbstractCore {
                             if (reject) { reject({ success: false, message: 'Timed out' }); }
                         }
                     }
-                    else if (_.isEmpty(data) || _.isEmpty(data.data)) {
+                    else if (Util.isEmpty(data) || Util.isEmpty(data.data)) {
                         if (connectReaderCb) { connectReaderCb(); } // ask to connect reader
                         poll(resolve, reject);
                     }

@@ -1,9 +1,9 @@
 import { DSClientInfo, DSRegistrationOrSyncRequest } from '../core/ds/DSClientModel';
 import { DataContainerUtil } from './DataContainerUtil';
-import * as lodash from 'lodash';
 import { T1CLibException } from '../core/exceptions/CoreExceptions';
 import { ContainerSyncRequest } from '../core/admin/adminModel';
 import { ActivatedContainerUtil } from './ActivatedContainerUtil';
+import { Util } from './Utils';
 var SyncUtil = (function () {
     function SyncUtil() {
     }
@@ -24,7 +24,7 @@ var SyncUtil = (function () {
     };
     SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
         return client.ds().then(function (ds) {
-            return ds.sync(new DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientInfo('JAVASCRIPT', '%%GULP_INJECT_VERSION%%'), info.namespace, containers));
+            return ds.sync(new DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientInfo('JAVASCRIPT', VERSION), info.namespace, containers));
         });
     };
     SyncUtil.doSyncFlow = function (client, mergedInfo, uuid, containers, isRetry) {
@@ -58,7 +58,7 @@ var SyncUtil = (function () {
             poll(resolve, reject);
         });
         function poll(resolve, reject) {
-            lodash.delay(function () {
+            setTimeout(function () {
                 --remainingTries;
                 client.core().info().then(function (infoData) {
                     var containers = infoData.data.containers;
@@ -99,23 +99,21 @@ var SyncUtil = (function () {
             });
         }
         function containerMissing(config, status) {
-            return lodash.find(config, function (cfgCt) {
-                return !lodash.find(status, function (statusCt) { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
+            return config.find(function (cfgCt) {
+                return !status.find(function (statusCt) { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
             });
         }
         function downloadErrored(config, status) {
-            return lodash.find(config, function (cfgCt) {
-                return lodash.find(status, function (statusCt) {
-                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-                        && lodash.includes(SyncUtil.ERROR_STATES, statusCt.status);
+            config.forEach(function (cfg) {
+                status.forEach(function (sts) {
+                    return !!(cfg.name === sts.name && cfg.version === sts.version && Util.includes(SyncUtil.ERROR_STATES, sts.status));
                 });
             });
         }
         function downloadOngoing(config, status) {
-            return lodash.find(config, function (cfgCt) {
-                return lodash.find(status, function (statusCt) {
-                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-                        && lodash.includes(SyncUtil.ONGOING_STATES, statusCt.status);
+            config.forEach(function (cfg) {
+                status.forEach(function (sts) {
+                    return !!(cfg.name === sts.name && cfg.version === sts.version && Util.includes(SyncUtil.ONGOING_STATES, sts.status));
                 });
             });
         }
