@@ -1,6 +1,6 @@
-import * as _ from 'lodash';
 import * as platform from 'platform';
 import { ResponseHandler } from '../../util/ResponseHandler';
+import { Util } from '../../util/Utils';
 var CORE_CONSENT = '/consent';
 var CORE_INFO = '/';
 var CORE_READERS = '/card-readers';
@@ -79,7 +79,7 @@ var CoreService = (function () {
             poll(resolve, reject);
         });
         function poll(resolve, reject) {
-            _.delay(function () {
+            setTimeout(function () {
                 --maxSeconds;
                 self.readers(function (error, data) {
                     if (error) {
@@ -105,8 +105,8 @@ var CoreService = (function () {
                         poll(resolve, reject);
                     }
                     else {
-                        var readerWithCard = _.find(data.data, function (reader) {
-                            return _.has(reader, 'card');
+                        var readerWithCard = data.data.find(function (reader) {
+                            return !!reader.card;
                         });
                         if (readerWithCard != null) {
                             callback(null, readerWithCard);
@@ -133,7 +133,7 @@ var CoreService = (function () {
             poll(resolve, reject);
         });
         function poll(resolve, reject) {
-            _.delay(function () {
+            setTimeout(function () {
                 --maxSeconds;
                 self.readers(function (error, data) {
                     if (error) {
@@ -152,9 +152,9 @@ var CoreService = (function () {
                             }
                         }
                     }
-                    else if (!_.isEmpty(data) && !_.isEmpty(data.data)) {
-                        var readersWithCards = _.filter(data.data, function (reader) {
-                            return _.has(reader, 'card');
+                    else if (!Util.isEmpty(data) && !Util.isEmpty(data.data)) {
+                        var readersWithCards = data.data.filter(function (reader) {
+                            return !!reader.card;
                         });
                         if (readersWithCards.length) {
                             var response = { data: readersWithCards, success: true };
@@ -188,7 +188,7 @@ var CoreService = (function () {
             poll(resolve, reject);
         });
         function poll(resolve, reject) {
-            _.delay(function () {
+            setTimeout(function () {
                 --maxSeconds;
                 self.readers(function (error, data) {
                     if (error) {
@@ -207,7 +207,7 @@ var CoreService = (function () {
                             }
                         }
                     }
-                    else if (_.isEmpty(data) || _.isEmpty(data.data)) {
+                    else if (Util.isEmpty(data) || Util.isEmpty(data.data)) {
                         if (connectReaderCb) {
                             connectReaderCb();
                         }
