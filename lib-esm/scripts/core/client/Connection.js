@@ -9,7 +9,6 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 import axios from 'axios';
-import * as lodash from 'lodash';
 import { T1CLibException } from '../exceptions/CoreExceptions';
 import { UrlUtil } from '../../util/UrlUtil';
 import * as store from 'store2';
@@ -299,7 +298,7 @@ var LocalConnection = (function (_super) {
         var reqHeaders = _super.prototype.getRequestHeaders.call(this, headers);
         reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
         var contextToken = this.cfg.contextToken;
-        if (contextToken && !lodash.isNil(contextToken)) {
+        if (contextToken && contextToken != null) {
             reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
         }
         return reqHeaders;
@@ -314,7 +313,6 @@ var LocalConnection = (function (_super) {
     };
     LocalConnection.prototype.requestFile = function (basePath, suffix, body, callback) {
         var _this = this;
-        var config = lodash.omit(this.cfg, ['apiKey', 'jwt']);
         if (!callback || typeof callback !== 'function') {
             callback = function () {
             };
@@ -322,10 +320,10 @@ var LocalConnection = (function (_super) {
         return new Promise(function (resolve, reject) {
             var headers = {};
             headers[GenericConnection.HEADER_GCL_LANG] = _this.cfg.lang;
-            if (config.tokenCompatible && _this.getSecurityConfig().sendToken) {
+            if (_this.cfg.tokenCompatible && _this.getSecurityConfig().sendToken) {
                 headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
             }
-            axios.post(UrlUtil.create(basePath, suffix, config, false), body, {
+            axios.post(UrlUtil.create(basePath, suffix, _this.cfg, false), body, {
                 responseType: 'arraybuffer', headers: headers
             }).then(function (response) {
                 callback(null, response.data);
@@ -349,7 +347,7 @@ var LocalConnection = (function (_super) {
         });
     };
     LocalConnection.prototype.postFile = function (basePath, suffix, body, queryParams, callback) {
-        var config = lodash.omit(this.cfg, ['apiKey', 'jwt']);
+        var _this = this;
         if (!callback || typeof callback !== 'function') {
             callback = function () {
             };
@@ -369,12 +367,12 @@ var LocalConnection = (function (_super) {
         }
         form.append('file', body.file);
         var headers = { 'Content-Type': 'multipart/form-data' };
-        if (config.tokenCompatible && this.getSecurityConfig().sendToken) {
+        if (this.cfg.tokenCompatible && this.getSecurityConfig().sendToken) {
             headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
         }
         headers[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
         return new Promise(function (resolve, reject) {
-            axios.post(UrlUtil.create(basePath, suffix, config, false), form, {
+            axios.post(UrlUtil.create(basePath, suffix, _this.cfg, false), form, {
                 headers: headers
             }).then(function (response) {
                 callback(null, response.data);

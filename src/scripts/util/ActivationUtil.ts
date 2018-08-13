@@ -6,6 +6,8 @@ import { DSClientInfo, DSPlatformInfo, DSRegistrationOrSyncRequest } from '../co
 import { SetPubKeyRequest } from '../core/admin/adminModel';
 import { GCLClient } from '../core/GCLLib';
 
+declare var VERSION;
+
 export class ActivationUtil {
     // constructor
     constructor() {}
@@ -43,7 +45,7 @@ export class ActivationUtil {
                     mergedInfo.os,
                     mergedInfo.ua,
                     client.config().gwUrl,
-                    new DSClientInfo('JAVASCRIPT', '%%GULP_INJECT_VERSION%%'),
+                    new DSClientInfo('JAVASCRIPT', VERSION),
                     mergedInfo.namespace
                 ));
             });
