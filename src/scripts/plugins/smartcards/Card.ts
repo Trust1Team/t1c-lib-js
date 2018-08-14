@@ -8,7 +8,6 @@ import { PinEnforcer } from '../../util/PinEnforcer';
 import { CertParser } from '../../util/CertParser';
 import { ResponseHandler } from '../../util/ResponseHandler';
 import { Options, RequestHandler, RequestOptions } from '../../util/RequestHandler';
-import * as lodash from 'lodash';
 import {GenericContainer} from '../GenericContainer';
 /**
  * @author Michallis Pashidis
@@ -42,7 +41,7 @@ export interface SecuredCertCard {
 
 // classes
 export class OptionalPin {
-    constructor(public pin?: string, public pace?: string) {}
+    constructor(public pin?: string, public pace?: string, private_key_reference?: string) {}
 }
 
 export class AuthenticateOrSignData extends OptionalPin {
@@ -80,7 +79,7 @@ export abstract class GenericReaderContainer extends GenericContainer {
         super.containerSuffix(path);
         let suffix = this.containerUrl;
         if (this.reader_id && this.reader_id.length) { suffix += '/' + this.reader_id; }
-        if (path && path.length) { suffix += lodash.startsWith(path, '/') ? path : '/' + path; }
+        if (path && path.length) { suffix += path.startsWith('/') ? path : '/' + path; }
         return suffix;
     }
 }

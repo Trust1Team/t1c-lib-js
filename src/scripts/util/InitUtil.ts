@@ -3,7 +3,6 @@
  * @since 2018
  */
 import {GCLClient} from '../core/GCLLib';
-import * as lodash from 'lodash';
 import * as semver from 'semver';
 import {SyncUtil} from './SyncUtil';
 import {ActivationUtil} from './ActivationUtil';
@@ -78,7 +77,7 @@ export class InitUtil {
                     finalResolve();
                 });
             }, err => {
-                console.log('Initialization error', err)
+                    console.log('Initialization error', err);
                 finalReject(err);
             });
 
@@ -159,13 +158,13 @@ export class InitUtil {
 
     private static coreV2Compatible(version: string): boolean {
         // sanitize version string
-        let sanitized = lodash.split(version, '-')[0];
+        let sanitized = version.split('_')[0];
         return semver.satisfies(sanitized, '>=2.0.0');
     }
 
     private static checkTokenCompatible(version: string): boolean {
         // sanitize version string
-        let sanitized = lodash.split(version, '-')[0];
+        let sanitized = version.split('_')[0];
         return semver.satisfies(sanitized, '>=1.4.0');
     }
 }

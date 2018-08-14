@@ -15,15 +15,6 @@ module.exports = {
         libraryTarget: "umd",
         umdNamedDefine: true,
     },
-    externals: {
-        lodash: {
-            commonjs: 'lodash',
-            commonjs2: 'lodash',
-            amd: 'lodash',
-            root: '_',
-            umd: 'lodash'
-        }
-    },
     plugins: [
         new webpack.DefinePlugin({
             VERSION: JSON.stringify(require("./package.json").version)

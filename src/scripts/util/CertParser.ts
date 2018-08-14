@@ -2,7 +2,6 @@
  * @author Maarten Somers
  */
 
-import * as lodash from 'lodash';
 import * as asn1js from 'asn1js';
 import * as Base64 from 'Base64';
 import Certificate from 'pkijs/build/Certificate';
@@ -16,35 +15,36 @@ export class CertParser {
                           parseCerts: boolean,
                           callback?: (error: T1CLibException, data: T1CResponse) => void):  Promise<any> {
         // check if data has properties
-        if (response && response.data && typeof response.data === 'object' && !lodash.isArray(response.data)) {
-            lodash.forEach(response.data, (value, key) => {
+        if (response && response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
+            for (let key in response.data) {
+                let value = response.data[key];
                 if (key.indexOf('certificate') > -1) {
                     if (typeof value === 'string') {
                         response.data[ key ] = { base64: value };
                         CertParser.setParsed(response.data[key], value, parseCerts);
                     }
-                    else if (lodash.isArray(value)) {
+                    else if (Array.isArray(value)) {
                         let newData = [];
-                        lodash.forEach(value, (certificate: string) => {
+                        value.forEach((certificate: string) => {
                             let cert: T1CCertificate = new T1CCertificate(certificate);
                             CertParser.setParsed(cert, certificate, parseCerts);
                             newData.push(cert);
                         });
                         response.data[ key ] = newData;
                     }
-                    else if (lodash.isObject(value)) {
+                    else if ( typeof value === 'object') {
                         response.data[ key ] = { base64: value.base64 };
                         // only aventra, oberthur en pkcs11 have id property returned from GCL, other cards can use fixed location
                         if (value.id) {response.data[ key ].id = value.id; }
                         if (parseCerts) { response.data[ key ].parsed = CertParser.processCert(value.base64); }
                     }
                 }
-            });
+            }
         } else {
             // assuming data is a string or string[]
-            if (lodash.isArray(response.data)) {
+            if (Array.isArray(response.data)) {
                 let newData = [];
-                lodash.forEach(response.data, (certificate: string | { base64: string, id: string }) => {
+                response.data.forEach((certificate: string | { base64: string, id: string }) => {
                     if (typeof certificate === 'string') {
                         let cert: T1CCertificate = new T1CCertificate(certificate);
                         CertParser.setParsed(cert, certificate, parseCerts);

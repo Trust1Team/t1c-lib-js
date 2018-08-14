@@ -8,7 +8,6 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-import * as lodash from 'lodash';
 import { GenericReaderContainer } from '../smartcards/Card';
 var RemoteLoading = (function (_super) {
     __extends(RemoteLoading, _super);
@@ -28,7 +27,7 @@ var RemoteLoading = (function (_super) {
     };
     RemoteLoading.prototype.apdu = function (apdu, sessionId, callback) {
         var suffix = this.containerSuffix(RemoteLoading.APDU);
-        if (lodash.isArray(apdu)) {
+        if (Array.isArray(apdu)) {
             suffix = this.containerSuffix(RemoteLoading.APDUS);
         }
         return this.connection.post(this.baseUrl, suffix, apdu, RemoteLoading.optionalSessionIdParam(sessionId), undefined, callback);
@@ -40,9 +39,9 @@ var RemoteLoading = (function (_super) {
         return this.connection.get(this.baseUrl, this.containerSuffix(RemoteLoading.CCID_FEATURES), RemoteLoading.optionalSessionIdParam(sessionId), undefined, callback);
     };
     RemoteLoading.prototype.command = function (tx, sessionId, callback) {
-        if (lodash.isArray(tx)) {
+        if (Array.isArray(tx)) {
             var body_1 = [];
-            lodash.forEach(tx, function (txElem) { body_1.push({ tx: txElem }); });
+            tx.forEach(function (txElem) { body_1.push({ tx: txElem }); });
             return this.connection.post(this.baseUrl, this.containerSuffix(RemoteLoading.CMDS), body_1, RemoteLoading.optionalSessionIdParam(sessionId), undefined, callback);
         }
         else {
