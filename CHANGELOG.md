@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.2.5-1 (13/08/2018)
+
+#### enhancement
+
+- Remove lodash from lib [#31](https://github.com/Trust1Team/t1c-lib-js/issues/31)
+
+---
+
 ## v2.2.5 (10/08/2018)
 
 #### closed
@@ -349,9 +357,3 @@ Release notes - Trust1Connector - Version js-v2.1.1
 ## v1.4.0-1
 ### Bug
 * [[T1C-783](https://trust1t.atlassian.net/browse/T1C-783)] - As RMC I want to provide a button to verify the reader is a Belfius branded reader
----
-
-##  (17/04/2018)
-## v1.4.0-2
-### Bug
-* Correctly identify a VASCO DIGIPASS 870 on all OS platforms
