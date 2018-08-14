@@ -6,12 +6,14 @@ import {
     DeviceResponse, DSClientInfo, DSContainer, DSPlatformInfo, DSRegistrationOrSyncRequest
 } from '../core/ds/DSClientModel';
 import { DataContainerUtil } from './DataContainerUtil';
-import * as lodash from 'lodash';
 import { GCLClient } from '../core/GCLLib';
 import { T1CLibException } from '../core/exceptions/CoreExceptions';
 import { T1CContainer } from '../core/service/CoreModel';
 import { ContainerSyncRequest } from '../core/admin/adminModel';
 import {ActivatedContainerUtil} from './ActivatedContainerUtil';
+import {Util} from './Utils';
+
+declare var VERSION;
 
 export class SyncUtil {
     static readonly DOWNLOAD_ERROR = 'DOWNLOAD_ERROR';
@@ -62,7 +64,7 @@ export class SyncUtil {
               info.os,
               info.ua,
               client.config().gwUrl,
-              new DSClientInfo('JAVASCRIPT', '%%GULP_INJECT_VERSION%%'),
+              new DSClientInfo('JAVASCRIPT', VERSION),
               info.namespace,
               containers)
           );
@@ -119,7 +121,7 @@ export class SyncUtil {
 
         function poll(resolve?: (containers: T1CContainer[]) => void, reject?: (error: any) => void) {
             // monitor status for each container in config
-            lodash.delay(() => {
+            setTimeout(() => {
                 --remainingTries;
                 client.core().info().then(infoData => {
                     let containers = infoData.data.containers;
@@ -158,25 +160,23 @@ export class SyncUtil {
         }
 
         function containerMissing(config: { name: string, version: string}[], status: { name: string, version: string, status: string }[]) {
-            return lodash.find(config, cfgCt => {
-                return !lodash.find(status, statusCt => { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
+            return config.find(cfgCt => {
+                return !status.find(statusCt => { return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version; });
             });
         }
 
         function downloadErrored(config: { name: string, version: string }[], status: { name: string, version: string, status: string }[]) {
-            return lodash.find(config, cfgCt => {
-                return lodash.find(status, statusCt => {
-                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-                           && lodash.includes(SyncUtil.ERROR_STATES, statusCt.status);
+            config.forEach(cfg => {
+                status.forEach(sts => {
+                    return !!(cfg.name === sts.name && cfg.version === sts.version && Util.includes(SyncUtil.ERROR_STATES, sts.status));
                 });
             });
         }
 
         function downloadOngoing(config: { name: string, version: string }[], status: { name: string, version: string, status: string }[]) {
-            return lodash.find(config, cfgCt => {
-                return lodash.find(status, statusCt => {
-                    return cfgCt.name === statusCt.name && cfgCt.version === statusCt.version
-                           && lodash.includes(SyncUtil.ONGOING_STATES, statusCt.status);
+            config.forEach(cfg => {
+                status.forEach(sts => {
+                    return !!(cfg.name === sts.name && cfg.version === sts.version && Util.includes(SyncUtil.ONGOING_STATES, sts.status));
                 });
             });
         }

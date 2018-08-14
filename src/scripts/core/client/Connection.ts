@@ -5,7 +5,6 @@
 
 import {GCLConfig} from '../GCLConfig';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
-import * as lodash from 'lodash';
 import {T1CLibException} from '../exceptions/CoreExceptions';
 import {UrlUtil} from '../../util/UrlUtil';
 import * as store from 'store2';
@@ -516,7 +515,7 @@ export class LocalConnection extends GenericConnection implements Connection {
         // contextToken = application id (ex. 26)
         let contextToken = this.cfg.contextToken;
         // only send relay-state header when a DS is available
-        if (contextToken && !lodash.isNil(contextToken)) {
+        if (contextToken && contextToken != null) {
             reqHeaders[LocalConnection.RELAY_STATE_HEADER_PREFIX + this.cfg.contextToken] = this.cfg.contextToken;
         }
         return reqHeaders;
@@ -562,7 +561,6 @@ export class LocalConnection extends GenericConnection implements Connection {
         rel_path: string[],
         notify_on_completion: boolean
     }, callback?: RequestCallback): Promise<any> {
-        let config: any = lodash.omit(this.cfg, ['apiKey', 'jwt']);
         // init callback if necessary
         if (!callback || typeof callback !== 'function') {
             callback = function () { /* no-op */
@@ -572,10 +570,10 @@ export class LocalConnection extends GenericConnection implements Connection {
         return new Promise((resolve, reject) => {
             let headers = {};
             headers[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
-            if (config.tokenCompatible && this.getSecurityConfig().sendToken) {
+            if (this.cfg.tokenCompatible && this.getSecurityConfig().sendToken) {
                 headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
             }
-            axios.post(UrlUtil.create(basePath, suffix, config, false), body, {
+            axios.post(UrlUtil.create(basePath, suffix, this.cfg, false), body, {
                 responseType: 'arraybuffer', headers
             }).then(response => {
                 callback(null, response.data);
@@ -607,7 +605,6 @@ export class LocalConnection extends GenericConnection implements Connection {
      * @returns {Promise<any>}
      */
     public postFile(basePath: string, suffix: string, body: RequestBody, queryParams: QueryParams, callback?: RequestCallback): Promise<any> {
-        let config: any = lodash.omit(this.cfg, ['apiKey', 'jwt']);
         // init callback if necessary
         if (!callback || typeof callback !== 'function') {
             callback = function () { /* no-op */
@@ -633,13 +630,13 @@ export class LocalConnection extends GenericConnection implements Connection {
         }
         form.append('file', body.file);
         let headers = {'Content-Type': 'multipart/form-data'};
-        if (config.tokenCompatible && this.getSecurityConfig().sendToken) {
+        if (this.cfg.tokenCompatible && this.getSecurityConfig().sendToken) {
             headers[GenericConnection.AUTH_TOKEN_HEADER] = BrowserFingerprint.get();
         }
         headers[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
 
         return new Promise((resolve, reject) => {
-            axios.post(UrlUtil.create(basePath, suffix, config, false), form, {
+            axios.post(UrlUtil.create(basePath, suffix, this.cfg, false), form, {
                 headers
             }).then(response => {
                 callback(null, response.data);
