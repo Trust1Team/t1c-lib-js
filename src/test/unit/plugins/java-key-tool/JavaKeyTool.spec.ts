@@ -169,4 +169,27 @@ describe('Java key tool', () => {
             // console.log(err)
         });
     });
+
+    test('Change alias', () => {
+        beforeEach(() => {
+            mock.onPost('containers/java-keytool-v1-0-0/changealias', {entity: 't1t', keystore: 't1t.jks', type: 'test', alias: 'selfsigned', destalias: 'signed'}).reply(200, {
+                data: true,
+                success: true
+            });
+        })
+        const body = {
+            entity: 't1t',
+            keystore: 't1t.jks',
+            type: 'test',
+            alias: 'selfsigned',
+            destalias: 'signed'
+        };
+
+        jks.ChangeKeyPassword(body).then(res => {
+            expect(res).toHaveProperty('success', true);
+            expect(res).toHaveProperty('data', true);
+        }).catch(err => {
+            // console.log(err)
+        });
+    });
 });
