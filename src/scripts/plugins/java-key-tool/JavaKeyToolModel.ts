@@ -22,7 +22,6 @@ export class ChangeKeystorePasswordData {
         public keystore: string,
         public alias?: string,
         public new_password?: string,
-        public keypass?: string,
         public storepass?: string,
         public storetype?: string,
         public providername?: string,
