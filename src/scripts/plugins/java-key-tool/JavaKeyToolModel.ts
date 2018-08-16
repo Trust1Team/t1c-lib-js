@@ -170,7 +170,7 @@ export class ImportCertData {
         public entity: string,
         public type: string,
         public keystore: string,
-        public alias?: string,
+        public alias: string,
         public file?: string, // file has priority over data
         public data?: string,
         public trustcacerts?: boolean,
