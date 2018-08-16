@@ -14,6 +14,30 @@ export interface AbstractJavaKeyTool {
     ExportCertificate(body: ExportCertData, callback?: (error: T1CLibException, data: ExportCertResponse) => void): Promise<DataResponse>;
     ChangeKeystorePassword(body: ChangeKeystorePasswordData, callback?: (error: T1CLibException, data: ChangeKeystorePasswordResponse) => void): Promise<DataResponse>;
     ChangeKeyPassword(body: ChangeKeyPasswordData, callback?: (error: T1CLibException, data: ChangeKeyPasswordResponse) => void): Promise<DataResponse>;
+    ChangeAlias(body: ChangeAliasData, callback?: (error: T1CLibException, data: ChangeAliasResponse) => void): Promise<DataResponse>;
+}
+
+export class ChangeAliasData {
+    constructor(
+        public entity: string,
+        public type: string,
+        public keystore: string,
+        public alias?: string,
+        public destalias?: string,
+        public keypass?: string,
+        public storepass?: string,
+        public storetype?: string,
+        public providername?: string,
+        public providerclass?: string,
+        public providerarg?: string,
+        public providerpath?: string
+    ) {}
+}
+
+export class ChangeAliasResponse extends T1CResponse {
+    constructor(public data: boolean, public success: boolean) {
+        super(success, data);
+    }
 }
 
 export class ChangeKeyPasswordData {
