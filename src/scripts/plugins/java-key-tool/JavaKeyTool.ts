@@ -1,4 +1,18 @@
-import {AbstractJavaKeyTool, ChangeKeystorePasswordData, ChangeKeystorePasswordResponse, CSRData, CSRResponse, ExportCertData, ExportCertResponse, GenerateKeyPairData, GenerateKeyPairResponse, ImportCertData, ImportCertResponse} from './JavaKeyToolModel';
+import {
+    AbstractJavaKeyTool,
+    ChangeKeyPasswordData,
+    ChangeKeyPasswordResponse,
+    ChangeKeystorePasswordData,
+    ChangeKeystorePasswordResponse,
+    CSRData,
+    CSRResponse,
+    ExportCertData,
+    ExportCertResponse,
+    GenerateKeyPairData,
+    GenerateKeyPairResponse,
+    ImportCertData,
+    ImportCertResponse
+} from './JavaKeyToolModel';
 import {DataResponse, T1CLibException} from '../../..';
 import {LocalConnection} from '../../core/client/Connection';
 import {GenericContainer} from '../GenericContainer';
@@ -17,6 +31,7 @@ export class JavaKeyTool extends GenericContainer implements AbstractJavaKeyTool
     static IMPORT_CERTIFICATE = '/importcert';
     static EXPORT_CERTIFICATE = '/exportcert';
     static CHANGE_KEYSTORE_PASSWORD = '/storepasswd​';
+    static CHANGE_KEY_PASSWORD = '/keypasswd​';
 
     constructor(baseUrl: string, containerUrl: string, connection: LocalConnection) {
         super(baseUrl, containerUrl, connection, JavaKeyTool.CONTAINER_PREFIX);
@@ -53,6 +68,24 @@ export class JavaKeyTool extends GenericContainer implements AbstractJavaKeyTool
             providerpath: body.providerpath
         };
         return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEYSTORE_PASSWORD), serializedbody, undefined, undefined, callback);
+    }
+
+    ChangeKeyPassword(body: ChangeKeyPasswordData, callback?: (error: T1CLibException, data: ChangeKeyPasswordResponse) => void): Promise<DataResponse> {
+        let serializedbody = {
+            entity: body.entity,
+            type: body.type,
+            keystore: body.keystore,
+            alias: body.alias,
+            new: body.new_password,
+            keypass: body.keypass,
+            storepass: body.storepass,
+            storetype: body.storetype,
+            providername: body.providername,
+            providerclass: body.providerclass,
+            providerarg: body.providerarg,
+            providerpath: body.providerpath
+        };
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEY_PASSWORD), serializedbody, undefined, undefined, callback);
     }
 
 }
