@@ -96,4 +96,31 @@ describe('Java key tool', () => {
             // console.log(err)
         });
     });
+
+    test('Export certificate', () => {
+        beforeEach(() => {
+            mock.onPost('containers/java-keytool-v1-0-0/exportcert', {entity: 't1t', keystore: 't1t.jks', type: 'test', alias: 'selfsigned', file: 'cert.pem'}).reply(200, {
+                data: {
+                    alias: 'selfsigned',
+                    path: 'documents/t1t/cert.pem'
+                },
+                success: true
+            });
+        })
+        const body = {
+            entity: 't1t',
+            keystore: 't1t.jks',
+            type: 'test',
+            file: 'cert.pem'
+        };
+
+        jks.ImportCertificate(body).then(res => {
+            expect(res).toHaveProperty('success', true);
+            expect(res).toHaveProperty('data', true);
+            expect(res.data).toHaveProperty('alias', 'selfsigned');
+            expect(res.data).toHaveProperty('path', 'documents/t1t/cert.pem');
+        }).catch(err => {
+            // console.log(err)
+        });
+    });
 });
