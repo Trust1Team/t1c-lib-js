@@ -227,4 +227,26 @@ describe('Java key tool', () => {
             // console.log(err)
         });
     });
+
+    test('Delete entry', () => {
+        beforeEach(() => {
+            mock.onPost('containers/java-keytool-v1-0-0/delete', {entity: 't1t', keystore: 't1t.jks', type: 'test', alias: 'selfsigned'}).reply(200, {
+                data: true,
+                success: true
+            });
+        });
+        const body = {
+            entity: 't1t',
+            keystore: 't1t.jks',
+            type: 'test',
+            alias: 'selfsigned'
+        };
+
+        jks.DeleteEntry(body).then(res => {
+            expect(res).toHaveProperty('success', true);
+            expect(res).toHaveProperty('data', true);
+        }).catch(err => {
+            // console.log(err)
+        });
+    });
 });
