@@ -11,6 +11,37 @@ export interface AbstractJavaKeyTool {
     generateKeyPair(body: GenerateKeyPairData, callback?: (error: T1CLibException, data: GenerateKeyPairResponse) => void): Promise<DataResponse>;
     GenerateCertificateRequest(body: CSRData, callback?: (error: T1CLibException, data: CSRResponse) => void): Promise<DataResponse>;
     ImportCertificate(body: ImportCertData, callback?: (error: T1CLibException, data: ImportCertResponse) => void): Promise<DataResponse>;
+    ExportCertificate(body: ExportCertData, callback?: (error: T1CLibException, data: ExportCertResponse) => void): Promise<DataResponse>;
+}
+
+export class ExportCertData {
+    constructor(
+        public entity: string,
+        public type: string,
+        public keystore: string,
+        public alias?: string,
+        public file?: string, // file has priority over data
+        public storepass?: string,
+        public storetype?: string,
+        public providername?: string,
+        public providerclass?: string,
+        public providerarg?: string,
+        public providerpath?: string
+    ) {}
+}
+
+export class ExportCertResponse extends T1CResponse {
+    constructor(public data: ExportCertResponseData, public success: boolean) {
+        super(success, data);
+    }
+}
+
+export class ExportCertResponseData {
+    constructor(
+        public alias: string,
+        public base64?: string,
+        public path?: string
+    ) {}
 }
 
 
