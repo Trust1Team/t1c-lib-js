@@ -29,6 +29,7 @@ describe('Java key tool', () => {
     afterEach(() => {
         mock.restore();
     });
+
     test('generate a key pair', () => {
         beforeEach(() => {
             mock.onPost('containers/java-keytool-v1-0-0/genkeypair', {entity: 't1t', keystore: 't1t.jks', type: 'test'}).reply(200, {
@@ -50,4 +51,28 @@ describe('Java key tool', () => {
             // console.log(err)
         });
     });
-})
+
+    test('generate certificate request', () => {
+        beforeEach(() => {
+            mock.onPost('containers/java-keytool-v1-0-0/certreq​', {entity: 't1t', keystore: 't1t.jks', type: 'test'}).reply(200, {
+                data: {
+                    base64: 'base64Value'
+                },
+                success: true
+            });
+        })
+        const body = {
+            entity: 't1t',
+            keystore: 't1t.jks',
+            type: 'test'
+        };
+
+        jks.GenerateCertificateRequest(body).then(res => {
+            expect(res).toHaveProperty('success');
+            expect(res).toHaveProperty('data');
+            expect(res.data).toHaveProperty('base64', 'base64Value');
+        }).catch(err => {
+            // console.log(err)
+        });
+    });
+});
