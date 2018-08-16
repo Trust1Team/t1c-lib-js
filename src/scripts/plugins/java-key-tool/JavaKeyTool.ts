@@ -1,5 +1,5 @@
 import {
-    AbstractJavaKeyTool,
+    AbstractJavaKeyTool, ChangeAliasData, ChangeAliasResponse,
     ChangeKeyPasswordData,
     ChangeKeyPasswordResponse,
     ChangeKeystorePasswordData,
@@ -32,6 +32,7 @@ export class JavaKeyTool extends GenericContainer implements AbstractJavaKeyTool
     static EXPORT_CERTIFICATE = '/exportcert';
     static CHANGE_KEYSTORE_PASSWORD = '/storepasswd​';
     static CHANGE_KEY_PASSWORD = '/keypasswd​';
+    static CHANGE_ALIAS = '/changealias';
 
     constructor(baseUrl: string, containerUrl: string, connection: LocalConnection) {
         super(baseUrl, containerUrl, connection, JavaKeyTool.CONTAINER_PREFIX);
@@ -86,6 +87,10 @@ export class JavaKeyTool extends GenericContainer implements AbstractJavaKeyTool
             providerpath: body.providerpath
         };
         return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEY_PASSWORD), serializedbody, undefined, undefined, callback);
+    }
+
+    ChangeAlias(body: ChangeAliasData, callback?: (error: T1CLibException, data: ChangeAliasResponse) => void): Promise<DataResponse> {
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_ALIAS), body, undefined, undefined, callback);
     }
 
 }
