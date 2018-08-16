@@ -10,6 +10,33 @@ import {T1CLibException} from '../../core/exceptions/CoreExceptions';
 export interface AbstractJavaKeyTool {
     generateKeyPair(body: GenerateKeyPairData, callback?: (error: T1CLibException, data: GenerateKeyPairResponse) => void): Promise<DataResponse>;
     GenerateCertificateRequest(body: CSRData, callback?: (error: T1CLibException, data: CSRResponse) => void): Promise<DataResponse>;
+    ImportCertificate(body: ImportCertData, callback?: (error: T1CLibException, data: ImportCertResponse) => void): Promise<DataResponse>;
+}
+
+
+export class ImportCertData {
+    constructor(
+        public entity: string,
+        public type: string,
+        public keystore: string,
+        public alias?: string,
+        public file?: string, // file has priority over data
+        public data?: string,
+        public trustcacerts?: boolean,
+        public keypass?: string,
+        public storepass?: string,
+        public storetype?: string,
+        public providername?: string,
+        public providerclass?: string,
+        public providerarg?: string,
+        public providerpath?: string
+    ) {}
+}
+
+export class ImportCertResponse extends T1CResponse {
+    constructor(public data: boolean, public success: boolean) {
+        super(success, data);
+    }
 }
 
 //  certificate Signing Request (CSR) data
