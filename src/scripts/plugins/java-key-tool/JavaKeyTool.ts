@@ -11,7 +11,7 @@ import {
     GenerateKeyPairData,
     GenerateKeyPairResponse,
     ImportCertData,
-    ImportCertResponse
+    ImportCertResponse, ListEntriesData, ListEntriesResponse
 } from './JavaKeyToolModel';
 import {DataResponse, T1CLibException} from '../../..';
 import {LocalConnection} from '../../core/client/Connection';
@@ -33,6 +33,7 @@ export class JavaKeyTool extends GenericContainer implements AbstractJavaKeyTool
     static CHANGE_KEYSTORE_PASSWORD = '/storepasswd​';
     static CHANGE_KEY_PASSWORD = '/keypasswd​';
     static CHANGE_ALIAS = '/changealias';
+    static LIST_ENTIRES = '/list';
 
     constructor(baseUrl: string, containerUrl: string, connection: LocalConnection) {
         super(baseUrl, containerUrl, connection, JavaKeyTool.CONTAINER_PREFIX);
@@ -91,6 +92,10 @@ export class JavaKeyTool extends GenericContainer implements AbstractJavaKeyTool
 
     ChangeAlias(body: ChangeAliasData, callback?: (error: T1CLibException, data: ChangeAliasResponse) => void): Promise<DataResponse> {
         return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_ALIAS), body, undefined, undefined, callback);
+    }
+
+    ListEntries(body: ListEntriesData, callback?: (error: T1CLibException, data: ListEntriesResponse) => void): Promise<DataResponse> {
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.LIST_ENTIRES), body, undefined, undefined, callback);
     }
 
 }
