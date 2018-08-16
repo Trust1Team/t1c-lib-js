@@ -35,6 +35,7 @@ export class GCLConfigOptions {
                 public gwOrProxyUrl?: string,
                 public apiKey?: string,
                 public gwJwt?: string,
+                public tokenExchangeContextPath?: string,
                 public ocvContextPath?: string,
                 public dsContextPath?: string,
                 public dsFileContextPath?: string,
@@ -65,6 +66,7 @@ export class GCLConfig {
     private _ocvContextPath: string;
     private _apiKey: string;
     private _gwJwt: string;
+    private _tokenExchangeContextPath: string;
     private _gclJwt: string;
     private _citrix: boolean;
     private _agentPort: number;
@@ -90,6 +92,7 @@ export class GCLConfig {
             if (options.gwOrProxyUrl) { this._gwUrl = options.gwOrProxyUrl; } else { this._gwUrl = undefined; }
             if (options.apiKey) { this._apiKey = options.apiKey; } else { this._apiKey = undefined; } // no default
             if (options.gwJwt) { this._gwJwt = options.gwJwt; } else { this._gwJwt = undefined; } // no default
+            if (options.tokenExchangeContextPath) { this._tokenExchangeContextPath = options.tokenExchangeContextPath; } else { this._tokenExchangeContextPath = defaults.tokenExchangeContextPath; }
             if (options.agentPort) { this._agentPort = options.agentPort; } else { this._agentPort = -1; }
             if (options.localTestMode) { this._localTestMode = options.localTestMode; } else { this._localTestMode = defaults.localTestMode; } // TODO: review
             if (options.forceHardwarePinpad) { this._forceHardwarePinpad = options.forceHardwarePinpad; } else { this._forceHardwarePinpad = defaults.forceHardwarePinpad; }
@@ -135,8 +138,16 @@ export class GCLConfig {
         }
     }
 
+    get tokenExchangeContextPath(): string {
+        return this._tokenExchangeContextPath;
+    }
+
+    set tokenExchangeContextPath(value: string) {
+        this._tokenExchangeContextPath = value;
+    }
+
     get authUrl(): string {
-        return this.gwUrl + defaults.tokenExchangeContextPath;
+        return this.gwUrl + this.tokenExchangeContextPath;
     }
 
     get ocvUrl(): string {
