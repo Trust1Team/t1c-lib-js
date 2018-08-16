@@ -5,7 +5,7 @@ import {
     ChangeKeystorePasswordData,
     ChangeKeystorePasswordResponse,
     CSRData,
-    CSRResponse,
+    CSRResponse, DeleteEntryData, DeleteEntryResponse,
     ExportCertData,
     ExportCertResponse,
     GenerateKeyPairData,
@@ -34,6 +34,7 @@ export class JavaKeyTool extends GenericContainer implements AbstractJavaKeyTool
     static CHANGE_KEY_PASSWORD = '/keypasswd​';
     static CHANGE_ALIAS = '/changealias';
     static LIST_ENTIRES = '/list';
+    static DELETE_ENTRY = '/delete';
 
     constructor(baseUrl: string, containerUrl: string, connection: LocalConnection) {
         super(baseUrl, containerUrl, connection, JavaKeyTool.CONTAINER_PREFIX);
@@ -96,6 +97,10 @@ export class JavaKeyTool extends GenericContainer implements AbstractJavaKeyTool
 
     ListEntries(body: ListEntriesData, callback?: (error: T1CLibException, data: ListEntriesResponse) => void): Promise<DataResponse> {
         return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.LIST_ENTIRES), body, undefined, undefined, callback);
+    }
+
+    DeleteEntry(body: DeleteEntryData, callback?: (error: T1CLibException, data: DeleteEntryResponse) => void): Promise<DataResponse> {
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.DELETE_ENTRY), body, undefined, undefined, callback);
     }
 
 }
