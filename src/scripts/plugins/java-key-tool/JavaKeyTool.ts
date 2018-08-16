@@ -45,14 +45,13 @@ export class JavaKeyTool extends GenericContainer implements AbstractJavaKeyTool
             keystore: body.keystore,
             alias: body.alias,
             new: body.new_password,
-            keypass: body.keypass,
             storepass: body.storepass,
             storetype: body.storetype,
             providername: body.providername,
             providerclass: body.providerclass,
             providerarg: body.providerarg,
             providerpath: body.providerpath
-        }
+        };
         return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEYSTORE_PASSWORD), serializedbody, undefined, undefined, callback);
     }
 
