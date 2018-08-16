@@ -146,4 +146,27 @@ describe('Java key tool', () => {
             // console.log(err)
         });
     });
+
+    test('Change key password', () => {
+        beforeEach(() => {
+            mock.onPost('containers/java-keytool-v1-0-0/keypasswd​', {entity: 't1t', keystore: 't1t.jks', type: 'test', alias: 'selfsigned', new_password: '123456'}).reply(200, {
+                data: true,
+                success: true
+            });
+        })
+        const body = {
+            entity: 't1t',
+            keystore: 't1t.jks',
+            type: 'test',
+            alias: 'selfsigned',
+            new_password: '123456'
+        };
+
+        jks.ChangeKeyPassword(body).then(res => {
+            expect(res).toHaveProperty('success', true);
+            expect(res).toHaveProperty('data', true);
+        }).catch(err => {
+            // console.log(err)
+        });
+    });
 });
