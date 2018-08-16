@@ -114,11 +114,34 @@ describe('Java key tool', () => {
             file: 'cert.pem'
         };
 
-        jks.ImportCertificate(body).then(res => {
+        jks.ExportCertificate(body).then(res => {
             expect(res).toHaveProperty('success', true);
-            expect(res).toHaveProperty('data', true);
+            expect(res).toHaveProperty('data');
             expect(res.data).toHaveProperty('alias', 'selfsigned');
             expect(res.data).toHaveProperty('path', 'documents/t1t/cert.pem');
+        }).catch(err => {
+            // console.log(err)
+        });
+    });
+
+    test('Change keystore password', () => {
+        beforeEach(() => {
+            mock.onPost('containers/java-keytool-v1-0-0/storepasswd​', {entity: 't1t', keystore: 't1t.jks', type: 'test', alias: 'selfsigned', new_password: '123456'}).reply(200, {
+                data: true,
+                success: true
+            });
+        })
+        const body = {
+            entity: 't1t',
+            keystore: 't1t.jks',
+            type: 'test',
+            alias: 'selfsigned',
+            new_password: '123456'
+        };
+
+        jks.ChangeKeystorePassword(body).then(res => {
+            expect(res).toHaveProperty('success', true);
+            expect(res).toHaveProperty('data', true);
         }).catch(err => {
             // console.log(err)
         });
