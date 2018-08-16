@@ -9,6 +9,45 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 import { T1CResponse } from '../../core/service/CoreModel';
+var CSRData = (function () {
+    function CSRData(entity, type, keystore, alias, sigalg, file, keypass, dname, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.sigalg = sigalg;
+        this.file = file;
+        this.keypass = keypass;
+        this.dname = dname;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return CSRData;
+}());
+export { CSRData };
+var CSRResponse = (function (_super) {
+    __extends(CSRResponse, _super);
+    function CSRResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return CSRResponse;
+}(T1CResponse));
+export { CSRResponse };
+var CSRResponseData = (function () {
+    function CSRResponseData(base64, path) {
+        this.base64 = base64;
+        this.path = path;
+    }
+    return CSRResponseData;
+}());
+export { CSRResponseData };
 var GenerateKeyPairData = (function () {
     function GenerateKeyPairData(entity, type, keystore, alias, keyalg, sigalg, destalias, dname, startdate, ext, validity, keypass, storepass, storetype, providername, providerclass, providerarg, providerpath) {
         this.entity = entity;

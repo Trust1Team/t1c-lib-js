@@ -15,11 +15,14 @@ var JavaKeyTool = (function (_super) {
         return _super.call(this, baseUrl, containerUrl, connection, JavaKeyTool.CONTAINER_PREFIX) || this;
     }
     JavaKeyTool.prototype.generateKeyPair = function (body, callback) {
-        console.log(body);
         return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.GENERATE_KEY_PAIR), body, undefined, undefined, callback);
+    };
+    JavaKeyTool.prototype.GenerateCertificateRequest = function (body, callback) {
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.GENERATE_CERTIFICATE_REQUEST), body, undefined, undefined, callback);
     };
     JavaKeyTool.CONTAINER_PREFIX = 'java-keytool';
     JavaKeyTool.GENERATE_KEY_PAIR = '/genkeypair';
+    JavaKeyTool.GENERATE_CERTIFICATE_REQUEST = '/certreq​';
     return JavaKeyTool;
 }(GenericContainer));
 export { JavaKeyTool };
