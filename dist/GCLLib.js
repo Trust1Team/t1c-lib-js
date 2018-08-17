@@ -5207,11 +5207,11 @@ var InitUtil = (function () {
         return hostname;
     };
     InitUtil.coreV2Compatible = function (version) {
-        var sanitized = version.split('_')[0];
+        var sanitized = semver.coerce(version);
         return semver.satisfies(sanitized, '>=2.0.0');
     };
     InitUtil.checkTokenCompatible = function (version) {
-        var sanitized = version.split('_')[0];
+        var sanitized = semver.coerce(version);
         return semver.satisfies(sanitized, '>=1.4.0');
     };
     return InitUtil;
@@ -38781,9 +38781,64 @@ var JavaKeyTool = (function (_super) {
     JavaKeyTool.prototype.GenerateCertificateRequest = function (body, callback) {
         return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.GENERATE_CERTIFICATE_REQUEST), body, undefined, undefined, callback);
     };
+    JavaKeyTool.prototype.ImportCertificate = function (body, callback) {
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.IMPORT_CERTIFICATE), body, undefined, undefined, callback);
+    };
+    JavaKeyTool.prototype.ExportCertificate = function (body, callback) {
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.EXPORT_CERTIFICATE), body, undefined, undefined, callback);
+    };
+    JavaKeyTool.prototype.ChangeKeystorePassword = function (body, callback) {
+        var serializedbody = {
+            entity: body.entity,
+            type: body.type,
+            keystore: body.keystore,
+            alias: body.alias,
+            new: body.new_password,
+            storepass: body.storepass,
+            storetype: body.storetype,
+            providername: body.providername,
+            providerclass: body.providerclass,
+            providerarg: body.providerarg,
+            providerpath: body.providerpath
+        };
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEYSTORE_PASSWORD), serializedbody, undefined, undefined, callback);
+    };
+    JavaKeyTool.prototype.ChangeKeyPassword = function (body, callback) {
+        var serializedbody = {
+            entity: body.entity,
+            type: body.type,
+            keystore: body.keystore,
+            alias: body.alias,
+            new: body.new_password,
+            keypass: body.keypass,
+            storepass: body.storepass,
+            storetype: body.storetype,
+            providername: body.providername,
+            providerclass: body.providerclass,
+            providerarg: body.providerarg,
+            providerpath: body.providerpath
+        };
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEY_PASSWORD), serializedbody, undefined, undefined, callback);
+    };
+    JavaKeyTool.prototype.ChangeAlias = function (body, callback) {
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_ALIAS), body, undefined, undefined, callback);
+    };
+    JavaKeyTool.prototype.ListEntries = function (body, callback) {
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.LIST_ENTIRES), body, undefined, undefined, callback);
+    };
+    JavaKeyTool.prototype.DeleteEntry = function (body, callback) {
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.DELETE_ENTRY), body, undefined, undefined, callback);
+    };
     JavaKeyTool.CONTAINER_PREFIX = 'java-keytool';
     JavaKeyTool.GENERATE_KEY_PAIR = '/genkeypair';
     JavaKeyTool.GENERATE_CERTIFICATE_REQUEST = '/certreq​';
+    JavaKeyTool.IMPORT_CERTIFICATE = '/importcert';
+    JavaKeyTool.EXPORT_CERTIFICATE = '/exportcert';
+    JavaKeyTool.CHANGE_KEYSTORE_PASSWORD = '/storepasswd​';
+    JavaKeyTool.CHANGE_KEY_PASSWORD = '/keypasswd​';
+    JavaKeyTool.CHANGE_ALIAS = '/changealias';
+    JavaKeyTool.LIST_ENTIRES = '/list';
+    JavaKeyTool.DELETE_ENTRY = '/delete';
     return JavaKeyTool;
 }(GenericContainer_1.GenericContainer));
 exports.JavaKeyTool = JavaKeyTool;
@@ -38807,6 +38862,221 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var CoreModel_1 = __webpack_require__(127);
+var DeleteEntryData = (function () {
+    function DeleteEntryData(entity, type, keystore, alias, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return DeleteEntryData;
+}());
+exports.DeleteEntryData = DeleteEntryData;
+var DeleteEntryResponse = (function (_super) {
+    __extends(DeleteEntryResponse, _super);
+    function DeleteEntryResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return DeleteEntryResponse;
+}(CoreModel_1.T1CResponse));
+exports.DeleteEntryResponse = DeleteEntryResponse;
+var ListEntriesData = (function () {
+    function ListEntriesData(entity, type, keystore, alias, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return ListEntriesData;
+}());
+exports.ListEntriesData = ListEntriesData;
+var ListEntriesResponse = (function (_super) {
+    __extends(ListEntriesResponse, _super);
+    function ListEntriesResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return ListEntriesResponse;
+}(CoreModel_1.T1CResponse));
+exports.ListEntriesResponse = ListEntriesResponse;
+var StoreEntry = (function () {
+    function StoreEntry(alias, base64) {
+        this.alias = alias;
+    }
+    return StoreEntry;
+}());
+exports.StoreEntry = StoreEntry;
+var ChangeAliasData = (function () {
+    function ChangeAliasData(entity, type, keystore, alias, destalias, keypass, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.destalias = destalias;
+        this.keypass = keypass;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return ChangeAliasData;
+}());
+exports.ChangeAliasData = ChangeAliasData;
+var ChangeAliasResponse = (function (_super) {
+    __extends(ChangeAliasResponse, _super);
+    function ChangeAliasResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return ChangeAliasResponse;
+}(CoreModel_1.T1CResponse));
+exports.ChangeAliasResponse = ChangeAliasResponse;
+var ChangeKeyPasswordData = (function () {
+    function ChangeKeyPasswordData(entity, type, keystore, alias, new_password, keypass, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.new_password = new_password;
+        this.keypass = keypass;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return ChangeKeyPasswordData;
+}());
+exports.ChangeKeyPasswordData = ChangeKeyPasswordData;
+var ChangeKeyPasswordResponse = (function (_super) {
+    __extends(ChangeKeyPasswordResponse, _super);
+    function ChangeKeyPasswordResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return ChangeKeyPasswordResponse;
+}(CoreModel_1.T1CResponse));
+exports.ChangeKeyPasswordResponse = ChangeKeyPasswordResponse;
+var ChangeKeystorePasswordData = (function () {
+    function ChangeKeystorePasswordData(entity, type, keystore, alias, new_password, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.new_password = new_password;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return ChangeKeystorePasswordData;
+}());
+exports.ChangeKeystorePasswordData = ChangeKeystorePasswordData;
+var ChangeKeystorePasswordResponse = (function (_super) {
+    __extends(ChangeKeystorePasswordResponse, _super);
+    function ChangeKeystorePasswordResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return ChangeKeystorePasswordResponse;
+}(CoreModel_1.T1CResponse));
+exports.ChangeKeystorePasswordResponse = ChangeKeystorePasswordResponse;
+var ExportCertData = (function () {
+    function ExportCertData(entity, type, keystore, alias, file, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.file = file;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return ExportCertData;
+}());
+exports.ExportCertData = ExportCertData;
+var ExportCertResponse = (function (_super) {
+    __extends(ExportCertResponse, _super);
+    function ExportCertResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return ExportCertResponse;
+}(CoreModel_1.T1CResponse));
+exports.ExportCertResponse = ExportCertResponse;
+var ExportCertResponseData = (function () {
+    function ExportCertResponseData(alias, base64, path) {
+        this.alias = alias;
+        this.base64 = base64;
+        this.path = path;
+    }
+    return ExportCertResponseData;
+}());
+exports.ExportCertResponseData = ExportCertResponseData;
+var ImportCertData = (function () {
+    function ImportCertData(entity, type, keystore, alias, file, data, trustcacerts, keypass, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.file = file;
+        this.data = data;
+        this.trustcacerts = trustcacerts;
+        this.keypass = keypass;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return ImportCertData;
+}());
+exports.ImportCertData = ImportCertData;
+var ImportCertResponse = (function (_super) {
+    __extends(ImportCertResponse, _super);
+    function ImportCertResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return ImportCertResponse;
+}(CoreModel_1.T1CResponse));
+exports.ImportCertResponse = ImportCertResponse;
 var CSRData = (function () {
     function CSRData(entity, type, keystore, alias, sigalg, file, keypass, dname, storepass, storetype, providername, providerclass, providerarg, providerpath) {
         this.entity = entity;
@@ -38912,11 +39182,12 @@ var defaults = {
     containerDownloadTimeout: 30
 };
 var GCLConfigOptions = (function () {
-    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, gwJwt, ocvContextPath, dsContextPath, dsFileContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode, lang, providedContainers) {
+    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, gwJwt, tokenExchangeContextPath, ocvContextPath, dsContextPath, dsFileContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode, lang, providedContainers) {
         this.gclUrl = gclUrl;
         this.gwOrProxyUrl = gwOrProxyUrl;
         this.apiKey = apiKey;
         this.gwJwt = gwJwt;
+        this.tokenExchangeContextPath = tokenExchangeContextPath;
         this.ocvContextPath = ocvContextPath;
         this.dsContextPath = dsContextPath;
         this.dsFileContextPath = dsFileContextPath;
@@ -38963,6 +39234,12 @@ var GCLConfig = (function () {
             }
             else {
                 this._gwJwt = undefined;
+            }
+            if (options.tokenExchangeContextPath) {
+                this._tokenExchangeContextPath = options.tokenExchangeContextPath;
+            }
+            else {
+                this._tokenExchangeContextPath = defaults.tokenExchangeContextPath;
             }
             if (options.agentPort) {
                 this._agentPort = options.agentPort;
@@ -39066,9 +39343,19 @@ var GCLConfig = (function () {
             }
         }
     }
+    Object.defineProperty(GCLConfig.prototype, "tokenExchangeContextPath", {
+        get: function () {
+            return this._tokenExchangeContextPath;
+        },
+        set: function (value) {
+            this._tokenExchangeContextPath = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(GCLConfig.prototype, "authUrl", {
         get: function () {
-            return this.gwUrl + defaults.tokenExchangeContextPath;
+            return this.gwUrl + this.tokenExchangeContextPath;
         },
         enumerable: true,
         configurable: true
