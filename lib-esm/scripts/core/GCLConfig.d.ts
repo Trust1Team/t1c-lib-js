@@ -5,7 +5,6 @@ export declare class GCLConfigOptions {
     gwOrProxyUrl?: string;
     apiKey?: string;
     gwJwt?: string;
-    tokenExchangeContextPath?: string;
     ocvContextPath?: string;
     dsContextPath?: string;
     dsFileContextPath?: string;
@@ -22,7 +21,7 @@ export declare class GCLConfigOptions {
     localTestMode?: boolean;
     lang?: string;
     providedContainers?: T1CContainerid[];
-    constructor(gclUrl?: string, gwOrProxyUrl?: string, apiKey?: string, gwJwt?: string, tokenExchangeContextPath?: string, ocvContextPath?: string, dsContextPath?: string, dsFileContextPath?: string, pkcs11Config?: Pkcs11ModuleConfig, agentPort?: number, implicitDownload?: boolean, forceHardwarePinpad?: boolean, sessionTimeout?: number, consentDuration?: number, consentTimeout?: number, syncManaged?: boolean, osPinDialog?: boolean, containerDownloadTimeout?: number, localTestMode?: boolean, lang?: string, providedContainers?: T1CContainerid[]);
+    constructor(gclUrl?: string, gwOrProxyUrl?: string, apiKey?: string, gwJwt?: string, ocvContextPath?: string, dsContextPath?: string, dsFileContextPath?: string, pkcs11Config?: Pkcs11ModuleConfig, agentPort?: number, implicitDownload?: boolean, forceHardwarePinpad?: boolean, sessionTimeout?: number, consentDuration?: number, consentTimeout?: number, syncManaged?: boolean, osPinDialog?: boolean, containerDownloadTimeout?: number, localTestMode?: boolean, lang?: string, providedContainers?: T1CContainerid[]);
 }
 export declare class GCLConfig {
     private _gwUrl;
@@ -32,7 +31,6 @@ export declare class GCLConfig {
     private _ocvContextPath;
     private _apiKey;
     private _gwJwt;
-    private _tokenExchangeContextPath;
     private _gclJwt;
     private _citrix;
     private _agentPort;
@@ -51,7 +49,6 @@ export declare class GCLConfig {
     private _providedContainers;
     private _activeContainers;
     constructor(options: GCLConfigOptions);
-    tokenExchangeContextPath: string;
     readonly authUrl: string;
     readonly ocvUrl: string;
     ocvContextPath: string;

@@ -64,42 +64,16 @@ export class JavaKeyTool extends GenericContainer implements AbstractJavaKeyTool
     }
 
     ChangeKeystorePassword(body: ChangeKeystorePasswordData, callback?: (error: T1CLibException, data: ChangeKeystorePasswordResponse) => void): Promise<DataResponse> {
-        body.new_password = PinEnforcer.encryptPin(body.new_password);
+        body.newpass = PinEnforcer.encryptPin(body.newpass);
         body.storepass = PinEnforcer.encryptPin(body.storepass);
-        let serializedbody = {
-            entity: body.entity,
-            type: body.type,
-            keystore: body.keystore,
-            new: body.new_password,
-            storepass: body.storepass,
-            storetype: body.storetype,
-            providername: body.providername,
-            providerclass: body.providerclass,
-            providerarg: body.providerarg,
-            providerpath: body.providerpath
-        };
-        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEYSTORE_PASSWORD), serializedbody, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEYSTORE_PASSWORD), body, undefined, undefined, callback);
     }
 
     ChangeKeyPassword(body: ChangeKeyPasswordData, callback?: (error: T1CLibException, data: ChangeKeyPasswordResponse) => void): Promise<DataResponse> {
-        body.new_password = PinEnforcer.encryptPin(body.new_password);
+        body.newpass = PinEnforcer.encryptPin(body.newpass);
         body.keypass = PinEnforcer.encryptPin(body.keypass);
         body.storepass = PinEnforcer.encryptPin(body.storepass);
-        let serializedbody = {
-            entity: body.entity,
-            type: body.type,
-            keystore: body.keystore,
-            alias: body.alias,
-            new: body.new_password,
-            keypass: body.keypass,
-            storepass: body.storepass,
-            storetype: body.storetype,
-            providername: body.providername,
-            providerclass: body.providerclass,
-            providerarg: body.providerarg,
-            providerpath: body.providerpath
-        };
-        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEY_PASSWORD), serializedbody, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEY_PASSWORD), body, undefined, undefined, callback);
     }
 
     ChangeAlias(body: ChangeAliasData, callback?: (error: T1CLibException, data: ChangeAliasResponse) => void): Promise<DataResponse> {

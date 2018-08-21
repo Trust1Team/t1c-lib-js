@@ -34,7 +34,6 @@ export class SyncUtil {
         // do core v2 sync flow
         // unmanaged sync is blocking, so reject if an error occurs
         return new Promise((resolve, reject) => {
-            console.log(client);
             if (client.ds()) {
                 SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, false).then(() => {
                     resolve();

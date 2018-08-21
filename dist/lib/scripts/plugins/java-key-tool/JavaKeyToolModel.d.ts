@@ -55,8 +55,8 @@ export declare class ChangeAliasData {
     entity: string;
     type: string;
     keystore: string;
-    alias?: string;
-    destalias?: string;
+    alias: string;
+    destalias: string;
     keypass?: string;
     storepass?: string;
     storetype?: string;
@@ -64,7 +64,7 @@ export declare class ChangeAliasData {
     providerclass?: string;
     providerarg?: string;
     providerpath?: string;
-    constructor(entity: string, type: string, keystore: string, alias?: string, destalias?: string, keypass?: string, storepass?: string, storetype?: string, providername?: string, providerclass?: string, providerarg?: string, providerpath?: string);
+    constructor(entity: string, type: string, keystore: string, alias: string, destalias: string, keypass?: string, storepass?: string, storetype?: string, providername?: string, providerclass?: string, providerarg?: string, providerpath?: string);
 }
 export declare class ChangeAliasResponse extends T1CResponse {
     data: boolean;
@@ -75,8 +75,8 @@ export declare class ChangeKeyPasswordData {
     entity: string;
     type: string;
     keystore: string;
-    alias?: string;
-    new_password?: string;
+    alias: string;
+    newpass?: string;
     keypass?: string;
     storepass?: string;
     storetype?: string;
@@ -84,7 +84,7 @@ export declare class ChangeKeyPasswordData {
     providerclass?: string;
     providerarg?: string;
     providerpath?: string;
-    constructor(entity: string, type: string, keystore: string, alias?: string, new_password?: string, keypass?: string, storepass?: string, storetype?: string, providername?: string, providerclass?: string, providerarg?: string, providerpath?: string);
+    constructor(entity: string, type: string, keystore: string, alias: string, newpass?: string, keypass?: string, storepass?: string, storetype?: string, providername?: string, providerclass?: string, providerarg?: string, providerpath?: string);
 }
 export declare class ChangeKeyPasswordResponse extends T1CResponse {
     data: boolean;
@@ -95,15 +95,14 @@ export declare class ChangeKeystorePasswordData {
     entity: string;
     type: string;
     keystore: string;
-    alias?: string;
-    new_password?: string;
+    newpass?: string;
     storepass?: string;
     storetype?: string;
     providername?: string;
     providerclass?: string;
     providerarg?: string;
     providerpath?: string;
-    constructor(entity: string, type: string, keystore: string, alias?: string, new_password?: string, storepass?: string, storetype?: string, providername?: string, providerclass?: string, providerarg?: string, providerpath?: string);
+    constructor(entity: string, type: string, keystore: string, newpass?: string, storepass?: string, storetype?: string, providername?: string, providerclass?: string, providerarg?: string, providerpath?: string);
 }
 export declare class ChangeKeystorePasswordResponse extends T1CResponse {
     data: boolean;
@@ -114,7 +113,7 @@ export declare class ExportCertData {
     entity: string;
     type: string;
     keystore: string;
-    alias?: string;
+    alias: string;
     file?: string;
     storepass?: string;
     storetype?: string;
@@ -122,7 +121,7 @@ export declare class ExportCertData {
     providerclass?: string;
     providerarg?: string;
     providerpath?: string;
-    constructor(entity: string, type: string, keystore: string, alias?: string, file?: string, storepass?: string, storetype?: string, providername?: string, providerclass?: string, providerarg?: string, providerpath?: string);
+    constructor(entity: string, type: string, keystore: string, alias: string, file?: string, storepass?: string, storetype?: string, providername?: string, providerclass?: string, providerarg?: string, providerpath?: string);
 }
 export declare class ExportCertResponse extends T1CResponse {
     data: ExportCertResponseData;
@@ -139,7 +138,7 @@ export declare class ImportCertData {
     entity: string;
     type: string;
     keystore: string;
-    alias?: string;
+    alias: string;
     file?: string;
     data?: string;
     trustcacerts?: boolean;
@@ -150,7 +149,7 @@ export declare class ImportCertData {
     providerclass?: string;
     providerarg?: string;
     providerpath?: string;
-    constructor(entity: string, type: string, keystore: string, alias?: string, file?: string, data?: string, trustcacerts?: boolean, keypass?: string, storepass?: string, storetype?: string, providername?: string, providerclass?: string, providerarg?: string, providerpath?: string);
+    constructor(entity: string, type: string, keystore: string, alias: string, file?: string, data?: string, trustcacerts?: boolean, keypass?: string, storepass?: string, storetype?: string, providername?: string, providerclass?: string, providerarg?: string, providerpath?: string);
 }
 export declare class ImportCertResponse extends T1CResponse {
     data: boolean;
@@ -164,6 +163,7 @@ export declare class CSRData {
     alias?: string;
     sigalg?: string;
     file?: string;
+    data?: string;
     keypass?: string;
     dname?: string;
     storepass?: string;
@@ -172,7 +172,7 @@ export declare class CSRData {
     providerclass?: string;
     providerarg?: string;
     providerpath?: string;
-    constructor(entity: string, type: string, keystore: string, alias?: string, sigalg?: string, file?: string, keypass?: string, dname?: string, storepass?: string, storetype?: string, providername?: string, providerclass?: string, providerarg?: string, providerpath?: string);
+    constructor(entity: string, type: string, keystore: string, alias?: string, sigalg?: string, file?: string, data?: string, keypass?: string, dname?: string, storepass?: string, storetype?: string, providername?: string, providerclass?: string, providerarg?: string, providerpath?: string);
 }
 export declare class CSRResponse extends T1CResponse {
     data: CSRResponseData;
