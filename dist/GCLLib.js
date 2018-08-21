@@ -6568,7 +6568,6 @@ var SyncUtil = (function () {
     }
     SyncUtil.unManagedSynchronization = function (client, mergedInfo, uuid, containers) {
         return new Promise(function (resolve, reject) {
-            console.log(client);
             if (client.ds()) {
                 SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, false).then(function () {
                     resolve();
@@ -38769,6 +38768,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+var __1 = __webpack_require__(0);
 var GenericContainer_1 = __webpack_require__(226);
 var JavaKeyTool = (function (_super) {
     __extends(JavaKeyTool, _super);
@@ -38776,66 +38776,55 @@ var JavaKeyTool = (function (_super) {
         return _super.call(this, baseUrl, containerUrl, connection, JavaKeyTool.CONTAINER_PREFIX) || this;
     }
     JavaKeyTool.prototype.generateKeyPair = function (body, callback) {
+        body.keypass = __1.PinEnforcer.encryptPin(body.keypass);
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
         return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.GENERATE_KEY_PAIR), body, undefined, undefined, callback);
     };
     JavaKeyTool.prototype.GenerateCertificateRequest = function (body, callback) {
+        body.keypass = __1.PinEnforcer.encryptPin(body.keypass);
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
         return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.GENERATE_CERTIFICATE_REQUEST), body, undefined, undefined, callback);
     };
     JavaKeyTool.prototype.ImportCertificate = function (body, callback) {
+        body.keypass = __1.PinEnforcer.encryptPin(body.keypass);
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
         return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.IMPORT_CERTIFICATE), body, undefined, undefined, callback);
     };
     JavaKeyTool.prototype.ExportCertificate = function (body, callback) {
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
         return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.EXPORT_CERTIFICATE), body, undefined, undefined, callback);
     };
     JavaKeyTool.prototype.ChangeKeystorePassword = function (body, callback) {
-        var serializedbody = {
-            entity: body.entity,
-            type: body.type,
-            keystore: body.keystore,
-            alias: body.alias,
-            new: body.new_password,
-            storepass: body.storepass,
-            storetype: body.storetype,
-            providername: body.providername,
-            providerclass: body.providerclass,
-            providerarg: body.providerarg,
-            providerpath: body.providerpath
-        };
-        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEYSTORE_PASSWORD), serializedbody, undefined, undefined, callback);
+        body.newpass = __1.PinEnforcer.encryptPin(body.newpass);
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEYSTORE_PASSWORD), body, undefined, undefined, callback);
     };
     JavaKeyTool.prototype.ChangeKeyPassword = function (body, callback) {
-        var serializedbody = {
-            entity: body.entity,
-            type: body.type,
-            keystore: body.keystore,
-            alias: body.alias,
-            new: body.new_password,
-            keypass: body.keypass,
-            storepass: body.storepass,
-            storetype: body.storetype,
-            providername: body.providername,
-            providerclass: body.providerclass,
-            providerarg: body.providerarg,
-            providerpath: body.providerpath
-        };
-        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEY_PASSWORD), serializedbody, undefined, undefined, callback);
+        body.newpass = __1.PinEnforcer.encryptPin(body.newpass);
+        body.keypass = __1.PinEnforcer.encryptPin(body.keypass);
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEY_PASSWORD), body, undefined, undefined, callback);
     };
     JavaKeyTool.prototype.ChangeAlias = function (body, callback) {
+        body.keypass = __1.PinEnforcer.encryptPin(body.keypass);
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
         return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_ALIAS), body, undefined, undefined, callback);
     };
     JavaKeyTool.prototype.ListEntries = function (body, callback) {
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
         return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.LIST_ENTIRES), body, undefined, undefined, callback);
     };
     JavaKeyTool.prototype.DeleteEntry = function (body, callback) {
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
         return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.DELETE_ENTRY), body, undefined, undefined, callback);
     };
     JavaKeyTool.CONTAINER_PREFIX = 'java-keytool';
     JavaKeyTool.GENERATE_KEY_PAIR = '/genkeypair';
-    JavaKeyTool.GENERATE_CERTIFICATE_REQUEST = '/certreq​';
+    JavaKeyTool.GENERATE_CERTIFICATE_REQUEST = '/certreq';
     JavaKeyTool.IMPORT_CERTIFICATE = '/importcert';
     JavaKeyTool.EXPORT_CERTIFICATE = '/exportcert';
-    JavaKeyTool.CHANGE_KEYSTORE_PASSWORD = '/storepasswd​';
-    JavaKeyTool.CHANGE_KEY_PASSWORD = '/keypasswd​';
+    JavaKeyTool.CHANGE_KEYSTORE_PASSWORD = '/storepasswd';
+    JavaKeyTool.CHANGE_KEY_PASSWORD = '/keypasswd';
     JavaKeyTool.CHANGE_ALIAS = '/changealias';
     JavaKeyTool.LIST_ENTIRES = '/list';
     JavaKeyTool.DELETE_ENTRY = '/delete';
@@ -38953,12 +38942,12 @@ var ChangeAliasResponse = (function (_super) {
 }(CoreModel_1.T1CResponse));
 exports.ChangeAliasResponse = ChangeAliasResponse;
 var ChangeKeyPasswordData = (function () {
-    function ChangeKeyPasswordData(entity, type, keystore, alias, new_password, keypass, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+    function ChangeKeyPasswordData(entity, type, keystore, alias, newpass, keypass, storepass, storetype, providername, providerclass, providerarg, providerpath) {
         this.entity = entity;
         this.type = type;
         this.keystore = keystore;
         this.alias = alias;
-        this.new_password = new_password;
+        this.newpass = newpass;
         this.keypass = keypass;
         this.storepass = storepass;
         this.storetype = storetype;
@@ -38982,12 +38971,11 @@ var ChangeKeyPasswordResponse = (function (_super) {
 }(CoreModel_1.T1CResponse));
 exports.ChangeKeyPasswordResponse = ChangeKeyPasswordResponse;
 var ChangeKeystorePasswordData = (function () {
-    function ChangeKeystorePasswordData(entity, type, keystore, alias, new_password, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+    function ChangeKeystorePasswordData(entity, type, keystore, newpass, storepass, storetype, providername, providerclass, providerarg, providerpath) {
         this.entity = entity;
         this.type = type;
         this.keystore = keystore;
-        this.alias = alias;
-        this.new_password = new_password;
+        this.newpass = newpass;
         this.storepass = storepass;
         this.storetype = storetype;
         this.providername = providername;
@@ -39078,13 +39066,14 @@ var ImportCertResponse = (function (_super) {
 }(CoreModel_1.T1CResponse));
 exports.ImportCertResponse = ImportCertResponse;
 var CSRData = (function () {
-    function CSRData(entity, type, keystore, alias, sigalg, file, keypass, dname, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+    function CSRData(entity, type, keystore, alias, sigalg, file, data, keypass, dname, storepass, storetype, providername, providerclass, providerarg, providerpath) {
         this.entity = entity;
         this.type = type;
         this.keystore = keystore;
         this.alias = alias;
         this.sigalg = sigalg;
         this.file = file;
+        this.data = data;
         this.keypass = keypass;
         this.dname = dname;
         this.storepass = storepass;
@@ -39182,12 +39171,11 @@ var defaults = {
     containerDownloadTimeout: 30
 };
 var GCLConfigOptions = (function () {
-    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, gwJwt, tokenExchangeContextPath, ocvContextPath, dsContextPath, dsFileContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode, lang, providedContainers) {
+    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, gwJwt, ocvContextPath, dsContextPath, dsFileContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode, lang, providedContainers) {
         this.gclUrl = gclUrl;
         this.gwOrProxyUrl = gwOrProxyUrl;
         this.apiKey = apiKey;
         this.gwJwt = gwJwt;
-        this.tokenExchangeContextPath = tokenExchangeContextPath;
         this.ocvContextPath = ocvContextPath;
         this.dsContextPath = dsContextPath;
         this.dsFileContextPath = dsFileContextPath;
@@ -39234,12 +39222,6 @@ var GCLConfig = (function () {
             }
             else {
                 this._gwJwt = undefined;
-            }
-            if (options.tokenExchangeContextPath) {
-                this._tokenExchangeContextPath = options.tokenExchangeContextPath;
-            }
-            else {
-                this._tokenExchangeContextPath = defaults.tokenExchangeContextPath;
             }
             if (options.agentPort) {
                 this._agentPort = options.agentPort;
@@ -39343,19 +39325,9 @@ var GCLConfig = (function () {
             }
         }
     }
-    Object.defineProperty(GCLConfig.prototype, "tokenExchangeContextPath", {
-        get: function () {
-            return this._tokenExchangeContextPath;
-        },
-        set: function (value) {
-            this._tokenExchangeContextPath = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(GCLConfig.prototype, "authUrl", {
         get: function () {
-            return this.gwUrl + this.tokenExchangeContextPath;
+            return this.gwUrl + defaults.tokenExchangeContextPath;
         },
         enumerable: true,
         configurable: true

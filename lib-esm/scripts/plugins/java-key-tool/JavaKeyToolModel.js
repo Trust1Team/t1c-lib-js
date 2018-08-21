@@ -100,12 +100,12 @@ var ChangeAliasResponse = (function (_super) {
 }(T1CResponse));
 export { ChangeAliasResponse };
 var ChangeKeyPasswordData = (function () {
-    function ChangeKeyPasswordData(entity, type, keystore, alias, new_password, keypass, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+    function ChangeKeyPasswordData(entity, type, keystore, alias, newpass, keypass, storepass, storetype, providername, providerclass, providerarg, providerpath) {
         this.entity = entity;
         this.type = type;
         this.keystore = keystore;
         this.alias = alias;
-        this.new_password = new_password;
+        this.newpass = newpass;
         this.keypass = keypass;
         this.storepass = storepass;
         this.storetype = storetype;
@@ -129,12 +129,11 @@ var ChangeKeyPasswordResponse = (function (_super) {
 }(T1CResponse));
 export { ChangeKeyPasswordResponse };
 var ChangeKeystorePasswordData = (function () {
-    function ChangeKeystorePasswordData(entity, type, keystore, alias, new_password, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+    function ChangeKeystorePasswordData(entity, type, keystore, newpass, storepass, storetype, providername, providerclass, providerarg, providerpath) {
         this.entity = entity;
         this.type = type;
         this.keystore = keystore;
-        this.alias = alias;
-        this.new_password = new_password;
+        this.newpass = newpass;
         this.storepass = storepass;
         this.storetype = storetype;
         this.providername = providername;
@@ -225,13 +224,14 @@ var ImportCertResponse = (function (_super) {
 }(T1CResponse));
 export { ImportCertResponse };
 var CSRData = (function () {
-    function CSRData(entity, type, keystore, alias, sigalg, file, keypass, dname, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+    function CSRData(entity, type, keystore, alias, sigalg, file, data, keypass, dname, storepass, storetype, providername, providerclass, providerarg, providerpath) {
         this.entity = entity;
         this.type = type;
         this.keystore = keystore;
         this.alias = alias;
         this.sigalg = sigalg;
         this.file = file;
+        this.data = data;
         this.keypass = keypass;
         this.dname = dname;
         this.storepass = storepass;
