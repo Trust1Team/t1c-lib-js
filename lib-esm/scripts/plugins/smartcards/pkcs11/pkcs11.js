@@ -3,6 +3,7 @@ import { ResponseHandler } from '../../../util/ResponseHandler';
 import * as platform from 'platform';
 import { RequestHandler } from '../../../util/RequestHandler';
 import { PinEnforcer } from '../../../util/PinEnforcer';
+import { ActivatedContainerUtil } from '../../../util/ActivatedContainerUtil';
 var PKCS11 = (function () {
     function PKCS11(baseUrl, containerUrl, connection) {
         this.baseUrl = baseUrl;
@@ -104,8 +105,16 @@ var PKCS11 = (function () {
         });
     };
     PKCS11.prototype.containerSuffix = function (path) {
-        return this.containerUrl + path;
+        var containername = ActivatedContainerUtil.getContainerFor(this.connection.cfg, 'pkcs11');
+        this.containerUrl = PKCS11.CONTAINER_NEW_CONTEXT_PATH + containername;
+        if (path && path.length) {
+            return this.containerUrl + path;
+        }
+        else {
+            return this.containerUrl;
+        }
     };
+    PKCS11.CONTAINER_NEW_CONTEXT_PATH = '/containers/';
     PKCS11.ALL_CERTIFICATES = '/certificates';
     PKCS11.INFO = '/info';
     PKCS11.SIGN = '/sign';
