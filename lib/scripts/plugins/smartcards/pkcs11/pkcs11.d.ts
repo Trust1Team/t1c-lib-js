@@ -7,6 +7,7 @@ export declare class PKCS11 implements AbstractPkcs11 {
     protected baseUrl: string;
     protected containerUrl: string;
     protected connection: LocalConnection;
+    static CONTAINER_NEW_CONTEXT_PATH: string;
     static ALL_CERTIFICATES: string;
     static INFO: string;
     static SIGN: string;
