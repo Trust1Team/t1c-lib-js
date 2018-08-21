@@ -32,15 +32,20 @@ module.exports = {
     module: {
         rules: [
             {
+                test: /\.js$/,
+                exclude: /node_modules\/(?!(pkijs|asn1|asn1js|pvutils)\/).*/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: ["es2015"]
+                    }
+                }
+            },
+            {
                 test: /\.ts$/,
                 exclude: /node_modules/,
                 use: 'ts-loader'
             }
-            // {
-            //     test: /\.js$/,
-            //     exclude: /node_modules/,
-            //     use: "babel-loader"
-            // }
         ]
     }
 };
