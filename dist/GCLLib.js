@@ -36862,6 +36862,7 @@ var ResponseHandler_1 = __webpack_require__(122);
 var platform = __webpack_require__(253);
 var RequestHandler_1 = __webpack_require__(225);
 var PinEnforcer_1 = __webpack_require__(181);
+var ActivatedContainerUtil_1 = __webpack_require__(132);
 var PKCS11 = (function () {
     function PKCS11(baseUrl, containerUrl, connection) {
         this.baseUrl = baseUrl;
@@ -36963,8 +36964,16 @@ var PKCS11 = (function () {
         });
     };
     PKCS11.prototype.containerSuffix = function (path) {
-        return this.containerUrl + path;
+        var containername = ActivatedContainerUtil_1.ActivatedContainerUtil.getContainerFor(this.connection.cfg, 'pkcs11');
+        this.containerUrl = PKCS11.CONTAINER_NEW_CONTEXT_PATH + containername;
+        if (path && path.length) {
+            return this.containerUrl + path;
+        }
+        else {
+            return this.containerUrl;
+        }
     };
+    PKCS11.CONTAINER_NEW_CONTEXT_PATH = '/containers/';
     PKCS11.ALL_CERTIFICATES = '/certificates';
     PKCS11.INFO = '/info';
     PKCS11.SIGN = '/sign';
