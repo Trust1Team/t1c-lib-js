@@ -39180,11 +39180,12 @@ var defaults = {
     containerDownloadTimeout: 30
 };
 var GCLConfigOptions = (function () {
-    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, gwJwt, ocvContextPath, dsContextPath, dsFileContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode, lang, providedContainers) {
+    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, gwJwt, tokenExchangeContextPath, ocvContextPath, dsContextPath, dsFileContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode, lang, providedContainers) {
         this.gclUrl = gclUrl;
         this.gwOrProxyUrl = gwOrProxyUrl;
         this.apiKey = apiKey;
         this.gwJwt = gwJwt;
+        this.tokenExchangeContextPath = tokenExchangeContextPath;
         this.ocvContextPath = ocvContextPath;
         this.dsContextPath = dsContextPath;
         this.dsFileContextPath = dsFileContextPath;
@@ -39231,6 +39232,12 @@ var GCLConfig = (function () {
             }
             else {
                 this._gwJwt = undefined;
+            }
+            if (options.tokenExchangeContextPath) {
+                this._tokenExchangeContextPath = options.tokenExchangeContextPath;
+            }
+            else {
+                this._tokenExchangeContextPath = defaults.tokenExchangeContextPath;
             }
             if (options.agentPort) {
                 this._agentPort = options.agentPort;
@@ -39334,9 +39341,19 @@ var GCLConfig = (function () {
             }
         }
     }
+    Object.defineProperty(GCLConfig.prototype, "tokenExchangeContextPath", {
+        get: function () {
+            return this._tokenExchangeContextPath;
+        },
+        set: function (value) {
+            this._tokenExchangeContextPath = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(GCLConfig.prototype, "authUrl", {
         get: function () {
-            return this.gwUrl + defaults.tokenExchangeContextPath;
+            return this.gwUrl + this.tokenExchangeContextPath;
         },
         enumerable: true,
         configurable: true
