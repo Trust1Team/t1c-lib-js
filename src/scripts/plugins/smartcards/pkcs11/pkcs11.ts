@@ -10,6 +10,7 @@ import {
     Pkcs11SignData, Pkcs11SlotsResponse, Pkcs11TokenResponse, Pkcs11VerifySignedData
 } from './pkcs11Model';
 import {PinEnforcer} from '../../../util/PinEnforcer';
+import {ActivatedContainerUtil} from '../../../util/ActivatedContainerUtil';
 
 /**
  * @author Maarten Somers
@@ -17,6 +18,9 @@ import {PinEnforcer} from '../../../util/PinEnforcer';
  */
 
 export class PKCS11 implements AbstractPkcs11 {
+
+    static CONTAINER_NEW_CONTEXT_PATH = '/containers/';
+
     static ALL_CERTIFICATES = '/certificates';
     static INFO = '/info';
     static SIGN = '/sign';
@@ -148,10 +152,16 @@ export class PKCS11 implements AbstractPkcs11 {
         });
     }
 
-
-    // resolves the reader_id in the base URL
+    // resolves the reader_id and container version in the base URL
     protected containerSuffix(path?: string): string {
-        return this.containerUrl + path;
+        const containername: string = ActivatedContainerUtil.getContainerFor(this.connection.cfg, 'pkcs11');
+        this.containerUrl = PKCS11.CONTAINER_NEW_CONTEXT_PATH + containername;
+        if (path && path.length) {
+            return this.containerUrl + path;
+        }
+        else {
+            return this.containerUrl;
+        }
     }
 }
 

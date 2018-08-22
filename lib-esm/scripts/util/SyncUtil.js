@@ -9,7 +9,6 @@ var SyncUtil = (function () {
     }
     SyncUtil.unManagedSynchronization = function (client, mergedInfo, uuid, containers) {
         return new Promise(function (resolve, reject) {
-            console.log(client);
             if (client.ds()) {
                 SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, false).then(function () {
                     resolve();

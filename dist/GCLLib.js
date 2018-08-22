@@ -153,6 +153,8 @@ __export(__webpack_require__(259));
 __export(__webpack_require__(260));
 __export(__webpack_require__(180));
 __export(__webpack_require__(261));
+__export(__webpack_require__(262));
+__export(__webpack_require__(263));
 __export(__webpack_require__(134));
 __export(__webpack_require__(169));
 __export(__webpack_require__(227));
@@ -168,8 +170,8 @@ __export(__webpack_require__(225));
 __export(__webpack_require__(122));
 __export(__webpack_require__(125));
 __export(__webpack_require__(167));
-__export(__webpack_require__(262));
-__export(__webpack_require__(391));
+__export(__webpack_require__(264));
+__export(__webpack_require__(393));
 Polyfills_1.Polyfills.check();
 
 
@@ -5205,11 +5207,11 @@ var InitUtil = (function () {
         return hostname;
     };
     InitUtil.coreV2Compatible = function (version) {
-        var sanitized = version.split('_')[0];
+        var sanitized = semver.coerce(version);
         return semver.satisfies(sanitized, '>=2.0.0');
     };
     InitUtil.checkTokenCompatible = function (version) {
-        var sanitized = version.split('_')[0];
+        var sanitized = semver.coerce(version);
         return semver.satisfies(sanitized, '>=1.4.0');
     };
     return InitUtil;
@@ -6566,7 +6568,6 @@ var SyncUtil = (function () {
     }
     SyncUtil.unManagedSynchronization = function (client, mergedInfo, uuid, containers) {
         return new Promise(function (resolve, reject) {
-            console.log(client);
             if (client.ds()) {
                 SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, false).then(function () {
                     resolve();
@@ -16575,6 +16576,16 @@ exports.CertParser = CertParser;
 "use strict";
 
 
+var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
@@ -16589,7 +16600,7 @@ var _pvutils = __webpack_require__(185);
 //**************************************************************************************
 //region Declaration of global variables
 //**************************************************************************************
-const powers2 = [new Uint8Array([1])]; /* eslint-disable indent */
+var powers2 = [new Uint8Array([1])]; /* eslint-disable indent */
 /*
  * Copyright (c) 2016-2018, Peculiar Ventures
  * All rights reserved.
@@ -16624,7 +16635,7 @@ const powers2 = [new Uint8Array([1])]; /* eslint-disable indent */
  */
 //**************************************************************************************
 
-const digitsString = "0123456789";
+var digitsString = "0123456789";
 //**************************************************************************************
 //endregion
 //**************************************************************************************
@@ -16639,14 +16650,19 @@ const digitsString = "0123456789";
  * @property {Array.<string>} warnings
  * @property {ArrayBuffer} valueBeforeDecode
  */
-class LocalBaseBlock {
+
+var LocalBaseBlock = function () {
 	//**********************************************************************************
 	/**
   * Constructor for "LocalBaseBlock" class
   * @param {Object} [parameters={}]
   * @property {ArrayBuffer} [valueBeforeDecode]
   */
-	constructor(parameters = {}) {
+	function LocalBaseBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+		_classCallCheck(this, LocalBaseBlock);
+
 		/**
    * @type {number} blockLength
    */
@@ -16670,25 +16686,36 @@ class LocalBaseBlock {
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "baseBlock";
-	}
-	//**********************************************************************************
-	/**
-  * Convertion for the block to JSON object
-  * @returns {{blockName: string, blockLength: number, error: string, warnings: Array.<string>, valueBeforeDecode: string}}
-  */
-	toJSON() {
-		return {
-			blockName: this.constructor.blockName(),
-			blockLength: this.blockLength,
-			error: this.error,
-			warnings: this.warnings,
-			valueBeforeDecode: (0, _pvutils.bufferToHexCodes)(this.valueBeforeDecode, 0, this.valueBeforeDecode.byteLength)
-		};
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(LocalBaseBlock, [{
+		key: "toJSON",
+
+		//**********************************************************************************
+		/**
+   * Convertion for the block to JSON object
+   * @returns {{blockName: string, blockLength: number, error: string, warnings: Array.<string>, valueBeforeDecode: string}}
+   */
+		value: function toJSON() {
+			return {
+				blockName: this.constructor.blockName(),
+				blockLength: this.blockLength,
+				error: this.error,
+				warnings: this.warnings,
+				valueBeforeDecode: (0, _pvutils.bufferToHexCodes)(this.valueBeforeDecode, 0, this.valueBeforeDecode.byteLength)
+			};
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "baseBlock";
+		}
+	}]);
+
+	return LocalBaseBlock;
+}();
 //**************************************************************************************
 //endregion
 //**************************************************************************************
@@ -16706,650 +16733,763 @@ class LocalBaseBlock {
  * @property {ArrayBuffer} valueHex
  */
 //noinspection JSUnusedLocalSymbols
-const LocalHexBlock = BaseClass => class LocalHexBlockMixin extends BaseClass {
-	//**********************************************************************************
-	//noinspection JSUnusedGlobalSymbols
-	/**
-  * Constructor for "LocalHexBlock" class
-  * @param {Object} [parameters={}]
-  * @property {ArrayBuffer} [valueHex]
-  */
-	constructor(parameters = {}) {
-		super(parameters);
 
+
+var LocalHexBlock = function LocalHexBlock(BaseClass) {
+	return function (_BaseClass) {
+		_inherits(LocalHexBlockMixin, _BaseClass);
+
+		//**********************************************************************************
+		//noinspection JSUnusedGlobalSymbols
 		/**
-   * @type {boolean}
+   * Constructor for "LocalHexBlock" class
+   * @param {Object} [parameters={}]
+   * @property {ArrayBuffer} [valueHex]
    */
-		this.isHexOnly = (0, _pvutils.getParametersValue)(parameters, "isHexOnly", false);
+		function LocalHexBlockMixin() {
+			var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+			_classCallCheck(this, LocalHexBlockMixin);
+
+			/**
+    * @type {boolean}
+    */
+			var _this = _possibleConstructorReturn(this, (LocalHexBlockMixin.__proto__ || Object.getPrototypeOf(LocalHexBlockMixin)).call(this, parameters));
+
+			_this.isHexOnly = (0, _pvutils.getParametersValue)(parameters, "isHexOnly", false);
+			/**
+    * @type {ArrayBuffer}
+    */
+			if ("valueHex" in parameters) _this.valueHex = parameters.valueHex.slice(0);else _this.valueHex = new ArrayBuffer(0);
+			return _this;
+		}
+		//**********************************************************************************
 		/**
-   * @type {ArrayBuffer}
+   * Aux function, need to get a block name. Need to have it here for inhiritence
+   * @returns {string}
    */
-		if ("valueHex" in parameters) this.valueHex = parameters.valueHex.slice(0);else this.valueHex = new ArrayBuffer(0);
-	}
-	//**********************************************************************************
-	/**
-  * Aux function, need to get a block name. Need to have it here for inhiritence
-  * @returns {string}
-  */
-	static blockName() {
-		return "hexBlock";
-	}
-	//**********************************************************************************
-	/**
-  * Base function for converting block from BER encoded array of bytes
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
-  * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
-  * @returns {number} Offset after least decoded byte
-  */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		//region Basic check for parameters
-		//noinspection JSCheckFunctionSignatures
-		if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
-		//endregion
 
-		//region Getting Uint8Array from ArrayBuffer
-		const intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
-		//endregion
 
-		//region Initial checks
-		if (intBuffer.length === 0) {
-			this.warnings.push("Zero buffer length");
-			return inputOffset;
-		}
-		//endregion
+		_createClass(LocalHexBlockMixin, [{
+			key: "fromBER",
 
-		//region Copy input buffer to internal buffer
-		this.valueHex = inputBuffer.slice(inputOffset, inputOffset + inputLength);
-		//endregion
+			//**********************************************************************************
+			/**
+    * Base function for converting block from BER encoded array of bytes
+    * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+    * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
+    * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
+    * @returns {number} Offset after least decoded byte
+    */
+			value: function fromBER(inputBuffer, inputOffset, inputLength) {
+				//region Basic check for parameters
+				//noinspection JSCheckFunctionSignatures
+				if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
+				//endregion
 
-		this.blockLength = inputLength;
+				//region Getting Uint8Array from ArrayBuffer
+				var intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
+				//endregion
 
-		return inputOffset + inputLength;
-	}
-	//**********************************************************************************
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		if (this.isHexOnly !== true) {
-			this.error = "Flag \"isHexOnly\" is not set, abort";
-			return new ArrayBuffer(0);
-		}
+				//region Initial checks
+				if (intBuffer.length === 0) {
+					this.warnings.push("Zero buffer length");
+					return inputOffset;
+				}
+				//endregion
 
-		if (sizeOnly === true) return new ArrayBuffer(this.valueHex.byteLength);
+				//region Copy input buffer to internal buffer
+				this.valueHex = inputBuffer.slice(inputOffset, inputOffset + inputLength);
+				//endregion
 
-		//noinspection JSCheckFunctionSignatures
-		return this.valueHex.slice(0);
-	}
-	//**********************************************************************************
-	/**
-  * Convertion for the block to JSON object
-  * @returns {Object}
-  */
-	toJSON() {
-		let object = {};
+				this.blockLength = inputLength;
 
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
+				return inputOffset + inputLength;
+			}
+			//**********************************************************************************
+			/**
+    * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+    * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+    * @returns {ArrayBuffer}
+    */
 
-		object.blockName = this.constructor.blockName();
-		object.isHexOnly = this.isHexOnly;
-		object.valueHex = (0, _pvutils.bufferToHexCodes)(this.valueHex, 0, this.valueHex.byteLength);
+		}, {
+			key: "toBER",
+			value: function toBER() {
+				var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-		return object;
-	}
-	//**********************************************************************************
+				if (this.isHexOnly !== true) {
+					this.error = "Flag \"isHexOnly\" is not set, abort";
+					return new ArrayBuffer(0);
+				}
+
+				if (sizeOnly === true) return new ArrayBuffer(this.valueHex.byteLength);
+
+				//noinspection JSCheckFunctionSignatures
+				return this.valueHex.slice(0);
+			}
+			//**********************************************************************************
+			/**
+    * Convertion for the block to JSON object
+    * @returns {Object}
+    */
+
+		}, {
+			key: "toJSON",
+			value: function toJSON() {
+				var object = {};
+
+				//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+				try {
+					object = _get(LocalHexBlockMixin.prototype.__proto__ || Object.getPrototypeOf(LocalHexBlockMixin.prototype), "toJSON", this).call(this);
+				} catch (ex) {}
+				//endregion
+
+				object.blockName = this.constructor.blockName();
+				object.isHexOnly = this.isHexOnly;
+				object.valueHex = (0, _pvutils.bufferToHexCodes)(this.valueHex, 0, this.valueHex.byteLength);
+
+				return object;
+			}
+			//**********************************************************************************
+
+		}], [{
+			key: "blockName",
+			value: function blockName() {
+				return "hexBlock";
+			}
+		}]);
+
+		return LocalHexBlockMixin;
+	}(BaseClass);
 };
 //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of identification block class
 //**************************************************************************************
-class LocalIdentificationBlock extends LocalHexBlock(LocalBaseBlock) {
+
+var LocalIdentificationBlock = function (_LocalHexBlock) {
+	_inherits(LocalIdentificationBlock, _LocalHexBlock);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalBaseBlock" class
   * @param {Object} [parameters={}]
   * @property {Object} [idBlock]
   */
-	constructor(parameters = {}) {
-		super();
+	function LocalIdentificationBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+		_classCallCheck(this, LocalIdentificationBlock);
+
+		var _this2 = _possibleConstructorReturn(this, (LocalIdentificationBlock.__proto__ || Object.getPrototypeOf(LocalIdentificationBlock)).call(this));
 
 		if ("idBlock" in parameters) {
 			//region Properties from hexBlock class
-			this.isHexOnly = (0, _pvutils.getParametersValue)(parameters.idBlock, "isHexOnly", false);
-			this.valueHex = (0, _pvutils.getParametersValue)(parameters.idBlock, "valueHex", new ArrayBuffer(0));
+			_this2.isHexOnly = (0, _pvutils.getParametersValue)(parameters.idBlock, "isHexOnly", false);
+			_this2.valueHex = (0, _pvutils.getParametersValue)(parameters.idBlock, "valueHex", new ArrayBuffer(0));
 			//endregion
 
-			this.tagClass = (0, _pvutils.getParametersValue)(parameters.idBlock, "tagClass", -1);
-			this.tagNumber = (0, _pvutils.getParametersValue)(parameters.idBlock, "tagNumber", -1);
-			this.isConstructed = (0, _pvutils.getParametersValue)(parameters.idBlock, "isConstructed", false);
+			_this2.tagClass = (0, _pvutils.getParametersValue)(parameters.idBlock, "tagClass", -1);
+			_this2.tagNumber = (0, _pvutils.getParametersValue)(parameters.idBlock, "tagNumber", -1);
+			_this2.isConstructed = (0, _pvutils.getParametersValue)(parameters.idBlock, "isConstructed", false);
 		} else {
-			this.tagClass = -1;
-			this.tagNumber = -1;
-			this.isConstructed = false;
+			_this2.tagClass = -1;
+			_this2.tagNumber = -1;
+			_this2.isConstructed = false;
 		}
+		return _this2;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "identificationBlock";
-	}
-	//**********************************************************************************
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		//region Initial variables
-		let firstOctet = 0;
-		let retBuf;
-		let retView;
-		//endregion
 
-		switch (this.tagClass) {
-			case 1:
-				firstOctet |= 0x00; // UNIVERSAL
-				break;
-			case 2:
-				firstOctet |= 0x40; // APPLICATION
-				break;
-			case 3:
-				firstOctet |= 0x80; // CONTEXT-SPECIFIC
-				break;
-			case 4:
-				firstOctet |= 0xC0; // PRIVATE
-				break;
-			default:
-				this.error = "Unknown tag class";
-				return new ArrayBuffer(0);
-		}
 
-		if (this.isConstructed) firstOctet |= 0x20;
+	_createClass(LocalIdentificationBlock, [{
+		key: "toBER",
 
-		if (this.tagNumber < 31 && !this.isHexOnly) {
-			retBuf = new ArrayBuffer(1);
-			retView = new Uint8Array(retBuf);
+		//**********************************************************************************
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
+		value: function toBER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-			if (!sizeOnly) {
-				let number = this.tagNumber;
-				number &= 0x1F;
-				firstOctet |= number;
+			//region Initial variables
+			var firstOctet = 0;
+			var retBuf = void 0;
+			var retView = void 0;
+			//endregion
 
-				retView[0] = firstOctet;
+			switch (this.tagClass) {
+				case 1:
+					firstOctet |= 0x00; // UNIVERSAL
+					break;
+				case 2:
+					firstOctet |= 0x40; // APPLICATION
+					break;
+				case 3:
+					firstOctet |= 0x80; // CONTEXT-SPECIFIC
+					break;
+				case 4:
+					firstOctet |= 0xC0; // PRIVATE
+					break;
+				default:
+					this.error = "Unknown tag class";
+					return new ArrayBuffer(0);
 			}
 
-			return retBuf;
-		}
+			if (this.isConstructed) firstOctet |= 0x20;
 
-		if (this.isHexOnly === false) {
-			const encodedBuf = (0, _pvutils.utilToBase)(this.tagNumber, 7);
-			const encodedView = new Uint8Array(encodedBuf);
-			const size = encodedBuf.byteLength;
+			if (this.tagNumber < 31 && !this.isHexOnly) {
+				retBuf = new ArrayBuffer(1);
+				retView = new Uint8Array(retBuf);
 
-			retBuf = new ArrayBuffer(size + 1);
+				if (!sizeOnly) {
+					var number = this.tagNumber;
+					number &= 0x1F;
+					firstOctet |= number;
+
+					retView[0] = firstOctet;
+				}
+
+				return retBuf;
+			}
+
+			if (this.isHexOnly === false) {
+				var encodedBuf = (0, _pvutils.utilToBase)(this.tagNumber, 7);
+				var encodedView = new Uint8Array(encodedBuf);
+				var size = encodedBuf.byteLength;
+
+				retBuf = new ArrayBuffer(size + 1);
+				retView = new Uint8Array(retBuf);
+				retView[0] = firstOctet | 0x1F;
+
+				if (!sizeOnly) {
+					for (var i = 0; i < size - 1; i++) {
+						retView[i + 1] = encodedView[i] | 0x80;
+					}retView[size] = encodedView[size - 1];
+				}
+
+				return retBuf;
+			}
+
+			retBuf = new ArrayBuffer(this.valueHex.byteLength + 1);
 			retView = new Uint8Array(retBuf);
+
 			retView[0] = firstOctet | 0x1F;
 
-			if (!sizeOnly) {
-				for (let i = 0; i < size - 1; i++) retView[i + 1] = encodedView[i] | 0x80;
+			if (sizeOnly === false) {
+				var curView = new Uint8Array(this.valueHex);
 
-				retView[size] = encodedView[size - 1];
+				for (var _i = 0; _i < curView.length - 1; _i++) {
+					retView[_i + 1] = curView[_i] | 0x80;
+				}retView[this.valueHex.byteLength] = curView[curView.length - 1];
 			}
 
 			return retBuf;
 		}
+		//**********************************************************************************
+		/**
+   * Base function for converting block from BER encoded array of bytes
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
+   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
+   * @returns {number}
+   */
 
-		retBuf = new ArrayBuffer(this.valueHex.byteLength + 1);
-		retView = new Uint8Array(retBuf);
+	}, {
+		key: "fromBER",
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			//region Basic check for parameters
+			//noinspection JSCheckFunctionSignatures
+			if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
+			//endregion
 
-		retView[0] = firstOctet | 0x1F;
+			//region Getting Uint8Array from ArrayBuffer
+			var intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
+			//endregion
 
-		if (sizeOnly === false) {
-			const curView = new Uint8Array(this.valueHex);
-
-			for (let i = 0; i < curView.length - 1; i++) retView[i + 1] = curView[i] | 0x80;
-
-			retView[this.valueHex.byteLength] = curView[curView.length - 1];
-		}
-
-		return retBuf;
-	}
-	//**********************************************************************************
-	/**
-  * Base function for converting block from BER encoded array of bytes
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
-  * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
-  * @returns {number}
-  */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		//region Basic check for parameters
-		//noinspection JSCheckFunctionSignatures
-		if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
-		//endregion
-
-		//region Getting Uint8Array from ArrayBuffer
-		const intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
-		//endregion
-
-		//region Initial checks
-		if (intBuffer.length === 0) {
-			this.error = "Zero buffer length";
-			return -1;
-		}
-		//endregion
-
-		//region Find tag class
-		const tagClassMask = intBuffer[0] & 0xC0;
-
-		switch (tagClassMask) {
-			case 0x00:
-				this.tagClass = 1; // UNIVERSAL
-				break;
-			case 0x40:
-				this.tagClass = 2; // APPLICATION
-				break;
-			case 0x80:
-				this.tagClass = 3; // CONTEXT-SPECIFIC
-				break;
-			case 0xC0:
-				this.tagClass = 4; // PRIVATE
-				break;
-			default:
-				this.error = "Unknown tag class";
+			//region Initial checks
+			if (intBuffer.length === 0) {
+				this.error = "Zero buffer length";
 				return -1;
-		}
-		//endregion
+			}
+			//endregion
 
-		//region Find it's constructed or not
-		this.isConstructed = (intBuffer[0] & 0x20) === 0x20;
-		//endregion
+			//region Find tag class
+			var tagClassMask = intBuffer[0] & 0xC0;
 
-		//region Find tag number
-		this.isHexOnly = false;
+			switch (tagClassMask) {
+				case 0x00:
+					this.tagClass = 1; // UNIVERSAL
+					break;
+				case 0x40:
+					this.tagClass = 2; // APPLICATION
+					break;
+				case 0x80:
+					this.tagClass = 3; // CONTEXT-SPECIFIC
+					break;
+				case 0xC0:
+					this.tagClass = 4; // PRIVATE
+					break;
+				default:
+					this.error = "Unknown tag class";
+					return -1;
+			}
+			//endregion
 
-		const tagNumberMask = intBuffer[0] & 0x1F;
+			//region Find it's constructed or not
+			this.isConstructed = (intBuffer[0] & 0x20) === 0x20;
+			//endregion
 
-		//region Simple case (tag number < 31)
-		if (tagNumberMask !== 0x1F) {
-			this.tagNumber = tagNumberMask;
-			this.blockLength = 1;
-		}
-		//endregion
-		//region Tag number bigger or equal to 31
-		else {
-				let count = 1;
+			//region Find tag number
+			this.isHexOnly = false;
 
-				this.valueHex = new ArrayBuffer(255);
-				let tagNumberBufferMaxLength = 255;
-				let intTagNumberBuffer = new Uint8Array(this.valueHex);
+			var tagNumberMask = intBuffer[0] & 0x1F;
 
-				//noinspection JSBitwiseOperatorUsage
-				while (intBuffer[count] & 0x80) {
-					intTagNumberBuffer[count - 1] = intBuffer[count] & 0x7F;
-					count++;
+			//region Simple case (tag number < 31)
+			if (tagNumberMask !== 0x1F) {
+				this.tagNumber = tagNumberMask;
+				this.blockLength = 1;
+			}
+			//endregion
+			//region Tag number bigger or equal to 31
+			else {
+					var count = 1;
 
-					if (count >= intBuffer.length) {
-						this.error = "End of input reached before message was fully decoded";
-						return -1;
+					this.valueHex = new ArrayBuffer(255);
+					var tagNumberBufferMaxLength = 255;
+					var intTagNumberBuffer = new Uint8Array(this.valueHex);
+
+					//noinspection JSBitwiseOperatorUsage
+					while (intBuffer[count] & 0x80) {
+						intTagNumberBuffer[count - 1] = intBuffer[count] & 0x7F;
+						count++;
+
+						if (count >= intBuffer.length) {
+							this.error = "End of input reached before message was fully decoded";
+							return -1;
+						}
+
+						//region In case if tag number length is greater than 255 bytes (rare but possible case)
+						if (count === tagNumberBufferMaxLength) {
+							tagNumberBufferMaxLength += 255;
+
+							var _tempBuffer = new ArrayBuffer(tagNumberBufferMaxLength);
+							var _tempBufferView = new Uint8Array(_tempBuffer);
+
+							for (var i = 0; i < intTagNumberBuffer.length; i++) {
+								_tempBufferView[i] = intTagNumberBuffer[i];
+							}this.valueHex = new ArrayBuffer(tagNumberBufferMaxLength);
+							intTagNumberBuffer = new Uint8Array(this.valueHex);
+						}
+						//endregion
 					}
 
-					//region In case if tag number length is greater than 255 bytes (rare but possible case)
-					if (count === tagNumberBufferMaxLength) {
-						tagNumberBufferMaxLength += 255;
+					this.blockLength = count + 1;
+					intTagNumberBuffer[count - 1] = intBuffer[count] & 0x7F; // Write last byte to buffer
 
-						const tempBuffer = new ArrayBuffer(tagNumberBufferMaxLength);
-						const tempBufferView = new Uint8Array(tempBuffer);
+					//region Cut buffer
+					var tempBuffer = new ArrayBuffer(count);
+					var tempBufferView = new Uint8Array(tempBuffer);
 
-						for (let i = 0; i < intTagNumberBuffer.length; i++) tempBufferView[i] = intTagNumberBuffer[i];
+					for (var _i2 = 0; _i2 < count; _i2++) {
+						tempBufferView[_i2] = intTagNumberBuffer[_i2];
+					}this.valueHex = new ArrayBuffer(count);
+					intTagNumberBuffer = new Uint8Array(this.valueHex);
+					intTagNumberBuffer.set(tempBufferView);
+					//endregion
 
-						this.valueHex = new ArrayBuffer(tagNumberBufferMaxLength);
-						intTagNumberBuffer = new Uint8Array(this.valueHex);
+					//region Try to convert long tag number to short form
+					if (this.blockLength <= 9) this.tagNumber = (0, _pvutils.utilFromBase)(intTagNumberBuffer, 7);else {
+						this.isHexOnly = true;
+						this.warnings.push("Tag too long, represented as hex-coded");
 					}
 					//endregion
 				}
+			//endregion
+			//endregion
 
-				this.blockLength = count + 1;
-				intTagNumberBuffer[count - 1] = intBuffer[count] & 0x7F; // Write last byte to buffer
-
-				//region Cut buffer
-				const tempBuffer = new ArrayBuffer(count);
-				const tempBufferView = new Uint8Array(tempBuffer);
-
-				for (let i = 0; i < count; i++) tempBufferView[i] = intTagNumberBuffer[i];
-
-				this.valueHex = new ArrayBuffer(count);
-				intTagNumberBuffer = new Uint8Array(this.valueHex);
-				intTagNumberBuffer.set(tempBufferView);
-				//endregion
-
-				//region Try to convert long tag number to short form
-				if (this.blockLength <= 9) this.tagNumber = (0, _pvutils.utilFromBase)(intTagNumberBuffer, 7);else {
-					this.isHexOnly = true;
-					this.warnings.push("Tag too long, represented as hex-coded");
+			//region Check if constructed encoding was using for primitive type
+			if (this.tagClass === 1 && this.isConstructed) {
+				switch (this.tagNumber) {
+					case 1: // Boolean
+					case 2: // REAL
+					case 5: // Null
+					case 6: // OBJECT IDENTIFIER
+					case 9: // REAL
+					case 14: // Time
+					case 23:
+					case 24:
+					case 31:
+					case 32:
+					case 33:
+					case 34:
+						this.error = "Constructed encoding used for primitive type";
+						return -1;
+					default:
 				}
-				//endregion
 			}
-		//endregion
-		//endregion
+			//endregion
 
-		//region Check if constructed encoding was using for primitive type
-		if (this.tagClass === 1 && this.isConstructed) {
-			switch (this.tagNumber) {
-				case 1: // Boolean
-				case 2: // REAL
-				case 5: // Null
-				case 6: // OBJECT IDENTIFIER
-				case 9: // REAL
-				case 14: // Time
-				case 23:
-				case 24:
-				case 31:
-				case 32:
-				case 33:
-				case 34:
-					this.error = "Constructed encoding used for primitive type";
-					return -1;
-				default:
-			}
+			return inputOffset + this.blockLength; // Return current offset in input buffer
 		}
-		//endregion
+		//**********************************************************************************
+		/**
+   * Convertion for the block to JSON object
+   * @returns {{blockName: string,
+   *  tagClass: number,
+   *  tagNumber: number,
+   *  isConstructed: boolean,
+   *  isHexOnly: boolean,
+   *  valueHex: ArrayBuffer,
+   *  blockLength: number,
+   *  error: string, warnings: Array.<string>,
+   *  valueBeforeDecode: string}}
+   */
 
-		return inputOffset + this.blockLength; // Return current offset in input buffer
-	}
-	//**********************************************************************************
-	/**
-  * Convertion for the block to JSON object
-  * @returns {{blockName: string,
-  *  tagClass: number,
-  *  tagNumber: number,
-  *  isConstructed: boolean,
-  *  isHexOnly: boolean,
-  *  valueHex: ArrayBuffer,
-  *  blockLength: number,
-  *  error: string, warnings: Array.<string>,
-  *  valueBeforeDecode: string}}
-  */
-	toJSON() {
-		let object = {};
+	}, {
+		key: "toJSON",
+		value: function toJSON() {
+			var object = {};
 
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(LocalIdentificationBlock.prototype.__proto__ || Object.getPrototypeOf(LocalIdentificationBlock.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
 
-		object.blockName = this.constructor.blockName();
-		object.tagClass = this.tagClass;
-		object.tagNumber = this.tagNumber;
-		object.isConstructed = this.isConstructed;
+			object.blockName = this.constructor.blockName();
+			object.tagClass = this.tagClass;
+			object.tagNumber = this.tagNumber;
+			object.isConstructed = this.isConstructed;
 
-		return object;
-	}
-	//**********************************************************************************
-}
+			return object;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "identificationBlock";
+		}
+	}]);
+
+	return LocalIdentificationBlock;
+}(LocalHexBlock(LocalBaseBlock));
 //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of length block class
 //**************************************************************************************
-class LocalLengthBlock extends LocalBaseBlock {
+
+
+var LocalLengthBlock = function (_LocalBaseBlock) {
+	_inherits(LocalLengthBlock, _LocalBaseBlock);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalLengthBlock" class
   * @param {Object} [parameters={}]
   * @property {Object} [lenBlock]
   */
-	constructor(parameters = {}) {
-		super();
+	function LocalLengthBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+		_classCallCheck(this, LocalLengthBlock);
+
+		var _this3 = _possibleConstructorReturn(this, (LocalLengthBlock.__proto__ || Object.getPrototypeOf(LocalLengthBlock)).call(this));
 
 		if ("lenBlock" in parameters) {
-			this.isIndefiniteForm = (0, _pvutils.getParametersValue)(parameters.lenBlock, "isIndefiniteForm", false);
-			this.longFormUsed = (0, _pvutils.getParametersValue)(parameters.lenBlock, "longFormUsed", false);
-			this.length = (0, _pvutils.getParametersValue)(parameters.lenBlock, "length", 0);
+			_this3.isIndefiniteForm = (0, _pvutils.getParametersValue)(parameters.lenBlock, "isIndefiniteForm", false);
+			_this3.longFormUsed = (0, _pvutils.getParametersValue)(parameters.lenBlock, "longFormUsed", false);
+			_this3.length = (0, _pvutils.getParametersValue)(parameters.lenBlock, "length", 0);
 		} else {
-			this.isIndefiniteForm = false;
-			this.longFormUsed = false;
-			this.length = 0;
+			_this3.isIndefiniteForm = false;
+			_this3.longFormUsed = false;
+			_this3.length = 0;
 		}
+		return _this3;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "lengthBlock";
-	}
-	//**********************************************************************************
-	/**
-  * Base function for converting block from BER encoded array of bytes
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
-  * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
-  * @returns {number}
-  */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		//region Basic check for parameters
-		//noinspection JSCheckFunctionSignatures
-		if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
-		//endregion
 
-		//region Getting Uint8Array from ArrayBuffer
-		const intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
-		//endregion
 
-		//region Initial checks
-		if (intBuffer.length === 0) {
-			this.error = "Zero buffer length";
-			return -1;
-		}
+	_createClass(LocalLengthBlock, [{
+		key: "fromBER",
 
-		if (intBuffer[0] === 0xFF) {
-			this.error = "Length block 0xFF is reserved by standard";
-			return -1;
-		}
-		//endregion
+		//**********************************************************************************
+		/**
+   * Base function for converting block from BER encoded array of bytes
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
+   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
+   * @returns {number}
+   */
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			//region Basic check for parameters
+			//noinspection JSCheckFunctionSignatures
+			if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
+			//endregion
 
-		//region Check for length form type
-		this.isIndefiniteForm = intBuffer[0] === 0x80;
-		//endregion
+			//region Getting Uint8Array from ArrayBuffer
+			var intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
+			//endregion
 
-		//region Stop working in case of indefinite length form
-		if (this.isIndefiniteForm === true) {
-			this.blockLength = 1;
-			return inputOffset + this.blockLength;
-		}
-		//endregion
-
-		//region Check is long form of length encoding using
-		this.longFormUsed = !!(intBuffer[0] & 0x80);
-		//endregion
-
-		//region Stop working in case of short form of length value
-		if (this.longFormUsed === false) {
-			this.length = intBuffer[0];
-			this.blockLength = 1;
-			return inputOffset + this.blockLength;
-		}
-		//endregion
-
-		//region Calculate length value in case of long form
-		const count = intBuffer[0] & 0x7F;
-
-		if (count > 8) // Too big length value
-			{
-				this.error = "Too big integer";
+			//region Initial checks
+			if (intBuffer.length === 0) {
+				this.error = "Zero buffer length";
 				return -1;
 			}
 
-		if (count + 1 > intBuffer.length) {
-			this.error = "End of input reached before message was fully decoded";
-			return -1;
+			if (intBuffer[0] === 0xFF) {
+				this.error = "Length block 0xFF is reserved by standard";
+				return -1;
+			}
+			//endregion
+
+			//region Check for length form type
+			this.isIndefiniteForm = intBuffer[0] === 0x80;
+			//endregion
+
+			//region Stop working in case of indefinite length form
+			if (this.isIndefiniteForm === true) {
+				this.blockLength = 1;
+				return inputOffset + this.blockLength;
+			}
+			//endregion
+
+			//region Check is long form of length encoding using
+			this.longFormUsed = !!(intBuffer[0] & 0x80);
+			//endregion
+
+			//region Stop working in case of short form of length value
+			if (this.longFormUsed === false) {
+				this.length = intBuffer[0];
+				this.blockLength = 1;
+				return inputOffset + this.blockLength;
+			}
+			//endregion
+
+			//region Calculate length value in case of long form
+			var count = intBuffer[0] & 0x7F;
+
+			if (count > 8) // Too big length value
+				{
+					this.error = "Too big integer";
+					return -1;
+				}
+
+			if (count + 1 > intBuffer.length) {
+				this.error = "End of input reached before message was fully decoded";
+				return -1;
+			}
+
+			var lengthBufferView = new Uint8Array(count);
+
+			for (var i = 0; i < count; i++) {
+				lengthBufferView[i] = intBuffer[i + 1];
+			}if (lengthBufferView[count - 1] === 0x00) this.warnings.push("Needlessly long encoded length");
+
+			this.length = (0, _pvutils.utilFromBase)(lengthBufferView, 8);
+
+			if (this.longFormUsed && this.length <= 127) this.warnings.push("Unneccesary usage of long length form");
+
+			this.blockLength = count + 1;
+			//endregion
+
+			return inputOffset + this.blockLength; // Return current offset in input buffer
 		}
+		//**********************************************************************************
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
 
-		const lengthBufferView = new Uint8Array(count);
+	}, {
+		key: "toBER",
+		value: function toBER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-		for (let i = 0; i < count; i++) lengthBufferView[i] = intBuffer[i + 1];
+			//region Initial variables
+			var retBuf = void 0;
+			var retView = void 0;
+			//endregion
 
-		if (lengthBufferView[count - 1] === 0x00) this.warnings.push("Needlessly long encoded length");
+			if (this.length > 127) this.longFormUsed = true;
 
-		this.length = (0, _pvutils.utilFromBase)(lengthBufferView, 8);
+			if (this.isIndefiniteForm) {
+				retBuf = new ArrayBuffer(1);
 
-		if (this.longFormUsed && this.length <= 127) this.warnings.push("Unneccesary usage of long length form");
+				if (sizeOnly === false) {
+					retView = new Uint8Array(retBuf);
+					retView[0] = 0x80;
+				}
 
-		this.blockLength = count + 1;
-		//endregion
+				return retBuf;
+			}
 
-		return inputOffset + this.blockLength; // Return current offset in input buffer
-	}
-	//**********************************************************************************
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		//region Initial variables
-		let retBuf;
-		let retView;
-		//endregion
+			if (this.longFormUsed === true) {
+				var encodedBuf = (0, _pvutils.utilToBase)(this.length, 8);
 
-		if (this.length > 127) this.longFormUsed = true;
+				if (encodedBuf.byteLength > 127) {
+					this.error = "Too big length";
+					return new ArrayBuffer(0);
+				}
 
-		if (this.isIndefiniteForm) {
+				retBuf = new ArrayBuffer(encodedBuf.byteLength + 1);
+
+				if (sizeOnly === true) return retBuf;
+
+				var encodedView = new Uint8Array(encodedBuf);
+				retView = new Uint8Array(retBuf);
+
+				retView[0] = encodedBuf.byteLength | 0x80;
+
+				for (var i = 0; i < encodedBuf.byteLength; i++) {
+					retView[i + 1] = encodedView[i];
+				}return retBuf;
+			}
+
 			retBuf = new ArrayBuffer(1);
 
 			if (sizeOnly === false) {
 				retView = new Uint8Array(retBuf);
-				retView[0] = 0x80;
+
+				retView[0] = this.length;
 			}
 
 			return retBuf;
 		}
+		//**********************************************************************************
+		/**
+   * Convertion for the block to JSON object
+   * @returns {{blockName, blockLength, error, warnings, valueBeforeDecode}|{blockName: string, blockLength: number, error: string, warnings: Array.<string>, valueBeforeDecode: string}}
+   */
 
-		if (this.longFormUsed === true) {
-			const encodedBuf = (0, _pvutils.utilToBase)(this.length, 8);
+	}, {
+		key: "toJSON",
+		value: function toJSON() {
+			var object = {};
 
-			if (encodedBuf.byteLength > 127) {
-				this.error = "Too big length";
-				return new ArrayBuffer(0);
-			}
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(LocalLengthBlock.prototype.__proto__ || Object.getPrototypeOf(LocalLengthBlock.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
 
-			retBuf = new ArrayBuffer(encodedBuf.byteLength + 1);
+			object.blockName = this.constructor.blockName();
+			object.isIndefiniteForm = this.isIndefiniteForm;
+			object.longFormUsed = this.longFormUsed;
+			object.length = this.length;
 
-			if (sizeOnly === true) return retBuf;
-
-			const encodedView = new Uint8Array(encodedBuf);
-			retView = new Uint8Array(retBuf);
-
-			retView[0] = encodedBuf.byteLength | 0x80;
-
-			for (let i = 0; i < encodedBuf.byteLength; i++) retView[i + 1] = encodedView[i];
-
-			return retBuf;
+			return object;
 		}
+		//**********************************************************************************
 
-		retBuf = new ArrayBuffer(1);
-
-		if (sizeOnly === false) {
-			retView = new Uint8Array(retBuf);
-
-			retView[0] = this.length;
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "lengthBlock";
 		}
+	}]);
 
-		return retBuf;
-	}
-	//**********************************************************************************
-	/**
-  * Convertion for the block to JSON object
-  * @returns {{blockName, blockLength, error, warnings, valueBeforeDecode}|{blockName: string, blockLength: number, error: string, warnings: Array.<string>, valueBeforeDecode: string}}
-  */
-	toJSON() {
-		let object = {};
-
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
-
-		object.blockName = this.constructor.blockName();
-		object.isIndefiniteForm = this.isIndefiniteForm;
-		object.longFormUsed = this.longFormUsed;
-		object.length = this.length;
-
-		return object;
-	}
-	//**********************************************************************************
-}
+	return LocalLengthBlock;
+}(LocalBaseBlock);
 //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of value block class
 //**************************************************************************************
-class LocalValueBlock extends LocalBaseBlock {
+
+
+var LocalValueBlock = function (_LocalBaseBlock2) {
+	_inherits(LocalValueBlock, _LocalBaseBlock2);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalValueBlock" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function LocalValueBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+		_classCallCheck(this, LocalValueBlock);
+
+		return _possibleConstructorReturn(this, (LocalValueBlock.__proto__ || Object.getPrototypeOf(LocalValueBlock)).call(this, parameters));
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "valueBlock";
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedLocalSymbols,JSUnusedLocalSymbols,JSUnusedLocalSymbols
-	/**
-  * Base function for converting block from BER encoded array of bytes
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
-  * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
-  * @returns {number}
-  */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		//region Throw an exception for a function which needs to be specified in extended classes
-		throw TypeError("User need to make a specific function in a class which extends \"LocalValueBlock\"");
-		//endregion
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedLocalSymbols
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		//region Throw an exception for a function which needs to be specified in extended classes
-		throw TypeError("User need to make a specific function in a class which extends \"LocalValueBlock\"");
-		//endregion
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(LocalValueBlock, [{
+		key: "fromBER",
+
+		//**********************************************************************************
+		//noinspection JSUnusedLocalSymbols,JSUnusedLocalSymbols,JSUnusedLocalSymbols
+		/**
+   * Base function for converting block from BER encoded array of bytes
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
+   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
+   * @returns {number}
+   */
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			//region Throw an exception for a function which needs to be specified in extended classes
+			throw TypeError("User need to make a specific function in a class which extends \"LocalValueBlock\"");
+			//endregion
+		}
+		//**********************************************************************************
+		//noinspection JSUnusedLocalSymbols
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
+
+	}, {
+		key: "toBER",
+		value: function toBER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+			//region Throw an exception for a function which needs to be specified in extended classes
+			throw TypeError("User need to make a specific function in a class which extends \"LocalValueBlock\"");
+			//endregion
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "valueBlock";
+		}
+	}]);
+
+	return LocalValueBlock;
+}(LocalBaseBlock);
 //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of basic ASN.1 block class
 //**************************************************************************************
-class BaseBlock extends LocalBaseBlock {
+
+
+var BaseBlock = function (_LocalBaseBlock3) {
+	_inherits(BaseBlock, _LocalBaseBlock3);
+
 	//**********************************************************************************
 	/**
   * Constructor for "BaseBlock" class
@@ -17359,133 +17499,166 @@ class BaseBlock extends LocalBaseBlock {
   * @property {boolean} [optional]
   * @param valueBlockType Type of value block
   */
-	constructor(parameters = {}, valueBlockType = LocalValueBlock) {
-		super(parameters);
+	function BaseBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+		var valueBlockType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : LocalValueBlock;
 
-		if ("name" in parameters) this.name = parameters.name;
-		if ("optional" in parameters) this.optional = parameters.optional;
-		if ("primitiveSchema" in parameters) this.primitiveSchema = parameters.primitiveSchema;
+		_classCallCheck(this, BaseBlock);
 
-		this.idBlock = new LocalIdentificationBlock(parameters);
-		this.lenBlock = new LocalLengthBlock(parameters);
-		this.valueBlock = new valueBlockType(parameters);
+		var _this5 = _possibleConstructorReturn(this, (BaseBlock.__proto__ || Object.getPrototypeOf(BaseBlock)).call(this, parameters));
+
+		if ("name" in parameters) _this5.name = parameters.name;
+		if ("optional" in parameters) _this5.optional = parameters.optional;
+		if ("primitiveSchema" in parameters) _this5.primitiveSchema = parameters.primitiveSchema;
+
+		_this5.idBlock = new LocalIdentificationBlock(parameters);
+		_this5.lenBlock = new LocalLengthBlock(parameters);
+		_this5.valueBlock = new valueBlockType(parameters);
+		return _this5;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "BaseBlock";
-	}
-	//**********************************************************************************
-	/**
-  * Base function for converting block from BER encoded array of bytes
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
-  * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
-  * @returns {number}
-  */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		const resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
-		if (resultOffset === -1) {
-			this.error = this.valueBlock.error;
-			return resultOffset;
-		}
 
-		if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
 
-		if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+	_createClass(BaseBlock, [{
+		key: "fromBER",
 
-		if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
-
-		return resultOffset;
-	}
-	//**********************************************************************************
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		let retBuf;
-
-		const idBlockBuf = this.idBlock.toBER(sizeOnly);
-		const valueBlockSizeBuf = this.valueBlock.toBER(true);
-
-		this.lenBlock.length = valueBlockSizeBuf.byteLength;
-		const lenBlockBuf = this.lenBlock.toBER(sizeOnly);
-
-		retBuf = (0, _pvutils.utilConcatBuf)(idBlockBuf, lenBlockBuf);
-
-		let valueBlockBuf;
-
-		if (sizeOnly === false) valueBlockBuf = this.valueBlock.toBER(sizeOnly);else valueBlockBuf = new ArrayBuffer(this.lenBlock.length);
-
-		retBuf = (0, _pvutils.utilConcatBuf)(retBuf, valueBlockBuf);
-
-		if (this.lenBlock.isIndefiniteForm === true) {
-			const indefBuf = new ArrayBuffer(2);
-
-			if (sizeOnly === false) {
-				const indefView = new Uint8Array(indefBuf);
-
-				indefView[0] = 0x00;
-				indefView[1] = 0x00;
+		//**********************************************************************************
+		/**
+   * Base function for converting block from BER encoded array of bytes
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
+   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
+   * @returns {number}
+   */
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			var resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
+			if (resultOffset === -1) {
+				this.error = this.valueBlock.error;
+				return resultOffset;
 			}
 
-			retBuf = (0, _pvutils.utilConcatBuf)(retBuf, indefBuf);
+			if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
+
+			if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+
+			if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
+
+			return resultOffset;
 		}
+		//**********************************************************************************
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
 
-		return retBuf;
-	}
-	//**********************************************************************************
-	/**
-  * Convertion for the block to JSON object
-  * @returns {{blockName, blockLength, error, warnings, valueBeforeDecode}|{blockName: string, blockLength: number, error: string, warnings: Array.<string>, valueBeforeDecode: string}}
-  */
-	toJSON() {
-		let object = {};
+	}, {
+		key: "toBER",
+		value: function toBER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
+			var retBuf = void 0;
 
-		object.idBlock = this.idBlock.toJSON();
-		object.lenBlock = this.lenBlock.toJSON();
-		object.valueBlock = this.valueBlock.toJSON();
+			var idBlockBuf = this.idBlock.toBER(sizeOnly);
+			var valueBlockSizeBuf = this.valueBlock.toBER(true);
 
-		if ("name" in this) object.name = this.name;
-		if ("optional" in this) object.optional = this.optional;
-		if ("primitiveSchema" in this) object.primitiveSchema = this.primitiveSchema.toJSON();
+			this.lenBlock.length = valueBlockSizeBuf.byteLength;
+			var lenBlockBuf = this.lenBlock.toBER(sizeOnly);
 
-		return object;
-	}
-	//**********************************************************************************
-}
+			retBuf = (0, _pvutils.utilConcatBuf)(idBlockBuf, lenBlockBuf);
+
+			var valueBlockBuf = void 0;
+
+			if (sizeOnly === false) valueBlockBuf = this.valueBlock.toBER(sizeOnly);else valueBlockBuf = new ArrayBuffer(this.lenBlock.length);
+
+			retBuf = (0, _pvutils.utilConcatBuf)(retBuf, valueBlockBuf);
+
+			if (this.lenBlock.isIndefiniteForm === true) {
+				var indefBuf = new ArrayBuffer(2);
+
+				if (sizeOnly === false) {
+					var indefView = new Uint8Array(indefBuf);
+
+					indefView[0] = 0x00;
+					indefView[1] = 0x00;
+				}
+
+				retBuf = (0, _pvutils.utilConcatBuf)(retBuf, indefBuf);
+			}
+
+			return retBuf;
+		}
+		//**********************************************************************************
+		/**
+   * Convertion for the block to JSON object
+   * @returns {{blockName, blockLength, error, warnings, valueBeforeDecode}|{blockName: string, blockLength: number, error: string, warnings: Array.<string>, valueBeforeDecode: string}}
+   */
+
+	}, {
+		key: "toJSON",
+		value: function toJSON() {
+			var object = {};
+
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(BaseBlock.prototype.__proto__ || Object.getPrototypeOf(BaseBlock.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
+
+			object.idBlock = this.idBlock.toJSON();
+			object.lenBlock = this.lenBlock.toJSON();
+			object.valueBlock = this.valueBlock.toJSON();
+
+			if ("name" in this) object.name = this.name;
+			if ("optional" in this) object.optional = this.optional;
+			if ("primitiveSchema" in this) object.primitiveSchema = this.primitiveSchema.toJSON();
+
+			return object;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "BaseBlock";
+		}
+	}]);
+
+	return BaseBlock;
+}(LocalBaseBlock);
+
 exports.BaseBlock = BaseBlock; //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of basic block for all PRIMITIVE types
 //**************************************************************************************
 
-class LocalPrimitiveValueBlock extends LocalValueBlock {
+var LocalPrimitiveValueBlock = function (_LocalValueBlock) {
+	_inherits(LocalPrimitiveValueBlock, _LocalValueBlock);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalPrimitiveValueBlock" class
   * @param {Object} [parameters={}]
   * @property {ArrayBuffer} [valueBeforeDecode]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function LocalPrimitiveValueBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+		_classCallCheck(this, LocalPrimitiveValueBlock);
 
 		//region Variables from "hexBlock" class
-		if ("valueHex" in parameters) this.valueHex = parameters.valueHex.slice(0);else this.valueHex = new ArrayBuffer(0);
+		var _this6 = _possibleConstructorReturn(this, (LocalPrimitiveValueBlock.__proto__ || Object.getPrototypeOf(LocalPrimitiveValueBlock)).call(this, parameters));
 
-		this.isHexOnly = (0, _pvutils.getParametersValue)(parameters, "isHexOnly", true);
+		if ("valueHex" in parameters) _this6.valueHex = parameters.valueHex.slice(0);else _this6.valueHex = new ArrayBuffer(0);
+
+		_this6.isHexOnly = (0, _pvutils.getParametersValue)(parameters, "isHexOnly", true);
 		//endregion
+		return _this6;
 	}
 	//**********************************************************************************
 	/**
@@ -17495,113 +17668,158 @@ class LocalPrimitiveValueBlock extends LocalValueBlock {
   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
   * @returns {number}
   */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		//region Basic check for parameters
-		//noinspection JSCheckFunctionSignatures
-		if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
-		//endregion
 
-		//region Getting Uint8Array from ArrayBuffer
-		const intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
-		//endregion
 
-		//region Initial checks
-		if (intBuffer.length === 0) {
-			this.warnings.push("Zero buffer length");
-			return inputOffset;
+	_createClass(LocalPrimitiveValueBlock, [{
+		key: "fromBER",
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			//region Basic check for parameters
+			//noinspection JSCheckFunctionSignatures
+			if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
+			//endregion
+
+			//region Getting Uint8Array from ArrayBuffer
+			var intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
+			//endregion
+
+			//region Initial checks
+			if (intBuffer.length === 0) {
+				this.warnings.push("Zero buffer length");
+				return inputOffset;
+			}
+			//endregion
+
+			//region Copy input buffer into internal buffer
+			this.valueHex = new ArrayBuffer(intBuffer.length);
+			var valueHexView = new Uint8Array(this.valueHex);
+
+			for (var i = 0; i < intBuffer.length; i++) {
+				valueHexView[i] = intBuffer[i];
+			} //endregion
+
+			this.blockLength = inputLength;
+
+			return inputOffset + inputLength;
 		}
-		//endregion
+		//**********************************************************************************
+		//noinspection JSUnusedLocalSymbols
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
 
-		//region Copy input buffer into internal buffer
-		this.valueHex = new ArrayBuffer(intBuffer.length);
-		const valueHexView = new Uint8Array(this.valueHex);
+	}, {
+		key: "toBER",
+		value: function toBER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-		for (let i = 0; i < intBuffer.length; i++) valueHexView[i] = intBuffer[i];
-		//endregion
+			return this.valueHex.slice(0);
+		}
+		//**********************************************************************************
+		/**
+   * Aux function, need to get a block name. Need to have it here for inhiritence
+   * @returns {string}
+   */
 
-		this.blockLength = inputLength;
+	}, {
+		key: "toJSON",
 
-		return inputOffset + inputLength;
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedLocalSymbols
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		return this.valueHex.slice(0);
-	}
-	//**********************************************************************************
-	/**
-  * Aux function, need to get a block name. Need to have it here for inhiritence
-  * @returns {string}
-  */
-	static blockName() {
-		return "PrimitiveValueBlock";
-	}
-	//**********************************************************************************
-	/**
-  * Convertion for the block to JSON object
-  * @returns {{blockName, blockLength, error, warnings, valueBeforeDecode}|{blockName: string, blockLength: number, error: string, warnings: Array.<string>, valueBeforeDecode: string}}
-  */
-	toJSON() {
-		let object = {};
+		//**********************************************************************************
+		/**
+   * Convertion for the block to JSON object
+   * @returns {{blockName, blockLength, error, warnings, valueBeforeDecode}|{blockName: string, blockLength: number, error: string, warnings: Array.<string>, valueBeforeDecode: string}}
+   */
+		value: function toJSON() {
+			var object = {};
 
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(LocalPrimitiveValueBlock.prototype.__proto__ || Object.getPrototypeOf(LocalPrimitiveValueBlock.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
 
-		object.valueHex = (0, _pvutils.bufferToHexCodes)(this.valueHex, 0, this.valueHex.byteLength);
-		object.isHexOnly = this.isHexOnly;
+			object.valueHex = (0, _pvutils.bufferToHexCodes)(this.valueHex, 0, this.valueHex.byteLength);
+			object.isHexOnly = this.isHexOnly;
 
-		return object;
-	}
-	//**********************************************************************************
-}
+			return object;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "PrimitiveValueBlock";
+		}
+	}]);
+
+	return LocalPrimitiveValueBlock;
+}(LocalValueBlock);
 //**************************************************************************************
-class Primitive extends BaseBlock {
+
+
+var Primitive = function (_BaseBlock) {
+	_inherits(Primitive, _BaseBlock);
+
 	//**********************************************************************************
 	/**
   * Constructor for "Primitive" class
   * @param {Object} [parameters={}]
   * @property {ArrayBuffer} [valueHex]
   */
-	constructor(parameters = {}) {
-		super(parameters, LocalPrimitiveValueBlock);
+	function Primitive() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.isConstructed = false;
+		_classCallCheck(this, Primitive);
+
+		var _this7 = _possibleConstructorReturn(this, (Primitive.__proto__ || Object.getPrototypeOf(Primitive)).call(this, parameters, LocalPrimitiveValueBlock));
+
+		_this7.idBlock.isConstructed = false;
+		return _this7;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "PRIMITIVE";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(Primitive, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "PRIMITIVE";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return Primitive;
+}(BaseBlock);
+
 exports.Primitive = Primitive; //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of basic block for all CONSTRUCTED types
 //**************************************************************************************
 
-class LocalConstructedValueBlock extends LocalValueBlock {
+var LocalConstructedValueBlock = function (_LocalValueBlock2) {
+	_inherits(LocalConstructedValueBlock, _LocalValueBlock2);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalConstructedValueBlock" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function LocalConstructedValueBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.value = (0, _pvutils.getParametersValue)(parameters, "value", []);
-		this.isIndefiniteForm = (0, _pvutils.getParametersValue)(parameters, "isIndefiniteForm", false);
+		_classCallCheck(this, LocalConstructedValueBlock);
+
+		var _this8 = _possibleConstructorReturn(this, (LocalConstructedValueBlock.__proto__ || Object.getPrototypeOf(LocalConstructedValueBlock)).call(this, parameters));
+
+		_this8.value = (0, _pvutils.getParametersValue)(parameters, "value", []);
+		_this8.isIndefiniteForm = (0, _pvutils.getParametersValue)(parameters, "isIndefiniteForm", false);
+		return _this8;
 	}
 	//**********************************************************************************
 	/**
@@ -17611,173 +17829,219 @@ class LocalConstructedValueBlock extends LocalValueBlock {
   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
   * @returns {number}
   */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		//region Store initial offset and length
-		const initialOffset = inputOffset;
-		const initialLength = inputLength;
-		//endregion
 
-		//region Basic check for parameters
-		//noinspection JSCheckFunctionSignatures
-		if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
-		//endregion
 
-		//region Getting Uint8Array from ArrayBuffer
-		const intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
-		//endregion
+	_createClass(LocalConstructedValueBlock, [{
+		key: "fromBER",
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			//region Store initial offset and length
+			var initialOffset = inputOffset;
+			var initialLength = inputLength;
+			//endregion
 
-		//region Initial checks
-		if (intBuffer.length === 0) {
-			this.warnings.push("Zero buffer length");
-			return inputOffset;
-		}
-		//endregion
+			//region Basic check for parameters
+			//noinspection JSCheckFunctionSignatures
+			if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
+			//endregion
 
-		//region Aux function
-		function checkLen(indefiniteLength, length) {
-			if (indefiniteLength === true) return 1;
+			//region Getting Uint8Array from ArrayBuffer
+			var intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
+			//endregion
 
-			return length;
-		}
-		//endregion
+			//region Initial checks
+			if (intBuffer.length === 0) {
+				this.warnings.push("Zero buffer length");
+				return inputOffset;
+			}
+			//endregion
 
-		let currentOffset = inputOffset;
+			//region Aux function
+			function checkLen(indefiniteLength, length) {
+				if (indefiniteLength === true) return 1;
 
-		while (checkLen(this.isIndefiniteForm, inputLength) > 0) {
-			const returnObject = LocalFromBER(inputBuffer, currentOffset, inputLength);
-			if (returnObject.offset === -1) {
-				this.error = returnObject.result.error;
-				this.warnings.concat(returnObject.result.warnings);
-				return -1;
+				return length;
+			}
+			//endregion
+
+			var currentOffset = inputOffset;
+
+			while (checkLen(this.isIndefiniteForm, inputLength) > 0) {
+				var returnObject = LocalFromBER(inputBuffer, currentOffset, inputLength);
+				if (returnObject.offset === -1) {
+					this.error = returnObject.result.error;
+					this.warnings.concat(returnObject.result.warnings);
+					return -1;
+				}
+
+				currentOffset = returnObject.offset;
+
+				this.blockLength += returnObject.result.blockLength;
+				inputLength -= returnObject.result.blockLength;
+
+				this.value.push(returnObject.result);
+
+				if (this.isIndefiniteForm === true && returnObject.result.constructor.blockName() === EndOfContent.blockName()) break;
 			}
 
-			currentOffset = returnObject.offset;
+			if (this.isIndefiniteForm === true) {
+				if (this.value[this.value.length - 1].constructor.blockName() === EndOfContent.blockName()) this.value.pop();else this.warnings.push("No EndOfContent block encoded");
+			}
 
-			this.blockLength += returnObject.result.blockLength;
-			inputLength -= returnObject.result.blockLength;
+			//region Copy "inputBuffer" to "valueBeforeDecode"
+			this.valueBeforeDecode = inputBuffer.slice(initialOffset, initialOffset + initialLength);
+			//endregion
 
-			this.value.push(returnObject.result);
-
-			if (this.isIndefiniteForm === true && returnObject.result.constructor.blockName() === EndOfContent.blockName()) break;
+			return currentOffset;
 		}
+		//**********************************************************************************
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
 
-		if (this.isIndefiniteForm === true) {
-			if (this.value[this.value.length - 1].constructor.blockName() === EndOfContent.blockName()) this.value.pop();else this.warnings.push("No EndOfContent block encoded");
+	}, {
+		key: "toBER",
+		value: function toBER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+			var retBuf = new ArrayBuffer(0);
+
+			for (var i = 0; i < this.value.length; i++) {
+				var valueBuf = this.value[i].toBER(sizeOnly);
+				retBuf = (0, _pvutils.utilConcatBuf)(retBuf, valueBuf);
+			}
+
+			return retBuf;
 		}
+		//**********************************************************************************
+		/**
+   * Aux function, need to get a block name. Need to have it here for inhiritence
+   * @returns {string}
+   */
 
-		//region Copy "inputBuffer" to "valueBeforeDecode"
-		this.valueBeforeDecode = inputBuffer.slice(initialOffset, initialOffset + initialLength);
-		//endregion
+	}, {
+		key: "toJSON",
 
-		return currentOffset;
-	}
-	//**********************************************************************************
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		let retBuf = new ArrayBuffer(0);
+		//**********************************************************************************
+		/**
+   * Convertion for the block to JSON object
+   * @returns {{blockName, blockLength, error, warnings, valueBeforeDecode}|{blockName: string, blockLength: number, error: string, warnings: Array.<string>, valueBeforeDecode: string}}
+   */
+		value: function toJSON() {
+			var object = {};
 
-		for (let i = 0; i < this.value.length; i++) {
-			const valueBuf = this.value[i].toBER(sizeOnly);
-			retBuf = (0, _pvutils.utilConcatBuf)(retBuf, valueBuf);
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(LocalConstructedValueBlock.prototype.__proto__ || Object.getPrototypeOf(LocalConstructedValueBlock.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
+
+			object.isIndefiniteForm = this.isIndefiniteForm;
+			object.value = [];
+			for (var i = 0; i < this.value.length; i++) {
+				object.value.push(this.value[i].toJSON());
+			}return object;
 		}
+		//**********************************************************************************
 
-		return retBuf;
-	}
-	//**********************************************************************************
-	/**
-  * Aux function, need to get a block name. Need to have it here for inhiritence
-  * @returns {string}
-  */
-	static blockName() {
-		return "ConstructedValueBlock";
-	}
-	//**********************************************************************************
-	/**
-  * Convertion for the block to JSON object
-  * @returns {{blockName, blockLength, error, warnings, valueBeforeDecode}|{blockName: string, blockLength: number, error: string, warnings: Array.<string>, valueBeforeDecode: string}}
-  */
-	toJSON() {
-		let object = {};
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "ConstructedValueBlock";
+		}
+	}]);
 
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
-
-		object.isIndefiniteForm = this.isIndefiniteForm;
-		object.value = [];
-		for (let i = 0; i < this.value.length; i++) object.value.push(this.value[i].toJSON());
-
-		return object;
-	}
-	//**********************************************************************************
-}
+	return LocalConstructedValueBlock;
+}(LocalValueBlock);
 //**************************************************************************************
-class Constructed extends BaseBlock {
+
+
+var Constructed = function (_BaseBlock2) {
+	_inherits(Constructed, _BaseBlock2);
+
 	//**********************************************************************************
 	/**
   * Constructor for "Constructed" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters, LocalConstructedValueBlock);
+	function Constructed() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.isConstructed = true;
+		_classCallCheck(this, Constructed);
+
+		var _this9 = _possibleConstructorReturn(this, (Constructed.__proto__ || Object.getPrototypeOf(Constructed)).call(this, parameters, LocalConstructedValueBlock));
+
+		_this9.idBlock.isConstructed = true;
+		return _this9;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "CONSTRUCTED";
-	}
-	//**********************************************************************************
-	/**
-  * Base function for converting block from BER encoded array of bytes
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
-  * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
-  * @returns {number}
-  */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		this.valueBlock.isIndefiniteForm = this.lenBlock.isIndefiniteForm;
 
-		const resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
-		if (resultOffset === -1) {
-			this.error = this.valueBlock.error;
+
+	_createClass(Constructed, [{
+		key: "fromBER",
+
+		//**********************************************************************************
+		/**
+   * Base function for converting block from BER encoded array of bytes
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
+   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
+   * @returns {number}
+   */
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			this.valueBlock.isIndefiniteForm = this.lenBlock.isIndefiniteForm;
+
+			var resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
+			if (resultOffset === -1) {
+				this.error = this.valueBlock.error;
+				return resultOffset;
+			}
+
+			if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
+
+			if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+
+			if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
+
 			return resultOffset;
 		}
+		//**********************************************************************************
 
-		if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "CONSTRUCTED";
+		}
+	}]);
 
-		if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+	return Constructed;
+}(BaseBlock);
 
-		if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
-
-		return resultOffset;
-	}
-	//**********************************************************************************
-}
 exports.Constructed = Constructed; //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of ASN.1 EndOfContent type class
 //**************************************************************************************
 
-class LocalEndOfContentValueBlock extends LocalValueBlock {
+var LocalEndOfContentValueBlock = function (_LocalValueBlock3) {
+	_inherits(LocalEndOfContentValueBlock, _LocalValueBlock3);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalEndOfContentValueBlock" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function LocalEndOfContentValueBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+		_classCallCheck(this, LocalEndOfContentValueBlock);
+
+		return _possibleConstructorReturn(this, (LocalEndOfContentValueBlock.__proto__ || Object.getPrototypeOf(LocalEndOfContentValueBlock)).call(this, parameters));
 	}
 	//**********************************************************************************
 	//noinspection JSUnusedLocalSymbols,JSUnusedLocalSymbols
@@ -17788,75 +18052,116 @@ class LocalEndOfContentValueBlock extends LocalValueBlock {
   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
   * @returns {number}
   */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		//region There is no "value block" for EndOfContent type and we need to return the same offset
-		return inputOffset;
-		//endregion
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedLocalSymbols
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		return new ArrayBuffer(0);
-	}
-	//**********************************************************************************
-	/**
-  * Aux function, need to get a block name. Need to have it here for inhiritence
-  * @returns {string}
-  */
-	static blockName() {
-		return "EndOfContentValueBlock";
-	}
-	//**********************************************************************************
-}
-//**************************************************************************************
-class EndOfContent extends BaseBlock {
-	//**********************************************************************************
-	constructor(paramaters = {}) {
-		super(paramaters, LocalEndOfContentValueBlock);
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 0; // EndOfContent
+
+	_createClass(LocalEndOfContentValueBlock, [{
+		key: "fromBER",
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			//region There is no "value block" for EndOfContent type and we need to return the same offset
+			return inputOffset;
+			//endregion
+		}
+		//**********************************************************************************
+		//noinspection JSUnusedLocalSymbols
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
+
+	}, {
+		key: "toBER",
+		value: function toBER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+			return new ArrayBuffer(0);
+		}
+		//**********************************************************************************
+		/**
+   * Aux function, need to get a block name. Need to have it here for inhiritence
+   * @returns {string}
+   */
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "EndOfContentValueBlock";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return LocalEndOfContentValueBlock;
+}(LocalValueBlock);
+//**************************************************************************************
+
+
+var EndOfContent = function (_BaseBlock3) {
+	_inherits(EndOfContent, _BaseBlock3);
+
+	//**********************************************************************************
+	function EndOfContent() {
+		var paramaters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+		_classCallCheck(this, EndOfContent);
+
+		var _this11 = _possibleConstructorReturn(this, (EndOfContent.__proto__ || Object.getPrototypeOf(EndOfContent)).call(this, paramaters, LocalEndOfContentValueBlock));
+
+		_this11.idBlock.tagClass = 1; // UNIVERSAL
+		_this11.idBlock.tagNumber = 0; // EndOfContent
+		return _this11;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "EndOfContent";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(EndOfContent, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "EndOfContent";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return EndOfContent;
+}(BaseBlock);
+
 exports.EndOfContent = EndOfContent; //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of ASN.1 Boolean type class
 //**************************************************************************************
 
-class LocalBooleanValueBlock extends LocalValueBlock {
+var LocalBooleanValueBlock = function (_LocalValueBlock4) {
+	_inherits(LocalBooleanValueBlock, _LocalValueBlock4);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalBooleanValueBlock" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function LocalBooleanValueBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.value = (0, _pvutils.getParametersValue)(parameters, "value", false);
-		this.isHexOnly = (0, _pvutils.getParametersValue)(parameters, "isHexOnly", false);
+		_classCallCheck(this, LocalBooleanValueBlock);
 
-		if ("valueHex" in parameters) this.valueHex = parameters.valueHex.slice(0);else {
-			this.valueHex = new ArrayBuffer(1);
-			if (this.value === true) {
-				const view = new Uint8Array(this.valueHex);
+		var _this12 = _possibleConstructorReturn(this, (LocalBooleanValueBlock.__proto__ || Object.getPrototypeOf(LocalBooleanValueBlock)).call(this, parameters));
+
+		_this12.value = (0, _pvutils.getParametersValue)(parameters, "value", false);
+		_this12.isHexOnly = (0, _pvutils.getParametersValue)(parameters, "isHexOnly", false);
+
+		if ("valueHex" in parameters) _this12.valueHex = parameters.valueHex.slice(0);else {
+			_this12.valueHex = new ArrayBuffer(1);
+			if (_this12.value === true) {
+				var view = new Uint8Array(_this12.valueHex);
 				view[0] = 0xFF;
 			}
 		}
+		return _this12;
 	}
 	//**********************************************************************************
 	/**
@@ -17866,235 +18171,338 @@ class LocalBooleanValueBlock extends LocalValueBlock {
   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
   * @returns {number} Offset after least decoded byte
   */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		//region Basic check for parameters
-		//noinspection JSCheckFunctionSignatures
-		if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
-		//endregion
 
-		//region Getting Uint8Array from ArrayBuffer
-		const intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
-		//endregion
 
-		if (inputLength > 1) this.warnings.push("Boolean value encoded in more then 1 octet");
+	_createClass(LocalBooleanValueBlock, [{
+		key: "fromBER",
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			//region Basic check for parameters
+			//noinspection JSCheckFunctionSignatures
+			if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
+			//endregion
 
-		this.isHexOnly = true;
+			//region Getting Uint8Array from ArrayBuffer
+			var intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
+			//endregion
 
-		//region Copy input buffer to internal array
-		this.valueHex = new ArrayBuffer(intBuffer.length);
-		const view = new Uint8Array(this.valueHex);
+			if (inputLength > 1) this.warnings.push("Boolean value encoded in more then 1 octet");
 
-		for (let i = 0; i < intBuffer.length; i++) view[i] = intBuffer[i];
-		//endregion
+			this.isHexOnly = true;
 
-		if (_pvutils.utilDecodeTC.call(this) !== 0) this.value = true;else this.value = false;
+			//region Copy input buffer to internal array
+			this.valueHex = new ArrayBuffer(intBuffer.length);
+			var view = new Uint8Array(this.valueHex);
 
-		this.blockLength = inputLength;
+			for (var i = 0; i < intBuffer.length; i++) {
+				view[i] = intBuffer[i];
+			} //endregion
 
-		return inputOffset + inputLength;
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedLocalSymbols
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		return this.valueHex;
-	}
-	//**********************************************************************************
-	/**
-  * Aux function, need to get a block name. Need to have it here for inhiritence
-  * @returns {string}
-  */
-	static blockName() {
-		return "BooleanValueBlock";
-	}
-	//**********************************************************************************
-	/**
-  * Convertion for the block to JSON object
-  * @returns {{blockName, blockLength, error, warnings, valueBeforeDecode}|{blockName: string, blockLength: number, error: string, warnings: Array.<string>, valueBeforeDecode: string}}
-  */
-	toJSON() {
-		let object = {};
+			if (_pvutils.utilDecodeTC.call(this) !== 0) this.value = true;else this.value = false;
 
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
+			this.blockLength = inputLength;
 
-		object.value = this.value;
-		object.isHexOnly = this.isHexOnly;
-		object.valueHex = (0, _pvutils.bufferToHexCodes)(this.valueHex, 0, this.valueHex.byteLength);
+			return inputOffset + inputLength;
+		}
+		//**********************************************************************************
+		//noinspection JSUnusedLocalSymbols
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
 
-		return object;
-	}
-	//**********************************************************************************
-}
+	}, {
+		key: "toBER",
+		value: function toBER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+			return this.valueHex;
+		}
+		//**********************************************************************************
+		/**
+   * Aux function, need to get a block name. Need to have it here for inhiritence
+   * @returns {string}
+   */
+
+	}, {
+		key: "toJSON",
+
+		//**********************************************************************************
+		/**
+   * Convertion for the block to JSON object
+   * @returns {{blockName, blockLength, error, warnings, valueBeforeDecode}|{blockName: string, blockLength: number, error: string, warnings: Array.<string>, valueBeforeDecode: string}}
+   */
+		value: function toJSON() {
+			var object = {};
+
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(LocalBooleanValueBlock.prototype.__proto__ || Object.getPrototypeOf(LocalBooleanValueBlock.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
+
+			object.value = this.value;
+			object.isHexOnly = this.isHexOnly;
+			object.valueHex = (0, _pvutils.bufferToHexCodes)(this.valueHex, 0, this.valueHex.byteLength);
+
+			return object;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "BooleanValueBlock";
+		}
+	}]);
+
+	return LocalBooleanValueBlock;
+}(LocalValueBlock);
 //**************************************************************************************
-class Boolean extends BaseBlock {
+
+
+var Boolean = function (_BaseBlock4) {
+	_inherits(Boolean, _BaseBlock4);
+
 	//**********************************************************************************
 	/**
   * Constructor for "Boolean" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters, LocalBooleanValueBlock);
+	function Boolean() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 1; // Boolean
+		_classCallCheck(this, Boolean);
+
+		var _this13 = _possibleConstructorReturn(this, (Boolean.__proto__ || Object.getPrototypeOf(Boolean)).call(this, parameters, LocalBooleanValueBlock));
+
+		_this13.idBlock.tagClass = 1; // UNIVERSAL
+		_this13.idBlock.tagNumber = 1; // Boolean
+		return _this13;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "Boolean";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(Boolean, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "Boolean";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return Boolean;
+}(BaseBlock);
+
 exports.Boolean = Boolean; //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of ASN.1 Sequence and Set type classes
 //**************************************************************************************
 
-class Sequence extends Constructed {
+var Sequence = function (_Constructed) {
+	_inherits(Sequence, _Constructed);
+
 	//**********************************************************************************
 	/**
   * Constructor for "Sequence" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function Sequence() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 16; // Sequence
+		_classCallCheck(this, Sequence);
+
+		var _this14 = _possibleConstructorReturn(this, (Sequence.__proto__ || Object.getPrototypeOf(Sequence)).call(this, parameters));
+
+		_this14.idBlock.tagClass = 1; // UNIVERSAL
+		_this14.idBlock.tagNumber = 16; // Sequence
+		return _this14;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "Sequence";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(Sequence, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "Sequence";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return Sequence;
+}(Constructed);
+
 exports.Sequence = Sequence; //**************************************************************************************
 
-class Set extends Constructed {
+var Set = function (_Constructed2) {
+	_inherits(Set, _Constructed2);
+
 	//**********************************************************************************
 	/**
   * Constructor for "Set" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function Set() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 17; // Set
+		_classCallCheck(this, Set);
+
+		var _this15 = _possibleConstructorReturn(this, (Set.__proto__ || Object.getPrototypeOf(Set)).call(this, parameters));
+
+		_this15.idBlock.tagClass = 1; // UNIVERSAL
+		_this15.idBlock.tagNumber = 17; // Set
+		return _this15;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "Set";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(Set, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "Set";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return Set;
+}(Constructed);
+
 exports.Set = Set; //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of ASN.1 Null type class
 //**************************************************************************************
 
-class Null extends BaseBlock {
+var Null = function (_BaseBlock5) {
+	_inherits(Null, _BaseBlock5);
+
 	//**********************************************************************************
 	/**
   * Constructor for "Null" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters, LocalBaseBlock); // We will not have a call to "Null value block" because of specified "fromBER" and "toBER" functions
+	function Null() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 5; // Null
+		_classCallCheck(this, Null);
+
+		// We will not have a call to "Null value block" because of specified "fromBER" and "toBER" functions
+
+		var _this16 = _possibleConstructorReturn(this, (Null.__proto__ || Object.getPrototypeOf(Null)).call(this, parameters, LocalBaseBlock));
+
+		_this16.idBlock.tagClass = 1; // UNIVERSAL
+		_this16.idBlock.tagNumber = 5; // Null
+		return _this16;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "Null";
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedLocalSymbols
-	/**
-  * Base function for converting block from BER encoded array of bytes
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
-  * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
-  * @returns {number} Offset after least decoded byte
-  */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		if (this.lenBlock.length > 0) this.warnings.push("Non-zero length of value block for Null type");
 
-		if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
 
-		if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+	_createClass(Null, [{
+		key: "fromBER",
 
-		this.blockLength += inputLength;
+		//**********************************************************************************
+		//noinspection JSUnusedLocalSymbols
+		/**
+   * Base function for converting block from BER encoded array of bytes
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
+   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
+   * @returns {number} Offset after least decoded byte
+   */
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			if (this.lenBlock.length > 0) this.warnings.push("Non-zero length of value block for Null type");
 
-		if (inputOffset + inputLength > inputBuffer.byteLength) {
-			this.error = "End of input reached before message was fully decoded (inconsistent offset and length values)";
-			return -1;
+			if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
+
+			if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+
+			this.blockLength += inputLength;
+
+			if (inputOffset + inputLength > inputBuffer.byteLength) {
+				this.error = "End of input reached before message was fully decoded (inconsistent offset and length values)";
+				return -1;
+			}
+
+			return inputOffset + inputLength;
 		}
+		//**********************************************************************************
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
 
-		return inputOffset + inputLength;
-	}
-	//**********************************************************************************
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		const retBuf = new ArrayBuffer(2);
+	}, {
+		key: "toBER",
+		value: function toBER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-		if (sizeOnly === true) return retBuf;
+			var retBuf = new ArrayBuffer(2);
 
-		const retView = new Uint8Array(retBuf);
-		retView[0] = 0x05;
-		retView[1] = 0x00;
+			if (sizeOnly === true) return retBuf;
 
-		return retBuf;
-	}
-	//**********************************************************************************
-}
+			var retView = new Uint8Array(retBuf);
+			retView[0] = 0x05;
+			retView[1] = 0x00;
+
+			return retBuf;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "Null";
+		}
+	}]);
+
+	return Null;
+}(BaseBlock);
+
 exports.Null = Null; //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of ASN.1 OctetString type class
 //**************************************************************************************
 
-class LocalOctetStringValueBlock extends LocalHexBlock(LocalConstructedValueBlock) {
+var LocalOctetStringValueBlock = function (_LocalHexBlock2) {
+	_inherits(LocalOctetStringValueBlock, _LocalHexBlock2);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalOctetStringValueBlock" class
   * @param {Object} [parameters={}]
   * @property {ArrayBuffer} [valueHex]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function LocalOctetStringValueBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.isConstructed = (0, _pvutils.getParametersValue)(parameters, "isConstructed", false);
+		_classCallCheck(this, LocalOctetStringValueBlock);
+
+		var _this17 = _possibleConstructorReturn(this, (LocalOctetStringValueBlock.__proto__ || Object.getPrototypeOf(LocalOctetStringValueBlock)).call(this, parameters));
+
+		_this17.isConstructed = (0, _pvutils.getParametersValue)(parameters, "isConstructed", false);
+		return _this17;
 	}
 	//**********************************************************************************
 	/**
@@ -18104,96 +18512,124 @@ class LocalOctetStringValueBlock extends LocalHexBlock(LocalConstructedValueBloc
   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
   * @returns {number} Offset after least decoded byte
   */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		let resultOffset = 0;
 
-		if (this.isConstructed === true) {
-			this.isHexOnly = false;
 
-			resultOffset = LocalConstructedValueBlock.prototype.fromBER.call(this, inputBuffer, inputOffset, inputLength);
-			if (resultOffset === -1) return resultOffset;
+	_createClass(LocalOctetStringValueBlock, [{
+		key: "fromBER",
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			var resultOffset = 0;
 
-			for (let i = 0; i < this.value.length; i++) {
-				const currentBlockName = this.value[i].constructor.blockName();
+			if (this.isConstructed === true) {
+				this.isHexOnly = false;
 
-				if (currentBlockName === EndOfContent.blockName()) {
-					if (this.isIndefiniteForm === true) break;else {
-						this.error = "EndOfContent is unexpected, OCTET STRING may consists of OCTET STRINGs only";
+				resultOffset = LocalConstructedValueBlock.prototype.fromBER.call(this, inputBuffer, inputOffset, inputLength);
+				if (resultOffset === -1) return resultOffset;
+
+				for (var i = 0; i < this.value.length; i++) {
+					var currentBlockName = this.value[i].constructor.blockName();
+
+					if (currentBlockName === EndOfContent.blockName()) {
+						if (this.isIndefiniteForm === true) break;else {
+							this.error = "EndOfContent is unexpected, OCTET STRING may consists of OCTET STRINGs only";
+							return -1;
+						}
+					}
+
+					if (currentBlockName !== OctetString.blockName()) {
+						this.error = "OCTET STRING may consists of OCTET STRINGs only";
 						return -1;
 					}
 				}
+			} else {
+				this.isHexOnly = true;
 
-				if (currentBlockName !== OctetString.blockName()) {
-					this.error = "OCTET STRING may consists of OCTET STRINGs only";
-					return -1;
-				}
+				resultOffset = _get(LocalOctetStringValueBlock.prototype.__proto__ || Object.getPrototypeOf(LocalOctetStringValueBlock.prototype), "fromBER", this).call(this, inputBuffer, inputOffset, inputLength);
+				this.blockLength = inputLength;
 			}
-		} else {
-			this.isHexOnly = true;
 
-			resultOffset = super.fromBER(inputBuffer, inputOffset, inputLength);
-			this.blockLength = inputLength;
+			return resultOffset;
 		}
+		//**********************************************************************************
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
 
-		return resultOffset;
-	}
-	//**********************************************************************************
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		if (this.isConstructed === true) return LocalConstructedValueBlock.prototype.toBER.call(this, sizeOnly);
+	}, {
+		key: "toBER",
+		value: function toBER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-		let retBuf = new ArrayBuffer(this.valueHex.byteLength);
+			if (this.isConstructed === true) return LocalConstructedValueBlock.prototype.toBER.call(this, sizeOnly);
 
-		if (sizeOnly === true) return retBuf;
+			var retBuf = new ArrayBuffer(this.valueHex.byteLength);
 
-		if (this.valueHex.byteLength === 0) return retBuf;
+			if (sizeOnly === true) return retBuf;
 
-		retBuf = this.valueHex.slice(0);
+			if (this.valueHex.byteLength === 0) return retBuf;
 
-		return retBuf;
-	}
-	//**********************************************************************************
-	/**
-  * Aux function, need to get a block name. Need to have it here for inhiritence
-  * @returns {string}
-  */
-	static blockName() {
-		return "OctetStringValueBlock";
-	}
-	//**********************************************************************************
-	toJSON() {
-		let object = {};
+			retBuf = this.valueHex.slice(0);
 
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
+			return retBuf;
+		}
+		//**********************************************************************************
+		/**
+   * Aux function, need to get a block name. Need to have it here for inhiritence
+   * @returns {string}
+   */
 
-		object.isConstructed = this.isConstructed;
-		object.isHexOnly = this.isHexOnly;
-		object.valueHex = (0, _pvutils.bufferToHexCodes)(this.valueHex, 0, this.valueHex.byteLength);
+	}, {
+		key: "toJSON",
 
-		return object;
-	}
-	//**********************************************************************************
-}
+		//**********************************************************************************
+		value: function toJSON() {
+			var object = {};
+
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(LocalOctetStringValueBlock.prototype.__proto__ || Object.getPrototypeOf(LocalOctetStringValueBlock.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
+
+			object.isConstructed = this.isConstructed;
+			object.isHexOnly = this.isHexOnly;
+			object.valueHex = (0, _pvutils.bufferToHexCodes)(this.valueHex, 0, this.valueHex.byteLength);
+
+			return object;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "OctetStringValueBlock";
+		}
+	}]);
+
+	return LocalOctetStringValueBlock;
+}(LocalHexBlock(LocalConstructedValueBlock));
 //**************************************************************************************
-class OctetString extends BaseBlock {
+
+
+var OctetString = function (_BaseBlock6) {
+	_inherits(OctetString, _BaseBlock6);
+
 	//**********************************************************************************
 	/**
   * Constructor for "OctetString" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters, LocalOctetStringValueBlock);
+	function OctetString() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 4; // OctetString
+		_classCallCheck(this, OctetString);
+
+		var _this18 = _possibleConstructorReturn(this, (OctetString.__proto__ || Object.getPrototypeOf(OctetString)).call(this, parameters, LocalOctetStringValueBlock));
+
+		_this18.idBlock.tagClass = 1; // UNIVERSAL
+		_this18.idBlock.tagNumber = 4; // OctetString
+		return _this18;
 	}
 	//**********************************************************************************
 	/**
@@ -18203,68 +18639,90 @@ class OctetString extends BaseBlock {
   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
   * @returns {number} Offset after least decoded byte
   */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		this.valueBlock.isConstructed = this.idBlock.isConstructed;
-		this.valueBlock.isIndefiniteForm = this.lenBlock.isIndefiniteForm;
 
-		//region Ability to encode empty OCTET STRING
-		if (inputLength === 0) {
-			if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
 
-			if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+	_createClass(OctetString, [{
+		key: "fromBER",
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			this.valueBlock.isConstructed = this.idBlock.isConstructed;
+			this.valueBlock.isIndefiniteForm = this.lenBlock.isIndefiniteForm;
 
-			return inputOffset;
+			//region Ability to encode empty OCTET STRING
+			if (inputLength === 0) {
+				if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
+
+				if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+
+				return inputOffset;
+			}
+			//endregion
+
+			return _get(OctetString.prototype.__proto__ || Object.getPrototypeOf(OctetString.prototype), "fromBER", this).call(this, inputBuffer, inputOffset, inputLength);
 		}
-		//endregion
+		//**********************************************************************************
+		/**
+   * Aux function, need to get a block name. Need to have it here for inhiritence
+   * @returns {string}
+   */
 
-		return super.fromBER(inputBuffer, inputOffset, inputLength);
-	}
-	//**********************************************************************************
-	/**
-  * Aux function, need to get a block name. Need to have it here for inhiritence
-  * @returns {string}
-  */
-	static blockName() {
-		return "OctetString";
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedGlobalSymbols
-	/**
-  * Checking that two OCTETSTRINGs are equal
-  * @param {OctetString} octetString
-  */
-	isEqual(octetString) {
-		//region Check input type
-		if (octetString instanceof OctetString === false) return false;
-		//endregion
+	}, {
+		key: "isEqual",
 
-		//region Compare two JSON strings
-		if (JSON.stringify(this) !== JSON.stringify(octetString)) return false;
-		//endregion
+		//**********************************************************************************
+		//noinspection JSUnusedGlobalSymbols
+		/**
+   * Checking that two OCTETSTRINGs are equal
+   * @param {OctetString} octetString
+   */
+		value: function isEqual(octetString) {
+			//region Check input type
+			if (octetString instanceof OctetString === false) return false;
+			//endregion
 
-		return true;
-	}
-	//**********************************************************************************
-}
+			//region Compare two JSON strings
+			if (JSON.stringify(this) !== JSON.stringify(octetString)) return false;
+			//endregion
+
+			return true;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "OctetString";
+		}
+	}]);
+
+	return OctetString;
+}(BaseBlock);
+
 exports.OctetString = OctetString; //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of ASN.1 BitString type class
 //**************************************************************************************
 
-class LocalBitStringValueBlock extends LocalHexBlock(LocalConstructedValueBlock) {
+var LocalBitStringValueBlock = function (_LocalHexBlock3) {
+	_inherits(LocalBitStringValueBlock, _LocalHexBlock3);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalBitStringValueBlock" class
   * @param {Object} [parameters={}]
   * @property {ArrayBuffer} [valueHex]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function LocalBitStringValueBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.unusedBits = (0, _pvutils.getParametersValue)(parameters, "unusedBits", 0);
-		this.isConstructed = (0, _pvutils.getParametersValue)(parameters, "isConstructed", false);
-		this.blockLength = this.valueHex.byteLength;
+		_classCallCheck(this, LocalBitStringValueBlock);
+
+		var _this19 = _possibleConstructorReturn(this, (LocalBitStringValueBlock.__proto__ || Object.getPrototypeOf(LocalBitStringValueBlock)).call(this, parameters));
+
+		_this19.unusedBits = (0, _pvutils.getParametersValue)(parameters, "unusedBits", 0);
+		_this19.isConstructed = (0, _pvutils.getParametersValue)(parameters, "isConstructed", false);
+		_this19.blockLength = _this19.valueHex.byteLength;
+		return _this19;
 	}
 	//**********************************************************************************
 	/**
@@ -18274,186 +18732,230 @@ class LocalBitStringValueBlock extends LocalHexBlock(LocalConstructedValueBlock)
   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
   * @returns {number} Offset after least decoded byte
   */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		//region Ability to decode zero-length BitString value
-		if (inputLength === 0) return inputOffset;
-		//endregion
 
-		let resultOffset = -1;
 
-		//region If the BISTRING supposed to be a constructed value
-		if (this.isConstructed === true) {
-			resultOffset = LocalConstructedValueBlock.prototype.fromBER.call(this, inputBuffer, inputOffset, inputLength);
-			if (resultOffset === -1) return resultOffset;
+	_createClass(LocalBitStringValueBlock, [{
+		key: "fromBER",
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			//region Ability to decode zero-length BitString value
+			if (inputLength === 0) return inputOffset;
+			//endregion
 
-			for (let i = 0; i < this.value.length; i++) {
-				const currentBlockName = this.value[i].constructor.blockName();
+			var resultOffset = -1;
 
-				if (currentBlockName === EndOfContent.blockName()) {
-					if (this.isIndefiniteForm === true) break;else {
-						this.error = "EndOfContent is unexpected, BIT STRING may consists of BIT STRINGs only";
+			//region If the BISTRING supposed to be a constructed value
+			if (this.isConstructed === true) {
+				resultOffset = LocalConstructedValueBlock.prototype.fromBER.call(this, inputBuffer, inputOffset, inputLength);
+				if (resultOffset === -1) return resultOffset;
+
+				for (var i = 0; i < this.value.length; i++) {
+					var currentBlockName = this.value[i].constructor.blockName();
+
+					if (currentBlockName === EndOfContent.blockName()) {
+						if (this.isIndefiniteForm === true) break;else {
+							this.error = "EndOfContent is unexpected, BIT STRING may consists of BIT STRINGs only";
+							return -1;
+						}
+					}
+
+					if (currentBlockName !== BitString.blockName()) {
+						this.error = "BIT STRING may consists of BIT STRINGs only";
+						return -1;
+					}
+
+					if (this.unusedBits > 0 && this.value[i].valueBlock.unusedBits > 0) {
+						this.error = "Usign of \"unused bits\" inside constructive BIT STRING allowed for least one only";
+						return -1;
+					}
+
+					this.unusedBits = this.value[i].valueBlock.unusedBits;
+					if (this.unusedBits > 7) {
+						this.error = "Unused bits for BitString must be in range 0-7";
 						return -1;
 					}
 				}
 
-				if (currentBlockName !== BitString.blockName()) {
-					this.error = "BIT STRING may consists of BIT STRINGs only";
-					return -1;
-				}
+				return resultOffset;
+			}
+			//endregion
+			//region If the BitString supposed to be a primitive value
+			//region Basic check for parameters
+			//noinspection JSCheckFunctionSignatures
+			if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
+			//endregion
 
-				if (this.unusedBits > 0 && this.value[i].valueBlock.unusedBits > 0) {
-					this.error = "Usign of \"unused bits\" inside constructive BIT STRING allowed for least one only";
-					return -1;
-				}
+			var intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
 
-				this.unusedBits = this.value[i].valueBlock.unusedBits;
-				if (this.unusedBits > 7) {
-					this.error = "Unused bits for BitString must be in range 0-7";
-					return -1;
-				}
+			this.unusedBits = intBuffer[0];
+
+			if (this.unusedBits > 7) {
+				this.error = "Unused bits for BitString must be in range 0-7";
+				return -1;
 			}
 
-			return resultOffset;
+			//region Copy input buffer to internal buffer
+			this.valueHex = new ArrayBuffer(intBuffer.length - 1);
+			var view = new Uint8Array(this.valueHex);
+			for (var _i3 = 0; _i3 < inputLength - 1; _i3++) {
+				view[_i3] = intBuffer[_i3 + 1];
+			} //endregion
+
+			this.blockLength = intBuffer.length;
+
+			return inputOffset + inputLength;
+			//endregion
 		}
-		//endregion
-		//region If the BitString supposed to be a primitive value
-		//region Basic check for parameters
-		//noinspection JSCheckFunctionSignatures
-		if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
-		//endregion
+		//**********************************************************************************
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
 
-		const intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
+	}, {
+		key: "toBER",
+		value: function toBER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-		this.unusedBits = intBuffer[0];
+			if (this.isConstructed === true) return LocalConstructedValueBlock.prototype.toBER.call(this, sizeOnly);
 
-		if (this.unusedBits > 7) {
-			this.error = "Unused bits for BitString must be in range 0-7";
-			return -1;
+			if (sizeOnly === true) return new ArrayBuffer(this.valueHex.byteLength + 1);
+
+			if (this.valueHex.byteLength === 0) return new ArrayBuffer(0);
+
+			var curView = new Uint8Array(this.valueHex);
+
+			var retBuf = new ArrayBuffer(this.valueHex.byteLength + 1);
+			var retView = new Uint8Array(retBuf);
+
+			retView[0] = this.unusedBits;
+
+			for (var i = 0; i < this.valueHex.byteLength; i++) {
+				retView[i + 1] = curView[i];
+			}return retBuf;
 		}
+		//**********************************************************************************
+		/**
+   * Aux function, need to get a block name. Need to have it here for inhiritence
+   * @returns {string}
+   */
 
-		//region Copy input buffer to internal buffer
-		this.valueHex = new ArrayBuffer(intBuffer.length - 1);
-		const view = new Uint8Array(this.valueHex);
-		for (let i = 0; i < inputLength - 1; i++) view[i] = intBuffer[i + 1];
-		//endregion
+	}, {
+		key: "toJSON",
 
-		this.blockLength = intBuffer.length;
+		//**********************************************************************************
+		/**
+   * Convertion for the block to JSON object
+   * @returns {{blockName, blockLength, error, warnings, valueBeforeDecode}|{blockName: string, blockLength: number, error: string, warnings: Array.<string>, valueBeforeDecode: string}}
+   */
+		value: function toJSON() {
+			var object = {};
 
-		return inputOffset + inputLength;
-		//endregion
-	}
-	//**********************************************************************************
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		if (this.isConstructed === true) return LocalConstructedValueBlock.prototype.toBER.call(this, sizeOnly);
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(LocalBitStringValueBlock.prototype.__proto__ || Object.getPrototypeOf(LocalBitStringValueBlock.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
 
-		if (sizeOnly === true) return new ArrayBuffer(this.valueHex.byteLength + 1);
+			object.unusedBits = this.unusedBits;
+			object.isConstructed = this.isConstructed;
+			object.isHexOnly = this.isHexOnly;
+			object.valueHex = (0, _pvutils.bufferToHexCodes)(this.valueHex, 0, this.valueHex.byteLength);
 
-		if (this.valueHex.byteLength === 0) return new ArrayBuffer(0);
+			return object;
+		}
+		//**********************************************************************************
 
-		const curView = new Uint8Array(this.valueHex);
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "BitStringValueBlock";
+		}
+	}]);
 
-		const retBuf = new ArrayBuffer(this.valueHex.byteLength + 1);
-		const retView = new Uint8Array(retBuf);
-
-		retView[0] = this.unusedBits;
-
-		for (let i = 0; i < this.valueHex.byteLength; i++) retView[i + 1] = curView[i];
-
-		return retBuf;
-	}
-	//**********************************************************************************
-	/**
-  * Aux function, need to get a block name. Need to have it here for inhiritence
-  * @returns {string}
-  */
-	static blockName() {
-		return "BitStringValueBlock";
-	}
-	//**********************************************************************************
-	/**
-  * Convertion for the block to JSON object
-  * @returns {{blockName, blockLength, error, warnings, valueBeforeDecode}|{blockName: string, blockLength: number, error: string, warnings: Array.<string>, valueBeforeDecode: string}}
-  */
-	toJSON() {
-		let object = {};
-
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
-
-		object.unusedBits = this.unusedBits;
-		object.isConstructed = this.isConstructed;
-		object.isHexOnly = this.isHexOnly;
-		object.valueHex = (0, _pvutils.bufferToHexCodes)(this.valueHex, 0, this.valueHex.byteLength);
-
-		return object;
-	}
-	//**********************************************************************************
-}
+	return LocalBitStringValueBlock;
+}(LocalHexBlock(LocalConstructedValueBlock));
 //**************************************************************************************
-class BitString extends BaseBlock {
+
+
+var BitString = function (_BaseBlock7) {
+	_inherits(BitString, _BaseBlock7);
+
 	//**********************************************************************************
 	/**
   * Constructor for "BitString" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters, LocalBitStringValueBlock);
+	function BitString() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 3; // BitString
+		_classCallCheck(this, BitString);
+
+		var _this20 = _possibleConstructorReturn(this, (BitString.__proto__ || Object.getPrototypeOf(BitString)).call(this, parameters, LocalBitStringValueBlock));
+
+		_this20.idBlock.tagClass = 1; // UNIVERSAL
+		_this20.idBlock.tagNumber = 3; // BitString
+		return _this20;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "BitString";
-	}
-	//**********************************************************************************
-	/**
-  * Base function for converting block from BER encoded array of bytes
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
-  * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
-  * @returns {number} Offset after least decoded byte
-  */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		//region Ability to encode empty BitString
-		if (inputLength === 0) return inputOffset;
-		//endregion
 
-		this.valueBlock.isConstructed = this.idBlock.isConstructed;
-		this.valueBlock.isIndefiniteForm = this.lenBlock.isIndefiniteForm;
 
-		return super.fromBER(inputBuffer, inputOffset, inputLength);
-	}
-	//**********************************************************************************
-	/**
-  * Checking that two BITSTRINGs are equal
-  * @param {BitString} bitString
-  */
-	isEqual(bitString) {
-		//region Check input type
-		if (bitString instanceof BitString === false) return false;
-		//endregion
+	_createClass(BitString, [{
+		key: "fromBER",
 
-		//region Compare two JSON strings
-		if (JSON.stringify(this) !== JSON.stringify(bitString)) return false;
-		//endregion
+		//**********************************************************************************
+		/**
+   * Base function for converting block from BER encoded array of bytes
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
+   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
+   * @returns {number} Offset after least decoded byte
+   */
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			//region Ability to encode empty BitString
+			if (inputLength === 0) return inputOffset;
+			//endregion
 
-		return true;
-	}
-	//**********************************************************************************
-}
+			this.valueBlock.isConstructed = this.idBlock.isConstructed;
+			this.valueBlock.isIndefiniteForm = this.lenBlock.isIndefiniteForm;
+
+			return _get(BitString.prototype.__proto__ || Object.getPrototypeOf(BitString.prototype), "fromBER", this).call(this, inputBuffer, inputOffset, inputLength);
+		}
+		//**********************************************************************************
+		/**
+   * Checking that two BITSTRINGs are equal
+   * @param {BitString} bitString
+   */
+
+	}, {
+		key: "isEqual",
+		value: function isEqual(bitString) {
+			//region Check input type
+			if (bitString instanceof BitString === false) return false;
+			//endregion
+
+			//region Compare two JSON strings
+			if (JSON.stringify(this) !== JSON.stringify(bitString)) return false;
+			//endregion
+
+			return true;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "BitString";
+		}
+	}]);
+
+	return BitString;
+}(BaseBlock);
+
 exports.BitString = BitString; //**************************************************************************************
 //endregion
 //**************************************************************************************
@@ -18463,464 +18965,556 @@ exports.BitString = BitString; //***********************************************
  * @extends LocalValueBlock
  */
 
-class LocalIntegerValueBlock extends LocalHexBlock(LocalValueBlock) {
+var LocalIntegerValueBlock = function (_LocalHexBlock4) {
+	_inherits(LocalIntegerValueBlock, _LocalHexBlock4);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalIntegerValueBlock" class
   * @param {Object} [parameters={}]
   * @property {ArrayBuffer} [valueHex]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function LocalIntegerValueBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		if ("value" in parameters) this.valueDec = parameters.value;
+		_classCallCheck(this, LocalIntegerValueBlock);
+
+		var _this21 = _possibleConstructorReturn(this, (LocalIntegerValueBlock.__proto__ || Object.getPrototypeOf(LocalIntegerValueBlock)).call(this, parameters));
+
+		if ("value" in parameters) _this21.valueDec = parameters.value;
+		return _this21;
 	}
 	//**********************************************************************************
 	/**
   * Setter for "valueHex"
   * @param {ArrayBuffer} _value
   */
-	set valueHex(_value) {
-		this._valueHex = _value.slice(0);
 
-		if (_value.byteLength >= 4) {
-			this.warnings.push("Too big Integer for decoding, hex only");
-			this.isHexOnly = true;
-			this._valueDec = 0;
-		} else {
-			this.isHexOnly = false;
 
-			if (_value.byteLength > 0) this._valueDec = _pvutils.utilDecodeTC.call(this);
-		}
-	}
-	//**********************************************************************************
-	/**
-  * Getter for "valueHex"
-  * @returns {ArrayBuffer}
-  */
-	get valueHex() {
-		return this._valueHex;
-	}
-	//**********************************************************************************
-	/**
-  * Getter for "valueDec"
-  * @param {number} _value
-  */
-	set valueDec(_value) {
-		this._valueDec = _value;
+	_createClass(LocalIntegerValueBlock, [{
+		key: "fromDER",
 
-		this.isHexOnly = false;
-		this._valueHex = (0, _pvutils.utilEncodeTC)(_value);
-	}
-	//**********************************************************************************
-	/**
-  * Getter for "valueDec"
-  * @returns {number}
-  */
-	get valueDec() {
-		return this._valueDec;
-	}
-	//**********************************************************************************
-	/**
-  * Base function for converting block from DER encoded array of bytes
-  * @param {!ArrayBuffer} inputBuffer ASN.1 DER encoded array
-  * @param {!number} inputOffset Offset in ASN.1 DER encoded array where decoding should be started
-  * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
-  * @param {number} [expectedLength=0] Expected length of converted "valueHex" buffer
-  * @returns {number} Offset after least decoded byte
-  */
-	fromDER(inputBuffer, inputOffset, inputLength, expectedLength = 0) {
-		const offset = this.fromBER(inputBuffer, inputOffset, inputLength);
-		if (offset === -1) return offset;
+		//**********************************************************************************
+		/**
+   * Base function for converting block from DER encoded array of bytes
+   * @param {!ArrayBuffer} inputBuffer ASN.1 DER encoded array
+   * @param {!number} inputOffset Offset in ASN.1 DER encoded array where decoding should be started
+   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
+   * @param {number} [expectedLength=0] Expected length of converted "valueHex" buffer
+   * @returns {number} Offset after least decoded byte
+   */
+		value: function fromDER(inputBuffer, inputOffset, inputLength) {
+			var expectedLength = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
 
-		const view = new Uint8Array(this._valueHex);
+			var offset = this.fromBER(inputBuffer, inputOffset, inputLength);
+			if (offset === -1) return offset;
 
-		if (view[0] === 0x00 && (view[1] & 0x80) !== 0) {
-			const updatedValueHex = new ArrayBuffer(this._valueHex.byteLength - 1);
-			const updatedView = new Uint8Array(updatedValueHex);
+			var view = new Uint8Array(this._valueHex);
 
-			updatedView.set(new Uint8Array(this._valueHex, 1, this._valueHex.byteLength - 1));
+			if (view[0] === 0x00 && (view[1] & 0x80) !== 0) {
+				var updatedValueHex = new ArrayBuffer(this._valueHex.byteLength - 1);
+				var updatedView = new Uint8Array(updatedValueHex);
 
-			this._valueHex = updatedValueHex.slice(0);
-		} else {
-			if (expectedLength !== 0) {
-				if (this._valueHex.byteLength < expectedLength) {
-					if (expectedLength - this._valueHex.byteLength > 1) expectedLength = this._valueHex.byteLength + 1;
+				updatedView.set(new Uint8Array(this._valueHex, 1, this._valueHex.byteLength - 1));
 
-					const updatedValueHex = new ArrayBuffer(expectedLength);
-					const updatedView = new Uint8Array(updatedValueHex);
+				this._valueHex = updatedValueHex.slice(0);
+			} else {
+				if (expectedLength !== 0) {
+					if (this._valueHex.byteLength < expectedLength) {
+						if (expectedLength - this._valueHex.byteLength > 1) expectedLength = this._valueHex.byteLength + 1;
 
-					updatedView.set(view, expectedLength - this._valueHex.byteLength);
+						var _updatedValueHex = new ArrayBuffer(expectedLength);
+						var _updatedView = new Uint8Array(_updatedValueHex);
 
-					this._valueHex = updatedValueHex.slice(0);
-				}
-			}
-		}
+						_updatedView.set(view, expectedLength - this._valueHex.byteLength);
 
-		return offset;
-	}
-	//**********************************************************************************
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (DER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toDER(sizeOnly = false) {
-		const view = new Uint8Array(this._valueHex);
-
-		switch (true) {
-			case (view[0] & 0x80) !== 0:
-				{
-					const updatedValueHex = new ArrayBuffer(this._valueHex.byteLength + 1);
-					const updatedView = new Uint8Array(updatedValueHex);
-
-					updatedView[0] = 0x00;
-					updatedView.set(view, 1);
-
-					this._valueHex = updatedValueHex.slice(0);
-				}
-				break;
-			case view[0] === 0x00 && (view[1] & 0x80) === 0:
-				{
-					const updatedValueHex = new ArrayBuffer(this._valueHex.byteLength - 1);
-					const updatedView = new Uint8Array(updatedValueHex);
-
-					updatedView.set(new Uint8Array(this._valueHex, 1, this._valueHex.byteLength - 1));
-
-					this._valueHex = updatedValueHex.slice(0);
-				}
-				break;
-			default:
-		}
-
-		return this.toBER(sizeOnly);
-	}
-	//**********************************************************************************
-	/**
-  * Base function for converting block from BER encoded array of bytes
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
-  * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
-  * @returns {number} Offset after least decoded byte
-  */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		const resultOffset = super.fromBER(inputBuffer, inputOffset, inputLength);
-		if (resultOffset === -1) return resultOffset;
-
-		this.blockLength = inputLength;
-
-		return inputOffset + inputLength;
-	}
-	//**********************************************************************************
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		//noinspection JSCheckFunctionSignatures
-		return this.valueHex.slice(0);
-	}
-	//**********************************************************************************
-	/**
-  * Aux function, need to get a block name. Need to have it here for inhiritence
-  * @returns {string}
-  */
-	static blockName() {
-		return "IntegerValueBlock";
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedGlobalSymbols
-	/**
-  * Convertion for the block to JSON object
-  * @returns {Object}
-  */
-	toJSON() {
-		let object = {};
-
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
-
-		object.valueDec = this.valueDec;
-
-		return object;
-	}
-	//**********************************************************************************
-	/**
-  * Convert current value to decimal string representation
-  */
-	toString() {
-		//region Aux functions
-		function viewAdd(first, second) {
-			//region Initial variables
-			const c = new Uint8Array([0]);
-
-			let firstView = new Uint8Array(first);
-			let secondView = new Uint8Array(second);
-
-			let firstViewCopy = firstView.slice(0);
-			const firstViewCopyLength = firstViewCopy.length - 1;
-			let secondViewCopy = secondView.slice(0);
-			const secondViewCopyLength = secondViewCopy.length - 1;
-
-			let value = 0;
-
-			const max = secondViewCopyLength < firstViewCopyLength ? firstViewCopyLength : secondViewCopyLength;
-
-			let counter = 0;
-			//endregion
-
-			for (let i = max; i >= 0; i--, counter++) {
-				switch (true) {
-					case counter < secondViewCopy.length:
-						value = firstViewCopy[firstViewCopyLength - counter] + secondViewCopy[secondViewCopyLength - counter] + c[0];
-						break;
-					default:
-						value = firstViewCopy[firstViewCopyLength - counter] + c[0];
-				}
-
-				c[0] = value / 10;
-
-				switch (true) {
-					case counter >= firstViewCopy.length:
-						firstViewCopy = (0, _pvutils.utilConcatView)(new Uint8Array([value % 10]), firstViewCopy);
-						break;
-					default:
-						firstViewCopy[firstViewCopyLength - counter] = value % 10;
-				}
-			}
-
-			if (c[0] > 0) firstViewCopy = (0, _pvutils.utilConcatView)(c, firstViewCopy);
-
-			return firstViewCopy.slice(0);
-		}
-
-		function power2(n) {
-			if (n >= powers2.length) {
-				for (let p = powers2.length; p <= n; p++) {
-					const c = new Uint8Array([0]);
-					let digits = powers2[p - 1].slice(0);
-
-					for (let i = digits.length - 1; i >= 0; i--) {
-						const newValue = new Uint8Array([(digits[i] << 1) + c[0]]);
-						c[0] = newValue[0] / 10;
-						digits[i] = newValue[0] % 10;
-					}
-
-					if (c[0] > 0) digits = (0, _pvutils.utilConcatView)(c, digits);
-
-					powers2.push(digits);
-				}
-			}
-
-			return powers2[n];
-		}
-
-		function viewSub(first, second) {
-			//region Initial variables
-			let b = 0;
-
-			let firstView = new Uint8Array(first);
-			let secondView = new Uint8Array(second);
-
-			let firstViewCopy = firstView.slice(0);
-			const firstViewCopyLength = firstViewCopy.length - 1;
-			let secondViewCopy = secondView.slice(0);
-			const secondViewCopyLength = secondViewCopy.length - 1;
-
-			let value;
-
-			let counter = 0;
-			//endregion
-
-			for (let i = secondViewCopyLength; i >= 0; i--, counter++) {
-				value = firstViewCopy[firstViewCopyLength - counter] - secondViewCopy[secondViewCopyLength - counter] - b;
-
-				switch (true) {
-					case value < 0:
-						b = 1;
-						firstViewCopy[firstViewCopyLength - counter] = value + 10;
-						break;
-					default:
-						b = 0;
-						firstViewCopy[firstViewCopyLength - counter] = value;
-				}
-			}
-
-			if (b > 0) {
-				for (let i = firstViewCopyLength - secondViewCopyLength + 1; i >= 0; i--, counter++) {
-					value = firstViewCopy[firstViewCopyLength - counter] - b;
-
-					if (value < 0) {
-						b = 1;
-						firstViewCopy[firstViewCopyLength - counter] = value + 10;
-					} else {
-						b = 0;
-						firstViewCopy[firstViewCopyLength - counter] = value;
-						break;
+						this._valueHex = _updatedValueHex.slice(0);
 					}
 				}
 			}
 
-			return firstViewCopy.slice();
+			return offset;
 		}
-		//endregion
+		//**********************************************************************************
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (DER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
 
-		//region Initial variables
-		const firstBit = this._valueHex.byteLength * 8 - 1;
+	}, {
+		key: "toDER",
+		value: function toDER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-		let digits = new Uint8Array(this._valueHex.byteLength * 8 / 3);
-		let bitNumber = 0;
-		let currentByte;
+			var view = new Uint8Array(this._valueHex);
 
-		const asn1View = new Uint8Array(this._valueHex);
+			switch (true) {
+				case (view[0] & 0x80) !== 0:
+					{
+						var updatedValueHex = new ArrayBuffer(this._valueHex.byteLength + 1);
+						var updatedView = new Uint8Array(updatedValueHex);
 
-		let result = "";
+						updatedView[0] = 0x00;
+						updatedView.set(view, 1);
 
-		let flag = false;
-		//endregion
+						this._valueHex = updatedValueHex.slice(0);
+					}
+					break;
+				case view[0] === 0x00 && (view[1] & 0x80) === 0:
+					{
+						var _updatedValueHex2 = new ArrayBuffer(this._valueHex.byteLength - 1);
+						var _updatedView2 = new Uint8Array(_updatedValueHex2);
 
-		//region Calculate number
-		for (let byteNumber = this._valueHex.byteLength - 1; byteNumber >= 0; byteNumber--) {
-			currentByte = asn1View[byteNumber];
+						_updatedView2.set(new Uint8Array(this._valueHex, 1, this._valueHex.byteLength - 1));
 
-			for (let i = 0; i < 8; i++) {
-				if ((currentByte & 1) === 1) {
-					switch (bitNumber) {
-						case firstBit:
-							digits = viewSub(power2(bitNumber), digits);
-							result = "-";
+						this._valueHex = _updatedValueHex2.slice(0);
+					}
+					break;
+				default:
+			}
+
+			return this.toBER(sizeOnly);
+		}
+		//**********************************************************************************
+		/**
+   * Base function for converting block from BER encoded array of bytes
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
+   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
+   * @returns {number} Offset after least decoded byte
+   */
+
+	}, {
+		key: "fromBER",
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			var resultOffset = _get(LocalIntegerValueBlock.prototype.__proto__ || Object.getPrototypeOf(LocalIntegerValueBlock.prototype), "fromBER", this).call(this, inputBuffer, inputOffset, inputLength);
+			if (resultOffset === -1) return resultOffset;
+
+			this.blockLength = inputLength;
+
+			return inputOffset + inputLength;
+		}
+		//**********************************************************************************
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
+
+	}, {
+		key: "toBER",
+		value: function toBER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+			//noinspection JSCheckFunctionSignatures
+			return this.valueHex.slice(0);
+		}
+		//**********************************************************************************
+		/**
+   * Aux function, need to get a block name. Need to have it here for inhiritence
+   * @returns {string}
+   */
+
+	}, {
+		key: "toJSON",
+
+		//**********************************************************************************
+		//noinspection JSUnusedGlobalSymbols
+		/**
+   * Convertion for the block to JSON object
+   * @returns {Object}
+   */
+		value: function toJSON() {
+			var object = {};
+
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(LocalIntegerValueBlock.prototype.__proto__ || Object.getPrototypeOf(LocalIntegerValueBlock.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
+
+			object.valueDec = this.valueDec;
+
+			return object;
+		}
+		//**********************************************************************************
+		/**
+   * Convert current value to decimal string representation
+   */
+
+	}, {
+		key: "toString",
+		value: function toString() {
+			//region Aux functions
+			function viewAdd(first, second) {
+				//region Initial variables
+				var c = new Uint8Array([0]);
+
+				var firstView = new Uint8Array(first);
+				var secondView = new Uint8Array(second);
+
+				var firstViewCopy = firstView.slice(0);
+				var firstViewCopyLength = firstViewCopy.length - 1;
+				var secondViewCopy = secondView.slice(0);
+				var secondViewCopyLength = secondViewCopy.length - 1;
+
+				var value = 0;
+
+				var max = secondViewCopyLength < firstViewCopyLength ? firstViewCopyLength : secondViewCopyLength;
+
+				var counter = 0;
+				//endregion
+
+				for (var i = max; i >= 0; i--, counter++) {
+					switch (true) {
+						case counter < secondViewCopy.length:
+							value = firstViewCopy[firstViewCopyLength - counter] + secondViewCopy[secondViewCopyLength - counter] + c[0];
 							break;
 						default:
-							digits = viewAdd(digits, power2(bitNumber));
+							value = firstViewCopy[firstViewCopyLength - counter] + c[0];
+					}
+
+					c[0] = value / 10;
+
+					switch (true) {
+						case counter >= firstViewCopy.length:
+							firstViewCopy = (0, _pvutils.utilConcatView)(new Uint8Array([value % 10]), firstViewCopy);
+							break;
+						default:
+							firstViewCopy[firstViewCopyLength - counter] = value % 10;
 					}
 				}
 
-				bitNumber++;
-				currentByte >>= 1;
+				if (c[0] > 0) firstViewCopy = (0, _pvutils.utilConcatView)(c, firstViewCopy);
+
+				return firstViewCopy.slice(0);
+			}
+
+			function power2(n) {
+				if (n >= powers2.length) {
+					for (var p = powers2.length; p <= n; p++) {
+						var c = new Uint8Array([0]);
+						var _digits = powers2[p - 1].slice(0);
+
+						for (var i = _digits.length - 1; i >= 0; i--) {
+							var newValue = new Uint8Array([(_digits[i] << 1) + c[0]]);
+							c[0] = newValue[0] / 10;
+							_digits[i] = newValue[0] % 10;
+						}
+
+						if (c[0] > 0) _digits = (0, _pvutils.utilConcatView)(c, _digits);
+
+						powers2.push(_digits);
+					}
+				}
+
+				return powers2[n];
+			}
+
+			function viewSub(first, second) {
+				//region Initial variables
+				var b = 0;
+
+				var firstView = new Uint8Array(first);
+				var secondView = new Uint8Array(second);
+
+				var firstViewCopy = firstView.slice(0);
+				var firstViewCopyLength = firstViewCopy.length - 1;
+				var secondViewCopy = secondView.slice(0);
+				var secondViewCopyLength = secondViewCopy.length - 1;
+
+				var value = void 0;
+
+				var counter = 0;
+				//endregion
+
+				for (var i = secondViewCopyLength; i >= 0; i--, counter++) {
+					value = firstViewCopy[firstViewCopyLength - counter] - secondViewCopy[secondViewCopyLength - counter] - b;
+
+					switch (true) {
+						case value < 0:
+							b = 1;
+							firstViewCopy[firstViewCopyLength - counter] = value + 10;
+							break;
+						default:
+							b = 0;
+							firstViewCopy[firstViewCopyLength - counter] = value;
+					}
+				}
+
+				if (b > 0) {
+					for (var _i4 = firstViewCopyLength - secondViewCopyLength + 1; _i4 >= 0; _i4--, counter++) {
+						value = firstViewCopy[firstViewCopyLength - counter] - b;
+
+						if (value < 0) {
+							b = 1;
+							firstViewCopy[firstViewCopyLength - counter] = value + 10;
+						} else {
+							b = 0;
+							firstViewCopy[firstViewCopyLength - counter] = value;
+							break;
+						}
+					}
+				}
+
+				return firstViewCopy.slice();
+			}
+			//endregion
+
+			//region Initial variables
+			var firstBit = this._valueHex.byteLength * 8 - 1;
+
+			var digits = new Uint8Array(this._valueHex.byteLength * 8 / 3);
+			var bitNumber = 0;
+			var currentByte = void 0;
+
+			var asn1View = new Uint8Array(this._valueHex);
+
+			var result = "";
+
+			var flag = false;
+			//endregion
+
+			//region Calculate number
+			for (var byteNumber = this._valueHex.byteLength - 1; byteNumber >= 0; byteNumber--) {
+				currentByte = asn1View[byteNumber];
+
+				for (var i = 0; i < 8; i++) {
+					if ((currentByte & 1) === 1) {
+						switch (bitNumber) {
+							case firstBit:
+								digits = viewSub(power2(bitNumber), digits);
+								result = "-";
+								break;
+							default:
+								digits = viewAdd(digits, power2(bitNumber));
+						}
+					}
+
+					bitNumber++;
+					currentByte >>= 1;
+				}
+			}
+			//endregion
+
+			//region Print number
+			for (var _i5 = 0; _i5 < digits.length; _i5++) {
+				if (digits[_i5]) flag = true;
+
+				if (flag) result += digitsString.charAt(digits[_i5]);
+			}
+
+			if (flag === false) result += digitsString.charAt(0);
+			//endregion
+
+			return result;
+		}
+		//**********************************************************************************
+
+	}, {
+		key: "valueHex",
+		set: function set(_value) {
+			this._valueHex = _value.slice(0);
+
+			if (_value.byteLength >= 4) {
+				this.warnings.push("Too big Integer for decoding, hex only");
+				this.isHexOnly = true;
+				this._valueDec = 0;
+			} else {
+				this.isHexOnly = false;
+
+				if (_value.byteLength > 0) this._valueDec = _pvutils.utilDecodeTC.call(this);
 			}
 		}
-		//endregion
-
-		//region Print number
-		for (let i = 0; i < digits.length; i++) {
-			if (digits[i]) flag = true;
-
-			if (flag) result += digitsString.charAt(digits[i]);
+		//**********************************************************************************
+		/**
+   * Getter for "valueHex"
+   * @returns {ArrayBuffer}
+   */
+		,
+		get: function get() {
+			return this._valueHex;
 		}
+		//**********************************************************************************
+		/**
+   * Getter for "valueDec"
+   * @param {number} _value
+   */
 
-		if (flag === false) result += digitsString.charAt(0);
-		//endregion
+	}, {
+		key: "valueDec",
+		set: function set(_value) {
+			this._valueDec = _value;
 
-		return result;
-	}
-	//**********************************************************************************
-}
+			this.isHexOnly = false;
+			this._valueHex = (0, _pvutils.utilEncodeTC)(_value);
+		}
+		//**********************************************************************************
+		/**
+   * Getter for "valueDec"
+   * @returns {number}
+   */
+		,
+		get: function get() {
+			return this._valueDec;
+		}
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "IntegerValueBlock";
+		}
+	}]);
+
+	return LocalIntegerValueBlock;
+}(LocalHexBlock(LocalValueBlock));
 //**************************************************************************************
-class Integer extends BaseBlock {
+
+
+var Integer = function (_BaseBlock8) {
+	_inherits(Integer, _BaseBlock8);
+
 	//**********************************************************************************
 	/**
   * Constructor for "Integer" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters, LocalIntegerValueBlock);
+	function Integer() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 2; // Integer
+		_classCallCheck(this, Integer);
+
+		var _this22 = _possibleConstructorReturn(this, (Integer.__proto__ || Object.getPrototypeOf(Integer)).call(this, parameters, LocalIntegerValueBlock));
+
+		_this22.idBlock.tagClass = 1; // UNIVERSAL
+		_this22.idBlock.tagNumber = 2; // Integer
+		return _this22;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "Integer";
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedGlobalSymbols
-	/**
-  * Compare two Integer object, or Integer and ArrayBuffer objects
-  * @param {!Integer|ArrayBuffer} otherValue
-  * @returns {boolean}
-  */
-	isEqual(otherValue) {
-		if (otherValue instanceof Integer) {
-			if (this.valueBlock.isHexOnly && otherValue.valueBlock.isHexOnly) // Compare two ArrayBuffers
-				return (0, _pvutils.isEqualBuffer)(this.valueBlock.valueHex, otherValue.valueBlock.valueHex);
 
-			if (this.valueBlock.isHexOnly === otherValue.valueBlock.isHexOnly) return this.valueBlock.valueDec === otherValue.valueBlock.valueDec;
+
+	_createClass(Integer, [{
+		key: "isEqual",
+
+		//**********************************************************************************
+		//noinspection JSUnusedGlobalSymbols
+		/**
+   * Compare two Integer object, or Integer and ArrayBuffer objects
+   * @param {!Integer|ArrayBuffer} otherValue
+   * @returns {boolean}
+   */
+		value: function isEqual(otherValue) {
+			if (otherValue instanceof Integer) {
+				if (this.valueBlock.isHexOnly && otherValue.valueBlock.isHexOnly) // Compare two ArrayBuffers
+					return (0, _pvutils.isEqualBuffer)(this.valueBlock.valueHex, otherValue.valueBlock.valueHex);
+
+				if (this.valueBlock.isHexOnly === otherValue.valueBlock.isHexOnly) return this.valueBlock.valueDec === otherValue.valueBlock.valueDec;
+
+				return false;
+			}
+
+			if (otherValue instanceof ArrayBuffer) return (0, _pvutils.isEqualBuffer)(this.valueBlock.valueHex, otherValue);
 
 			return false;
 		}
+		//**********************************************************************************
+		/**
+   * Convert current Integer value from BER into DER format
+   * @returns {Integer}
+   */
 
-		if (otherValue instanceof ArrayBuffer) return (0, _pvutils.isEqualBuffer)(this.valueBlock.valueHex, otherValue);
+	}, {
+		key: "convertToDER",
+		value: function convertToDER() {
+			var integer = new Integer({ valueHex: this.valueBlock.valueHex });
+			integer.valueBlock.toDER();
 
-		return false;
-	}
-	//**********************************************************************************
-	/**
-  * Convert current Integer value from BER into DER format
-  * @returns {Integer}
-  */
-	convertToDER() {
-		const integer = new Integer({ valueHex: this.valueBlock.valueHex });
-		integer.valueBlock.toDER();
+			return integer;
+		}
+		//**********************************************************************************
+		/**
+   * Convert current Integer value from DER to BER format
+   * @returns {Integer}
+   */
 
-		return integer;
-	}
-	//**********************************************************************************
-	/**
-  * Convert current Integer value from DER to BER format
-  * @returns {Integer}
-  */
-	convertFromDER() {
-		const expectedLength = this.valueBlock.valueHex.byteLength % 2 ? this.valueBlock.valueHex.byteLength + 1 : this.valueBlock.valueHex.byteLength;
-		const integer = new Integer({ valueHex: this.valueBlock.valueHex });
-		integer.valueBlock.fromDER(integer.valueBlock.valueHex, 0, integer.valueBlock.valueHex.byteLength, expectedLength);
+	}, {
+		key: "convertFromDER",
+		value: function convertFromDER() {
+			var expectedLength = this.valueBlock.valueHex.byteLength % 2 ? this.valueBlock.valueHex.byteLength + 1 : this.valueBlock.valueHex.byteLength;
+			var integer = new Integer({ valueHex: this.valueBlock.valueHex });
+			integer.valueBlock.fromDER(integer.valueBlock.valueHex, 0, integer.valueBlock.valueHex.byteLength, expectedLength);
 
-		return integer;
-	}
-	//**********************************************************************************
-}
+			return integer;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "Integer";
+		}
+	}]);
+
+	return Integer;
+}(BaseBlock);
+
 exports.Integer = Integer; //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of ASN.1 Enumerated type class
 //**************************************************************************************
 
-class Enumerated extends Integer {
+var Enumerated = function (_Integer) {
+	_inherits(Enumerated, _Integer);
+
 	//**********************************************************************************
 	/**
   * Constructor for "Enumerated" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function Enumerated() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 10; // Enumerated
+		_classCallCheck(this, Enumerated);
+
+		var _this23 = _possibleConstructorReturn(this, (Enumerated.__proto__ || Object.getPrototypeOf(Enumerated)).call(this, parameters));
+
+		_this23.idBlock.tagClass = 1; // UNIVERSAL
+		_this23.idBlock.tagNumber = 10; // Enumerated
+		return _this23;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "Enumerated";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(Enumerated, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "Enumerated";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return Enumerated;
+}(Integer);
+
 exports.Enumerated = Enumerated; //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of ASN.1 ObjectIdentifier type class
 //**************************************************************************************
 
-class LocalSidValueBlock extends LocalHexBlock(LocalBaseBlock) {
+var LocalSidValueBlock = function (_LocalHexBlock5) {
+	_inherits(LocalSidValueBlock, _LocalHexBlock5);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalSidValueBlock" class
@@ -18928,182 +19522,218 @@ class LocalSidValueBlock extends LocalHexBlock(LocalBaseBlock) {
   * @property {number} [valueDec]
   * @property {boolean} [isFirstSid]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function LocalSidValueBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.valueDec = (0, _pvutils.getParametersValue)(parameters, "valueDec", -1);
-		this.isFirstSid = (0, _pvutils.getParametersValue)(parameters, "isFirstSid", false);
+		_classCallCheck(this, LocalSidValueBlock);
+
+		var _this24 = _possibleConstructorReturn(this, (LocalSidValueBlock.__proto__ || Object.getPrototypeOf(LocalSidValueBlock)).call(this, parameters));
+
+		_this24.valueDec = (0, _pvutils.getParametersValue)(parameters, "valueDec", -1);
+		_this24.isFirstSid = (0, _pvutils.getParametersValue)(parameters, "isFirstSid", false);
+		return _this24;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "sidBlock";
-	}
-	//**********************************************************************************
-	/**
-  * Base function for converting block from BER encoded array of bytes
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
-  * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
-  * @returns {number} Offset after least decoded byte
-  */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		if (inputLength === 0) return inputOffset;
 
-		//region Basic check for parameters
-		//noinspection JSCheckFunctionSignatures
-		if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
-		//endregion
 
-		const intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
+	_createClass(LocalSidValueBlock, [{
+		key: "fromBER",
 
-		this.valueHex = new ArrayBuffer(inputLength);
-		let view = new Uint8Array(this.valueHex);
+		//**********************************************************************************
+		/**
+   * Base function for converting block from BER encoded array of bytes
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
+   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
+   * @returns {number} Offset after least decoded byte
+   */
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			if (inputLength === 0) return inputOffset;
 
-		for (let i = 0; i < inputLength; i++) {
-			view[i] = intBuffer[i] & 0x7F;
+			//region Basic check for parameters
+			//noinspection JSCheckFunctionSignatures
+			if ((0, _pvutils.checkBufferParams)(this, inputBuffer, inputOffset, inputLength) === false) return -1;
+			//endregion
 
-			this.blockLength++;
+			var intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
 
-			if ((intBuffer[i] & 0x80) === 0x00) break;
+			this.valueHex = new ArrayBuffer(inputLength);
+			var view = new Uint8Array(this.valueHex);
+
+			for (var i = 0; i < inputLength; i++) {
+				view[i] = intBuffer[i] & 0x7F;
+
+				this.blockLength++;
+
+				if ((intBuffer[i] & 0x80) === 0x00) break;
+			}
+
+			//region Ajust size of valueHex buffer
+			var tempValueHex = new ArrayBuffer(this.blockLength);
+			var tempView = new Uint8Array(tempValueHex);
+
+			for (var _i6 = 0; _i6 < this.blockLength; _i6++) {
+				tempView[_i6] = view[_i6];
+			} //noinspection JSCheckFunctionSignatures
+			this.valueHex = tempValueHex.slice(0);
+			view = new Uint8Array(this.valueHex);
+			//endregion
+
+			if ((intBuffer[this.blockLength - 1] & 0x80) !== 0x00) {
+				this.error = "End of input reached before message was fully decoded";
+				return -1;
+			}
+
+			if (view[0] === 0x00) this.warnings.push("Needlessly long format of SID encoding");
+
+			if (this.blockLength <= 8) this.valueDec = (0, _pvutils.utilFromBase)(view, 7);else {
+				this.isHexOnly = true;
+				this.warnings.push("Too big SID for decoding, hex only");
+			}
+
+			return inputOffset + this.blockLength;
 		}
+		//**********************************************************************************
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
 
-		//region Ajust size of valueHex buffer
-		const tempValueHex = new ArrayBuffer(this.blockLength);
-		const tempView = new Uint8Array(tempValueHex);
+	}, {
+		key: "toBER",
+		value: function toBER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-		for (let i = 0; i < this.blockLength; i++) tempView[i] = view[i];
+			//region Initial variables
+			var retBuf = void 0;
+			var retView = void 0;
+			//endregion
 
-		//noinspection JSCheckFunctionSignatures
-		this.valueHex = tempValueHex.slice(0);
-		view = new Uint8Array(this.valueHex);
-		//endregion
+			if (this.isHexOnly) {
+				if (sizeOnly === true) return new ArrayBuffer(this.valueHex.byteLength);
 
-		if ((intBuffer[this.blockLength - 1] & 0x80) !== 0x00) {
-			this.error = "End of input reached before message was fully decoded";
-			return -1;
-		}
+				var curView = new Uint8Array(this.valueHex);
 
-		if (view[0] === 0x00) this.warnings.push("Needlessly long format of SID encoding");
+				retBuf = new ArrayBuffer(this.blockLength);
+				retView = new Uint8Array(retBuf);
 
-		if (this.blockLength <= 8) this.valueDec = (0, _pvutils.utilFromBase)(view, 7);else {
-			this.isHexOnly = true;
-			this.warnings.push("Too big SID for decoding, hex only");
-		}
+				for (var i = 0; i < this.blockLength - 1; i++) {
+					retView[i] = curView[i] | 0x80;
+				}retView[this.blockLength - 1] = curView[this.blockLength - 1];
 
-		return inputOffset + this.blockLength;
-	}
-	//**********************************************************************************
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		//region Initial variables
-		let retBuf;
-		let retView;
-		//endregion
+				return retBuf;
+			}
 
-		if (this.isHexOnly) {
-			if (sizeOnly === true) return new ArrayBuffer(this.valueHex.byteLength);
+			var encodedBuf = (0, _pvutils.utilToBase)(this.valueDec, 7);
+			if (encodedBuf.byteLength === 0) {
+				this.error = "Error during encoding SID value";
+				return new ArrayBuffer(0);
+			}
 
-			const curView = new Uint8Array(this.valueHex);
+			retBuf = new ArrayBuffer(encodedBuf.byteLength);
 
-			retBuf = new ArrayBuffer(this.blockLength);
-			retView = new Uint8Array(retBuf);
+			if (sizeOnly === false) {
+				var encodedView = new Uint8Array(encodedBuf);
+				retView = new Uint8Array(retBuf);
 
-			for (let i = 0; i < this.blockLength - 1; i++) retView[i] = curView[i] | 0x80;
-
-			retView[this.blockLength - 1] = curView[this.blockLength - 1];
+				for (var _i7 = 0; _i7 < encodedBuf.byteLength - 1; _i7++) {
+					retView[_i7] = encodedView[_i7] | 0x80;
+				}retView[encodedBuf.byteLength - 1] = encodedView[encodedBuf.byteLength - 1];
+			}
 
 			return retBuf;
 		}
+		//**********************************************************************************
+		/**
+   * Create string representation of current SID block
+   * @returns {string}
+   */
 
-		const encodedBuf = (0, _pvutils.utilToBase)(this.valueDec, 7);
-		if (encodedBuf.byteLength === 0) {
-			this.error = "Error during encoding SID value";
-			return new ArrayBuffer(0);
-		}
+	}, {
+		key: "toString",
+		value: function toString() {
+			var result = "";
 
-		retBuf = new ArrayBuffer(encodedBuf.byteLength);
+			if (this.isHexOnly === true) result = (0, _pvutils.bufferToHexCodes)(this.valueHex, 0, this.valueHex.byteLength);else {
+				if (this.isFirstSid) {
+					var sidValue = this.valueDec;
 
-		if (sizeOnly === false) {
-			const encodedView = new Uint8Array(encodedBuf);
-			retView = new Uint8Array(retBuf);
-
-			for (let i = 0; i < encodedBuf.byteLength - 1; i++) retView[i] = encodedView[i] | 0x80;
-
-			retView[encodedBuf.byteLength - 1] = encodedView[encodedBuf.byteLength - 1];
-		}
-
-		return retBuf;
-	}
-	//**********************************************************************************
-	/**
-  * Create string representation of current SID block
-  * @returns {string}
-  */
-	toString() {
-		let result = "";
-
-		if (this.isHexOnly === true) result = (0, _pvutils.bufferToHexCodes)(this.valueHex, 0, this.valueHex.byteLength);else {
-			if (this.isFirstSid) {
-				let sidValue = this.valueDec;
-
-				if (this.valueDec <= 39) result = "0.";else {
-					if (this.valueDec <= 79) {
-						result = "1.";
-						sidValue -= 40;
-					} else {
-						result = "2.";
-						sidValue -= 80;
+					if (this.valueDec <= 39) result = "0.";else {
+						if (this.valueDec <= 79) {
+							result = "1.";
+							sidValue -= 40;
+						} else {
+							result = "2.";
+							sidValue -= 80;
+						}
 					}
-				}
 
-				result += sidValue.toString();
-			} else result = this.valueDec.toString();
+					result += sidValue.toString();
+				} else result = this.valueDec.toString();
+			}
+
+			return result;
 		}
+		//**********************************************************************************
+		//noinspection JSUnusedGlobalSymbols
+		/**
+   * Convertion for the block to JSON object
+   * @returns {Object}
+   */
 
-		return result;
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedGlobalSymbols
-	/**
-  * Convertion for the block to JSON object
-  * @returns {Object}
-  */
-	toJSON() {
-		let object = {};
+	}, {
+		key: "toJSON",
+		value: function toJSON() {
+			var object = {};
 
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(LocalSidValueBlock.prototype.__proto__ || Object.getPrototypeOf(LocalSidValueBlock.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
 
-		object.valueDec = this.valueDec;
-		object.isFirstSid = this.isFirstSid;
+			object.valueDec = this.valueDec;
+			object.isFirstSid = this.isFirstSid;
 
-		return object;
-	}
-	//**********************************************************************************
-}
+			return object;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "sidBlock";
+		}
+	}]);
+
+	return LocalSidValueBlock;
+}(LocalHexBlock(LocalBaseBlock));
 //**************************************************************************************
-class LocalObjectIdentifierValueBlock extends LocalValueBlock {
+
+
+var LocalObjectIdentifierValueBlock = function (_LocalValueBlock5) {
+	_inherits(LocalObjectIdentifierValueBlock, _LocalValueBlock5);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalObjectIdentifierValueBlock" class
   * @param {Object} [parameters={}]
   * @property {ArrayBuffer} [valueHex]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function LocalObjectIdentifierValueBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.fromString((0, _pvutils.getParametersValue)(parameters, "value", ""));
+		_classCallCheck(this, LocalObjectIdentifierValueBlock);
+
+		var _this25 = _possibleConstructorReturn(this, (LocalObjectIdentifierValueBlock.__proto__ || Object.getPrototypeOf(LocalObjectIdentifierValueBlock)).call(this, parameters));
+
+		_this25.fromString((0, _pvutils.getParametersValue)(parameters, "value", ""));
+		return _this25;
 	}
 	//**********************************************************************************
 	/**
@@ -19113,966 +19743,1338 @@ class LocalObjectIdentifierValueBlock extends LocalValueBlock {
   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
   * @returns {number} Offset after least decoded byte
   */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		let resultOffset = inputOffset;
 
-		while (inputLength > 0) {
-			const sidBlock = new LocalSidValueBlock();
-			resultOffset = sidBlock.fromBER(inputBuffer, resultOffset, inputLength);
-			if (resultOffset === -1) {
-				this.blockLength = 0;
-				this.error = sidBlock.error;
-				return resultOffset;
-			}
 
-			if (this.value.length === 0) sidBlock.isFirstSid = true;
+	_createClass(LocalObjectIdentifierValueBlock, [{
+		key: "fromBER",
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			var resultOffset = inputOffset;
 
-			this.blockLength += sidBlock.blockLength;
-			inputLength -= sidBlock.blockLength;
-
-			this.value.push(sidBlock);
-		}
-
-		return resultOffset;
-	}
-	//**********************************************************************************
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		let retBuf = new ArrayBuffer(0);
-
-		for (let i = 0; i < this.value.length; i++) {
-			const valueBuf = this.value[i].toBER(sizeOnly);
-			if (valueBuf.byteLength === 0) {
-				this.error = this.value[i].error;
-				return new ArrayBuffer(0);
-			}
-
-			retBuf = (0, _pvutils.utilConcatBuf)(retBuf, valueBuf);
-		}
-
-		return retBuf;
-	}
-	//**********************************************************************************
-	/**
-  * Create "LocalObjectIdentifierValueBlock" class from string
-  * @param {string} string Input string to convert from
-  * @returns {boolean}
-  */
-	fromString(string) {
-		this.value = []; // Clear existing SID values
-
-		let pos1 = 0;
-		let pos2 = 0;
-
-		let sid = "";
-
-		let flag = false;
-
-		do {
-			pos2 = string.indexOf(".", pos1);
-			if (pos2 === -1) sid = string.substr(pos1);else sid = string.substr(pos1, pos2 - pos1);
-
-			pos1 = pos2 + 1;
-
-			if (flag) {
-				const sidBlock = this.value[0];
-
-				let plus = 0;
-
-				switch (sidBlock.valueDec) {
-					case 0:
-						break;
-					case 1:
-						plus = 40;
-						break;
-					case 2:
-						plus = 80;
-						break;
-					default:
-						this.value = []; // clear SID array
-						return false; // ???
+			while (inputLength > 0) {
+				var sidBlock = new LocalSidValueBlock();
+				resultOffset = sidBlock.fromBER(inputBuffer, resultOffset, inputLength);
+				if (resultOffset === -1) {
+					this.blockLength = 0;
+					this.error = sidBlock.error;
+					return resultOffset;
 				}
 
-				const parsedSID = parseInt(sid, 10);
-				if (isNaN(parsedSID)) return true;
+				if (this.value.length === 0) sidBlock.isFirstSid = true;
 
-				sidBlock.valueDec = parsedSID + plus;
-
-				flag = false;
-			} else {
-				const sidBlock = new LocalSidValueBlock();
-				sidBlock.valueDec = parseInt(sid, 10);
-				if (isNaN(sidBlock.valueDec)) return true;
-
-				if (this.value.length === 0) {
-					sidBlock.isFirstSid = true;
-					flag = true;
-				}
+				this.blockLength += sidBlock.blockLength;
+				inputLength -= sidBlock.blockLength;
 
 				this.value.push(sidBlock);
 			}
-		} while (pos2 !== -1);
 
-		return true;
-	}
-	//**********************************************************************************
-	/**
-  * Converts "LocalObjectIdentifierValueBlock" class to string
-  * @returns {string}
-  */
-	toString() {
-		let result = "";
-		let isHexOnly = false;
-
-		for (let i = 0; i < this.value.length; i++) {
-			isHexOnly = this.value[i].isHexOnly;
-
-			let sidStr = this.value[i].toString();
-
-			if (i !== 0) result = `${result}.`;
-
-			if (isHexOnly) {
-				sidStr = `{${sidStr}}`;
-
-				if (this.value[i].isFirstSid) result = `2.{${sidStr} - 80}`;else result += sidStr;
-			} else result += sidStr;
+			return resultOffset;
 		}
+		//**********************************************************************************
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
 
-		return result;
-	}
-	//**********************************************************************************
-	/**
-  * Aux function, need to get a block name. Need to have it here for inhiritence
-  * @returns {string}
-  */
-	static blockName() {
-		return "ObjectIdentifierValueBlock";
-	}
-	//**********************************************************************************
-	/**
-  * Convertion for the block to JSON object
-  * @returns {Object}
-  */
-	toJSON() {
-		let object = {};
+	}, {
+		key: "toBER",
+		value: function toBER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
+			var retBuf = new ArrayBuffer(0);
 
-		object.value = this.toString();
-		object.sidArray = [];
-		for (let i = 0; i < this.value.length; i++) object.sidArray.push(this.value[i].toJSON());
+			for (var i = 0; i < this.value.length; i++) {
+				var valueBuf = this.value[i].toBER(sizeOnly);
+				if (valueBuf.byteLength === 0) {
+					this.error = this.value[i].error;
+					return new ArrayBuffer(0);
+				}
 
-		return object;
-	}
-	//**********************************************************************************
-}
+				retBuf = (0, _pvutils.utilConcatBuf)(retBuf, valueBuf);
+			}
+
+			return retBuf;
+		}
+		//**********************************************************************************
+		/**
+   * Create "LocalObjectIdentifierValueBlock" class from string
+   * @param {string} string Input string to convert from
+   * @returns {boolean}
+   */
+
+	}, {
+		key: "fromString",
+		value: function fromString(string) {
+			this.value = []; // Clear existing SID values
+
+			var pos1 = 0;
+			var pos2 = 0;
+
+			var sid = "";
+
+			var flag = false;
+
+			do {
+				pos2 = string.indexOf(".", pos1);
+				if (pos2 === -1) sid = string.substr(pos1);else sid = string.substr(pos1, pos2 - pos1);
+
+				pos1 = pos2 + 1;
+
+				if (flag) {
+					var sidBlock = this.value[0];
+
+					var plus = 0;
+
+					switch (sidBlock.valueDec) {
+						case 0:
+							break;
+						case 1:
+							plus = 40;
+							break;
+						case 2:
+							plus = 80;
+							break;
+						default:
+							this.value = []; // clear SID array
+							return false; // ???
+					}
+
+					var parsedSID = parseInt(sid, 10);
+					if (isNaN(parsedSID)) return true;
+
+					sidBlock.valueDec = parsedSID + plus;
+
+					flag = false;
+				} else {
+					var _sidBlock = new LocalSidValueBlock();
+					_sidBlock.valueDec = parseInt(sid, 10);
+					if (isNaN(_sidBlock.valueDec)) return true;
+
+					if (this.value.length === 0) {
+						_sidBlock.isFirstSid = true;
+						flag = true;
+					}
+
+					this.value.push(_sidBlock);
+				}
+			} while (pos2 !== -1);
+
+			return true;
+		}
+		//**********************************************************************************
+		/**
+   * Converts "LocalObjectIdentifierValueBlock" class to string
+   * @returns {string}
+   */
+
+	}, {
+		key: "toString",
+		value: function toString() {
+			var result = "";
+			var isHexOnly = false;
+
+			for (var i = 0; i < this.value.length; i++) {
+				isHexOnly = this.value[i].isHexOnly;
+
+				var sidStr = this.value[i].toString();
+
+				if (i !== 0) result = result + ".";
+
+				if (isHexOnly) {
+					sidStr = "{" + sidStr + "}";
+
+					if (this.value[i].isFirstSid) result = "2.{" + sidStr + " - 80}";else result += sidStr;
+				} else result += sidStr;
+			}
+
+			return result;
+		}
+		//**********************************************************************************
+		/**
+   * Aux function, need to get a block name. Need to have it here for inhiritence
+   * @returns {string}
+   */
+
+	}, {
+		key: "toJSON",
+
+		//**********************************************************************************
+		/**
+   * Convertion for the block to JSON object
+   * @returns {Object}
+   */
+		value: function toJSON() {
+			var object = {};
+
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(LocalObjectIdentifierValueBlock.prototype.__proto__ || Object.getPrototypeOf(LocalObjectIdentifierValueBlock.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
+
+			object.value = this.toString();
+			object.sidArray = [];
+			for (var i = 0; i < this.value.length; i++) {
+				object.sidArray.push(this.value[i].toJSON());
+			}return object;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "ObjectIdentifierValueBlock";
+		}
+	}]);
+
+	return LocalObjectIdentifierValueBlock;
+}(LocalValueBlock);
 //**************************************************************************************
 /**
  * @extends BaseBlock
  */
-class ObjectIdentifier extends BaseBlock {
+
+
+var ObjectIdentifier = function (_BaseBlock9) {
+	_inherits(ObjectIdentifier, _BaseBlock9);
+
 	//**********************************************************************************
 	/**
   * Constructor for "ObjectIdentifier" class
   * @param {Object} [parameters={}]
   * @property {ArrayBuffer} [valueHex]
   */
-	constructor(parameters = {}) {
-		super(parameters, LocalObjectIdentifierValueBlock);
+	function ObjectIdentifier() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 6; // OBJECT IDENTIFIER
+		_classCallCheck(this, ObjectIdentifier);
+
+		var _this26 = _possibleConstructorReturn(this, (ObjectIdentifier.__proto__ || Object.getPrototypeOf(ObjectIdentifier)).call(this, parameters, LocalObjectIdentifierValueBlock));
+
+		_this26.idBlock.tagClass = 1; // UNIVERSAL
+		_this26.idBlock.tagNumber = 6; // OBJECT IDENTIFIER
+		return _this26;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "ObjectIdentifier";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(ObjectIdentifier, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "ObjectIdentifier";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return ObjectIdentifier;
+}(BaseBlock);
+
 exports.ObjectIdentifier = ObjectIdentifier; //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of all string's classes
 //**************************************************************************************
 
-class LocalUtf8StringValueBlock extends LocalHexBlock(LocalBaseBlock) {
+var LocalUtf8StringValueBlock = function (_LocalHexBlock6) {
+	_inherits(LocalUtf8StringValueBlock, _LocalHexBlock6);
+
 	//**********************************************************************************
 	//noinspection JSUnusedGlobalSymbols
 	/**
   * Constructor for "LocalUtf8StringValueBlock" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function LocalUtf8StringValueBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.isHexOnly = true;
-		this.value = ""; // String representation of decoded ArrayBuffer
+		_classCallCheck(this, LocalUtf8StringValueBlock);
+
+		var _this27 = _possibleConstructorReturn(this, (LocalUtf8StringValueBlock.__proto__ || Object.getPrototypeOf(LocalUtf8StringValueBlock)).call(this, parameters));
+
+		_this27.isHexOnly = true;
+		_this27.value = ""; // String representation of decoded ArrayBuffer
+		return _this27;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "Utf8StringValueBlock";
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedGlobalSymbols
-	/**
-  * Convertion for the block to JSON object
-  * @returns {Object}
-  */
-	toJSON() {
-		let object = {};
 
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
 
-		object.value = this.value;
+	_createClass(LocalUtf8StringValueBlock, [{
+		key: "toJSON",
 
-		return object;
-	}
-	//**********************************************************************************
-}
+		//**********************************************************************************
+		//noinspection JSUnusedGlobalSymbols
+		/**
+   * Convertion for the block to JSON object
+   * @returns {Object}
+   */
+		value: function toJSON() {
+			var object = {};
+
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(LocalUtf8StringValueBlock.prototype.__proto__ || Object.getPrototypeOf(LocalUtf8StringValueBlock.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
+
+			object.value = this.value;
+
+			return object;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "Utf8StringValueBlock";
+		}
+	}]);
+
+	return LocalUtf8StringValueBlock;
+}(LocalHexBlock(LocalBaseBlock));
 //**************************************************************************************
 /**
  * @extends BaseBlock
  */
-class Utf8String extends BaseBlock {
+
+
+var Utf8String = function (_BaseBlock10) {
+	_inherits(Utf8String, _BaseBlock10);
+
 	//**********************************************************************************
 	/**
   * Constructor for "Utf8String" class
   * @param {Object} [parameters={}]
   * @property {ArrayBuffer} [valueHex]
   */
-	constructor(parameters = {}) {
-		super(parameters, LocalUtf8StringValueBlock);
+	function Utf8String() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		if ("value" in parameters) this.fromString(parameters.value);
+		_classCallCheck(this, Utf8String);
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 12; // Utf8String
+		var _this28 = _possibleConstructorReturn(this, (Utf8String.__proto__ || Object.getPrototypeOf(Utf8String)).call(this, parameters, LocalUtf8StringValueBlock));
+
+		if ("value" in parameters) _this28.fromString(parameters.value);
+
+		_this28.idBlock.tagClass = 1; // UNIVERSAL
+		_this28.idBlock.tagNumber = 12; // Utf8String
+		return _this28;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "Utf8String";
-	}
-	//**********************************************************************************
-	/**
-  * Base function for converting block from BER encoded array of bytes
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
-  * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
-  * @returns {number} Offset after least decoded byte
-  */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		const resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
-		if (resultOffset === -1) {
-			this.error = this.valueBlock.error;
+
+
+	_createClass(Utf8String, [{
+		key: "fromBER",
+
+		//**********************************************************************************
+		/**
+   * Base function for converting block from BER encoded array of bytes
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
+   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
+   * @returns {number} Offset after least decoded byte
+   */
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			var resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
+			if (resultOffset === -1) {
+				this.error = this.valueBlock.error;
+				return resultOffset;
+			}
+
+			this.fromBuffer(this.valueBlock.valueHex);
+
+			if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
+
+			if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+
+			if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
+
 			return resultOffset;
 		}
+		//**********************************************************************************
+		/**
+   * Function converting ArrayBuffer into ASN.1 internal string
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   */
 
-		this.fromBuffer(this.valueBlock.valueHex);
+	}, {
+		key: "fromBuffer",
+		value: function fromBuffer(inputBuffer) {
+			this.valueBlock.value = String.fromCharCode.apply(null, new Uint8Array(inputBuffer));
 
-		if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
-
-		if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
-
-		if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
-
-		return resultOffset;
-	}
-	//**********************************************************************************
-	/**
-  * Function converting ArrayBuffer into ASN.1 internal string
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  */
-	fromBuffer(inputBuffer) {
-		this.valueBlock.value = String.fromCharCode.apply(null, new Uint8Array(inputBuffer));
-
-		try {
-			//noinspection JSDeprecatedSymbols
-			this.valueBlock.value = decodeURIComponent(escape(this.valueBlock.value));
-		} catch (ex) {
-			this.warnings.push(`Error during "decodeURIComponent": ${ex}, using raw string`);
+			try {
+				//noinspection JSDeprecatedSymbols
+				this.valueBlock.value = decodeURIComponent(escape(this.valueBlock.value));
+			} catch (ex) {
+				this.warnings.push("Error during \"decodeURIComponent\": " + ex + ", using raw string");
+			}
 		}
-	}
-	//**********************************************************************************
-	/**
-  * Function converting JavaScript string into ASN.1 internal class
-  * @param {!string} inputString ASN.1 BER encoded array
-  */
-	fromString(inputString) {
-		//noinspection JSDeprecatedSymbols
-		const str = unescape(encodeURIComponent(inputString));
-		const strLen = str.length;
+		//**********************************************************************************
+		/**
+   * Function converting JavaScript string into ASN.1 internal class
+   * @param {!string} inputString ASN.1 BER encoded array
+   */
 
-		this.valueBlock.valueHex = new ArrayBuffer(strLen);
-		const view = new Uint8Array(this.valueBlock.valueHex);
+	}, {
+		key: "fromString",
+		value: function fromString(inputString) {
+			//noinspection JSDeprecatedSymbols
+			var str = unescape(encodeURIComponent(inputString));
+			var strLen = str.length;
 
-		for (let i = 0; i < strLen; i++) view[i] = str.charCodeAt(i);
+			this.valueBlock.valueHex = new ArrayBuffer(strLen);
+			var view = new Uint8Array(this.valueBlock.valueHex);
 
-		this.valueBlock.value = inputString;
-	}
-	//**********************************************************************************
-}
+			for (var i = 0; i < strLen; i++) {
+				view[i] = str.charCodeAt(i);
+			}this.valueBlock.value = inputString;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "Utf8String";
+		}
+	}]);
+
+	return Utf8String;
+}(BaseBlock);
+
 exports.Utf8String = Utf8String; //**************************************************************************************
 /**
  * @extends LocalBaseBlock
  * @extends LocalHexBlock
  */
 
-class LocalBmpStringValueBlock extends LocalHexBlock(LocalBaseBlock) {
+var LocalBmpStringValueBlock = function (_LocalHexBlock7) {
+	_inherits(LocalBmpStringValueBlock, _LocalHexBlock7);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalBmpStringValueBlock" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function LocalBmpStringValueBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.isHexOnly = true;
-		this.value = "";
+		_classCallCheck(this, LocalBmpStringValueBlock);
+
+		var _this29 = _possibleConstructorReturn(this, (LocalBmpStringValueBlock.__proto__ || Object.getPrototypeOf(LocalBmpStringValueBlock)).call(this, parameters));
+
+		_this29.isHexOnly = true;
+		_this29.value = "";
+		return _this29;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "BmpStringValueBlock";
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedGlobalSymbols
-	/**
-  * Convertion for the block to JSON object
-  * @returns {Object}
-  */
-	toJSON() {
-		let object = {};
 
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
 
-		object.value = this.value;
+	_createClass(LocalBmpStringValueBlock, [{
+		key: "toJSON",
 
-		return object;
-	}
-	//**********************************************************************************
-}
+		//**********************************************************************************
+		//noinspection JSUnusedGlobalSymbols
+		/**
+   * Convertion for the block to JSON object
+   * @returns {Object}
+   */
+		value: function toJSON() {
+			var object = {};
+
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(LocalBmpStringValueBlock.prototype.__proto__ || Object.getPrototypeOf(LocalBmpStringValueBlock.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
+
+			object.value = this.value;
+
+			return object;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "BmpStringValueBlock";
+		}
+	}]);
+
+	return LocalBmpStringValueBlock;
+}(LocalHexBlock(LocalBaseBlock));
 //**************************************************************************************
 /**
  * @extends BaseBlock
  */
-class BmpString extends BaseBlock {
+
+
+var BmpString = function (_BaseBlock11) {
+	_inherits(BmpString, _BaseBlock11);
+
 	//**********************************************************************************
 	/**
   * Constructor for "BmpString" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters, LocalBmpStringValueBlock);
+	function BmpString() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		if ("value" in parameters) this.fromString(parameters.value);
+		_classCallCheck(this, BmpString);
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 30; // BmpString
+		var _this30 = _possibleConstructorReturn(this, (BmpString.__proto__ || Object.getPrototypeOf(BmpString)).call(this, parameters, LocalBmpStringValueBlock));
+
+		if ("value" in parameters) _this30.fromString(parameters.value);
+
+		_this30.idBlock.tagClass = 1; // UNIVERSAL
+		_this30.idBlock.tagNumber = 30; // BmpString
+		return _this30;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "BmpString";
-	}
-	//**********************************************************************************
-	/**
-  * Base function for converting block from BER encoded array of bytes
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
-  * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
-  * @returns {number} Offset after least decoded byte
-  */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		const resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
-		if (resultOffset === -1) {
-			this.error = this.valueBlock.error;
+
+
+	_createClass(BmpString, [{
+		key: "fromBER",
+
+		//**********************************************************************************
+		/**
+   * Base function for converting block from BER encoded array of bytes
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
+   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
+   * @returns {number} Offset after least decoded byte
+   */
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			var resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
+			if (resultOffset === -1) {
+				this.error = this.valueBlock.error;
+				return resultOffset;
+			}
+
+			this.fromBuffer(this.valueBlock.valueHex);
+
+			if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
+
+			if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+
+			if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
+
 			return resultOffset;
 		}
+		//**********************************************************************************
+		/**
+   * Function converting ArrayBuffer into ASN.1 internal string
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   */
 
-		this.fromBuffer(this.valueBlock.valueHex);
+	}, {
+		key: "fromBuffer",
+		value: function fromBuffer(inputBuffer) {
+			//noinspection JSCheckFunctionSignatures
+			var copyBuffer = inputBuffer.slice(0);
+			var valueView = new Uint8Array(copyBuffer);
 
-		if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
+			for (var i = 0; i < valueView.length; i += 2) {
+				var temp = valueView[i];
 
-		if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+				valueView[i] = valueView[i + 1];
+				valueView[i + 1] = temp;
+			}
 
-		if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
-
-		return resultOffset;
-	}
-	//**********************************************************************************
-	/**
-  * Function converting ArrayBuffer into ASN.1 internal string
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  */
-	fromBuffer(inputBuffer) {
-		//noinspection JSCheckFunctionSignatures
-		const copyBuffer = inputBuffer.slice(0);
-		const valueView = new Uint8Array(copyBuffer);
-
-		for (let i = 0; i < valueView.length; i += 2) {
-			const temp = valueView[i];
-
-			valueView[i] = valueView[i + 1];
-			valueView[i + 1] = temp;
+			this.valueBlock.value = String.fromCharCode.apply(null, new Uint16Array(copyBuffer));
 		}
+		//**********************************************************************************
+		/**
+   * Function converting JavaScript string into ASN.1 internal class
+   * @param {!string} inputString ASN.1 BER encoded array
+   */
 
-		this.valueBlock.value = String.fromCharCode.apply(null, new Uint16Array(copyBuffer));
-	}
-	//**********************************************************************************
-	/**
-  * Function converting JavaScript string into ASN.1 internal class
-  * @param {!string} inputString ASN.1 BER encoded array
-  */
-	fromString(inputString) {
-		const strLength = inputString.length;
+	}, {
+		key: "fromString",
+		value: function fromString(inputString) {
+			var strLength = inputString.length;
 
-		this.valueBlock.valueHex = new ArrayBuffer(strLength * 2);
-		const valueHexView = new Uint8Array(this.valueBlock.valueHex);
+			this.valueBlock.valueHex = new ArrayBuffer(strLength * 2);
+			var valueHexView = new Uint8Array(this.valueBlock.valueHex);
 
-		for (let i = 0; i < strLength; i++) {
-			const codeBuf = (0, _pvutils.utilToBase)(inputString.charCodeAt(i), 8);
-			const codeView = new Uint8Array(codeBuf);
-			if (codeView.length > 2) continue;
+			for (var i = 0; i < strLength; i++) {
+				var codeBuf = (0, _pvutils.utilToBase)(inputString.charCodeAt(i), 8);
+				var codeView = new Uint8Array(codeBuf);
+				if (codeView.length > 2) continue;
 
-			const dif = 2 - codeView.length;
+				var dif = 2 - codeView.length;
 
-			for (let j = codeView.length - 1; j >= 0; j--) valueHexView[i * 2 + j + dif] = codeView[j];
+				for (var j = codeView.length - 1; j >= 0; j--) {
+					valueHexView[i * 2 + j + dif] = codeView[j];
+				}
+			}
+
+			this.valueBlock.value = inputString;
 		}
+		//**********************************************************************************
 
-		this.valueBlock.value = inputString;
-	}
-	//**********************************************************************************
-}
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "BmpString";
+		}
+	}]);
+
+	return BmpString;
+}(BaseBlock);
+
 exports.BmpString = BmpString; //**************************************************************************************
 
-class LocalUniversalStringValueBlock extends LocalHexBlock(LocalBaseBlock) {
+var LocalUniversalStringValueBlock = function (_LocalHexBlock8) {
+	_inherits(LocalUniversalStringValueBlock, _LocalHexBlock8);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalUniversalStringValueBlock" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function LocalUniversalStringValueBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.isHexOnly = true;
-		this.value = "";
+		_classCallCheck(this, LocalUniversalStringValueBlock);
+
+		var _this31 = _possibleConstructorReturn(this, (LocalUniversalStringValueBlock.__proto__ || Object.getPrototypeOf(LocalUniversalStringValueBlock)).call(this, parameters));
+
+		_this31.isHexOnly = true;
+		_this31.value = "";
+		return _this31;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "UniversalStringValueBlock";
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedGlobalSymbols
-	/**
-  * Convertion for the block to JSON object
-  * @returns {Object}
-  */
-	toJSON() {
-		let object = {};
 
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
 
-		object.value = this.value;
+	_createClass(LocalUniversalStringValueBlock, [{
+		key: "toJSON",
 
-		return object;
-	}
-	//**********************************************************************************
-}
+		//**********************************************************************************
+		//noinspection JSUnusedGlobalSymbols
+		/**
+   * Convertion for the block to JSON object
+   * @returns {Object}
+   */
+		value: function toJSON() {
+			var object = {};
+
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(LocalUniversalStringValueBlock.prototype.__proto__ || Object.getPrototypeOf(LocalUniversalStringValueBlock.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
+
+			object.value = this.value;
+
+			return object;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "UniversalStringValueBlock";
+		}
+	}]);
+
+	return LocalUniversalStringValueBlock;
+}(LocalHexBlock(LocalBaseBlock));
 //**************************************************************************************
 /**
  * @extends BaseBlock
  */
-class UniversalString extends BaseBlock {
+
+
+var UniversalString = function (_BaseBlock12) {
+	_inherits(UniversalString, _BaseBlock12);
+
 	//**********************************************************************************
 	/**
   * Constructor for "UniversalString" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters, LocalUniversalStringValueBlock);
+	function UniversalString() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		if ("value" in parameters) this.fromString(parameters.value);
+		_classCallCheck(this, UniversalString);
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 28; // UniversalString
+		var _this32 = _possibleConstructorReturn(this, (UniversalString.__proto__ || Object.getPrototypeOf(UniversalString)).call(this, parameters, LocalUniversalStringValueBlock));
+
+		if ("value" in parameters) _this32.fromString(parameters.value);
+
+		_this32.idBlock.tagClass = 1; // UNIVERSAL
+		_this32.idBlock.tagNumber = 28; // UniversalString
+		return _this32;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "UniversalString";
-	}
-	//**********************************************************************************
-	/**
-  * Base function for converting block from BER encoded array of bytes
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
-  * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
-  * @returns {number} Offset after least decoded byte
-  */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		const resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
-		if (resultOffset === -1) {
-			this.error = this.valueBlock.error;
+
+
+	_createClass(UniversalString, [{
+		key: "fromBER",
+
+		//**********************************************************************************
+		/**
+   * Base function for converting block from BER encoded array of bytes
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
+   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
+   * @returns {number} Offset after least decoded byte
+   */
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			var resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
+			if (resultOffset === -1) {
+				this.error = this.valueBlock.error;
+				return resultOffset;
+			}
+
+			this.fromBuffer(this.valueBlock.valueHex);
+
+			if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
+
+			if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+
+			if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
+
 			return resultOffset;
 		}
+		//**********************************************************************************
+		/**
+   * Function converting ArrayBuffer into ASN.1 internal string
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   */
 
-		this.fromBuffer(this.valueBlock.valueHex);
+	}, {
+		key: "fromBuffer",
+		value: function fromBuffer(inputBuffer) {
+			//noinspection JSCheckFunctionSignatures
+			var copyBuffer = inputBuffer.slice(0);
+			var valueView = new Uint8Array(copyBuffer);
 
-		if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
+			for (var i = 0; i < valueView.length; i += 4) {
+				valueView[i] = valueView[i + 3];
+				valueView[i + 1] = valueView[i + 2];
+				valueView[i + 2] = 0x00;
+				valueView[i + 3] = 0x00;
+			}
 
-		if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
-
-		if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
-
-		return resultOffset;
-	}
-	//**********************************************************************************
-	/**
-  * Function converting ArrayBuffer into ASN.1 internal string
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  */
-	fromBuffer(inputBuffer) {
-		//noinspection JSCheckFunctionSignatures
-		const copyBuffer = inputBuffer.slice(0);
-		const valueView = new Uint8Array(copyBuffer);
-
-		for (let i = 0; i < valueView.length; i += 4) {
-			valueView[i] = valueView[i + 3];
-			valueView[i + 1] = valueView[i + 2];
-			valueView[i + 2] = 0x00;
-			valueView[i + 3] = 0x00;
+			this.valueBlock.value = String.fromCharCode.apply(null, new Uint32Array(copyBuffer));
 		}
+		//**********************************************************************************
+		/**
+   * Function converting JavaScript string into ASN.1 internal class
+   * @param {!string} inputString ASN.1 BER encoded array
+   */
 
-		this.valueBlock.value = String.fromCharCode.apply(null, new Uint32Array(copyBuffer));
-	}
-	//**********************************************************************************
-	/**
-  * Function converting JavaScript string into ASN.1 internal class
-  * @param {!string} inputString ASN.1 BER encoded array
-  */
-	fromString(inputString) {
-		const strLength = inputString.length;
+	}, {
+		key: "fromString",
+		value: function fromString(inputString) {
+			var strLength = inputString.length;
 
-		this.valueBlock.valueHex = new ArrayBuffer(strLength * 4);
-		const valueHexView = new Uint8Array(this.valueBlock.valueHex);
+			this.valueBlock.valueHex = new ArrayBuffer(strLength * 4);
+			var valueHexView = new Uint8Array(this.valueBlock.valueHex);
 
-		for (let i = 0; i < strLength; i++) {
-			const codeBuf = (0, _pvutils.utilToBase)(inputString.charCodeAt(i), 8);
-			const codeView = new Uint8Array(codeBuf);
-			if (codeView.length > 4) continue;
+			for (var i = 0; i < strLength; i++) {
+				var codeBuf = (0, _pvutils.utilToBase)(inputString.charCodeAt(i), 8);
+				var codeView = new Uint8Array(codeBuf);
+				if (codeView.length > 4) continue;
 
-			const dif = 4 - codeView.length;
+				var dif = 4 - codeView.length;
 
-			for (let j = codeView.length - 1; j >= 0; j--) valueHexView[i * 4 + j + dif] = codeView[j];
+				for (var j = codeView.length - 1; j >= 0; j--) {
+					valueHexView[i * 4 + j + dif] = codeView[j];
+				}
+			}
+
+			this.valueBlock.value = inputString;
 		}
+		//**********************************************************************************
 
-		this.valueBlock.value = inputString;
-	}
-	//**********************************************************************************
-}
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "UniversalString";
+		}
+	}]);
+
+	return UniversalString;
+}(BaseBlock);
+
 exports.UniversalString = UniversalString; //**************************************************************************************
 
-class LocalSimpleStringValueBlock extends LocalHexBlock(LocalBaseBlock) {
+var LocalSimpleStringValueBlock = function (_LocalHexBlock9) {
+	_inherits(LocalSimpleStringValueBlock, _LocalHexBlock9);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalSimpleStringValueBlock" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function LocalSimpleStringValueBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.value = "";
-		this.isHexOnly = true;
+		_classCallCheck(this, LocalSimpleStringValueBlock);
+
+		var _this33 = _possibleConstructorReturn(this, (LocalSimpleStringValueBlock.__proto__ || Object.getPrototypeOf(LocalSimpleStringValueBlock)).call(this, parameters));
+
+		_this33.value = "";
+		_this33.isHexOnly = true;
+		return _this33;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "SimpleStringValueBlock";
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedGlobalSymbols
-	/**
-  * Convertion for the block to JSON object
-  * @returns {Object}
-  */
-	toJSON() {
-		let object = {};
 
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
 
-		object.value = this.value;
+	_createClass(LocalSimpleStringValueBlock, [{
+		key: "toJSON",
 
-		return object;
-	}
-	//**********************************************************************************
-}
+		//**********************************************************************************
+		//noinspection JSUnusedGlobalSymbols
+		/**
+   * Convertion for the block to JSON object
+   * @returns {Object}
+   */
+		value: function toJSON() {
+			var object = {};
+
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(LocalSimpleStringValueBlock.prototype.__proto__ || Object.getPrototypeOf(LocalSimpleStringValueBlock.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
+
+			object.value = this.value;
+
+			return object;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "SimpleStringValueBlock";
+		}
+	}]);
+
+	return LocalSimpleStringValueBlock;
+}(LocalHexBlock(LocalBaseBlock));
 //**************************************************************************************
 /**
  * @extends BaseBlock
  */
-class LocalSimpleStringBlock extends BaseBlock {
+
+
+var LocalSimpleStringBlock = function (_BaseBlock13) {
+	_inherits(LocalSimpleStringBlock, _BaseBlock13);
+
 	//**********************************************************************************
 	/**
   * Constructor for "LocalSimpleStringBlock" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters, LocalSimpleStringValueBlock);
+	function LocalSimpleStringBlock() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		if ("value" in parameters) this.fromString(parameters.value);
+		_classCallCheck(this, LocalSimpleStringBlock);
+
+		var _this34 = _possibleConstructorReturn(this, (LocalSimpleStringBlock.__proto__ || Object.getPrototypeOf(LocalSimpleStringBlock)).call(this, parameters, LocalSimpleStringValueBlock));
+
+		if ("value" in parameters) _this34.fromString(parameters.value);
+		return _this34;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "SIMPLESTRING";
-	}
-	//**********************************************************************************
-	/**
-  * Base function for converting block from BER encoded array of bytes
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
-  * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
-  * @returns {number} Offset after least decoded byte
-  */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		const resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
-		if (resultOffset === -1) {
-			this.error = this.valueBlock.error;
+
+
+	_createClass(LocalSimpleStringBlock, [{
+		key: "fromBER",
+
+		//**********************************************************************************
+		/**
+   * Base function for converting block from BER encoded array of bytes
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   * @param {!number} inputOffset Offset in ASN.1 BER encoded array where decoding should be started
+   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
+   * @returns {number} Offset after least decoded byte
+   */
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			var resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
+			if (resultOffset === -1) {
+				this.error = this.valueBlock.error;
+				return resultOffset;
+			}
+
+			this.fromBuffer(this.valueBlock.valueHex);
+
+			if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
+
+			if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+
+			if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
+
 			return resultOffset;
 		}
+		//**********************************************************************************
+		/**
+   * Function converting ArrayBuffer into ASN.1 internal string
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   */
 
-		this.fromBuffer(this.valueBlock.valueHex);
+	}, {
+		key: "fromBuffer",
+		value: function fromBuffer(inputBuffer) {
+			this.valueBlock.value = String.fromCharCode.apply(null, new Uint8Array(inputBuffer));
+		}
+		//**********************************************************************************
+		/**
+   * Function converting JavaScript string into ASN.1 internal class
+   * @param {!string} inputString ASN.1 BER encoded array
+   */
 
-		if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
+	}, {
+		key: "fromString",
+		value: function fromString(inputString) {
+			var strLen = inputString.length;
 
-		if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+			this.valueBlock.valueHex = new ArrayBuffer(strLen);
+			var view = new Uint8Array(this.valueBlock.valueHex);
 
-		if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
+			for (var i = 0; i < strLen; i++) {
+				view[i] = inputString.charCodeAt(i);
+			}this.valueBlock.value = inputString;
+		}
+		//**********************************************************************************
 
-		return resultOffset;
-	}
-	//**********************************************************************************
-	/**
-  * Function converting ArrayBuffer into ASN.1 internal string
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  */
-	fromBuffer(inputBuffer) {
-		this.valueBlock.value = String.fromCharCode.apply(null, new Uint8Array(inputBuffer));
-	}
-	//**********************************************************************************
-	/**
-  * Function converting JavaScript string into ASN.1 internal class
-  * @param {!string} inputString ASN.1 BER encoded array
-  */
-	fromString(inputString) {
-		const strLen = inputString.length;
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "SIMPLESTRING";
+		}
+	}]);
 
-		this.valueBlock.valueHex = new ArrayBuffer(strLen);
-		const view = new Uint8Array(this.valueBlock.valueHex);
-
-		for (let i = 0; i < strLen; i++) view[i] = inputString.charCodeAt(i);
-
-		this.valueBlock.value = inputString;
-	}
-	//**********************************************************************************
-}
+	return LocalSimpleStringBlock;
+}(BaseBlock);
 //**************************************************************************************
 /**
  * @extends LocalSimpleStringBlock
  */
-class NumericString extends LocalSimpleStringBlock {
+
+
+var NumericString = function (_LocalSimpleStringBlo) {
+	_inherits(NumericString, _LocalSimpleStringBlo);
+
 	//**********************************************************************************
 	/**
   * Constructor for "NumericString" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function NumericString() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 18; // NumericString
+		_classCallCheck(this, NumericString);
+
+		var _this35 = _possibleConstructorReturn(this, (NumericString.__proto__ || Object.getPrototypeOf(NumericString)).call(this, parameters));
+
+		_this35.idBlock.tagClass = 1; // UNIVERSAL
+		_this35.idBlock.tagNumber = 18; // NumericString
+		return _this35;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "NumericString";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(NumericString, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "NumericString";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return NumericString;
+}(LocalSimpleStringBlock);
+
 exports.NumericString = NumericString; //**************************************************************************************
 /**
  * @extends LocalSimpleStringBlock
  */
 
-class PrintableString extends LocalSimpleStringBlock {
+var PrintableString = function (_LocalSimpleStringBlo2) {
+	_inherits(PrintableString, _LocalSimpleStringBlo2);
+
 	//**********************************************************************************
 	/**
   * Constructor for "PrintableString" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function PrintableString() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 19; // PrintableString
+		_classCallCheck(this, PrintableString);
+
+		var _this36 = _possibleConstructorReturn(this, (PrintableString.__proto__ || Object.getPrototypeOf(PrintableString)).call(this, parameters));
+
+		_this36.idBlock.tagClass = 1; // UNIVERSAL
+		_this36.idBlock.tagNumber = 19; // PrintableString
+		return _this36;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "PrintableString";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(PrintableString, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "PrintableString";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return PrintableString;
+}(LocalSimpleStringBlock);
+
 exports.PrintableString = PrintableString; //**************************************************************************************
 /**
  * @extends LocalSimpleStringBlock
  */
 
-class TeletexString extends LocalSimpleStringBlock {
+var TeletexString = function (_LocalSimpleStringBlo3) {
+	_inherits(TeletexString, _LocalSimpleStringBlo3);
+
 	//**********************************************************************************
 	/**
   * Constructor for "TeletexString" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function TeletexString() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 20; // TeletexString
+		_classCallCheck(this, TeletexString);
+
+		var _this37 = _possibleConstructorReturn(this, (TeletexString.__proto__ || Object.getPrototypeOf(TeletexString)).call(this, parameters));
+
+		_this37.idBlock.tagClass = 1; // UNIVERSAL
+		_this37.idBlock.tagNumber = 20; // TeletexString
+		return _this37;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "TeletexString";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(TeletexString, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "TeletexString";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return TeletexString;
+}(LocalSimpleStringBlock);
+
 exports.TeletexString = TeletexString; //**************************************************************************************
 /**
  * @extends LocalSimpleStringBlock
  */
 
-class VideotexString extends LocalSimpleStringBlock {
+var VideotexString = function (_LocalSimpleStringBlo4) {
+	_inherits(VideotexString, _LocalSimpleStringBlo4);
+
 	//**********************************************************************************
 	/**
   * Constructor for "VideotexString" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function VideotexString() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 21; // VideotexString
+		_classCallCheck(this, VideotexString);
+
+		var _this38 = _possibleConstructorReturn(this, (VideotexString.__proto__ || Object.getPrototypeOf(VideotexString)).call(this, parameters));
+
+		_this38.idBlock.tagClass = 1; // UNIVERSAL
+		_this38.idBlock.tagNumber = 21; // VideotexString
+		return _this38;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "VideotexString";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(VideotexString, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "VideotexString";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return VideotexString;
+}(LocalSimpleStringBlock);
+
 exports.VideotexString = VideotexString; //**************************************************************************************
 /**
  * @extends LocalSimpleStringBlock
  */
 
-class IA5String extends LocalSimpleStringBlock {
+var IA5String = function (_LocalSimpleStringBlo5) {
+	_inherits(IA5String, _LocalSimpleStringBlo5);
+
 	//**********************************************************************************
 	/**
   * Constructor for "IA5String" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function IA5String() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 22; // IA5String
+		_classCallCheck(this, IA5String);
+
+		var _this39 = _possibleConstructorReturn(this, (IA5String.__proto__ || Object.getPrototypeOf(IA5String)).call(this, parameters));
+
+		_this39.idBlock.tagClass = 1; // UNIVERSAL
+		_this39.idBlock.tagNumber = 22; // IA5String
+		return _this39;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "IA5String";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(IA5String, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "IA5String";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return IA5String;
+}(LocalSimpleStringBlock);
+
 exports.IA5String = IA5String; //**************************************************************************************
 /**
  * @extends LocalSimpleStringBlock
  */
 
-class GraphicString extends LocalSimpleStringBlock {
+var GraphicString = function (_LocalSimpleStringBlo6) {
+	_inherits(GraphicString, _LocalSimpleStringBlo6);
+
 	//**********************************************************************************
 	/**
   * Constructor for "GraphicString" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function GraphicString() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 25; // GraphicString
+		_classCallCheck(this, GraphicString);
+
+		var _this40 = _possibleConstructorReturn(this, (GraphicString.__proto__ || Object.getPrototypeOf(GraphicString)).call(this, parameters));
+
+		_this40.idBlock.tagClass = 1; // UNIVERSAL
+		_this40.idBlock.tagNumber = 25; // GraphicString
+		return _this40;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "GraphicString";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(GraphicString, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "GraphicString";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return GraphicString;
+}(LocalSimpleStringBlock);
+
 exports.GraphicString = GraphicString; //**************************************************************************************
 /**
  * @extends LocalSimpleStringBlock
  */
 
-class VisibleString extends LocalSimpleStringBlock {
+var VisibleString = function (_LocalSimpleStringBlo7) {
+	_inherits(VisibleString, _LocalSimpleStringBlo7);
+
 	//**********************************************************************************
 	/**
   * Constructor for "VisibleString" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function VisibleString() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 26; // VisibleString
+		_classCallCheck(this, VisibleString);
+
+		var _this41 = _possibleConstructorReturn(this, (VisibleString.__proto__ || Object.getPrototypeOf(VisibleString)).call(this, parameters));
+
+		_this41.idBlock.tagClass = 1; // UNIVERSAL
+		_this41.idBlock.tagNumber = 26; // VisibleString
+		return _this41;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "VisibleString";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(VisibleString, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "VisibleString";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return VisibleString;
+}(LocalSimpleStringBlock);
+
 exports.VisibleString = VisibleString; //**************************************************************************************
 /**
  * @extends LocalSimpleStringBlock
  */
 
-class GeneralString extends LocalSimpleStringBlock {
+var GeneralString = function (_LocalSimpleStringBlo8) {
+	_inherits(GeneralString, _LocalSimpleStringBlo8);
+
 	//**********************************************************************************
 	/**
   * Constructor for "GeneralString" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function GeneralString() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 27; // GeneralString
+		_classCallCheck(this, GeneralString);
+
+		var _this42 = _possibleConstructorReturn(this, (GeneralString.__proto__ || Object.getPrototypeOf(GeneralString)).call(this, parameters));
+
+		_this42.idBlock.tagClass = 1; // UNIVERSAL
+		_this42.idBlock.tagNumber = 27; // GeneralString
+		return _this42;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "GeneralString";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(GeneralString, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "GeneralString";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return GeneralString;
+}(LocalSimpleStringBlock);
+
 exports.GeneralString = GeneralString; //**************************************************************************************
 /**
  * @extends LocalSimpleStringBlock
  */
 
-class CharacterString extends LocalSimpleStringBlock {
+var CharacterString = function (_LocalSimpleStringBlo9) {
+	_inherits(CharacterString, _LocalSimpleStringBlo9);
+
 	//**********************************************************************************
 	/**
   * Constructor for "CharacterString" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function CharacterString() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 29; // CharacterString
+		_classCallCheck(this, CharacterString);
+
+		var _this43 = _possibleConstructorReturn(this, (CharacterString.__proto__ || Object.getPrototypeOf(CharacterString)).call(this, parameters));
+
+		_this43.idBlock.tagClass = 1; // UNIVERSAL
+		_this43.idBlock.tagNumber = 29; // CharacterString
+		return _this43;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "CharacterString";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(CharacterString, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "CharacterString";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return CharacterString;
+}(LocalSimpleStringBlock);
+
 exports.CharacterString = CharacterString; //**************************************************************************************
 //endregion
 //**************************************************************************************
@@ -20082,7 +21084,9 @@ exports.CharacterString = CharacterString; //***********************************
  * @extends VisibleString
  */
 
-class UTCTime extends VisibleString {
+var UTCTime = function (_VisibleString) {
+	_inherits(UTCTime, _VisibleString);
+
 	//**********************************************************************************
 	/**
   * Constructor for "UTCTime" class
@@ -20090,35 +21094,42 @@ class UTCTime extends VisibleString {
   * @property {string} [value] String representatio of the date
   * @property {Date} [valueDate] JavaScript "Date" object
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function UTCTime() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.year = 0;
-		this.month = 0;
-		this.day = 0;
-		this.hour = 0;
-		this.minute = 0;
-		this.second = 0;
+		_classCallCheck(this, UTCTime);
+
+		var _this44 = _possibleConstructorReturn(this, (UTCTime.__proto__ || Object.getPrototypeOf(UTCTime)).call(this, parameters));
+
+		_this44.year = 0;
+		_this44.month = 0;
+		_this44.day = 0;
+		_this44.hour = 0;
+		_this44.minute = 0;
+		_this44.second = 0;
 
 		//region Create UTCTime from ASN.1 UTC string value
 		if ("value" in parameters) {
-			this.fromString(parameters.value);
+			_this44.fromString(parameters.value);
 
-			this.valueBlock.valueHex = new ArrayBuffer(parameters.value.length);
-			const view = new Uint8Array(this.valueBlock.valueHex);
+			_this44.valueBlock.valueHex = new ArrayBuffer(parameters.value.length);
+			var view = new Uint8Array(_this44.valueBlock.valueHex);
 
-			for (let i = 0; i < parameters.value.length; i++) view[i] = parameters.value.charCodeAt(i);
+			for (var i = 0; i < parameters.value.length; i++) {
+				view[i] = parameters.value.charCodeAt(i);
+			}
 		}
 		//endregion
 		//region Create GeneralizedTime from JavaScript Date type
 		if ("valueDate" in parameters) {
-			this.fromDate(parameters.valueDate);
-			this.valueBlock.valueHex = this.toBuffer();
+			_this44.fromDate(parameters.valueDate);
+			_this44.valueBlock.valueHex = _this44.toBuffer();
 		}
 		//endregion
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 23; // UTCTime
+		_this44.idBlock.tagClass = 1; // UNIVERSAL
+		_this44.idBlock.tagNumber = 23; // UTCTime
+		return _this44;
 	}
 	//**********************************************************************************
 	/**
@@ -20128,151 +21139,186 @@ class UTCTime extends VisibleString {
   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
   * @returns {number} Offset after least decoded byte
   */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		const resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
-		if (resultOffset === -1) {
-			this.error = this.valueBlock.error;
+
+
+	_createClass(UTCTime, [{
+		key: "fromBER",
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			var resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
+			if (resultOffset === -1) {
+				this.error = this.valueBlock.error;
+				return resultOffset;
+			}
+
+			this.fromBuffer(this.valueBlock.valueHex);
+
+			if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
+
+			if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+
+			if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
+
 			return resultOffset;
 		}
+		//**********************************************************************************
+		/**
+   * Function converting ArrayBuffer into ASN.1 internal string
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   */
 
-		this.fromBuffer(this.valueBlock.valueHex);
-
-		if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
-
-		if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
-
-		if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
-
-		return resultOffset;
-	}
-	//**********************************************************************************
-	/**
-  * Function converting ArrayBuffer into ASN.1 internal string
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  */
-	fromBuffer(inputBuffer) {
-		this.fromString(String.fromCharCode.apply(null, new Uint8Array(inputBuffer)));
-	}
-	//**********************************************************************************
-	/**
-  * Function converting ASN.1 internal string into ArrayBuffer
-  * @returns {ArrayBuffer}
-  */
-	toBuffer() {
-		const str = this.toString();
-
-		const buffer = new ArrayBuffer(str.length);
-		const view = new Uint8Array(buffer);
-
-		for (let i = 0; i < str.length; i++) view[i] = str.charCodeAt(i);
-
-		return buffer;
-	}
-	//**********************************************************************************
-	/**
-  * Function converting "Date" object into ASN.1 internal string
-  * @param {!Date} inputDate JavaScript "Date" object
-  */
-	fromDate(inputDate) {
-		this.year = inputDate.getUTCFullYear();
-		this.month = inputDate.getUTCMonth() + 1;
-		this.day = inputDate.getUTCDate();
-		this.hour = inputDate.getUTCHours();
-		this.minute = inputDate.getUTCMinutes();
-		this.second = inputDate.getUTCSeconds();
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedGlobalSymbols
-	/**
-  * Function converting ASN.1 internal string into "Date" object
-  * @returns {Date}
-  */
-	toDate() {
-		return new Date(Date.UTC(this.year, this.month - 1, this.day, this.hour, this.minute, this.second));
-	}
-	//**********************************************************************************
-	/**
-  * Function converting JavaScript string into ASN.1 internal class
-  * @param {!string} inputString ASN.1 BER encoded array
-  */
-	fromString(inputString) {
-		//region Parse input string
-		const parser = /(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})Z/ig;
-		const parserArray = parser.exec(inputString);
-		if (parserArray === null) {
-			this.error = "Wrong input string for convertion";
-			return;
+	}, {
+		key: "fromBuffer",
+		value: function fromBuffer(inputBuffer) {
+			this.fromString(String.fromCharCode.apply(null, new Uint8Array(inputBuffer)));
 		}
-		//endregion
+		//**********************************************************************************
+		/**
+   * Function converting ASN.1 internal string into ArrayBuffer
+   * @returns {ArrayBuffer}
+   */
 
-		//region Store parsed values
-		const year = parseInt(parserArray[1], 10);
-		if (year >= 50) this.year = 1900 + year;else this.year = 2000 + year;
+	}, {
+		key: "toBuffer",
+		value: function toBuffer() {
+			var str = this.toString();
 
-		this.month = parseInt(parserArray[2], 10);
-		this.day = parseInt(parserArray[3], 10);
-		this.hour = parseInt(parserArray[4], 10);
-		this.minute = parseInt(parserArray[5], 10);
-		this.second = parseInt(parserArray[6], 10);
-		//endregion
-	}
-	//**********************************************************************************
-	/**
-  * Function converting ASN.1 internal class into JavaScript string
-  * @returns {string}
-  */
-	toString() {
-		const outputArray = new Array(7);
+			var buffer = new ArrayBuffer(str.length);
+			var view = new Uint8Array(buffer);
 
-		outputArray[0] = (0, _pvutils.padNumber)(this.year < 2000 ? this.year - 1900 : this.year - 2000, 2);
-		outputArray[1] = (0, _pvutils.padNumber)(this.month, 2);
-		outputArray[2] = (0, _pvutils.padNumber)(this.day, 2);
-		outputArray[3] = (0, _pvutils.padNumber)(this.hour, 2);
-		outputArray[4] = (0, _pvutils.padNumber)(this.minute, 2);
-		outputArray[5] = (0, _pvutils.padNumber)(this.second, 2);
-		outputArray[6] = "Z";
+			for (var i = 0; i < str.length; i++) {
+				view[i] = str.charCodeAt(i);
+			}return buffer;
+		}
+		//**********************************************************************************
+		/**
+   * Function converting "Date" object into ASN.1 internal string
+   * @param {!Date} inputDate JavaScript "Date" object
+   */
 
-		return outputArray.join("");
-	}
-	//**********************************************************************************
-	/**
-  * Aux function, need to get a block name. Need to have it here for inhiritence
-  * @returns {string}
-  */
-	static blockName() {
-		return "UTCTime";
-	}
-	//**********************************************************************************
-	/**
-  * Convertion for the block to JSON object
-  * @returns {Object}
-  */
-	toJSON() {
-		let object = {};
+	}, {
+		key: "fromDate",
+		value: function fromDate(inputDate) {
+			this.year = inputDate.getUTCFullYear();
+			this.month = inputDate.getUTCMonth() + 1;
+			this.day = inputDate.getUTCDate();
+			this.hour = inputDate.getUTCHours();
+			this.minute = inputDate.getUTCMinutes();
+			this.second = inputDate.getUTCSeconds();
+		}
+		//**********************************************************************************
+		//noinspection JSUnusedGlobalSymbols
+		/**
+   * Function converting ASN.1 internal string into "Date" object
+   * @returns {Date}
+   */
 
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
+	}, {
+		key: "toDate",
+		value: function toDate() {
+			return new Date(Date.UTC(this.year, this.month - 1, this.day, this.hour, this.minute, this.second));
+		}
+		//**********************************************************************************
+		/**
+   * Function converting JavaScript string into ASN.1 internal class
+   * @param {!string} inputString ASN.1 BER encoded array
+   */
 
-		object.year = this.year;
-		object.month = this.month;
-		object.day = this.day;
-		object.hour = this.hour;
-		object.minute = this.minute;
-		object.second = this.second;
+	}, {
+		key: "fromString",
+		value: function fromString(inputString) {
+			//region Parse input string
+			var parser = /(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})Z/ig;
+			var parserArray = parser.exec(inputString);
+			if (parserArray === null) {
+				this.error = "Wrong input string for convertion";
+				return;
+			}
+			//endregion
 
-		return object;
-	}
-	//**********************************************************************************
-}
+			//region Store parsed values
+			var year = parseInt(parserArray[1], 10);
+			if (year >= 50) this.year = 1900 + year;else this.year = 2000 + year;
+
+			this.month = parseInt(parserArray[2], 10);
+			this.day = parseInt(parserArray[3], 10);
+			this.hour = parseInt(parserArray[4], 10);
+			this.minute = parseInt(parserArray[5], 10);
+			this.second = parseInt(parserArray[6], 10);
+			//endregion
+		}
+		//**********************************************************************************
+		/**
+   * Function converting ASN.1 internal class into JavaScript string
+   * @returns {string}
+   */
+
+	}, {
+		key: "toString",
+		value: function toString() {
+			var outputArray = new Array(7);
+
+			outputArray[0] = (0, _pvutils.padNumber)(this.year < 2000 ? this.year - 1900 : this.year - 2000, 2);
+			outputArray[1] = (0, _pvutils.padNumber)(this.month, 2);
+			outputArray[2] = (0, _pvutils.padNumber)(this.day, 2);
+			outputArray[3] = (0, _pvutils.padNumber)(this.hour, 2);
+			outputArray[4] = (0, _pvutils.padNumber)(this.minute, 2);
+			outputArray[5] = (0, _pvutils.padNumber)(this.second, 2);
+			outputArray[6] = "Z";
+
+			return outputArray.join("");
+		}
+		//**********************************************************************************
+		/**
+   * Aux function, need to get a block name. Need to have it here for inhiritence
+   * @returns {string}
+   */
+
+	}, {
+		key: "toJSON",
+
+		//**********************************************************************************
+		/**
+   * Convertion for the block to JSON object
+   * @returns {Object}
+   */
+		value: function toJSON() {
+			var object = {};
+
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(UTCTime.prototype.__proto__ || Object.getPrototypeOf(UTCTime.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
+
+			object.year = this.year;
+			object.month = this.month;
+			object.day = this.day;
+			object.hour = this.hour;
+			object.minute = this.minute;
+			object.second = this.second;
+
+			return object;
+		}
+		//**********************************************************************************
+
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "UTCTime";
+		}
+	}]);
+
+	return UTCTime;
+}(VisibleString);
+
 exports.UTCTime = UTCTime; //**************************************************************************************
 /**
  * @extends VisibleString
  */
 
-class GeneralizedTime extends VisibleString {
+var GeneralizedTime = function (_VisibleString2) {
+	_inherits(GeneralizedTime, _VisibleString2);
+
 	//**********************************************************************************
 	/**
   * Constructor for "GeneralizedTime" class
@@ -20280,36 +21326,43 @@ class GeneralizedTime extends VisibleString {
   * @property {string} [value] String representatio of the date
   * @property {Date} [valueDate] JavaScript "Date" object
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function GeneralizedTime() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.year = 0;
-		this.month = 0;
-		this.day = 0;
-		this.hour = 0;
-		this.minute = 0;
-		this.second = 0;
-		this.millisecond = 0;
+		_classCallCheck(this, GeneralizedTime);
+
+		var _this45 = _possibleConstructorReturn(this, (GeneralizedTime.__proto__ || Object.getPrototypeOf(GeneralizedTime)).call(this, parameters));
+
+		_this45.year = 0;
+		_this45.month = 0;
+		_this45.day = 0;
+		_this45.hour = 0;
+		_this45.minute = 0;
+		_this45.second = 0;
+		_this45.millisecond = 0;
 
 		//region Create UTCTime from ASN.1 UTC string value
 		if ("value" in parameters) {
-			this.fromString(parameters.value);
+			_this45.fromString(parameters.value);
 
-			this.valueBlock.valueHex = new ArrayBuffer(parameters.value.length);
-			const view = new Uint8Array(this.valueBlock.valueHex);
+			_this45.valueBlock.valueHex = new ArrayBuffer(parameters.value.length);
+			var view = new Uint8Array(_this45.valueBlock.valueHex);
 
-			for (let i = 0; i < parameters.value.length; i++) view[i] = parameters.value.charCodeAt(i);
+			for (var i = 0; i < parameters.value.length; i++) {
+				view[i] = parameters.value.charCodeAt(i);
+			}
 		}
 		//endregion
 		//region Create GeneralizedTime from JavaScript Date type
 		if ("valueDate" in parameters) {
-			this.fromDate(parameters.valueDate);
-			this.valueBlock.valueHex = this.toBuffer();
+			_this45.fromDate(parameters.valueDate);
+			_this45.valueBlock.valueHex = _this45.toBuffer();
 		}
 		//endregion
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 24; // GeneralizedTime
+		_this45.idBlock.tagClass = 1; // UNIVERSAL
+		_this45.idBlock.tagNumber = 24; // GeneralizedTime
+		return _this45;
 	}
 	//**********************************************************************************
 	/**
@@ -20319,512 +21372,640 @@ class GeneralizedTime extends VisibleString {
   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
   * @returns {number} Offset after least decoded byte
   */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		const resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
-		if (resultOffset === -1) {
-			this.error = this.valueBlock.error;
+
+
+	_createClass(GeneralizedTime, [{
+		key: "fromBER",
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			var resultOffset = this.valueBlock.fromBER(inputBuffer, inputOffset, this.lenBlock.isIndefiniteForm === true ? inputLength : this.lenBlock.length);
+			if (resultOffset === -1) {
+				this.error = this.valueBlock.error;
+				return resultOffset;
+			}
+
+			this.fromBuffer(this.valueBlock.valueHex);
+
+			if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
+
+			if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
+
+			if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
+
 			return resultOffset;
 		}
+		//**********************************************************************************
+		/**
+   * Function converting ArrayBuffer into ASN.1 internal string
+   * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
+   */
 
-		this.fromBuffer(this.valueBlock.valueHex);
-
-		if (this.idBlock.error.length === 0) this.blockLength += this.idBlock.blockLength;
-
-		if (this.lenBlock.error.length === 0) this.blockLength += this.lenBlock.blockLength;
-
-		if (this.valueBlock.error.length === 0) this.blockLength += this.valueBlock.blockLength;
-
-		return resultOffset;
-	}
-	//**********************************************************************************
-	/**
-  * Function converting ArrayBuffer into ASN.1 internal string
-  * @param {!ArrayBuffer} inputBuffer ASN.1 BER encoded array
-  */
-	fromBuffer(inputBuffer) {
-		this.fromString(String.fromCharCode.apply(null, new Uint8Array(inputBuffer)));
-	}
-	//**********************************************************************************
-	/**
-  * Function converting ASN.1 internal string into ArrayBuffer
-  * @returns {ArrayBuffer}
-  */
-	toBuffer() {
-		const str = this.toString();
-
-		const buffer = new ArrayBuffer(str.length);
-		const view = new Uint8Array(buffer);
-
-		for (let i = 0; i < str.length; i++) view[i] = str.charCodeAt(i);
-
-		return buffer;
-	}
-	//**********************************************************************************
-	/**
-  * Function converting "Date" object into ASN.1 internal string
-  * @param {!Date} inputDate JavaScript "Date" object
-  */
-	fromDate(inputDate) {
-		this.year = inputDate.getUTCFullYear();
-		this.month = inputDate.getUTCMonth() + 1;
-		this.day = inputDate.getUTCDate();
-		this.hour = inputDate.getUTCHours();
-		this.minute = inputDate.getUTCMinutes();
-		this.second = inputDate.getUTCSeconds();
-		this.millisecond = inputDate.getUTCMilliseconds();
-	}
-	//**********************************************************************************
-	//noinspection JSUnusedGlobalSymbols
-	/**
-  * Function converting ASN.1 internal string into "Date" object
-  * @returns {Date}
-  */
-	toDate() {
-		return new Date(Date.UTC(this.year, this.month - 1, this.day, this.hour, this.minute, this.second, this.millisecond));
-	}
-	//**********************************************************************************
-	/**
-  * Function converting JavaScript string into ASN.1 internal class
-  * @param {!string} inputString ASN.1 BER encoded array
-  */
-	fromString(inputString) {
-		//region Initial variables
-		let isUTC = false;
-
-		let timeString = "";
-		let dateTimeString = "";
-		let fractionPart = 0;
-
-		let parser;
-
-		let hourDifference = 0;
-		let minuteDifference = 0;
-		//endregion
-
-		//region Convert as UTC time
-		if (inputString[inputString.length - 1] === "Z") {
-			timeString = inputString.substr(0, inputString.length - 1);
-
-			isUTC = true;
+	}, {
+		key: "fromBuffer",
+		value: function fromBuffer(inputBuffer) {
+			this.fromString(String.fromCharCode.apply(null, new Uint8Array(inputBuffer)));
 		}
-		//endregion
-		//region Convert as local time
-		else {
-				//noinspection JSPrimitiveTypeWrapperUsage
-				const number = new Number(inputString[inputString.length - 1]);
+		//**********************************************************************************
+		/**
+   * Function converting ASN.1 internal string into ArrayBuffer
+   * @returns {ArrayBuffer}
+   */
 
-				if (isNaN(number.valueOf())) throw new Error("Wrong input string for convertion");
+	}, {
+		key: "toBuffer",
+		value: function toBuffer() {
+			var str = this.toString();
 
-				timeString = inputString;
+			var buffer = new ArrayBuffer(str.length);
+			var view = new Uint8Array(buffer);
+
+			for (var i = 0; i < str.length; i++) {
+				view[i] = str.charCodeAt(i);
+			}return buffer;
+		}
+		//**********************************************************************************
+		/**
+   * Function converting "Date" object into ASN.1 internal string
+   * @param {!Date} inputDate JavaScript "Date" object
+   */
+
+	}, {
+		key: "fromDate",
+		value: function fromDate(inputDate) {
+			this.year = inputDate.getUTCFullYear();
+			this.month = inputDate.getUTCMonth() + 1;
+			this.day = inputDate.getUTCDate();
+			this.hour = inputDate.getUTCHours();
+			this.minute = inputDate.getUTCMinutes();
+			this.second = inputDate.getUTCSeconds();
+			this.millisecond = inputDate.getUTCMilliseconds();
+		}
+		//**********************************************************************************
+		//noinspection JSUnusedGlobalSymbols
+		/**
+   * Function converting ASN.1 internal string into "Date" object
+   * @returns {Date}
+   */
+
+	}, {
+		key: "toDate",
+		value: function toDate() {
+			return new Date(Date.UTC(this.year, this.month - 1, this.day, this.hour, this.minute, this.second, this.millisecond));
+		}
+		//**********************************************************************************
+		/**
+   * Function converting JavaScript string into ASN.1 internal class
+   * @param {!string} inputString ASN.1 BER encoded array
+   */
+
+	}, {
+		key: "fromString",
+		value: function fromString(inputString) {
+			//region Initial variables
+			var isUTC = false;
+
+			var timeString = "";
+			var dateTimeString = "";
+			var fractionPart = 0;
+
+			var parser = void 0;
+
+			var hourDifference = 0;
+			var minuteDifference = 0;
+			//endregion
+
+			//region Convert as UTC time
+			if (inputString[inputString.length - 1] === "Z") {
+				timeString = inputString.substr(0, inputString.length - 1);
+
+				isUTC = true;
 			}
-		//endregion
-
-		//region Check that we do not have a "+" and "-" symbols inside UTC time
-		if (isUTC) {
-			if (timeString.indexOf("+") !== -1) throw new Error("Wrong input string for convertion");
-
-			if (timeString.indexOf("-") !== -1) throw new Error("Wrong input string for convertion");
-		}
-		//endregion
-		//region Get "UTC time difference" in case of local time
-		else {
-				let multiplier = 1;
-				let differencePosition = timeString.indexOf("+");
-				let differenceString = "";
-
-				if (differencePosition === -1) {
-					differencePosition = timeString.indexOf("-");
-					multiplier = -1;
-				}
-
-				if (differencePosition !== -1) {
-					differenceString = timeString.substr(differencePosition + 1);
-					timeString = timeString.substr(0, differencePosition);
-
-					if (differenceString.length !== 2 && differenceString.length !== 4) throw new Error("Wrong input string for convertion");
-
+			//endregion
+			//region Convert as local time
+			else {
 					//noinspection JSPrimitiveTypeWrapperUsage
-					let number = new Number(differenceString.substr(0, 2));
+					var number = new Number(inputString[inputString.length - 1]);
 
 					if (isNaN(number.valueOf())) throw new Error("Wrong input string for convertion");
 
-					hourDifference = multiplier * number;
+					timeString = inputString;
+				}
+			//endregion
 
-					if (differenceString.length === 4) {
+			//region Check that we do not have a "+" and "-" symbols inside UTC time
+			if (isUTC) {
+				if (timeString.indexOf("+") !== -1) throw new Error("Wrong input string for convertion");
+
+				if (timeString.indexOf("-") !== -1) throw new Error("Wrong input string for convertion");
+			}
+			//endregion
+			//region Get "UTC time difference" in case of local time
+			else {
+					var multiplier = 1;
+					var differencePosition = timeString.indexOf("+");
+					var differenceString = "";
+
+					if (differencePosition === -1) {
+						differencePosition = timeString.indexOf("-");
+						multiplier = -1;
+					}
+
+					if (differencePosition !== -1) {
+						differenceString = timeString.substr(differencePosition + 1);
+						timeString = timeString.substr(0, differencePosition);
+
+						if (differenceString.length !== 2 && differenceString.length !== 4) throw new Error("Wrong input string for convertion");
+
 						//noinspection JSPrimitiveTypeWrapperUsage
-						number = new Number(differenceString.substr(2, 2));
+						var _number = new Number(differenceString.substr(0, 2));
 
-						if (isNaN(number.valueOf())) throw new Error("Wrong input string for convertion");
+						if (isNaN(_number.valueOf())) throw new Error("Wrong input string for convertion");
 
-						minuteDifference = multiplier * number;
+						hourDifference = multiplier * _number;
+
+						if (differenceString.length === 4) {
+							//noinspection JSPrimitiveTypeWrapperUsage
+							_number = new Number(differenceString.substr(2, 2));
+
+							if (isNaN(_number.valueOf())) throw new Error("Wrong input string for convertion");
+
+							minuteDifference = multiplier * _number;
+						}
 					}
 				}
-			}
-		//endregion
+			//endregion
 
-		//region Get position of fraction point
-		let fractionPointPosition = timeString.indexOf("."); // Check for "full stop" symbol
-		if (fractionPointPosition === -1) fractionPointPosition = timeString.indexOf(","); // Check for "comma" symbol
-		//endregion
+			//region Get position of fraction point
+			var fractionPointPosition = timeString.indexOf("."); // Check for "full stop" symbol
+			if (fractionPointPosition === -1) fractionPointPosition = timeString.indexOf(","); // Check for "comma" symbol
+			//endregion
 
-		//region Get fraction part
-		if (fractionPointPosition !== -1) {
-			//noinspection JSPrimitiveTypeWrapperUsage
-			const fractionPartCheck = new Number(`0${timeString.substr(fractionPointPosition)}`);
+			//region Get fraction part
+			if (fractionPointPosition !== -1) {
+				//noinspection JSPrimitiveTypeWrapperUsage
+				var fractionPartCheck = new Number("0" + timeString.substr(fractionPointPosition));
 
-			if (isNaN(fractionPartCheck.valueOf())) throw new Error("Wrong input string for convertion");
+				if (isNaN(fractionPartCheck.valueOf())) throw new Error("Wrong input string for convertion");
 
-			fractionPart = fractionPartCheck.valueOf();
+				fractionPart = fractionPartCheck.valueOf();
 
-			dateTimeString = timeString.substr(0, fractionPointPosition);
-		} else dateTimeString = timeString;
-		//endregion
+				dateTimeString = timeString.substr(0, fractionPointPosition);
+			} else dateTimeString = timeString;
+			//endregion
 
-		//region Parse internal date
-		switch (true) {
-			case dateTimeString.length === 8:
-				// "YYYYMMDD"
-				parser = /(\d{4})(\d{2})(\d{2})/ig;
-				if (fractionPointPosition !== -1) throw new Error("Wrong input string for convertion"); // Here we should not have a "fraction point"
-				break;
-			case dateTimeString.length === 10:
-				// "YYYYMMDDHH"
-				parser = /(\d{4})(\d{2})(\d{2})(\d{2})/ig;
-
-				if (fractionPointPosition !== -1) {
-					let fractionResult = 60 * fractionPart;
-					this.minute = Math.floor(fractionResult);
-
-					fractionResult = 60 * (fractionResult - this.minute);
-					this.second = Math.floor(fractionResult);
-
-					fractionResult = 1000 * (fractionResult - this.second);
-					this.millisecond = Math.floor(fractionResult);
-				}
-				break;
-			case dateTimeString.length === 12:
-				// "YYYYMMDDHHMM"
-				parser = /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/ig;
-
-				if (fractionPointPosition !== -1) {
-					let fractionResult = 60 * fractionPart;
-					this.second = Math.floor(fractionResult);
-
-					fractionResult = 1000 * (fractionResult - this.second);
-					this.millisecond = Math.floor(fractionResult);
-				}
-				break;
-			case dateTimeString.length === 14:
-				// "YYYYMMDDHHMMSS"
-				parser = /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/ig;
-
-				if (fractionPointPosition !== -1) {
-					const fractionResult = 1000 * fractionPart;
-					this.millisecond = Math.floor(fractionResult);
-				}
-				break;
-			default:
-				throw new Error("Wrong input string for convertion");
-		}
-		//endregion
-
-		//region Put parsed values at right places
-		const parserArray = parser.exec(dateTimeString);
-		if (parserArray === null) throw new Error("Wrong input string for convertion");
-
-		for (let j = 1; j < parserArray.length; j++) {
-			switch (j) {
-				case 1:
-					this.year = parseInt(parserArray[j], 10);
+			//region Parse internal date
+			switch (true) {
+				case dateTimeString.length === 8:
+					// "YYYYMMDD"
+					parser = /(\d{4})(\d{2})(\d{2})/ig;
+					if (fractionPointPosition !== -1) throw new Error("Wrong input string for convertion"); // Here we should not have a "fraction point"
 					break;
-				case 2:
-					this.month = parseInt(parserArray[j], 10);
+				case dateTimeString.length === 10:
+					// "YYYYMMDDHH"
+					parser = /(\d{4})(\d{2})(\d{2})(\d{2})/ig;
+
+					if (fractionPointPosition !== -1) {
+						var fractionResult = 60 * fractionPart;
+						this.minute = Math.floor(fractionResult);
+
+						fractionResult = 60 * (fractionResult - this.minute);
+						this.second = Math.floor(fractionResult);
+
+						fractionResult = 1000 * (fractionResult - this.second);
+						this.millisecond = Math.floor(fractionResult);
+					}
 					break;
-				case 3:
-					this.day = parseInt(parserArray[j], 10);
+				case dateTimeString.length === 12:
+					// "YYYYMMDDHHMM"
+					parser = /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/ig;
+
+					if (fractionPointPosition !== -1) {
+						var _fractionResult = 60 * fractionPart;
+						this.second = Math.floor(_fractionResult);
+
+						_fractionResult = 1000 * (_fractionResult - this.second);
+						this.millisecond = Math.floor(_fractionResult);
+					}
 					break;
-				case 4:
-					this.hour = parseInt(parserArray[j], 10) + hourDifference;
-					break;
-				case 5:
-					this.minute = parseInt(parserArray[j], 10) + minuteDifference;
-					break;
-				case 6:
-					this.second = parseInt(parserArray[j], 10);
+				case dateTimeString.length === 14:
+					// "YYYYMMDDHHMMSS"
+					parser = /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/ig;
+
+					if (fractionPointPosition !== -1) {
+						var _fractionResult2 = 1000 * fractionPart;
+						this.millisecond = Math.floor(_fractionResult2);
+					}
 					break;
 				default:
 					throw new Error("Wrong input string for convertion");
 			}
+			//endregion
+
+			//region Put parsed values at right places
+			var parserArray = parser.exec(dateTimeString);
+			if (parserArray === null) throw new Error("Wrong input string for convertion");
+
+			for (var j = 1; j < parserArray.length; j++) {
+				switch (j) {
+					case 1:
+						this.year = parseInt(parserArray[j], 10);
+						break;
+					case 2:
+						this.month = parseInt(parserArray[j], 10);
+						break;
+					case 3:
+						this.day = parseInt(parserArray[j], 10);
+						break;
+					case 4:
+						this.hour = parseInt(parserArray[j], 10) + hourDifference;
+						break;
+					case 5:
+						this.minute = parseInt(parserArray[j], 10) + minuteDifference;
+						break;
+					case 6:
+						this.second = parseInt(parserArray[j], 10);
+						break;
+					default:
+						throw new Error("Wrong input string for convertion");
+				}
+			}
+			//endregion
+
+			//region Get final date
+			if (isUTC === false) {
+				var tempDate = new Date(this.year, this.month, this.day, this.hour, this.minute, this.second, this.millisecond);
+
+				this.year = tempDate.getUTCFullYear();
+				this.month = tempDate.getUTCMonth();
+				this.day = tempDate.getUTCDay();
+				this.hour = tempDate.getUTCHours();
+				this.minute = tempDate.getUTCMinutes();
+				this.second = tempDate.getUTCSeconds();
+				this.millisecond = tempDate.getUTCMilliseconds();
+			}
+			//endregion
 		}
-		//endregion
+		//**********************************************************************************
+		/**
+   * Function converting ASN.1 internal class into JavaScript string
+   * @returns {string}
+   */
 
-		//region Get final date
-		if (isUTC === false) {
-			const tempDate = new Date(this.year, this.month, this.day, this.hour, this.minute, this.second, this.millisecond);
+	}, {
+		key: "toString",
+		value: function toString() {
+			var outputArray = [];
 
-			this.year = tempDate.getUTCFullYear();
-			this.month = tempDate.getUTCMonth();
-			this.day = tempDate.getUTCDay();
-			this.hour = tempDate.getUTCHours();
-			this.minute = tempDate.getUTCMinutes();
-			this.second = tempDate.getUTCSeconds();
-			this.millisecond = tempDate.getUTCMilliseconds();
+			outputArray.push((0, _pvutils.padNumber)(this.year, 4));
+			outputArray.push((0, _pvutils.padNumber)(this.month, 2));
+			outputArray.push((0, _pvutils.padNumber)(this.day, 2));
+			outputArray.push((0, _pvutils.padNumber)(this.hour, 2));
+			outputArray.push((0, _pvutils.padNumber)(this.minute, 2));
+			outputArray.push((0, _pvutils.padNumber)(this.second, 2));
+			if (this.millisecond !== 0) {
+				outputArray.push(".");
+				outputArray.push((0, _pvutils.padNumber)(this.millisecond, 3));
+			}
+			outputArray.push("Z");
+
+			return outputArray.join("");
 		}
-		//endregion
-	}
-	//**********************************************************************************
-	/**
-  * Function converting ASN.1 internal class into JavaScript string
-  * @returns {string}
-  */
-	toString() {
-		const outputArray = [];
+		//**********************************************************************************
+		/**
+   * Aux function, need to get a block name. Need to have it here for inhiritence
+   * @returns {string}
+   */
 
-		outputArray.push((0, _pvutils.padNumber)(this.year, 4));
-		outputArray.push((0, _pvutils.padNumber)(this.month, 2));
-		outputArray.push((0, _pvutils.padNumber)(this.day, 2));
-		outputArray.push((0, _pvutils.padNumber)(this.hour, 2));
-		outputArray.push((0, _pvutils.padNumber)(this.minute, 2));
-		outputArray.push((0, _pvutils.padNumber)(this.second, 2));
-		if (this.millisecond !== 0) {
-			outputArray.push(".");
-			outputArray.push((0, _pvutils.padNumber)(this.millisecond, 3));
+	}, {
+		key: "toJSON",
+
+		//**********************************************************************************
+		/**
+   * Convertion for the block to JSON object
+   * @returns {Object}
+   */
+		value: function toJSON() {
+			var object = {};
+
+			//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
+			try {
+				object = _get(GeneralizedTime.prototype.__proto__ || Object.getPrototypeOf(GeneralizedTime.prototype), "toJSON", this).call(this);
+			} catch (ex) {}
+			//endregion
+
+			object.year = this.year;
+			object.month = this.month;
+			object.day = this.day;
+			object.hour = this.hour;
+			object.minute = this.minute;
+			object.second = this.second;
+			object.millisecond = this.millisecond;
+
+			return object;
 		}
-		outputArray.push("Z");
+		//**********************************************************************************
 
-		return outputArray.join("");
-	}
-	//**********************************************************************************
-	/**
-  * Aux function, need to get a block name. Need to have it here for inhiritence
-  * @returns {string}
-  */
-	static blockName() {
-		return "GeneralizedTime";
-	}
-	//**********************************************************************************
-	/**
-  * Convertion for the block to JSON object
-  * @returns {Object}
-  */
-	toJSON() {
-		let object = {};
+	}], [{
+		key: "blockName",
+		value: function blockName() {
+			return "GeneralizedTime";
+		}
+	}]);
 
-		//region Seems at the moment (Sep 2016) there is no way how to check method is supported in "super" object
-		try {
-			object = super.toJSON();
-		} catch (ex) {}
-		//endregion
+	return GeneralizedTime;
+}(VisibleString);
 
-		object.year = this.year;
-		object.month = this.month;
-		object.day = this.day;
-		object.hour = this.hour;
-		object.minute = this.minute;
-		object.second = this.second;
-		object.millisecond = this.millisecond;
-
-		return object;
-	}
-	//**********************************************************************************
-}
 exports.GeneralizedTime = GeneralizedTime; //**************************************************************************************
 /**
  * @extends Utf8String
  */
 
-class DATE extends Utf8String {
+var DATE = function (_Utf8String) {
+	_inherits(DATE, _Utf8String);
+
 	//**********************************************************************************
 	/**
   * Constructor for "DATE" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function DATE() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 31; // DATE
+		_classCallCheck(this, DATE);
+
+		var _this46 = _possibleConstructorReturn(this, (DATE.__proto__ || Object.getPrototypeOf(DATE)).call(this, parameters));
+
+		_this46.idBlock.tagClass = 1; // UNIVERSAL
+		_this46.idBlock.tagNumber = 31; // DATE
+		return _this46;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "DATE";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(DATE, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "DATE";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return DATE;
+}(Utf8String);
+
 exports.DATE = DATE; //**************************************************************************************
 /**
  * @extends Utf8String
  */
 
-class TimeOfDay extends Utf8String {
+var TimeOfDay = function (_Utf8String2) {
+	_inherits(TimeOfDay, _Utf8String2);
+
 	//**********************************************************************************
 	/**
   * Constructor for "TimeOfDay" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function TimeOfDay() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 32; // TimeOfDay
+		_classCallCheck(this, TimeOfDay);
+
+		var _this47 = _possibleConstructorReturn(this, (TimeOfDay.__proto__ || Object.getPrototypeOf(TimeOfDay)).call(this, parameters));
+
+		_this47.idBlock.tagClass = 1; // UNIVERSAL
+		_this47.idBlock.tagNumber = 32; // TimeOfDay
+		return _this47;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "TimeOfDay";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(TimeOfDay, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "TimeOfDay";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return TimeOfDay;
+}(Utf8String);
+
 exports.TimeOfDay = TimeOfDay; //**************************************************************************************
 /**
  * @extends Utf8String
  */
 
-class DateTime extends Utf8String {
+var DateTime = function (_Utf8String3) {
+	_inherits(DateTime, _Utf8String3);
+
 	//**********************************************************************************
 	/**
   * Constructor for "DateTime" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function DateTime() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 33; // DateTime
+		_classCallCheck(this, DateTime);
+
+		var _this48 = _possibleConstructorReturn(this, (DateTime.__proto__ || Object.getPrototypeOf(DateTime)).call(this, parameters));
+
+		_this48.idBlock.tagClass = 1; // UNIVERSAL
+		_this48.idBlock.tagNumber = 33; // DateTime
+		return _this48;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "DateTime";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(DateTime, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "DateTime";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return DateTime;
+}(Utf8String);
+
 exports.DateTime = DateTime; //**************************************************************************************
 /**
  * @extends Utf8String
  */
 
-class Duration extends Utf8String {
+var Duration = function (_Utf8String4) {
+	_inherits(Duration, _Utf8String4);
+
 	//**********************************************************************************
 	/**
   * Constructor for "Duration" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function Duration() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 34; // Duration
+		_classCallCheck(this, Duration);
+
+		var _this49 = _possibleConstructorReturn(this, (Duration.__proto__ || Object.getPrototypeOf(Duration)).call(this, parameters));
+
+		_this49.idBlock.tagClass = 1; // UNIVERSAL
+		_this49.idBlock.tagNumber = 34; // Duration
+		return _this49;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "Duration";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(Duration, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "Duration";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return Duration;
+}(Utf8String);
+
 exports.Duration = Duration; //**************************************************************************************
 /**
  * @extends Utf8String
  */
 
-class TIME extends Utf8String {
+var TIME = function (_Utf8String5) {
+	_inherits(TIME, _Utf8String5);
+
 	//**********************************************************************************
 	/**
   * Constructor for "Time" class
   * @param {Object} [parameters={}]
   */
-	constructor(parameters = {}) {
-		super(parameters);
+	function TIME() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-		this.idBlock.tagClass = 1; // UNIVERSAL
-		this.idBlock.tagNumber = 14; // Time
+		_classCallCheck(this, TIME);
+
+		var _this50 = _possibleConstructorReturn(this, (TIME.__proto__ || Object.getPrototypeOf(TIME)).call(this, parameters));
+
+		_this50.idBlock.tagClass = 1; // UNIVERSAL
+		_this50.idBlock.tagNumber = 14; // Time
+		return _this50;
 	}
 	//**********************************************************************************
 	/**
   * Aux function, need to get a block name. Need to have it here for inhiritence
   * @returns {string}
   */
-	static blockName() {
-		return "TIME";
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(TIME, null, [{
+		key: "blockName",
+		value: function blockName() {
+			return "TIME";
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return TIME;
+}(Utf8String);
+
 exports.TIME = TIME; //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of special ASN.1 schema type Choice
 //**************************************************************************************
 
-class Choice {
-	//**********************************************************************************
-	/**
-  * Constructor for "Choice" class
-  * @param {Object} [parameters={}]
-  * @property {Array} [value] Array of ASN.1 types for make a choice from
-  * @property {boolean} [optional]
-  */
-	constructor(parameters = {}) {
-		this.value = (0, _pvutils.getParametersValue)(parameters, "value", []);
-		this.optional = (0, _pvutils.getParametersValue)(parameters, "optional", false);
-	}
-	//**********************************************************************************
+var Choice =
+//**********************************************************************************
+/**
+ * Constructor for "Choice" class
+ * @param {Object} [parameters={}]
+ * @property {Array} [value] Array of ASN.1 types for make a choice from
+ * @property {boolean} [optional]
+ */
+function Choice() {
+	var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+	_classCallCheck(this, Choice);
+
+	this.value = (0, _pvutils.getParametersValue)(parameters, "value", []);
+	this.optional = (0, _pvutils.getParametersValue)(parameters, "optional", false);
 }
+//**********************************************************************************
+;
+
 exports.Choice = Choice; //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of special ASN.1 schema type Any
 //**************************************************************************************
 
-class Any {
-	//**********************************************************************************
-	/**
-  * Constructor for "Any" class
-  * @param {Object} [parameters={}]
-  * @property {string} [name]
-  * @property {boolean} [optional]
-  */
-	constructor(parameters = {}) {
-		this.name = (0, _pvutils.getParametersValue)(parameters, "name", "");
-		this.optional = (0, _pvutils.getParametersValue)(parameters, "optional", false);
-	}
-	//**********************************************************************************
+var Any =
+//**********************************************************************************
+/**
+ * Constructor for "Any" class
+ * @param {Object} [parameters={}]
+ * @property {string} [name]
+ * @property {boolean} [optional]
+ */
+function Any() {
+	var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+	_classCallCheck(this, Any);
+
+	this.name = (0, _pvutils.getParametersValue)(parameters, "name", "");
+	this.optional = (0, _pvutils.getParametersValue)(parameters, "optional", false);
 }
+//**********************************************************************************
+;
+
 exports.Any = Any; //**************************************************************************************
 //endregion
 //**************************************************************************************
 //region Declaration of special ASN.1 schema type Repeated
 //**************************************************************************************
 
-class Repeated {
-	//**********************************************************************************
-	/**
-  * Constructor for "Repeated" class
-  * @param {Object} [parameters={}]
-  * @property {string} [name]
-  * @property {boolean} [optional]
-  */
-	constructor(parameters = {}) {
-		this.name = (0, _pvutils.getParametersValue)(parameters, "name", "");
-		this.optional = (0, _pvutils.getParametersValue)(parameters, "optional", false);
-		this.value = (0, _pvutils.getParametersValue)(parameters, "value", new Any());
-		this.local = (0, _pvutils.getParametersValue)(parameters, "local", false); // Could local or global array to store elements
-	}
-	//**********************************************************************************
+var Repeated =
+//**********************************************************************************
+/**
+ * Constructor for "Repeated" class
+ * @param {Object} [parameters={}]
+ * @property {string} [name]
+ * @property {boolean} [optional]
+ */
+function Repeated() {
+	var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+	_classCallCheck(this, Repeated);
+
+	this.name = (0, _pvutils.getParametersValue)(parameters, "name", "");
+	this.optional = (0, _pvutils.getParametersValue)(parameters, "optional", false);
+	this.value = (0, _pvutils.getParametersValue)(parameters, "value", new Any());
+	this.local = (0, _pvutils.getParametersValue)(parameters, "local", false); // Could local or global array to store elements
 }
+//**********************************************************************************
+;
+
 exports.Repeated = Repeated; //**************************************************************************************
 //endregion
 //**************************************************************************************
@@ -20834,7 +22015,7 @@ exports.Repeated = Repeated; //*************************************************
  * @description Special class providing ability to have "toBER/fromBER" for raw ArrayBuffer
  */
 
-class RawData {
+var RawData = function () {
 	//**********************************************************************************
 	/**
   * Constructor for "Repeated" class
@@ -20842,7 +22023,11 @@ class RawData {
   * @property {string} [name]
   * @property {boolean} [optional]
   */
-	constructor(parameters = {}) {
+	function RawData() {
+		var parameters = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+		_classCallCheck(this, RawData);
+
 		this.data = (0, _pvutils.getParametersValue)(parameters, "data", new ArrayBuffer(0));
 	}
 	//**********************************************************************************
@@ -20853,21 +22038,35 @@ class RawData {
   * @param {!number} inputLength Maximum length of array of bytes which can be using in this function
   * @returns {number} Offset after least decoded byte
   */
-	fromBER(inputBuffer, inputOffset, inputLength) {
-		this.data = inputBuffer.slice(inputOffset, inputLength);
-		return inputOffset + inputLength;
-	}
-	//**********************************************************************************
-	/**
-  * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
-  * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
-  * @returns {ArrayBuffer}
-  */
-	toBER(sizeOnly = false) {
-		return this.data;
-	}
-	//**********************************************************************************
-}
+
+
+	_createClass(RawData, [{
+		key: "fromBER",
+		value: function fromBER(inputBuffer, inputOffset, inputLength) {
+			this.data = inputBuffer.slice(inputOffset, inputLength);
+			return inputOffset + inputLength;
+		}
+		//**********************************************************************************
+		/**
+   * Encoding of current ASN.1 block into ASN.1 encoded array (BER rules)
+   * @param {boolean} [sizeOnly=false] Flag that we need only a size of encoding, not a real array of bytes
+   * @returns {ArrayBuffer}
+   */
+
+	}, {
+		key: "toBER",
+		value: function toBER() {
+			var sizeOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+			return this.data;
+		}
+		//**********************************************************************************
+
+	}]);
+
+	return RawData;
+}();
+
 exports.RawData = RawData; //**************************************************************************************
 //endregion
 //**************************************************************************************
@@ -20882,13 +22081,13 @@ exports.RawData = RawData; //***************************************************
  */
 
 function LocalFromBER(inputBuffer, inputOffset, inputLength) {
-	const incomingOffset = inputOffset; // Need to store initial offset since "inputOffset" is changing in the function
+	var incomingOffset = inputOffset; // Need to store initial offset since "inputOffset" is changing in the function
 
 	//region Local function changing a type for ASN.1 classes
 	function localChangeType(inputObject, newType) {
 		if (inputObject instanceof newType) return inputObject;
 
-		const newObject = new newType();
+		var newObject = new newType();
 		newObject.idBlock = inputObject.idBlock;
 		newObject.lenBlock = inputObject.lenBlock;
 		newObject.warnings = inputObject.warnings;
@@ -20900,7 +22099,7 @@ function LocalFromBER(inputBuffer, inputOffset, inputLength) {
 	//endregion
 
 	//region Create a basic ASN.1 type since we need to return errors and warnings from the function
-	let returnObject = new BaseBlock({}, Object);
+	var returnObject = new BaseBlock({}, Object);
 	//endregion
 
 	//region Basic check for parameters
@@ -20914,7 +22113,7 @@ function LocalFromBER(inputBuffer, inputOffset, inputLength) {
 	//endregion
 
 	//region Getting Uint8Array from ArrayBuffer
-	const intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
+	var intBuffer = new Uint8Array(inputBuffer, inputOffset, inputLength);
 	//endregion
 
 	//region Initial checks
@@ -20928,7 +22127,7 @@ function LocalFromBER(inputBuffer, inputOffset, inputLength) {
 	//endregion
 
 	//region Decode indentifcation block of ASN.1 BER structure
-	let resultOffset = returnObject.idBlock.fromBER(inputBuffer, inputOffset, inputLength);
+	var resultOffset = returnObject.idBlock.fromBER(inputBuffer, inputOffset, inputLength);
 	returnObject.warnings.concat(returnObject.idBlock.warnings);
 	if (resultOffset === -1) {
 		returnObject.error = returnObject.idBlock.error;
@@ -20968,7 +22167,7 @@ function LocalFromBER(inputBuffer, inputOffset, inputLength) {
 	//endregion
 
 	//region Switch ASN.1 block type
-	let newASN1Type = BaseBlock;
+	var newASN1Type = BaseBlock;
 
 	switch (returnObject.idBlock.tagClass) {
 		//region UNIVERSAL
@@ -21151,7 +22350,7 @@ function LocalFromBER(inputBuffer, inputOffset, inputLength) {
 				//region default
 				default:
 					{
-						let newObject;
+						var newObject = void 0;
 
 						if (returnObject.idBlock.isConstructed === true) newObject = new Constructed();else newObject = new Primitive();
 
@@ -21200,12 +22399,12 @@ function LocalFromBER(inputBuffer, inputOffset, inputLength) {
  */
 function fromBER(inputBuffer) {
 	if (inputBuffer.byteLength === 0) {
-		const result = new BaseBlock({}, Object);
+		var result = new BaseBlock({}, Object);
 		result.error = "Input buffer has zero length";
 
 		return {
 			offset: -1,
-			result
+			result: result
 		};
 	}
 
@@ -21226,10 +22425,10 @@ function fromBER(inputBuffer) {
 function compareSchema(root, inputData, inputSchema) {
 	//region Special case for Choice schema element type
 	if (inputSchema instanceof Choice) {
-		const choiceResult = false;
+		var choiceResult = false;
 
-		for (let j = 0; j < inputSchema.value.length; j++) {
-			const result = compareSchema(root, inputData, inputSchema.value[j]);
+		for (var j = 0; j < inputSchema.value.length; j++) {
+			var result = compareSchema(root, inputData, inputSchema.value[j]);
 			if (result.verified === true) {
 				return {
 					verified: true,
@@ -21239,7 +22438,7 @@ function compareSchema(root, inputData, inputSchema) {
 		}
 
 		if (choiceResult === false) {
-			const _result = {
+			var _result = {
 				verified: false,
 				result: {
 					error: "Wrong values for Choice type"
@@ -21313,7 +22512,7 @@ function compareSchema(root, inputData, inputSchema) {
 		};
 	}
 
-	const encodedId = inputSchema.idBlock.toBER(false);
+	var encodedId = inputSchema.idBlock.toBER(false);
 	if (encodedId.byteLength === 0) {
 		return {
 			verified: false,
@@ -21321,7 +22520,7 @@ function compareSchema(root, inputData, inputSchema) {
 		};
 	}
 
-	const decodedOffset = inputSchema.idBlock.fromBER(encodedId, 0, encodedId.byteLength);
+	var decodedOffset = inputSchema.idBlock.fromBER(encodedId, 0, encodedId.byteLength);
 	if (decodedOffset === -1) {
 		return {
 			verified: false,
@@ -21401,8 +22600,8 @@ function compareSchema(root, inputData, inputSchema) {
 				};
 			}
 
-		const schemaView = new Uint8Array(inputSchema.idBlock.valueHex);
-		const asn1View = new Uint8Array(inputData.idBlock.valueHex);
+		var schemaView = new Uint8Array(inputSchema.idBlock.valueHex);
+		var asn1View = new Uint8Array(inputData.idBlock.valueHex);
 
 		if (schemaView.length !== asn1View.length) {
 			return {
@@ -21411,7 +22610,7 @@ function compareSchema(root, inputData, inputSchema) {
 			};
 		}
 
-		for (let i = 0; i < schemaView.length; i++) {
+		for (var i = 0; i < schemaView.length; i++) {
 			if (schemaView[i] !== asn1View[1]) {
 				return {
 					verified: false,
@@ -21432,10 +22631,10 @@ function compareSchema(root, inputData, inputSchema) {
 
 	//region Getting next ASN.1 block for comparition
 	if (inputSchema.idBlock.isConstructed === true) {
-		let admission = 0;
-		let result = { verified: false };
+		var admission = 0;
+		var _result2 = { verified: false };
 
-		let maxLength = inputSchema.valueBlock.value.length;
+		var maxLength = inputSchema.valueBlock.value.length;
 
 		if (maxLength > 0) {
 			if (inputSchema.valueBlock.value[0] instanceof Repeated) maxLength = inputData.valueBlock.value.length;
@@ -21452,11 +22651,11 @@ function compareSchema(root, inputData, inputSchema) {
 
 		//region Special case when "inputData" has no values and "inputSchema" has all optional values
 		if (inputData.valueBlock.value.length === 0 && inputSchema.valueBlock.value.length !== 0) {
-			let _optional = true;
+			var _optional = true;
 
-			for (let i = 0; i < inputSchema.valueBlock.value.length; i++) _optional = _optional && (inputSchema.valueBlock.value[i].optional || false);
-
-			if (_optional === true) {
+			for (var _i8 = 0; _i8 < inputSchema.valueBlock.value.length; _i8++) {
+				_optional = _optional && (inputSchema.valueBlock.value[_i8].optional || false);
+			}if (_optional === true) {
 				return {
 					verified: true,
 					result: root
@@ -21479,11 +22678,11 @@ function compareSchema(root, inputData, inputSchema) {
 		}
 		//endregion
 
-		for (let i = 0; i < maxLength; i++) {
+		for (var _i9 = 0; _i9 < maxLength; _i9++) {
 			//region Special case when there is an "optional" element of ASN.1 schema at the end
-			if (i - admission >= inputData.valueBlock.value.length) {
-				if (inputSchema.valueBlock.value[i].optional === false) {
-					const _result = {
+			if (_i9 - admission >= inputData.valueBlock.value.length) {
+				if (inputSchema.valueBlock.value[_i9].optional === false) {
+					var _result3 = {
 						verified: false,
 						result: root
 					};
@@ -21495,20 +22694,20 @@ function compareSchema(root, inputData, inputSchema) {
 						inputSchema.name = inputSchema.name.replace(/^\s+|\s+$/g, "");
 						if (inputSchema.name !== "") {
 							delete root[inputSchema.name];
-							_result.name = inputSchema.name;
+							_result3.name = inputSchema.name;
 						}
 					}
 					//endregion
 
-					return _result;
+					return _result3;
 				}
 			}
 			//endregion
 			else {
 					//region Special case for Repeated type of ASN.1 schema element
 					if (inputSchema.valueBlock.value[0] instanceof Repeated) {
-						result = compareSchema(root, inputData.valueBlock.value[i], inputSchema.valueBlock.value[0].value);
-						if (result.verified === false) {
+						_result2 = compareSchema(root, inputData.valueBlock.value[_i9], inputSchema.valueBlock.value[0].value);
+						if (_result2.verified === false) {
 							if (inputSchema.valueBlock.value[0].optional === true) admission++;else {
 								//region Delete early added name of block
 								if (inputSchema.hasOwnProperty("name")) {
@@ -21517,25 +22716,25 @@ function compareSchema(root, inputData, inputSchema) {
 								}
 								//endregion
 
-								return result;
+								return _result2;
 							}
 						}
 
 						if ("name" in inputSchema.valueBlock.value[0] && inputSchema.valueBlock.value[0].name.length > 0) {
-							let arrayRoot = {};
+							var arrayRoot = {};
 
 							if ("local" in inputSchema.valueBlock.value[0] && inputSchema.valueBlock.value[0].local === true) arrayRoot = inputData;else arrayRoot = root;
 
 							if (typeof arrayRoot[inputSchema.valueBlock.value[0].name] === "undefined") arrayRoot[inputSchema.valueBlock.value[0].name] = [];
 
-							arrayRoot[inputSchema.valueBlock.value[0].name].push(inputData.valueBlock.value[i]);
+							arrayRoot[inputSchema.valueBlock.value[0].name].push(inputData.valueBlock.value[_i9]);
 						}
 					}
 					//endregion
 					else {
-							result = compareSchema(root, inputData.valueBlock.value[i - admission], inputSchema.valueBlock.value[i]);
-							if (result.verified === false) {
-								if (inputSchema.valueBlock.value[i].optional === true) admission++;else {
+							_result2 = compareSchema(root, inputData.valueBlock.value[_i9 - admission], inputSchema.valueBlock.value[_i9]);
+							if (_result2.verified === false) {
+								if (inputSchema.valueBlock.value[_i9].optional === true) admission++;else {
 									//region Delete early added name of block
 									if (inputSchema.hasOwnProperty("name")) {
 										inputSchema.name = inputSchema.name.replace(/^\s+|\s+$/g, "");
@@ -21543,16 +22742,16 @@ function compareSchema(root, inputData, inputSchema) {
 									}
 									//endregion
 
-									return result;
+									return _result2;
 								}
 							}
 						}
 				}
 		}
 
-		if (result.verified === false) // The situation may take place if last element is "optional" and verification failed
+		if (_result2.verified === false) // The situation may take place if last element is "optional" and verification failed
 			{
-				const _result = {
+				var _result4 = {
 					verified: false,
 					result: root
 				};
@@ -21562,12 +22761,12 @@ function compareSchema(root, inputData, inputSchema) {
 					inputSchema.name = inputSchema.name.replace(/^\s+|\s+$/g, "");
 					if (inputSchema.name !== "") {
 						delete root[inputSchema.name];
-						_result.name = inputSchema.name;
+						_result4.name = inputSchema.name;
 					}
 				}
 				//endregion
 
-				return _result;
+				return _result4;
 			}
 
 		return {
@@ -21579,9 +22778,9 @@ function compareSchema(root, inputData, inputSchema) {
 	//region Ability to parse internal value for primitive-encoded value (value of OctetString, for example)
 	if ("primitiveSchema" in inputSchema && "valueHex" in inputData.valueBlock) {
 		//region Decoding of raw ASN.1 data
-		const asn1 = fromBER(inputData.valueBlock.valueHex);
+		var asn1 = fromBER(inputData.valueBlock.valueHex);
 		if (asn1.offset === -1) {
-			const _result = {
+			var _result5 = {
 				verified: false,
 				result: asn1.result
 			};
@@ -21591,12 +22790,12 @@ function compareSchema(root, inputData, inputSchema) {
 				inputSchema.name = inputSchema.name.replace(/^\s+|\s+$/g, "");
 				if (inputSchema.name !== "") {
 					delete root[inputSchema.name];
-					_result.name = inputSchema.name;
+					_result5.name = inputSchema.name;
 				}
 			}
 			//endregion
 
-			return _result;
+			return _result5;
 		}
 		//endregion
 
@@ -21628,7 +22827,7 @@ function verifySchema(inputBuffer, inputSchema) {
 	//endregion
 
 	//region Decoding of raw ASN.1 data
-	const asn1 = fromBER(inputBuffer);
+	var asn1 = fromBER(inputBuffer);
 	if (asn1.offset === -1) {
 		return {
 			verified: false,
@@ -21661,38 +22860,41 @@ function fromJSON(json) {}
 
 /***/ }),
 /* 185 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getUTCDate", function() { return getUTCDate; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getParametersValue", function() { return getParametersValue; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "bufferToHexCodes", function() { return bufferToHexCodes; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkBufferParams", function() { return checkBufferParams; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "utilFromBase", function() { return utilFromBase; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "utilToBase", function() { return utilToBase; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "utilConcatBuf", function() { return utilConcatBuf; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "utilConcatView", function() { return utilConcatView; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "utilDecodeTC", function() { return utilDecodeTC; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "utilEncodeTC", function() { return utilEncodeTC; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isEqualBuffer", function() { return isEqualBuffer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "padNumber", function() { return padNumber; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "toBase64", function() { return toBase64; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fromBase64", function() { return fromBase64; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "arrayBufferToString", function() { return arrayBufferToString; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "stringToArrayBuffer", function() { return stringToArrayBuffer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "nearestPowerOf2", function() { return nearestPowerOf2; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "clearProps", function() { return clearProps; });
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.getUTCDate = getUTCDate;
+exports.getParametersValue = getParametersValue;
+exports.bufferToHexCodes = bufferToHexCodes;
+exports.checkBufferParams = checkBufferParams;
+exports.utilFromBase = utilFromBase;
+exports.utilToBase = utilToBase;
+exports.utilConcatBuf = utilConcatBuf;
+exports.utilConcatView = utilConcatView;
+exports.utilDecodeTC = utilDecodeTC;
+exports.utilEncodeTC = utilEncodeTC;
+exports.isEqualBuffer = isEqualBuffer;
+exports.padNumber = padNumber;
+exports.toBase64 = toBase64;
+exports.fromBase64 = fromBase64;
+exports.arrayBufferToString = arrayBufferToString;
+exports.stringToArrayBuffer = stringToArrayBuffer;
+exports.nearestPowerOf2 = nearestPowerOf2;
+exports.clearProps = clearProps;
 //**************************************************************************************
 /**
  * Making UTC date from local date
  * @param {Date} date Date to convert from
  * @returns {Date}
  */
-function getUTCDate(date)
-{
+function getUTCDate(date) {
 	// noinspection NestedFunctionCallJS, MagicNumberJS
-	return new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
+	return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
 }
 //**************************************************************************************
 // noinspection FunctionWithMultipleReturnPointsJS
@@ -21702,16 +22904,13 @@ function getUTCDate(date)
  * @param {string} name
  * @param defaultValue
  */
-function getParametersValue(parameters, name, defaultValue)
-{
+function getParametersValue(parameters, name, defaultValue) {
 	// noinspection ConstantOnRightSideOfComparisonJS, NonBlockStatementBodyJS
-	if((parameters instanceof Object) === false)
-		return defaultValue;
-	
+	if (parameters instanceof Object === false) return defaultValue;
+
 	// noinspection NonBlockStatementBodyJS
-	if(name in parameters)
-		return parameters[name];
-	
+	if (name in parameters) return parameters[name];
+
 	return defaultValue;
 }
 //**************************************************************************************
@@ -21723,26 +22922,47 @@ function getParametersValue(parameters, name, defaultValue)
  * @param {boolean} [insertSpace=false]
  * @returns {string}
  */
-function bufferToHexCodes(inputBuffer, inputOffset = 0, inputLength = (inputBuffer.byteLength - inputOffset), insertSpace = false)
-{
-	let result = "";
-	
-	for(const item of (new Uint8Array(inputBuffer, inputOffset, inputLength)))
-	{
-		// noinspection ChainedFunctionCallJS
-		const str = item.toString(16).toUpperCase();
-		
-		// noinspection ConstantOnRightSideOfComparisonJS, NonBlockStatementBodyJS
-		if(str.length === 1)
-			result += "0";
-		
-		result += str;
-		
-		// noinspection NonBlockStatementBodyJS
-		if(insertSpace)
-			result += " ";
+function bufferToHexCodes(inputBuffer) {
+	var inputOffset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+	var inputLength = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : inputBuffer.byteLength - inputOffset;
+	var insertSpace = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+	var result = "";
+
+	var _iteratorNormalCompletion = true;
+	var _didIteratorError = false;
+	var _iteratorError = undefined;
+
+	try {
+		for (var _iterator = new Uint8Array(inputBuffer, inputOffset, inputLength)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+			var item = _step.value;
+
+			// noinspection ChainedFunctionCallJS
+			var str = item.toString(16).toUpperCase();
+
+			// noinspection ConstantOnRightSideOfComparisonJS, NonBlockStatementBodyJS
+			if (str.length === 1) result += "0";
+
+			result += str;
+
+			// noinspection NonBlockStatementBodyJS
+			if (insertSpace) result += " ";
+		}
+	} catch (err) {
+		_didIteratorError = true;
+		_iteratorError = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion && _iterator.return) {
+				_iterator.return();
+			}
+		} finally {
+			if (_didIteratorError) {
+				throw _iteratorError;
+			}
+		}
 	}
-	
+
 	return result.trim();
 }
 //**************************************************************************************
@@ -21755,48 +22975,42 @@ function bufferToHexCodes(inputBuffer, inputOffset = 0, inputLength = (inputBuff
  * @param {number} inputLength
  * @returns {boolean}
  */
-function checkBufferParams(baseBlock, inputBuffer, inputOffset, inputLength)
-{
+function checkBufferParams(baseBlock, inputBuffer, inputOffset, inputLength) {
 	// noinspection ConstantOnRightSideOfComparisonJS
-	if((inputBuffer instanceof ArrayBuffer) === false)
-	{
+	if (inputBuffer instanceof ArrayBuffer === false) {
 		// noinspection JSUndefinedPropertyAssignment
 		baseBlock.error = "Wrong parameter: inputBuffer must be \"ArrayBuffer\"";
 		return false;
 	}
-	
+
 	// noinspection ConstantOnRightSideOfComparisonJS
-	if(inputBuffer.byteLength === 0)
-	{
+	if (inputBuffer.byteLength === 0) {
 		// noinspection JSUndefinedPropertyAssignment
 		baseBlock.error = "Wrong parameter: inputBuffer has zero length";
 		return false;
 	}
-	
+
 	// noinspection ConstantOnRightSideOfComparisonJS
-	if(inputOffset < 0)
-	{
+	if (inputOffset < 0) {
 		// noinspection JSUndefinedPropertyAssignment
 		baseBlock.error = "Wrong parameter: inputOffset less than zero";
 		return false;
 	}
-	
+
 	// noinspection ConstantOnRightSideOfComparisonJS
-	if(inputLength < 0)
-	{
+	if (inputLength < 0) {
 		// noinspection JSUndefinedPropertyAssignment
 		baseBlock.error = "Wrong parameter: inputLength less than zero";
 		return false;
 	}
-	
+
 	// noinspection ConstantOnRightSideOfComparisonJS
-	if((inputBuffer.byteLength - inputOffset - inputLength) < 0)
-	{
+	if (inputBuffer.byteLength - inputOffset - inputLength < 0) {
 		// noinspection JSUndefinedPropertyAssignment
 		baseBlock.error = "End of input reached before message was fully decoded (inconsistent offset and length values)";
 		return false;
 	}
-	
+
 	return true;
 }
 //**************************************************************************************
@@ -21807,19 +23021,16 @@ function checkBufferParams(baseBlock, inputBuffer, inputOffset, inputLength)
  * @param {number} inputBase
  * @returns {number}
  */
-function utilFromBase(inputBuffer, inputBase)
-{
-	let result = 0;
-	
+function utilFromBase(inputBuffer, inputBase) {
+	var result = 0;
+
 	// noinspection ConstantOnRightSideOfComparisonJS, NonBlockStatementBodyJS
-	if(inputBuffer.length === 1)
-		return inputBuffer[0];
-	
+	if (inputBuffer.length === 1) return inputBuffer[0];
+
 	// noinspection ConstantOnRightSideOfComparisonJS, NonBlockStatementBodyJS
-	for(let i = (inputBuffer.length - 1); i >= 0; i--)
-		result += inputBuffer[(inputBuffer.length - 1) - i] * Math.pow(2, inputBase * i);
-	
-	return result;
+	for (var i = inputBuffer.length - 1; i >= 0; i--) {
+		result += inputBuffer[inputBuffer.length - 1 - i] * Math.pow(2, inputBase * i);
+	}return result;
 }
 //**************************************************************************************
 // noinspection FunctionWithMultipleLoopsJS, FunctionWithMultipleReturnPointsJS
@@ -21830,55 +23041,49 @@ function utilFromBase(inputBuffer, inputBase)
  * @param {number} [reserved=0] Pre-defined number of bytes in output array (-1 = limited by function itself)
  * @returns {ArrayBuffer}
  */
-function utilToBase(value, base, reserved = (-1))
-{
-	const internalReserved = reserved;
-	let internalValue = value;
-	
-	let result = 0;
-	let biggest = Math.pow(2, base);
-	
+function utilToBase(value, base) {
+	var reserved = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : -1;
+
+	var internalReserved = reserved;
+	var internalValue = value;
+
+	var result = 0;
+	var biggest = Math.pow(2, base);
+
 	// noinspection ConstantOnRightSideOfComparisonJS
-	for(let i = 1; i < 8; i++)
-	{
-		if(value < biggest)
-		{
-			let retBuf;
-			
+	for (var i = 1; i < 8; i++) {
+		if (value < biggest) {
+			var retBuf = void 0;
+
 			// noinspection ConstantOnRightSideOfComparisonJS
-			if(internalReserved < 0)
-			{
+			if (internalReserved < 0) {
 				retBuf = new ArrayBuffer(i);
 				result = i;
-			}
-			else
-			{
+			} else {
 				// noinspection NonBlockStatementBodyJS
-				if(internalReserved < i)
-					return (new ArrayBuffer(0));
-				
+				if (internalReserved < i) return new ArrayBuffer(0);
+
 				retBuf = new ArrayBuffer(internalReserved);
-				
+
 				result = internalReserved;
 			}
-			
-			const retView = new Uint8Array(retBuf);
-			
+
+			var retView = new Uint8Array(retBuf);
+
 			// noinspection ConstantOnRightSideOfComparisonJS
-			for(let j = (i - 1); j >= 0; j--)
-			{
-				const basis = Math.pow(2, j * base);
-				
+			for (var j = i - 1; j >= 0; j--) {
+				var basis = Math.pow(2, j * base);
+
 				retView[result - j - 1] = Math.floor(internalValue / basis);
-				internalValue -= (retView[result - j - 1]) * basis;
+				internalValue -= retView[result - j - 1] * basis;
 			}
-			
+
 			return retBuf;
 		}
-		
+
 		biggest *= Math.pow(2, base);
 	}
-	
+
 	return new ArrayBuffer(0);
 }
 //**************************************************************************************
@@ -21887,30 +23092,75 @@ function utilToBase(value, base, reserved = (-1))
  * Concatenate two ArrayBuffers
  * @param {...ArrayBuffer} buffers Set of ArrayBuffer
  */
-function utilConcatBuf(...buffers)
-{
+function utilConcatBuf() {
 	//region Initial variables
-	let outputLength = 0;
-	let prevLength = 0;
+	var outputLength = 0;
+	var prevLength = 0;
 	//endregion
-	
+
 	//region Calculate output length
-	
+
 	// noinspection NonBlockStatementBodyJS
-	for(const buffer of buffers)
-		outputLength += buffer.byteLength;
-	//endregion
-	
-	const retBuf = new ArrayBuffer(outputLength);
-	const retView = new Uint8Array(retBuf);
-	
-	for(const buffer of buffers)
-	{
-		// noinspection NestedFunctionCallJS
-		retView.set(new Uint8Array(buffer), prevLength);
-		prevLength += buffer.byteLength;
+
+	for (var _len = arguments.length, buffers = Array(_len), _key = 0; _key < _len; _key++) {
+		buffers[_key] = arguments[_key];
 	}
-	
+
+	var _iteratorNormalCompletion2 = true;
+	var _didIteratorError2 = false;
+	var _iteratorError2 = undefined;
+
+	try {
+		for (var _iterator2 = buffers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+			var buffer = _step2.value;
+
+			outputLength += buffer.byteLength;
+		} //endregion
+	} catch (err) {
+		_didIteratorError2 = true;
+		_iteratorError2 = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion2 && _iterator2.return) {
+				_iterator2.return();
+			}
+		} finally {
+			if (_didIteratorError2) {
+				throw _iteratorError2;
+			}
+		}
+	}
+
+	var retBuf = new ArrayBuffer(outputLength);
+	var retView = new Uint8Array(retBuf);
+
+	var _iteratorNormalCompletion3 = true;
+	var _didIteratorError3 = false;
+	var _iteratorError3 = undefined;
+
+	try {
+		for (var _iterator3 = buffers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+			var _buffer = _step3.value;
+
+			// noinspection NestedFunctionCallJS
+			retView.set(new Uint8Array(_buffer), prevLength);
+			prevLength += _buffer.byteLength;
+		}
+	} catch (err) {
+		_didIteratorError3 = true;
+		_iteratorError3 = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion3 && _iterator3.return) {
+				_iterator3.return();
+			}
+		} finally {
+			if (_didIteratorError3) {
+				throw _iteratorError3;
+			}
+		}
+	}
+
 	return retBuf;
 }
 //**************************************************************************************
@@ -21919,28 +23169,73 @@ function utilConcatBuf(...buffers)
  * Concatenate two Uint8Array
  * @param {...Uint8Array} views Set of Uint8Array
  */
-function utilConcatView(...views)
-{
+function utilConcatView() {
 	//region Initial variables
-	let outputLength = 0;
-	let prevLength = 0;
+	var outputLength = 0;
+	var prevLength = 0;
 	//endregion
-	
+
 	//region Calculate output length
 	// noinspection NonBlockStatementBodyJS
-	for(const view of views)
-		outputLength += view.length;
-	//endregion
-	
-	const retBuf = new ArrayBuffer(outputLength);
-	const retView = new Uint8Array(retBuf);
-	
-	for(const view of views)
-	{
-		retView.set(view, prevLength);
-		prevLength += view.length;
+
+	for (var _len2 = arguments.length, views = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+		views[_key2] = arguments[_key2];
 	}
-	
+
+	var _iteratorNormalCompletion4 = true;
+	var _didIteratorError4 = false;
+	var _iteratorError4 = undefined;
+
+	try {
+		for (var _iterator4 = views[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+			var view = _step4.value;
+
+			outputLength += view.length;
+		} //endregion
+	} catch (err) {
+		_didIteratorError4 = true;
+		_iteratorError4 = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion4 && _iterator4.return) {
+				_iterator4.return();
+			}
+		} finally {
+			if (_didIteratorError4) {
+				throw _iteratorError4;
+			}
+		}
+	}
+
+	var retBuf = new ArrayBuffer(outputLength);
+	var retView = new Uint8Array(retBuf);
+
+	var _iteratorNormalCompletion5 = true;
+	var _didIteratorError5 = false;
+	var _iteratorError5 = undefined;
+
+	try {
+		for (var _iterator5 = views[Symbol.iterator](), _step5; !(_iteratorNormalCompletion5 = (_step5 = _iterator5.next()).done); _iteratorNormalCompletion5 = true) {
+			var _view = _step5.value;
+
+			retView.set(_view, prevLength);
+			prevLength += _view.length;
+		}
+	} catch (err) {
+		_didIteratorError5 = true;
+		_iteratorError5 = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion5 && _iterator5.return) {
+				_iterator5.return();
+			}
+		} finally {
+			if (_didIteratorError5) {
+				throw _iteratorError5;
+			}
+		}
+	}
+
 	return retView;
 }
 //**************************************************************************************
@@ -21950,50 +23245,45 @@ function utilConcatView(...views)
  * The function must be called in scope of instance of "hexBlock" class ("valueHex" and "warnings" properties must be present)
  * @returns {number}
  */
-function utilDecodeTC()
-{
-	const buf = new Uint8Array(this.valueHex);
-	
+function utilDecodeTC() {
+	var buf = new Uint8Array(this.valueHex);
+
 	// noinspection ConstantOnRightSideOfComparisonJS
-	if(this.valueHex.byteLength >= 2)
-	{
+	if (this.valueHex.byteLength >= 2) {
 		//noinspection JSBitwiseOperatorUsage, ConstantOnRightSideOfComparisonJS, LocalVariableNamingConventionJS, MagicNumberJS, NonShortCircuitBooleanExpressionJS
-		const condition1 = (buf[0] === 0xFF) && (buf[1] & 0x80);
+		var condition1 = buf[0] === 0xFF && buf[1] & 0x80;
 		// noinspection ConstantOnRightSideOfComparisonJS, LocalVariableNamingConventionJS, MagicNumberJS, NonShortCircuitBooleanExpressionJS
-		const condition2 = (buf[0] === 0x00) && ((buf[1] & 0x80) === 0x00);
-		
+		var condition2 = buf[0] === 0x00 && (buf[1] & 0x80) === 0x00;
+
 		// noinspection NonBlockStatementBodyJS
-		if(condition1 || condition2)
-			this.warnings.push("Needlessly long format");
+		if (condition1 || condition2) this.warnings.push("Needlessly long format");
 	}
-	
+
 	//region Create big part of the integer
-	const bigIntBuffer = new ArrayBuffer(this.valueHex.byteLength);
-	const bigIntView = new Uint8Array(bigIntBuffer);
+	var bigIntBuffer = new ArrayBuffer(this.valueHex.byteLength);
+	var bigIntView = new Uint8Array(bigIntBuffer);
 	// noinspection NonBlockStatementBodyJS
-	for(let i = 0; i < this.valueHex.byteLength; i++)
+	for (var i = 0; i < this.valueHex.byteLength; i++) {
 		bigIntView[i] = 0;
-	
-	// noinspection MagicNumberJS, NonShortCircuitBooleanExpressionJS
-	bigIntView[0] = (buf[0] & 0x80); // mask only the biggest bit
-	
-	const bigInt = utilFromBase(bigIntView, 8);
+	} // noinspection MagicNumberJS, NonShortCircuitBooleanExpressionJS
+	bigIntView[0] = buf[0] & 0x80; // mask only the biggest bit
+
+	var bigInt = utilFromBase(bigIntView, 8);
 	//endregion
-	
+
 	//region Create small part of the integer
-	const smallIntBuffer = new ArrayBuffer(this.valueHex.byteLength);
-	const smallIntView = new Uint8Array(smallIntBuffer);
+	var smallIntBuffer = new ArrayBuffer(this.valueHex.byteLength);
+	var smallIntView = new Uint8Array(smallIntBuffer);
 	// noinspection NonBlockStatementBodyJS
-	for(let j = 0; j < this.valueHex.byteLength; j++)
+	for (var j = 0; j < this.valueHex.byteLength; j++) {
 		smallIntView[j] = buf[j];
-	
-	// noinspection MagicNumberJS
+	} // noinspection MagicNumberJS
 	smallIntView[0] &= 0x7F; // mask biggest bit
-	
-	const smallInt = utilFromBase(smallIntView, 8);
+
+	var smallInt = utilFromBase(smallIntView, 8);
 	//endregion
-	
-	return (smallInt - bigInt);
+
+	return smallInt - bigInt;
 }
 //**************************************************************************************
 // noinspection FunctionWithMultipleLoopsJS, FunctionWithMultipleReturnPointsJS
@@ -22002,60 +23292,54 @@ function utilDecodeTC()
  * @param {number} value Value to encode
  * @returns {ArrayBuffer}
  */
-function utilEncodeTC(value)
-{
+function utilEncodeTC(value) {
 	// noinspection ConstantOnRightSideOfComparisonJS, ConditionalExpressionJS
-	const modValue = (value < 0) ? (value * (-1)) : value;
-	let bigInt = 128;
-	
+	var modValue = value < 0 ? value * -1 : value;
+	var bigInt = 128;
+
 	// noinspection ConstantOnRightSideOfComparisonJS
-	for(let i = 1; i < 8; i++)
-	{
-		if(modValue <= bigInt)
-		{
+	for (var i = 1; i < 8; i++) {
+		if (modValue <= bigInt) {
 			// noinspection ConstantOnRightSideOfComparisonJS
-			if(value < 0)
-			{
-				const smallInt = bigInt - modValue;
-				
-				const retBuf = utilToBase(smallInt, 8, i);
-				const retView = new Uint8Array(retBuf);
-				
+			if (value < 0) {
+				var smallInt = bigInt - modValue;
+
+				var _retBuf = utilToBase(smallInt, 8, i);
+				var _retView = new Uint8Array(_retBuf);
+
 				// noinspection MagicNumberJS
-				retView[0] |= 0x80;
-				
-				return retBuf;
+				_retView[0] |= 0x80;
+
+				return _retBuf;
 			}
-			
-			let retBuf = utilToBase(modValue, 8, i);
-			let retView = new Uint8Array(retBuf);
-			
+
+			var retBuf = utilToBase(modValue, 8, i);
+			var retView = new Uint8Array(retBuf);
+
 			//noinspection JSBitwiseOperatorUsage, MagicNumberJS, NonShortCircuitBooleanExpressionJS
-			if(retView[0] & 0x80)
-			{
+			if (retView[0] & 0x80) {
 				//noinspection JSCheckFunctionSignatures
-				const tempBuf = retBuf.slice(0);
-				const tempView = new Uint8Array(tempBuf);
-				
+				var tempBuf = retBuf.slice(0);
+				var tempView = new Uint8Array(tempBuf);
+
 				retBuf = new ArrayBuffer(retBuf.byteLength + 1);
 				// noinspection ReuseOfLocalVariableJS
 				retView = new Uint8Array(retBuf);
-				
+
 				// noinspection NonBlockStatementBodyJS
-				for(let k = 0; k < tempBuf.byteLength; k++)
+				for (var k = 0; k < tempBuf.byteLength; k++) {
 					retView[k + 1] = tempView[k];
-				
-				// noinspection MagicNumberJS
+				} // noinspection MagicNumberJS
 				retView[0] = 0x00;
 			}
-			
+
 			return retBuf;
 		}
-		
+
 		bigInt *= Math.pow(2, 8);
 	}
-	
-	return (new ArrayBuffer(0));
+
+	return new ArrayBuffer(0);
 }
 //**************************************************************************************
 // noinspection FunctionWithMultipleReturnPointsJS, ParameterNamingConventionJS
@@ -22065,24 +23349,20 @@ function utilEncodeTC(value)
  * @param {!ArrayBuffer} inputBuffer2
  * @returns {boolean}
  */
-function isEqualBuffer(inputBuffer1, inputBuffer2)
-{
+function isEqualBuffer(inputBuffer1, inputBuffer2) {
 	// noinspection NonBlockStatementBodyJS
-	if(inputBuffer1.byteLength !== inputBuffer2.byteLength)
-		return false;
-	
+	if (inputBuffer1.byteLength !== inputBuffer2.byteLength) return false;
+
 	// noinspection LocalVariableNamingConventionJS
-	const view1 = new Uint8Array(inputBuffer1);
+	var view1 = new Uint8Array(inputBuffer1);
 	// noinspection LocalVariableNamingConventionJS
-	const view2 = new Uint8Array(inputBuffer2);
-	
-	for(let i = 0; i < view1.length; i++)
-	{
+	var view2 = new Uint8Array(inputBuffer2);
+
+	for (var i = 0; i < view1.length; i++) {
 		// noinspection NonBlockStatementBodyJS
-		if(view1[i] !== view2[i])
-			return false;
+		if (view1[i] !== view2[i]) return false;
 	}
-	
+
 	return true;
 }
 //**************************************************************************************
@@ -22093,28 +23373,25 @@ function isEqualBuffer(inputBuffer1, inputBuffer2)
  * @param {number} inputNumber
  * @param {number} fullLength
  */
-function padNumber(inputNumber, fullLength)
-{
-	const str = inputNumber.toString(10);
-	
+function padNumber(inputNumber, fullLength) {
+	var str = inputNumber.toString(10);
+
 	// noinspection NonBlockStatementBodyJS
-	if(fullLength < str.length)
-		return "";
-	
-	const dif = fullLength - str.length;
-	
-	const padding = new Array(dif);
+	if (fullLength < str.length) return "";
+
+	var dif = fullLength - str.length;
+
+	var padding = new Array(dif);
 	// noinspection NonBlockStatementBodyJS
-	for(let i = 0; i < dif; i++)
+	for (var i = 0; i < dif; i++) {
 		padding[i] = "0";
-	
-	const paddingString = padding.join("");
-	
+	}var paddingString = padding.join("");
+
 	return paddingString.concat(str);
 }
 //**************************************************************************************
-const base64Template = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
-const base64UrlTemplate = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=";
+var base64Template = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+var base64UrlTemplate = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_=";
 //**************************************************************************************
 // noinspection FunctionWithMultipleLoopsJS, OverlyComplexFunctionJS, FunctionTooLongJS, FunctionNamingConventionJS
 /**
@@ -22125,98 +23402,82 @@ const base64UrlTemplate = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0
  * @param {boolean} skipLeadingZeros Skip leading zeros in input data or not
  * @returns {string}
  */
-function toBase64(input, useUrlTemplate = false, skipPadding = false, skipLeadingZeros = false)
-{
-	let i = 0;
-	
+function toBase64(input) {
+	var useUrlTemplate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+	var skipPadding = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+	var skipLeadingZeros = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+	var i = 0;
+
 	// noinspection LocalVariableNamingConventionJS
-	let flag1 = 0;
+	var flag1 = 0;
 	// noinspection LocalVariableNamingConventionJS
-	let flag2 = 0;
-	
-	let output = "";
-	
+	var flag2 = 0;
+
+	var output = "";
+
 	// noinspection ConditionalExpressionJS
-	const template = (useUrlTemplate) ? base64UrlTemplate : base64Template;
-	
-	if(skipLeadingZeros)
-	{
-		let nonZeroPosition = 0;
-		
-		for(let i = 0; i < input.length; i++)
-		{
+	var template = useUrlTemplate ? base64UrlTemplate : base64Template;
+
+	if (skipLeadingZeros) {
+		var nonZeroPosition = 0;
+
+		for (var _i = 0; _i < input.length; _i++) {
 			// noinspection ConstantOnRightSideOfComparisonJS
-			if(input.charCodeAt(i) !== 0)
-			{
-				nonZeroPosition = i;
+			if (input.charCodeAt(_i) !== 0) {
+				nonZeroPosition = _i;
 				// noinspection BreakStatementJS
 				break;
 			}
 		}
-		
+
 		// noinspection AssignmentToFunctionParameterJS
 		input = input.slice(nonZeroPosition);
 	}
-	
-	while(i < input.length)
-	{
+
+	while (i < input.length) {
 		// noinspection LocalVariableNamingConventionJS, IncrementDecrementResultUsedJS
-		const chr1 = input.charCodeAt(i++);
+		var chr1 = input.charCodeAt(i++);
 		// noinspection NonBlockStatementBodyJS
-		if(i >= input.length)
-			flag1 = 1;
+		if (i >= input.length) flag1 = 1;
 		// noinspection LocalVariableNamingConventionJS, IncrementDecrementResultUsedJS
-		const chr2 = input.charCodeAt(i++);
+		var chr2 = input.charCodeAt(i++);
 		// noinspection NonBlockStatementBodyJS
-		if(i >= input.length)
-			flag2 = 1;
+		if (i >= input.length) flag2 = 1;
 		// noinspection LocalVariableNamingConventionJS, IncrementDecrementResultUsedJS
-		const chr3 = input.charCodeAt(i++);
-		
+		var chr3 = input.charCodeAt(i++);
+
 		// noinspection LocalVariableNamingConventionJS
-		const enc1 = chr1 >> 2;
+		var enc1 = chr1 >> 2;
 		// noinspection LocalVariableNamingConventionJS, MagicNumberJS, NonShortCircuitBooleanExpressionJS
-		const enc2 = ((chr1 & 0x03) << 4) | (chr2 >> 4);
+		var enc2 = (chr1 & 0x03) << 4 | chr2 >> 4;
 		// noinspection LocalVariableNamingConventionJS, MagicNumberJS, NonShortCircuitBooleanExpressionJS
-		let enc3 = ((chr2 & 0x0F) << 2) | (chr3 >> 6);
+		var enc3 = (chr2 & 0x0F) << 2 | chr3 >> 6;
 		// noinspection LocalVariableNamingConventionJS, MagicNumberJS, NonShortCircuitBooleanExpressionJS
-		let enc4 = chr3 & 0x3F;
-		
+		var enc4 = chr3 & 0x3F;
+
 		// noinspection ConstantOnRightSideOfComparisonJS
-		if(flag1 === 1)
-		{
+		if (flag1 === 1) {
 			// noinspection NestedAssignmentJS, AssignmentResultUsedJS, MagicNumberJS
 			enc3 = enc4 = 64;
-		}
-		else
-		{
+		} else {
 			// noinspection ConstantOnRightSideOfComparisonJS
-			if(flag2 === 1)
-			{
+			if (flag2 === 1) {
 				// noinspection MagicNumberJS
 				enc4 = 64;
 			}
 		}
-		
+
 		// noinspection NonBlockStatementBodyJS
-		if(skipPadding)
-		{
+		if (skipPadding) {
 			// noinspection ConstantOnRightSideOfComparisonJS, NonBlockStatementBodyJS, MagicNumberJS
-			if(enc3 === 64)
-				output += `${template.charAt(enc1)}${template.charAt(enc2)}`;
-			else
-			{
+			if (enc3 === 64) output += "" + template.charAt(enc1) + template.charAt(enc2);else {
 				// noinspection ConstantOnRightSideOfComparisonJS, NonBlockStatementBodyJS, MagicNumberJS
-				if(enc4 === 64)
-					output += `${template.charAt(enc1)}${template.charAt(enc2)}${template.charAt(enc3)}`;
-				else
-					output += `${template.charAt(enc1)}${template.charAt(enc2)}${template.charAt(enc3)}${template.charAt(enc4)}`;
+				if (enc4 === 64) output += "" + template.charAt(enc1) + template.charAt(enc2) + template.charAt(enc3);else output += "" + template.charAt(enc1) + template.charAt(enc2) + template.charAt(enc3) + template.charAt(enc4);
 			}
-		}
-		else
-			output += `${template.charAt(enc1)}${template.charAt(enc2)}${template.charAt(enc3)}${template.charAt(enc4)}`;
+		} else output += "" + template.charAt(enc1) + template.charAt(enc2) + template.charAt(enc3) + template.charAt(enc4);
 	}
-	
+
 	return output;
 }
 //**************************************************************************************
@@ -22228,122 +23489,130 @@ function toBase64(input, useUrlTemplate = false, skipPadding = false, skipLeadin
  * @param {boolean} [cutTailZeros=false] If "true" then cut tailing zeroz from function result
  * @returns {string}
  */
-function fromBase64(input, useUrlTemplate = false, cutTailZeros = false)
-{
+function fromBase64(input) {
+	var useUrlTemplate = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+	var cutTailZeros = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
 	// noinspection ConditionalExpressionJS
-	const template = (useUrlTemplate) ? base64UrlTemplate : base64Template;
-	
+	var template = useUrlTemplate ? base64UrlTemplate : base64Template;
+
 	//region Aux functions
 	// noinspection FunctionWithMultipleReturnPointsJS, NestedFunctionJS
-	function indexof(toSearch)
-	{
+	function indexof(toSearch) {
 		// noinspection ConstantOnRightSideOfComparisonJS, MagicNumberJS
-		for(let i = 0; i < 64; i++)
-		{
+		for (var _i2 = 0; _i2 < 64; _i2++) {
 			// noinspection NonBlockStatementBodyJS
-			if(template.charAt(i) === toSearch)
-				return i;
+			if (template.charAt(_i2) === toSearch) return _i2;
 		}
-		
+
 		// noinspection MagicNumberJS
 		return 64;
 	}
-	
+
 	// noinspection NestedFunctionJS
-	function test(incoming)
-	{
+	function test(incoming) {
 		// noinspection ConstantOnRightSideOfComparisonJS, ConditionalExpressionJS, MagicNumberJS
-		return ((incoming === 64) ? 0x00 : incoming);
+		return incoming === 64 ? 0x00 : incoming;
 	}
 	//endregion
-	
-	let i = 0;
-	
-	let output = "";
-	
-	while(i < input.length)
-	{
+
+	var i = 0;
+
+	var output = "";
+
+	while (i < input.length) {
 		// noinspection NestedFunctionCallJS, LocalVariableNamingConventionJS, IncrementDecrementResultUsedJS
-		const enc1 = indexof(input.charAt(i++));
+		var enc1 = indexof(input.charAt(i++));
 		// noinspection NestedFunctionCallJS, LocalVariableNamingConventionJS, ConditionalExpressionJS, MagicNumberJS, IncrementDecrementResultUsedJS
-		const enc2 = (i >= input.length) ? 0x00 : indexof(input.charAt(i++));
+		var enc2 = i >= input.length ? 0x00 : indexof(input.charAt(i++));
 		// noinspection NestedFunctionCallJS, LocalVariableNamingConventionJS, ConditionalExpressionJS, MagicNumberJS, IncrementDecrementResultUsedJS
-		const enc3 = (i >= input.length) ? 0x00 : indexof(input.charAt(i++));
+		var enc3 = i >= input.length ? 0x00 : indexof(input.charAt(i++));
 		// noinspection NestedFunctionCallJS, LocalVariableNamingConventionJS, ConditionalExpressionJS, MagicNumberJS, IncrementDecrementResultUsedJS
-		const enc4 = (i >= input.length) ? 0x00 : indexof(input.charAt(i++));
-		
+		var enc4 = i >= input.length ? 0x00 : indexof(input.charAt(i++));
+
 		// noinspection LocalVariableNamingConventionJS, NonShortCircuitBooleanExpressionJS
-		const chr1 = (test(enc1) << 2) | (test(enc2) >> 4);
+		var chr1 = test(enc1) << 2 | test(enc2) >> 4;
 		// noinspection LocalVariableNamingConventionJS, MagicNumberJS, NonShortCircuitBooleanExpressionJS
-		const chr2 = ((test(enc2) & 0x0F) << 4) | (test(enc3) >> 2);
+		var chr2 = (test(enc2) & 0x0F) << 4 | test(enc3) >> 2;
 		// noinspection LocalVariableNamingConventionJS, MagicNumberJS, NonShortCircuitBooleanExpressionJS
-		const chr3 = ((test(enc3) & 0x03) << 6) | test(enc4);
-		
+		var chr3 = (test(enc3) & 0x03) << 6 | test(enc4);
+
 		output += String.fromCharCode(chr1);
-		
+
 		// noinspection ConstantOnRightSideOfComparisonJS, NonBlockStatementBodyJS, MagicNumberJS
-		if(enc3 !== 64)
-			output += String.fromCharCode(chr2);
-		
+		if (enc3 !== 64) output += String.fromCharCode(chr2);
+
 		// noinspection ConstantOnRightSideOfComparisonJS, NonBlockStatementBodyJS, MagicNumberJS
-		if(enc4 !== 64)
-			output += String.fromCharCode(chr3);
+		if (enc4 !== 64) output += String.fromCharCode(chr3);
 	}
-	
-	if(cutTailZeros)
-	{
-		const outputLength = output.length;
-		let nonZeroStart = (-1);
-		
+
+	if (cutTailZeros) {
+		var outputLength = output.length;
+		var nonZeroStart = -1;
+
 		// noinspection ConstantOnRightSideOfComparisonJS
-		for(let i = (outputLength - 1); i >= 0; i--)
-		{
+		for (var _i3 = outputLength - 1; _i3 >= 0; _i3--) {
 			// noinspection ConstantOnRightSideOfComparisonJS
-			if(output.charCodeAt(i) !== 0)
-			{
-				nonZeroStart = i;
+			if (output.charCodeAt(_i3) !== 0) {
+				nonZeroStart = _i3;
 				// noinspection BreakStatementJS
 				break;
 			}
 		}
-		
+
 		// noinspection NonBlockStatementBodyJS, NegatedIfStatementJS
-		if(nonZeroStart !== (-1))
-			output = output.slice(0, nonZeroStart + 1);
-		else
-			output = "";
+		if (nonZeroStart !== -1) output = output.slice(0, nonZeroStart + 1);else output = "";
 	}
-	
+
 	return output;
 }
 //**************************************************************************************
-function arrayBufferToString(buffer)
-{
-	let resultString = "";
-	const view = new Uint8Array(buffer);
-	
+function arrayBufferToString(buffer) {
+	var resultString = "";
+	var view = new Uint8Array(buffer);
+
 	// noinspection NonBlockStatementBodyJS
-	for(const element of view)
-		resultString += String.fromCharCode(element);
-	
+	var _iteratorNormalCompletion6 = true;
+	var _didIteratorError6 = false;
+	var _iteratorError6 = undefined;
+
+	try {
+		for (var _iterator6 = view[Symbol.iterator](), _step6; !(_iteratorNormalCompletion6 = (_step6 = _iterator6.next()).done); _iteratorNormalCompletion6 = true) {
+			var element = _step6.value;
+
+			resultString += String.fromCharCode(element);
+		}
+	} catch (err) {
+		_didIteratorError6 = true;
+		_iteratorError6 = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion6 && _iterator6.return) {
+				_iterator6.return();
+			}
+		} finally {
+			if (_didIteratorError6) {
+				throw _iteratorError6;
+			}
+		}
+	}
+
 	return resultString;
 }
 //**************************************************************************************
-function stringToArrayBuffer(str)
-{
-	const stringLength = str.length;
-	
-	const resultBuffer = new ArrayBuffer(stringLength);
-	const resultView = new Uint8Array(resultBuffer);
-	
+function stringToArrayBuffer(str) {
+	var stringLength = str.length;
+
+	var resultBuffer = new ArrayBuffer(stringLength);
+	var resultView = new Uint8Array(resultBuffer);
+
 	// noinspection NonBlockStatementBodyJS
-	for(let i = 0; i < stringLength; i++)
+	for (var i = 0; i < stringLength; i++) {
 		resultView[i] = str.charCodeAt(i);
-	
-	return resultBuffer;
+	}return resultBuffer;
 }
 //**************************************************************************************
-const log2 = Math.log(2);
+var log2 = Math.log(2);
 //**************************************************************************************
 // noinspection FunctionNamingConventionJS
 /**
@@ -22351,15 +23620,14 @@ const log2 = Math.log(2);
  * @param {number} length Current length of existing array
  * @returns {number}
  */
-function nearestPowerOf2(length)
-{
-	const base = (Math.log(length) / log2);
-	
-	const floor = Math.floor(base);
-	const round = Math.round(base);
-	
+function nearestPowerOf2(length) {
+	var base = Math.log(length) / log2;
+
+	var floor = Math.floor(base);
+	var round = Math.round(base);
+
 	// noinspection ConditionalExpressionJS
-	return ((floor === round) ? floor : round);
+	return floor === round ? floor : round;
 }
 //**************************************************************************************
 /**
@@ -22367,13 +23635,33 @@ function nearestPowerOf2(length)
  * @param {Object} object Object to delete properties from
  * @param {Array.<string>} propsArray Array of properties names
  */
-function clearProps(object, propsArray)
-{
-	for(const prop of propsArray)
-		delete object[prop];
+function clearProps(object, propsArray) {
+	var _iteratorNormalCompletion7 = true;
+	var _didIteratorError7 = false;
+	var _iteratorError7 = undefined;
+
+	try {
+		for (var _iterator7 = propsArray[Symbol.iterator](), _step7; !(_iteratorNormalCompletion7 = (_step7 = _iterator7.next()).done); _iteratorNormalCompletion7 = true) {
+			var prop = _step7.value;
+
+			delete object[prop];
+		}
+	} catch (err) {
+		_didIteratorError7 = true;
+		_iteratorError7 = err;
+	} finally {
+		try {
+			if (!_iteratorNormalCompletion7 && _iterator7.return) {
+				_iterator7.return();
+			}
+		} finally {
+			if (_didIteratorError7) {
+				throw _iteratorError7;
+			}
+		}
+	}
 }
 //**************************************************************************************
-
 
 /***/ }),
 /* 186 */
@@ -22386,7 +23674,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -22424,11 +23720,27 @@ var _RSASSAPSSParams = __webpack_require__(189);
 
 var _RSASSAPSSParams2 = _interopRequireDefault(_RSASSAPSSParams);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 function tbsCertificate() {
@@ -22646,10 +23958,8 @@ var Certificate = function () {
   * @param {string} memberName String name for a class member
   */
 
-
 	_createClass(Certificate, [{
 		key: "fromSchema",
-
 
 		//**********************************************************************************
 		/**
@@ -23295,9 +24605,21 @@ var _CryptoEngine = __webpack_require__(190);
 
 var _CryptoEngine2 = _interopRequireDefault(_CryptoEngine);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
 //**************************************************************************************
 //region Crypto engine related function
@@ -24518,7 +25840,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -24526,9 +25856,23 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(185);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -24571,7 +25915,6 @@ var AlgorithmIdentifier = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(AlgorithmIdentifier, [{
 		key: "fromSchema",
@@ -24753,7 +26096,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -24765,11 +26116,27 @@ var _AlgorithmIdentifier = __webpack_require__(188);
 
 var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -24819,7 +26186,6 @@ var RSASSAPSSParams = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(RSASSAPSSParams, [{
 		key: "fromSchema",
@@ -25050,7 +26416,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -25066,11 +26440,27 @@ var _PrivateKeyInfo = __webpack_require__(194);
 
 var _PrivateKeyInfo2 = _interopRequireDefault(_PrivateKeyInfo);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 var CryptoEngine = function () {
@@ -25109,7 +26499,6 @@ var CryptoEngine = function () {
   * @param {Array} keyUsages
   * @returns {Promise}
   */
-
 
 	_createClass(CryptoEngine, [{
 		key: "importKey",
@@ -25890,7 +27279,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -25912,11 +27309,27 @@ var _RSAPublicKey = __webpack_require__(193);
 
 var _RSAPublicKey2 = _interopRequireDefault(_RSAPublicKey);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -25968,10 +27381,8 @@ var PublicKeyInfo = function () {
   * @param {string} memberName String name for a class member
   */
 
-
 	_createClass(PublicKeyInfo, [{
 		key: "fromSchema",
-
 
 		//**********************************************************************************
 		/**
@@ -26245,7 +27656,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -26253,9 +27672,23 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(185);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -26303,7 +27736,6 @@ var ECPublicKey = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(ECPublicKey, [{
 		key: "fromSchema",
@@ -26495,7 +27927,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -26503,9 +27943,23 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(185);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -26550,7 +28004,6 @@ var RSAPublicKey = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(RSAPublicKey, [{
 		key: "fromSchema",
@@ -26683,7 +28136,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -26707,11 +28168,27 @@ var _RSAPrivateKey = __webpack_require__(197);
 
 var _RSAPrivateKey2 = _interopRequireDefault(_RSAPrivateKey);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -26773,7 +28250,6 @@ var PrivateKeyInfo = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(PrivateKeyInfo, [{
 		key: "fromSchema",
@@ -27060,7 +28536,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -27068,9 +28552,23 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(185);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -27111,7 +28609,6 @@ var Attribute = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(Attribute, [{
 		key: "fromSchema",
@@ -27267,7 +28764,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -27279,11 +28784,27 @@ var _ECPublicKey = __webpack_require__(192);
 
 var _ECPublicKey2 = _interopRequireDefault(_ECPublicKey);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -27340,7 +28861,6 @@ var ECPrivateKey = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(ECPrivateKey, [{
 		key: "fromSchema",
@@ -27599,7 +29119,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -27611,11 +29139,27 @@ var _OtherPrimeInfo = __webpack_require__(198);
 
 var _OtherPrimeInfo2 = _interopRequireDefault(_OtherPrimeInfo);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -27700,7 +29244,6 @@ var RSAPrivateKey = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(RSAPrivateKey, [{
 		key: "fromSchema",
@@ -27948,7 +29491,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -27956,9 +29507,23 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(185);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -28006,7 +29571,6 @@ var OtherPrimeInfo = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(OtherPrimeInfo, [{
 		key: "fromSchema",
@@ -28148,9 +29712,41 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
+var _slicedToArray = function () {
+	function sliceIterator(arr, i) {
+		var _arr = [];var _n = true;var _d = false;var _e = undefined;try {
+			for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+				_arr.push(_s.value);if (i && _arr.length === i) break;
+			}
+		} catch (err) {
+			_d = true;_e = err;
+		} finally {
+			try {
+				if (!_n && _i["return"]) _i["return"]();
+			} finally {
+				if (_d) throw _e;
+			}
+		}return _arr;
+	}return function (arr, i) {
+		if (Array.isArray(arr)) {
+			return arr;
+		} else if (Symbol.iterator in Object(arr)) {
+			return sliceIterator(arr, i);
+		} else {
+			throw new TypeError("Invalid attempt to destructure non-iterable instance");
+		}
+	};
+}();
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -28162,11 +29758,27 @@ var _AttributeTypeAndValue = __webpack_require__(200);
 
 var _AttributeTypeAndValue2 = _interopRequireDefault(_AttributeTypeAndValue);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -28208,7 +29820,6 @@ var RelativeDistinguishedNames = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(RelativeDistinguishedNames, [{
 		key: "fromSchema",
@@ -28425,7 +30036,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -28435,9 +30054,23 @@ var _pvutils = __webpack_require__(185);
 
 var _common = __webpack_require__(187);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -28477,7 +30110,6 @@ var AttributeTypeAndValue = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(AttributeTypeAndValue, [{
 		key: "fromSchema",
@@ -28637,7 +30269,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -28645,9 +30285,23 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(185);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -28689,7 +30343,6 @@ var Time = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(Time, [{
 		key: "fromSchema",
@@ -28816,7 +30469,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -28880,11 +30541,27 @@ var _InfoAccess = __webpack_require__(222);
 
 var _InfoAccess2 = _interopRequireDefault(_InfoAccess);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -28936,7 +30613,6 @@ var Extension = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(Extension, [{
 		key: "fromSchema",
@@ -29177,7 +30853,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -29189,11 +30873,27 @@ var _Attribute = __webpack_require__(195);
 
 var _Attribute2 = _interopRequireDefault(_Attribute);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -29228,7 +30928,6 @@ var SubjectDirectoryAttributes = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(SubjectDirectoryAttributes, [{
 		key: "fromSchema",
@@ -29352,7 +31051,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -29360,9 +31067,23 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(185);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -29405,7 +31126,6 @@ var PrivateKeyUsagePeriod = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(PrivateKeyUsagePeriod, [{
 		key: "fromSchema",
@@ -29578,7 +31298,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -29590,11 +31318,27 @@ var _GeneralName = __webpack_require__(206);
 
 var _GeneralName2 = _interopRequireDefault(_GeneralName);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -29629,7 +31373,6 @@ var AltName = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(AltName, [{
 		key: "fromSchema",
@@ -29753,7 +31496,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -29765,11 +31516,27 @@ var _RelativeDistinguishedNames = __webpack_require__(199);
 
 var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 //region Additional asn1js schema elements existing inside GENERAL_NAME schema
@@ -30007,7 +31774,6 @@ var GeneralName = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(GeneralName, [{
 		key: "fromSchema",
@@ -30346,7 +32112,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -30354,9 +32128,23 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(185);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -30400,7 +32188,6 @@ var BasicConstraints = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(BasicConstraints, [{
 		key: "fromSchema",
@@ -30544,7 +32331,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -30560,11 +32355,27 @@ var _RelativeDistinguishedNames = __webpack_require__(199);
 
 var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -30631,7 +32442,6 @@ var IssuingDistributionPoint = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(IssuingDistributionPoint, [{
 		key: "fromSchema",
@@ -30993,7 +32803,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -31005,11 +32823,27 @@ var _GeneralName = __webpack_require__(206);
 
 var _GeneralName2 = _interopRequireDefault(_GeneralName);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -31044,7 +32878,6 @@ var GeneralNames = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(GeneralNames, [{
 		key: "fromSchema",
@@ -31158,7 +32991,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -31170,11 +33011,27 @@ var _GeneralSubtree = __webpack_require__(211);
 
 var _GeneralSubtree2 = _interopRequireDefault(_GeneralSubtree);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -31217,7 +33074,6 @@ var NameConstraints = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(NameConstraints, [{
 		key: "fromSchema",
@@ -31405,7 +33261,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -31417,11 +33281,27 @@ var _GeneralName = __webpack_require__(206);
 
 var _GeneralName2 = _interopRequireDefault(_GeneralName);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -31469,7 +33349,6 @@ var GeneralSubtree = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(GeneralSubtree, [{
 		key: "fromSchema",
@@ -31666,7 +33545,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -31678,11 +33565,27 @@ var _DistributionPoint = __webpack_require__(213);
 
 var _DistributionPoint2 = _interopRequireDefault(_DistributionPoint);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -31717,7 +33620,6 @@ var CRLDistributionPoints = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(CRLDistributionPoints, [{
 		key: "fromSchema",
@@ -31840,7 +33742,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -31856,11 +33766,27 @@ var _RelativeDistinguishedNames = __webpack_require__(199);
 
 var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -31913,7 +33839,6 @@ var DistributionPoint = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(DistributionPoint, [{
 		key: "fromSchema",
@@ -32192,7 +34117,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -32204,11 +34137,27 @@ var _PolicyInformation = __webpack_require__(215);
 
 var _PolicyInformation2 = _interopRequireDefault(_PolicyInformation);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -32243,7 +34192,6 @@ var CertificatePolicies = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(CertificatePolicies, [{
 		key: "fromSchema",
@@ -32366,7 +34314,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -32378,11 +34334,27 @@ var _PolicyQualifierInfo = __webpack_require__(216);
 
 var _PolicyQualifierInfo2 = _interopRequireDefault(_PolicyQualifierInfo);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -32424,7 +34396,6 @@ var PolicyInformation = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(PolicyInformation, [{
 		key: "fromSchema",
@@ -32575,7 +34546,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -32583,9 +34562,23 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(185);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -32625,7 +34618,6 @@ var PolicyQualifierInfo = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(PolicyQualifierInfo, [{
 		key: "fromSchema",
@@ -32751,7 +34743,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -32763,11 +34763,27 @@ var _PolicyMapping = __webpack_require__(218);
 
 var _PolicyMapping2 = _interopRequireDefault(_PolicyMapping);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -32802,7 +34818,6 @@ var PolicyMappings = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(PolicyMappings, [{
 		key: "fromSchema",
@@ -32926,7 +34941,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -32934,9 +34957,23 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(185);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -32976,7 +35013,6 @@ var PolicyMapping = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(PolicyMapping, [{
 		key: "fromSchema",
@@ -33096,7 +35132,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -33108,11 +35152,27 @@ var _GeneralName = __webpack_require__(206);
 
 var _GeneralName2 = _interopRequireDefault(_GeneralName);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -33162,7 +35222,6 @@ var AuthorityKeyIdentifier = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(AuthorityKeyIdentifier, [{
 		key: "fromSchema",
@@ -33374,7 +35433,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -33382,9 +35449,23 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(185);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -33427,7 +35508,6 @@ var PolicyConstraints = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(PolicyConstraints, [{
 		key: "fromSchema",
@@ -33613,7 +35693,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -33621,9 +35709,23 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(185);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -33658,7 +35760,6 @@ var ExtKeyUsage = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(ExtKeyUsage, [{
 		key: "fromSchema",
@@ -33781,7 +35882,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -33793,11 +35902,27 @@ var _AccessDescription = __webpack_require__(223);
 
 var _AccessDescription2 = _interopRequireDefault(_AccessDescription);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -33832,7 +35957,6 @@ var InfoAccess = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(InfoAccess, [{
 		key: "fromSchema",
@@ -33957,7 +36081,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -33969,11 +36101,27 @@ var _GeneralName = __webpack_require__(206);
 
 var _GeneralName2 = _interopRequireDefault(_GeneralName);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -34013,7 +36161,6 @@ var AccessDescription = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(AccessDescription, [{
 		key: "fromSchema",
@@ -34137,7 +36284,15 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _asn1js = __webpack_require__(184);
 
@@ -34149,11 +36304,27 @@ var _Extension = __webpack_require__(202);
 
 var _Extension2 = _interopRequireDefault(_Extension);
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
 //**************************************************************************************
 /**
@@ -34188,7 +36359,6 @@ var Extensions = function () {
   * Return default values for all class members
   * @param {string} memberName String name for a class member
   */
-
 
 	_createClass(Extensions, [{
 		key: "fromSchema",
@@ -36861,6 +39031,7 @@ var ResponseHandler_1 = __webpack_require__(122);
 var platform = __webpack_require__(253);
 var RequestHandler_1 = __webpack_require__(225);
 var PinEnforcer_1 = __webpack_require__(181);
+var ActivatedContainerUtil_1 = __webpack_require__(132);
 var PKCS11 = (function () {
     function PKCS11(baseUrl, containerUrl, connection) {
         this.baseUrl = baseUrl;
@@ -36962,8 +39133,16 @@ var PKCS11 = (function () {
         });
     };
     PKCS11.prototype.containerSuffix = function (path) {
-        return this.containerUrl + path;
+        var containername = ActivatedContainerUtil_1.ActivatedContainerUtil.getContainerFor(this.connection.cfg, 'pkcs11');
+        this.containerUrl = PKCS11.CONTAINER_NEW_CONTEXT_PATH + containername;
+        if (path && path.length) {
+            return this.containerUrl + path;
+        }
+        else {
+            return this.containerUrl;
+        }
     };
+    PKCS11.CONTAINER_NEW_CONTEXT_PATH = '/containers/';
     PKCS11.ALL_CERTIFICATES = '/certificates';
     PKCS11.INFO = '/info';
     PKCS11.SIGN = '/sign';
@@ -38689,9 +40868,10 @@ var Belfius_1 = __webpack_require__(234);
 var FileExchange_1 = __webpack_require__(232);
 var pkcs11_1 = __webpack_require__(252);
 var DataContainer_1 = __webpack_require__(231);
+var JavaKeyTool_1 = __webpack_require__(262);
 var CONTAINER_NEW_CONTEXT_PATH = '/containers/';
-var CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid-v2-1-1';
-var CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid-v2-1-1';
+var CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
+var CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
 var CONTAINER_DNIE = CONTAINER_NEW_CONTEXT_PATH + 'dnie';
 var CONTAINER_EMV = CONTAINER_NEW_CONTEXT_PATH + 'emv';
 var CONTAINER_FILE_EXCHANGE = CONTAINER_NEW_CONTEXT_PATH + 'file-exchange';
@@ -38704,6 +40884,7 @@ var CONTAINER_PIV = CONTAINER_NEW_CONTEXT_PATH + 'piv';
 var CONTAINER_PTEID = CONTAINER_NEW_CONTEXT_PATH + 'pteid';
 var CONTAINER_PKCS11 = CONTAINER_NEW_CONTEXT_PATH + 'pkcs11';
 var CONTAINER_REMOTE_LOADING = CONTAINER_NEW_CONTEXT_PATH + 'readerapi';
+var CONTAINER_JAVA_KEY_TOOL = CONTAINER_NEW_CONTEXT_PATH + 'java-keytool';
 var PluginFactory = (function () {
     function PluginFactory(url, connection) {
         this.url = url;
@@ -38740,6 +40921,9 @@ var PluginFactory = (function () {
             return new DataContainer_1.DataContainer(_this.url, containerPath, _this.connection);
         };
     };
+    PluginFactory.prototype.createJavaKeyTool = function () {
+        return new JavaKeyTool_1.JavaKeyTool(this.url, CONTAINER_JAVA_KEY_TOOL, this.connection);
+    };
     return PluginFactory;
 }());
 exports.PluginFactory = PluginFactory;
@@ -38751,10 +40935,401 @@ exports.PluginFactory = PluginFactory;
 
 "use strict";
 
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var __1 = __webpack_require__(0);
+var GenericContainer_1 = __webpack_require__(226);
+var JavaKeyTool = (function (_super) {
+    __extends(JavaKeyTool, _super);
+    function JavaKeyTool(baseUrl, containerUrl, connection) {
+        return _super.call(this, baseUrl, containerUrl, connection, JavaKeyTool.CONTAINER_PREFIX) || this;
+    }
+    JavaKeyTool.prototype.generateKeyPair = function (body, callback) {
+        body.keypass = __1.PinEnforcer.encryptPin(body.keypass);
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.GENERATE_KEY_PAIR), body, undefined, undefined, callback);
+    };
+    JavaKeyTool.prototype.GenerateCertificateRequest = function (body, callback) {
+        body.keypass = __1.PinEnforcer.encryptPin(body.keypass);
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.GENERATE_CERTIFICATE_REQUEST), body, undefined, undefined, callback);
+    };
+    JavaKeyTool.prototype.ImportCertificate = function (body, callback) {
+        body.keypass = __1.PinEnforcer.encryptPin(body.keypass);
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.IMPORT_CERTIFICATE), body, undefined, undefined, callback);
+    };
+    JavaKeyTool.prototype.ExportCertificate = function (body, callback) {
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.EXPORT_CERTIFICATE), body, undefined, undefined, callback);
+    };
+    JavaKeyTool.prototype.ChangeKeystorePassword = function (body, callback) {
+        body.newpass = __1.PinEnforcer.encryptPin(body.newpass);
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEYSTORE_PASSWORD), body, undefined, undefined, callback);
+    };
+    JavaKeyTool.prototype.ChangeKeyPassword = function (body, callback) {
+        body.newpass = __1.PinEnforcer.encryptPin(body.newpass);
+        body.keypass = __1.PinEnforcer.encryptPin(body.keypass);
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_KEY_PASSWORD), body, undefined, undefined, callback);
+    };
+    JavaKeyTool.prototype.ChangeAlias = function (body, callback) {
+        body.keypass = __1.PinEnforcer.encryptPin(body.keypass);
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.CHANGE_ALIAS), body, undefined, undefined, callback);
+    };
+    JavaKeyTool.prototype.ListEntries = function (body, callback) {
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.LIST_ENTIRES), body, undefined, undefined, callback);
+    };
+    JavaKeyTool.prototype.DeleteEntry = function (body, callback) {
+        body.storepass = __1.PinEnforcer.encryptPin(body.storepass);
+        return this.connection.post(this.baseUrl, this.containerSuffix(JavaKeyTool.DELETE_ENTRY), body, undefined, undefined, callback);
+    };
+    JavaKeyTool.CONTAINER_PREFIX = 'java-keytool';
+    JavaKeyTool.GENERATE_KEY_PAIR = '/genkeypair';
+    JavaKeyTool.GENERATE_CERTIFICATE_REQUEST = '/certreq';
+    JavaKeyTool.IMPORT_CERTIFICATE = '/importcert';
+    JavaKeyTool.EXPORT_CERTIFICATE = '/exportcert';
+    JavaKeyTool.CHANGE_KEYSTORE_PASSWORD = '/storepasswd';
+    JavaKeyTool.CHANGE_KEY_PASSWORD = '/keypasswd';
+    JavaKeyTool.CHANGE_ALIAS = '/changealias';
+    JavaKeyTool.LIST_ENTIRES = '/list';
+    JavaKeyTool.DELETE_ENTRY = '/delete';
+    return JavaKeyTool;
+}(GenericContainer_1.GenericContainer));
+exports.JavaKeyTool = JavaKeyTool;
+
+
+/***/ }),
+/* 263 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var CoreModel_1 = __webpack_require__(127);
+var DeleteEntryData = (function () {
+    function DeleteEntryData(entity, type, keystore, alias, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return DeleteEntryData;
+}());
+exports.DeleteEntryData = DeleteEntryData;
+var DeleteEntryResponse = (function (_super) {
+    __extends(DeleteEntryResponse, _super);
+    function DeleteEntryResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return DeleteEntryResponse;
+}(CoreModel_1.T1CResponse));
+exports.DeleteEntryResponse = DeleteEntryResponse;
+var ListEntriesData = (function () {
+    function ListEntriesData(entity, type, keystore, alias, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return ListEntriesData;
+}());
+exports.ListEntriesData = ListEntriesData;
+var ListEntriesResponse = (function (_super) {
+    __extends(ListEntriesResponse, _super);
+    function ListEntriesResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return ListEntriesResponse;
+}(CoreModel_1.T1CResponse));
+exports.ListEntriesResponse = ListEntriesResponse;
+var StoreEntry = (function () {
+    function StoreEntry(alias, base64) {
+        this.alias = alias;
+    }
+    return StoreEntry;
+}());
+exports.StoreEntry = StoreEntry;
+var ChangeAliasData = (function () {
+    function ChangeAliasData(entity, type, keystore, alias, destalias, keypass, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.destalias = destalias;
+        this.keypass = keypass;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return ChangeAliasData;
+}());
+exports.ChangeAliasData = ChangeAliasData;
+var ChangeAliasResponse = (function (_super) {
+    __extends(ChangeAliasResponse, _super);
+    function ChangeAliasResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return ChangeAliasResponse;
+}(CoreModel_1.T1CResponse));
+exports.ChangeAliasResponse = ChangeAliasResponse;
+var ChangeKeyPasswordData = (function () {
+    function ChangeKeyPasswordData(entity, type, keystore, alias, newpass, keypass, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.newpass = newpass;
+        this.keypass = keypass;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return ChangeKeyPasswordData;
+}());
+exports.ChangeKeyPasswordData = ChangeKeyPasswordData;
+var ChangeKeyPasswordResponse = (function (_super) {
+    __extends(ChangeKeyPasswordResponse, _super);
+    function ChangeKeyPasswordResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return ChangeKeyPasswordResponse;
+}(CoreModel_1.T1CResponse));
+exports.ChangeKeyPasswordResponse = ChangeKeyPasswordResponse;
+var ChangeKeystorePasswordData = (function () {
+    function ChangeKeystorePasswordData(entity, type, keystore, newpass, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.newpass = newpass;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return ChangeKeystorePasswordData;
+}());
+exports.ChangeKeystorePasswordData = ChangeKeystorePasswordData;
+var ChangeKeystorePasswordResponse = (function (_super) {
+    __extends(ChangeKeystorePasswordResponse, _super);
+    function ChangeKeystorePasswordResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return ChangeKeystorePasswordResponse;
+}(CoreModel_1.T1CResponse));
+exports.ChangeKeystorePasswordResponse = ChangeKeystorePasswordResponse;
+var ExportCertData = (function () {
+    function ExportCertData(entity, type, keystore, alias, file, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.file = file;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return ExportCertData;
+}());
+exports.ExportCertData = ExportCertData;
+var ExportCertResponse = (function (_super) {
+    __extends(ExportCertResponse, _super);
+    function ExportCertResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return ExportCertResponse;
+}(CoreModel_1.T1CResponse));
+exports.ExportCertResponse = ExportCertResponse;
+var ExportCertResponseData = (function () {
+    function ExportCertResponseData(alias, base64, path) {
+        this.alias = alias;
+        this.base64 = base64;
+        this.path = path;
+    }
+    return ExportCertResponseData;
+}());
+exports.ExportCertResponseData = ExportCertResponseData;
+var ImportCertData = (function () {
+    function ImportCertData(entity, type, keystore, alias, file, data, trustcacerts, keypass, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.file = file;
+        this.data = data;
+        this.trustcacerts = trustcacerts;
+        this.keypass = keypass;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return ImportCertData;
+}());
+exports.ImportCertData = ImportCertData;
+var ImportCertResponse = (function (_super) {
+    __extends(ImportCertResponse, _super);
+    function ImportCertResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return ImportCertResponse;
+}(CoreModel_1.T1CResponse));
+exports.ImportCertResponse = ImportCertResponse;
+var CSRData = (function () {
+    function CSRData(entity, type, keystore, alias, sigalg, file, data, keypass, dname, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.sigalg = sigalg;
+        this.file = file;
+        this.data = data;
+        this.keypass = keypass;
+        this.dname = dname;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return CSRData;
+}());
+exports.CSRData = CSRData;
+var CSRResponse = (function (_super) {
+    __extends(CSRResponse, _super);
+    function CSRResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return CSRResponse;
+}(CoreModel_1.T1CResponse));
+exports.CSRResponse = CSRResponse;
+var CSRResponseData = (function () {
+    function CSRResponseData(base64, path) {
+        this.base64 = base64;
+        this.path = path;
+    }
+    return CSRResponseData;
+}());
+exports.CSRResponseData = CSRResponseData;
+var GenerateKeyPairData = (function () {
+    function GenerateKeyPairData(entity, type, keystore, alias, keyalg, sigalg, destalias, dname, startdate, ext, validity, keypass, storepass, storetype, providername, providerclass, providerarg, providerpath) {
+        this.entity = entity;
+        this.type = type;
+        this.keystore = keystore;
+        this.alias = alias;
+        this.keyalg = keyalg;
+        this.sigalg = sigalg;
+        this.destalias = destalias;
+        this.dname = dname;
+        this.startdate = startdate;
+        this.ext = ext;
+        this.validity = validity;
+        this.keypass = keypass;
+        this.storepass = storepass;
+        this.storetype = storetype;
+        this.providername = providername;
+        this.providerclass = providerclass;
+        this.providerarg = providerarg;
+        this.providerpath = providerpath;
+    }
+    return GenerateKeyPairData;
+}());
+exports.GenerateKeyPairData = GenerateKeyPairData;
+var GenerateKeyPairResponse = (function (_super) {
+    __extends(GenerateKeyPairResponse, _super);
+    function GenerateKeyPairResponse(data, success) {
+        var _this = _super.call(this, success, data) || this;
+        _this.data = data;
+        _this.success = success;
+        return _this;
+    }
+    return GenerateKeyPairResponse;
+}(CoreModel_1.T1CResponse));
+exports.GenerateKeyPairResponse = GenerateKeyPairResponse;
+
+
+/***/ }),
+/* 264 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = __webpack_require__(136);
-var jwtDecode = __webpack_require__(263);
-var moment = __webpack_require__(266);
+var jwtDecode = __webpack_require__(265);
+var moment = __webpack_require__(268);
 var CoreExceptions_1 = __webpack_require__(130);
 var defaults = {
     gclUrl: 'https://localhost:10443/v2',
@@ -38774,11 +41349,12 @@ var defaults = {
     containerDownloadTimeout: 30
 };
 var GCLConfigOptions = (function () {
-    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, gwJwt, ocvContextPath, dsContextPath, dsFileContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode, lang, providedContainers) {
+    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, gwJwt, tokenExchangeContextPath, ocvContextPath, dsContextPath, dsFileContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode, lang, providedContainers) {
         this.gclUrl = gclUrl;
         this.gwOrProxyUrl = gwOrProxyUrl;
         this.apiKey = apiKey;
         this.gwJwt = gwJwt;
+        this.tokenExchangeContextPath = tokenExchangeContextPath;
         this.ocvContextPath = ocvContextPath;
         this.dsContextPath = dsContextPath;
         this.dsFileContextPath = dsFileContextPath;
@@ -38825,6 +41401,12 @@ var GCLConfig = (function () {
             }
             else {
                 this._gwJwt = undefined;
+            }
+            if (options.tokenExchangeContextPath) {
+                this._tokenExchangeContextPath = options.tokenExchangeContextPath;
+            }
+            else {
+                this._tokenExchangeContextPath = defaults.tokenExchangeContextPath;
             }
             if (options.agentPort) {
                 this._agentPort = options.agentPort;
@@ -38928,9 +41510,19 @@ var GCLConfig = (function () {
             }
         }
     }
+    Object.defineProperty(GCLConfig.prototype, "tokenExchangeContextPath", {
+        get: function () {
+            return this._tokenExchangeContextPath;
+        },
+        set: function (value) {
+            this._tokenExchangeContextPath = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(GCLConfig.prototype, "authUrl", {
         get: function () {
-            return this.gwUrl + defaults.tokenExchangeContextPath;
+            return this.gwUrl + this.tokenExchangeContextPath;
         },
         enumerable: true,
         configurable: true
@@ -39260,13 +41852,13 @@ exports.GCLConfig = GCLConfig;
 
 
 /***/ }),
-/* 263 */
+/* 265 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var base64_url_decode = __webpack_require__(264);
+var base64_url_decode = __webpack_require__(266);
 
 function InvalidTokenError(message) {
   this.message = message;
@@ -39293,10 +41885,10 @@ module.exports.InvalidTokenError = InvalidTokenError;
 
 
 /***/ }),
-/* 264 */
+/* 266 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var atob = __webpack_require__(265);
+var atob = __webpack_require__(267);
 
 function b64DecodeUnicode(str) {
   return decodeURIComponent(atob(str).replace(/(.)/g, function (m, p) {
@@ -39332,7 +41924,7 @@ module.exports = function(str) {
 
 
 /***/ }),
-/* 265 */
+/* 267 */
 /***/ (function(module, exports) {
 
 /**
@@ -39376,7 +41968,7 @@ module.exports = typeof window !== 'undefined' && window.atob && window.atob.bin
 
 
 /***/ }),
-/* 266 */
+/* 268 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(module) {var require;//! moment.js
@@ -41213,7 +43805,7 @@ module.exports = typeof window !== 'undefined' && window.atob && window.atob.bin
             try {
                 oldLocale = globalLocale._abbr;
                 var aliasedRequire = require;
-                __webpack_require__(267)("./" + name);
+                __webpack_require__(269)("./" + name);
                 getSetGlobalLocale(oldLocale);
             } catch (e) {}
         }
@@ -43888,256 +46480,256 @@ module.exports = typeof window !== 'undefined' && window.atob && window.atob.bin
 /* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(254)(module)))
 
 /***/ }),
-/* 267 */
+/* 269 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./af": 268,
-	"./af.js": 268,
-	"./ar": 269,
-	"./ar-dz": 270,
-	"./ar-dz.js": 270,
-	"./ar-kw": 271,
-	"./ar-kw.js": 271,
-	"./ar-ly": 272,
-	"./ar-ly.js": 272,
-	"./ar-ma": 273,
-	"./ar-ma.js": 273,
-	"./ar-sa": 274,
-	"./ar-sa.js": 274,
-	"./ar-tn": 275,
-	"./ar-tn.js": 275,
-	"./ar.js": 269,
-	"./az": 276,
-	"./az.js": 276,
-	"./be": 277,
-	"./be.js": 277,
-	"./bg": 278,
-	"./bg.js": 278,
-	"./bm": 279,
-	"./bm.js": 279,
-	"./bn": 280,
-	"./bn.js": 280,
-	"./bo": 281,
-	"./bo.js": 281,
-	"./br": 282,
-	"./br.js": 282,
-	"./bs": 283,
-	"./bs.js": 283,
-	"./ca": 284,
-	"./ca.js": 284,
-	"./cs": 285,
-	"./cs.js": 285,
-	"./cv": 286,
-	"./cv.js": 286,
-	"./cy": 287,
-	"./cy.js": 287,
-	"./da": 288,
-	"./da.js": 288,
-	"./de": 289,
-	"./de-at": 290,
-	"./de-at.js": 290,
-	"./de-ch": 291,
-	"./de-ch.js": 291,
-	"./de.js": 289,
-	"./dv": 292,
-	"./dv.js": 292,
-	"./el": 293,
-	"./el.js": 293,
-	"./en-au": 294,
-	"./en-au.js": 294,
-	"./en-ca": 295,
-	"./en-ca.js": 295,
-	"./en-gb": 296,
-	"./en-gb.js": 296,
-	"./en-ie": 297,
-	"./en-ie.js": 297,
-	"./en-il": 298,
-	"./en-il.js": 298,
-	"./en-nz": 299,
-	"./en-nz.js": 299,
-	"./eo": 300,
-	"./eo.js": 300,
-	"./es": 301,
-	"./es-do": 302,
-	"./es-do.js": 302,
-	"./es-us": 303,
-	"./es-us.js": 303,
-	"./es.js": 301,
-	"./et": 304,
-	"./et.js": 304,
-	"./eu": 305,
-	"./eu.js": 305,
-	"./fa": 306,
-	"./fa.js": 306,
-	"./fi": 307,
-	"./fi.js": 307,
-	"./fo": 308,
-	"./fo.js": 308,
-	"./fr": 309,
-	"./fr-ca": 310,
-	"./fr-ca.js": 310,
-	"./fr-ch": 311,
-	"./fr-ch.js": 311,
-	"./fr.js": 309,
-	"./fy": 312,
-	"./fy.js": 312,
-	"./gd": 313,
-	"./gd.js": 313,
-	"./gl": 314,
-	"./gl.js": 314,
-	"./gom-latn": 315,
-	"./gom-latn.js": 315,
-	"./gu": 316,
-	"./gu.js": 316,
-	"./he": 317,
-	"./he.js": 317,
-	"./hi": 318,
-	"./hi.js": 318,
-	"./hr": 319,
-	"./hr.js": 319,
-	"./hu": 320,
-	"./hu.js": 320,
-	"./hy-am": 321,
-	"./hy-am.js": 321,
-	"./id": 322,
-	"./id.js": 322,
-	"./is": 323,
-	"./is.js": 323,
-	"./it": 324,
-	"./it.js": 324,
-	"./ja": 325,
-	"./ja.js": 325,
-	"./jv": 326,
-	"./jv.js": 326,
-	"./ka": 327,
-	"./ka.js": 327,
-	"./kk": 328,
-	"./kk.js": 328,
-	"./km": 329,
-	"./km.js": 329,
-	"./kn": 330,
-	"./kn.js": 330,
-	"./ko": 331,
-	"./ko.js": 331,
-	"./ky": 332,
-	"./ky.js": 332,
-	"./lb": 333,
-	"./lb.js": 333,
-	"./lo": 334,
-	"./lo.js": 334,
-	"./lt": 335,
-	"./lt.js": 335,
-	"./lv": 336,
-	"./lv.js": 336,
-	"./me": 337,
-	"./me.js": 337,
-	"./mi": 338,
-	"./mi.js": 338,
-	"./mk": 339,
-	"./mk.js": 339,
-	"./ml": 340,
-	"./ml.js": 340,
-	"./mn": 341,
-	"./mn.js": 341,
-	"./mr": 342,
-	"./mr.js": 342,
-	"./ms": 343,
-	"./ms-my": 344,
-	"./ms-my.js": 344,
-	"./ms.js": 343,
-	"./mt": 345,
-	"./mt.js": 345,
-	"./my": 346,
-	"./my.js": 346,
-	"./nb": 347,
-	"./nb.js": 347,
-	"./ne": 348,
-	"./ne.js": 348,
-	"./nl": 349,
-	"./nl-be": 350,
-	"./nl-be.js": 350,
-	"./nl.js": 349,
-	"./nn": 351,
-	"./nn.js": 351,
-	"./pa-in": 352,
-	"./pa-in.js": 352,
-	"./pl": 353,
-	"./pl.js": 353,
-	"./pt": 354,
-	"./pt-br": 355,
-	"./pt-br.js": 355,
-	"./pt.js": 354,
-	"./ro": 356,
-	"./ro.js": 356,
-	"./ru": 357,
-	"./ru.js": 357,
-	"./sd": 358,
-	"./sd.js": 358,
-	"./se": 359,
-	"./se.js": 359,
-	"./si": 360,
-	"./si.js": 360,
-	"./sk": 361,
-	"./sk.js": 361,
-	"./sl": 362,
-	"./sl.js": 362,
-	"./sq": 363,
-	"./sq.js": 363,
-	"./sr": 364,
-	"./sr-cyrl": 365,
-	"./sr-cyrl.js": 365,
-	"./sr.js": 364,
-	"./ss": 366,
-	"./ss.js": 366,
-	"./sv": 367,
-	"./sv.js": 367,
-	"./sw": 368,
-	"./sw.js": 368,
-	"./ta": 369,
-	"./ta.js": 369,
-	"./te": 370,
-	"./te.js": 370,
-	"./tet": 371,
-	"./tet.js": 371,
-	"./tg": 372,
-	"./tg.js": 372,
-	"./th": 373,
-	"./th.js": 373,
-	"./tl-ph": 374,
-	"./tl-ph.js": 374,
-	"./tlh": 375,
-	"./tlh.js": 375,
-	"./tr": 376,
-	"./tr.js": 376,
-	"./tzl": 377,
-	"./tzl.js": 377,
-	"./tzm": 378,
-	"./tzm-latn": 379,
-	"./tzm-latn.js": 379,
-	"./tzm.js": 378,
-	"./ug-cn": 380,
-	"./ug-cn.js": 380,
-	"./uk": 381,
-	"./uk.js": 381,
-	"./ur": 382,
-	"./ur.js": 382,
-	"./uz": 383,
-	"./uz-latn": 384,
-	"./uz-latn.js": 384,
-	"./uz.js": 383,
-	"./vi": 385,
-	"./vi.js": 385,
-	"./x-pseudo": 386,
-	"./x-pseudo.js": 386,
-	"./yo": 387,
-	"./yo.js": 387,
-	"./zh-cn": 388,
-	"./zh-cn.js": 388,
-	"./zh-hk": 389,
-	"./zh-hk.js": 389,
-	"./zh-tw": 390,
-	"./zh-tw.js": 390
+	"./af": 270,
+	"./af.js": 270,
+	"./ar": 271,
+	"./ar-dz": 272,
+	"./ar-dz.js": 272,
+	"./ar-kw": 273,
+	"./ar-kw.js": 273,
+	"./ar-ly": 274,
+	"./ar-ly.js": 274,
+	"./ar-ma": 275,
+	"./ar-ma.js": 275,
+	"./ar-sa": 276,
+	"./ar-sa.js": 276,
+	"./ar-tn": 277,
+	"./ar-tn.js": 277,
+	"./ar.js": 271,
+	"./az": 278,
+	"./az.js": 278,
+	"./be": 279,
+	"./be.js": 279,
+	"./bg": 280,
+	"./bg.js": 280,
+	"./bm": 281,
+	"./bm.js": 281,
+	"./bn": 282,
+	"./bn.js": 282,
+	"./bo": 283,
+	"./bo.js": 283,
+	"./br": 284,
+	"./br.js": 284,
+	"./bs": 285,
+	"./bs.js": 285,
+	"./ca": 286,
+	"./ca.js": 286,
+	"./cs": 287,
+	"./cs.js": 287,
+	"./cv": 288,
+	"./cv.js": 288,
+	"./cy": 289,
+	"./cy.js": 289,
+	"./da": 290,
+	"./da.js": 290,
+	"./de": 291,
+	"./de-at": 292,
+	"./de-at.js": 292,
+	"./de-ch": 293,
+	"./de-ch.js": 293,
+	"./de.js": 291,
+	"./dv": 294,
+	"./dv.js": 294,
+	"./el": 295,
+	"./el.js": 295,
+	"./en-au": 296,
+	"./en-au.js": 296,
+	"./en-ca": 297,
+	"./en-ca.js": 297,
+	"./en-gb": 298,
+	"./en-gb.js": 298,
+	"./en-ie": 299,
+	"./en-ie.js": 299,
+	"./en-il": 300,
+	"./en-il.js": 300,
+	"./en-nz": 301,
+	"./en-nz.js": 301,
+	"./eo": 302,
+	"./eo.js": 302,
+	"./es": 303,
+	"./es-do": 304,
+	"./es-do.js": 304,
+	"./es-us": 305,
+	"./es-us.js": 305,
+	"./es.js": 303,
+	"./et": 306,
+	"./et.js": 306,
+	"./eu": 307,
+	"./eu.js": 307,
+	"./fa": 308,
+	"./fa.js": 308,
+	"./fi": 309,
+	"./fi.js": 309,
+	"./fo": 310,
+	"./fo.js": 310,
+	"./fr": 311,
+	"./fr-ca": 312,
+	"./fr-ca.js": 312,
+	"./fr-ch": 313,
+	"./fr-ch.js": 313,
+	"./fr.js": 311,
+	"./fy": 314,
+	"./fy.js": 314,
+	"./gd": 315,
+	"./gd.js": 315,
+	"./gl": 316,
+	"./gl.js": 316,
+	"./gom-latn": 317,
+	"./gom-latn.js": 317,
+	"./gu": 318,
+	"./gu.js": 318,
+	"./he": 319,
+	"./he.js": 319,
+	"./hi": 320,
+	"./hi.js": 320,
+	"./hr": 321,
+	"./hr.js": 321,
+	"./hu": 322,
+	"./hu.js": 322,
+	"./hy-am": 323,
+	"./hy-am.js": 323,
+	"./id": 324,
+	"./id.js": 324,
+	"./is": 325,
+	"./is.js": 325,
+	"./it": 326,
+	"./it.js": 326,
+	"./ja": 327,
+	"./ja.js": 327,
+	"./jv": 328,
+	"./jv.js": 328,
+	"./ka": 329,
+	"./ka.js": 329,
+	"./kk": 330,
+	"./kk.js": 330,
+	"./km": 331,
+	"./km.js": 331,
+	"./kn": 332,
+	"./kn.js": 332,
+	"./ko": 333,
+	"./ko.js": 333,
+	"./ky": 334,
+	"./ky.js": 334,
+	"./lb": 335,
+	"./lb.js": 335,
+	"./lo": 336,
+	"./lo.js": 336,
+	"./lt": 337,
+	"./lt.js": 337,
+	"./lv": 338,
+	"./lv.js": 338,
+	"./me": 339,
+	"./me.js": 339,
+	"./mi": 340,
+	"./mi.js": 340,
+	"./mk": 341,
+	"./mk.js": 341,
+	"./ml": 342,
+	"./ml.js": 342,
+	"./mn": 343,
+	"./mn.js": 343,
+	"./mr": 344,
+	"./mr.js": 344,
+	"./ms": 345,
+	"./ms-my": 346,
+	"./ms-my.js": 346,
+	"./ms.js": 345,
+	"./mt": 347,
+	"./mt.js": 347,
+	"./my": 348,
+	"./my.js": 348,
+	"./nb": 349,
+	"./nb.js": 349,
+	"./ne": 350,
+	"./ne.js": 350,
+	"./nl": 351,
+	"./nl-be": 352,
+	"./nl-be.js": 352,
+	"./nl.js": 351,
+	"./nn": 353,
+	"./nn.js": 353,
+	"./pa-in": 354,
+	"./pa-in.js": 354,
+	"./pl": 355,
+	"./pl.js": 355,
+	"./pt": 356,
+	"./pt-br": 357,
+	"./pt-br.js": 357,
+	"./pt.js": 356,
+	"./ro": 358,
+	"./ro.js": 358,
+	"./ru": 359,
+	"./ru.js": 359,
+	"./sd": 360,
+	"./sd.js": 360,
+	"./se": 361,
+	"./se.js": 361,
+	"./si": 362,
+	"./si.js": 362,
+	"./sk": 363,
+	"./sk.js": 363,
+	"./sl": 364,
+	"./sl.js": 364,
+	"./sq": 365,
+	"./sq.js": 365,
+	"./sr": 366,
+	"./sr-cyrl": 367,
+	"./sr-cyrl.js": 367,
+	"./sr.js": 366,
+	"./ss": 368,
+	"./ss.js": 368,
+	"./sv": 369,
+	"./sv.js": 369,
+	"./sw": 370,
+	"./sw.js": 370,
+	"./ta": 371,
+	"./ta.js": 371,
+	"./te": 372,
+	"./te.js": 372,
+	"./tet": 373,
+	"./tet.js": 373,
+	"./tg": 374,
+	"./tg.js": 374,
+	"./th": 375,
+	"./th.js": 375,
+	"./tl-ph": 376,
+	"./tl-ph.js": 376,
+	"./tlh": 377,
+	"./tlh.js": 377,
+	"./tr": 378,
+	"./tr.js": 378,
+	"./tzl": 379,
+	"./tzl.js": 379,
+	"./tzm": 380,
+	"./tzm-latn": 381,
+	"./tzm-latn.js": 381,
+	"./tzm.js": 380,
+	"./ug-cn": 382,
+	"./ug-cn.js": 382,
+	"./uk": 383,
+	"./uk.js": 383,
+	"./ur": 384,
+	"./ur.js": 384,
+	"./uz": 385,
+	"./uz-latn": 386,
+	"./uz-latn.js": 386,
+	"./uz.js": 385,
+	"./vi": 387,
+	"./vi.js": 387,
+	"./x-pseudo": 388,
+	"./x-pseudo.js": 388,
+	"./yo": 389,
+	"./yo.js": 389,
+	"./zh-cn": 390,
+	"./zh-cn.js": 390,
+	"./zh-hk": 391,
+	"./zh-hk.js": 391,
+	"./zh-tw": 392,
+	"./zh-tw.js": 392
 };
 
 
@@ -44159,16 +46751,16 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 267;
+webpackContext.id = 269;
 
 /***/ }),
-/* 268 */
+/* 270 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -44238,13 +46830,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 269 */
+/* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -44376,13 +46968,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 270 */
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -44438,13 +47030,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 271 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -44500,13 +47092,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 272 */
+/* 274 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -44625,13 +47217,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 273 */
+/* 275 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -44687,13 +47279,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 274 */
+/* 276 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -44794,13 +47386,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 275 */
+/* 277 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -44856,13 +47448,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 276 */
+/* 278 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -44964,13 +47556,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 277 */
+/* 279 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -45099,13 +47691,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 278 */
+/* 280 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -45192,13 +47784,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 279 */
+/* 281 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -45253,13 +47845,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 280 */
+/* 282 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -45375,13 +47967,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 281 */
+/* 283 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -45497,13 +48089,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 282 */
+/* 284 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -45608,13 +48200,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 283 */
+/* 285 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -45762,13 +48354,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 284 */
+/* 286 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -45853,13 +48445,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 285 */
+/* 287 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -46035,13 +48627,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 286 */
+/* 288 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -46101,13 +48693,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 287 */
+/* 289 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -46184,13 +48776,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 288 */
+/* 290 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -46247,13 +48839,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 289 */
+/* 291 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -46326,13 +48918,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 290 */
+/* 292 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -46405,13 +48997,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 291 */
+/* 293 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -46484,13 +49076,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 292 */
+/* 294 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -46586,13 +49178,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 293 */
+/* 295 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -46689,13 +49281,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 294 */
+/* 296 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -46759,13 +49351,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 295 */
+/* 297 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -46825,13 +49417,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 296 */
+/* 298 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -46895,13 +49487,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 297 */
+/* 299 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -46965,13 +49557,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 298 */
+/* 300 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -47030,13 +49622,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 299 */
+/* 301 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -47100,13 +49692,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 300 */
+/* 302 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -47174,13 +49766,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 301 */
+/* 303 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -47269,13 +49861,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 302 */
+/* 304 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -47364,13 +49956,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 303 */
+/* 305 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -47450,13 +50042,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 304 */
+/* 306 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -47533,13 +50125,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 305 */
+/* 307 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -47602,13 +50194,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 306 */
+/* 308 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -47711,13 +50303,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 307 */
+/* 309 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -47823,13 +50415,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 308 */
+/* 310 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -47886,13 +50478,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 309 */
+/* 311 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -47972,13 +50564,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 310 */
+/* 312 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -48049,13 +50641,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 311 */
+/* 313 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -48130,13 +50722,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 312 */
+/* 314 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -48208,13 +50800,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 313 */
+/* 315 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -48287,13 +50879,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 314 */
+/* 316 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -48367,13 +50959,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 315 */
+/* 317 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -48493,13 +51085,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 316 */
+/* 318 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -48620,13 +51212,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 317 */
+/* 319 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -48720,13 +51312,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 318 */
+/* 320 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -48847,13 +51439,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 319 */
+/* 321 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -49004,13 +51596,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 320 */
+/* 322 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -49117,13 +51709,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 321 */
+/* 323 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -49215,13 +51807,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 322 */
+/* 324 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -49300,13 +51892,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 323 */
+/* 325 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -49435,13 +52027,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 324 */
+/* 326 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -49507,13 +52099,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 325 */
+/* 327 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -49602,13 +52194,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 326 */
+/* 328 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -49687,13 +52279,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 327 */
+/* 329 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -49779,13 +52371,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 328 */
+/* 330 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -49869,13 +52461,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 329 */
+/* 331 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -49982,13 +52574,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 330 */
+/* 332 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -50111,13 +52703,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 331 */
+/* 333 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -50195,13 +52787,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 332 */
+/* 334 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -50285,13 +52877,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 333 */
+/* 335 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -50424,13 +53016,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 334 */
+/* 336 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -50497,13 +53089,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 335 */
+/* 337 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -50618,13 +53210,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 336 */
+/* 338 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -50718,13 +53310,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 337 */
+/* 339 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -50833,13 +53425,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 338 */
+/* 340 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -50900,13 +53492,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 339 */
+/* 341 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -50993,13 +53585,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 340 */
+/* 342 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -51077,13 +53669,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 341 */
+/* 343 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -51184,13 +53776,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 342 */
+/* 344 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -51347,13 +53939,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 343 */
+/* 345 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -51432,13 +54024,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 344 */
+/* 346 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -51517,13 +54109,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 345 */
+/* 347 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -51580,13 +54172,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 346 */
+/* 348 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -51676,13 +54268,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 347 */
+/* 349 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -51741,13 +54333,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 348 */
+/* 350 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -51867,13 +54459,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 349 */
+/* 351 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -51957,13 +54549,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 350 */
+/* 352 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -52047,13 +54639,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 351 */
+/* 353 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -52110,13 +54702,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 352 */
+/* 354 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -52237,13 +54829,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 353 */
+/* 355 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -52366,13 +54958,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 354 */
+/* 356 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -52434,13 +55026,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 355 */
+/* 357 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -52498,13 +55090,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 356 */
+/* 358 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -52576,13 +55168,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 357 */
+/* 359 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -52761,13 +55353,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 358 */
+/* 360 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -52862,13 +55454,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 359 */
+/* 361 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -52925,13 +55517,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 360 */
+/* 362 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -52999,13 +55591,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 361 */
+/* 363 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -53158,13 +55750,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 362 */
+/* 364 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -53334,13 +55926,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 363 */
+/* 365 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -53405,13 +55997,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 364 */
+/* 366 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -53519,13 +56111,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 365 */
+/* 367 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -53633,13 +56225,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 366 */
+/* 368 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -53724,13 +56316,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 367 */
+/* 369 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -53796,13 +56388,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 368 */
+/* 370 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -53858,13 +56450,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 369 */
+/* 371 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -53990,13 +56582,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 370 */
+/* 372 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -54082,13 +56674,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 371 */
+/* 373 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -54152,13 +56744,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 372 */
+/* 374 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -54271,13 +56863,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 373 */
+/* 375 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -54341,13 +56933,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 374 */
+/* 376 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -54406,13 +56998,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 375 */
+/* 377 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -54531,12 +57123,12 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 376 */
+/* 378 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -54628,13 +57220,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 377 */
+/* 379 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -54722,13 +57314,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 378 */
+/* 380 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -54783,13 +57375,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 379 */
+/* 381 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -54844,13 +57436,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 380 */
+/* 382 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js language configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -54966,13 +57558,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 381 */
+/* 383 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -55120,13 +57712,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 382 */
+/* 384 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -55221,13 +57813,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 383 */
+/* 385 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -55282,13 +57874,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 384 */
+/* 386 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -55343,13 +57935,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 385 */
+/* 387 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -55425,13 +58017,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 386 */
+/* 388 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -55496,13 +58088,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 387 */
+/* 389 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -55559,13 +58151,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 388 */
+/* 390 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -55672,13 +58264,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 389 */
+/* 391 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -55778,13 +58370,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 390 */
+/* 392 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
 
 ;(function (global, factory) {
-    true ? factory(__webpack_require__(266)) :
+    true ? factory(__webpack_require__(268)) :
    undefined
 }(this, (function (moment) { 'use strict';
 
@@ -55884,13 +58476,13 @@ webpackContext.id = 267;
 
 
 /***/ }),
-/* 391 */
+/* 393 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreService_1 = __webpack_require__(392);
+var CoreService_1 = __webpack_require__(394);
 var Connection_1 = __webpack_require__(166);
 var DSClientModel_1 = __webpack_require__(126);
 var DSClient_1 = __webpack_require__(177);
@@ -55903,9 +58495,9 @@ var admin_1 = __webpack_require__(121);
 var InitUtil_1 = __webpack_require__(123);
 var ClientService_1 = __webpack_require__(129);
 var Auth_1 = __webpack_require__(164);
-var moment = __webpack_require__(266);
+var moment = __webpack_require__(268);
 var Polyfills_1 = __webpack_require__(1);
-var DSException_1 = __webpack_require__(393);
+var DSException_1 = __webpack_require__(395);
 var defaults = {
     gclUrl: 'https://localhost:10443/v2',
     gwUrl: 'https://accapim.t1t.be:443',
@@ -56002,6 +58594,9 @@ var GCLClient = (function () {
         };
         this.filex = function () {
             return _this.pluginFactory.createFileExchange();
+        };
+        this.javakeytool = function () {
+            return _this.pluginFactory.createJavaKeyTool();
         };
         this.localConfig = cfg;
         this.connection = new Connection_1.LocalConnection(this.localConfig);
@@ -56130,7 +58725,7 @@ exports.GCLClient = GCLClient;
 
 
 /***/ }),
-/* 392 */
+/* 394 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -56382,7 +58977,7 @@ exports.CoreService = CoreService;
 
 
 /***/ }),
-/* 393 */
+/* 395 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
