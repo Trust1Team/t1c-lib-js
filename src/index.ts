@@ -79,6 +79,9 @@ export * from './scripts/plugins/smartcards/Card';
 
 export * from './scripts/plugins/PluginFactory';
 
+export * from './scripts/plugins/java-key-tool/JavaKeyTool';
+export * from './scripts/plugins/java-key-tool/JavaKeyToolModel';
+
 export * from './scripts/util/ActivationUtil';
 export * from './scripts/util/BrowserFingerprint';
 export * from './scripts/util/CardUtil';
@@ -94,6 +97,8 @@ export * from './scripts/util/RequestHandler';
 export * from './scripts/util/ResponseHandler';
 export * from './scripts/util/SyncUtil';
 export * from './scripts/util/UrlUtil';
+
+
 
 export * from './scripts/core/GCLConfig';
 export * from './scripts/core/GCLLib';

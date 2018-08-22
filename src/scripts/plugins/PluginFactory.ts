@@ -36,6 +36,8 @@ import { AbstractPkcs11 } from './smartcards/pkcs11/pkcs11Model';
 import { PKCS11 } from './smartcards/pkcs11/pkcs11';
 import { AbstractDataContainer } from './data-container/DataContainerModel';
 import { DataContainer } from './data-container/DataContainer';
+import {AbstractJavaKeyTool} from './java-key-tool/JavaKeyToolModel';
+import {JavaKeyTool} from './java-key-tool/JavaKeyTool';
 
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
@@ -48,11 +50,12 @@ export interface AbstractFactory {
     createOberthurNO(reader_id?: string): AbstractOberthur;
     createPIV(reader_id?: string): AbstractPiv;
     createPKCS11(): AbstractPkcs11;
+    createJavaKeyTool(): AbstractJavaKeyTool
 }
 
 const CONTAINER_NEW_CONTEXT_PATH = '/containers/';
-const CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid-v2-1-1';
-const CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid-v2-1-1';
+const CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
+const CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
 const CONTAINER_DNIE = CONTAINER_NEW_CONTEXT_PATH + 'dnie';
 const CONTAINER_EMV = CONTAINER_NEW_CONTEXT_PATH + 'emv';
 const CONTAINER_FILE_EXCHANGE = CONTAINER_NEW_CONTEXT_PATH + 'file-exchange';
@@ -65,6 +68,7 @@ const CONTAINER_PIV = CONTAINER_NEW_CONTEXT_PATH + 'piv';
 const CONTAINER_PTEID = CONTAINER_NEW_CONTEXT_PATH + 'pteid';
 const CONTAINER_PKCS11 = CONTAINER_NEW_CONTEXT_PATH + 'pkcs11';
 const CONTAINER_REMOTE_LOADING = CONTAINER_NEW_CONTEXT_PATH + 'readerapi';
+const CONTAINER_JAVA_KEY_TOOL = CONTAINER_NEW_CONTEXT_PATH + 'java-keytool';
 
 
 export class PluginFactory implements AbstractFactory {
@@ -113,5 +117,9 @@ export class PluginFactory implements AbstractFactory {
         return (): AbstractDataContainer => {
             return new DataContainer(this.url, containerPath, this.connection);
         };
+    }
+
+    createJavaKeyTool(): AbstractJavaKeyTool {
+        return new JavaKeyTool(this.url, CONTAINER_JAVA_KEY_TOOL, this.connection);
     }
 }

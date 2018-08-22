@@ -158,13 +158,13 @@ export class InitUtil {
 
     private static coreV2Compatible(version: string): boolean {
         // sanitize version string
-        let sanitized = version.split('_')[0];
+        let sanitized = semver.coerce(version);
         return semver.satisfies(sanitized, '>=2.0.0');
     }
 
     private static checkTokenCompatible(version: string): boolean {
         // sanitize version string
-        let sanitized = version.split('_')[0];
+        let sanitized = semver.coerce(version);
         return semver.satisfies(sanitized, '>=1.4.0');
     }
 }

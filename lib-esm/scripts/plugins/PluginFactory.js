@@ -14,9 +14,10 @@ import { Belfius } from './remote-loading/belfius/Belfius';
 import { FileExchange } from './file/FileExchange';
 import { PKCS11 } from './smartcards/pkcs11/pkcs11';
 import { DataContainer } from './data-container/DataContainer';
+import { JavaKeyTool } from './java-key-tool/JavaKeyTool';
 var CONTAINER_NEW_CONTEXT_PATH = '/containers/';
-var CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid-v2-1-1';
-var CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid-v2-1-1';
+var CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
+var CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
 var CONTAINER_DNIE = CONTAINER_NEW_CONTEXT_PATH + 'dnie';
 var CONTAINER_EMV = CONTAINER_NEW_CONTEXT_PATH + 'emv';
 var CONTAINER_FILE_EXCHANGE = CONTAINER_NEW_CONTEXT_PATH + 'file-exchange';
@@ -29,6 +30,7 @@ var CONTAINER_PIV = CONTAINER_NEW_CONTEXT_PATH + 'piv';
 var CONTAINER_PTEID = CONTAINER_NEW_CONTEXT_PATH + 'pteid';
 var CONTAINER_PKCS11 = CONTAINER_NEW_CONTEXT_PATH + 'pkcs11';
 var CONTAINER_REMOTE_LOADING = CONTAINER_NEW_CONTEXT_PATH + 'readerapi';
+var CONTAINER_JAVA_KEY_TOOL = CONTAINER_NEW_CONTEXT_PATH + 'java-keytool';
 var PluginFactory = (function () {
     function PluginFactory(url, connection) {
         this.url = url;
@@ -64,6 +66,9 @@ var PluginFactory = (function () {
         return function () {
             return new DataContainer(_this.url, containerPath, _this.connection);
         };
+    };
+    PluginFactory.prototype.createJavaKeyTool = function () {
+        return new JavaKeyTool(this.url, CONTAINER_JAVA_KEY_TOOL, this.connection);
     };
     return PluginFactory;
 }());
