@@ -45,7 +45,7 @@ export class InitUtil {
                             console.log('citrix: ', cfg.citrix);
                             this.activateAndSync(infoResponse, mergedInfo, client, cfg, resolve, reject);
                         } else {
-                           resolve();
+                            resolve();
                         }
                     } else {
                         // installed version is not compatible, reject initialization
@@ -77,7 +77,7 @@ export class InitUtil {
                     finalResolve();
                 });
             }, err => {
-                    console.log('Initialization error', err);
+                console.log('Initialization error', err);
                 finalReject(err);
             });
 
@@ -110,13 +110,23 @@ export class InitUtil {
         const activated = infoResponse.data.activated;
         const uuid = infoResponse.data.uid;
         let activationPromise = new Promise((resolve, reject) => {
-            if (!config.dsUrl && activated) {
-                // already activated, only need to sync device
+            if (activated) {
                 resolve();
             } else {
-                // not yet activated, do this now
-                resolve(ActivationUtil.unManagedInitialization(client, mergedInfo, uuid));
+                if (config.dsUrl) {
+                    resolve(ActivationUtil.unManagedInitialization(client, mergedInfo, uuid));
+                }
+                else {
+                    initReject(new T1CLibException(400, '400', 'Installed GCL is not activated and has no DS to activate', client));
+                }
             }
+            // if (!config.dsUrl && activated) {
+            //     // already activated, only need to sync device
+            //     resolve();
+            // } else {
+            //     // not yet activated, do this now
+            //     resolve();
+            // }
         });
         activationPromise.then(() => {
             // update core service
