@@ -120,13 +120,6 @@ export class InitUtil {
                     initReject(new T1CLibException(400, '400', 'Installed GCL is not activated and has no DS to activate', client));
                 }
             }
-            // if (!config.dsUrl && activated) {
-            //     // already activated, only need to sync device
-            //     resolve();
-            // } else {
-            //     // not yet activated, do this now
-            //     resolve();
-            // }
         });
         activationPromise.then(() => {
             // update core service
