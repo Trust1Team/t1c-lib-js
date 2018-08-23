@@ -72,11 +72,16 @@ var InitUtil = (function () {
         var activated = infoResponse.data.activated;
         var uuid = infoResponse.data.uid;
         var activationPromise = new Promise(function (resolve, reject) {
-            if (!config.dsUrl && activated) {
+            if (activated) {
                 resolve();
             }
             else {
-                resolve(ActivationUtil.unManagedInitialization(client, mergedInfo, uuid));
+                if (config.dsUrl) {
+                    resolve(ActivationUtil.unManagedInitialization(client, mergedInfo, uuid));
+                }
+                else {
+                    initReject(new T1CLibException(400, '400', 'Installed GCL is not activated and has no DS to activate', client));
+                }
             }
         });
         activationPromise.then(function () {
