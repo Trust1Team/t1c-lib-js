@@ -5170,11 +5170,16 @@ var InitUtil = (function () {
         var activated = infoResponse.data.activated;
         var uuid = infoResponse.data.uid;
         var activationPromise = new Promise(function (resolve, reject) {
-            if (!config.dsUrl && activated) {
+            if (activated) {
                 resolve();
             }
             else {
-                resolve(ActivationUtil_1.ActivationUtil.unManagedInitialization(client, mergedInfo, uuid));
+                if (config.dsUrl) {
+                    resolve(ActivationUtil_1.ActivationUtil.unManagedInitialization(client, mergedInfo, uuid));
+                }
+                else {
+                    initReject(new CoreExceptions_1.T1CLibException(400, '400', 'Installed GCL is not activated and has no DS to activate', client));
+                }
             }
         });
         activationPromise.then(function () {
@@ -6582,7 +6587,7 @@ var SyncUtil = (function () {
     };
     SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
         return client.ds().then(function (ds) {
-            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.7"), info.namespace, containers));
+            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.8"), info.namespace, containers));
         });
     };
     SyncUtil.doSyncFlow = function (client, mergedInfo, uuid, containers, isRetry) {
@@ -7292,7 +7297,7 @@ var ActivationUtil = (function () {
     ActivationUtil.registerDevice = function (client, mergedInfo, uuid) {
         return client.admin().getPubKey().then(function (pubKey) {
             return client.ds().then(function (ds) {
-                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.7"), mergedInfo.namespace));
+                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.8"), mergedInfo.namespace));
             });
         });
     };
@@ -58969,7 +58974,7 @@ var CoreService = (function () {
     CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
     CoreService.prototype.getUrl = function () { return this.url; };
     CoreService.prototype.version = function () {
-        return Promise.resolve("2.2.7");
+        return Promise.resolve("2.2.8");
     };
     return CoreService;
 }());
