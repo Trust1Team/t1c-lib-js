@@ -10,6 +10,18 @@ var DSClient = (function () {
         this.connection = connection;
         this.cfg = cfg;
     }
+    DSClient.namespaceFilter = function (gwurl) {
+        var hostname;
+        if (gwurl.indexOf('//') > -1) {
+            hostname = gwurl.split('/')[2];
+        }
+        else {
+            hostname = gwurl.split('/')[0];
+        }
+        hostname = hostname.split(':')[0];
+        hostname = hostname.split('?')[0];
+        return { namespace: hostname };
+    };
     DSClient.prototype.getUrl = function () {
         return this.url;
     };
@@ -20,7 +32,12 @@ var DSClient = (function () {
         return this.connection.get(this.url, DEVICE + SEPARATOR + uuid, undefined, undefined, callback);
     };
     DSClient.prototype.getPubKey = function (uuid, callback) {
-        return this.connection.get(this.url, PUB_KEY + SEPARATOR + uuid, undefined, undefined, callback);
+        if (this.cfg.gwUrl) {
+            return this.connection.get(this.url, PUB_KEY + SEPARATOR + uuid, DSClient.namespaceFilter(this.cfg.gwUrl), undefined, callback);
+        }
+        else {
+            return this.connection.get(this.url, PUB_KEY + SEPARATOR + uuid, undefined, undefined, callback);
+        }
     };
     DSClient.prototype.downloadLink = function (downloadData, callback) {
         var self = this;
