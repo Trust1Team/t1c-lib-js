@@ -25,6 +25,20 @@ export class DSClient implements AbstractDSClient {
     constructor(private url: string, private connection: Connection, private cfg: GCLConfig) {
     }
 
+    private static namespaceFilter(gwurl: string): {} {
+        let hostname;
+        if (gwurl.indexOf('//') > -1) {
+            hostname = gwurl.split('/')[2];
+        }
+        else {
+            hostname = gwurl.split('/')[0];
+        }
+        hostname = hostname.split(':')[0];
+        hostname = hostname.split('?')[0];
+
+        return { namespace: hostname};
+    }
+
     public getUrl() {
         return this.url;
     }
@@ -40,7 +54,12 @@ export class DSClient implements AbstractDSClient {
 
     public getPubKey(uuid: string,
                      callback?: (error: T1CLibException, data: DSPubKeyResponse) => void): Promise<DSPubKeyResponse> {
-        return this.connection.get(this.url, PUB_KEY + SEPARATOR + uuid, undefined, undefined, callback);
+        if (this.cfg.gwUrl) {
+            return this.connection.get(this.url, PUB_KEY + SEPARATOR + uuid  , DSClient.namespaceFilter(this.cfg.gwUrl), undefined, callback);
+        }
+        else {
+            return this.connection.get(this.url, PUB_KEY + SEPARATOR + uuid  , undefined, undefined, callback);
+        }
     }
 
     public downloadLink(downloadData: DSDownloadRequest,
