@@ -6587,7 +6587,7 @@ var SyncUtil = (function () {
     };
     SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
         return client.ds().then(function (ds) {
-            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.8"), info.namespace, containers));
+            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.9"), info.namespace, containers));
         });
     };
     SyncUtil.doSyncFlow = function (client, mergedInfo, uuid, containers, isRetry) {
@@ -7297,7 +7297,7 @@ var ActivationUtil = (function () {
     ActivationUtil.registerDevice = function (client, mergedInfo, uuid) {
         return client.admin().getPubKey().then(function (pubKey) {
             return client.ds().then(function (ds) {
-                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.8"), mergedInfo.namespace));
+                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.9"), mergedInfo.namespace));
             });
         });
     };
@@ -10285,6 +10285,18 @@ var DSClient = (function () {
         this.connection = connection;
         this.cfg = cfg;
     }
+    DSClient.namespaceFilter = function (gwurl) {
+        var hostname;
+        if (gwurl.indexOf('//') > -1) {
+            hostname = gwurl.split('/')[2];
+        }
+        else {
+            hostname = gwurl.split('/')[0];
+        }
+        hostname = hostname.split(':')[0];
+        hostname = hostname.split('?')[0];
+        return { namespace: hostname };
+    };
     DSClient.prototype.getUrl = function () {
         return this.url;
     };
@@ -10295,7 +10307,12 @@ var DSClient = (function () {
         return this.connection.get(this.url, DEVICE + SEPARATOR + uuid, undefined, undefined, callback);
     };
     DSClient.prototype.getPubKey = function (uuid, callback) {
-        return this.connection.get(this.url, PUB_KEY + SEPARATOR + uuid, undefined, undefined, callback);
+        if (this.cfg.gwUrl) {
+            return this.connection.get(this.url, PUB_KEY + SEPARATOR + uuid, DSClient.namespaceFilter(this.cfg.gwUrl), undefined, callback);
+        }
+        else {
+            return this.connection.get(this.url, PUB_KEY + SEPARATOR + uuid, undefined, undefined, callback);
+        }
     };
     DSClient.prototype.downloadLink = function (downloadData, callback) {
         var self = this;
@@ -58974,7 +58991,7 @@ var CoreService = (function () {
     CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
     CoreService.prototype.getUrl = function () { return this.url; };
     CoreService.prototype.version = function () {
-        return Promise.resolve("2.2.8");
+        return Promise.resolve("2.2.9");
     };
     return CoreService;
 }());

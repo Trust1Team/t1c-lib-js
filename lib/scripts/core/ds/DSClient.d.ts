@@ -7,6 +7,7 @@ export declare class DSClient implements AbstractDSClient {
     private connection;
     private cfg;
     constructor(url: string, connection: Connection, cfg: GCLConfig);
+    private static namespaceFilter;
     getUrl(): string;
     getInfo(callback?: (error: T1CLibException, data: DSInfoResponse) => void): Promise<DSInfoResponse>;
     getDevice(uuid: string, callback?: (error: T1CLibException, data: DeviceResponse) => void): Promise<DeviceResponse>;
