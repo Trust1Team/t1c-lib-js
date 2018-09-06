@@ -599,7 +599,7 @@ export class LocalConnection extends GenericConnection implements Connection {
      * Helper method for uploading files. These are uploaded as multipart/form-data and require special handling.
      * @param {string} basePath
      * @param {string} suffix
-     * @param {RequestBody} body
+     * @param {RequestBody} body - containing the file blob
      * @param {QueryParams} queryParams
      * @param {RequestCallback} callback
      * @returns {Promise<any>}
