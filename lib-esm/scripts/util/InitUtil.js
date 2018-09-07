@@ -86,7 +86,7 @@ var InitUtil = (function () {
         });
         activationPromise.then(function () {
             client.updateAuthConnection(config);
-            initResolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, infoResponse.data.containers));
+            initResolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, infoResponse.data.containers, config));
         }, function (err) {
         });
     };

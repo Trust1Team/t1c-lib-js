@@ -1,12 +1,12 @@
 /**
- * @author Maarten Somers
- * @since 2017
+ * @author Michallis Pashidis
+ * @since 2018
  */
+
 import { T1CLibException } from '../../core/exceptions/CoreExceptions';
 import {BoolDataResponse, DataArrayResponse, DataResponse, T1CResponse} from '../../core/service/CoreModel';
-
 export interface AbstractFileExchange {
-    download(entity: string, type: string, file: ArrayBuffer, filename: string, relpath?: [string], implicitCreationType?: boolean, notifyOnCompletion?: boolean, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<DataResponse>; // implicit
+    download(entity: string, type: string, file: Blob, filename: string, relpath?: [string], implicitCreationType?: boolean, notifyOnCompletion?: boolean, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<DataResponse>; // implicit
     upload(entity: string, type: string, filename: string, rel_path?: [string], notifyOnCompletion?: boolean, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<ArrayBuffer>;
     // getProgress(entity: string, type: String, filename?: String, action?: FileAction, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<DataResponse>;
     showModal(title: string, text: string, modal: ModalType, timeoutInSeconds?: number, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<boolean>;
