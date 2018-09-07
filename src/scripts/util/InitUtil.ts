@@ -124,7 +124,7 @@ export class InitUtil {
         activationPromise.then(() => {
             // update core service
             client.updateAuthConnection(config);
-            initResolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, infoResponse.data.containers));
+            initResolve(SyncUtil.unManagedSynchronization(client, mergedInfo, uuid, infoResponse.data.containers, config));
         }, err => {
             // initReject(err);
             // resolve(SyncUtil.unManagedSynchronization(client.admin(), client.ds(), cfg, mergedInfo, uuid));

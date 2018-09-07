@@ -30,7 +30,7 @@ export declare class FileExchange extends GenericContainer implements AbstractFi
     createType(entity: string, type: string, initabspath?: [string], showModal?: boolean, timeoutInSeconds?: number, callback?: (error: T1CLibException, data: TypeResponse) => void): Promise<TypeResponse>;
     createTypeDirs(entity: string, type: string, relpath: [string], showModal?: boolean, timeoutInSeconds?: number, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<FileListResponse>;
     deleteType(entity: string, type: string, callback?: (error: T1CLibException, data: boolean) => void): Promise<boolean>;
-    download(entity: string, type: string, file: ArrayBuffer, filename: string, rel_path?: [string], implicit_creation_type?: boolean, notify_on_completion?: boolean, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<DataResponse>;
+    download(entity: string, type: string, file: Blob, filename: string, rel_path?: [string], implicit_creation_type?: boolean, notify_on_completion?: boolean, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<DataResponse>;
     existsFile(entity: string, type: string, rel_path: [string], callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
     existsType(entity: string, type: string, callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
     getAccessMode(entity: string, type: string, relpath?: [string], callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
