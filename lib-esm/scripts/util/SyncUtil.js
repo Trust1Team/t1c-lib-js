@@ -1,16 +1,16 @@
 import { DSClientInfo, DSRegistrationOrSyncRequest } from '../core/ds/DSClientModel';
 import { DataContainerUtil } from './DataContainerUtil';
 import { T1CLibException } from '../core/exceptions/CoreExceptions';
-import { ContainerSyncRequest } from '../core/admin/adminModel';
+import { ContainerSyncRequest, SetPubKeyRequest } from '../core/admin/adminModel';
 import { ActivatedContainerUtil } from './ActivatedContainerUtil';
 import { Util } from './Utils';
 var SyncUtil = (function () {
     function SyncUtil() {
     }
-    SyncUtil.unManagedSynchronization = function (client, mergedInfo, uuid, containers) {
+    SyncUtil.unManagedSynchronization = function (client, mergedInfo, uuid, containers, config) {
         return new Promise(function (resolve, reject) {
             if (client.ds()) {
-                SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, false).then(function () {
+                SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, false, config).then(function () {
                     resolve();
                 }).catch(function (err) {
                     reject(err);
@@ -26,25 +26,42 @@ var SyncUtil = (function () {
             return ds.sync(new DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientInfo('JAVASCRIPT', VERSION), info.namespace, containers));
         });
     };
-    SyncUtil.doSyncFlow = function (client, mergedInfo, uuid, containers, isRetry) {
+    SyncUtil.doSyncFlow = function (client, mergedInfo, uuid, containers, isRetry, config) {
         return client.admin().getPubKey().then(function (pubKey) {
             return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, containers).then(function (device) {
-                client.config().contextToken = device.contextToken;
-                client.admin().atr(device.atrList);
-                return client.admin().updateContainerConfig(new ContainerSyncRequest(device.containerResponses)).then(function () {
-                    client.config().activeContainers = ActivatedContainerUtil.getSortedContainers(device.containerResponses);
-                    DataContainerUtil.setupDataContainers(device.containerResponses);
-                    return SyncUtil.pollDownloadCompletion(client, device.containerResponses, isRetry).then(function (finalContainerList) {
-                        return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, finalContainerList);
-                    }, function (error) {
-                        if (typeof error === 'boolean' && !isRetry) {
-                            console.log('download error, retrying');
-                            return Promise.resolve(SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, true));
-                        }
-                        else {
-                            return Promise.reject(error);
-                        }
+                client.ds().then(function (dsclient) {
+                    client.updateAuthConnection(config);
+                    dsclient.getPubKey(uuid).then(function (dsPubkeyres) {
+                        var pubKeyReq = new SetPubKeyRequest(dsPubkeyres.encryptedPublicKey, dsPubkeyres.encryptedAesKey, dsPubkeyres.ns);
+                        client.admin().setPubKey(pubKeyReq).then(function (res) {
+                            client.config().contextToken = device.contextToken;
+                            client.admin().atr(device.atrList);
+                            return client.admin().updateContainerConfig(new ContainerSyncRequest(device.containerResponses)).then(function () {
+                                client.config().activeContainers = ActivatedContainerUtil.getSortedContainers(device.containerResponses);
+                                DataContainerUtil.setupDataContainers(device.containerResponses);
+                                return SyncUtil.pollDownloadCompletion(client, device.containerResponses, isRetry).then(function (finalContainerList) {
+                                    return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, finalContainerList);
+                                }, function (error) {
+                                    if (typeof error === 'boolean' && !isRetry) {
+                                        console.log('download error, retrying');
+                                        return Promise.resolve(SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, true, config));
+                                    }
+                                    else {
+                                        return Promise.reject(error);
+                                    }
+                                });
+                            });
+                        }, function (err) {
+                            console.error(err);
+                            return Promise.reject(err);
+                        });
+                    }, function (err) {
+                        console.error(err);
+                        return Promise.reject(err);
                     });
+                }, function (err) {
+                    console.error(err);
+                    return Promise.reject(err);
                 });
             });
         });

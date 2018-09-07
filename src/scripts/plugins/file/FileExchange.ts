@@ -63,7 +63,7 @@ export class FileExchange extends GenericContainer implements AbstractFileExchan
         return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_DELETE), {entity, type}, undefined, undefined, callback);
     }
 
-    download(entity: string, type: string, file: ArrayBuffer, filename: string, rel_path?: [string], implicit_creation_type?: boolean, notify_on_completion?: boolean,
+    download(entity: string, type: string, file: Blob, filename: string, rel_path?: [string], implicit_creation_type?: boolean, notify_on_completion?: boolean,
              callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<DataResponse> {
         let relPathInput;
         if (rel_path && rel_path.length > 0) {
