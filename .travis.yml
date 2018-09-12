@@ -9,6 +9,6 @@ cache:
   yarn: true
 script:
   - yarn test
-  - yarn build
+  - yarn build-prod
 notifications:
   slack: trust1team:b6NFLueV7BtxzxOhUrFs9RBT
