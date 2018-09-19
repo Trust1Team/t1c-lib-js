@@ -8,10 +8,8 @@ module.exports = (env, argv) => {
     return {
         mode: argv.mode,
         entry:
-            argv.mode === 'production' ? {
-                'GCLLib.min': './src/index.ts'
-            } : {
-                'GCLLib': './src/index.ts',
+            {
+                'GCLLib': './src/index.ts'
             },
         devtool: argv.mode === 'production' ? "source-map" : "eval-source-map",
         output: {
