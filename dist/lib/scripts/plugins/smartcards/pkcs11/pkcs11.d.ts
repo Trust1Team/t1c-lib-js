@@ -1,8 +1,8 @@
 import { T1CLibException } from '../../../core/exceptions/CoreExceptions';
-import { BoolDataResponse, DataResponse } from '../../../core/service/CoreModel';
+import { DataResponse } from '../../../core/service/CoreModel';
 import { LocalConnection } from '../../../core/client/Connection';
 import { Options } from '../../../util/RequestHandler';
-import { AbstractPkcs11, Pkcs11CertificatesResponse, Pkcs11InfoResponse, Pkcs11SignData, Pkcs11SlotsResponse, Pkcs11TokenResponse, Pkcs11VerifySignedData } from './pkcs11Model';
+import { AbstractPkcs11, Pkcs11CertificatesResponse, Pkcs11InfoResponse, Pkcs11SignData, Pkcs11SlotsResponse, Pkcs11TokenResponse } from './pkcs11Model';
 export declare class PKCS11 implements AbstractPkcs11 {
     protected baseUrl: string;
     protected containerUrl: string;
@@ -13,7 +13,6 @@ export declare class PKCS11 implements AbstractPkcs11 {
     static SIGN: string;
     static SLOTS: string;
     static TOKEN: string;
-    static VERIFY: string;
     private modulePath;
     private os;
     constructor(baseUrl: string, containerUrl: string, connection: LocalConnection);
@@ -23,6 +22,5 @@ export declare class PKCS11 implements AbstractPkcs11 {
     slots(callback?: (error: T1CLibException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse>;
     slotsWithTokenPresent(callback?: (error: T1CLibException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse>;
     token(slotId: string, callback: (error: T1CLibException, data: Pkcs11TokenResponse) => void): Promise<Pkcs11TokenResponse>;
-    verifySignedData(verifyData: Pkcs11VerifySignedData, callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
     protected containerSuffix(path?: string): string;
 }

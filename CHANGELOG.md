@@ -1,5 +1,63 @@
 # Changelog
 
+## v2.2.10 (07/09/2018)
+
+#### bug
+
+- JavaScript Connector Library synchronization flow does not update the Distribution Service public key on device [#44](https://github.com/Trust1Team/t1c-lib-js/issues/44)
+
+#### enhancement
+
+- Change the signature of the File-Exchange download data from ArrayBuffer to blob [#42](https://github.com/Trust1Team/t1c-lib-js/issues/42)
+
+---
+
+## v2.2.9 (05/09/2018)
+
+#### closed
+
+- getPubKey must have namespace parameter in the queryparams [#40](https://github.com/Trust1Team/t1c-lib-js/issues/40)
+
+---
+
+## v2.2.8 (29/08/2018)
+
+#### bug
+
+- Activate call happens when already activated [#38](https://github.com/Trust1Team/t1c-lib-js/issues/38)
+
+---
+
+## v2.2.7 (22/08/2018)
+
+#### closed
+
+- Return correct version [#37](https://github.com/Trust1Team/t1c-lib-js/issues/37)
+
+---
+
+## v2.2.6 (22/08/2018)
+
+#### bug
+
+- IE11 es6 code [#36](https://github.com/Trust1Team/t1c-lib-js/issues/36)
+
+#### closed
+
+- Fix version checking [#35](https://github.com/Trust1Team/t1c-lib-js/issues/35)
+- Make hard-coded tokenExchangeContextPath property configurable [#34](https://github.com/Trust1Team/t1c-lib-js/issues/34)
+- Generate key pair implementation [#27](https://github.com/Trust1Team/t1c-lib-js/issues/27)
+- Generate a certificate request implementation [#26](https://github.com/Trust1Team/t1c-lib-js/issues/26)
+- Import certificate implementation [#25](https://github.com/Trust1Team/t1c-lib-js/issues/25)
+- Export certificate implementation [#24](https://github.com/Trust1Team/t1c-lib-js/issues/24)
+- Change keystore password implementation [#23](https://github.com/Trust1Team/t1c-lib-js/issues/23)
+- Change key password implementation [#22](https://github.com/Trust1Team/t1c-lib-js/issues/22)
+- Change alias implementation [#21](https://github.com/Trust1Team/t1c-lib-js/issues/21)
+- List entries implementation [#20](https://github.com/Trust1Team/t1c-lib-js/issues/20)
+- delete an entry implementation [#19](https://github.com/Trust1Team/t1c-lib-js/issues/19)
+
+---
+
 ## v2.2.5-1 (13/08/2018)
 
 #### enhancement
@@ -315,45 +373,3 @@ Release notes - Trust1Connector - Version js-v2.1.1
 
 *   Fix issue with callback detection: if an object (such as request options) was passed in a position that can contain a callback, in specific cases we would incorrectly assume it to be a callback function, and attempt to call it.
 
-
----
-
-##  (17/04/2018)
-
-## v1.3.8
-### Other
-
-*   Fix issue where PIV/CIV container was identified as PIV (uppercase); brought in line with other containers (lowercase)
-*   Added some LuxTrust examples with certificate parsing enabled
-
----
-
-##  (17/04/2018)
-
-## v1.3.9
-### Story
-
-*   [[T1C-747](https://trust1t.atlassian.net/browse/T1C-747)] - No longer attempt to sync on initialization for managed installs
-
-### Other
-*   Correctly allow the OCV url to be set using config
-
----
-
-##  (17/04/2018)
-## v1.3.10
-###Story
-*   [[T1C-756](https://trust1t.atlassian.net/browse/T1C-756)] - Add activated endpoint to LuxTrust
----
-
-##  (17/04/2018)
-## v1.3.11
-###Other
-*   Add Portuguese eID container
-
----
-
-##  (17/04/2018)
-## v1.4.0-1
-### Bug
-* [[T1C-783](https://trust1t.atlassian.net/browse/T1C-783)] - As RMC I want to provide a button to verify the reader is a Belfius branded reader
