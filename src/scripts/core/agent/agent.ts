@@ -20,7 +20,7 @@ export class AgentClient implements AbstractAgent {
         return AgentClient.AGENT_PATH + '/' + port;
     }
 
-    public get(username?: string, callback?: (error: T1CLibException, data: AgentResponse) => void): Promise<any> {
+    public get(username: string, callback?: (error: T1CLibException, data: AgentResponse) => void): Promise<any> {
         let body: RequestBody = { 'username' :  username};
         return this.connection.postSkipCitrix(this.url, AgentClient.AGENT_PATH, undefined, body, undefined, callback);
     }
