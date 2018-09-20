@@ -26,7 +26,6 @@ export class PKCS11 implements AbstractPkcs11 {
     static SIGN = '/sign';
     static SLOTS = '/slots';
     static TOKEN = '/token';
-    static VERIFY = '/verify';
     // static DEFAULT_CONFIG = {
     //     linux: '/usr/local/lib/libeTPkcs11.so',
     //     mac: '/Library/cv cryptovision/libcvP11.dylib',
@@ -126,26 +125,6 @@ export class PKCS11 implements AbstractPkcs11 {
     public token(slotId: string, callback: (error: T1CLibException, data: Pkcs11TokenResponse) => void): Promise<Pkcs11TokenResponse> {
         let req = Object.assign({slot_id: slotId}, {module: this.modulePath});
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.TOKEN), req, undefined).then(data => {
-            return ResponseHandler.response(data, callback);
-        }, err => {
-            return ResponseHandler.error(err, callback);
-        });
-    }
-
-    public verifySignedData(verifyData: Pkcs11VerifySignedData,
-                            callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse> {
-        let req = {
-            module: this.modulePath,
-            id: verifyData.cert_id,
-            slot_id: verifyData.slot_id,
-            pin: PinEnforcer.encryptPin(verifyData.pin),
-            data: verifyData.data,
-            digest: verifyData.algorithm_reference,
-            signature: verifyData.signature,
-            pinpad: false,
-            os_dialog: this.connection.cfg.osPinDialog
-        };
-        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.VERIFY), req, undefined).then(data => {
             return ResponseHandler.response(data, callback);
         }, err => {
             return ResponseHandler.error(err, callback);
