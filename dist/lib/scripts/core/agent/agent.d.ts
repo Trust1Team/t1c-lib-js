@@ -7,5 +7,5 @@ export declare class AgentClient implements AbstractAgent {
     static AGENT_PATH: string;
     constructor(url: string, connection: LocalAuthConnection);
     static urlPrefix(port: number): string;
-    get(username?: string, callback?: (error: T1CLibException, data: AgentResponse) => void): Promise<any>;
+    get(username: string, callback?: (error: T1CLibException, data: AgentResponse) => void): Promise<any>;
 }

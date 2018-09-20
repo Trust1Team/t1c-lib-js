@@ -1,5 +1,5 @@
 import { T1CLibException } from '../../../core/exceptions/CoreExceptions';
-import { BoolDataResponse, CertificatesResponse, DataObjectResponse, DataResponse, T1CCertificate } from '../../../core/service/CoreModel';
+import { CertificatesResponse, DataObjectResponse, DataResponse, T1CCertificate } from '../../../core/service/CoreModel';
 import { Options } from '../../../util/RequestHandler';
 import { AuthenticateOrSignData } from '../Card';
 export interface AbstractPkcs11 {
@@ -9,7 +9,6 @@ export interface AbstractPkcs11 {
     slots(callback?: (error: T1CLibException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse>;
     slotsWithTokenPresent(callback?: (error: T1CLibException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse>;
     token(slotId: string, callback?: (error: T1CLibException, data: Pkcs11TokenResponse) => void): Promise<Pkcs11TokenResponse>;
-    verifySignedData(data: Pkcs11VerifySignedData, callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
 }
 export declare class Pkcs11InfoResponse extends DataObjectResponse {
     data: Pkcs11Info;
