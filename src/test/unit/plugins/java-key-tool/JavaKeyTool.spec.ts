@@ -86,7 +86,8 @@ describe('Java key tool', () => {
         const body = {
             entity: 't1t',
             keystore: 't1t.jks',
-            type: 'test'
+            type: 'test',
+            alias: 'test'
         };
 
         jks.ImportCertificate(body).then(res => {
@@ -111,7 +112,8 @@ describe('Java key tool', () => {
             entity: 't1t',
             keystore: 't1t.jks',
             type: 'test',
-            file: 'cert.pem'
+            file: 'cert.pem',
+            alias: 'test'
         };
 
         jks.ExportCertificate(body).then(res => {
