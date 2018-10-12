@@ -11,6 +11,7 @@ export declare class EidPt extends GenericCertCard implements AbstractEidPT {
     static CERT_ROOT_NON_REP: string;
     static ID_DATA: string;
     static PHOTO: string;
+    static VERIFY_PRIV_KEY_REF: string;
     constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string);
     idData(callback?: (error: T1CLibException, data: PtIdDataResponse) => void): Promise<PtIdDataResponse>;
     idDataWithOutPhoto(callback?: (error: T1CLibException, data: PtIdDataResponse) => void): Promise<PtIdDataResponse>;

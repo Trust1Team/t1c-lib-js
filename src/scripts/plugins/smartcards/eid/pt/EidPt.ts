@@ -8,6 +8,7 @@ import {GenericCertCard, OptionalPin} from '../../Card';
 import {Options, RequestHandler} from '../../../../util/RequestHandler';
 import {AbstractEidPT, PtIdDataResponse, PtAddressResponse} from './EidPtModel';
 import {LocalConnection} from '../../../../core/client/Connection';
+import {PinEnforcer} from '../../../../..';
 
 export class EidPt extends GenericCertCard implements AbstractEidPT {
     static CONTAINER_PREFIX = 'pteid';
@@ -16,6 +17,7 @@ export class EidPt extends GenericCertCard implements AbstractEidPT {
     static CERT_ROOT_NON_REP = '/root-non-repudiation';
     static ID_DATA = '/id';
     static PHOTO = '/photo';
+    static VERIFY_PRIV_KEY_REF = 'non-repudiation';
 
 
     constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string) {
@@ -31,7 +33,11 @@ export class EidPt extends GenericCertCard implements AbstractEidPT {
     }
 
     public address(data: OptionalPin, callback?: (error: T1CLibException, data: PtAddressResponse) => void): Promise<PtAddressResponse> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(EidPt.ADDRESS), data, undefined, undefined, callback);
+        return PinEnforcer.check(this.connection, this.reader_id, data).then(() => {
+            let encryptedBody = Object.assign({ private_key_reference: EidPt.VERIFY_PRIV_KEY_REF }, data);
+            return this.connection.post(this.baseUrl, this.containerSuffix(EidPt.ADDRESS),
+                encryptedBody, undefined, undefined, callback);
+        });
     }
 
     public photo(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
