@@ -16,6 +16,7 @@ import { AbstractFileExchange } from './file/FileExchangeModel';
 import { AbstractPkcs11 } from './smartcards/pkcs11/pkcs11Model';
 import { AbstractDataContainer } from './data-container/DataContainerModel';
 import { AbstractJavaKeyTool } from './java-key-tool/JavaKeyToolModel';
+import { AbstractSsh } from './ssh/SshModel';
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
     createEidLUX(reader_id?: string): AbstractEidLUX;
@@ -28,6 +29,7 @@ export interface AbstractFactory {
     createPIV(reader_id?: string): AbstractPiv;
     createPKCS11(): AbstractPkcs11;
     createJavaKeyTool(): AbstractJavaKeyTool;
+    createSsh(): AbstractSsh;
 }
 export declare class PluginFactory implements AbstractFactory {
     private url;
@@ -50,4 +52,5 @@ export declare class PluginFactory implements AbstractFactory {
     createFileExchange(): AbstractFileExchange;
     createDataContainer(containerPath: string): () => AbstractDataContainer;
     createJavaKeyTool(): AbstractJavaKeyTool;
+    createSsh(): AbstractSsh;
 }
