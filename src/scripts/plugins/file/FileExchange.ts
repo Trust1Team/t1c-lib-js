@@ -104,23 +104,11 @@ export class FileExchange extends GenericContainer implements AbstractFileExchan
     }
 
     listTypeContent(entity: string, type: string, rel_path?: [string], page?: Page, callback?: (error: T1CLibException, data: FileListResponse) => void): Promise<FileListResponse> {
-        let paging: Page;
-        if (page) {
-            paging = page;
-        } else {
-            paging = {start: 1, size: 10, sort: FileSort.ASC};
-        }
-        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CONTENT_LIST), {entity, type, rel_path, paging}, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPE_CONTENT_LIST), {entity, type, rel_path, page}, undefined, undefined, callback);
     }
 
     listTypes(entity: string, page?: Page, callback?: (error: T1CLibException, data: TypeListResponse) => void): Promise<TypeListResponse> {
-        let paging: Page;
-        if (page) {
-            paging = page;
-        } else {
-            paging = {start: 1, size: 10, sort: FileSort.ASC};
-        }
-        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPES_LIST), {entity, paging}, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.TYPES_LIST), {entity, page}, undefined, undefined, callback);
     }
 
     moveFile(entity: string, from_type: string, to_type: string, filename: string, from_rel_path?: [string], to_rel_path?: [string], callback?: (error: T1CLibException, data: FileResponse) => void): Promise<FileResponse> {

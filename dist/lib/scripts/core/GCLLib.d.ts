@@ -25,7 +25,7 @@ import { AbstractPkcs11 } from '../plugins/smartcards/pkcs11/pkcs11Model';
 import { AuthClient } from './auth/Auth';
 import { AbstractOCVClient } from './ocv/OCVModel';
 import { GCLConfig } from './GCLConfig';
-import { AbstractJavaKeyTool } from '../..';
+import { AbstractJavaKeyTool, AbstractSsh } from '../..';
 export declare class GCLClient {
     private _gclInstalled;
     private localConfig;
@@ -71,6 +71,7 @@ export declare class GCLClient {
     belfius: (reader_id: string) => AbstractBelfius;
     filex: () => AbstractFileExchange;
     javakeytool: () => AbstractJavaKeyTool;
+    ssh: () => AbstractSsh;
     gclInstalled: boolean;
     containerFor(readerId: string, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     download(callback?: (error: T1CLibException, data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse>;

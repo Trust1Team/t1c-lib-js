@@ -46,8 +46,7 @@ import {Polyfills} from '../util/Polyfills';
 import {AbstractOCVClient} from './ocv/OCVModel';
 import {GCLConfig} from './GCLConfig';
 import {DSException} from './exceptions/DSException';
-import {AbstractJavaKeyTool} from '../..';
-
+import {AbstractJavaKeyTool, AbstractSsh} from '../..';
 
 // check if any polyfills are needed
 const defaults = {
@@ -281,6 +280,11 @@ export class GCLClient {
     public javakeytool = (): AbstractJavaKeyTool => {
         return this.pluginFactory.createJavaKeyTool();
     };
+    // get instance for SSH
+    public ssh = (): AbstractSsh => {
+        return this.pluginFactory.createSsh();
+    };
+
 
 
     get gclInstalled(): boolean {

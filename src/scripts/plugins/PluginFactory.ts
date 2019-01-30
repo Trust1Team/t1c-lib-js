@@ -38,6 +38,8 @@ import { AbstractDataContainer } from './data-container/DataContainerModel';
 import { DataContainer } from './data-container/DataContainer';
 import {AbstractJavaKeyTool} from './java-key-tool/JavaKeyToolModel';
 import {JavaKeyTool} from './java-key-tool/JavaKeyTool';
+import {AbstractSsh} from './ssh/SshModel';
+import {Ssh} from './ssh/Ssh';
 
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
@@ -51,6 +53,7 @@ export interface AbstractFactory {
     createPIV(reader_id?: string): AbstractPiv;
     createPKCS11(): AbstractPkcs11;
     createJavaKeyTool(): AbstractJavaKeyTool
+    createSsh(): AbstractSsh
 }
 
 const CONTAINER_NEW_CONTEXT_PATH = '/containers/';
@@ -69,6 +72,7 @@ const CONTAINER_PTEID = CONTAINER_NEW_CONTEXT_PATH + 'pteid';
 const CONTAINER_PKCS11 = CONTAINER_NEW_CONTEXT_PATH + 'pkcs11';
 const CONTAINER_REMOTE_LOADING = CONTAINER_NEW_CONTEXT_PATH + 'readerapi';
 const CONTAINER_JAVA_KEY_TOOL = CONTAINER_NEW_CONTEXT_PATH + 'java-keytool';
+const CONTAINER_SSH = CONTAINER_NEW_CONTEXT_PATH + 'ssh';
 
 
 export class PluginFactory implements AbstractFactory {
@@ -121,5 +125,9 @@ export class PluginFactory implements AbstractFactory {
 
     createJavaKeyTool(): AbstractJavaKeyTool {
         return new JavaKeyTool(this.url, CONTAINER_JAVA_KEY_TOOL, this.connection);
+    }
+
+    createSsh(): AbstractSsh {
+        return new Ssh(this.url, '', this.connection, 'ssh');
     }
 }
