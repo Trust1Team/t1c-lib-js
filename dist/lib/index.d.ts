@@ -14,6 +14,8 @@ export * from './scripts/core/ocv/OCVModel';
 export * from './scripts/core/service/CoreModel';
 export * from './scripts/plugins/data-container/DataContainer';
 export * from './scripts/plugins/data-container/DataContainerModel';
+export * from './scripts/plugins/ssh/Ssh';
+export * from './scripts/plugins/ssh/SshModel';
 export * from './scripts/plugins/file/FileExchange';
 export * from './scripts/plugins/file/FileExchangeModel';
 export * from './scripts/plugins/remote-loading/belfius/Belfius';
