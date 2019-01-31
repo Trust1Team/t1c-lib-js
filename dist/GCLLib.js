@@ -22531,14 +22531,14 @@ var Ssh = (function (_super) {
         return this.connection.get(this.baseUrl, this.containerSuffix(Ssh.ALL), undefined, undefined, callback);
     };
     Ssh.prototype.get = function (request, callback) {
-        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.ADD), request, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.GET), request, undefined, undefined, callback);
     };
     Ssh.prototype.remove = function (request, callback) {
         return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.REMOVE), request, undefined, undefined, callback);
     };
     Ssh.CONTAINER_PREFIX = 'ssh';
-    Ssh.ALL = '/get-user-keys';
-    Ssh.GET = '/get-user-key';
+    Ssh.ALL = '/get-keys';
+    Ssh.GET = '/get-key';
     Ssh.ADD = '/create-key';
     Ssh.REMOVE = '/remove-key';
     return Ssh;

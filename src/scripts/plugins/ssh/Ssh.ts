@@ -5,8 +5,8 @@ import {AbstractSsh, CreateKeyRequest, CreateKeyResponse, GetAllKeysResponse, Ge
 
 export class Ssh extends GenericContainer implements AbstractSsh {
     static CONTAINER_PREFIX = 'ssh';
-    static ALL = '/get-user-keys';
-    static GET = '/get-user-key';
+    static ALL = '/get-keys';
+    static GET = '/get-key';
     static ADD = '/create-key';
     static REMOVE = '/remove-key';
 
@@ -16,7 +16,7 @@ export class Ssh extends GenericContainer implements AbstractSsh {
     }
 
     add(request: CreateKeyRequest, callback?: (error: T1CLibException, data: CreateKeyResponse) => void): Promise<CreateKeyResponse> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.ADD), request ,undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.ADD), request , undefined, undefined, callback);
     }
 
     all(callback?: (error: T1CLibException, data: GetAllKeysResponse) => void): Promise<GetAllKeysResponse> {
@@ -24,10 +24,10 @@ export class Ssh extends GenericContainer implements AbstractSsh {
     }
 
     get(request: GetKeyRequest, callback?: (error: T1CLibException, data: GetUserKeyResponse) => void): Promise<GetUserKeyResponse> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.ADD), request ,undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.GET), request , undefined, undefined, callback);
     }
 
     remove(request: RemoveKeyRequest, callback?: (error: T1CLibException, data: RemoveKeyResponse) => void): Promise<RemoveKeyResponse> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.REMOVE), request ,undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.REMOVE), request , undefined, undefined, callback);
     }
 }
