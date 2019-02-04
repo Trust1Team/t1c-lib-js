@@ -1,4 +1,4 @@
-import {CloseTunnelRequest, CloseTunnelResponse, LocalConnection, OpenTunnelRequest, OpenTunnelResponse, T1CLibException} from '../../..';
+import {CloseTunnelRequest, CloseTunnelResponse, FreePortResponse, LocalConnection, OpenTunnelRequest, OpenTunnelResponse, T1CLibException} from '../../..';
 import {GenericContainer} from '../GenericContainer';
 import {AbstractSsh, CreateKeyRequest, CreateKeyResponse, GetAllKeysResponse, GetKeyRequest, GetUserKeyResponse, RemoveKeyRequest, RemoveKeyResponse} from './SshModel';
 
@@ -11,6 +11,7 @@ export class Ssh extends GenericContainer implements AbstractSsh {
     static REMOVE = '/remove-key';
     static OPEN_TUNNEL = '/open-ssh-tunnel';
     static CLOSE_TUNNEL = '/close-ssh-tunnel';
+    static FREE_PORT = '/free-port';
 
 
     constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, containerPrefix: string) {
@@ -39,5 +40,9 @@ export class Ssh extends GenericContainer implements AbstractSsh {
 
     openTunnel(request: OpenTunnelRequest, callback?: (error: T1CLibException, data: OpenTunnelResponse) => void): Promise<OpenTunnelResponse> {
         return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.CLOSE_TUNNEL), request , undefined, undefined, callback);
+    }
+
+    freePort(callback?: (error: T1CLibException, data: FreePortResponse) => void): Promise<FreePortResponse> {
+        return this.connection.get(this.baseUrl, this.containerSuffix(Ssh.FREE_PORT), undefined, undefined, callback);
     }
 }
