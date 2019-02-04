@@ -6,6 +6,7 @@ export interface AbstractSsh {
     remove(request: RemoveKeyRequest, callback?: (error: T1CLibException, data: RemoveKeyResponse) => void): Promise<RemoveKeyResponse>;
     openTunnel(request: OpenTunnelRequest, callback?: (error: T1CLibException, data: OpenTunnelResponse) => void): Promise<OpenTunnelResponse>;
     closeTunnel(request: CloseTunnelRequest, callback?: (error: T1CLibException, data: CloseTunnelResponse) => void): Promise<CloseTunnelResponse>;
+    freePort(callback?: (error: T1CLibException, data: FreePortResponse) => void): Promise<FreePortResponse>;
 }
 export declare class SshKey {
     name: string;
@@ -39,6 +40,11 @@ export declare class CreateKeyRequest {
     name: string;
     key_size: number;
     constructor(name: string, key_size: number);
+}
+export declare class FreePortResponse {
+    data: number;
+    success: boolean;
+    constructor(data: number, success: boolean);
 }
 export declare class OpenTunnelResponse {
     data: number;

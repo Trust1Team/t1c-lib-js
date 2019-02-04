@@ -22542,6 +22542,9 @@ var Ssh = (function (_super) {
     Ssh.prototype.openTunnel = function (request, callback) {
         return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.CLOSE_TUNNEL), request, undefined, undefined, callback);
     };
+    Ssh.prototype.freePort = function (callback) {
+        return this.connection.get(this.baseUrl, this.containerSuffix(Ssh.FREE_PORT), undefined, undefined, callback);
+    };
     Ssh.CONTAINER_PREFIX = 'ssh';
     Ssh.ALL = '/get-keys';
     Ssh.GET = '/get-key';
@@ -22549,6 +22552,7 @@ var Ssh = (function (_super) {
     Ssh.REMOVE = '/remove-key';
     Ssh.OPEN_TUNNEL = '/open-ssh-tunnel';
     Ssh.CLOSE_TUNNEL = '/close-ssh-tunnel';
+    Ssh.FREE_PORT = '/free-port';
     return Ssh;
 }(GenericContainer_1.GenericContainer));
 exports.Ssh = Ssh;
@@ -56311,6 +56315,14 @@ var CreateKeyRequest = (function () {
     return CreateKeyRequest;
 }());
 exports.CreateKeyRequest = CreateKeyRequest;
+var FreePortResponse = (function () {
+    function FreePortResponse(data, success) {
+        this.data = data;
+        this.success = success;
+    }
+    return FreePortResponse;
+}());
+exports.FreePortResponse = FreePortResponse;
 var OpenTunnelResponse = (function () {
     function OpenTunnelResponse(data, success) {
         this.data = data;
