@@ -22537,10 +22537,10 @@ var Ssh = (function (_super) {
         return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.REMOVE), request, undefined, undefined, callback);
     };
     Ssh.prototype.closeTunnel = function (request, callback) {
-        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.OPEN_TUNNEL), request, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.CLOSE_TUNNEL), request, undefined, undefined, callback);
     };
     Ssh.prototype.openTunnel = function (request, callback) {
-        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.CLOSE_TUNNEL), request, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.OPEN_TUNNEL), request, undefined, undefined, callback);
     };
     Ssh.prototype.freePort = function (callback) {
         return this.connection.get(this.baseUrl, this.containerSuffix(Ssh.FREE_PORT), undefined, undefined, callback);

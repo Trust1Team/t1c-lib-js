@@ -35,11 +35,11 @@ export class Ssh extends GenericContainer implements AbstractSsh {
     }
 
     closeTunnel(request: CloseTunnelRequest, callback?: (error: T1CLibException, data: CloseTunnelResponse) => void): Promise<CloseTunnelResponse> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.OPEN_TUNNEL), request , undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.CLOSE_TUNNEL), request , undefined, undefined, callback);
     }
 
     openTunnel(request: OpenTunnelRequest, callback?: (error: T1CLibException, data: OpenTunnelResponse) => void): Promise<OpenTunnelResponse> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.CLOSE_TUNNEL), request , undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.OPEN_TUNNEL), request , undefined, undefined, callback);
     }
 
     freePort(callback?: (error: T1CLibException, data: FreePortResponse) => void): Promise<FreePortResponse> {
