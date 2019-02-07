@@ -16481,7 +16481,7 @@ var SyncUtil = (function () {
     };
     SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
         return client.ds().then(function (ds) {
-            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.13"), info.namespace, containers));
+            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.14"), info.namespace, containers));
         });
     };
     SyncUtil.doSyncFlow = function (client, mergedInfo, uuid, containers, isRetry, config) {
@@ -19510,7 +19510,7 @@ var ActivationUtil = (function () {
     ActivationUtil.registerDevice = function (client, mergedInfo, uuid) {
         return client.admin().getPubKey().then(function (pubKey) {
             return client.ds().then(function (ds) {
-                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.13"), mergedInfo.namespace));
+                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.14"), mergedInfo.namespace));
             });
         });
     };
@@ -22531,16 +22531,28 @@ var Ssh = (function (_super) {
         return this.connection.get(this.baseUrl, this.containerSuffix(Ssh.ALL), undefined, undefined, callback);
     };
     Ssh.prototype.get = function (request, callback) {
-        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.ADD), request, undefined, undefined, callback);
+        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.GET), request, undefined, undefined, callback);
     };
     Ssh.prototype.remove = function (request, callback) {
         return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.REMOVE), request, undefined, undefined, callback);
     };
+    Ssh.prototype.closeTunnel = function (request, callback) {
+        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.CLOSE_TUNNEL), request, undefined, undefined, callback);
+    };
+    Ssh.prototype.openTunnel = function (request, callback) {
+        return this.connection.post(this.baseUrl, this.containerSuffix(Ssh.OPEN_TUNNEL), request, undefined, undefined, callback);
+    };
+    Ssh.prototype.freePort = function (callback) {
+        return this.connection.get(this.baseUrl, this.containerSuffix(Ssh.FREE_PORT), undefined, undefined, callback);
+    };
     Ssh.CONTAINER_PREFIX = 'ssh';
-    Ssh.ALL = '/get-user-keys';
-    Ssh.GET = '/get-user-key';
+    Ssh.ALL = '/get-keys';
+    Ssh.GET = '/get-key';
     Ssh.ADD = '/create-key';
     Ssh.REMOVE = '/remove-key';
+    Ssh.OPEN_TUNNEL = '/open-ssh-tunnel';
+    Ssh.CLOSE_TUNNEL = '/close-ssh-tunnel';
+    Ssh.FREE_PORT = '/free-port';
     return Ssh;
 }(GenericContainer_1.GenericContainer));
 exports.Ssh = Ssh;
@@ -56268,6 +56280,26 @@ var RemoveKeyRequest = (function () {
     return RemoveKeyRequest;
 }());
 exports.RemoveKeyRequest = RemoveKeyRequest;
+var OpenTunnelRequest = (function () {
+    function OpenTunnelRequest(ssh_mediator_host, ssh_mediator_username, ssh_mediator_port, remote_port, local_port, timeout, private_key_path) {
+        this.ssh_mediator_host = ssh_mediator_host;
+        this.ssh_mediator_username = ssh_mediator_username;
+        this.ssh_mediator_port = ssh_mediator_port;
+        this.remote_port = remote_port;
+        this.local_port = local_port;
+        this.timeout = timeout;
+        this.private_key_path = private_key_path;
+    }
+    return OpenTunnelRequest;
+}());
+exports.OpenTunnelRequest = OpenTunnelRequest;
+var CloseTunnelRequest = (function () {
+    function CloseTunnelRequest(port) {
+        this.port = port;
+    }
+    return CloseTunnelRequest;
+}());
+exports.CloseTunnelRequest = CloseTunnelRequest;
 var GetKeyRequest = (function () {
     function GetKeyRequest(name) {
         this.name = name;
@@ -56283,6 +56315,30 @@ var CreateKeyRequest = (function () {
     return CreateKeyRequest;
 }());
 exports.CreateKeyRequest = CreateKeyRequest;
+var FreePortResponse = (function () {
+    function FreePortResponse(data, success) {
+        this.data = data;
+        this.success = success;
+    }
+    return FreePortResponse;
+}());
+exports.FreePortResponse = FreePortResponse;
+var OpenTunnelResponse = (function () {
+    function OpenTunnelResponse(data, success) {
+        this.data = data;
+        this.success = success;
+    }
+    return OpenTunnelResponse;
+}());
+exports.OpenTunnelResponse = OpenTunnelResponse;
+var CloseTunnelResponse = (function () {
+    function CloseTunnelResponse(data, success) {
+        this.data = data;
+        this.success = success;
+    }
+    return CloseTunnelResponse;
+}());
+exports.CloseTunnelResponse = CloseTunnelResponse;
 var GetAllKeysResponse = (function (_super) {
     __extends(GetAllKeysResponse, _super);
     function GetAllKeysResponse(data, success) {
@@ -59159,7 +59215,7 @@ var CoreService = (function () {
     CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
     CoreService.prototype.getUrl = function () { return this.url; };
     CoreService.prototype.version = function () {
-        return Promise.resolve("2.2.13");
+        return Promise.resolve("2.2.14");
     };
     return CoreService;
 }());
