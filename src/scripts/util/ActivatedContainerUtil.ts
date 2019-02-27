@@ -8,7 +8,11 @@ export class ActivatedContainerUtil {
     }
 
     public static getContainerFor(cfg: GCLConfig, containerName: string): string {
-        return cfg.activeContainers.get(containerName)[0];
+        try {
+            return cfg.activeContainers.get(containerName)[0];
+        } catch (e) {
+            console.log(e);
+        }
     }
 
     /*
