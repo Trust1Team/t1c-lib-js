@@ -15046,7 +15046,12 @@ var ActivatedContainerUtil = (function () {
     function ActivatedContainerUtil() {
     }
     ActivatedContainerUtil.getContainerFor = function (cfg, containerName) {
-        return cfg.activeContainers.get(containerName)[0];
+        try {
+            return cfg.activeContainers.get(containerName)[0];
+        }
+        catch (e) {
+            console.log(e);
+        }
     };
     ActivatedContainerUtil.getSortedProvidedContainers = function (containers) {
         var containerHashmap = new Map();
@@ -16378,18 +16383,7 @@ var InitUtil = (function () {
         });
     };
     InitUtil.containerHandler = function (config, infoResponse) {
-        if (!config.dsUrl && config.overrideContainers) {
-            config.activeContainers = ActivatedContainerUtil_1.ActivatedContainerUtil.getSortedProvidedContainers(config.overrideContainers);
-        }
-        else if (!config.dsUrl && !config.overrideContainers) {
-            config.activeContainers = ActivatedContainerUtil_1.ActivatedContainerUtil.getSortedContainers(infoResponse.data.containers);
-        }
-        else if (config.citrix && config.overrideContainers) {
-            config.activeContainers = ActivatedContainerUtil_1.ActivatedContainerUtil.getSortedProvidedContainers(config.overrideContainers);
-        }
-        else if (config.citrix && !config.overrideContainers) {
-            config.activeContainers = ActivatedContainerUtil_1.ActivatedContainerUtil.getSortedContainers(infoResponse.data.containers);
-        }
+        config.activeContainers = config.overrideContainers ? ActivatedContainerUtil_1.ActivatedContainerUtil.getSortedProvidedContainers(config.overrideContainers) : ActivatedContainerUtil_1.ActivatedContainerUtil.getSortedContainers(infoResponse.data.containers);
     };
     InitUtil.activateAndSync = function (infoResponse, mergedInfo, client, config, initResolve, initReject) {
         var activated = infoResponse.data.activated;

@@ -85,24 +85,7 @@ export class InitUtil {
     }
 
     private static containerHandler(config: GCLConfig, infoResponse: InfoResponse) {
-        // if no DS has been configured but containers override present in config
-        if (!config.dsUrl && config.overrideContainers) {
-            // values from overrideContainers should be sorted and available when there is no DS available but the containers are provided in the constructor
-            config.activeContainers = ActivatedContainerUtil.getSortedProvidedContainers(config.overrideContainers);
-        }
-        // if no DS has been configured and containers are not declared
-        else if (!config.dsUrl && !config.overrideContainers) {
-            // if there is no DS available and the containers arent provided in the constructor turn to the GCL v2 info endpoint to fetch the containers
-            config.activeContainers = ActivatedContainerUtil.getSortedContainers(infoResponse.data.containers);
-        }
-        // if shared environment - ignore DS and use declared containers
-        else if (config.citrix && config.overrideContainers) {
-            config.activeContainers = ActivatedContainerUtil.getSortedProvidedContainers(config.overrideContainers);
-        }
-        // if shared environment - ignore DS and request GCL for containers
-        else if (config.citrix && !config.overrideContainers) {
-            config.activeContainers = ActivatedContainerUtil.getSortedContainers(infoResponse.data.containers);
-        }
+        config.activeContainers = config.overrideContainers ? ActivatedContainerUtil.getSortedProvidedContainers(config.overrideContainers) : ActivatedContainerUtil.getSortedContainers(infoResponse.data.containers);
     }
 
 
