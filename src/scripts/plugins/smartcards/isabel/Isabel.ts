@@ -3,7 +3,7 @@
  * @since 2019
  */
 
-import {AbstractIsabel, IsabelApplicationDataResponse, IsabelApplicationsResponse, IsabelCertificateResponse} from './IsabelModel';
+import {AbstractIsabel} from './IsabelModel';
 import {LocalConnection, CertificateResponse, Options, PinEnforcer, RequestHandler, T1CLibException, OptionalPin, T1CResponse, AuthenticateOrSignData, DataResponse, VerifyPinData} from '../../../..';
 import {GenericCertCard} from '../Card';
 

@@ -15,6 +15,7 @@ import { Oberthur } from './smartcards/pki/oberthur/Oberthur';
 import { PIV } from './smartcards/piv/piv';
 import { AbstractEidBE } from './smartcards/eid/be/EidBeModel';
 import { AbstractEMV } from './smartcards/emv/EMVModel';
+import { AbstractIsabel } from './smartcards/isabel/IsabelModel';
 import { AbstractOcra } from './smartcards/ocra/ocraModel';
 import { AbstractAventra } from './smartcards/pki/aventra/AventraModel';
 import { AbstractLuxTrust } from './smartcards/pki/luxtrust/LuxTrustModel';
@@ -40,11 +41,13 @@ import {AbstractJavaKeyTool} from './java-key-tool/JavaKeyToolModel';
 import {JavaKeyTool} from './java-key-tool/JavaKeyTool';
 import {AbstractSsh} from './ssh/SshModel';
 import {Ssh} from './ssh/Ssh';
+import {Isabel} from './smartcards/isabel/Isabel';
 
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
     createEidLUX(reader_id?: string): AbstractEidLUX;
     createEmv(reader_id?: string): AbstractEMV;
+    createIsabel(reader_id?: string): AbstractIsabel;
     createLuxTrust(reader_id?: string): AbstractLuxTrust;
     createMobib(reader_id?: string): AbstractMobib;
     createOcra(reader_id?: string): AbstractOcra;
@@ -61,6 +64,7 @@ const CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
 const CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
 const CONTAINER_DNIE = CONTAINER_NEW_CONTEXT_PATH + 'dnie';
 const CONTAINER_EMV = CONTAINER_NEW_CONTEXT_PATH + 'emv';
+const CONTAINER_ISABEL = CONTAINER_NEW_CONTEXT_PATH + 'isabel';
 const CONTAINER_FILE_EXCHANGE = CONTAINER_NEW_CONTEXT_PATH + 'file-exchange';
 const CONTAINER_LUXTRUST = CONTAINER_NEW_CONTEXT_PATH + 'luxtrust';
 const CONTAINER_MOBIB = CONTAINER_NEW_CONTEXT_PATH + 'mobib';
@@ -88,6 +92,8 @@ export class PluginFactory implements AbstractFactory {
     public createEidPT(reader_id?: string): AbstractEidPT { return new EidPt(this.url, CONTAINER_PTEID, this.connection, reader_id); }
 
     public createEmv(reader_id?: string): AbstractEMV { return new EMV(this.url, CONTAINER_EMV, this.connection, reader_id); }
+
+    public createIsabel(reader_id?: string): AbstractIsabel { return new Isabel(this.url, CONTAINER_EMV, this.connection, reader_id); }
 
     public createLuxTrust(reader_id?: string): AbstractLuxTrust { return new LuxTrust(this.url, CONTAINER_LUXTRUST, this.connection, reader_id); }
 
