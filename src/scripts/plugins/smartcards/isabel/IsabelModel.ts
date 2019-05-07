@@ -3,19 +3,24 @@
  * @since 2019
  */
 import {T1CLibException} from '../../../core/exceptions/CoreExceptions';
-import {CertCard, PinCard} from '../Card';
-import {DataObjectResponse} from '../../../core/service/CoreModel';
+import {AuthenticateOrSignData, CertCard, PinCard, VerifyPinData} from '../Card';
+import {CertificateResponse, DataObjectResponse, DataResponse, T1CResponse} from '../../../core/service/CoreModel';
+import {Options} from '../../../..';
 
 
 export interface AbstractIsabel extends CertCard {
 
-    applications(callback?: (error: T1CLibException, data: IsabelApplicationsResponse) => void): Promise<IsabelApplicationsResponse>;
+    rootCertificate(options: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
-    applicationData(callback?: (error: T1CLibException, data: IsabelApplicationDataResponse) => void): Promise<IsabelApplicationDataResponse>;
+    intermediateCertificate(options: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
-    iccPublicKeyCertificate(aid: string, callback?: (error: T1CLibException, data: IsabelCertificateResponse) => void): Promise<IsabelCertificateResponse>;
+    nonRepudiationCertificate(options: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
-    issuerPublicKeyCertificate(aid: string, callback?: (error: T1CLibException, data: IsabelCertificateResponse) => void): Promise<IsabelCertificateResponse>;
+    verifyPin(body: VerifyPinData, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse>;
+
+    signData(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+
+    authenticate(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
 }
 
 export class IsabelAllDataResponse extends DataObjectResponse {
