@@ -3,20 +3,22 @@
  * @since 2019
  */
 
-import { AbstractIsabel, IsabelApplicationDataResponse, IsabelApplicationsResponse, IsabelCertificateResponse } from './IsabelModel';
-import { T1CLibException } from '../../../core/exceptions/CoreExceptions';
-import { GenericPinCard } from '../Card';
-import {LocalConnection} from '../../../core/client/Connection';
+import {AbstractIsabel, IsabelApplicationDataResponse, IsabelApplicationsResponse, IsabelCertificateResponse} from './IsabelModel';
+import {LocalConnection, CertificateResponse, Options, PinEnforcer, RequestHandler, T1CLibException, OptionalPin, T1CResponse} from '../../../..';
+import {GenericCertCard} from '../Card';
 
-export class Isabel extends GenericPinCard implements AbstractIsabel {
+export class Isabel extends GenericCertCard implements AbstractIsabel {
     static CONTAINER_PREFIX = 'isabel';
     static APPLICATIONS = '/applications';
     static APPLICATION_DATA = '/application-data';
     static ISSUER_PUBLIC_KEY_CERT = '/issuer-public-key-certificate';
     static ICC_PUBLIC_KEY_CERT = '/icc-public-key-certificate';
+    static VERIFY_PRIV_KEY_REF = 'non-repudiation';
 
-
-    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string) {
+    constructor(baseUrl: string,
+                containerUrl: string,
+                connection: LocalConnection,
+                reader_id: string) {
         super(baseUrl, containerUrl, connection, reader_id, Isabel.CONTAINER_PREFIX);
     }
 
@@ -31,12 +33,26 @@ export class Isabel extends GenericPinCard implements AbstractIsabel {
     public iccPublicKeyCertificate(aid: string, callback?: (error: T1CLibException, data: IsabelCertificateResponse)
         => void): Promise<IsabelCertificateResponse> {
         return this.connection.post(this.baseUrl, this.containerSuffix(Isabel.ICC_PUBLIC_KEY_CERT),
-            { aid }, undefined, undefined, callback);
+            {aid}, undefined, undefined, callback);
     }
 
     public issuerPublicKeyCertificate(aid: string, callback?: (error: T1CLibException, data: IsabelCertificateResponse)
         => void): Promise<IsabelCertificateResponse> {
         return this.connection.post(this.baseUrl, this.containerSuffix(Isabel.ISSUER_PUBLIC_KEY_CERT),
-            { aid }, undefined, undefined, callback);
+            {aid}, undefined, undefined, callback);
+    }
+
+    public rootCertificate(options: Options,
+                           callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse> {
+        return this.getCertificate(Isabel.CERT_ROOT, RequestHandler.determineOptions(options, callback));
+    }
+
+    public verifyPin(body: OptionalPin,
+                     callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse> {
+        return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
+            let encryptedBody = Object.assign({ private_key_reference: Isabel.VERIFY_PRIV_KEY_REF }, body);
+            return this.connection.post(this.baseUrl, this.containerSuffix(GenericCertCard.VERIFY_PIN),
+                encryptedBody, undefined, undefined, callback);
+        });
     }
 }

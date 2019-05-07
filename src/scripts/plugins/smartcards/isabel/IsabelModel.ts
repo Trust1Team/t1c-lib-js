@@ -3,12 +3,11 @@
  * @since 2019
  */
 import {T1CLibException} from '../../../core/exceptions/CoreExceptions';
-import {PinCard} from '../Card';
+import {CertCard, PinCard} from '../Card';
 import {DataObjectResponse} from '../../../core/service/CoreModel';
 
 
-export interface AbstractIsabel extends PinCard {
-    allData(filters: string[], callback?: (error: T1CLibException, data: IsabelAllDataResponse) => void): Promise<IsabelAllDataResponse>;
+export interface AbstractIsabel extends CertCard {
 
     applications(callback?: (error: T1CLibException, data: IsabelApplicationsResponse) => void): Promise<IsabelApplicationsResponse>;
 
