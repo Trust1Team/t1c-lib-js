@@ -1,7 +1,3 @@
-/**
- * @author Maarten Somers
- * @since 2017
- */
 import { T1CLibException } from '../../../../core/exceptions/CoreExceptions';
 import { CertCard, OptionalPin } from '../../Card';
 import {
@@ -29,7 +25,6 @@ export interface AbstractEidBE extends CertCard {
     rrnCertificate(options: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     verifyPin(body: OptionalPin, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse>;
     tokenData(callback?: (error: T1CLibException, data: BeidTokenDataResponse) => void): Promise<BeidTokenDataResponse>;
-
 }
 
 export class BeidAddressResponse extends DataObjectResponse {

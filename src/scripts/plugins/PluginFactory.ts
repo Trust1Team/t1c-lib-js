@@ -15,7 +15,7 @@ import { Oberthur } from './smartcards/pki/oberthur/Oberthur';
 import { PIV } from './smartcards/piv/piv';
 import { AbstractEidBE } from './smartcards/eid/be/EidBeModel';
 import { AbstractEMV } from './smartcards/emv/EMVModel';
-import { AbstractIsabel } from './smartcards/isabel/IsabelModel';
+// import { AbstractIsabel } from './smartcards/isabel/IsabelModel';
 import { AbstractOcra } from './smartcards/ocra/ocraModel';
 import { AbstractAventra } from './smartcards/pki/aventra/AventraModel';
 import { AbstractLuxTrust } from './smartcards/pki/luxtrust/LuxTrustModel';
@@ -41,13 +41,13 @@ import {AbstractJavaKeyTool} from './java-key-tool/JavaKeyToolModel';
 import {JavaKeyTool} from './java-key-tool/JavaKeyTool';
 import {AbstractSsh} from './ssh/SshModel';
 import {Ssh} from './ssh/Ssh';
-import {Isabel} from './smartcards/isabel/Isabel';
+// import {Isabel} from './smartcards/isabel/Isabel';
 
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
     createEidLUX(reader_id?: string): AbstractEidLUX;
     createEmv(reader_id?: string): AbstractEMV;
-    createIsabel(reader_id?: string): AbstractIsabel;
+    // createIsabel(reader_id?: string): AbstractIsabel;
     createLuxTrust(reader_id?: string): AbstractLuxTrust;
     createMobib(reader_id?: string): AbstractMobib;
     createOcra(reader_id?: string): AbstractOcra;
@@ -93,7 +93,7 @@ export class PluginFactory implements AbstractFactory {
 
     public createEmv(reader_id?: string): AbstractEMV { return new EMV(this.url, CONTAINER_EMV, this.connection, reader_id); }
 
-    public createIsabel(reader_id?: string): AbstractIsabel { return new Isabel(this.url, CONTAINER_EMV, this.connection, reader_id); }
+    // public createIsabel(reader_id?: string): AbstractIsabel { return new Isabel(this.url, CONTAINER_EMV, this.connection, reader_id); }
 
     public createLuxTrust(reader_id?: string): AbstractLuxTrust { return new LuxTrust(this.url, CONTAINER_LUXTRUST, this.connection, reader_id); }
 
