@@ -46,7 +46,7 @@ import {Polyfills} from '../util/Polyfills';
 import {AbstractOCVClient} from './ocv/OCVModel';
 import {GCLConfig} from './GCLConfig';
 import {DSException} from './exceptions/DSException';
-import {AbstractJavaKeyTool, AbstractSsh} from '../..';
+import {AbstractJavaKeyTool, AbstractSsh, PinEnforcer} from '../..';
 
 // check if any polyfills are needed
 const defaults = {
@@ -107,8 +107,7 @@ export class GCLClient {
         if (this.localConfig.dsUrl) {
             if (this.localConfig.localTestMode) {
                 this.dsClient = new DSClient(this.localConfig.dsUrl, this.localTestConnection, this.localConfig);
-            }
-            else {
+            } else {
                 this.dsClient = new DSClient(this.localConfig.dsUrl, this.remoteConnection, this.localConfig);
             }
         } else {
@@ -168,6 +167,10 @@ export class GCLClient {
         });
     }
 
+    public static encryptPin(pin: string): string {
+        return PinEnforcer.encryptPin(pin);
+    }
+
     /**
      * Init security context
      */
@@ -201,8 +204,7 @@ export class GCLClient {
         return new Promise((resolve, reject) => {
             if (this.dsClient) {
                 resolve(this.dsClient);
-            }
-            else {
+            } else {
                 reject(new DSException('Distribution server is not configured'));
             }
         });
@@ -284,8 +286,6 @@ export class GCLClient {
     public ssh = (): AbstractSsh => {
         return this.pluginFactory.createSsh();
     };
-
-
 
     get gclInstalled(): boolean {
         return this._gclInstalled;

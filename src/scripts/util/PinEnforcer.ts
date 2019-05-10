@@ -1,11 +1,11 @@
 /**
  * @author Maarten Somers
  */
-import { GenericConnection, LocalAuthConnection } from '../core/client/Connection';
-import { JSEncrypt} from 'jsencrypt';
-import { PubKeyService } from './PubKeyService';
-import { T1CLibException } from '../core/exceptions/CoreExceptions';
-import { GCLConfig } from '../core/GCLConfig';
+import {GenericConnection, LocalAuthConnection} from '../core/client/Connection';
+import {JSEncrypt} from 'jsencrypt';
+import {PubKeyService} from './PubKeyService';
+import {T1CLibException} from '../core/exceptions/CoreExceptions';
+import {GCLConfig} from '../core/GCLConfig';
 
 const CORE_READERS = '/card-readers';
 
@@ -23,7 +23,7 @@ export class PinEnforcer {
     public static checkAlreadyEncryptedPin(connection: GenericConnection,
                                            readerId: string,
                                            pin: string): Promise<any> {
-        return PinEnforcer.doPinCheck(connection.cfg, readerId, { pin });
+        return PinEnforcer.doPinCheck(connection.cfg, readerId, {pin});
     }
 
 
@@ -34,7 +34,9 @@ export class PinEnforcer {
             let crypt = new JSEncrypt();
             crypt.setKey(pubKey);
             return crypt.encrypt(pin);
-        } else { return undefined; }
+        } else {
+            return '';
+        }
     }
 
     private static doPinCheck(cfg: GCLConfig, readerId: string,
@@ -52,18 +54,26 @@ export class PinEnforcer {
                     if (body.pinpad) {
                         // if true, check that no pin was sent
                         if (body.pin) {
-                            reject({ data: new T1CLibException(400, '600', 'Strict pinpad enforcement is enabled.' +
-                                                              ' This request was sent with a PIN,' +
-                                                                         ' but the reader has a pinpad.' ), success: false });
-                        } else { resolve(); }
+                            reject({
+                                data: new T1CLibException(400, '600', 'Strict pinpad enforcement is enabled.' +
+                                    ' This request was sent with a PIN,' +
+                                    ' but the reader has a pinpad.'), success: false
+                            });
+                        } else {
+                            resolve();
+                        }
                     } else {
                         // check if a pin was sent, or if we are using OS pin dialog
                         if (!body.pin && !body.os_dialog) {
-                            reject({ data: new T1CLibException(400, '601', 'Strict pinpad enforcement is enabled.' +
-                                                              ' This request was sent without a PIN,' +
-                                                              ' but the reader does not have a pinpad and' +
-                                                                         ' OS PIN dialog is not enabled.'), success: false });
-                        } else { resolve(); }
+                            reject({
+                                data: new T1CLibException(400, '601', 'Strict pinpad enforcement is enabled.' +
+                                    ' This request was sent without a PIN,' +
+                                    ' but the reader does not have a pinpad and' +
+                                    ' OS PIN dialog is not enabled.'), success: false
+                            });
+                        } else {
+                            resolve();
+                        }
                     }
                 } else {
                     // don't force, can resolve now
@@ -82,5 +92,6 @@ export class PinEnforcer {
 }
 
 export class EncryptedOptionalPin {
-    constructor(public os_dialog?: boolean, public pinpad?: boolean, public pin?: string, public pace?: string) {}
+    constructor(public os_dialog?: boolean, public pinpad?: boolean, public pin?: string, public pace?: string) {
+    }
 }

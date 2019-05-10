@@ -23,17 +23,13 @@ export interface AbstractEidLUX extends CertCard {
 
     picture(callback?: (error: T1CLibException, data: LuxidPictureResponse) => void): Promise<LuxidPictureResponse>;
 
-    rootCertificate(options?: Options,
-                    callback?: (error: T1CLibException, data: CertificatesResponse) => void): Promise<CertificatesResponse>;
+    rootCertificate(options?: Options, callback?: (error: T1CLibException, data: CertificatesResponse) => void): Promise<CertificatesResponse>;
 
-    authenticationCertificate(options?: Options,
-                              callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    authenticationCertificate(options?: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
-    nonRepudiationCertificate(options?: Options,
-                              callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
+    nonRepudiationCertificate(options?: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 
     signatureImage(callback?: (error: T1CLibException, data: LuxidSignatureImageResponse) => void): Promise<LuxidSignatureImageResponse>;
-
 
     pinTryCounter(pin_reference: PinTryCounterData, callback?: (error: T1CLibException, data: LuxPinTryCounterResponse) => void): Promise<LuxPinTryCounterResponse>;
 
@@ -70,7 +66,7 @@ export class LuxAllDataResponse extends AllCertsResponse {
 }
 
 export class LuxPinTryCounterResponse extends T1CResponse {
-    constructor(public data: number , public success: boolean) {
+    constructor(public data: number, public success: boolean) {
         super(success, data);
     }
 }

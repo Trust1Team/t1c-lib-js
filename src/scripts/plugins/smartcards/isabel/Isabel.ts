@@ -30,6 +30,7 @@ export class Isabel extends GenericCertCard implements AbstractIsabel {
     //             encryptedBody, undefined, undefined, callback);
     //     });
     // }
+
     public intermediateCertificate(options: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         return this.getCertificate(Isabel.CERT_INTERMEDIATE, RequestHandler.determineOptions(options, callback));
     }

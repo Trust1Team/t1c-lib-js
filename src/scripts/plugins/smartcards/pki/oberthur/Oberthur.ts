@@ -64,4 +64,10 @@ export class Oberthur extends GenericCertCard implements AbstractOberthur {
             return this.connection.post(this.baseUrl, this.containerSuffix(Oberthur.VERIFY_PIN), body, undefined, undefined, callback);
         });
     }
+
+    public verifyPinWithEncryptedPin(body: VerifyPinData, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse> {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin).then(() => {
+            return this.connection.post(this.baseUrl, this.containerSuffix(Oberthur.VERIFY_PIN), body, undefined, undefined, callback);
+        });
+    }
 }
