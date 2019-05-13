@@ -1,5 +1,11 @@
 # Changelog
 
+## v2.2.15 (13/05/2019)
+
+#### enhancement
+
+- Added methods to encrypt pin and reuse encrypted pin
+
 ## v2.2.10 (07/09/2018)
 
 #### bug
