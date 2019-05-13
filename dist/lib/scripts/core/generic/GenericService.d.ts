@@ -22,8 +22,11 @@ export declare class GenericService {
     static signCapable(client: GCLClient, callback?: (error: T1CLibException, data: CardReadersResponse) => void): Promise<any>;
     static verifyPinCapable(client: GCLClient, callback?: (error: T1CLibException, data: CardReadersResponse) => void): Promise<any>;
     static authenticate(client: GCLClient, readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
+    static authenticateWithEncryptedPin(client: GCLClient, readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
     static sign(client: GCLClient, readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
+    static signWithEncryptedPin(client: GCLClient, readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
     static verifyPin(client: GCLClient, readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
+    static verifyPinWithEncryptedPin(client: GCLClient, readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
     static checkPKCS11(client: GCLClient): Promise<{}>;
     private static checkCanAuthenticate;
     private static checkCanSign;
@@ -37,6 +40,9 @@ export declare class GenericService {
     private static determineDataDumpMethod;
     private static doDataDump;
     private static doSign;
+    private static doSignWithEncryptedPin;
     private static doAuthenticate;
+    private static doAuthenticateWithEncryptedPin;
     private static doVerifyPin;
+    private static doVerifyPinWithEncryptedPin;
 }

@@ -10,6 +10,7 @@ export declare class EidLux extends GenericCertCard implements AbstractEidLUX {
     protected connection: LocalConnection;
     protected reader_id: string;
     protected pin: string;
+    protected isEncrypted: boolean;
     protected pinType: PinType;
     static CONTAINER_PREFIX: string;
     static BIOMETRIC: string;
@@ -19,7 +20,7 @@ export declare class EidLux extends GenericCertCard implements AbstractEidLUX {
     static PIN_CHANGE: string;
     static PIN_RESET: string;
     static PIN_TRY_COUNTER: string;
-    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string, pin: string, pinType: PinType);
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string, pin: string, isEncrypted: boolean, pinType: PinType);
     private static EncryptedHeader;
     allDataFilters(): string[];
     allCertFilters(): string[];

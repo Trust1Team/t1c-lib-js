@@ -86,8 +86,8 @@ export class PluginFactory implements AbstractFactory {
 
     public createEidBE(reader_id?: string): AbstractEidBE { return new EidBe(this.url, CONTAINER_BEID, this.connection, reader_id); }
 
-    public createEidLUX(reader_id?: string, pin?: string, pinType?: PinType): AbstractEidLUX {
-        return new EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin, pinType);
+    public createEidLUX(reader_id?: string, pin?: string, isEncrypted: boolean = false, pinType?: PinType): AbstractEidLUX {
+        return new EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin, isEncrypted, pinType);
     }
     public createEidPT(reader_id?: string): AbstractEidPT { return new EidPt(this.url, CONTAINER_PTEID, this.connection, reader_id); }
 

@@ -37,7 +37,7 @@ export declare class PluginFactory implements AbstractFactory {
     constructor(url: string, connection: LocalConnection);
     createDNIe(reader_id?: string): AbstractDNIe;
     createEidBE(reader_id?: string): AbstractEidBE;
-    createEidLUX(reader_id?: string, pin?: string, pinType?: PinType): AbstractEidLUX;
+    createEidLUX(reader_id?: string, pin?: string, isEncrypted?: boolean, pinType?: PinType): AbstractEidLUX;
     createEidPT(reader_id?: string): AbstractEidPT;
     createEmv(reader_id?: string): AbstractEMV;
     createLuxTrust(reader_id?: string): AbstractLuxTrust;

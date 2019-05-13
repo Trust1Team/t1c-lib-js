@@ -33,12 +33,13 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
                 protected connection: LocalConnection,
                 protected reader_id: string,
                 protected pin: string,
+                protected isEncrypted: boolean = false,
                 protected pinType: PinType) {
         super(baseUrl, containerUrl, connection, reader_id, EidLux.CONTAINER_PREFIX);
         if (!pinType) {
             this.pinType = PinType.PIN;
         }
-        this.pin = PinEnforcer.encryptPin(pin);
+        this.pin = (isEncrypted) ? pin : PinEnforcer.encryptPin(pin);
     }
 
     // by default using Pace-PIN

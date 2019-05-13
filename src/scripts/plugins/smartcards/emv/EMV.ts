@@ -6,8 +6,9 @@
 
 import { AbstractEMV, EmvApplicationDataResponse, EmvApplicationsResponse, EmvCertificateResponse } from './EMVModel';
 import { T1CLibException } from '../../../core/exceptions/CoreExceptions';
-import { GenericPinCard } from '../Card';
+import {GenericPinCard, VerifyPinData} from '../Card';
 import {LocalConnection} from '../../../core/client/Connection';
+import {T1CResponse} from '../../../..';
 
 export class EMV extends GenericPinCard implements AbstractEMV {
     static CONTAINER_PREFIX = 'emv';

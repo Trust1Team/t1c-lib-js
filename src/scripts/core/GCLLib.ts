@@ -226,8 +226,8 @@ export class GCLClient {
         return this.pluginFactory.createDNIe(reader_id);
     };
     // get instance for luxemburg eID card
-    public luxeid = (reader_id?: string, pin?: string, pinType?: PinType): AbstractEidLUX => {
-        return this.pluginFactory.createEidLUX(reader_id, pin, pinType);
+    public luxeid = (reader_id?: string, pin?: string, isEncrypted = false, pinType?: PinType): AbstractEidLUX => {
+        return this.pluginFactory.createEidLUX(reader_id, pin, isEncrypted, pinType);
     };
     // get instance for luxtrust card
     public luxtrust = (reader_id?: string, pin?: string): AbstractLuxTrust => {
@@ -326,6 +326,10 @@ export class GCLClient {
         return GenericService.authenticate(this, readerId, data, callback);
     }
 
+    public authenticateWithEncryptedPin(readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void) {
+        return GenericService.authenticateWithEncryptedPin(this, readerId, data, callback);
+    }
+
     public readersCanSign(callback?: (error: T1CLibException, data: CardReadersResponse) => void) {
         return GenericService.signCapable(this, callback);
     }
@@ -334,12 +338,20 @@ export class GCLClient {
         return GenericService.sign(this, readerId, data, callback);
     }
 
+    public signWithEncryptedPin(readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void) {
+        return GenericService.signWithEncryptedPin(this, readerId, data, callback);
+    }
+
     public readersCanVerifyPin(callback?: (error: T1CLibException, data: CardReadersResponse) => void) {
         return GenericService.verifyPinCapable(this, callback);
     }
 
     public verifyPin(readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void) {
         return GenericService.verifyPin(this, readerId, data, callback);
+    }
+
+    public verifyPinWithEncryptedPin(readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void) {
+        return GenericService.verifyPinWithEncryptedPin(this, readerId, data, callback);
     }
 
     /**

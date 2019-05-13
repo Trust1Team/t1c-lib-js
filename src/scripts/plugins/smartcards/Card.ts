@@ -23,12 +23,15 @@ export interface Card {
 
 export interface PinCard extends Card {
     verifyPin: (body: VerifyPinData, callback?: () => void) => Promise<T1CResponse>;
+    verifyPinWithEncryptedPin: (body: VerifyPinData, callback?: () => void) => Promise<T1CResponse>;
 }
 
 export interface CertCard extends PinCard {
     allCerts: (filters: string[] | Options, callback?: () => void) => Promise<DataObjectResponse>
     authenticate: (body: any, callback?: () => void) => Promise<DataResponse>
+    authenticateWithEncryptedPin: (body: any, callback?: () => void) => Promise<DataResponse>
     signData: (body: any, callback?: () => void) => Promise<DataResponse>
+    signDataWithEncryptedPin: (body: any, callback?: () => void) => Promise<DataResponse>
 }
 
 export interface SecuredCertCard {
@@ -42,7 +45,7 @@ export interface SecuredCertCard {
 
 // classes
 export class OptionalPin {
-    constructor(public pin?: string, public pace?: string, private_key_reference?: string) {
+    constructor(public pin?: string, public pace?: string, private_key_reference?: string ) {
     }
 }
 
@@ -109,6 +112,14 @@ export abstract class GenericPinCard extends GenericSmartCard implements PinCard
     public verifyPin(body: VerifyPinData,
                      callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse> {
         return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
+            return this.connection.post(this.baseUrl, this.containerSuffix(GenericPinCard.VERIFY_PIN),
+                body, undefined, undefined, callback);
+        });
+    }
+
+    public verifyPinWithEncryptedPin(body: VerifyPinData,
+                                     callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse> {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericPinCard.VERIFY_PIN),
                 body, undefined, undefined, callback);
         });

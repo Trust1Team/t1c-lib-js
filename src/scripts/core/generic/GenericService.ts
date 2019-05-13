@@ -115,6 +115,22 @@ export class GenericService {
             });
     }
 
+    public static authenticateWithEncryptedPin(client: GCLClient,
+                                               readerId: string,
+                                               data: AuthenticateOrSignData,
+                                               callback?: (error: T1CLibException, data: DataResponse) => void) {
+
+        return this.checkPrerequisites(client, readerId, data)
+            .then(this.determineAlgorithm)
+            .then(GenericService.doAuthenticateWithEncryptedPin)
+            .then(res => {
+                return ResponseHandler.response(res, callback);
+            })
+            .catch(err => {
+                return ResponseHandler.error(err, callback);
+            });
+    }
+
     public static sign(client: GCLClient,
                        readerId: string,
                        data: AuthenticateOrSignData,
@@ -123,6 +139,22 @@ export class GenericService {
         return this.checkPrerequisites(client, readerId, data)
             .then(this.determineAlgorithm)
             .then(GenericService.doSign)
+            .then(res => {
+                return ResponseHandler.response(res, callback);
+            })
+            .catch(err => {
+                return ResponseHandler.error(err, callback);
+            });
+    }
+
+    public static signWithEncryptedPin(client: GCLClient,
+                                       readerId: string,
+                                       data: AuthenticateOrSignData,
+                                       callback?: (error: T1CLibException, data: DataResponse) => void) {
+
+        return this.checkPrerequisites(client, readerId, data)
+            .then(this.determineAlgorithm)
+            .then(GenericService.doSignWithEncryptedPin)
             .then(res => {
                 return ResponseHandler.response(res, callback);
             })
@@ -146,13 +178,28 @@ export class GenericService {
             });
     }
 
+    public static verifyPinWithEncryptedPin(client: GCLClient,
+                                            readerId: string,
+                                            data: OptionalPin,
+                                            callback?: (error: T1CLibException, data: DataResponse) => void) {
+
+        return this.checkPrerequisites(client, readerId, data)
+            .then(GenericService.doVerifyPinWithEncryptedPin)
+            .then(res => {
+                return ResponseHandler.response(res, callback);
+            })
+            .catch(err => {
+                return ResponseHandler.error(err, callback);
+            });
+    }
+
     public static checkPKCS11(client: GCLClient) {
         return new Promise((resolve, reject) => {
             // try a PKCS11 call, if success, it's PKCS11 :)
             client.pkcs11().slotsWithTokenPresent().then(slots => {
                 if (slots && slots.data && slots.data.length) {
                     // check if valid token present
-                    let validToken  = slots.data.find(slot => {
+                    let validToken = slots.data.find(slot => {
                         return Util.includes(this.PKCS11_FLAGS, slot.flags);
                     });
                     resolve(!!validToken);
@@ -167,7 +214,7 @@ export class GenericService {
 
     private static checkCanAuthenticate(data: CardReadersResponse) {
         return new Promise((resolve) => {
-            data.data = data.data.filter( reader => {
+            data.data = data.data.filter(reader => {
                 return CardUtil.canAuthenticate(reader.card);
             });
             resolve(data);
@@ -176,7 +223,7 @@ export class GenericService {
 
     private static checkCanSign(data: CardReadersResponse) {
         return new Promise((resolve) => {
-            data.data = data.data.filter( reader => {
+            data.data = data.data.filter(reader => {
                 return CardUtil.canSign(reader.card);
             });
             resolve(data);
@@ -185,7 +232,7 @@ export class GenericService {
 
     private static checkCanVerifyPin(data: CardReadersResponse) {
         return new Promise((resolve) => {
-            data.data = data.data.filter( reader => {
+            data.data = data.data.filter(reader => {
                 return CardUtil.canVerifyPin(reader.card);
             });
             resolve(data);
@@ -234,8 +281,7 @@ export class GenericService {
             } else {
                 if (args.readerId && args.readerId.length) {
                     reject('No card found for this ID');
-                }
-                else {
+                } else {
                     reject('Reader ID is required.');
                 }
             }
@@ -267,8 +313,7 @@ export class GenericService {
             }
             if (!args.data.algorithm_reference) {
                 reject('No algorithm reference provided and cannot determine default algorithm');
-            }
-            else {
+            } else {
                 resolve(args);
             }
         });
@@ -299,8 +344,7 @@ export class GenericService {
             args.dumpOptions = CardUtil.dumpOptions(args.container);
             if (args.dumpMethod) {
                 resolve(args);
-            }
-            else {
+            } else {
                 reject('Cannot determine method to use for data dump');
             }
         });
@@ -312,8 +356,7 @@ export class GenericService {
         }
         if (args.dumpOptions) {
             return args.client[args.container](args.readerId)[args.dumpMethod](args.dumpOptions, args.data);
-        }
-        else {
+        } else {
             return args.client[args.container](args.readerId)[args.dumpMethod](args.data);
         }
     }
@@ -327,11 +370,28 @@ export class GenericService {
         }
     }
 
+    private static doSignWithEncryptedPin(args: Arguments) {
+        // TODO use marker interface for PACE
+        if (args.container === 'luxeid') {
+            return args.client.luxeid(args.readerId, args.data.pin).signDataWithEncryptedPin(args.data);
+        } else {
+            return args.client[args.container](args.readerId).signDataWithEncryptedPin(args.data);
+        }
+    }
+
     private static doAuthenticate(args: Arguments) {
         if (args.container === 'luxeid') {
             return args.client.luxeid(args.readerId, args.data.pin).authenticate(args.data);
         } else {
             return args.client[args.container](args.readerId).authenticate(args.data);
+        }
+    }
+
+    private static doAuthenticateWithEncryptedPin(args: Arguments) {
+        if (args.container === 'luxeid') {
+            return args.client.luxeid(args.readerId, args.data.pin).authenticateWithEncryptedPin(args.data);
+        } else {
+            return args.client[args.container](args.readerId).authenticateWithEncryptedPin(args.data);
         }
     }
 
@@ -352,6 +412,26 @@ export class GenericService {
             return args.client.aventra(args.readerId).verifyPin(verifyPinData);
         } else {
             return args.client[args.container](args.readerId).verifyPin(args.data);
+        }
+    }
+
+    private static doVerifyPinWithEncryptedPin(args: Arguments) {
+        if (args.container === 'luxeid') {
+            return args.client.luxeid(args.readerId, args.data.pin, true).verifyPinWithEncryptedPin(args.data);
+        } else if (args.container === 'beid') {
+            let verifyPinData: VerifyPinData = {
+                pin: args.data.pin,
+                private_key_reference: EidBe.VERIFY_PRIV_KEY_REF
+            };
+            return args.client.beid(args.readerId).verifyPinWithEncryptedPin(verifyPinData);
+        } else if (args.container === 'aventra') {
+            let verifyPinData: VerifyPinData = {
+                pin: args.data.pin,
+                private_key_reference: Aventra.DEFAULT_VERIFY_PIN
+            };
+            return args.client.aventra(args.readerId).verifyPinWithEncryptedPin(verifyPinData);
+        } else {
+            return args.client[args.container](args.readerId).verifyPinWithEncryptedPin(args.data);
         }
     }
 }

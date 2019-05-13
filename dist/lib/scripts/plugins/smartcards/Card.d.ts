@@ -8,11 +8,14 @@ export interface Card {
 }
 export interface PinCard extends Card {
     verifyPin: (body: VerifyPinData, callback?: () => void) => Promise<T1CResponse>;
+    verifyPinWithEncryptedPin: (body: VerifyPinData, callback?: () => void) => Promise<T1CResponse>;
 }
 export interface CertCard extends PinCard {
     allCerts: (filters: string[] | Options, callback?: () => void) => Promise<DataObjectResponse>;
     authenticate: (body: any, callback?: () => void) => Promise<DataResponse>;
+    authenticateWithEncryptedPin: (body: any, callback?: () => void) => Promise<DataResponse>;
     signData: (body: any, callback?: () => void) => Promise<DataResponse>;
+    signDataWithEncryptedPin: (body: any, callback?: () => void) => Promise<DataResponse>;
 }
 export interface SecuredCertCard {
     allCerts: (filters: string[] | Options, body: OptionalPin, callback?: () => void) => Promise<DataObjectResponse>;
@@ -64,6 +67,7 @@ export declare abstract class GenericSmartCard extends GenericReaderContainer im
 export declare abstract class GenericPinCard extends GenericSmartCard implements PinCard {
     static VERIFY_PIN: string;
     verifyPin(body: VerifyPinData, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse>;
+    verifyPinWithEncryptedPin(body: VerifyPinData, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse>;
 }
 export declare abstract class GenericCertCard extends GenericPinCard implements CertCard {
     static ALL_CERTIFICATES: string;

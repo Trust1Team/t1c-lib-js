@@ -45,11 +45,11 @@ export class PinEnforcer {
         return new Promise((resolve, reject) => {
             let connection = new LocalAuthConnection(cfg);
             body.os_dialog = connection.cfg.osPinDialog;
-            console.log('body', body);
+            // console.log('body', body);
             connection.get(connection.cfg.gclUrl, CORE_READERS + '/' + readerId, undefined).then(reader => {
                 body.pinpad = reader.data.pinpad || false;
-                console.log('body', body);
-                console.log('reader', reader);
+                // console.log('body', body);
+                // console.log('reader', reader);
 
                 // check if we need to force HW pinpad
                 if (connection.cfg.forceHardwarePinpad) {
