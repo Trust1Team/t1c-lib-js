@@ -167,16 +167,16 @@ export class GCLClient {
         });
     }
 
-    public static encryptPin(pin: string): string {
-        return PinEnforcer.encryptPin(pin);
-    }
-
     /**
      * Init security context
      */
     private static initLibrary(): Promise<GCLClient> {
         return InitUtil.initializeLibrary(ClientService.getClient());
     };
+
+    public encryptPin(pin: string): string {
+        return PinEnforcer.encryptPin(pin);
+    }
 
     // get admin services
     public admin = (): AdminService => {
