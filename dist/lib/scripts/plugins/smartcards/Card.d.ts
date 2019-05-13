@@ -81,7 +81,9 @@ export declare abstract class GenericCertCard extends GenericPinCard implements 
     allAlgoRefsForSigning(callback?: (error: T1CLibException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
     allCerts(options: string[] | Options, callback?: (error: T1CLibException, data: DataObjectResponse) => void): Promise<DataObjectResponse>;
     authenticate(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    authenticateWithEncryptedPin(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     signData(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    signDataWithEncryptedPin(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     protected getCertificate(certUrl: string, options: RequestOptions): Promise<CertificateResponse>;
 }
 export declare abstract class GenericSecuredCertCard extends GenericReaderContainer implements SecuredCertCard {
@@ -99,13 +101,24 @@ export declare abstract class GenericSecuredCertCard extends GenericReaderContai
     allData(options: string[] | Options, body: OptionalPin, callback?: (error: T1CLibException, data: DataObjectResponse) => void): Promise<DataObjectResponse>;
     allCerts(options: string[] | Options, body: OptionalPin, callback?: (error: T1CLibException, data: DataObjectResponse) => void): Promise<DataObjectResponse>;
     verifyPin(body: OptionalPin, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse>;
+    verifyPinWithEncryptedPin(body: OptionalPin, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse>;
     signData(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    signDataWithEncryptedPin(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     authenticate(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    authenticateWithEncryptedPin(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     protected getCertificate(certUrl: string, body: OptionalPin, options: RequestOptions, params?: {
         filter?: string;
         pin?: string;
     }): Promise<CertificateResponse>;
+    protected getCertificateWithEncryptedPin(certUrl: string, body: OptionalPin, options: RequestOptions, params?: {
+        filter?: string;
+        pin?: string;
+    }): Promise<CertificateResponse>;
     protected getCertificateArray(certUrl: string, body: OptionalPin, options: RequestOptions, params?: {
+        filter?: string;
+        pin?: string;
+    }): Promise<CertificatesResponse>;
+    protected getCertificateArrayWithEncryptedPin(certUrl: string, body: OptionalPin, options: RequestOptions, params?: {
         filter?: string;
         pin?: string;
     }): Promise<CertificatesResponse>;

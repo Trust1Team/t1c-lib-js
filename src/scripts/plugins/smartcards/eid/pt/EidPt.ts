@@ -41,7 +41,7 @@ export class EidPt extends GenericCertCard implements AbstractEidPT {
     }
 
     public addressWithEncryptedPin(data: OptionalPin, callback?: (error: T1CLibException, data: PtAddressResponse) => void): Promise<PtAddressResponse> {
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, data.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, data).then(() => {
             let encryptedBody = Object.assign({ private_key_reference: EidPt.VERIFY_PRIV_KEY_REF }, data);
             return this.connection.post(this.baseUrl, this.containerSuffix(EidPt.ADDRESS),
                 encryptedBody, undefined, undefined, callback);

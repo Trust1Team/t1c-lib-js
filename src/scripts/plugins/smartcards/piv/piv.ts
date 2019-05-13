@@ -59,7 +59,7 @@ export class PIV extends GenericSecuredCertCard implements AbstractPiv {
                                               callback?: (error: T1CLibException,
                                                           data: PivPrintedInformationResponse) => void): Promise<PivPrintedInformationResponse> {
         if (callback && typeof callback === 'function') {
-            PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin).then(() => {
+            PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
                 return this.connection.post(this.baseUrl, this.containerSuffix(PIV.PRINTED_INFORMATION),
                     body, undefined, undefined, callback);
             }, error => {
@@ -67,7 +67,7 @@ export class PIV extends GenericSecuredCertCard implements AbstractPiv {
             });
         } else {
             return new Promise((resolve, reject) => {
-                PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin).then(() => {
+                PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
                     resolve(this.connection.post(this.baseUrl, this.containerSuffix(PIV.PRINTED_INFORMATION), body, undefined));
                 }, error => {
                     reject(error);
@@ -98,14 +98,14 @@ export class PIV extends GenericSecuredCertCard implements AbstractPiv {
     public facialImageWithEncryptedPin(body: OptionalPin,
                                        callback?: (error: T1CLibException, data: PivFacialImageResponse) => void): Promise<PivFacialImageResponse> {
         if (callback && typeof callback === 'function') {
-            PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin).then(() => {
+            PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
                 return this.connection.post(this.baseUrl, this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined, undefined, callback);
             }, error => {
                 return callback(error, null);
             });
         } else {
             return new Promise((resolve, reject) => {
-                PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin).then(() => {
+                PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
                     resolve(this.connection.post(this.baseUrl, this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined));
                 }, error => {
                     reject(error);

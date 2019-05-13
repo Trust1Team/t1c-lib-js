@@ -160,7 +160,7 @@ export abstract class GenericCertCard extends GenericPinCard implements CertCard
     public authenticateWithEncryptedPin(body: AuthenticateOrSignData,
                                         callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
         body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericCertCard.AUTHENTICATE),
                 body, undefined, undefined, callback);
         });
@@ -182,7 +182,7 @@ export abstract class GenericCertCard extends GenericPinCard implements CertCard
         if (body.algorithm_reference) {
             body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
         }
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericCertCard.SIGN_DATA),
                 body, undefined, undefined, callback);
         });
@@ -251,7 +251,7 @@ export abstract class GenericSecuredCertCard extends GenericReaderContainer impl
 
     public verifyPinWithEncryptedPin(body: OptionalPin,
                                      callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse> {
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericSecuredCertCard.VERIFY_PIN),
                 body, undefined, undefined, callback);
         });
@@ -267,7 +267,7 @@ export abstract class GenericSecuredCertCard extends GenericReaderContainer impl
 
     public signDataWithEncryptedPin(body: AuthenticateOrSignData,
                                     callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericSecuredCertCard.SIGN_DATA),
                 body, undefined, undefined, callback);
         });
@@ -283,7 +283,7 @@ export abstract class GenericSecuredCertCard extends GenericReaderContainer impl
 
     public authenticateWithEncryptedPin(body: AuthenticateOrSignData,
                                         callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericSecuredCertCard.AUTHENTICATE),
                 body, undefined, undefined, callback);
         });
@@ -313,7 +313,7 @@ export abstract class GenericSecuredCertCard extends GenericReaderContainer impl
                                              params?: { filter?: string, pin?: string }): Promise<CertificateResponse> {
         let self = this;
 
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin)
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body)
             .then(() => {
                 return self.connection.post(this.baseUrl,
                     self.containerSuffix(GenericSecuredCertCard.ALL_CERTIFICATES + certUrl), body, params);
@@ -349,7 +349,7 @@ export abstract class GenericSecuredCertCard extends GenericReaderContainer impl
                                                   params?: { filter?: string, pin?: string }): Promise<CertificatesResponse> {
         let self = this;
 
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin)
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body)
             .then(() => {
                 return self.connection.post(this.baseUrl,
                     self.containerSuffix(GenericSecuredCertCard.ALL_CERTIFICATES + certUrl), body, params);

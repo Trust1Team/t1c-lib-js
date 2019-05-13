@@ -120,7 +120,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
     }
 
     public verifyPinWithEncryptedPin(body: OptionalPin, callback?: (error: T1CLibException, data: T1CResponse) => void | Promise<T1CResponse>) {
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl,
                 this.containerSuffix(EidLux.VERIFY_PIN), body, undefined, EidLux.EncryptedHeader(this.pin, this.pinType), callback);
         });
@@ -134,7 +134,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
     }
 
     public signDataWithEncryptedPin(body: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void | Promise<DataResponse>) {
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl,
                 this.containerSuffix(EidLux.SIGN_DATA), body, undefined, EidLux.EncryptedHeader(this.pin, this.pinType), callback);
         });
@@ -150,7 +150,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
 
     public authenticateWithEncryptedPin(body: OptionalPin,
                                         callback?: (error: T1CLibException, data: DataResponse) => void | Promise<DataResponse>) {
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl,
                 this.containerSuffix(EidLux.AUTHENTICATE), body, undefined, EidLux.EncryptedHeader(this.pin, this.pinType), callback);
         });
@@ -189,7 +189,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
                              headers?: RequestHeaders): Promise<CertificateResponse> {
         let self = this;
 
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, this.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, {pin: this.pin}).then(() => {
             return self.connection.get(self.baseUrl, self.containerSuffix(EidLux.ALL_CERTIFICATES + certUrl),
                 params, headers).then(certData => {
                 return CertParser.process(certData, options.parseCerts, options.callback);
@@ -204,7 +204,7 @@ export class EidLux extends GenericCertCard implements AbstractEidLUX {
                                   params?: QueryParams, headers?: RequestHeaders): Promise<CertificatesResponse> {
         let self = this;
 
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, this.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, {pin: this.pin}).then(() => {
             return self.connection.get(self.baseUrl, self.containerSuffix(EidLux.ALL_CERTIFICATES + certUrl),
                 params, headers).then(certData => {
                 return CertParser.process(certData, options.parseCerts, options.callback);

@@ -31,8 +31,11 @@ export declare class EidLux extends GenericCertCard implements AbstractEidLUX {
     authenticationCertificate(options?: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void | Promise<CertificateResponse>): Promise<CertificateResponse>;
     nonRepudiationCertificate(options?: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void | Promise<CertificateResponse>): Promise<CertificateResponse>;
     verifyPin(body: OptionalPin, callback?: (error: T1CLibException, data: T1CResponse) => void | Promise<T1CResponse>): Promise<any>;
+    verifyPinWithEncryptedPin(body: OptionalPin, callback?: (error: T1CLibException, data: T1CResponse) => void | Promise<T1CResponse>): Promise<any>;
     signData(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void | Promise<DataResponse>): Promise<any>;
+    signDataWithEncryptedPin(body: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void | Promise<DataResponse>): Promise<any>;
     authenticate(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void | Promise<DataResponse>): Promise<any>;
+    authenticateWithEncryptedPin(body: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void | Promise<DataResponse>): Promise<any>;
     signatureImage(callback?: (error: T1CLibException, data: LuxidSignatureImageResponse) => void | Promise<LuxidSignatureImageResponse>): Promise<any>;
     pinTryCounter(pin_reference: PinTryCounterData, callback?: (error: T1CLibException, data: LuxPinTryCounterResponse) => void): Promise<LuxPinTryCounterResponse>;
     pinReset(body: LuxPinResetData, callback?: (error: T1CLibException, data: T1CResponse) => (void | Promise<T1CResponse>)): Promise<any>;

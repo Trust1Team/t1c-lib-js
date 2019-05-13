@@ -9,5 +9,7 @@ export declare class Ocra extends GenericPinCard implements AbstractOcra {
     static READ_COUNTER: string;
     constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string);
     challenge(body: OcraChallenge, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    challengeWithEncryptedPin(body: OcraChallenge, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     readCounter(body: OptionalPin, callback?: (error: T1CLibException, data: OcraReadCounterResponse) => void): Promise<OcraReadCounterResponse>;
+    readCounterWithEncryptedPin(body: OptionalPin, callback?: (error: T1CLibException, data: OcraReadCounterResponse) => void): Promise<OcraReadCounterResponse>;
 }

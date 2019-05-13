@@ -13,7 +13,9 @@ export declare class PIV extends GenericSecuredCertCard implements AbstractPiv {
     allCertFilters(): string[];
     allKeyRefs(): string[];
     printedInformation(body: OptionalPin, callback?: (error: T1CLibException, data: PivPrintedInformationResponse) => void): Promise<PivPrintedInformationResponse>;
+    printedInformationWithEncryptedPin(body: OptionalPin, callback?: (error: T1CLibException, data: PivPrintedInformationResponse) => void): Promise<PivPrintedInformationResponse>;
     facialImage(body: OptionalPin, callback?: (error: T1CLibException, data: PivFacialImageResponse) => void): Promise<PivFacialImageResponse>;
+    facialImageWithEncryptedPin(body: OptionalPin, callback?: (error: T1CLibException, data: PivFacialImageResponse) => void): Promise<PivFacialImageResponse>;
     authenticationCertificate(body: OptionalPin, options?: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     signingCertificate(body: OptionalPin, options?: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
 }

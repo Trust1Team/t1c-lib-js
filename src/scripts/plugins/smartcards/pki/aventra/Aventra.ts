@@ -67,7 +67,7 @@ export class Aventra extends GenericCertCard implements AbstractAventra {
     }
 
     public verifyPinWithEncryptedPin(body: VerifyPinData, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse> {
-        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body.pin).then(() => {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(Aventra.VERIFY_PIN), body, undefined, undefined, callback);
         });
     }
