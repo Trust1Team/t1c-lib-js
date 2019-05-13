@@ -58,7 +58,7 @@ export declare class GCLClient {
     pf: () => PluginFactory;
     beid: (reader_id?: string) => AbstractEidBE;
     dnie: (reader_id?: string) => AbstractDNIe;
-    luxeid: (reader_id?: string, pin?: string, isEncrypted?: boolean, pinType?: PinType) => AbstractEidLUX;
+    luxeid: (reader_id?: string, pin?: string, pinType?: PinType, isEncrypted?: boolean) => AbstractEidLUX;
     luxtrust: (reader_id?: string, pin?: string) => AbstractLuxTrust;
     emv: (reader_id?: string) => AbstractEMV;
     mobib: (reader_id?: string) => AbstractMobib;

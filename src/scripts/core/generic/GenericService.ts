@@ -417,7 +417,7 @@ export class GenericService {
 
     private static doVerifyPinWithEncryptedPin(args: Arguments) {
         if (args.container === 'luxeid') {
-            return args.client.luxeid(args.readerId, args.data.pin, true).verifyPinWithEncryptedPin(args.data);
+            return args.client.luxeid(args.readerId, args.data.pin, 'Pin', true).verifyPinWithEncryptedPin(args.data);
         } else if (args.container === 'beid') {
             let verifyPinData: VerifyPinData = {
                 pin: args.data.pin,

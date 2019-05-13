@@ -226,8 +226,8 @@ export class GCLClient {
         return this.pluginFactory.createDNIe(reader_id);
     };
     // get instance for luxemburg eID card
-    public luxeid = (reader_id?: string, pin?: string, isEncrypted = false, pinType?: PinType): AbstractEidLUX => {
-        return this.pluginFactory.createEidLUX(reader_id, pin, isEncrypted, pinType);
+    public luxeid = (reader_id?: string, pin?: string, pinType?: PinType, isEncrypted = false): AbstractEidLUX => {
+        return this.pluginFactory.createEidLUX(reader_id, pin, pinType, isEncrypted);
     };
     // get instance for luxtrust card
     public luxtrust = (reader_id?: string, pin?: string): AbstractLuxTrust => {

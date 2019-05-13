@@ -35,7 +35,7 @@ export class PinEnforcer {
             crypt.setKey(pubKey);
             return crypt.encrypt(pin);
         } else {
-            return '';
+            return undefined;
         }
     }
 
