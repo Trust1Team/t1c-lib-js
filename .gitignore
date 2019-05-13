@@ -85,3 +85,4 @@ fabric.properties
 lib
 lib-esm
 dist/report.html
+.npmrc
