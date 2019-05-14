@@ -104,6 +104,24 @@ export class PKCS11 implements AbstractPkcs11 {
         });
     }
 
+    public signDataWithEncryptedPin(signData: Pkcs11SignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
+        let req = {
+            module: this.modulePath,
+            id: signData.cert_id,
+            slot_id: signData.slot_id,
+            pin: signData.pin,
+            data: signData.data,
+            digest: signData.algorithm_reference,
+            pinpad: false,
+            os_dialog: this.connection.cfg.osPinDialog
+        };
+        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.SIGN), req, undefined).then(data => {
+            return ResponseHandler.response(data, callback);
+        }, err => {
+            return ResponseHandler.error(err, callback);
+        });
+    }
+
     public slots(callback?: (error: T1CLibException, data: Pkcs11SlotsResponse) => void): Promise<Pkcs11SlotsResponse> {
         let req = {module: this.modulePath};
         return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.SLOTS), req, undefined).then(data => {

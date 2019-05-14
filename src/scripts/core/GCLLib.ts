@@ -46,7 +46,7 @@ import {Polyfills} from '../util/Polyfills';
 import {AbstractOCVClient} from './ocv/OCVModel';
 import {GCLConfig} from './GCLConfig';
 import {DSException} from './exceptions/DSException';
-import {AbstractJavaKeyTool, AbstractSsh} from '../..';
+import {AbstractJavaKeyTool, AbstractSsh, PinEnforcer} from '../..';
 
 // check if any polyfills are needed
 const defaults = {
@@ -107,8 +107,7 @@ export class GCLClient {
         if (this.localConfig.dsUrl) {
             if (this.localConfig.localTestMode) {
                 this.dsClient = new DSClient(this.localConfig.dsUrl, this.localTestConnection, this.localConfig);
-            }
-            else {
+            } else {
                 this.dsClient = new DSClient(this.localConfig.dsUrl, this.remoteConnection, this.localConfig);
             }
         } else {
@@ -175,6 +174,10 @@ export class GCLClient {
         return InitUtil.initializeLibrary(ClientService.getClient());
     };
 
+    public encryptPin(pin: string): string {
+        return PinEnforcer.encryptPin(pin);
+    }
+
     // get admin services
     public admin = (): AdminService => {
         return this.adminService;
@@ -201,8 +204,7 @@ export class GCLClient {
         return new Promise((resolve, reject) => {
             if (this.dsClient) {
                 resolve(this.dsClient);
-            }
-            else {
+            } else {
                 reject(new DSException('Distribution server is not configured'));
             }
         });
@@ -224,8 +226,8 @@ export class GCLClient {
         return this.pluginFactory.createDNIe(reader_id);
     };
     // get instance for luxemburg eID card
-    public luxeid = (reader_id?: string, pin?: string, pinType?: PinType): AbstractEidLUX => {
-        return this.pluginFactory.createEidLUX(reader_id, pin, pinType);
+    public luxeid = (reader_id?: string, pin?: string, pinType?: PinType, isEncrypted = false): AbstractEidLUX => {
+        return this.pluginFactory.createEidLUX(reader_id, pin, pinType, isEncrypted);
     };
     // get instance for luxtrust card
     public luxtrust = (reader_id?: string, pin?: string): AbstractLuxTrust => {
@@ -285,8 +287,6 @@ export class GCLClient {
         return this.pluginFactory.createSsh();
     };
 
-
-
     get gclInstalled(): boolean {
         return this._gclInstalled;
     }
@@ -326,6 +326,10 @@ export class GCLClient {
         return GenericService.authenticate(this, readerId, data, callback);
     }
 
+    public authenticateWithEncryptedPin(readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void) {
+        return GenericService.authenticateWithEncryptedPin(this, readerId, data, callback);
+    }
+
     public readersCanSign(callback?: (error: T1CLibException, data: CardReadersResponse) => void) {
         return GenericService.signCapable(this, callback);
     }
@@ -334,12 +338,20 @@ export class GCLClient {
         return GenericService.sign(this, readerId, data, callback);
     }
 
+    public signWithEncryptedPin(readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void) {
+        return GenericService.signWithEncryptedPin(this, readerId, data, callback);
+    }
+
     public readersCanVerifyPin(callback?: (error: T1CLibException, data: CardReadersResponse) => void) {
         return GenericService.verifyPinCapable(this, callback);
     }
 
     public verifyPin(readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void) {
         return GenericService.verifyPin(this, readerId, data, callback);
+    }
+
+    public verifyPinWithEncryptedPin(readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void) {
+        return GenericService.verifyPinWithEncryptedPin(this, readerId, data, callback);
     }
 
     /**

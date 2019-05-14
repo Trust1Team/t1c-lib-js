@@ -47,6 +47,7 @@ export declare class GCLClient {
     static checkPolyfills(): void;
     static initialize(cfg: GCLConfig, callback?: (error: T1CLibException, client: GCLClient) => void): Promise<GCLClient>;
     private static initLibrary;
+    encryptPin(pin: string): string;
     admin: () => AdminService;
     auth: () => AuthClient;
     core: () => CoreService;
@@ -57,7 +58,7 @@ export declare class GCLClient {
     pf: () => PluginFactory;
     beid: (reader_id?: string) => AbstractEidBE;
     dnie: (reader_id?: string) => AbstractDNIe;
-    luxeid: (reader_id?: string, pin?: string, pinType?: PinType) => AbstractEidLUX;
+    luxeid: (reader_id?: string, pin?: string, pinType?: PinType, isEncrypted?: boolean) => AbstractEidLUX;
     luxtrust: (reader_id?: string, pin?: string) => AbstractLuxTrust;
     emv: (reader_id?: string) => AbstractEMV;
     mobib: (reader_id?: string) => AbstractMobib;
@@ -78,9 +79,12 @@ export declare class GCLClient {
     dumpData(readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     readersCanAuthenticate(callback?: (error: T1CLibException, data: CardReadersResponse) => void): Promise<any>;
     authenticate(readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
+    authenticateWithEncryptedPin(readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
     readersCanSign(callback?: (error: T1CLibException, data: CardReadersResponse) => void): Promise<any>;
     sign(readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
+    signWithEncryptedPin(readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
     readersCanVerifyPin(callback?: (error: T1CLibException, data: CardReadersResponse) => void): Promise<any>;
     verifyPin(readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
+    verifyPinWithEncryptedPin(readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
     updateAuthConnection(cfg: GCLConfig): void;
 }
