@@ -3,7 +3,9 @@ export declare class PinEnforcer {
     static check(connection: GenericConnection, readerId: string, body: {
         pin?: string;
     }): Promise<any>;
-    static checkAlreadyEncryptedPin(connection: GenericConnection, readerId: string, pin: string): Promise<any>;
+    static checkAlreadyEncryptedPin(connection: GenericConnection, readerId: string, body: {
+        pin?: string;
+    }): Promise<any>;
     static encryptPin(pin: string): string;
     private static doPinCheck;
     private static updateBodyWithEncryptedPin;

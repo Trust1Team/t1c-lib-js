@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 41);
+/******/ 	return __webpack_require__(__webpack_require__.s = 33);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -11707,7 +11707,7 @@ function clearProps(object, propsArray) {
 var global = __webpack_require__(7);
 var core = __webpack_require__(19);
 var hide = __webpack_require__(15);
-var redefine = __webpack_require__(33);
+var redefine = __webpack_require__(34);
 var ctx = __webpack_require__(43);
 var PROTOTYPE = 'prototype';
 
@@ -11988,10 +11988,10 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var PinEnforcer_1 = __webpack_require__(18);
-var CertParser_1 = __webpack_require__(38);
+var CertParser_1 = __webpack_require__(39);
 var ResponseHandler_1 = __webpack_require__(9);
 var RequestHandler_1 = __webpack_require__(11);
-var GenericContainer_1 = __webpack_require__(40);
+var GenericContainer_1 = __webpack_require__(41);
 var OptionalPin = (function () {
     function OptionalPin(pin, pace, private_key_reference) {
         this.pin = pin;
@@ -12093,6 +12093,12 @@ var GenericPinCard = (function (_super) {
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(GenericPinCard.VERIFY_PIN), body, undefined, undefined, callback);
         });
     };
+    GenericPinCard.prototype.verifyPinWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
+            return _this.connection.post(_this.baseUrl, _this.containerSuffix(GenericPinCard.VERIFY_PIN), body, undefined, undefined, callback);
+        });
+    };
     GenericPinCard.VERIFY_PIN = '/verify-pin';
     return GenericPinCard;
 }(GenericSmartCard));
@@ -12123,12 +12129,28 @@ var GenericCertCard = (function (_super) {
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(GenericCertCard.AUTHENTICATE), body, undefined, undefined, callback);
         });
     };
+    GenericCertCard.prototype.authenticateWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
+            return _this.connection.post(_this.baseUrl, _this.containerSuffix(GenericCertCard.AUTHENTICATE), body, undefined, undefined, callback);
+        });
+    };
     GenericCertCard.prototype.signData = function (body, callback) {
         var _this = this;
         if (body.algorithm_reference) {
             body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
         }
         return PinEnforcer_1.PinEnforcer.check(this.connection, this.reader_id, body).then(function () {
+            return _this.connection.post(_this.baseUrl, _this.containerSuffix(GenericCertCard.SIGN_DATA), body, undefined, undefined, callback);
+        });
+    };
+    GenericCertCard.prototype.signDataWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        if (body.algorithm_reference) {
+            body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
+        }
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(GenericCertCard.SIGN_DATA), body, undefined, undefined, callback);
         });
     };
@@ -12187,15 +12209,33 @@ var GenericSecuredCertCard = (function (_super) {
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(GenericSecuredCertCard.VERIFY_PIN), body, undefined, undefined, callback);
         });
     };
+    GenericSecuredCertCard.prototype.verifyPinWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
+            return _this.connection.post(_this.baseUrl, _this.containerSuffix(GenericSecuredCertCard.VERIFY_PIN), body, undefined, undefined, callback);
+        });
+    };
     GenericSecuredCertCard.prototype.signData = function (body, callback) {
         var _this = this;
         return PinEnforcer_1.PinEnforcer.check(this.connection, this.reader_id, body).then(function () {
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(GenericSecuredCertCard.SIGN_DATA), body, undefined, undefined, callback);
         });
     };
+    GenericSecuredCertCard.prototype.signDataWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
+            return _this.connection.post(_this.baseUrl, _this.containerSuffix(GenericSecuredCertCard.SIGN_DATA), body, undefined, undefined, callback);
+        });
+    };
     GenericSecuredCertCard.prototype.authenticate = function (body, callback) {
         var _this = this;
         return PinEnforcer_1.PinEnforcer.check(this.connection, this.reader_id, body).then(function () {
+            return _this.connection.post(_this.baseUrl, _this.containerSuffix(GenericSecuredCertCard.AUTHENTICATE), body, undefined, undefined, callback);
+        });
+    };
+    GenericSecuredCertCard.prototype.authenticateWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(GenericSecuredCertCard.AUTHENTICATE), body, undefined, undefined, callback);
         });
     };
@@ -12212,10 +12252,36 @@ var GenericSecuredCertCard = (function (_super) {
             return ResponseHandler_1.ResponseHandler.error(err, options.callback);
         });
     };
+    GenericSecuredCertCard.prototype.getCertificateWithEncryptedPin = function (certUrl, body, options, params) {
+        var _this = this;
+        var self = this;
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body)
+            .then(function () {
+            return self.connection.post(_this.baseUrl, self.containerSuffix(GenericSecuredCertCard.ALL_CERTIFICATES + certUrl), body, params);
+        })
+            .then(function (data) {
+            return CertParser_1.CertParser.process(data, options.parseCerts, options.callback);
+        }).catch(function (err) {
+            return ResponseHandler_1.ResponseHandler.error(err, options.callback);
+        });
+    };
     GenericSecuredCertCard.prototype.getCertificateArray = function (certUrl, body, options, params) {
         var _this = this;
         var self = this;
         return PinEnforcer_1.PinEnforcer.check(this.connection, this.reader_id, body)
+            .then(function () {
+            return self.connection.post(_this.baseUrl, self.containerSuffix(GenericSecuredCertCard.ALL_CERTIFICATES + certUrl), body, params);
+        })
+            .then(function (data) {
+            return CertParser_1.CertParser.process(data, options.parseCerts, options.callback);
+        }).catch(function (err) {
+            return ResponseHandler_1.ResponseHandler.error(err, options.callback);
+        });
+    };
+    GenericSecuredCertCard.prototype.getCertificateArrayWithEncryptedPin = function (certUrl, body, options, params) {
+        var _this = this;
+        var self = this;
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body)
             .then(function () {
             return self.connection.post(_this.baseUrl, self.containerSuffix(GenericSecuredCertCard.ALL_CERTIFICATES + certUrl), body, params);
         })
@@ -12784,7 +12850,7 @@ if (__webpack_require__(16)) {
   var createArrayIncludes = __webpack_require__(58);
   var speciesConstructor = __webpack_require__(98);
   var ArrayIterators = __webpack_require__(94);
-  var Iterators = __webpack_require__(34);
+  var Iterators = __webpack_require__(35);
   var $iterDetect = __webpack_require__(91);
   var setSpecies = __webpack_require__(65);
   var arrayFill = __webpack_require__(64);
@@ -13253,8 +13319,8 @@ var PinEnforcer = (function () {
             return PinEnforcer.updateBodyWithEncryptedPin(body);
         });
     };
-    PinEnforcer.checkAlreadyEncryptedPin = function (connection, readerId, pin) {
-        return PinEnforcer.doPinCheck(connection.cfg, readerId, { pin: pin });
+    PinEnforcer.checkAlreadyEncryptedPin = function (connection, readerId, body) {
+        return PinEnforcer.doPinCheck(connection.cfg, readerId, body);
     };
     PinEnforcer.encryptPin = function (pin) {
         if (pin && pin.length) {
@@ -13276,9 +13342,11 @@ var PinEnforcer = (function () {
                 if (connection.cfg.forceHardwarePinpad) {
                     if (body.pinpad) {
                         if (body.pin) {
-                            reject({ data: new CoreExceptions_1.T1CLibException(400, '600', 'Strict pinpad enforcement is enabled.' +
+                            reject({
+                                data: new CoreExceptions_1.T1CLibException(400, '600', 'Strict pinpad enforcement is enabled.' +
                                     ' This request was sent with a PIN,' +
-                                    ' but the reader has a pinpad.'), success: false });
+                                    ' but the reader has a pinpad.'), success: false
+                            });
                         }
                         else {
                             resolve();
@@ -13286,10 +13354,12 @@ var PinEnforcer = (function () {
                     }
                     else {
                         if (!body.pin && !body.os_dialog) {
-                            reject({ data: new CoreExceptions_1.T1CLibException(400, '601', 'Strict pinpad enforcement is enabled.' +
+                            reject({
+                                data: new CoreExceptions_1.T1CLibException(400, '601', 'Strict pinpad enforcement is enabled.' +
                                     ' This request was sent without a PIN,' +
                                     ' but the reader does not have a pinpad and' +
-                                    ' OS PIN dialog is not enabled.'), success: false });
+                                    ' OS PIN dialog is not enabled.'), success: false
+                            });
                         }
                         else {
                             resolve();
@@ -14132,6 +14202,89 @@ exports.T1CLibException = T1CLibException;
 /* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
+"use strict";
+
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
+Object.defineProperty(exports, "__esModule", { value: true });
+var Polyfills_1 = __webpack_require__(53);
+__export(__webpack_require__(68));
+__export(__webpack_require__(103));
+__export(__webpack_require__(74));
+__export(__webpack_require__(337));
+__export(__webpack_require__(112));
+__export(__webpack_require__(338));
+__export(__webpack_require__(75));
+__export(__webpack_require__(117));
+__export(__webpack_require__(37));
+__export(__webpack_require__(32));
+__export(__webpack_require__(118));
+__export(__webpack_require__(125));
+__export(__webpack_require__(376));
+__export(__webpack_require__(4));
+__export(__webpack_require__(126));
+__export(__webpack_require__(127));
+__export(__webpack_require__(377));
+__export(__webpack_require__(128));
+__export(__webpack_require__(378));
+__export(__webpack_require__(129));
+__export(__webpack_require__(79));
+__export(__webpack_require__(130));
+__export(__webpack_require__(76));
+__export(__webpack_require__(379));
+__export(__webpack_require__(131));
+__export(__webpack_require__(380));
+__export(__webpack_require__(132));
+__export(__webpack_require__(133));
+__export(__webpack_require__(80));
+__export(__webpack_require__(134));
+__export(__webpack_require__(80));
+__export(__webpack_require__(134));
+__export(__webpack_require__(135));
+__export(__webpack_require__(381));
+__export(__webpack_require__(136));
+__export(__webpack_require__(382));
+__export(__webpack_require__(137));
+__export(__webpack_require__(383));
+__export(__webpack_require__(138));
+__export(__webpack_require__(384));
+__export(__webpack_require__(139));
+__export(__webpack_require__(385));
+__export(__webpack_require__(78));
+__export(__webpack_require__(386));
+__export(__webpack_require__(142));
+__export(__webpack_require__(387));
+__export(__webpack_require__(143));
+__export(__webpack_require__(388));
+__export(__webpack_require__(6));
+__export(__webpack_require__(144));
+__export(__webpack_require__(145));
+__export(__webpack_require__(389));
+__export(__webpack_require__(106));
+__export(__webpack_require__(115));
+__export(__webpack_require__(124));
+__export(__webpack_require__(39));
+__export(__webpack_require__(50));
+__export(__webpack_require__(104));
+__export(__webpack_require__(69));
+__export(__webpack_require__(105));
+__export(__webpack_require__(18));
+__export(__webpack_require__(53));
+__export(__webpack_require__(71));
+__export(__webpack_require__(11));
+__export(__webpack_require__(9));
+__export(__webpack_require__(70));
+__export(__webpack_require__(113));
+__export(__webpack_require__(390));
+__export(__webpack_require__(395));
+Polyfills_1.Polyfills.check();
+
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
 var global = __webpack_require__(7);
 var hide = __webpack_require__(15);
 var has = __webpack_require__(21);
@@ -14166,14 +14319,14 @@ __webpack_require__(19).inspectSource = function (it) {
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports) {
 
 module.exports = {};
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 22.1.3.31 Array.prototype[@@unscopables]
@@ -14186,7 +14339,7 @@ module.exports = function (key) {
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14354,7 +14507,7 @@ exports.DSPlatformInfo = DSPlatformInfo;
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14408,7 +14561,7 @@ exports.Util = Util;
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14508,7 +14661,7 @@ exports.CertParser = CertParser;
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14764,7 +14917,7 @@ exports.default = AlgorithmIdentifier;
 //# sourceMappingURL=AlgorithmIdentifier.js.map
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14792,89 +14945,6 @@ var GenericContainer = (function () {
     return GenericContainer;
 }());
 exports.GenericContainer = GenericContainer;
-
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
-Object.defineProperty(exports, "__esModule", { value: true });
-var Polyfills_1 = __webpack_require__(53);
-__export(__webpack_require__(68));
-__export(__webpack_require__(103));
-__export(__webpack_require__(74));
-__export(__webpack_require__(337));
-__export(__webpack_require__(112));
-__export(__webpack_require__(338));
-__export(__webpack_require__(75));
-__export(__webpack_require__(117));
-__export(__webpack_require__(36));
-__export(__webpack_require__(32));
-__export(__webpack_require__(118));
-__export(__webpack_require__(125));
-__export(__webpack_require__(376));
-__export(__webpack_require__(4));
-__export(__webpack_require__(126));
-__export(__webpack_require__(127));
-__export(__webpack_require__(377));
-__export(__webpack_require__(128));
-__export(__webpack_require__(378));
-__export(__webpack_require__(129));
-__export(__webpack_require__(79));
-__export(__webpack_require__(130));
-__export(__webpack_require__(76));
-__export(__webpack_require__(379));
-__export(__webpack_require__(131));
-__export(__webpack_require__(380));
-__export(__webpack_require__(132));
-__export(__webpack_require__(133));
-__export(__webpack_require__(80));
-__export(__webpack_require__(134));
-__export(__webpack_require__(80));
-__export(__webpack_require__(134));
-__export(__webpack_require__(135));
-__export(__webpack_require__(381));
-__export(__webpack_require__(136));
-__export(__webpack_require__(382));
-__export(__webpack_require__(137));
-__export(__webpack_require__(383));
-__export(__webpack_require__(138));
-__export(__webpack_require__(384));
-__export(__webpack_require__(139));
-__export(__webpack_require__(385));
-__export(__webpack_require__(78));
-__export(__webpack_require__(386));
-__export(__webpack_require__(142));
-__export(__webpack_require__(387));
-__export(__webpack_require__(143));
-__export(__webpack_require__(388));
-__export(__webpack_require__(6));
-__export(__webpack_require__(144));
-__export(__webpack_require__(145));
-__export(__webpack_require__(389));
-__export(__webpack_require__(106));
-__export(__webpack_require__(115));
-__export(__webpack_require__(124));
-__export(__webpack_require__(38));
-__export(__webpack_require__(50));
-__export(__webpack_require__(104));
-__export(__webpack_require__(69));
-__export(__webpack_require__(105));
-__export(__webpack_require__(18));
-__export(__webpack_require__(53));
-__export(__webpack_require__(71));
-__export(__webpack_require__(11));
-__export(__webpack_require__(9));
-__export(__webpack_require__(70));
-__export(__webpack_require__(113));
-__export(__webpack_require__(390));
-__export(__webpack_require__(395));
-Polyfills_1.Polyfills.check();
 
 
 /***/ }),
@@ -16329,7 +16399,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var semver = __webpack_require__(318);
 var SyncUtil_1 = __webpack_require__(70);
 var ActivationUtil_1 = __webpack_require__(106);
-var DSClientModel_1 = __webpack_require__(36);
+var DSClientModel_1 = __webpack_require__(37);
 var PubKeyService_1 = __webpack_require__(71);
 var CoreExceptions_1 = __webpack_require__(32);
 var axios_1 = __webpack_require__(72);
@@ -16450,12 +16520,12 @@ exports.InitUtil = InitUtil;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var DSClientModel_1 = __webpack_require__(36);
+var DSClientModel_1 = __webpack_require__(37);
 var DataContainerUtil_1 = __webpack_require__(104);
 var CoreExceptions_1 = __webpack_require__(32);
 var adminModel_1 = __webpack_require__(68);
 var ActivatedContainerUtil_1 = __webpack_require__(51);
-var Utils_1 = __webpack_require__(37);
+var Utils_1 = __webpack_require__(38);
 var SyncUtil = (function () {
     function SyncUtil() {
     }
@@ -16475,7 +16545,7 @@ var SyncUtil = (function () {
     };
     SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
         return client.ds().then(function (ds) {
-            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.14-1"), info.namespace, containers));
+            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.17"), info.namespace, containers));
         });
     };
     SyncUtil.doSyncFlow = function (client, mergedInfo, uuid, containers, isRetry, config) {
@@ -17324,6 +17394,13 @@ var EidBe = (function (_super) {
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(Card_1.GenericCertCard.VERIFY_PIN), encryptedBody, undefined, undefined, callback);
         });
     };
+    EidBe.prototype.verifyPinWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
+            var encryptedBody = Object.assign({ private_key_reference: EidBe.VERIFY_PRIV_KEY_REF }, body);
+            return _this.connection.post(_this.baseUrl, _this.containerSuffix(Card_1.GenericCertCard.VERIFY_PIN), encryptedBody, undefined, undefined, callback);
+        });
+    };
     EidBe.CONTAINER_PREFIX = 'beid';
     EidBe.RN_DATA = '/rn';
     EidBe.ADDRESS = '/address';
@@ -17365,7 +17442,7 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _AlgorithmIdentifier = __webpack_require__(39);
+var _AlgorithmIdentifier = __webpack_require__(40);
 
 var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 
@@ -18657,6 +18734,12 @@ var Aventra = (function (_super) {
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(Aventra.VERIFY_PIN), body, undefined, undefined, callback);
         });
     };
+    Aventra.prototype.verifyPinWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
+            return _this.connection.post(_this.baseUrl, _this.containerSuffix(Aventra.VERIFY_PIN), body, undefined, undefined, callback);
+        });
+    };
     Aventra.prototype.resetPin = function (body, callback) {
         return this.connection.post(this.baseUrl, this.containerSuffix(Aventra.RESET_PIN), body, undefined, undefined, callback);
     };
@@ -18774,7 +18857,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var Card_1 = __webpack_require__(6);
 var RequestHandler_1 = __webpack_require__(11);
-var __1 = __webpack_require__(41);
+var __1 = __webpack_require__(33);
 var EidPt = (function (_super) {
     __extends(EidPt, _super);
     function EidPt(baseUrl, containerUrl, connection, reader_id) {
@@ -18789,6 +18872,13 @@ var EidPt = (function (_super) {
     EidPt.prototype.address = function (data, callback) {
         var _this = this;
         return __1.PinEnforcer.check(this.connection, this.reader_id, data).then(function () {
+            var encryptedBody = Object.assign({ private_key_reference: EidPt.VERIFY_PRIV_KEY_REF }, data);
+            return _this.connection.post(_this.baseUrl, _this.containerSuffix(EidPt.ADDRESS), encryptedBody, undefined, undefined, callback);
+        });
+    };
+    EidPt.prototype.addressWithEncryptedPin = function (data, callback) {
+        var _this = this;
+        return __1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, data).then(function () {
             var encryptedBody = Object.assign({ private_key_reference: EidPt.VERIFY_PRIV_KEY_REF }, data);
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(EidPt.ADDRESS), encryptedBody, undefined, undefined, callback);
         });
@@ -18857,9 +18947,9 @@ module.exports = g;
 
 var LIBRARY = __webpack_require__(29);
 var $export = __webpack_require__(3);
-var redefine = __webpack_require__(33);
+var redefine = __webpack_require__(34);
 var hide = __webpack_require__(15);
-var Iterators = __webpack_require__(34);
+var Iterators = __webpack_require__(35);
 var $iterCreate = __webpack_require__(273);
 var setToStringTag = __webpack_require__(47);
 var getPrototypeOf = __webpack_require__(87);
@@ -19002,7 +19092,7 @@ module.exports = Object.getPrototypeOf || function (O) {
 /***/ (function(module, exports, __webpack_require__) {
 
 // check on default Array iterator
-var Iterators = __webpack_require__(34);
+var Iterators = __webpack_require__(35);
 var ITERATOR = __webpack_require__(5)('iterator');
 var ArrayProto = Array.prototype;
 
@@ -19032,7 +19122,7 @@ module.exports = function (object, index, value) {
 
 var classof = __webpack_require__(63);
 var ITERATOR = __webpack_require__(5)('iterator');
-var Iterators = __webpack_require__(34);
+var Iterators = __webpack_require__(35);
 module.exports = __webpack_require__(19).getIteratorMethod = function (it) {
   if (it != undefined) return it[ITERATOR]
     || it['@@iterator']
@@ -19141,9 +19231,9 @@ module.exports = [].copyWithin || function copyWithin(target /* = 0 */, start /*
 
 "use strict";
 
-var addToUnscopables = __webpack_require__(35);
+var addToUnscopables = __webpack_require__(36);
 var step = __webpack_require__(298);
-var Iterators = __webpack_require__(34);
+var Iterators = __webpack_require__(35);
 var toIObject = __webpack_require__(22);
 
 // 22.1.3.4 Array.prototype.entries()
@@ -19180,7 +19270,7 @@ addToUnscopables('entries');
 /* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var redefine = __webpack_require__(33);
+var redefine = __webpack_require__(34);
 module.exports = function (target, src, safe) {
   for (var key in src) redefine(target, key, src[key], safe);
   return target;
@@ -19262,7 +19352,7 @@ var classof = __webpack_require__(63);
 var test = {};
 test[__webpack_require__(5)('toStringTag')] = 'z';
 if (test + '' != '[object z]') {
-  __webpack_require__(33)(Object.prototype, 'toString', function toString() {
+  __webpack_require__(34)(Object.prototype, 'toString', function toString() {
     return '[object ' + classof(this) + ']';
   }, true);
 }
@@ -19292,7 +19382,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var ResponseHandler_1 = __webpack_require__(9);
 var InitUtil_1 = __webpack_require__(69);
 var ClientService_1 = __webpack_require__(50);
-var Utils_1 = __webpack_require__(37);
+var Utils_1 = __webpack_require__(38);
 var CORE_ACTIVATE = '/admin/activate';
 var CORE_ATR_LIST = '/admin/atr';
 var CORE_PUB_KEY = '/admin/certificate';
@@ -19484,7 +19574,7 @@ exports.ObjectUtil = ObjectUtil;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var DSClientModel_1 = __webpack_require__(36);
+var DSClientModel_1 = __webpack_require__(37);
 var adminModel_1 = __webpack_require__(68);
 var ActivationUtil = (function () {
     function ActivationUtil() {
@@ -19504,7 +19594,7 @@ var ActivationUtil = (function () {
     ActivationUtil.registerDevice = function (client, mergedInfo, uuid) {
         return client.admin().getPubKey().then(function (pubKey) {
             return client.ds().then(function (ds) {
-                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.14-1"), mergedInfo.namespace));
+                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.17"), mergedInfo.namespace));
             });
         });
     };
@@ -20333,7 +20423,7 @@ var ResponseHandler_1 = __webpack_require__(9);
 var CardUtil_1 = __webpack_require__(124);
 var Aventra_1 = __webpack_require__(78);
 var SyncUtil_1 = __webpack_require__(70);
-var Utils_1 = __webpack_require__(37);
+var Utils_1 = __webpack_require__(38);
 var Arguments = (function () {
     function Arguments(client, readerId, container, data, dumpMethod, dumpOptions, reader) {
         this.client = client;
@@ -20421,6 +20511,17 @@ var GenericService = (function () {
             return ResponseHandler_1.ResponseHandler.error(err, callback);
         });
     };
+    GenericService.authenticateWithEncryptedPin = function (client, readerId, data, callback) {
+        return this.checkPrerequisites(client, readerId, data)
+            .then(this.determineAlgorithm)
+            .then(GenericService.doAuthenticateWithEncryptedPin)
+            .then(function (res) {
+            return ResponseHandler_1.ResponseHandler.response(res, callback);
+        })
+            .catch(function (err) {
+            return ResponseHandler_1.ResponseHandler.error(err, callback);
+        });
+    };
     GenericService.sign = function (client, readerId, data, callback) {
         return this.checkPrerequisites(client, readerId, data)
             .then(this.determineAlgorithm)
@@ -20432,9 +20533,30 @@ var GenericService = (function () {
             return ResponseHandler_1.ResponseHandler.error(err, callback);
         });
     };
+    GenericService.signWithEncryptedPin = function (client, readerId, data, callback) {
+        return this.checkPrerequisites(client, readerId, data)
+            .then(this.determineAlgorithm)
+            .then(GenericService.doSignWithEncryptedPin)
+            .then(function (res) {
+            return ResponseHandler_1.ResponseHandler.response(res, callback);
+        })
+            .catch(function (err) {
+            return ResponseHandler_1.ResponseHandler.error(err, callback);
+        });
+    };
     GenericService.verifyPin = function (client, readerId, data, callback) {
         return this.checkPrerequisites(client, readerId, data)
             .then(GenericService.doVerifyPin)
+            .then(function (res) {
+            return ResponseHandler_1.ResponseHandler.response(res, callback);
+        })
+            .catch(function (err) {
+            return ResponseHandler_1.ResponseHandler.error(err, callback);
+        });
+    };
+    GenericService.verifyPinWithEncryptedPin = function (client, readerId, data, callback) {
+        return this.checkPrerequisites(client, readerId, data)
+            .then(GenericService.doVerifyPinWithEncryptedPin)
             .then(function (res) {
             return ResponseHandler_1.ResponseHandler.response(res, callback);
         })
@@ -20615,12 +20737,28 @@ var GenericService = (function () {
             return args.client[args.container](args.readerId).signData(args.data);
         }
     };
+    GenericService.doSignWithEncryptedPin = function (args) {
+        if (args.container === 'luxeid') {
+            return args.client.luxeid(args.readerId, args.data.pin).signDataWithEncryptedPin(args.data);
+        }
+        else {
+            return args.client[args.container](args.readerId).signDataWithEncryptedPin(args.data);
+        }
+    };
     GenericService.doAuthenticate = function (args) {
         if (args.container === 'luxeid') {
             return args.client.luxeid(args.readerId, args.data.pin).authenticate(args.data);
         }
         else {
             return args.client[args.container](args.readerId).authenticate(args.data);
+        }
+    };
+    GenericService.doAuthenticateWithEncryptedPin = function (args) {
+        if (args.container === 'luxeid') {
+            return args.client.luxeid(args.readerId, args.data.pin).authenticateWithEncryptedPin(args.data);
+        }
+        else {
+            return args.client[args.container](args.readerId).authenticateWithEncryptedPin(args.data);
         }
     };
     GenericService.doVerifyPin = function (args) {
@@ -20643,6 +20781,28 @@ var GenericService = (function () {
         }
         else {
             return args.client[args.container](args.readerId).verifyPin(args.data);
+        }
+    };
+    GenericService.doVerifyPinWithEncryptedPin = function (args) {
+        if (args.container === 'luxeid') {
+            return args.client.luxeid(args.readerId, args.data.pin, 'Pin', true).verifyPinWithEncryptedPin(args.data);
+        }
+        else if (args.container === 'beid') {
+            var verifyPinData = {
+                pin: args.data.pin,
+                private_key_reference: EidBe_1.EidBe.VERIFY_PRIV_KEY_REF
+            };
+            return args.client.beid(args.readerId).verifyPinWithEncryptedPin(verifyPinData);
+        }
+        else if (args.container === 'aventra') {
+            var verifyPinData = {
+                pin: args.data.pin,
+                private_key_reference: Aventra_1.Aventra.DEFAULT_VERIFY_PIN
+            };
+            return args.client.aventra(args.readerId).verifyPinWithEncryptedPin(verifyPinData);
+        }
+        else {
+            return args.client[args.container](args.readerId).verifyPinWithEncryptedPin(args.data);
         }
     };
     GenericService.PKCS11_FLAGS = [1, 3, 5, 7];
@@ -20678,7 +20838,7 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _AlgorithmIdentifier = __webpack_require__(39);
+var _AlgorithmIdentifier = __webpack_require__(40);
 
 var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 
@@ -21000,7 +21160,7 @@ var _pvutils = __webpack_require__(2);
 
 var _common = __webpack_require__(77);
 
-var _AlgorithmIdentifier = __webpack_require__(39);
+var _AlgorithmIdentifier = __webpack_require__(40);
 
 var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 
@@ -22239,7 +22399,7 @@ exports.default = Extension;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var RequestHandler_1 = __webpack_require__(11);
-var Utils_1 = __webpack_require__(37);
+var Utils_1 = __webpack_require__(38);
 var CardUtil = (function () {
     function CardUtil() {
     }
@@ -22472,7 +22632,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var GenericContainer_1 = __webpack_require__(40);
+var GenericContainer_1 = __webpack_require__(41);
 var DataContainer = (function (_super) {
     __extends(DataContainer, _super);
     function DataContainer(baseUrl, containerUrl, connection) {
@@ -22512,7 +22672,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var GenericContainer_1 = __webpack_require__(40);
+var GenericContainer_1 = __webpack_require__(41);
 var Ssh = (function (_super) {
     __extends(Ssh, _super);
     function Ssh(baseUrl, containerUrl, connection, containerPrefix) {
@@ -22569,7 +22729,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var GenericContainer_1 = __webpack_require__(40);
+var GenericContainer_1 = __webpack_require__(41);
 var FileExchange = (function (_super) {
     __extends(FileExchange, _super);
     function FileExchange(baseUrl, containerUrl, connection) {
@@ -22876,7 +23036,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var Card_1 = __webpack_require__(6);
 var RequestHandler_1 = __webpack_require__(11);
-var CertParser_1 = __webpack_require__(38);
+var CertParser_1 = __webpack_require__(39);
 var ResponseHandler_1 = __webpack_require__(9);
 var DNIe = (function (_super) {
     __extends(DNIe, _super);
@@ -22929,12 +23089,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Card_1 = __webpack_require__(6);
 var EidLuxModel_1 = __webpack_require__(133);
 var PinEnforcer_1 = __webpack_require__(18);
-var CertParser_1 = __webpack_require__(38);
+var CertParser_1 = __webpack_require__(39);
 var ResponseHandler_1 = __webpack_require__(9);
 var RequestHandler_1 = __webpack_require__(11);
 var EidLux = (function (_super) {
     __extends(EidLux, _super);
-    function EidLux(baseUrl, containerUrl, connection, reader_id, pin, pinType) {
+    function EidLux(baseUrl, containerUrl, connection, reader_id, pin, pinType, isEncrypted) {
+        if (isEncrypted === void 0) { isEncrypted = false; }
         var _this = _super.call(this, baseUrl, containerUrl, connection, reader_id, EidLux.CONTAINER_PREFIX) || this;
         _this.baseUrl = baseUrl;
         _this.containerUrl = containerUrl;
@@ -22942,18 +23103,19 @@ var EidLux = (function (_super) {
         _this.reader_id = reader_id;
         _this.pin = pin;
         _this.pinType = pinType;
+        _this.isEncrypted = isEncrypted;
         if (!pinType) {
             _this.pinType = EidLuxModel_1.PinType.PIN;
         }
-        _this.pin = PinEnforcer_1.PinEnforcer.encryptPin(pin);
+        _this.pin = (isEncrypted) ? pin : PinEnforcer_1.PinEnforcer.encryptPin(pin);
         return _this;
     }
     EidLux.EncryptedHeader = function (code, pinType) {
         if (pinType === EidLuxModel_1.PinType.CAN) {
-            return { 'X-Encrypted-Can': code };
+            return { 'X-Encrypted-Can': code === undefined ? '' : code };
         }
         else {
-            return { 'X-Encrypted-Pin': code };
+            return { 'X-Encrypted-Pin': code === undefined ? '' : code };
         }
     };
     EidLux.prototype.allDataFilters = function () {
@@ -22999,15 +23161,33 @@ var EidLux = (function (_super) {
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(EidLux.VERIFY_PIN), body, undefined, EidLux.EncryptedHeader(_this.pin, _this.pinType), callback);
         });
     };
+    EidLux.prototype.verifyPinWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
+            return _this.connection.post(_this.baseUrl, _this.containerSuffix(EidLux.VERIFY_PIN), body, undefined, EidLux.EncryptedHeader(_this.pin, _this.pinType), callback);
+        });
+    };
     EidLux.prototype.signData = function (body, callback) {
         var _this = this;
         return PinEnforcer_1.PinEnforcer.check(this.connection, this.reader_id, body).then(function () {
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(EidLux.SIGN_DATA), body, undefined, EidLux.EncryptedHeader(_this.pin, _this.pinType), callback);
         });
     };
+    EidLux.prototype.signDataWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
+            return _this.connection.post(_this.baseUrl, _this.containerSuffix(EidLux.SIGN_DATA), body, undefined, EidLux.EncryptedHeader(_this.pin, _this.pinType), callback);
+        });
+    };
     EidLux.prototype.authenticate = function (body, callback) {
         var _this = this;
         return PinEnforcer_1.PinEnforcer.check(this.connection, this.reader_id, body).then(function () {
+            return _this.connection.post(_this.baseUrl, _this.containerSuffix(EidLux.AUTHENTICATE), body, undefined, EidLux.EncryptedHeader(_this.pin, _this.pinType), callback);
+        });
+    };
+    EidLux.prototype.authenticateWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(EidLux.AUTHENTICATE), body, undefined, EidLux.EncryptedHeader(_this.pin, _this.pinType), callback);
         });
     };
@@ -23033,18 +23213,22 @@ var EidLux = (function (_super) {
     };
     EidLux.prototype.getCertificate = function (certUrl, options, params, headers) {
         var self = this;
-        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, this.pin).then(function () {
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, { pin: this.pin }).then(function () {
             return self.connection.get(self.baseUrl, self.containerSuffix(EidLux.ALL_CERTIFICATES + certUrl), params, headers).then(function (certData) {
                 return CertParser_1.CertParser.process(certData, options.parseCerts, options.callback);
-            }, function (err) { return ResponseHandler_1.ResponseHandler.error(err, options.callback); });
+            }, function (err) {
+                return ResponseHandler_1.ResponseHandler.error(err, options.callback);
+            });
         });
     };
     EidLux.prototype.getCertificateArray = function (certUrl, options, params, headers) {
         var self = this;
-        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, this.pin).then(function () {
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, { pin: this.pin }).then(function () {
             return self.connection.get(self.baseUrl, self.containerSuffix(EidLux.ALL_CERTIFICATES + certUrl), params, headers).then(function (certData) {
                 return CertParser_1.CertParser.process(certData, options.parseCerts, options.callback);
-            }, function (err) { return ResponseHandler_1.ResponseHandler.error(err, options.callback); });
+            }, function (err) {
+                return ResponseHandler_1.ResponseHandler.error(err, options.callback);
+            });
         });
     };
     EidLux.CONTAINER_PREFIX = 'luxeid';
@@ -23527,6 +23711,25 @@ var Ocra = (function (_super) {
             });
         }
     };
+    Ocra.prototype.challengeWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        if (callback && typeof callback === 'function') {
+            PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
+                return _this.connection.post(_this.baseUrl, _this.containerSuffix(Ocra.CHALLENGE), body, undefined, undefined, callback);
+            }, function (error) {
+                return callback(error, null);
+            });
+        }
+        else {
+            return new Promise(function (resolve, reject) {
+                PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(_this.connection, _this.reader_id, body).then(function () {
+                    resolve(_this.connection.post(_this.baseUrl, _this.containerSuffix(Ocra.CHALLENGE), body, undefined));
+                }, function (error) {
+                    reject(error);
+                });
+            });
+        }
+    };
     Ocra.prototype.readCounter = function (body, callback) {
         var _this = this;
         if (callback && typeof callback === 'function') {
@@ -23539,6 +23742,25 @@ var Ocra = (function (_super) {
         else {
             return new Promise(function (resolve, reject) {
                 PinEnforcer_1.PinEnforcer.check(_this.connection, _this.reader_id, body).then(function () {
+                    resolve(_this.connection.get(_this.baseUrl, _this.containerSuffix(Ocra.READ_COUNTER), { pin: body.pin }, undefined));
+                }, function (error) {
+                    reject(error);
+                });
+            });
+        }
+    };
+    Ocra.prototype.readCounterWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        if (callback && typeof callback === 'function') {
+            PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
+                return _this.connection.get(_this.baseUrl, _this.containerSuffix(Ocra.READ_COUNTER), { pin: body.pin }, undefined, callback);
+            }, function (error) {
+                return callback(error, null);
+            });
+        }
+        else {
+            return new Promise(function (resolve, reject) {
+                PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(_this.connection, _this.reader_id, body).then(function () {
                     resolve(_this.connection.get(_this.baseUrl, _this.containerSuffix(Ocra.READ_COUNTER), { pin: body.pin }, undefined));
                 }, function (error) {
                     reject(error);
@@ -23602,7 +23824,28 @@ var PIV = (function (_super) {
             return new Promise(function (resolve, reject) {
                 PinEnforcer_1.PinEnforcer.check(_this.connection, _this.reader_id, body).then(function () {
                     resolve(_this.connection.post(_this.baseUrl, _this.containerSuffix(PIV.PRINTED_INFORMATION), body, undefined));
-                }, function (error) { reject(error); });
+                }, function (error) {
+                    reject(error);
+                });
+            });
+        }
+    };
+    PIV.prototype.printedInformationWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        if (callback && typeof callback === 'function') {
+            PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
+                return _this.connection.post(_this.baseUrl, _this.containerSuffix(PIV.PRINTED_INFORMATION), body, undefined, undefined, callback);
+            }, function (error) {
+                return callback(error, null);
+            });
+        }
+        else {
+            return new Promise(function (resolve, reject) {
+                PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(_this.connection, _this.reader_id, body).then(function () {
+                    resolve(_this.connection.post(_this.baseUrl, _this.containerSuffix(PIV.PRINTED_INFORMATION), body, undefined));
+                }, function (error) {
+                    reject(error);
+                });
             });
         }
     };
@@ -23619,7 +23862,28 @@ var PIV = (function (_super) {
             return new Promise(function (resolve, reject) {
                 PinEnforcer_1.PinEnforcer.check(_this.connection, _this.reader_id, body).then(function () {
                     resolve(_this.connection.post(_this.baseUrl, _this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined));
-                }, function (error) { reject(error); });
+                }, function (error) {
+                    reject(error);
+                });
+            });
+        }
+    };
+    PIV.prototype.facialImageWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        if (callback && typeof callback === 'function') {
+            PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
+                return _this.connection.post(_this.baseUrl, _this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined, undefined, callback);
+            }, function (error) {
+                return callback(error, null);
+            });
+        }
+        else {
+            return new Promise(function (resolve, reject) {
+                PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(_this.connection, _this.reader_id, body).then(function () {
+                    resolve(_this.connection.post(_this.baseUrl, _this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined));
+                }, function (error) {
+                    reject(error);
+                });
             });
         }
     };
@@ -23644,7 +23908,7 @@ exports.PIV = PIV;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var CertParser_1 = __webpack_require__(38);
+var CertParser_1 = __webpack_require__(39);
 var ResponseHandler_1 = __webpack_require__(9);
 var platform = __webpack_require__(140);
 var RequestHandler_1 = __webpack_require__(11);
@@ -23697,6 +23961,23 @@ var PKCS11 = (function () {
             id: signData.cert_id,
             slot_id: signData.slot_id,
             pin: PinEnforcer_1.PinEnforcer.encryptPin(signData.pin),
+            data: signData.data,
+            digest: signData.algorithm_reference,
+            pinpad: false,
+            os_dialog: this.connection.cfg.osPinDialog
+        };
+        return this.connection.post(this.baseUrl, this.containerSuffix(PKCS11.SIGN), req, undefined).then(function (data) {
+            return ResponseHandler_1.ResponseHandler.response(data, callback);
+        }, function (err) {
+            return ResponseHandler_1.ResponseHandler.error(err, callback);
+        });
+    };
+    PKCS11.prototype.signDataWithEncryptedPin = function (signData, callback) {
+        var req = {
+            module: this.modulePath,
+            id: signData.cert_id,
+            slot_id: signData.slot_id,
+            pin: signData.pin,
             data: signData.data,
             digest: signData.algorithm_reference,
             pinpad: false,
@@ -25096,6 +25377,12 @@ var Oberthur = (function (_super) {
             return _this.connection.post(_this.baseUrl, _this.containerSuffix(Oberthur.VERIFY_PIN), body, undefined, undefined, callback);
         });
     };
+    Oberthur.prototype.verifyPinWithEncryptedPin = function (body, callback) {
+        var _this = this;
+        return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
+            return _this.connection.post(_this.baseUrl, _this.containerSuffix(Oberthur.VERIFY_PIN), body, undefined, undefined, callback);
+        });
+    };
     Oberthur.CONTAINER_PREFIX = 'oberthur';
     return Oberthur;
 }(Card_1.GenericCertCard));
@@ -25132,6 +25419,7 @@ var CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
 var CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
 var CONTAINER_DNIE = CONTAINER_NEW_CONTEXT_PATH + 'dnie';
 var CONTAINER_EMV = CONTAINER_NEW_CONTEXT_PATH + 'emv';
+var CONTAINER_ISABEL = CONTAINER_NEW_CONTEXT_PATH + 'isabel';
 var CONTAINER_FILE_EXCHANGE = CONTAINER_NEW_CONTEXT_PATH + 'file-exchange';
 var CONTAINER_LUXTRUST = CONTAINER_NEW_CONTEXT_PATH + 'luxtrust';
 var CONTAINER_MOBIB = CONTAINER_NEW_CONTEXT_PATH + 'mobib';
@@ -25151,8 +25439,9 @@ var PluginFactory = (function () {
     }
     PluginFactory.prototype.createDNIe = function (reader_id) { return new dnie_1.DNIe(this.url, CONTAINER_DNIE, this.connection, reader_id); };
     PluginFactory.prototype.createEidBE = function (reader_id) { return new EidBe_1.EidBe(this.url, CONTAINER_BEID, this.connection, reader_id); };
-    PluginFactory.prototype.createEidLUX = function (reader_id, pin, pinType) {
-        return new EidLux_1.EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin, pinType);
+    PluginFactory.prototype.createEidLUX = function (reader_id, pin, pinType, isEncrypted) {
+        if (isEncrypted === void 0) { isEncrypted = false; }
+        return new EidLux_1.EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin, pinType, isEncrypted);
     };
     PluginFactory.prototype.createEidPT = function (reader_id) { return new EidPt_1.EidPt(this.url, CONTAINER_PTEID, this.connection, reader_id); };
     PluginFactory.prototype.createEmv = function (reader_id) { return new EMV_1.EMV(this.url, CONTAINER_EMV, this.connection, reader_id); };
@@ -25208,8 +25497,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var __1 = __webpack_require__(41);
-var GenericContainer_1 = __webpack_require__(40);
+var __1 = __webpack_require__(33);
+var GenericContainer_1 = __webpack_require__(41);
 var JavaKeyTool = (function (_super) {
     __extends(JavaKeyTool, _super);
     function JavaKeyTool(baseUrl, containerUrl, connection) {
@@ -38695,7 +38984,7 @@ var $export = __webpack_require__(3);
 
 $export($export.P, 'Array', { copyWithin: __webpack_require__(93) });
 
-__webpack_require__(35)('copyWithin');
+__webpack_require__(36)('copyWithin');
 
 
 /***/ }),
@@ -38707,7 +38996,7 @@ var $export = __webpack_require__(3);
 
 $export($export.P, 'Array', { fill: __webpack_require__(64) });
 
-__webpack_require__(35)('fill');
+__webpack_require__(36)('fill');
 
 
 /***/ }),
@@ -38728,7 +39017,7 @@ $export($export.P + $export.F * forced, 'Array', {
     return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
   }
 });
-__webpack_require__(35)(KEY);
+__webpack_require__(36)(KEY);
 
 
 /***/ }),
@@ -38749,7 +39038,7 @@ $export($export.P + $export.F * forced, 'Array', {
     return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
   }
 });
-__webpack_require__(35)(KEY);
+__webpack_require__(36)(KEY);
 
 
 /***/ }),
@@ -38969,7 +39258,7 @@ var global = __webpack_require__(7);
 var has = __webpack_require__(21);
 var DESCRIPTORS = __webpack_require__(16);
 var $export = __webpack_require__(3);
-var redefine = __webpack_require__(33);
+var redefine = __webpack_require__(34);
 var META = __webpack_require__(313).KEY;
 var $fails = __webpack_require__(12);
 var shared = __webpack_require__(60);
@@ -47401,7 +47690,7 @@ var _pvutils = __webpack_require__(2);
 
 var _common = __webpack_require__(77);
 
-var _AlgorithmIdentifier = __webpack_require__(39);
+var _AlgorithmIdentifier = __webpack_require__(40);
 
 var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 
@@ -49371,7 +49660,7 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _AlgorithmIdentifier = __webpack_require__(39);
+var _AlgorithmIdentifier = __webpack_require__(40);
 
 var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 
@@ -56257,7 +56546,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var __1 = __webpack_require__(41);
+var __1 = __webpack_require__(33);
 var SshKey = (function () {
     function SshKey(name, private_key, public_key) {
         this.name = name;
@@ -58721,7 +59010,7 @@ webpackContext.id = 394;
 Object.defineProperty(exports, "__esModule", { value: true });
 var CoreService_1 = __webpack_require__(396);
 var Connection_1 = __webpack_require__(75);
-var DSClientModel_1 = __webpack_require__(36);
+var DSClientModel_1 = __webpack_require__(37);
 var DSClient_1 = __webpack_require__(117);
 var OCVClient_1 = __webpack_require__(125);
 var PluginFactory_1 = __webpack_require__(144);
@@ -58735,6 +59024,7 @@ var Auth_1 = __webpack_require__(112);
 var moment = __webpack_require__(0);
 var Polyfills_1 = __webpack_require__(53);
 var DSException_1 = __webpack_require__(397);
+var __1 = __webpack_require__(33);
 var defaults = {
     gclUrl: 'https://localhost:10443/v2',
     gwUrl: 'https://accapim.t1t.be:443',
@@ -58793,8 +59083,9 @@ var GCLClient = (function () {
         this.dnie = function (reader_id) {
             return _this.pluginFactory.createDNIe(reader_id);
         };
-        this.luxeid = function (reader_id, pin, pinType) {
-            return _this.pluginFactory.createEidLUX(reader_id, pin, pinType);
+        this.luxeid = function (reader_id, pin, pinType, isEncrypted) {
+            if (isEncrypted === void 0) { isEncrypted = false; }
+            return _this.pluginFactory.createEidLUX(reader_id, pin, pinType, isEncrypted);
         };
         this.luxtrust = function (reader_id, pin) {
             return _this.pluginFactory.createLuxTrust(reader_id);
@@ -58907,6 +59198,9 @@ var GCLClient = (function () {
         return InitUtil_1.InitUtil.initializeLibrary(ClientService_1.ClientService.getClient());
     };
     ;
+    GCLClient.prototype.encryptPin = function (pin) {
+        return __1.PinEnforcer.encryptPin(pin);
+    };
     Object.defineProperty(GCLClient.prototype, "gclInstalled", {
         get: function () {
             return this._gclInstalled;
@@ -58942,17 +59236,26 @@ var GCLClient = (function () {
     GCLClient.prototype.authenticate = function (readerId, data, callback) {
         return GenericService_1.GenericService.authenticate(this, readerId, data, callback);
     };
+    GCLClient.prototype.authenticateWithEncryptedPin = function (readerId, data, callback) {
+        return GenericService_1.GenericService.authenticateWithEncryptedPin(this, readerId, data, callback);
+    };
     GCLClient.prototype.readersCanSign = function (callback) {
         return GenericService_1.GenericService.signCapable(this, callback);
     };
     GCLClient.prototype.sign = function (readerId, data, callback) {
         return GenericService_1.GenericService.sign(this, readerId, data, callback);
     };
+    GCLClient.prototype.signWithEncryptedPin = function (readerId, data, callback) {
+        return GenericService_1.GenericService.signWithEncryptedPin(this, readerId, data, callback);
+    };
     GCLClient.prototype.readersCanVerifyPin = function (callback) {
         return GenericService_1.GenericService.verifyPinCapable(this, callback);
     };
     GCLClient.prototype.verifyPin = function (readerId, data, callback) {
         return GenericService_1.GenericService.verifyPin(this, readerId, data, callback);
+    };
+    GCLClient.prototype.verifyPinWithEncryptedPin = function (readerId, data, callback) {
+        return GenericService_1.GenericService.verifyPinWithEncryptedPin(this, readerId, data, callback);
     };
     GCLClient.prototype.updateAuthConnection = function (cfg) {
         this.authConnection = new Connection_1.LocalAuthConnection(cfg);
@@ -58973,7 +59276,7 @@ exports.GCLClient = GCLClient;
 Object.defineProperty(exports, "__esModule", { value: true });
 var platform = __webpack_require__(140);
 var ResponseHandler_1 = __webpack_require__(9);
-var Utils_1 = __webpack_require__(37);
+var Utils_1 = __webpack_require__(38);
 var CORE_CONSENT = '/consent';
 var CORE_INFO = '/';
 var CORE_READERS = '/card-readers';
@@ -59209,7 +59512,7 @@ var CoreService = (function () {
     CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
     CoreService.prototype.getUrl = function () { return this.url; };
     CoreService.prototype.version = function () {
-        return Promise.resolve("2.2.14-1");
+        return Promise.resolve("2.2.17");
     };
     return CoreService;
 }());

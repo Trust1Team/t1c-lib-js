@@ -82,3 +82,7 @@ fabric.properties
 
 # Test Reports
 /reports/
+lib
+lib-esm
+dist/report.html
+.npmrc

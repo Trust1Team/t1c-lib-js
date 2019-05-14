@@ -16,6 +16,7 @@ export declare class EidPt extends GenericCertCard implements AbstractEidPT {
     idData(callback?: (error: T1CLibException, data: PtIdDataResponse) => void): Promise<PtIdDataResponse>;
     idDataWithOutPhoto(callback?: (error: T1CLibException, data: PtIdDataResponse) => void): Promise<PtIdDataResponse>;
     address(data: OptionalPin, callback?: (error: T1CLibException, data: PtAddressResponse) => void): Promise<PtAddressResponse>;
+    addressWithEncryptedPin(data: OptionalPin, callback?: (error: T1CLibException, data: PtAddressResponse) => void): Promise<PtAddressResponse>;
     photo(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     rootCertificate(options: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
     rootAuthenticationCertificate(options: Options, callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;

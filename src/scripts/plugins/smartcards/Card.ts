@@ -1,14 +1,15 @@
-import { T1CLibException } from '../../core/exceptions/CoreExceptions';
+import {T1CLibException} from '../../core/exceptions/CoreExceptions';
 import {
     CertificateResponse, CertificatesResponse, DataArrayResponse, DataObjectResponse, DataResponse,
     T1CResponse
 } from '../../core/service/CoreModel';
-import { LocalConnection } from '../../core/client/Connection';
-import { PinEnforcer } from '../../util/PinEnforcer';
-import { CertParser } from '../../util/CertParser';
-import { ResponseHandler } from '../../util/ResponseHandler';
-import { Options, RequestHandler, RequestOptions } from '../../util/RequestHandler';
+import {LocalConnection} from '../../core/client/Connection';
+import {PinEnforcer} from '../../util/PinEnforcer';
+import {CertParser} from '../../util/CertParser';
+import {ResponseHandler} from '../../util/ResponseHandler';
+import {Options, RequestHandler, RequestOptions} from '../../util/RequestHandler';
 import {GenericContainer} from '../GenericContainer';
+
 /**
  * @author Michallis Pashidis
  * @author Maarten Somers
@@ -17,17 +18,20 @@ import {GenericContainer} from '../GenericContainer';
 
 // interfaces
 export interface Card {
-    allData: (filters: string[]| Options, callback?: () => void) => Promise<DataObjectResponse>;
+    allData: (filters: string[] | Options, callback?: () => void) => Promise<DataObjectResponse>;
 }
 
 export interface PinCard extends Card {
     verifyPin: (body: VerifyPinData, callback?: () => void) => Promise<T1CResponse>;
+    verifyPinWithEncryptedPin: (body: VerifyPinData, callback?: () => void) => Promise<T1CResponse>;
 }
 
 export interface CertCard extends PinCard {
     allCerts: (filters: string[] | Options, callback?: () => void) => Promise<DataObjectResponse>
     authenticate: (body: any, callback?: () => void) => Promise<DataResponse>
+    authenticateWithEncryptedPin: (body: any, callback?: () => void) => Promise<DataResponse>
     signData: (body: any, callback?: () => void) => Promise<DataResponse>
+    signDataWithEncryptedPin: (body: any, callback?: () => void) => Promise<DataResponse>
 }
 
 export interface SecuredCertCard {
@@ -41,7 +45,8 @@ export interface SecuredCertCard {
 
 // classes
 export class OptionalPin {
-    constructor(public pin?: string, public pace?: string, private_key_reference?: string) {}
+    constructor(public pin?: string, public pace?: string, private_key_reference?: string ) {
+    }
 }
 
 export class AuthenticateOrSignData extends OptionalPin {
@@ -57,11 +62,13 @@ export class VerifyPinData extends OptionalPin {
 }
 
 export class ResetPinData {
-    constructor(public puk: string, public new_pin: string, public private_key_reference: string) {}
+    constructor(public puk: string, public new_pin: string, public private_key_reference: string) {
+    }
 }
 
 export class PinTryCounterData {
-    constructor(public pin_reference: string) {}
+    constructor(public pin_reference: string) {
+    }
 }
 
 export abstract class GenericReaderContainer extends GenericContainer {
@@ -78,8 +85,12 @@ export abstract class GenericReaderContainer extends GenericContainer {
     protected containerSuffix(path?: string): string {
         super.containerSuffix(path);
         let suffix = this.containerUrl;
-        if (this.reader_id && this.reader_id.length) { suffix += '/' + this.reader_id; }
-        if (path && path.length) { suffix += path.startsWith('/') ? path : '/' + path; }
+        if (this.reader_id && this.reader_id.length) {
+            suffix += '/' + this.reader_id;
+        }
+        if (path && path.length) {
+            suffix += path.startsWith('/') ? path : '/' + path;
+        }
         return suffix;
     }
 }
@@ -101,6 +112,14 @@ export abstract class GenericPinCard extends GenericSmartCard implements PinCard
     public verifyPin(body: VerifyPinData,
                      callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse> {
         return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
+            return this.connection.post(this.baseUrl, this.containerSuffix(GenericPinCard.VERIFY_PIN),
+                body, undefined, undefined, callback);
+        });
+    }
+
+    public verifyPinWithEncryptedPin(body: VerifyPinData,
+                                     callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse> {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericPinCard.VERIFY_PIN),
                 body, undefined, undefined, callback);
         });
@@ -149,10 +168,32 @@ export abstract class GenericCertCard extends GenericPinCard implements CertCard
         });
     }
 
+    public authenticateWithEncryptedPin(body: AuthenticateOrSignData,
+                                        callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
+        body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
+            return this.connection.post(this.baseUrl, this.containerSuffix(GenericCertCard.AUTHENTICATE),
+                body, undefined, undefined, callback);
+        });
+    }
+
     public signData(body: AuthenticateOrSignData,
                     callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
-        if (body.algorithm_reference) { body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase(); }
+        if (body.algorithm_reference) {
+            body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
+        }
         return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
+            return this.connection.post(this.baseUrl, this.containerSuffix(GenericCertCard.SIGN_DATA),
+                body, undefined, undefined, callback);
+        });
+    }
+
+    public signDataWithEncryptedPin(body: AuthenticateOrSignData,
+                                    callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
+        if (body.algorithm_reference) {
+            body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
+        }
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericCertCard.SIGN_DATA),
                 body, undefined, undefined, callback);
         });
@@ -219,9 +260,25 @@ export abstract class GenericSecuredCertCard extends GenericReaderContainer impl
         });
     }
 
+    public verifyPinWithEncryptedPin(body: OptionalPin,
+                                     callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<T1CResponse> {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
+            return this.connection.post(this.baseUrl, this.containerSuffix(GenericSecuredCertCard.VERIFY_PIN),
+                body, undefined, undefined, callback);
+        });
+    }
+
     public signData(body: AuthenticateOrSignData,
                     callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
         return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
+            return this.connection.post(this.baseUrl, this.containerSuffix(GenericSecuredCertCard.SIGN_DATA),
+                body, undefined, undefined, callback);
+        });
+    }
+
+    public signDataWithEncryptedPin(body: AuthenticateOrSignData,
+                                    callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
             return this.connection.post(this.baseUrl, this.containerSuffix(GenericSecuredCertCard.SIGN_DATA),
                 body, undefined, undefined, callback);
         });
@@ -235,6 +292,14 @@ export abstract class GenericSecuredCertCard extends GenericReaderContainer impl
         });
     }
 
+    public authenticateWithEncryptedPin(body: AuthenticateOrSignData,
+                                        callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
+            return this.connection.post(this.baseUrl, this.containerSuffix(GenericSecuredCertCard.AUTHENTICATE),
+                body, undefined, undefined, callback);
+        });
+    }
+
     protected getCertificate(certUrl: string,
                              body: OptionalPin,
                              options: RequestOptions,
@@ -242,13 +307,31 @@ export abstract class GenericSecuredCertCard extends GenericReaderContainer impl
         let self = this;
 
         return PinEnforcer.check(this.connection, this.reader_id, body)
-                          .then(() => {
-                              return self.connection.post(this.baseUrl,
-                                  self.containerSuffix(GenericSecuredCertCard.ALL_CERTIFICATES + certUrl), body, params);
-                          })
-                          .then(data => {
-                              return CertParser.process(data, options.parseCerts, options.callback);
-                          }).catch(err => {
+            .then(() => {
+                return self.connection.post(this.baseUrl,
+                    self.containerSuffix(GenericSecuredCertCard.ALL_CERTIFICATES + certUrl), body, params);
+            })
+            .then(data => {
+                return CertParser.process(data, options.parseCerts, options.callback);
+            }).catch(err => {
+                return ResponseHandler.error(err, options.callback);
+            });
+    }
+
+    protected getCertificateWithEncryptedPin(certUrl: string,
+                                             body: OptionalPin,
+                                             options: RequestOptions,
+                                             params?: { filter?: string, pin?: string }): Promise<CertificateResponse> {
+        let self = this;
+
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body)
+            .then(() => {
+                return self.connection.post(this.baseUrl,
+                    self.containerSuffix(GenericSecuredCertCard.ALL_CERTIFICATES + certUrl), body, params);
+            })
+            .then(data => {
+                return CertParser.process(data, options.parseCerts, options.callback);
+            }).catch(err => {
                 return ResponseHandler.error(err, options.callback);
             });
     }
@@ -260,13 +343,31 @@ export abstract class GenericSecuredCertCard extends GenericReaderContainer impl
         let self = this;
 
         return PinEnforcer.check(this.connection, this.reader_id, body)
-                          .then(() => {
-                              return self.connection.post(this.baseUrl,
-                                  self.containerSuffix(GenericSecuredCertCard.ALL_CERTIFICATES + certUrl), body, params);
-                          })
-                          .then(data => {
-                              return CertParser.process(data, options.parseCerts, options.callback);
-                          }).catch(err => {
+            .then(() => {
+                return self.connection.post(this.baseUrl,
+                    self.containerSuffix(GenericSecuredCertCard.ALL_CERTIFICATES + certUrl), body, params);
+            })
+            .then(data => {
+                return CertParser.process(data, options.parseCerts, options.callback);
+            }).catch(err => {
+                return ResponseHandler.error(err, options.callback);
+            });
+    }
+
+    protected getCertificateArrayWithEncryptedPin(certUrl: string,
+                                                  body: OptionalPin,
+                                                  options: RequestOptions,
+                                                  params?: { filter?: string, pin?: string }): Promise<CertificatesResponse> {
+        let self = this;
+
+        return PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body)
+            .then(() => {
+                return self.connection.post(this.baseUrl,
+                    self.containerSuffix(GenericSecuredCertCard.ALL_CERTIFICATES + certUrl), body, params);
+            })
+            .then(data => {
+                return CertParser.process(data, options.parseCerts, options.callback);
+            }).catch(err => {
                 return ResponseHandler.error(err, options.callback);
             });
     }

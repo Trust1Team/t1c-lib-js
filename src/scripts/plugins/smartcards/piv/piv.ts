@@ -2,12 +2,12 @@
  * @author Maarten Somers
  * @since 2017
  */
-import { T1CLibException } from '../../../core/exceptions/CoreExceptions';
-import { GenericSecuredCertCard, OptionalPin } from '../Card';
-import { CertificateResponse } from '../../../core/service/CoreModel';
-import { AbstractPiv, PivFacialImageResponse, PivPrintedInformationResponse } from './pivModel';
-import { PinEnforcer } from '../../../util/PinEnforcer';
-import { Options, RequestHandler } from '../../../util/RequestHandler';
+import {T1CLibException} from '../../../core/exceptions/CoreExceptions';
+import {GenericSecuredCertCard, OptionalPin} from '../Card';
+import {CertificateResponse} from '../../../core/service/CoreModel';
+import {AbstractPiv, PivFacialImageResponse, PivPrintedInformationResponse} from './pivModel';
+import {PinEnforcer} from '../../../util/PinEnforcer';
+import {Options, RequestHandler} from '../../../util/RequestHandler';
 import {LocalConnection} from '../../../core/client/Connection';
 
 export class PIV extends GenericSecuredCertCard implements AbstractPiv {
@@ -22,16 +22,16 @@ export class PIV extends GenericSecuredCertCard implements AbstractPiv {
 
 // filters
     public allDataFilters() {
-        return [ 'applet-info', 'root_certificate', 'authentication-certificate',
-                 'encryption_certificate', 'issuer_certificate', 'signing_certificate' ];
+        return ['applet-info', 'root_certificate', 'authentication-certificate',
+            'encryption_certificate', 'issuer_certificate', 'signing_certificate'];
     }
 
     public allCertFilters() {
-        return [ 'authentication-certificate', 'signing_certificate' ];
+        return ['authentication-certificate', 'signing_certificate'];
     }
 
     public allKeyRefs() {
-        return [ 'authenticate', 'sign', 'encrypt' ];
+        return ['authenticate', 'sign', 'encrypt'];
     }
 
     public printedInformation(body: OptionalPin,
@@ -48,7 +48,30 @@ export class PIV extends GenericSecuredCertCard implements AbstractPiv {
             return new Promise((resolve, reject) => {
                 PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
                     resolve(this.connection.post(this.baseUrl, this.containerSuffix(PIV.PRINTED_INFORMATION), body, undefined));
-                }, error => { reject(error); });
+                }, error => {
+                    reject(error);
+                });
+            });
+        }
+    }
+
+    public printedInformationWithEncryptedPin(body: OptionalPin,
+                                              callback?: (error: T1CLibException,
+                                                          data: PivPrintedInformationResponse) => void): Promise<PivPrintedInformationResponse> {
+        if (callback && typeof callback === 'function') {
+            PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
+                return this.connection.post(this.baseUrl, this.containerSuffix(PIV.PRINTED_INFORMATION),
+                    body, undefined, undefined, callback);
+            }, error => {
+                return callback(error, null);
+            });
+        } else {
+            return new Promise((resolve, reject) => {
+                PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
+                    resolve(this.connection.post(this.baseUrl, this.containerSuffix(PIV.PRINTED_INFORMATION), body, undefined));
+                }, error => {
+                    reject(error);
+                });
             });
         }
     }
@@ -65,7 +88,28 @@ export class PIV extends GenericSecuredCertCard implements AbstractPiv {
             return new Promise((resolve, reject) => {
                 PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
                     resolve(this.connection.post(this.baseUrl, this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined));
-                }, error => { reject(error); });
+                }, error => {
+                    reject(error);
+                });
+            });
+        }
+    }
+
+    public facialImageWithEncryptedPin(body: OptionalPin,
+                                       callback?: (error: T1CLibException, data: PivFacialImageResponse) => void): Promise<PivFacialImageResponse> {
+        if (callback && typeof callback === 'function') {
+            PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
+                return this.connection.post(this.baseUrl, this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined, undefined, callback);
+            }, error => {
+                return callback(error, null);
+            });
+        } else {
+            return new Promise((resolve, reject) => {
+                PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(() => {
+                    resolve(this.connection.post(this.baseUrl, this.containerSuffix(PIV.FACIAL_IMAGE), body, undefined));
+                }, error => {
+                    reject(error);
+                });
             });
         }
     }
