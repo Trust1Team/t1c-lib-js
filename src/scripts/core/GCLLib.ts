@@ -354,6 +354,11 @@ export class GCLClient {
         return GenericService.verifyPinWithEncryptedPin(this, readerId, data, callback);
     }
 
+    public retrieveEncryptedUserPin(callback?: (error: T1CLibException, data: DataResponse) => void) {
+        return this.core().retrieveEncryptedUserPin(callback);
+    }
+
+
     /**
      * Utility methods
      */
