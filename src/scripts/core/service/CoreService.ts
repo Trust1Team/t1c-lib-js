@@ -13,7 +13,7 @@ const CORE_CONSENT = '/consent';
 const CORE_INFO = '/';
 const CORE_READERS = '/card-readers';
 const CORE_CONSENT_IMPLICIT = '/consent/implicit';
-const CORE_RETUREVE_ENCRYPTED_PIN = 'dialog/pin';
+const CORE_RETUREVE_ENCRYPTED_PIN = '/dialog/pin';
 
 
 declare var VERSION: string;
