@@ -1,5 +1,5 @@
 import { LocalAuthConnection } from '../client/Connection';
-import { AbstractCore, BoolDataResponse, BrowserInfoResponse, CardReader, CardReadersResponse, InfoResponse, SingleReaderResponse } from './CoreModel';
+import { AbstractCore, BoolDataResponse, BrowserInfoResponse, CardReader, CardReadersResponse, DataResponse, InfoResponse, SingleReaderResponse } from './CoreModel';
 import { T1CLibException } from '../exceptions/CoreExceptions';
 export declare class CoreService implements AbstractCore {
     private url;
@@ -11,6 +11,7 @@ export declare class CoreService implements AbstractCore {
     getImplicitConsent(codeWord: string, durationInDays?: number, type?: string, callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
     info(callback?: (error: T1CLibException, data: InfoResponse) => void): Promise<InfoResponse>;
     infoBrowser(callback?: (error: T1CLibException, data: BrowserInfoResponse) => void): Promise<BrowserInfoResponse>;
+    retrieveEncryptedUserPin(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     pollCardInserted(secondsToPollCard?: number, callback?: (error: T1CLibException, data: CardReader) => void, connectReaderCb?: () => void, insertCardCb?: () => void, cardTimeoutCb?: () => void): Promise<CardReader>;
     pollReadersWithCards(secondsToPollCard?: number, callback?: (error: T1CLibException, data: CardReadersResponse) => void, connectReaderCb?: () => void, insertCardCb?: () => void, cardTimeoutCb?: () => void): Promise<CardReadersResponse>;
     pollReaders(secondsToPollReader?: number, callback?: (error: T1CLibException, data: CardReadersResponse) => void, connectReaderCb?: () => void, readerTimeoutCb?: () => void): Promise<CardReadersResponse>;

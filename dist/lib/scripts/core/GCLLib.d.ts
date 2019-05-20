@@ -86,5 +86,6 @@ export declare class GCLClient {
     readersCanVerifyPin(callback?: (error: T1CLibException, data: CardReadersResponse) => void): Promise<any>;
     verifyPin(readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
     verifyPinWithEncryptedPin(readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
+    retrieveEncryptedUserPin(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     updateAuthConnection(cfg: GCLConfig): void;
 }
