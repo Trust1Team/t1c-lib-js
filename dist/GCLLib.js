@@ -59257,6 +59257,9 @@ var GCLClient = (function () {
     GCLClient.prototype.verifyPinWithEncryptedPin = function (readerId, data, callback) {
         return GenericService_1.GenericService.verifyPinWithEncryptedPin(this, readerId, data, callback);
     };
+    GCLClient.prototype.retrieveEncryptedUserPin = function (callback) {
+        return this.core().retrieveEncryptedUserPin(callback);
+    };
     GCLClient.prototype.updateAuthConnection = function (cfg) {
         this.authConnection = new Connection_1.LocalAuthConnection(cfg);
         this.adminService = new admin_1.AdminService(cfg.gclUrl, this.authConnection, this.adminConnection);
@@ -59281,6 +59284,7 @@ var CORE_CONSENT = '/consent';
 var CORE_INFO = '/';
 var CORE_READERS = '/card-readers';
 var CORE_CONSENT_IMPLICIT = '/consent/implicit';
+var CORE_RETUREVE_ENCRYPTED_PIN = '/dialog/pin';
 var CoreService = (function () {
     function CoreService(url, connection) {
         this.url = url;
@@ -59345,11 +59349,15 @@ var CoreService = (function () {
             return Promise.resolve(CoreService.platformInfo());
         }
     };
+    CoreService.prototype.retrieveEncryptedUserPin = function (callback) {
+        return this.connection.post(this.url, CORE_RETUREVE_ENCRYPTED_PIN, {}, undefined, undefined, callback);
+    };
     CoreService.prototype.pollCardInserted = function (secondsToPollCard, callback, connectReaderCb, insertCardCb, cardTimeoutCb) {
         var maxSeconds = secondsToPollCard || 30;
         var self = this;
         if (!callback || typeof callback !== 'function') {
-            callback = function () { };
+            callback = function () {
+            };
         }
         return new Promise(function (resolve, reject) {
             poll(resolve, reject);
@@ -59403,7 +59411,8 @@ var CoreService = (function () {
         var maxSeconds = secondsToPollCard || 30;
         var self = this;
         if (!callback || typeof callback !== 'function') {
-            callback = function () { };
+            callback = function () {
+            };
         }
         return new Promise(function (resolve, reject) {
             poll(resolve, reject);
@@ -59458,7 +59467,8 @@ var CoreService = (function () {
         var maxSeconds = secondsToPollReader || 30;
         var self = this;
         if (!callback || typeof callback !== 'function') {
-            callback = function () { };
+            callback = function () {
+            };
         }
         return new Promise(function (resolve, reject) {
             poll(resolve, reject);
@@ -59509,8 +59519,12 @@ var CoreService = (function () {
     CoreService.prototype.readersCardsUnavailable = function (callback) {
         return this.connection.get(this.url, CORE_READERS, CoreService.cardInsertedFilter(false), undefined, callback);
     };
-    CoreService.prototype.infoBrowserSync = function () { return CoreService.platformInfo(); };
-    CoreService.prototype.getUrl = function () { return this.url; };
+    CoreService.prototype.infoBrowserSync = function () {
+        return CoreService.platformInfo();
+    };
+    CoreService.prototype.getUrl = function () {
+        return this.url;
+    };
     CoreService.prototype.version = function () {
         return Promise.resolve("2.2.17");
     };
