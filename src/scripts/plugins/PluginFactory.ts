@@ -41,12 +41,15 @@ import {AbstractJavaKeyTool} from './java-key-tool/JavaKeyToolModel';
 import {JavaKeyTool} from './java-key-tool/JavaKeyTool';
 import {AbstractSsh} from './ssh/SshModel';
 import {Ssh} from './ssh/Ssh';
+import {Wacom} from './wacom/Wacom';
+import {AbstractWacom} from './wacom/WacomModel';
 // import {Isabel} from './smartcards/isabel/Isabel';
 
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
     createEidLUX(reader_id?: string): AbstractEidLUX;
     createEmv(reader_id?: string): AbstractEMV;
+    createWacom(): AbstractWacom;
     // createIsabel(reader_id?: string): AbstractIsabel;
     createLuxTrust(reader_id?: string): AbstractLuxTrust;
     createMobib(reader_id?: string): AbstractMobib;
@@ -64,6 +67,7 @@ const CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
 const CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
 const CONTAINER_DNIE = CONTAINER_NEW_CONTEXT_PATH + 'dnie';
 const CONTAINER_EMV = CONTAINER_NEW_CONTEXT_PATH + 'emv';
+const CONTAINER_WACOM = CONTAINER_NEW_CONTEXT_PATH + 'wacom';
 const CONTAINER_ISABEL = CONTAINER_NEW_CONTEXT_PATH + 'isabel';
 const CONTAINER_FILE_EXCHANGE = CONTAINER_NEW_CONTEXT_PATH + 'file-exchange';
 const CONTAINER_LUXTRUST = CONTAINER_NEW_CONTEXT_PATH + 'luxtrust';
@@ -135,5 +139,9 @@ export class PluginFactory implements AbstractFactory {
 
     createSsh(): AbstractSsh {
         return new Ssh(this.url, '', this.connection, 'ssh');
+    }
+
+    createWacom(): AbstractWacom {
+        return new Wacom(this.url, '', this.connection, 'wacom');
     }
 }
