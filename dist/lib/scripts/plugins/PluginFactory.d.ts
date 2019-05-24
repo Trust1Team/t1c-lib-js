@@ -17,10 +17,12 @@ import { AbstractPkcs11 } from './smartcards/pkcs11/pkcs11Model';
 import { AbstractDataContainer } from './data-container/DataContainerModel';
 import { AbstractJavaKeyTool } from './java-key-tool/JavaKeyToolModel';
 import { AbstractSsh } from './ssh/SshModel';
+import { AbstractWacom } from './wacom/WacomModel';
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
     createEidLUX(reader_id?: string): AbstractEidLUX;
     createEmv(reader_id?: string): AbstractEMV;
+    createWacom(): AbstractWacom;
     createLuxTrust(reader_id?: string): AbstractLuxTrust;
     createMobib(reader_id?: string): AbstractMobib;
     createOcra(reader_id?: string): AbstractOcra;
@@ -40,6 +42,7 @@ export declare class PluginFactory implements AbstractFactory {
     createEidLUX(reader_id?: string, pin?: string, pinType?: PinType, isEncrypted?: boolean): AbstractEidLUX;
     createEidPT(reader_id?: string): AbstractEidPT;
     createEmv(reader_id?: string): AbstractEMV;
+    createWacom(): AbstractWacom;
     createLuxTrust(reader_id?: string): AbstractLuxTrust;
     createMobib(reader_id?: string): AbstractMobib;
     createOcra(reader_id?: string): AbstractOcra;

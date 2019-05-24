@@ -86,6 +86,7 @@ export class InitUtil {
 
     private static containerHandler(config: GCLConfig, infoResponse: InfoResponse) {
         config.activeContainers = config.overrideContainers ? ActivatedContainerUtil.getSortedProvidedContainers(config.overrideContainers) : ActivatedContainerUtil.getSortedContainers(infoResponse.data.containers);
+        // console.log(config.activeContainers);
     }
 
 
