@@ -1,6 +1,7 @@
 export interface AbstractWacom {
     signData: (body: WacomSignDataRequest, callback?: () => void) => Promise<WacomSignDataResponse>;
     getDevices: (callback?: () => void) => Promise<WacomGetDevicesResponse>;
+    systemInfo: (callback?: () => void) => Promise<WacomSystemInfoResponse>;
 }
 export declare class WacomDevice {
     name: string;
@@ -29,6 +30,11 @@ export declare class WacomImage {
     rectH: number;
     constructor(data: string, rectX: number, rectY: number, rectW: number, rectH: number);
 }
+export declare class WacomPackage {
+    component: string;
+    version: string;
+    constructor(component: string, version: string);
+}
 export declare class WacomSignDataResponse {
     data: WacomSignDataResponseData;
     success: boolean;
@@ -42,4 +48,14 @@ export declare class WacomSignDataResponseData {
     constructor(image: string, metadata: Array<{
         string: string;
     }>);
+}
+export declare class WacomSystemInfoResponse {
+    data: WacomSystemInfoResponseData;
+    success: boolean;
+    constructor(data: WacomSystemInfoResponseData, success: boolean);
+}
+export declare class WacomSystemInfoResponseData {
+    device_list: Array<string>;
+    package_list: Array<WacomPackage>;
+    constructor(device_list: Array<string>, package_list: Array<WacomPackage>);
 }

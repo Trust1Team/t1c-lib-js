@@ -3,6 +3,7 @@ import {Wacom} from './Wacom';
 export interface AbstractWacom {
     signData: (body: WacomSignDataRequest, callback?: () => void) => Promise<WacomSignDataResponse>
     getDevices: (callback?: () => void) => Promise<WacomGetDevicesResponse>
+    systemInfo: (callback?: () => void) => Promise<WacomSystemInfoResponse>
 }
 
 export class WacomDevice {
@@ -36,14 +37,30 @@ export class WacomImage {
     }
 }
 
+export class WacomPackage {
+    constructor(
+        public component: string,
+        public version: string
+    ) {
+    }
+}
+
 export class WacomSignDataResponse {
     constructor(public data: WacomSignDataResponseData, public success: boolean) {
     }
 }
 
 export class WacomSignDataResponseData {
-    constructor(public image: string, public metadata: Array<{string: string}>) {
+    constructor(public image: string, public metadata: Array<{ string: string }>) {
     }
 }
 
+export class WacomSystemInfoResponse {
+    constructor(public data: WacomSystemInfoResponseData, public success: boolean) {
+    }
+}
 
+export class WacomSystemInfoResponseData {
+    constructor(public device_list: Array<string>, public package_list: Array<WacomPackage>) {
+    }
+}
