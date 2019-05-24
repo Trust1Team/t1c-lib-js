@@ -1,13 +1,17 @@
 import {GenericContainer} from '../GenericContainer';
-import {AbstractWacom, WacomDevice, WacomGetDevicesResponse, WacomSignDataRequest, WacomSignDataResponse, WacomSystemInfoResponse} from './WacomModel';
+import {AbstractWacom, WacomGetDevicesResponse, WacomSignDataRequest, WacomSignDataResponse, WacomSystemInfoResponse} from './WacomModel';
 import {LocalConnection} from '../../..';
 
 export class Wacom extends GenericContainer implements AbstractWacom {
-    static CONTAINER_PREFIX = 'ssh';
+    static CONTAINER_PREFIX = 'wacom-stu';
     static GET = '/get-key';
     static DEVICES = '/devices';
     static SIGN = '/sign';
     static SYSTEM_INFO = '/system-info';
+
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, containerPrefix: string) {
+        super(baseUrl, containerUrl, connection, containerPrefix);
+    }
 
     getDevices(callback?: () => void): Promise<WacomGetDevicesResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(Wacom.DEVICES), undefined, undefined, callback);

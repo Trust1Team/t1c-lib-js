@@ -1,5 +1,3 @@
-import {Wacom} from './Wacom';
-
 export interface AbstractWacom {
     signData: (body: WacomSignDataRequest, callback?: () => void) => Promise<WacomSignDataResponse>
     getDevices: (callback?: () => void) => Promise<WacomGetDevicesResponse>

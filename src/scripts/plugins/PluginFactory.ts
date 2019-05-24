@@ -67,7 +67,7 @@ const CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
 const CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
 const CONTAINER_DNIE = CONTAINER_NEW_CONTEXT_PATH + 'dnie';
 const CONTAINER_EMV = CONTAINER_NEW_CONTEXT_PATH + 'emv';
-const CONTAINER_WACOM = CONTAINER_NEW_CONTEXT_PATH + 'wacom';
+const CONTAINER_WACOM = CONTAINER_NEW_CONTEXT_PATH + 'wacom-stu';
 const CONTAINER_ISABEL = CONTAINER_NEW_CONTEXT_PATH + 'isabel';
 const CONTAINER_FILE_EXCHANGE = CONTAINER_NEW_CONTEXT_PATH + 'file-exchange';
 const CONTAINER_LUXTRUST = CONTAINER_NEW_CONTEXT_PATH + 'luxtrust';
@@ -96,6 +96,8 @@ export class PluginFactory implements AbstractFactory {
     public createEidPT(reader_id?: string): AbstractEidPT { return new EidPt(this.url, CONTAINER_PTEID, this.connection, reader_id); }
 
     public createEmv(reader_id?: string): AbstractEMV { return new EMV(this.url, CONTAINER_EMV, this.connection, reader_id); }
+
+    public createWacom(): AbstractWacom { return new Wacom(this.url, CONTAINER_WACOM, this.connection, 'wacom-stu'); }
 
     // public createIsabel(reader_id?: string): AbstractIsabel { return new Isabel(this.url, CONTAINER_EMV, this.connection, reader_id); }
 
@@ -139,9 +141,5 @@ export class PluginFactory implements AbstractFactory {
 
     createSsh(): AbstractSsh {
         return new Ssh(this.url, '', this.connection, 'ssh');
-    }
-
-    createWacom(): AbstractWacom {
-        return new Wacom(this.url, '', this.connection, 'wacom');
     }
 }
