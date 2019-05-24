@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 33);
+/******/ 	return __webpack_require__(__webpack_require__.s = 34);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -1932,7 +1932,7 @@ return /******/ (function(modules) { // webpackBootstrap
             try {
                 oldLocale = globalLocale._abbr;
                 var aliasedRequire = require;
-                __webpack_require__(394)("./" + name);
+                __webpack_require__(395)("./" + name);
                 getSetGlobalLocale(oldLocale);
             } catch (e) {}
         }
@@ -11707,7 +11707,7 @@ function clearProps(object, propsArray) {
 var global = __webpack_require__(7);
 var core = __webpack_require__(19);
 var hide = __webpack_require__(15);
-var redefine = __webpack_require__(34);
+var redefine = __webpack_require__(35);
 var ctx = __webpack_require__(43);
 var PROTOTYPE = 'prototype';
 
@@ -11988,10 +11988,10 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var PinEnforcer_1 = __webpack_require__(18);
-var CertParser_1 = __webpack_require__(39);
+var CertParser_1 = __webpack_require__(40);
 var ResponseHandler_1 = __webpack_require__(9);
 var RequestHandler_1 = __webpack_require__(11);
-var GenericContainer_1 = __webpack_require__(41);
+var GenericContainer_1 = __webpack_require__(33);
 var OptionalPin = (function () {
     function OptionalPin(pin, pace, private_key_reference) {
         this.pin = pin;
@@ -12850,7 +12850,7 @@ if (__webpack_require__(16)) {
   var createArrayIncludes = __webpack_require__(58);
   var speciesConstructor = __webpack_require__(98);
   var ArrayIterators = __webpack_require__(94);
-  var Iterators = __webpack_require__(35);
+  var Iterators = __webpack_require__(36);
   var $iterDetect = __webpack_require__(91);
   var setSpecies = __webpack_require__(65);
   var arrayFill = __webpack_require__(64);
@@ -14204,6 +14204,37 @@ exports.T1CLibException = T1CLibException;
 
 "use strict";
 
+Object.defineProperty(exports, "__esModule", { value: true });
+var ActivatedContainerUtil_1 = __webpack_require__(51);
+var GenericContainer = (function () {
+    function GenericContainer(baseUrl, containerUrl, connection, containerPrefix) {
+        this.baseUrl = baseUrl;
+        this.containerUrl = containerUrl;
+        this.connection = connection;
+        this.containerPrefix = containerPrefix;
+        this.CONTAINER_NEW_CONTEXT_PATH = '/containers/';
+    }
+    GenericContainer.prototype.containerSuffix = function (path) {
+        var containername = ActivatedContainerUtil_1.ActivatedContainerUtil.getContainerFor(this.connection.cfg, this.containerPrefix);
+        this.containerUrl = this.CONTAINER_NEW_CONTEXT_PATH + containername;
+        if (path && path.length) {
+            return this.containerUrl + path;
+        }
+        else {
+            return this.containerUrl;
+        }
+    };
+    return GenericContainer;
+}());
+exports.GenericContainer = GenericContainer;
+
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
@@ -14217,7 +14248,7 @@ __export(__webpack_require__(112));
 __export(__webpack_require__(338));
 __export(__webpack_require__(75));
 __export(__webpack_require__(117));
-__export(__webpack_require__(37));
+__export(__webpack_require__(38));
 __export(__webpack_require__(32));
 __export(__webpack_require__(118));
 __export(__webpack_require__(125));
@@ -14260,11 +14291,11 @@ __export(__webpack_require__(388));
 __export(__webpack_require__(6));
 __export(__webpack_require__(144));
 __export(__webpack_require__(145));
-__export(__webpack_require__(389));
+__export(__webpack_require__(390));
 __export(__webpack_require__(106));
 __export(__webpack_require__(115));
 __export(__webpack_require__(124));
-__export(__webpack_require__(39));
+__export(__webpack_require__(40));
 __export(__webpack_require__(50));
 __export(__webpack_require__(104));
 __export(__webpack_require__(69));
@@ -14276,13 +14307,13 @@ __export(__webpack_require__(11));
 __export(__webpack_require__(9));
 __export(__webpack_require__(70));
 __export(__webpack_require__(113));
-__export(__webpack_require__(390));
-__export(__webpack_require__(395));
+__export(__webpack_require__(391));
+__export(__webpack_require__(396));
 Polyfills_1.Polyfills.check();
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(7);
@@ -14319,14 +14350,14 @@ __webpack_require__(19).inspectSource = function (it) {
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports) {
 
 module.exports = {};
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 22.1.3.31 Array.prototype[@@unscopables]
@@ -14339,7 +14370,7 @@ module.exports = function (key) {
 
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14507,7 +14538,7 @@ exports.DSPlatformInfo = DSPlatformInfo;
 
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14561,7 +14592,7 @@ exports.Util = Util;
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14661,7 +14692,7 @@ exports.CertParser = CertParser;
 
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14915,37 +14946,6 @@ var AlgorithmIdentifier = function () {
 
 exports.default = AlgorithmIdentifier;
 //# sourceMappingURL=AlgorithmIdentifier.js.map
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var ActivatedContainerUtil_1 = __webpack_require__(51);
-var GenericContainer = (function () {
-    function GenericContainer(baseUrl, containerUrl, connection, containerPrefix) {
-        this.baseUrl = baseUrl;
-        this.containerUrl = containerUrl;
-        this.connection = connection;
-        this.containerPrefix = containerPrefix;
-        this.CONTAINER_NEW_CONTEXT_PATH = '/containers/';
-    }
-    GenericContainer.prototype.containerSuffix = function (path) {
-        var containername = ActivatedContainerUtil_1.ActivatedContainerUtil.getContainerFor(this.connection.cfg, this.containerPrefix);
-        this.containerUrl = this.CONTAINER_NEW_CONTEXT_PATH + containername;
-        if (path && path.length) {
-            return this.containerUrl + path;
-        }
-        else {
-            return this.containerUrl;
-        }
-    };
-    return GenericContainer;
-}());
-exports.GenericContainer = GenericContainer;
-
 
 /***/ }),
 /* 42 */
@@ -16399,7 +16399,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var semver = __webpack_require__(318);
 var SyncUtil_1 = __webpack_require__(70);
 var ActivationUtil_1 = __webpack_require__(106);
-var DSClientModel_1 = __webpack_require__(37);
+var DSClientModel_1 = __webpack_require__(38);
 var PubKeyService_1 = __webpack_require__(71);
 var CoreExceptions_1 = __webpack_require__(32);
 var axios_1 = __webpack_require__(72);
@@ -16520,12 +16520,12 @@ exports.InitUtil = InitUtil;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var DSClientModel_1 = __webpack_require__(37);
+var DSClientModel_1 = __webpack_require__(38);
 var DataContainerUtil_1 = __webpack_require__(104);
 var CoreExceptions_1 = __webpack_require__(32);
 var adminModel_1 = __webpack_require__(68);
 var ActivatedContainerUtil_1 = __webpack_require__(51);
-var Utils_1 = __webpack_require__(38);
+var Utils_1 = __webpack_require__(39);
 var SyncUtil = (function () {
     function SyncUtil() {
     }
@@ -16545,7 +16545,7 @@ var SyncUtil = (function () {
     };
     SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
         return client.ds().then(function (ds) {
-            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.20"), info.namespace, containers));
+            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.21"), info.namespace, containers));
         });
     };
     SyncUtil.doSyncFlow = function (client, mergedInfo, uuid, containers, isRetry, config) {
@@ -17442,7 +17442,7 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _AlgorithmIdentifier = __webpack_require__(40);
+var _AlgorithmIdentifier = __webpack_require__(41);
 
 var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 
@@ -18857,7 +18857,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var Card_1 = __webpack_require__(6);
 var RequestHandler_1 = __webpack_require__(11);
-var __1 = __webpack_require__(33);
+var __1 = __webpack_require__(34);
 var EidPt = (function (_super) {
     __extends(EidPt, _super);
     function EidPt(baseUrl, containerUrl, connection, reader_id) {
@@ -18947,9 +18947,9 @@ module.exports = g;
 
 var LIBRARY = __webpack_require__(29);
 var $export = __webpack_require__(3);
-var redefine = __webpack_require__(34);
+var redefine = __webpack_require__(35);
 var hide = __webpack_require__(15);
-var Iterators = __webpack_require__(35);
+var Iterators = __webpack_require__(36);
 var $iterCreate = __webpack_require__(273);
 var setToStringTag = __webpack_require__(47);
 var getPrototypeOf = __webpack_require__(87);
@@ -19092,7 +19092,7 @@ module.exports = Object.getPrototypeOf || function (O) {
 /***/ (function(module, exports, __webpack_require__) {
 
 // check on default Array iterator
-var Iterators = __webpack_require__(35);
+var Iterators = __webpack_require__(36);
 var ITERATOR = __webpack_require__(5)('iterator');
 var ArrayProto = Array.prototype;
 
@@ -19122,7 +19122,7 @@ module.exports = function (object, index, value) {
 
 var classof = __webpack_require__(63);
 var ITERATOR = __webpack_require__(5)('iterator');
-var Iterators = __webpack_require__(35);
+var Iterators = __webpack_require__(36);
 module.exports = __webpack_require__(19).getIteratorMethod = function (it) {
   if (it != undefined) return it[ITERATOR]
     || it['@@iterator']
@@ -19231,9 +19231,9 @@ module.exports = [].copyWithin || function copyWithin(target /* = 0 */, start /*
 
 "use strict";
 
-var addToUnscopables = __webpack_require__(36);
+var addToUnscopables = __webpack_require__(37);
 var step = __webpack_require__(298);
-var Iterators = __webpack_require__(35);
+var Iterators = __webpack_require__(36);
 var toIObject = __webpack_require__(22);
 
 // 22.1.3.4 Array.prototype.entries()
@@ -19270,7 +19270,7 @@ addToUnscopables('entries');
 /* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var redefine = __webpack_require__(34);
+var redefine = __webpack_require__(35);
 module.exports = function (target, src, safe) {
   for (var key in src) redefine(target, key, src[key], safe);
   return target;
@@ -19352,7 +19352,7 @@ var classof = __webpack_require__(63);
 var test = {};
 test[__webpack_require__(5)('toStringTag')] = 'z';
 if (test + '' != '[object z]') {
-  __webpack_require__(34)(Object.prototype, 'toString', function toString() {
+  __webpack_require__(35)(Object.prototype, 'toString', function toString() {
     return '[object ' + classof(this) + ']';
   }, true);
 }
@@ -19382,7 +19382,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var ResponseHandler_1 = __webpack_require__(9);
 var InitUtil_1 = __webpack_require__(69);
 var ClientService_1 = __webpack_require__(50);
-var Utils_1 = __webpack_require__(38);
+var Utils_1 = __webpack_require__(39);
 var CORE_ACTIVATE = '/admin/activate';
 var CORE_ATR_LIST = '/admin/atr';
 var CORE_PUB_KEY = '/admin/certificate';
@@ -19574,7 +19574,7 @@ exports.ObjectUtil = ObjectUtil;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var DSClientModel_1 = __webpack_require__(37);
+var DSClientModel_1 = __webpack_require__(38);
 var adminModel_1 = __webpack_require__(68);
 var ActivationUtil = (function () {
     function ActivationUtil() {
@@ -19594,7 +19594,7 @@ var ActivationUtil = (function () {
     ActivationUtil.registerDevice = function (client, mergedInfo, uuid) {
         return client.admin().getPubKey().then(function (pubKey) {
             return client.ds().then(function (ds) {
-                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.20"), mergedInfo.namespace));
+                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.21"), mergedInfo.namespace));
             });
         });
     };
@@ -20423,7 +20423,7 @@ var ResponseHandler_1 = __webpack_require__(9);
 var CardUtil_1 = __webpack_require__(124);
 var Aventra_1 = __webpack_require__(78);
 var SyncUtil_1 = __webpack_require__(70);
-var Utils_1 = __webpack_require__(38);
+var Utils_1 = __webpack_require__(39);
 var Arguments = (function () {
     function Arguments(client, readerId, container, data, dumpMethod, dumpOptions, reader) {
         this.client = client;
@@ -20838,7 +20838,7 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _AlgorithmIdentifier = __webpack_require__(40);
+var _AlgorithmIdentifier = __webpack_require__(41);
 
 var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 
@@ -21160,7 +21160,7 @@ var _pvutils = __webpack_require__(2);
 
 var _common = __webpack_require__(77);
 
-var _AlgorithmIdentifier = __webpack_require__(40);
+var _AlgorithmIdentifier = __webpack_require__(41);
 
 var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 
@@ -22399,7 +22399,7 @@ exports.default = Extension;
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var RequestHandler_1 = __webpack_require__(11);
-var Utils_1 = __webpack_require__(38);
+var Utils_1 = __webpack_require__(39);
 var CardUtil = (function () {
     function CardUtil() {
     }
@@ -22632,7 +22632,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var GenericContainer_1 = __webpack_require__(41);
+var GenericContainer_1 = __webpack_require__(33);
 var DataContainer = (function (_super) {
     __extends(DataContainer, _super);
     function DataContainer(baseUrl, containerUrl, connection) {
@@ -22672,7 +22672,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var GenericContainer_1 = __webpack_require__(41);
+var GenericContainer_1 = __webpack_require__(33);
 var Ssh = (function (_super) {
     __extends(Ssh, _super);
     function Ssh(baseUrl, containerUrl, connection, containerPrefix) {
@@ -22729,7 +22729,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var GenericContainer_1 = __webpack_require__(41);
+var GenericContainer_1 = __webpack_require__(33);
 var FileExchange = (function (_super) {
     __extends(FileExchange, _super);
     function FileExchange(baseUrl, containerUrl, connection) {
@@ -23036,7 +23036,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var Card_1 = __webpack_require__(6);
 var RequestHandler_1 = __webpack_require__(11);
-var CertParser_1 = __webpack_require__(39);
+var CertParser_1 = __webpack_require__(40);
 var ResponseHandler_1 = __webpack_require__(9);
 var DNIe = (function (_super) {
     __extends(DNIe, _super);
@@ -23089,7 +23089,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Card_1 = __webpack_require__(6);
 var EidLuxModel_1 = __webpack_require__(133);
 var PinEnforcer_1 = __webpack_require__(18);
-var CertParser_1 = __webpack_require__(39);
+var CertParser_1 = __webpack_require__(40);
 var ResponseHandler_1 = __webpack_require__(9);
 var RequestHandler_1 = __webpack_require__(11);
 var EidLux = (function (_super) {
@@ -23908,7 +23908,7 @@ exports.PIV = PIV;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var CertParser_1 = __webpack_require__(39);
+var CertParser_1 = __webpack_require__(40);
 var ResponseHandler_1 = __webpack_require__(9);
 var platform = __webpack_require__(140);
 var RequestHandler_1 = __webpack_require__(11);
@@ -25414,11 +25414,13 @@ var pkcs11_1 = __webpack_require__(139);
 var DataContainer_1 = __webpack_require__(126);
 var JavaKeyTool_1 = __webpack_require__(145);
 var Ssh_1 = __webpack_require__(127);
+var Wacom_1 = __webpack_require__(389);
 var CONTAINER_NEW_CONTEXT_PATH = '/containers/';
 var CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
 var CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
 var CONTAINER_DNIE = CONTAINER_NEW_CONTEXT_PATH + 'dnie';
 var CONTAINER_EMV = CONTAINER_NEW_CONTEXT_PATH + 'emv';
+var CONTAINER_WACOM = CONTAINER_NEW_CONTEXT_PATH + 'wacom-stu';
 var CONTAINER_ISABEL = CONTAINER_NEW_CONTEXT_PATH + 'isabel';
 var CONTAINER_FILE_EXCHANGE = CONTAINER_NEW_CONTEXT_PATH + 'file-exchange';
 var CONTAINER_LUXTRUST = CONTAINER_NEW_CONTEXT_PATH + 'luxtrust';
@@ -25445,6 +25447,7 @@ var PluginFactory = (function () {
     };
     PluginFactory.prototype.createEidPT = function (reader_id) { return new EidPt_1.EidPt(this.url, CONTAINER_PTEID, this.connection, reader_id); };
     PluginFactory.prototype.createEmv = function (reader_id) { return new EMV_1.EMV(this.url, CONTAINER_EMV, this.connection, reader_id); };
+    PluginFactory.prototype.createWacom = function () { return new Wacom_1.Wacom(this.url, CONTAINER_WACOM, this.connection, 'wacom-stu'); };
     PluginFactory.prototype.createLuxTrust = function (reader_id) { return new LuxTrust_1.LuxTrust(this.url, CONTAINER_LUXTRUST, this.connection, reader_id); };
     PluginFactory.prototype.createMobib = function (reader_id) { return new mobib_1.Mobib(this.url, CONTAINER_MOBIB, this.connection, reader_id); };
     PluginFactory.prototype.createOcra = function (reader_id) { return new ocra_1.Ocra(this.url, CONTAINER_OCRA, this.connection, reader_id); };
@@ -25497,8 +25500,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var __1 = __webpack_require__(33);
-var GenericContainer_1 = __webpack_require__(41);
+var __1 = __webpack_require__(34);
+var GenericContainer_1 = __webpack_require__(33);
 var JavaKeyTool = (function (_super) {
     __extends(JavaKeyTool, _super);
     function JavaKeyTool(baseUrl, containerUrl, connection) {
@@ -38984,7 +38987,7 @@ var $export = __webpack_require__(3);
 
 $export($export.P, 'Array', { copyWithin: __webpack_require__(93) });
 
-__webpack_require__(36)('copyWithin');
+__webpack_require__(37)('copyWithin');
 
 
 /***/ }),
@@ -38996,7 +38999,7 @@ var $export = __webpack_require__(3);
 
 $export($export.P, 'Array', { fill: __webpack_require__(64) });
 
-__webpack_require__(36)('fill');
+__webpack_require__(37)('fill');
 
 
 /***/ }),
@@ -39017,7 +39020,7 @@ $export($export.P + $export.F * forced, 'Array', {
     return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
   }
 });
-__webpack_require__(36)(KEY);
+__webpack_require__(37)(KEY);
 
 
 /***/ }),
@@ -39038,7 +39041,7 @@ $export($export.P + $export.F * forced, 'Array', {
     return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
   }
 });
-__webpack_require__(36)(KEY);
+__webpack_require__(37)(KEY);
 
 
 /***/ }),
@@ -39258,7 +39261,7 @@ var global = __webpack_require__(7);
 var has = __webpack_require__(21);
 var DESCRIPTORS = __webpack_require__(16);
 var $export = __webpack_require__(3);
-var redefine = __webpack_require__(34);
+var redefine = __webpack_require__(35);
 var META = __webpack_require__(313).KEY;
 var $fails = __webpack_require__(12);
 var shared = __webpack_require__(60);
@@ -47690,7 +47693,7 @@ var _pvutils = __webpack_require__(2);
 
 var _common = __webpack_require__(77);
 
-var _AlgorithmIdentifier = __webpack_require__(40);
+var _AlgorithmIdentifier = __webpack_require__(41);
 
 var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 
@@ -49660,7 +49663,7 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _AlgorithmIdentifier = __webpack_require__(40);
+var _AlgorithmIdentifier = __webpack_require__(41);
 
 var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 
@@ -56546,7 +56549,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var __1 = __webpack_require__(33);
+var __1 = __webpack_require__(34);
 var SshKey = (function () {
     function SshKey(name, private_key, public_key) {
         this.name = name;
@@ -57788,6 +57791,48 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+var GenericContainer_1 = __webpack_require__(33);
+var Wacom = (function (_super) {
+    __extends(Wacom, _super);
+    function Wacom(baseUrl, containerUrl, connection, containerPrefix) {
+        return _super.call(this, baseUrl, containerUrl, connection, containerPrefix) || this;
+    }
+    Wacom.prototype.getDevices = function (callback) {
+        return this.connection.get(this.baseUrl, this.containerSuffix(Wacom.DEVICES), undefined, undefined, callback);
+    };
+    Wacom.prototype.signData = function (body, callback) {
+        return this.connection.post(this.baseUrl, this.containerSuffix(Wacom.SIGN), body, undefined, undefined, callback);
+    };
+    Wacom.prototype.systemInfo = function (callback) {
+        return this.connection.get(this.baseUrl, this.containerSuffix(Wacom.SYSTEM_INFO), undefined, undefined, callback);
+    };
+    Wacom.CONTAINER_PREFIX = 'wacom-stu';
+    Wacom.GET = '/get-key';
+    Wacom.DEVICES = '/devices';
+    Wacom.SIGN = '/sign';
+    Wacom.SYSTEM_INFO = '/system-info';
+    return Wacom;
+}(GenericContainer_1.GenericContainer));
+exports.Wacom = Wacom;
+
+
+/***/ }),
+/* 390 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
 var CoreModel_1 = __webpack_require__(4);
 var DeleteEntryData = (function () {
     function DeleteEntryData(entity, type, keystore, alias, storepass, storetype, providername, providerclass, providerarg, providerpath) {
@@ -58081,14 +58126,14 @@ exports.GenerateKeyPairResponse = GenerateKeyPairResponse;
 
 
 /***/ }),
-/* 390 */
+/* 391 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = __webpack_require__(72);
-var jwtDecode = __webpack_require__(391);
+var jwtDecode = __webpack_require__(392);
 var moment = __webpack_require__(0);
 var CoreExceptions_1 = __webpack_require__(32);
 var defaults = {
@@ -58612,13 +58657,13 @@ exports.GCLConfig = GCLConfig;
 
 
 /***/ }),
-/* 391 */
+/* 392 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var base64_url_decode = __webpack_require__(392);
+var base64_url_decode = __webpack_require__(393);
 
 function InvalidTokenError(message) {
   this.message = message;
@@ -58645,10 +58690,10 @@ module.exports.InvalidTokenError = InvalidTokenError;
 
 
 /***/ }),
-/* 392 */
+/* 393 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var atob = __webpack_require__(393);
+var atob = __webpack_require__(394);
 
 function b64DecodeUnicode(str) {
   return decodeURIComponent(atob(str).replace(/(.)/g, function (m, p) {
@@ -58684,7 +58729,7 @@ module.exports = function(str) {
 
 
 /***/ }),
-/* 393 */
+/* 394 */
 /***/ (function(module, exports) {
 
 /**
@@ -58728,7 +58773,7 @@ module.exports = typeof window !== 'undefined' && window.atob && window.atob.bin
 
 
 /***/ }),
-/* 394 */
+/* 395 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
@@ -58999,18 +59044,18 @@ webpackContext.keys = function webpackContextKeys() {
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 394;
+webpackContext.id = 395;
 
 /***/ }),
-/* 395 */
+/* 396 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreService_1 = __webpack_require__(396);
+var CoreService_1 = __webpack_require__(397);
 var Connection_1 = __webpack_require__(75);
-var DSClientModel_1 = __webpack_require__(37);
+var DSClientModel_1 = __webpack_require__(38);
 var DSClient_1 = __webpack_require__(117);
 var OCVClient_1 = __webpack_require__(125);
 var PluginFactory_1 = __webpack_require__(144);
@@ -59023,8 +59068,8 @@ var ClientService_1 = __webpack_require__(50);
 var Auth_1 = __webpack_require__(112);
 var moment = __webpack_require__(0);
 var Polyfills_1 = __webpack_require__(53);
-var DSException_1 = __webpack_require__(397);
-var __1 = __webpack_require__(33);
+var DSException_1 = __webpack_require__(398);
+var __1 = __webpack_require__(34);
 var defaults = {
     gclUrl: 'https://localhost:10443/v2',
     gwUrl: 'https://accapim.t1t.be:443',
@@ -59128,6 +59173,9 @@ var GCLClient = (function () {
         };
         this.ssh = function () {
             return _this.pluginFactory.createSsh();
+        };
+        this.wacom = function () {
+            return _this.pluginFactory.createWacom();
         };
         this.localConfig = cfg;
         this.connection = new Connection_1.LocalConnection(this.localConfig);
@@ -59271,7 +59319,7 @@ exports.GCLClient = GCLClient;
 
 
 /***/ }),
-/* 396 */
+/* 397 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -59279,7 +59327,7 @@ exports.GCLClient = GCLClient;
 Object.defineProperty(exports, "__esModule", { value: true });
 var platform = __webpack_require__(140);
 var ResponseHandler_1 = __webpack_require__(9);
-var Utils_1 = __webpack_require__(38);
+var Utils_1 = __webpack_require__(39);
 var CORE_CONSENT = '/consent';
 var CORE_INFO = '/';
 var CORE_READERS = '/card-readers';
@@ -59526,7 +59574,7 @@ var CoreService = (function () {
         return this.url;
     };
     CoreService.prototype.version = function () {
-        return Promise.resolve("2.2.20");
+        return Promise.resolve("2.2.21");
     };
     return CoreService;
 }());
@@ -59534,7 +59582,7 @@ exports.CoreService = CoreService;
 
 
 /***/ }),
-/* 397 */
+/* 398 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
