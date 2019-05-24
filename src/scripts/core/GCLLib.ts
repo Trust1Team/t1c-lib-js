@@ -47,6 +47,7 @@ import {AbstractOCVClient} from './ocv/OCVModel';
 import {GCLConfig} from './GCLConfig';
 import {DSException} from './exceptions/DSException';
 import {AbstractJavaKeyTool, AbstractSsh, PinEnforcer} from '../..';
+import {AbstractWacom} from '../plugins/wacom/WacomModel';
 
 // check if any polyfills are needed
 const defaults = {
@@ -285,6 +286,10 @@ export class GCLClient {
     // get instance for SSH
     public ssh = (): AbstractSsh => {
         return this.pluginFactory.createSsh();
+    };
+    // get instance for Wacom
+    public wacom = (): AbstractWacom => {
+        return this.pluginFactory.createWacom();
     };
 
     get gclInstalled(): boolean {
