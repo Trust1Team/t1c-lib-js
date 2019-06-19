@@ -2,6 +2,7 @@
  * @author Maarten Somers
  * @since 2017
  */
+
 import { CertCard } from '../../Card';
 import { DataResponse, DataObjectResponse } from '../../../../core/service/CoreModel';
 import { Options } from '../../../../util/RequestHandler';
