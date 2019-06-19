@@ -1,4 +1,4 @@
-import { CertCard } from '../../Card';
+import { AuthenticateOrSignData, CertCard } from '../../Card';
 import { Options, T1CLibException, DataObjectResponse, DataResponse } from '../../../../../../lib';
 export interface AbstractBeLawyer extends CertCard {
     signingCertificate(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
@@ -8,6 +8,16 @@ export interface AbstractBeLawyer extends CertCard {
     allData(filters: string[] | Options, callback?: (error: T1CLibException, data: BeLawyerAllDataResponse) => void): Promise<BeLawyerAllDataResponse>;
     personalInfo(callback?: (error: T1CLibException, data: BeLawyerPersonalInfoResponse) => void): Promise<BeLawyerPersonalInfoResponse>;
     photo(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    signData(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    authenticateMethods(callback?: (error: T1CLibException, data: AuthenticateDataResponse) => void): Promise<AuthenticateDataResponse>;
+    authenticate(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    verifyPin(body: VerifyPinRequest, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+}
+export declare class VerifyPinRequest {
+    os_dialog: boolean;
+    pinpad: boolean;
+    pin?: string;
+    constructor(os_dialog: boolean, pinpad: boolean, pin?: string);
 }
 export declare class BeLawyerPersonalInfo {
     version: number;
@@ -46,4 +56,9 @@ export declare class BeLawyerAllCertificatesResponse extends DataObjectResponse 
     data: BeLawyerAllCertificatesData;
     success: boolean;
     constructor(data: BeLawyerAllCertificatesData, success: boolean);
+}
+export declare class AuthenticateDataResponse extends DataObjectResponse {
+    data: Array<string>;
+    success: boolean;
+    constructor(data: Array<string>, success: boolean);
 }
