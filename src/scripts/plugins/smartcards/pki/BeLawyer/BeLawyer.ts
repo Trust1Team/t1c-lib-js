@@ -46,10 +46,10 @@ export class BeLawyer extends GenericCertCard implements AbstractBeLawyer {
     }
 
     public personalInfo(callback?: (error: T1CLibException, data: BeLawyerPersonalInfoResponse) => void): Promise<BeLawyerPersonalInfoResponse> {
-        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_PHOTO), undefined, undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_PERSONAL_INFO), undefined, undefined, callback);
     }
 
     public photo(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_PERSONAL_INFO), undefined, undefined, callback);
+        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_PHOTO), undefined, undefined, callback);
     }
 }
