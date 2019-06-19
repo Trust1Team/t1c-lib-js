@@ -15,7 +15,7 @@ const BELAWYER_PHOTO = '/photo';
 const BELAWYER_PERSONAL_INFO = '/personal-info';
 
 export class BeLawyer extends GenericCertCard implements AbstractBeLawyer {
-    static CONTAINER_PREFIX = 'beLawyer';
+    static CONTAINER_PREFIX = 'diplad';
 
     constructor(baseUrl: string, containerUrl: string, connection: any, reader_id: string) {
         super(baseUrl, containerUrl, connection, reader_id, BeLawyer.CONTAINER_PREFIX);
