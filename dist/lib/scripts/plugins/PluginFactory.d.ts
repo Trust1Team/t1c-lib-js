@@ -18,8 +18,10 @@ import { AbstractDataContainer } from './data-container/DataContainerModel';
 import { AbstractJavaKeyTool } from './java-key-tool/JavaKeyToolModel';
 import { AbstractSsh } from './ssh/SshModel';
 import { AbstractWacom } from './wacom/WacomModel';
+import { AbstractBeLawyer } from './smartcards/pki/BeLawyer/BeLawyerModel';
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
+    createBeLawyer(reader_id?: string): AbstractBeLawyer;
     createEidLUX(reader_id?: string): AbstractEidLUX;
     createEmv(reader_id?: string): AbstractEMV;
     createWacom(): AbstractWacom;
@@ -39,6 +41,7 @@ export declare class PluginFactory implements AbstractFactory {
     constructor(url: string, connection: LocalConnection);
     createDNIe(reader_id?: string): AbstractDNIe;
     createEidBE(reader_id?: string): AbstractEidBE;
+    createBeLawyer(reader_id?: string): AbstractBeLawyer;
     createEidLUX(reader_id?: string, pin?: string, pinType?: PinType, isEncrypted?: boolean): AbstractEidLUX;
     createEidPT(reader_id?: string): AbstractEidPT;
     createEmv(reader_id?: string): AbstractEMV;

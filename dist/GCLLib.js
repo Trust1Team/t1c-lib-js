@@ -1241,22 +1241,36 @@ return /******/ (function(modules) { // webpackBootstrap
     function createDate (y, m, d, h, M, s, ms) {
         // can't just apply() to create a date:
         // https://stackoverflow.com/q/181348
-        var date = new Date(y, m, d, h, M, s, ms);
-
+        var date;
         // the date constructor remaps years 0-99 to 1900-1999
-        if (y < 100 && y >= 0 && isFinite(date.getFullYear())) {
-            date.setFullYear(y);
+        if (y < 100 && y >= 0) {
+            // preserve leap years using a full 400 year cycle, then reset
+            date = new Date(y + 400, m, d, h, M, s, ms);
+            if (isFinite(date.getFullYear())) {
+                date.setFullYear(y);
+            }
+        } else {
+            date = new Date(y, m, d, h, M, s, ms);
         }
+
         return date;
     }
 
     function createUTCDate (y) {
-        var date = new Date(Date.UTC.apply(null, arguments));
-
+        var date;
         // the Date.UTC function remaps years 0-99 to 1900-1999
-        if (y < 100 && y >= 0 && isFinite(date.getUTCFullYear())) {
-            date.setUTCFullYear(y);
+        if (y < 100 && y >= 0) {
+            var args = Array.prototype.slice.call(arguments);
+            // preserve leap years using a full 400 year cycle, then reset
+            args[0] = y + 400;
+            date = new Date(Date.UTC.apply(null, args));
+            if (isFinite(date.getUTCFullYear())) {
+                date.setUTCFullYear(y);
+            }
+        } else {
+            date = new Date(Date.UTC.apply(null, arguments));
         }
+
         return date;
     }
 
@@ -1358,7 +1372,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
     var defaultLocaleWeek = {
         dow : 0, // Sunday is the first day of the week.
-        doy : 6  // The week that contains Jan 1st is the first week of the year.
+        doy : 6  // The week that contains Jan 6th is the first week of the year.
     };
 
     function localeFirstDayOfWeek () {
@@ -1467,25 +1481,28 @@ return /******/ (function(modules) { // webpackBootstrap
     }
 
     // LOCALES
+    function shiftWeekdays (ws, n) {
+        return ws.slice(n, 7).concat(ws.slice(0, n));
+    }
 
     var defaultLocaleWeekdays = 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split('_');
     function localeWeekdays (m, format) {
-        if (!m) {
-            return isArray(this._weekdays) ? this._weekdays :
-                this._weekdays['standalone'];
-        }
-        return isArray(this._weekdays) ? this._weekdays[m.day()] :
-            this._weekdays[this._weekdays.isFormat.test(format) ? 'format' : 'standalone'][m.day()];
+        var weekdays = isArray(this._weekdays) ? this._weekdays :
+            this._weekdays[(m && m !== true && this._weekdays.isFormat.test(format)) ? 'format' : 'standalone'];
+        return (m === true) ? shiftWeekdays(weekdays, this._week.dow)
+            : (m) ? weekdays[m.day()] : weekdays;
     }
 
     var defaultLocaleWeekdaysShort = 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_');
     function localeWeekdaysShort (m) {
-        return (m) ? this._weekdaysShort[m.day()] : this._weekdaysShort;
+        return (m === true) ? shiftWeekdays(this._weekdaysShort, this._week.dow)
+            : (m) ? this._weekdaysShort[m.day()] : this._weekdaysShort;
     }
 
     var defaultLocaleWeekdaysMin = 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_');
     function localeWeekdaysMin (m) {
-        return (m) ? this._weekdaysMin[m.day()] : this._weekdaysMin;
+        return (m === true) ? shiftWeekdays(this._weekdaysMin, this._week.dow)
+            : (m) ? this._weekdaysMin[m.day()] : this._weekdaysMin;
     }
 
     function handleStrictParse$1(weekdayName, format, strict) {
@@ -1932,7 +1949,7 @@ return /******/ (function(modules) { // webpackBootstrap
             try {
                 oldLocale = globalLocale._abbr;
                 var aliasedRequire = require;
-                __webpack_require__(395)("./" + name);
+                __webpack_require__(401)("./" + name);
                 getSetGlobalLocale(oldLocale);
             } catch (e) {}
         }
@@ -2234,13 +2251,13 @@ return /******/ (function(modules) { // webpackBootstrap
                     weekdayOverflow = true;
                 }
             } else if (w.e != null) {
-                // local weekday -- counting starts from begining of week
+                // local weekday -- counting starts from beginning of week
                 weekday = w.e + dow;
                 if (w.e < 0 || w.e > 6) {
                     weekdayOverflow = true;
                 }
             } else {
-                // default to begining of week
+                // default to beginning of week
                 weekday = dow;
             }
         }
@@ -2834,7 +2851,7 @@ return /******/ (function(modules) { // webpackBootstrap
             years = normalizedInput.year || 0,
             quarters = normalizedInput.quarter || 0,
             months = normalizedInput.month || 0,
-            weeks = normalizedInput.week || 0,
+            weeks = normalizedInput.week || normalizedInput.isoWeek || 0,
             days = normalizedInput.day || 0,
             hours = normalizedInput.hour || 0,
             minutes = normalizedInput.minute || 0,
@@ -3138,7 +3155,7 @@ return /******/ (function(modules) { // webpackBootstrap
                 ms : toInt(absRound(match[MILLISECOND] * 1000)) * sign // the millisecond decimal point is included in the match
             };
         } else if (!!(match = isoRegex.exec(input))) {
-            sign = (match[1] === '-') ? -1 : (match[1] === '+') ? 1 : 1;
+            sign = (match[1] === '-') ? -1 : 1;
             duration = {
                 y : parseIso(match[2], sign),
                 M : parseIso(match[3], sign),
@@ -3180,7 +3197,7 @@ return /******/ (function(modules) { // webpackBootstrap
     }
 
     function positiveMomentsDifference(base, other) {
-        var res = {milliseconds: 0, months: 0};
+        var res = {};
 
         res.months = other.month() - base.month() +
             (other.year() - base.year()) * 12;
@@ -3289,7 +3306,7 @@ return /******/ (function(modules) { // webpackBootstrap
         if (!(this.isValid() && localInput.isValid())) {
             return false;
         }
-        units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
+        units = normalizeUnits(units) || 'millisecond';
         if (units === 'millisecond') {
             return this.valueOf() > localInput.valueOf();
         } else {
@@ -3302,7 +3319,7 @@ return /******/ (function(modules) { // webpackBootstrap
         if (!(this.isValid() && localInput.isValid())) {
             return false;
         }
-        units = normalizeUnits(!isUndefined(units) ? units : 'millisecond');
+        units = normalizeUnits(units) || 'millisecond';
         if (units === 'millisecond') {
             return this.valueOf() < localInput.valueOf();
         } else {
@@ -3311,9 +3328,14 @@ return /******/ (function(modules) { // webpackBootstrap
     }
 
     function isBetween (from, to, units, inclusivity) {
+        var localFrom = isMoment(from) ? from : createLocal(from),
+            localTo = isMoment(to) ? to : createLocal(to);
+        if (!(this.isValid() && localFrom.isValid() && localTo.isValid())) {
+            return false;
+        }
         inclusivity = inclusivity || '()';
-        return (inclusivity[0] === '(' ? this.isAfter(from, units) : !this.isBefore(from, units)) &&
-            (inclusivity[1] === ')' ? this.isBefore(to, units) : !this.isAfter(to, units));
+        return (inclusivity[0] === '(' ? this.isAfter(localFrom, units) : !this.isBefore(localFrom, units)) &&
+            (inclusivity[1] === ')' ? this.isBefore(localTo, units) : !this.isAfter(localTo, units));
     }
 
     function isSame (input, units) {
@@ -3322,7 +3344,7 @@ return /******/ (function(modules) { // webpackBootstrap
         if (!(this.isValid() && localInput.isValid())) {
             return false;
         }
-        units = normalizeUnits(units || 'millisecond');
+        units = normalizeUnits(units) || 'millisecond';
         if (units === 'millisecond') {
             return this.valueOf() === localInput.valueOf();
         } else {
@@ -3332,11 +3354,11 @@ return /******/ (function(modules) { // webpackBootstrap
     }
 
     function isSameOrAfter (input, units) {
-        return this.isSame(input, units) || this.isAfter(input,units);
+        return this.isSame(input, units) || this.isAfter(input, units);
     }
 
     function isSameOrBefore (input, units) {
-        return this.isSame(input, units) || this.isBefore(input,units);
+        return this.isSame(input, units) || this.isBefore(input, units);
     }
 
     function diff (input, units, asFloat) {
@@ -3513,62 +3535,130 @@ return /******/ (function(modules) { // webpackBootstrap
         return this._locale;
     }
 
+    var MS_PER_SECOND = 1000;
+    var MS_PER_MINUTE = 60 * MS_PER_SECOND;
+    var MS_PER_HOUR = 60 * MS_PER_MINUTE;
+    var MS_PER_400_YEARS = (365 * 400 + 97) * 24 * MS_PER_HOUR;
+
+    // actual modulo - handles negative numbers (for dates before 1970):
+    function mod$1(dividend, divisor) {
+        return (dividend % divisor + divisor) % divisor;
+    }
+
+    function localStartOfDate(y, m, d) {
+        // the date constructor remaps years 0-99 to 1900-1999
+        if (y < 100 && y >= 0) {
+            // preserve leap years using a full 400 year cycle, then reset
+            return new Date(y + 400, m, d) - MS_PER_400_YEARS;
+        } else {
+            return new Date(y, m, d).valueOf();
+        }
+    }
+
+    function utcStartOfDate(y, m, d) {
+        // Date.UTC remaps years 0-99 to 1900-1999
+        if (y < 100 && y >= 0) {
+            // preserve leap years using a full 400 year cycle, then reset
+            return Date.UTC(y + 400, m, d) - MS_PER_400_YEARS;
+        } else {
+            return Date.UTC(y, m, d);
+        }
+    }
+
     function startOf (units) {
+        var time;
         units = normalizeUnits(units);
-        // the following switch intentionally omits break keywords
-        // to utilize falling through the cases.
+        if (units === undefined || units === 'millisecond' || !this.isValid()) {
+            return this;
+        }
+
+        var startOfDate = this._isUTC ? utcStartOfDate : localStartOfDate;
+
         switch (units) {
             case 'year':
-                this.month(0);
-                /* falls through */
+                time = startOfDate(this.year(), 0, 1);
+                break;
             case 'quarter':
+                time = startOfDate(this.year(), this.month() - this.month() % 3, 1);
+                break;
             case 'month':
-                this.date(1);
-                /* falls through */
+                time = startOfDate(this.year(), this.month(), 1);
+                break;
             case 'week':
+                time = startOfDate(this.year(), this.month(), this.date() - this.weekday());
+                break;
             case 'isoWeek':
+                time = startOfDate(this.year(), this.month(), this.date() - (this.isoWeekday() - 1));
+                break;
             case 'day':
             case 'date':
-                this.hours(0);
-                /* falls through */
+                time = startOfDate(this.year(), this.month(), this.date());
+                break;
             case 'hour':
-                this.minutes(0);
-                /* falls through */
+                time = this._d.valueOf();
+                time -= mod$1(time + (this._isUTC ? 0 : this.utcOffset() * MS_PER_MINUTE), MS_PER_HOUR);
+                break;
             case 'minute':
-                this.seconds(0);
-                /* falls through */
+                time = this._d.valueOf();
+                time -= mod$1(time, MS_PER_MINUTE);
+                break;
             case 'second':
-                this.milliseconds(0);
+                time = this._d.valueOf();
+                time -= mod$1(time, MS_PER_SECOND);
+                break;
         }
 
-        // weeks are a special case
-        if (units === 'week') {
-            this.weekday(0);
-        }
-        if (units === 'isoWeek') {
-            this.isoWeekday(1);
-        }
-
-        // quarters are also special
-        if (units === 'quarter') {
-            this.month(Math.floor(this.month() / 3) * 3);
-        }
-
+        this._d.setTime(time);
+        hooks.updateOffset(this, true);
         return this;
     }
 
     function endOf (units) {
+        var time;
         units = normalizeUnits(units);
-        if (units === undefined || units === 'millisecond') {
+        if (units === undefined || units === 'millisecond' || !this.isValid()) {
             return this;
         }
 
-        // 'date' is an alias for 'day', so it should be considered as such.
-        if (units === 'date') {
-            units = 'day';
+        var startOfDate = this._isUTC ? utcStartOfDate : localStartOfDate;
+
+        switch (units) {
+            case 'year':
+                time = startOfDate(this.year() + 1, 0, 1) - 1;
+                break;
+            case 'quarter':
+                time = startOfDate(this.year(), this.month() - this.month() % 3 + 3, 1) - 1;
+                break;
+            case 'month':
+                time = startOfDate(this.year(), this.month() + 1, 1) - 1;
+                break;
+            case 'week':
+                time = startOfDate(this.year(), this.month(), this.date() - this.weekday() + 7) - 1;
+                break;
+            case 'isoWeek':
+                time = startOfDate(this.year(), this.month(), this.date() - (this.isoWeekday() - 1) + 7) - 1;
+                break;
+            case 'day':
+            case 'date':
+                time = startOfDate(this.year(), this.month(), this.date() + 1) - 1;
+                break;
+            case 'hour':
+                time = this._d.valueOf();
+                time += MS_PER_HOUR - mod$1(time + (this._isUTC ? 0 : this.utcOffset() * MS_PER_MINUTE), MS_PER_HOUR) - 1;
+                break;
+            case 'minute':
+                time = this._d.valueOf();
+                time += MS_PER_MINUTE - mod$1(time, MS_PER_MINUTE) - 1;
+                break;
+            case 'second':
+                time = this._d.valueOf();
+                time += MS_PER_SECOND - mod$1(time, MS_PER_SECOND) - 1;
+                break;
         }
 
-        return this.startOf(units).add(1, (units === 'isoWeek' ? 'week' : units)).subtract(1, 'ms');
+        this._d.setTime(time);
+        hooks.updateOffset(this, true);
+        return this;
     }
 
     function valueOf () {
@@ -4274,10 +4364,14 @@ return /******/ (function(modules) { // webpackBootstrap
 
         units = normalizeUnits(units);
 
-        if (units === 'month' || units === 'year') {
-            days   = this._days   + milliseconds / 864e5;
+        if (units === 'month' || units === 'quarter' || units === 'year') {
+            days = this._days + milliseconds / 864e5;
             months = this._months + daysToMonths(days);
-            return units === 'month' ? months : months / 12;
+            switch (units) {
+                case 'month':   return months;
+                case 'quarter': return months / 3;
+                case 'year':    return months / 12;
+            }
         } else {
             // handle milliseconds separately because of floating point math errors (issue #1867)
             days = this._days + Math.round(monthsToDays(this._months));
@@ -4320,6 +4414,7 @@ return /******/ (function(modules) { // webpackBootstrap
     var asDays         = makeAs('d');
     var asWeeks        = makeAs('w');
     var asMonths       = makeAs('M');
+    var asQuarters     = makeAs('Q');
     var asYears        = makeAs('y');
 
     function clone$1 () {
@@ -4511,6 +4606,7 @@ return /******/ (function(modules) { // webpackBootstrap
     proto$2.asDays         = asDays;
     proto$2.asWeeks        = asWeeks;
     proto$2.asMonths       = asMonths;
+    proto$2.asQuarters     = asQuarters;
     proto$2.asYears        = asYears;
     proto$2.valueOf        = valueOf$1;
     proto$2._bubble        = bubble;
@@ -4555,7 +4651,7 @@ return /******/ (function(modules) { // webpackBootstrap
     // Side effect imports
 
 
-    hooks.version = '2.22.2';
+    hooks.version = '2.24.0';
 
     setHookCallback(createLocal);
 
@@ -4596,7 +4692,7 @@ return /******/ (function(modules) { // webpackBootstrap
         TIME: 'HH:mm',                                  // <input type="time" />
         TIME_SECONDS: 'HH:mm:ss',                       // <input type="time" step="1" />
         TIME_MS: 'HH:mm:ss.SSS',                        // <input type="time" step="0.001" />
-        WEEK: 'YYYY-[W]WW',                             // <input type="week" />
+        WEEK: 'GGGG-[W]WW',                             // <input type="week" />
         MONTH: 'YYYY-MM'                                // <input type="month" />
     };
 
@@ -11705,10 +11801,10 @@ function clearProps(object, propsArray) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(7);
-var core = __webpack_require__(19);
+var core = __webpack_require__(20);
 var hide = __webpack_require__(15);
 var redefine = __webpack_require__(35);
-var ctx = __webpack_require__(43);
+var ctx = __webpack_require__(44);
 var PROTOTYPE = 'prototype';
 
 var $export = function (type, name, source) {
@@ -11957,23 +12053,6 @@ exports.SingleReaderResponse = SingleReaderResponse;
 /* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var store = __webpack_require__(60)('wks');
-var uid = __webpack_require__(27);
-var Symbol = __webpack_require__(7).Symbol;
-var USE_SYMBOL = typeof Symbol == 'function';
-
-var $exports = module.exports = function (name) {
-  return store[name] || (store[name] =
-    USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : uid)('Symbol.' + name));
-};
-
-$exports.store = store;
-
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
 "use strict";
 
 var __extends = (this && this.__extends) || (function () {
@@ -11987,7 +12066,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var PinEnforcer_1 = __webpack_require__(18);
+var PinEnforcer_1 = __webpack_require__(19);
 var CertParser_1 = __webpack_require__(40);
 var ResponseHandler_1 = __webpack_require__(9);
 var RequestHandler_1 = __webpack_require__(11);
@@ -12306,6 +12385,23 @@ exports.GenericSecuredCertCard = GenericSecuredCertCard;
 
 
 /***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var store = __webpack_require__(43)('wks');
+var uid = __webpack_require__(27);
+var Symbol = __webpack_require__(7).Symbol;
+var USE_SYMBOL = typeof Symbol == 'function';
+
+var $exports = module.exports = function (name) {
+  return store[name] || (store[name] =
+    USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : uid)('Symbol.' + name));
+};
+
+$exports.store = store;
+
+
+/***/ }),
 /* 7 */
 /***/ (function(module, exports) {
 
@@ -12364,7 +12460,7 @@ exports.ResponseHandler = ResponseHandler;
 
 
 var bind = __webpack_require__(107);
-var isBuffer = __webpack_require__(320);
+var isBuffer = __webpack_require__(325);
 
 /*global toString:true*/
 
@@ -12816,6 +12912,17 @@ module.exports = !__webpack_require__(12)(function () {
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
+// 7.1.13 ToObject(argument)
+var defined = __webpack_require__(56);
+module.exports = function (it) {
+  return Object(defined(it));
+};
+
+
+/***/ }),
+/* 18 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 if (__webpack_require__(16)) {
@@ -12823,9 +12930,9 @@ if (__webpack_require__(16)) {
   var global = __webpack_require__(7);
   var fails = __webpack_require__(12);
   var $export = __webpack_require__(3);
-  var $typed = __webpack_require__(48);
+  var $typed = __webpack_require__(49);
   var $buffer = __webpack_require__(66);
-  var ctx = __webpack_require__(43);
+  var ctx = __webpack_require__(44);
   var anInstance = __webpack_require__(96);
   var propertyDesc = __webpack_require__(30);
   var hide = __webpack_require__(15);
@@ -12835,19 +12942,19 @@ if (__webpack_require__(16)) {
   var toIndex = __webpack_require__(97);
   var toAbsoluteIndex = __webpack_require__(31);
   var toPrimitive = __webpack_require__(42);
-  var has = __webpack_require__(21);
+  var has = __webpack_require__(22);
   var classof = __webpack_require__(63);
-  var isObject = __webpack_require__(20);
-  var toObject = __webpack_require__(23);
+  var isObject = __webpack_require__(21);
+  var toObject = __webpack_require__(17);
   var isArrayIter = __webpack_require__(88);
-  var create = __webpack_require__(56);
+  var create = __webpack_require__(57);
   var getPrototypeOf = __webpack_require__(87);
-  var gOPN = __webpack_require__(49).f;
+  var gOPN = __webpack_require__(50).f;
   var getIterFn = __webpack_require__(90);
   var uid = __webpack_require__(27);
-  var wks = __webpack_require__(5);
+  var wks = __webpack_require__(6);
   var createArrayMethod = __webpack_require__(24);
-  var createArrayIncludes = __webpack_require__(58);
+  var createArrayIncludes = __webpack_require__(59);
   var speciesConstructor = __webpack_require__(98);
   var ArrayIterators = __webpack_require__(94);
   var Iterators = __webpack_require__(36);
@@ -13300,14 +13407,14 @@ if (__webpack_require__(16)) {
 
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var Connection_1 = __webpack_require__(75);
-var jsencrypt_1 = __webpack_require__(345);
+var jsencrypt_1 = __webpack_require__(350);
 var PubKeyService_1 = __webpack_require__(71);
 var CoreExceptions_1 = __webpack_require__(32);
 var CORE_READERS = '/card-readers';
@@ -13394,15 +13501,15 @@ exports.EncryptedOptionalPin = EncryptedOptionalPin;
 
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports) {
 
-var core = module.exports = { version: '2.5.7' };
+var core = module.exports = { version: '2.6.8' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports) {
 
 module.exports = function (it) {
@@ -13411,7 +13518,7 @@ module.exports = function (it) {
 
 
 /***/ }),
-/* 21 */
+/* 22 */
 /***/ (function(module, exports) {
 
 var hasOwnProperty = {}.hasOwnProperty;
@@ -13421,25 +13528,14 @@ module.exports = function (it, key) {
 
 
 /***/ }),
-/* 22 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// to indexed object, toObject with fallback for non-array-like ES3 strings
-var IObject = __webpack_require__(45);
-var defined = __webpack_require__(55);
-module.exports = function (it) {
-  return IObject(defined(it));
-};
-
-
-/***/ }),
 /* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
-// 7.1.13 ToObject(argument)
-var defined = __webpack_require__(55);
+// to indexed object, toObject with fallback for non-array-like ES3 strings
+var IObject = __webpack_require__(46);
+var defined = __webpack_require__(56);
 module.exports = function (it) {
-  return Object(defined(it));
+  return IObject(defined(it));
 };
 
 
@@ -13454,11 +13550,11 @@ module.exports = function (it) {
 // 4 -> Array#every
 // 5 -> Array#find
 // 6 -> Array#findIndex
-var ctx = __webpack_require__(43);
-var IObject = __webpack_require__(45);
-var toObject = __webpack_require__(23);
+var ctx = __webpack_require__(44);
+var IObject = __webpack_require__(46);
+var toObject = __webpack_require__(17);
 var toLength = __webpack_require__(8);
-var asc = __webpack_require__(283);
+var asc = __webpack_require__(288);
 module.exports = function (TYPE, $create) {
   var IS_MAP = TYPE == 1;
   var IS_FILTER = TYPE == 2;
@@ -13509,7 +13605,7 @@ module.exports = function (it) {
 /* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isObject = __webpack_require__(20);
+var isObject = __webpack_require__(21);
 module.exports = function (it) {
   if (!isObject(it)) throw TypeError(it + ' is not an object!');
   return it;
@@ -13554,7 +13650,7 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _RelativeDistinguishedNames = __webpack_require__(52);
+var _RelativeDistinguishedNames = __webpack_require__(53);
 
 var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 
@@ -14205,7 +14301,7 @@ exports.T1CLibException = T1CLibException;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ActivatedContainerUtil_1 = __webpack_require__(51);
+var ActivatedContainerUtil_1 = __webpack_require__(52);
 var GenericContainer = (function () {
     function GenericContainer(baseUrl, containerUrl, connection, containerPrefix) {
         this.baseUrl = baseUrl;
@@ -14239,33 +14335,33 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-var Polyfills_1 = __webpack_require__(53);
+var Polyfills_1 = __webpack_require__(54);
 __export(__webpack_require__(68));
 __export(__webpack_require__(103));
 __export(__webpack_require__(74));
-__export(__webpack_require__(337));
+__export(__webpack_require__(342));
 __export(__webpack_require__(112));
-__export(__webpack_require__(338));
+__export(__webpack_require__(343));
 __export(__webpack_require__(75));
 __export(__webpack_require__(117));
 __export(__webpack_require__(38));
 __export(__webpack_require__(32));
 __export(__webpack_require__(118));
 __export(__webpack_require__(125));
-__export(__webpack_require__(376));
+__export(__webpack_require__(381));
 __export(__webpack_require__(4));
 __export(__webpack_require__(126));
 __export(__webpack_require__(127));
-__export(__webpack_require__(377));
+__export(__webpack_require__(382));
 __export(__webpack_require__(128));
-__export(__webpack_require__(378));
+__export(__webpack_require__(383));
 __export(__webpack_require__(129));
 __export(__webpack_require__(79));
 __export(__webpack_require__(130));
 __export(__webpack_require__(76));
-__export(__webpack_require__(379));
+__export(__webpack_require__(384));
 __export(__webpack_require__(131));
-__export(__webpack_require__(380));
+__export(__webpack_require__(385));
 __export(__webpack_require__(132));
 __export(__webpack_require__(133));
 __export(__webpack_require__(80));
@@ -14273,42 +14369,42 @@ __export(__webpack_require__(134));
 __export(__webpack_require__(80));
 __export(__webpack_require__(134));
 __export(__webpack_require__(135));
-__export(__webpack_require__(381));
-__export(__webpack_require__(136));
-__export(__webpack_require__(382));
-__export(__webpack_require__(137));
-__export(__webpack_require__(383));
-__export(__webpack_require__(138));
-__export(__webpack_require__(384));
-__export(__webpack_require__(139));
-__export(__webpack_require__(385));
-__export(__webpack_require__(78));
 __export(__webpack_require__(386));
-__export(__webpack_require__(142));
+__export(__webpack_require__(136));
 __export(__webpack_require__(387));
-__export(__webpack_require__(143));
+__export(__webpack_require__(137));
 __export(__webpack_require__(388));
-__export(__webpack_require__(6));
+__export(__webpack_require__(138));
+__export(__webpack_require__(389));
+__export(__webpack_require__(139));
+__export(__webpack_require__(390));
+__export(__webpack_require__(78));
+__export(__webpack_require__(391));
+__export(__webpack_require__(142));
+__export(__webpack_require__(392));
+__export(__webpack_require__(143));
+__export(__webpack_require__(393));
+__export(__webpack_require__(5));
 __export(__webpack_require__(144));
 __export(__webpack_require__(145));
-__export(__webpack_require__(390));
+__export(__webpack_require__(396));
 __export(__webpack_require__(106));
 __export(__webpack_require__(115));
 __export(__webpack_require__(124));
 __export(__webpack_require__(40));
-__export(__webpack_require__(50));
+__export(__webpack_require__(51));
 __export(__webpack_require__(104));
 __export(__webpack_require__(69));
 __export(__webpack_require__(105));
-__export(__webpack_require__(18));
-__export(__webpack_require__(53));
+__export(__webpack_require__(19));
+__export(__webpack_require__(54));
 __export(__webpack_require__(71));
 __export(__webpack_require__(11));
 __export(__webpack_require__(9));
 __export(__webpack_require__(70));
 __export(__webpack_require__(113));
-__export(__webpack_require__(391));
-__export(__webpack_require__(396));
+__export(__webpack_require__(397));
+__export(__webpack_require__(402));
 Polyfills_1.Polyfills.check();
 
 
@@ -14318,13 +14414,13 @@ Polyfills_1.Polyfills.check();
 
 var global = __webpack_require__(7);
 var hide = __webpack_require__(15);
-var has = __webpack_require__(21);
+var has = __webpack_require__(22);
 var SRC = __webpack_require__(27)('src');
+var $toString = __webpack_require__(277);
 var TO_STRING = 'toString';
-var $toString = Function[TO_STRING];
 var TPL = ('' + $toString).split(TO_STRING);
 
-__webpack_require__(19).inspectSource = function (it) {
+__webpack_require__(20).inspectSource = function (it) {
   return $toString.call(it);
 };
 
@@ -14361,7 +14457,7 @@ module.exports = {};
 /***/ (function(module, exports, __webpack_require__) {
 
 // 22.1.3.31 Array.prototype[@@unscopables]
-var UNSCOPABLES = __webpack_require__(5)('unscopables');
+var UNSCOPABLES = __webpack_require__(6)('unscopables');
 var ArrayProto = Array.prototype;
 if (ArrayProto[UNSCOPABLES] == undefined) __webpack_require__(15)(ArrayProto, UNSCOPABLES, {});
 module.exports = function (key) {
@@ -14600,7 +14696,7 @@ exports.Util = Util;
 Object.defineProperty(exports, "__esModule", { value: true });
 var asn1js = __webpack_require__(1);
 var Base64 = __webpack_require__(116);
-var Certificate_1 = __webpack_require__(346);
+var Certificate_1 = __webpack_require__(351);
 var CoreModel_1 = __webpack_require__(4);
 var ResponseHandler_1 = __webpack_require__(9);
 var CertParser = (function () {
@@ -14952,7 +15048,7 @@ exports.default = AlgorithmIdentifier;
 /***/ (function(module, exports, __webpack_require__) {
 
 // 7.1.1 ToPrimitive(input [, PreferredType])
-var isObject = __webpack_require__(20);
+var isObject = __webpack_require__(21);
 // instead of the ES6 spec version, we didn't implement @@toPrimitive case
 // and the second argument - flag - preferred type is a string
 module.exports = function (it, S) {
@@ -14969,8 +15065,26 @@ module.exports = function (it, S) {
 /* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
+var core = __webpack_require__(20);
+var global = __webpack_require__(7);
+var SHARED = '__core-js_shared__';
+var store = global[SHARED] || (global[SHARED] = {});
+
+(module.exports = function (key, value) {
+  return store[key] || (store[key] = value !== undefined ? value : {});
+})('versions', []).push({
+  version: core.version,
+  mode: __webpack_require__(29) ? 'pure' : 'global',
+  copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
+});
+
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
 // optional / simple context binding
-var aFunction = __webpack_require__(44);
+var aFunction = __webpack_require__(45);
 module.exports = function (fn, that, length) {
   aFunction(fn);
   if (that === undefined) return fn;
@@ -14992,7 +15106,7 @@ module.exports = function (fn, that, length) {
 
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports) {
 
 module.exports = function (it) {
@@ -15002,11 +15116,11 @@ module.exports = function (it) {
 
 
 /***/ }),
-/* 45 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // fallback for non-array-like ES3 and non-enumerable old V8 strings
-var cof = __webpack_require__(46);
+var cof = __webpack_require__(47);
 // eslint-disable-next-line no-prototype-builtins
 module.exports = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
   return cof(it) == 'String' ? it.split('') : Object(it);
@@ -15014,7 +15128,7 @@ module.exports = Object('z').propertyIsEnumerable(0) ? Object : function (it) {
 
 
 /***/ }),
-/* 46 */
+/* 47 */
 /***/ (function(module, exports) {
 
 var toString = {}.toString;
@@ -15025,12 +15139,12 @@ module.exports = function (it) {
 
 
 /***/ }),
-/* 47 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var def = __webpack_require__(14).f;
-var has = __webpack_require__(21);
-var TAG = __webpack_require__(5)('toStringTag');
+var has = __webpack_require__(22);
+var TAG = __webpack_require__(6)('toStringTag');
 
 module.exports = function (it, tag, stat) {
   if (it && !has(it = stat ? it : it.prototype, TAG)) def(it, TAG, { configurable: true, value: tag });
@@ -15038,7 +15152,7 @@ module.exports = function (it, tag, stat) {
 
 
 /***/ }),
-/* 48 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(7);
@@ -15072,7 +15186,7 @@ module.exports = {
 
 
 /***/ }),
-/* 49 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
@@ -15085,7 +15199,7 @@ exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
 
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15106,7 +15220,7 @@ exports.ClientService = ClientService;
 
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15177,7 +15291,7 @@ exports.ActivatedContainerUtil = ActivatedContainerUtil;
 
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15229,7 +15343,7 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _AttributeTypeAndValue = __webpack_require__(353);
+var _AttributeTypeAndValue = __webpack_require__(358);
 
 var _AttributeTypeAndValue2 = _interopRequireDefault(_AttributeTypeAndValue);
 
@@ -15501,7 +15615,7 @@ exports.default = RelativeDistinguishedNames;
 //# sourceMappingURL=RelativeDistinguishedNames.js.map
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15514,20 +15628,20 @@ var Polyfills = (function () {
         var windowToCheck = window;
         if (!windowToCheck.Promise) {
             console.log('T1C-JS Lib: applying polyfill for ES6 Promise');
-            __webpack_require__(269).polyfill();
+            __webpack_require__(273).polyfill();
         }
         if (!Array.from) {
             console.log('T1C-JS Lib: applying polyfill for ES6 Array');
-            __webpack_require__(270);
-            __webpack_require__(299);
+            __webpack_require__(274);
+            __webpack_require__(304);
         }
         if (!windowToCheck.Symbol) {
             console.log('T1C-JS Lib: applying polyfill for ES6 Symbol');
-            __webpack_require__(311);
+            __webpack_require__(316);
         }
         if (typeof Object.assign !== 'function') {
             console.log('T1C-JS Lib: applying polyfill for ES6 Object Assign');
-            __webpack_require__(317).polyfill();
+            __webpack_require__(322).polyfill();
         }
         if (!String.prototype.startsWith) {
             console.log('T1C-JS Lib: applying polyfill for IE11 String.startsWith');
@@ -15626,7 +15740,7 @@ exports.Polyfills = Polyfills;
 
 
 /***/ }),
-/* 54 */
+/* 55 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -15816,7 +15930,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 55 */
+/* 56 */
 /***/ (function(module, exports) {
 
 // 7.2.1 RequireObjectCoercible(argument)
@@ -15827,14 +15941,14 @@ module.exports = function (it) {
 
 
 /***/ }),
-/* 56 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.2 / 15.2.3.5 Object.create(O [, Properties])
 var anObject = __webpack_require__(26);
-var dPs = __webpack_require__(274);
+var dPs = __webpack_require__(279);
 var enumBugKeys = __webpack_require__(61);
-var IE_PROTO = __webpack_require__(59)('IE_PROTO');
+var IE_PROTO = __webpack_require__(60)('IE_PROTO');
 var Empty = function () { /* empty */ };
 var PROTOTYPE = 'prototype';
 
@@ -15874,7 +15988,7 @@ module.exports = Object.create || function create(O, Properties) {
 
 
 /***/ }),
-/* 57 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.14 / 15.2.3.14 Object.keys(O)
@@ -15887,12 +16001,12 @@ module.exports = Object.keys || function keys(O) {
 
 
 /***/ }),
-/* 58 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // false -> Array#indexOf
 // true  -> Array#includes
-var toIObject = __webpack_require__(22);
+var toIObject = __webpack_require__(23);
 var toLength = __webpack_require__(8);
 var toAbsoluteIndex = __webpack_require__(31);
 module.exports = function (IS_INCLUDES) {
@@ -15916,32 +16030,14 @@ module.exports = function (IS_INCLUDES) {
 
 
 /***/ }),
-/* 59 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var shared = __webpack_require__(60)('keys');
+var shared = __webpack_require__(43)('keys');
 var uid = __webpack_require__(27);
 module.exports = function (key) {
   return shared[key] || (shared[key] = uid(key));
 };
-
-
-/***/ }),
-/* 60 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var core = __webpack_require__(19);
-var global = __webpack_require__(7);
-var SHARED = '__core-js_shared__';
-var store = global[SHARED] || (global[SHARED] = {});
-
-(module.exports = function (key, value) {
-  return store[key] || (store[key] = value !== undefined ? value : {});
-})('versions', []).push({
-  version: core.version,
-  mode: __webpack_require__(29) ? 'pure' : 'global',
-  copyright: '© 2018 Denis Pushkarev (zloirock.ru)'
-});
 
 
 /***/ }),
@@ -15959,7 +16055,7 @@ module.exports = (
 /***/ (function(module, exports, __webpack_require__) {
 
 // 7.2.2 IsArray(argument)
-var cof = __webpack_require__(46);
+var cof = __webpack_require__(47);
 module.exports = Array.isArray || function isArray(arg) {
   return cof(arg) == 'Array';
 };
@@ -15970,8 +16066,8 @@ module.exports = Array.isArray || function isArray(arg) {
 /***/ (function(module, exports, __webpack_require__) {
 
 // getting tag from 19.1.3.6 Object.prototype.toString()
-var cof = __webpack_require__(46);
-var TAG = __webpack_require__(5)('toStringTag');
+var cof = __webpack_require__(47);
+var TAG = __webpack_require__(6)('toStringTag');
 // ES3 wrong here
 var ARG = cof(function () { return arguments; }()) == 'Arguments';
 
@@ -16001,7 +16097,7 @@ module.exports = function (it) {
 "use strict";
 // 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
 
-var toObject = __webpack_require__(23);
+var toObject = __webpack_require__(17);
 var toAbsoluteIndex = __webpack_require__(31);
 var toLength = __webpack_require__(8);
 module.exports = function fill(value /* , start = 0, end = @length */) {
@@ -16025,7 +16121,7 @@ module.exports = function fill(value /* , start = 0, end = @length */) {
 var global = __webpack_require__(7);
 var dP = __webpack_require__(14);
 var DESCRIPTORS = __webpack_require__(16);
-var SPECIES = __webpack_require__(5)('species');
+var SPECIES = __webpack_require__(6)('species');
 
 module.exports = function (KEY) {
   var C = global[KEY];
@@ -16045,7 +16141,7 @@ module.exports = function (KEY) {
 var global = __webpack_require__(7);
 var DESCRIPTORS = __webpack_require__(16);
 var LIBRARY = __webpack_require__(29);
-var $typed = __webpack_require__(48);
+var $typed = __webpack_require__(49);
 var hide = __webpack_require__(15);
 var redefineAll = __webpack_require__(95);
 var fails = __webpack_require__(12);
@@ -16053,10 +16149,10 @@ var anInstance = __webpack_require__(96);
 var toInteger = __webpack_require__(25);
 var toLength = __webpack_require__(8);
 var toIndex = __webpack_require__(97);
-var gOPN = __webpack_require__(49).f;
+var gOPN = __webpack_require__(50).f;
 var dP = __webpack_require__(14).f;
 var arrayFill = __webpack_require__(64);
-var setToStringTag = __webpack_require__(47);
+var setToStringTag = __webpack_require__(48);
 var ARRAY_BUFFER = 'ArrayBuffer';
 var DATA_VIEW = 'DataView';
 var PROTOTYPE = 'prototype';
@@ -16396,14 +16492,14 @@ exports.ResolvedAgent = ResolvedAgent;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var semver = __webpack_require__(318);
+var semver = __webpack_require__(323);
 var SyncUtil_1 = __webpack_require__(70);
 var ActivationUtil_1 = __webpack_require__(106);
 var DSClientModel_1 = __webpack_require__(38);
 var PubKeyService_1 = __webpack_require__(71);
 var CoreExceptions_1 = __webpack_require__(32);
 var axios_1 = __webpack_require__(72);
-var ActivatedContainerUtil_1 = __webpack_require__(51);
+var ActivatedContainerUtil_1 = __webpack_require__(52);
 var InitUtil = (function () {
     function InitUtil() {
     }
@@ -16524,7 +16620,7 @@ var DSClientModel_1 = __webpack_require__(38);
 var DataContainerUtil_1 = __webpack_require__(104);
 var CoreExceptions_1 = __webpack_require__(32);
 var adminModel_1 = __webpack_require__(68);
-var ActivatedContainerUtil_1 = __webpack_require__(51);
+var ActivatedContainerUtil_1 = __webpack_require__(52);
 var Utils_1 = __webpack_require__(39);
 var SyncUtil = (function () {
     function SyncUtil() {
@@ -16545,7 +16641,7 @@ var SyncUtil = (function () {
     };
     SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
         return client.ds().then(function (ds) {
-            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.21"), info.namespace, containers));
+            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.22"), info.namespace, containers));
         });
     };
     SyncUtil.doSyncFlow = function (client, mergedInfo, uuid, containers, isRetry, config) {
@@ -16693,7 +16789,7 @@ exports.PubKeyService = PubKeyService;
 /* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(319);
+module.exports = __webpack_require__(324);
 
 /***/ }),
 /* 73 */
@@ -16703,7 +16799,7 @@ module.exports = __webpack_require__(319);
 /* WEBPACK VAR INJECTION */(function(process) {
 
 var utils = __webpack_require__(10);
-var normalizeHeaderName = __webpack_require__(322);
+var normalizeHeaderName = __webpack_require__(327);
 
 var DEFAULT_CONTENT_TYPE = {
   'Content-Type': 'application/x-www-form-urlencoded'
@@ -16797,7 +16893,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(54)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(55)))
 
 /***/ }),
 /* 74 */
@@ -17352,8 +17448,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Card_1 = __webpack_require__(6);
-var PinEnforcer_1 = __webpack_require__(18);
+var Card_1 = __webpack_require__(5);
+var PinEnforcer_1 = __webpack_require__(19);
 var RequestHandler_1 = __webpack_require__(11);
 var EidBe = (function (_super) {
     __extends(EidBe, _super);
@@ -17450,7 +17546,7 @@ var _RSASSAPSSParams = __webpack_require__(119);
 
 var _RSASSAPSSParams2 = _interopRequireDefault(_RSASSAPSSParams);
 
-var _CryptoEngine = __webpack_require__(347);
+var _CryptoEngine = __webpack_require__(352);
 
 var _CryptoEngine2 = _interopRequireDefault(_CryptoEngine);
 
@@ -18695,8 +18791,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Card_1 = __webpack_require__(6);
-var PinEnforcer_1 = __webpack_require__(18);
+var Card_1 = __webpack_require__(5);
+var PinEnforcer_1 = __webpack_require__(19);
 var RequestHandler_1 = __webpack_require__(11);
 var Aventra = (function (_super) {
     __extends(Aventra, _super);
@@ -18768,7 +18864,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Card_1 = __webpack_require__(6);
+var Card_1 = __webpack_require__(5);
 var RemoteLoading = (function (_super) {
     __extends(RemoteLoading, _super);
     function RemoteLoading(baseUrl, containerUrl, connection, reader_id) {
@@ -18855,7 +18951,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Card_1 = __webpack_require__(6);
+var Card_1 = __webpack_require__(5);
 var RequestHandler_1 = __webpack_require__(11);
 var __1 = __webpack_require__(34);
 var EidPt = (function (_super) {
@@ -18926,7 +19022,7 @@ g = (function() {
 
 try {
 	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1, eval)("this");
+	g = g || new Function("return this")();
 } catch (e) {
 	// This works if the window reference is available
 	if (typeof window === "object") g = window;
@@ -18950,10 +19046,10 @@ var $export = __webpack_require__(3);
 var redefine = __webpack_require__(35);
 var hide = __webpack_require__(15);
 var Iterators = __webpack_require__(36);
-var $iterCreate = __webpack_require__(273);
-var setToStringTag = __webpack_require__(47);
+var $iterCreate = __webpack_require__(278);
+var setToStringTag = __webpack_require__(48);
 var getPrototypeOf = __webpack_require__(87);
-var ITERATOR = __webpack_require__(5)('iterator');
+var ITERATOR = __webpack_require__(6)('iterator');
 var BUGGY = !([].keys && 'next' in [].keys()); // Safari has buggy iterators w/o `next`
 var FF_ITERATOR = '@@iterator';
 var KEYS = 'keys';
@@ -19028,7 +19124,7 @@ module.exports = !__webpack_require__(16) && !__webpack_require__(12)(function (
 /* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isObject = __webpack_require__(20);
+var isObject = __webpack_require__(21);
 var document = __webpack_require__(7).document;
 // typeof document.createElement is 'object' in old IE
 var is = isObject(document) && isObject(document.createElement);
@@ -19041,10 +19137,10 @@ module.exports = function (it) {
 /* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var has = __webpack_require__(21);
-var toIObject = __webpack_require__(22);
-var arrayIndexOf = __webpack_require__(58)(false);
-var IE_PROTO = __webpack_require__(59)('IE_PROTO');
+var has = __webpack_require__(22);
+var toIObject = __webpack_require__(23);
+var arrayIndexOf = __webpack_require__(59)(false);
+var IE_PROTO = __webpack_require__(60)('IE_PROTO');
 
 module.exports = function (object, names) {
   var O = toIObject(object);
@@ -19073,9 +19169,9 @@ module.exports = document && document.documentElement;
 /***/ (function(module, exports, __webpack_require__) {
 
 // 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
-var has = __webpack_require__(21);
-var toObject = __webpack_require__(23);
-var IE_PROTO = __webpack_require__(59)('IE_PROTO');
+var has = __webpack_require__(22);
+var toObject = __webpack_require__(17);
+var IE_PROTO = __webpack_require__(60)('IE_PROTO');
 var ObjectProto = Object.prototype;
 
 module.exports = Object.getPrototypeOf || function (O) {
@@ -19093,7 +19189,7 @@ module.exports = Object.getPrototypeOf || function (O) {
 
 // check on default Array iterator
 var Iterators = __webpack_require__(36);
-var ITERATOR = __webpack_require__(5)('iterator');
+var ITERATOR = __webpack_require__(6)('iterator');
 var ArrayProto = Array.prototype;
 
 module.exports = function (it) {
@@ -19121,9 +19217,9 @@ module.exports = function (object, index, value) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var classof = __webpack_require__(63);
-var ITERATOR = __webpack_require__(5)('iterator');
+var ITERATOR = __webpack_require__(6)('iterator');
 var Iterators = __webpack_require__(36);
-module.exports = __webpack_require__(19).getIteratorMethod = function (it) {
+module.exports = __webpack_require__(20).getIteratorMethod = function (it) {
   if (it != undefined) return it[ITERATOR]
     || it['@@iterator']
     || Iterators[classof(it)];
@@ -19134,7 +19230,7 @@ module.exports = __webpack_require__(19).getIteratorMethod = function (it) {
 /* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var ITERATOR = __webpack_require__(5)('iterator');
+var ITERATOR = __webpack_require__(6)('iterator');
 var SAFE_CLOSING = false;
 
 try {
@@ -19162,9 +19258,9 @@ module.exports = function (exec, skipClosing) {
 /* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var aFunction = __webpack_require__(44);
-var toObject = __webpack_require__(23);
-var IObject = __webpack_require__(45);
+var aFunction = __webpack_require__(45);
+var toObject = __webpack_require__(17);
+var IObject = __webpack_require__(46);
 var toLength = __webpack_require__(8);
 
 module.exports = function (that, callbackfn, aLen, memo, isRight) {
@@ -19199,7 +19295,7 @@ module.exports = function (that, callbackfn, aLen, memo, isRight) {
 "use strict";
 // 22.1.3.3 Array.prototype.copyWithin(target, start, end = this.length)
 
-var toObject = __webpack_require__(23);
+var toObject = __webpack_require__(17);
 var toAbsoluteIndex = __webpack_require__(31);
 var toLength = __webpack_require__(8);
 
@@ -19232,9 +19328,9 @@ module.exports = [].copyWithin || function copyWithin(target /* = 0 */, start /*
 "use strict";
 
 var addToUnscopables = __webpack_require__(37);
-var step = __webpack_require__(298);
+var step = __webpack_require__(303);
 var Iterators = __webpack_require__(36);
-var toIObject = __webpack_require__(22);
+var toIObject = __webpack_require__(23);
 
 // 22.1.3.4 Array.prototype.entries()
 // 22.1.3.13 Array.prototype.keys()
@@ -19310,8 +19406,8 @@ module.exports = function (it) {
 
 // 7.3.20 SpeciesConstructor(O, defaultConstructor)
 var anObject = __webpack_require__(26);
-var aFunction = __webpack_require__(44);
-var SPECIES = __webpack_require__(5)('species');
+var aFunction = __webpack_require__(45);
+var SPECIES = __webpack_require__(6)('species');
 module.exports = function (O, D) {
   var C = anObject(O).constructor;
   var S;
@@ -19325,9 +19421,9 @@ module.exports = function (O, D) {
 
 var pIE = __webpack_require__(67);
 var createDesc = __webpack_require__(30);
-var toIObject = __webpack_require__(22);
+var toIObject = __webpack_require__(23);
 var toPrimitive = __webpack_require__(42);
-var has = __webpack_require__(21);
+var has = __webpack_require__(22);
 var IE8_DOM_DEFINE = __webpack_require__(83);
 var gOPD = Object.getOwnPropertyDescriptor;
 
@@ -19350,7 +19446,7 @@ exports.f = __webpack_require__(16) ? gOPD : function getOwnPropertyDescriptor(O
 // 19.1.3.6 Object.prototype.toString()
 var classof = __webpack_require__(63);
 var test = {};
-test[__webpack_require__(5)('toStringTag')] = 'z';
+test[__webpack_require__(6)('toStringTag')] = 'z';
 if (test + '' != '[object z]') {
   __webpack_require__(35)(Object.prototype, 'toString', function toString() {
     return '[object ' + classof(this) + ']';
@@ -19362,7 +19458,7 @@ if (test + '' != '[object z]') {
 /* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports.f = __webpack_require__(5);
+exports.f = __webpack_require__(6);
 
 
 /***/ }),
@@ -19381,7 +19477,7 @@ exports.f = Object.getOwnPropertySymbols;
 Object.defineProperty(exports, "__esModule", { value: true });
 var ResponseHandler_1 = __webpack_require__(9);
 var InitUtil_1 = __webpack_require__(69);
-var ClientService_1 = __webpack_require__(50);
+var ClientService_1 = __webpack_require__(51);
 var Utils_1 = __webpack_require__(39);
 var CORE_ACTIVATE = '/admin/activate';
 var CORE_ATR_LIST = '/admin/atr';
@@ -19531,7 +19627,7 @@ exports.AdminService = AdminService;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var ClientService_1 = __webpack_require__(50);
+var ClientService_1 = __webpack_require__(51);
 var DataContainerUtil = (function () {
     function DataContainerUtil() {
     }
@@ -19594,7 +19690,7 @@ var ActivationUtil = (function () {
     ActivationUtil.registerDevice = function (client, mergedInfo, uuid) {
         return client.admin().getPubKey().then(function (pubKey) {
             return client.ds().then(function (ds) {
-                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.21"), mergedInfo.namespace));
+                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.22"), mergedInfo.namespace));
             });
         });
     };
@@ -19642,12 +19738,12 @@ module.exports = function bind(fn, thisArg) {
 
 
 var utils = __webpack_require__(10);
-var settle = __webpack_require__(323);
-var buildURL = __webpack_require__(325);
-var parseHeaders = __webpack_require__(326);
-var isURLSameOrigin = __webpack_require__(327);
+var settle = __webpack_require__(328);
+var buildURL = __webpack_require__(330);
+var parseHeaders = __webpack_require__(331);
+var isURLSameOrigin = __webpack_require__(332);
 var createError = __webpack_require__(109);
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(328);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(333);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -19665,7 +19761,7 @@ module.exports = function xhrAdapter(config) {
     // For IE 8/9 CORS support
     // Only supports POST and GET calls and doesn't returns the response headers.
     // DON'T do this for testing b/c XMLHttpRequest is mocked, not XDomainRequest.
-    if ("production" !== 'test' &&
+    if ( true &&
         typeof window !== 'undefined' &&
         window.XDomainRequest && !('withCredentials' in request) &&
         !isURLSameOrigin(config.url)) {
@@ -19744,7 +19840,7 @@ module.exports = function xhrAdapter(config) {
     // This is only done if running in a standard browser environment.
     // Specifically not if we're in a web worker, or react-native.
     if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(329);
+      var cookies = __webpack_require__(334);
 
       // Add xsrf header
       var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -19828,7 +19924,7 @@ module.exports = function xhrAdapter(config) {
 "use strict";
 
 
-var enhanceError = __webpack_require__(324);
+var enhanceError = __webpack_require__(329);
 
 /**
  * Create an Error with the specified message, config, error code, request and response.
@@ -19936,13 +20032,13 @@ exports.UrlUtil = UrlUtil;
 
 /***/ }),
 /* 114 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-/*! store2 - v2.7.0 - 2018-02-08
+/*! store2 - v2.7.1 - 2018-11-15
 * Copyright (c) 2018 Nathan Bubna; Licensed (MIT OR GPL-3.0) */
 ;(function(window, define) {
     var _ = {
-        version: "2.7.0",
+        version: "2.7.1",
         areas: {},
         apis: {},
 
@@ -19989,8 +20085,8 @@ exports.UrlUtil = UrlUtil;
             });
             store._id = id;
             try {
-                var testKey = '_safariPrivate_';
-                area.setItem(testKey, 'sucks');
+                var testKey = '_-bad-_';
+                area.setItem(testKey, 'wolf');
                 store._area = area;
                 area.removeItem(testKey);
             } catch (e) {}
@@ -20183,7 +20279,7 @@ exports.UrlUtil = UrlUtil;
         define('store2', [], function () {
             return store;
         });
-    } else if (typeof module !== 'undefined' && module.exports) {
+    } else if ( true && module.exports) {
         module.exports = store;
     } else {
         // expose the primary store fn to the global object and save conflicts
@@ -20191,7 +20287,7 @@ exports.UrlUtil = UrlUtil;
         window.store = store;
     }
 
-})(this, this.define);
+})(this, this && this.define);
 
 
 /***/ }),
@@ -20203,8 +20299,8 @@ exports.UrlUtil = UrlUtil;
 Object.defineProperty(exports, "__esModule", { value: true });
 var store = __webpack_require__(114);
 var Base64 = __webpack_require__(116);
-var uuid = __webpack_require__(339);
-var sha = __webpack_require__(342);
+var uuid = __webpack_require__(344);
+var sha = __webpack_require__(347);
 var BrowserFingerprint = (function () {
     function BrowserFingerprint() {
     }
@@ -20256,9 +20352,17 @@ exports.BrowserFingerprint = BrowserFingerprint;
 
 ;(function () {
 
-  var object =
-     true ? exports :
-    undefined; // #31: ExtendScript
+  var object = (
+    // #34: CommonJS
+     true && exports !== null &&
+    typeof exports.nodeType !== 'number' ?
+      exports :
+    // #8: web workers
+    typeof self != 'undefined' ?
+      self :
+    // #31: ExtendScript
+      $.global
+  );
 
   var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 
@@ -21168,7 +21272,7 @@ var _ECPublicKey = __webpack_require__(121);
 
 var _ECPublicKey2 = _interopRequireDefault(_ECPublicKey);
 
-var _RSAPublicKey = __webpack_require__(348);
+var _RSAPublicKey = __webpack_require__(353);
 
 var _RSAPublicKey2 = _interopRequireDefault(_RSAPublicKey);
 
@@ -22034,59 +22138,59 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _SubjectDirectoryAttributes = __webpack_require__(355);
+var _SubjectDirectoryAttributes = __webpack_require__(360);
 
 var _SubjectDirectoryAttributes2 = _interopRequireDefault(_SubjectDirectoryAttributes);
 
-var _PrivateKeyUsagePeriod = __webpack_require__(356);
+var _PrivateKeyUsagePeriod = __webpack_require__(361);
 
 var _PrivateKeyUsagePeriod2 = _interopRequireDefault(_PrivateKeyUsagePeriod);
 
-var _AltName = __webpack_require__(357);
+var _AltName = __webpack_require__(362);
 
 var _AltName2 = _interopRequireDefault(_AltName);
 
-var _BasicConstraints = __webpack_require__(358);
+var _BasicConstraints = __webpack_require__(363);
 
 var _BasicConstraints2 = _interopRequireDefault(_BasicConstraints);
 
-var _IssuingDistributionPoint = __webpack_require__(359);
+var _IssuingDistributionPoint = __webpack_require__(364);
 
 var _IssuingDistributionPoint2 = _interopRequireDefault(_IssuingDistributionPoint);
 
-var _GeneralNames = __webpack_require__(360);
+var _GeneralNames = __webpack_require__(365);
 
 var _GeneralNames2 = _interopRequireDefault(_GeneralNames);
 
-var _NameConstraints = __webpack_require__(361);
+var _NameConstraints = __webpack_require__(366);
 
 var _NameConstraints2 = _interopRequireDefault(_NameConstraints);
 
-var _CRLDistributionPoints = __webpack_require__(363);
+var _CRLDistributionPoints = __webpack_require__(368);
 
 var _CRLDistributionPoints2 = _interopRequireDefault(_CRLDistributionPoints);
 
-var _CertificatePolicies = __webpack_require__(365);
+var _CertificatePolicies = __webpack_require__(370);
 
 var _CertificatePolicies2 = _interopRequireDefault(_CertificatePolicies);
 
-var _PolicyMappings = __webpack_require__(368);
+var _PolicyMappings = __webpack_require__(373);
 
 var _PolicyMappings2 = _interopRequireDefault(_PolicyMappings);
 
-var _AuthorityKeyIdentifier = __webpack_require__(370);
+var _AuthorityKeyIdentifier = __webpack_require__(375);
 
 var _AuthorityKeyIdentifier2 = _interopRequireDefault(_AuthorityKeyIdentifier);
 
-var _PolicyConstraints = __webpack_require__(371);
+var _PolicyConstraints = __webpack_require__(376);
 
 var _PolicyConstraints2 = _interopRequireDefault(_PolicyConstraints);
 
-var _ExtKeyUsage = __webpack_require__(372);
+var _ExtKeyUsage = __webpack_require__(377);
 
 var _ExtKeyUsage2 = _interopRequireDefault(_ExtKeyUsage);
 
-var _InfoAccess = __webpack_require__(373);
+var _InfoAccess = __webpack_require__(378);
 
 var _InfoAccess2 = _interopRequireDefault(_InfoAccess);
 
@@ -23034,7 +23138,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Card_1 = __webpack_require__(6);
+var Card_1 = __webpack_require__(5);
 var RequestHandler_1 = __webpack_require__(11);
 var CertParser_1 = __webpack_require__(40);
 var ResponseHandler_1 = __webpack_require__(9);
@@ -23086,9 +23190,9 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Card_1 = __webpack_require__(6);
+var Card_1 = __webpack_require__(5);
 var EidLuxModel_1 = __webpack_require__(133);
-var PinEnforcer_1 = __webpack_require__(18);
+var PinEnforcer_1 = __webpack_require__(19);
 var CertParser_1 = __webpack_require__(40);
 var ResponseHandler_1 = __webpack_require__(9);
 var RequestHandler_1 = __webpack_require__(11);
@@ -23595,7 +23699,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Card_1 = __webpack_require__(6);
+var Card_1 = __webpack_require__(5);
 var EMV = (function (_super) {
     __extends(EMV, _super);
     function EMV(baseUrl, containerUrl, connection, reader_id) {
@@ -23640,7 +23744,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Card_1 = __webpack_require__(6);
+var Card_1 = __webpack_require__(5);
 var MOBIB_CARD_ISSUING = '/card-issuing';
 var MOBIB_CONTRACTS = '/contracts';
 var MOBIB_PHOTO = '/picture';
@@ -23685,8 +23789,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Card_1 = __webpack_require__(6);
-var PinEnforcer_1 = __webpack_require__(18);
+var Card_1 = __webpack_require__(5);
+var PinEnforcer_1 = __webpack_require__(19);
 var Ocra = (function (_super) {
     __extends(Ocra, _super);
     function Ocra(baseUrl, containerUrl, connection, reader_id) {
@@ -23793,8 +23897,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Card_1 = __webpack_require__(6);
-var PinEnforcer_1 = __webpack_require__(18);
+var Card_1 = __webpack_require__(5);
+var PinEnforcer_1 = __webpack_require__(19);
 var RequestHandler_1 = __webpack_require__(11);
 var PIV = (function (_super) {
     __extends(PIV, _super);
@@ -23912,8 +24016,8 @@ var CertParser_1 = __webpack_require__(40);
 var ResponseHandler_1 = __webpack_require__(9);
 var platform = __webpack_require__(140);
 var RequestHandler_1 = __webpack_require__(11);
-var PinEnforcer_1 = __webpack_require__(18);
-var ActivatedContainerUtil_1 = __webpack_require__(51);
+var PinEnforcer_1 = __webpack_require__(19);
+var ActivatedContainerUtil_1 = __webpack_require__(52);
 var PKCS11 = (function () {
     function PKCS11(baseUrl, containerUrl, connection) {
         this.baseUrl = baseUrl;
@@ -25295,7 +25399,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Card_1 = __webpack_require__(6);
+var Card_1 = __webpack_require__(5);
 var RequestHandler_1 = __webpack_require__(11);
 var LuxTrust = (function (_super) {
     __extends(LuxTrust, _super);
@@ -25338,8 +25442,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Card_1 = __webpack_require__(6);
-var PinEnforcer_1 = __webpack_require__(18);
+var Card_1 = __webpack_require__(5);
+var PinEnforcer_1 = __webpack_require__(19);
 var RequestHandler_1 = __webpack_require__(11);
 var Oberthur = (function (_super) {
     __extends(Oberthur, _super);
@@ -25414,9 +25518,11 @@ var pkcs11_1 = __webpack_require__(139);
 var DataContainer_1 = __webpack_require__(126);
 var JavaKeyTool_1 = __webpack_require__(145);
 var Ssh_1 = __webpack_require__(127);
-var Wacom_1 = __webpack_require__(389);
+var Wacom_1 = __webpack_require__(394);
+var BeLawyer_1 = __webpack_require__(395);
 var CONTAINER_NEW_CONTEXT_PATH = '/containers/';
 var CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
+var CONTAINER_BELAWYER = CONTAINER_NEW_CONTEXT_PATH + 'diplad';
 var CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
 var CONTAINER_DNIE = CONTAINER_NEW_CONTEXT_PATH + 'dnie';
 var CONTAINER_EMV = CONTAINER_NEW_CONTEXT_PATH + 'emv';
@@ -25441,6 +25547,7 @@ var PluginFactory = (function () {
     }
     PluginFactory.prototype.createDNIe = function (reader_id) { return new dnie_1.DNIe(this.url, CONTAINER_DNIE, this.connection, reader_id); };
     PluginFactory.prototype.createEidBE = function (reader_id) { return new EidBe_1.EidBe(this.url, CONTAINER_BEID, this.connection, reader_id); };
+    PluginFactory.prototype.createBeLawyer = function (reader_id) { return new BeLawyer_1.BeLawyer(this.url, CONTAINER_BELAWYER, this.connection, reader_id); };
     PluginFactory.prototype.createEidLUX = function (reader_id, pin, pinType, isEncrypted) {
         if (isEncrypted === void 0) { isEncrypted = false; }
         return new EidLux_1.EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin, pinType, isEncrypted);
@@ -25770,7 +25877,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 6, // Saturday is the first day of the week.
-            doy : 12  // The week that contains Jan 1st is the first week of the year.
+            doy : 12  // The week that contains Jan 12th is the first week of the year.
         }
     });
 
@@ -25832,7 +25939,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 0, // Sunday is the first day of the week.
-            doy : 4  // The week that contains Jan 1st is the first week of the year.
+            doy : 4  // The week that contains Jan 4th is the first week of the year.
         }
     });
 
@@ -25894,7 +26001,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 0, // Sunday is the first day of the week.
-            doy : 12  // The week that contains Jan 1st is the first week of the year.
+            doy : 12  // The week that contains Jan 12th is the first week of the year.
         }
     });
 
@@ -26019,7 +26126,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 6, // Saturday is the first day of the week.
-            doy : 12  // The week that contains Jan 1st is the first week of the year.
+            doy : 12  // The week that contains Jan 12th is the first week of the year.
         }
     });
 
@@ -26081,7 +26188,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 6, // Saturday is the first day of the week.
-            doy : 12  // The week that contains Jan 1st is the first week of the year.
+            doy : 12  // The week that contains Jan 12th is the first week of the year.
         }
     });
 
@@ -26188,7 +26295,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 0, // Sunday is the first day of the week.
-            doy : 6  // The week that contains Jan 1st is the first week of the year.
+            doy : 6  // The week that contains Jan 6th is the first week of the year.
         }
     });
 
@@ -26358,7 +26465,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -26493,7 +26600,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -26586,7 +26693,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -26769,7 +26876,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 0, // Sunday is the first day of the week.
-            doy : 6  // The week that contains Jan 1st is the first week of the year.
+            doy : 6  // The week that contains Jan 6th is the first week of the year.
         }
     });
 
@@ -26891,7 +26998,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 0, // Sunday is the first day of the week.
-            doy : 6  // The week that contains Jan 1st is the first week of the year.
+            doy : 6  // The week that contains Jan 6th is the first week of the year.
         }
     });
 
@@ -27156,7 +27263,7 @@ exports.JavaKeyTool = JavaKeyTool;
         ordinal : '%d.',
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -27270,6 +27377,12 @@ exports.JavaKeyTool = JavaKeyTool;
 
     var months = 'leden_únor_březen_duben_květen_červen_červenec_srpen_září_říjen_listopad_prosinec'.split('_'),
         monthsShort = 'led_úno_bře_dub_kvě_čvn_čvc_srp_zář_říj_lis_pro'.split('_');
+
+    var monthsParse = [/^led/i, /^úno/i, /^bře/i, /^dub/i, /^kvě/i, /^(čvn|červen$|června)/i, /^(čvc|červenec|července)/i, /^srp/i, /^zář/i, /^říj/i, /^lis/i, /^pro/i];
+    // NOTE: 'červen' is substring of 'červenec'; therefore 'červenec' must precede 'červen' in the regex to be fully matched.
+    // Otherwise parser matches '1. červenec' as '1. červen' + 'ec'.
+    var monthsRegex = /^(leden|únor|březen|duben|květen|červenec|července|červen|června|srpen|září|říjen|listopad|prosinec|led|úno|bře|dub|kvě|čvn|čvc|srp|zář|říj|lis|pro)/i;
+
     function plural(n) {
         return (n > 1) && (n < 5) && (~~(n / 10) !== 1);
     }
@@ -27336,28 +27449,15 @@ exports.JavaKeyTool = JavaKeyTool;
     var cs = moment.defineLocale('cs', {
         months : months,
         monthsShort : monthsShort,
-        monthsParse : (function (months, monthsShort) {
-            var i, _monthsParse = [];
-            for (i = 0; i < 12; i++) {
-                // use custom parser to solve problem with July (červenec)
-                _monthsParse[i] = new RegExp('^' + months[i] + '$|^' + monthsShort[i] + '$', 'i');
-            }
-            return _monthsParse;
-        }(months, monthsShort)),
-        shortMonthsParse : (function (monthsShort) {
-            var i, _shortMonthsParse = [];
-            for (i = 0; i < 12; i++) {
-                _shortMonthsParse[i] = new RegExp('^' + monthsShort[i] + '$', 'i');
-            }
-            return _shortMonthsParse;
-        }(monthsShort)),
-        longMonthsParse : (function (months) {
-            var i, _longMonthsParse = [];
-            for (i = 0; i < 12; i++) {
-                _longMonthsParse[i] = new RegExp('^' + months[i] + '$', 'i');
-            }
-            return _longMonthsParse;
-        }(months)),
+        monthsRegex : monthsRegex,
+        monthsShortRegex : monthsRegex,
+        // NOTE: 'červen' is substring of 'červenec'; therefore 'červenec' must precede 'červen' in the regex to be fully matched.
+        // Otherwise parser matches '1. červenec' as '1. červen' + 'ec'.
+        monthsStrictRegex : /^(leden|ledna|února|únor|březen|března|duben|dubna|květen|května|červenec|července|červen|června|srpen|srpna|září|říjen|října|listopadu|listopad|prosinec|prosince)/i,
+        monthsShortStrictRegex : /^(led|úno|bře|dub|kvě|čvn|čvc|srp|zář|říj|lis|pro)/i,
+        monthsParse : monthsParse,
+        longMonthsParse : monthsParse,
+        shortMonthsParse : monthsParse,
         weekdays : 'neděle_pondělí_úterý_středa_čtvrtek_pátek_sobota'.split('_'),
         weekdaysShort : 'ne_po_út_st_čt_pá_so'.split('_'),
         weekdaysMin : 'ne_po_út_st_čt_pá_so'.split('_'),
@@ -27495,7 +27595,7 @@ exports.JavaKeyTool = JavaKeyTool;
         ordinal : '%d-мӗш',
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -27980,7 +28080,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 7,  // Sunday is the first day of the week.
-            doy : 12  // The week that contains Jan 1st is the first week of the year.
+            doy : 12  // The week that contains Jan 12th is the first week of the year.
         }
     });
 
@@ -28104,6 +28204,76 @@ exports.JavaKeyTool = JavaKeyTool;
 }(this, (function (moment) { 'use strict';
 
 
+    var enSG = moment.defineLocale('en-SG', {
+        months : 'January_February_March_April_May_June_July_August_September_October_November_December'.split('_'),
+        monthsShort : 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
+        weekdays : 'Sunday_Monday_Tuesday_Wednesday_Thursday_Friday_Saturday'.split('_'),
+        weekdaysShort : 'Sun_Mon_Tue_Wed_Thu_Fri_Sat'.split('_'),
+        weekdaysMin : 'Su_Mo_Tu_We_Th_Fr_Sa'.split('_'),
+        longDateFormat : {
+            LT : 'HH:mm',
+            LTS : 'HH:mm:ss',
+            L : 'DD/MM/YYYY',
+            LL : 'D MMMM YYYY',
+            LLL : 'D MMMM YYYY HH:mm',
+            LLLL : 'dddd, D MMMM YYYY HH:mm'
+        },
+        calendar : {
+            sameDay : '[Today at] LT',
+            nextDay : '[Tomorrow at] LT',
+            nextWeek : 'dddd [at] LT',
+            lastDay : '[Yesterday at] LT',
+            lastWeek : '[Last] dddd [at] LT',
+            sameElse : 'L'
+        },
+        relativeTime : {
+            future : 'in %s',
+            past : '%s ago',
+            s : 'a few seconds',
+            ss : '%d seconds',
+            m : 'a minute',
+            mm : '%d minutes',
+            h : 'an hour',
+            hh : '%d hours',
+            d : 'a day',
+            dd : '%d days',
+            M : 'a month',
+            MM : '%d months',
+            y : 'a year',
+            yy : '%d years'
+        },
+        dayOfMonthOrdinalParse: /\d{1,2}(st|nd|rd|th)/,
+        ordinal : function (number) {
+            var b = number % 10,
+                output = (~~(number % 100 / 10) === 1) ? 'th' :
+                (b === 1) ? 'st' :
+                (b === 2) ? 'nd' :
+                (b === 3) ? 'rd' : 'th';
+            return number + output;
+        },
+        week : {
+            dow : 1, // Monday is the first day of the week.
+            doy : 4  // The week that contains Jan 4th is the first week of the year.
+        }
+    });
+
+    return enSG;
+
+})));
+
+
+/***/ }),
+/* 173 */
+/***/ (function(module, exports, __webpack_require__) {
+
+//! moment.js locale configuration
+
+;(function (global, factory) {
+    true ? factory(__webpack_require__(0)) :
+   undefined
+}(this, (function (moment) { 'use strict';
+
+
     var enAu = moment.defineLocale('en-au', {
         months : 'January_February_March_April_May_June_July_August_September_October_November_December'.split('_'),
         monthsShort : 'Jan_Feb_Mar_Apr_May_Jun_Jul_Aug_Sep_Oct_Nov_Dec'.split('_'),
@@ -28163,7 +28333,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 173 */
+/* 174 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28229,7 +28399,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 174 */
+/* 175 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28299,7 +28469,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 175 */
+/* 176 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28319,7 +28489,7 @@ exports.JavaKeyTool = JavaKeyTool;
         longDateFormat : {
             LT : 'HH:mm',
             LTS : 'HH:mm:ss',
-            L : 'DD-MM-YYYY',
+            L : 'DD/MM/YYYY',
             LL : 'D MMMM YYYY',
             LLL : 'D MMMM YYYY HH:mm',
             LLLL : 'dddd D MMMM YYYY HH:mm'
@@ -28369,7 +28539,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 176 */
+/* 177 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28434,7 +28604,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 177 */
+/* 178 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28504,7 +28674,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 178 */
+/* 179 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28568,7 +28738,7 @@ exports.JavaKeyTool = JavaKeyTool;
         ordinal : '%da',
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -28578,7 +28748,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 179 */
+/* 180 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28673,7 +28843,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 180 */
+/* 181 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28768,7 +28938,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 181 */
+/* 182 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28782,6 +28952,9 @@ exports.JavaKeyTool = JavaKeyTool;
     var monthsShortDot = 'ene._feb._mar._abr._may._jun._jul._ago._sep._oct._nov._dic.'.split('_'),
         monthsShort = 'ene_feb_mar_abr_may_jun_jul_ago_sep_oct_nov_dic'.split('_');
 
+    var monthsParse = [/^ene/i, /^feb/i, /^mar/i, /^abr/i, /^may/i, /^jun/i, /^jul/i, /^ago/i, /^sep/i, /^oct/i, /^nov/i, /^dic/i];
+    var monthsRegex = /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i;
+
     var esUs = moment.defineLocale('es-us', {
         months : 'enero_febrero_marzo_abril_mayo_junio_julio_agosto_septiembre_octubre_noviembre_diciembre'.split('_'),
         monthsShort : function (m, format) {
@@ -28793,7 +28966,13 @@ exports.JavaKeyTool = JavaKeyTool;
                 return monthsShortDot[m.month()];
             }
         },
-        monthsParseExact : true,
+        monthsRegex: monthsRegex,
+        monthsShortRegex: monthsRegex,
+        monthsStrictRegex: /^(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre)/i,
+        monthsShortStrictRegex: /^(ene\.?|feb\.?|mar\.?|abr\.?|may\.?|jun\.?|jul\.?|ago\.?|sep\.?|oct\.?|nov\.?|dic\.?)/i,
+        monthsParse: monthsParse,
+        longMonthsParse: monthsParse,
+        shortMonthsParse: monthsParse,
         weekdays : 'domingo_lunes_martes_miércoles_jueves_viernes_sábado'.split('_'),
         weekdaysShort : 'dom._lun._mar._mié._jue._vie._sáb.'.split('_'),
         weekdaysMin : 'do_lu_ma_mi_ju_vi_sá'.split('_'),
@@ -28802,9 +28981,9 @@ exports.JavaKeyTool = JavaKeyTool;
             LT : 'h:mm A',
             LTS : 'h:mm:ss A',
             L : 'MM/DD/YYYY',
-            LL : 'MMMM [de] D [de] YYYY',
-            LLL : 'MMMM [de] D [de] YYYY h:mm A',
-            LLLL : 'dddd, MMMM [de] D [de] YYYY h:mm A'
+            LL : 'D [de] MMMM [de] YYYY',
+            LLL : 'D [de] MMMM [de] YYYY h:mm A',
+            LLLL : 'dddd, D [de] MMMM [de] YYYY h:mm A'
         },
         calendar : {
             sameDay : function () {
@@ -28844,7 +29023,7 @@ exports.JavaKeyTool = JavaKeyTool;
         ordinal : '%dº',
         week : {
             dow : 0, // Sunday is the first day of the week.
-            doy : 6  // The week that contains Jan 1st is the first week of the year.
+            doy : 6  // The week that contains Jan 6th is the first week of the year.
         }
     });
 
@@ -28854,7 +29033,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 182 */
+/* 183 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28937,7 +29116,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 183 */
+/* 184 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -28996,7 +29175,7 @@ exports.JavaKeyTool = JavaKeyTool;
         ordinal : '%d.',
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -29006,7 +29185,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 184 */
+/* 185 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29105,7 +29284,7 @@ exports.JavaKeyTool = JavaKeyTool;
         ordinal : '%dم',
         week : {
             dow : 6, // Saturday is the first day of the week.
-            doy : 12 // The week that contains Jan 1st is the first week of the year.
+            doy : 12 // The week that contains Jan 12th is the first week of the year.
         }
     });
 
@@ -29115,7 +29294,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 185 */
+/* 186 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29227,7 +29406,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 186 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29265,13 +29444,13 @@ exports.JavaKeyTool = JavaKeyTool;
             past : '%s síðani',
             s : 'fá sekund',
             ss : '%d sekundir',
-            m : 'ein minutt',
+            m : 'ein minuttur',
             mm : '%d minuttir',
             h : 'ein tími',
             hh : '%d tímar',
             d : 'ein dagur',
             dd : '%d dagar',
-            M : 'ein mánaði',
+            M : 'ein mánaður',
             MM : '%d mánaðir',
             y : 'eitt ár',
             yy : '%d ár'
@@ -29290,7 +29469,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 187 */
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29376,7 +29555,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 188 */
+/* 189 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29453,7 +29632,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 189 */
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29534,7 +29713,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 190 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29612,7 +29791,87 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 191 */
+/* 192 */
+/***/ (function(module, exports, __webpack_require__) {
+
+//! moment.js locale configuration
+
+;(function (global, factory) {
+    true ? factory(__webpack_require__(0)) :
+   undefined
+}(this, (function (moment) { 'use strict';
+
+
+
+    var months = [
+        'Eanáir', 'Feabhra', 'Márta', 'Aibreán', 'Bealtaine', 'Méitheamh', 'Iúil', 'Lúnasa', 'Meán Fómhair', 'Deaireadh Fómhair', 'Samhain', 'Nollaig'
+    ];
+
+    var monthsShort = ['Eaná', 'Feab', 'Márt', 'Aibr', 'Beal', 'Méit', 'Iúil', 'Lúna', 'Meán', 'Deai', 'Samh', 'Noll'];
+
+    var weekdays = ['Dé Domhnaigh', 'Dé Luain', 'Dé Máirt', 'Dé Céadaoin', 'Déardaoin', 'Dé hAoine', 'Dé Satharn'];
+
+    var weekdaysShort = ['Dom', 'Lua', 'Mái', 'Céa', 'Déa', 'hAo', 'Sat'];
+
+    var weekdaysMin = ['Do', 'Lu', 'Má', 'Ce', 'Dé', 'hA', 'Sa'];
+
+    var ga = moment.defineLocale('ga', {
+        months: months,
+        monthsShort: monthsShort,
+        monthsParseExact: true,
+        weekdays: weekdays,
+        weekdaysShort: weekdaysShort,
+        weekdaysMin: weekdaysMin,
+        longDateFormat: {
+            LT: 'HH:mm',
+            LTS: 'HH:mm:ss',
+            L: 'DD/MM/YYYY',
+            LL: 'D MMMM YYYY',
+            LLL: 'D MMMM YYYY HH:mm',
+            LLLL: 'dddd, D MMMM YYYY HH:mm'
+        },
+        calendar: {
+            sameDay: '[Inniu ag] LT',
+            nextDay: '[Amárach ag] LT',
+            nextWeek: 'dddd [ag] LT',
+            lastDay: '[Inné aig] LT',
+            lastWeek: 'dddd [seo caite] [ag] LT',
+            sameElse: 'L'
+        },
+        relativeTime: {
+            future: 'i %s',
+            past: '%s ó shin',
+            s: 'cúpla soicind',
+            ss: '%d soicind',
+            m: 'nóiméad',
+            mm: '%d nóiméad',
+            h: 'uair an chloig',
+            hh: '%d uair an chloig',
+            d: 'lá',
+            dd: '%d lá',
+            M: 'mí',
+            MM: '%d mí',
+            y: 'bliain',
+            yy: '%d bliain'
+        },
+        dayOfMonthOrdinalParse: /\d{1,2}(d|na|mh)/,
+        ordinal: function (number) {
+            var output = number === 1 ? 'd' : number % 10 === 2 ? 'na' : 'mh';
+            return number + output;
+        },
+        week: {
+            dow: 1, // Monday is the first day of the week.
+            doy: 4  // The week that contains Jan 4th is the first week of the year.
+        }
+    });
+
+    return ga;
+
+})));
+
+
+/***/ }),
+/* 193 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29691,7 +29950,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 192 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29771,7 +30030,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 193 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -29788,8 +30047,8 @@ exports.JavaKeyTool = JavaKeyTool;
             'ss': [number + ' secondanim', number + ' second'],
             'm': ['eka mintan', 'ek minute'],
             'mm': [number + ' mintanim', number + ' mintam'],
-            'h': ['eka horan', 'ek hor'],
-            'hh': [number + ' horanim', number + ' horam'],
+            'h': ['eka voran', 'ek vor'],
+            'hh': [number + ' voranim', number + ' voram'],
             'd': ['eka disan', 'ek dis'],
             'dd': [number + ' disanim', number + ' dis'],
             'M': ['eka mhoinean', 'ek mhoino'],
@@ -29897,7 +30156,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 194 */
+/* 196 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30014,7 +30273,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week: {
             dow: 0, // Sunday is the first day of the week.
-            doy: 6 // The week that contains Jan 1st is the first week of the year.
+            doy: 6 // The week that contains Jan 6th is the first week of the year.
         }
     });
 
@@ -30024,7 +30283,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 195 */
+/* 197 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30124,7 +30383,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 196 */
+/* 198 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30241,7 +30500,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 0, // Sunday is the first day of the week.
-            doy : 6  // The week that contains Jan 1st is the first week of the year.
+            doy : 6  // The week that contains Jan 6th is the first week of the year.
         }
     });
 
@@ -30251,7 +30510,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 197 */
+/* 199 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30398,7 +30657,7 @@ exports.JavaKeyTool = JavaKeyTool;
         ordinal : '%d.',
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -30408,7 +30667,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 198 */
+/* 200 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30521,7 +30780,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 199 */
+/* 201 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30609,7 +30868,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -30619,7 +30878,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 200 */
+/* 202 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30694,7 +30953,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -30704,7 +30963,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 201 */
+/* 203 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30839,7 +31098,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 202 */
+/* 204 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30911,7 +31170,79 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 203 */
+/* 205 */
+/***/ (function(module, exports, __webpack_require__) {
+
+//! moment.js locale configuration
+
+;(function (global, factory) {
+    true ? factory(__webpack_require__(0)) :
+   undefined
+}(this, (function (moment) { 'use strict';
+
+
+    var itCh = moment.defineLocale('it-ch', {
+        months : 'gennaio_febbraio_marzo_aprile_maggio_giugno_luglio_agosto_settembre_ottobre_novembre_dicembre'.split('_'),
+        monthsShort : 'gen_feb_mar_apr_mag_giu_lug_ago_set_ott_nov_dic'.split('_'),
+        weekdays : 'domenica_lunedì_martedì_mercoledì_giovedì_venerdì_sabato'.split('_'),
+        weekdaysShort : 'dom_lun_mar_mer_gio_ven_sab'.split('_'),
+        weekdaysMin : 'do_lu_ma_me_gi_ve_sa'.split('_'),
+        longDateFormat : {
+            LT : 'HH:mm',
+            LTS : 'HH:mm:ss',
+            L : 'DD.MM.YYYY',
+            LL : 'D MMMM YYYY',
+            LLL : 'D MMMM YYYY HH:mm',
+            LLLL : 'dddd D MMMM YYYY HH:mm'
+        },
+        calendar : {
+            sameDay: '[Oggi alle] LT',
+            nextDay: '[Domani alle] LT',
+            nextWeek: 'dddd [alle] LT',
+            lastDay: '[Ieri alle] LT',
+            lastWeek: function () {
+                switch (this.day()) {
+                    case 0:
+                        return '[la scorsa] dddd [alle] LT';
+                    default:
+                        return '[lo scorso] dddd [alle] LT';
+                }
+            },
+            sameElse: 'L'
+        },
+        relativeTime : {
+            future : function (s) {
+                return ((/^[0-9].+$/).test(s) ? 'tra' : 'in') + ' ' + s;
+            },
+            past : '%s fa',
+            s : 'alcuni secondi',
+            ss : '%d secondi',
+            m : 'un minuto',
+            mm : '%d minuti',
+            h : 'un\'ora',
+            hh : '%d ore',
+            d : 'un giorno',
+            dd : '%d giorni',
+            M : 'un mese',
+            MM : '%d mesi',
+            y : 'un anno',
+            yy : '%d anni'
+        },
+        dayOfMonthOrdinalParse : /\d{1,2}º/,
+        ordinal: '%dº',
+        week : {
+            dow : 1, // Monday is the first day of the week.
+            doy : 4  // The week that contains Jan 4th is the first week of the year.
+        }
+    });
+
+    return itCh;
+
+})));
+
+
+/***/ }),
+/* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -30923,7 +31254,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
     var ja = moment.defineLocale('ja', {
-        months : '1月_2月_3月_4月_5月_6月_7月_8月_9月_10月_11月_12月'.split('_'),
+        months : '一月_二月_三月_四月_五月_六月_七月_八月_九月_十月_十一月_十二月'.split('_'),
         monthsShort : '1月_2月_3月_4月_5月_6月_7月_8月_9月_10月_11月_12月'.split('_'),
         weekdays : '日曜日_月曜日_火曜日_水曜日_木曜日_金曜日_土曜日'.split('_'),
         weekdaysShort : '日_月_火_水_木_金_土'.split('_'),
@@ -31006,7 +31337,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 204 */
+/* 207 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31081,7 +31412,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -31091,7 +31422,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 205 */
+/* 208 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31183,7 +31514,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 206 */
+/* 209 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31263,7 +31594,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -31273,7 +31604,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 207 */
+/* 210 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31386,7 +31717,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 208 */
+/* 211 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31505,7 +31836,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 0, // Sunday is the first day of the week.
-            doy : 6  // The week that contains Jan 1st is the first week of the year.
+            doy : 6  // The week that contains Jan 6th is the first week of the year.
         }
     });
 
@@ -31515,7 +31846,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 209 */
+/* 212 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31599,7 +31930,129 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 210 */
+/* 213 */
+/***/ (function(module, exports, __webpack_require__) {
+
+//! moment.js locale configuration
+
+;(function (global, factory) {
+    true ? factory(__webpack_require__(0)) :
+   undefined
+}(this, (function (moment) { 'use strict';
+
+
+    var symbolMap = {
+        '1': '١',
+        '2': '٢',
+        '3': '٣',
+        '4': '٤',
+        '5': '٥',
+        '6': '٦',
+        '7': '٧',
+        '8': '٨',
+        '9': '٩',
+        '0': '٠'
+    }, numberMap = {
+        '١': '1',
+        '٢': '2',
+        '٣': '3',
+        '٤': '4',
+        '٥': '5',
+        '٦': '6',
+        '٧': '7',
+        '٨': '8',
+        '٩': '9',
+        '٠': '0'
+    },
+    months = [
+        'کانونی دووەم',
+        'شوبات',
+        'ئازار',
+        'نیسان',
+        'ئایار',
+        'حوزەیران',
+        'تەمموز',
+        'ئاب',
+        'ئەیلوول',
+        'تشرینی یەكەم',
+        'تشرینی دووەم',
+        'كانونی یەکەم'
+    ];
+
+
+    var ku = moment.defineLocale('ku', {
+        months : months,
+        monthsShort : months,
+        weekdays : 'یه‌كشه‌ممه‌_دووشه‌ممه‌_سێشه‌ممه‌_چوارشه‌ممه‌_پێنجشه‌ممه‌_هه‌ینی_شه‌ممه‌'.split('_'),
+        weekdaysShort : 'یه‌كشه‌م_دووشه‌م_سێشه‌م_چوارشه‌م_پێنجشه‌م_هه‌ینی_شه‌ممه‌'.split('_'),
+        weekdaysMin : 'ی_د_س_چ_پ_ه_ش'.split('_'),
+        weekdaysParseExact : true,
+        longDateFormat : {
+            LT : 'HH:mm',
+            LTS : 'HH:mm:ss',
+            L : 'DD/MM/YYYY',
+            LL : 'D MMMM YYYY',
+            LLL : 'D MMMM YYYY HH:mm',
+            LLLL : 'dddd, D MMMM YYYY HH:mm'
+        },
+        meridiemParse: /ئێواره‌|به‌یانی/,
+        isPM: function (input) {
+            return /ئێواره‌/.test(input);
+        },
+        meridiem : function (hour, minute, isLower) {
+            if (hour < 12) {
+                return 'به‌یانی';
+            } else {
+                return 'ئێواره‌';
+            }
+        },
+        calendar : {
+            sameDay : '[ئه‌مرۆ كاتژمێر] LT',
+            nextDay : '[به‌یانی كاتژمێر] LT',
+            nextWeek : 'dddd [كاتژمێر] LT',
+            lastDay : '[دوێنێ كاتژمێر] LT',
+            lastWeek : 'dddd [كاتژمێر] LT',
+            sameElse : 'L'
+        },
+        relativeTime : {
+            future : 'له‌ %s',
+            past : '%s',
+            s : 'چه‌ند چركه‌یه‌ك',
+            ss : 'چركه‌ %d',
+            m : 'یه‌ك خوله‌ك',
+            mm : '%d خوله‌ك',
+            h : 'یه‌ك كاتژمێر',
+            hh : '%d كاتژمێر',
+            d : 'یه‌ك ڕۆژ',
+            dd : '%d ڕۆژ',
+            M : 'یه‌ك مانگ',
+            MM : '%d مانگ',
+            y : 'یه‌ك ساڵ',
+            yy : '%d ساڵ'
+        },
+        preparse: function (string) {
+            return string.replace(/[١٢٣٤٥٦٧٨٩٠]/g, function (match) {
+                return numberMap[match];
+            }).replace(/،/g, ',');
+        },
+        postformat: function (string) {
+            return string.replace(/\d/g, function (match) {
+                return symbolMap[match];
+            }).replace(/,/g, '،');
+        },
+        week : {
+            dow : 6, // Saturday is the first day of the week.
+            doy : 12 // The week that contains Jan 12th is the first week of the year.
+        }
+    });
+
+    return ku;
+
+})));
+
+
+/***/ }),
+/* 214 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31651,8 +32104,8 @@ exports.JavaKeyTool = JavaKeyTool;
             sameDay : '[Бүгүн саат] LT',
             nextDay : '[Эртең саат] LT',
             nextWeek : 'dddd [саат] LT',
-            lastDay : '[Кече саат] LT',
-            lastWeek : '[Өткен аптанын] dddd [күнү] [саат] LT',
+            lastDay : '[Кечээ саат] LT',
+            lastWeek : '[Өткөн аптанын] dddd [күнү] [саат] LT',
             sameElse : 'L'
         },
         relativeTime : {
@@ -31679,7 +32132,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -31689,7 +32142,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 211 */
+/* 215 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31828,7 +32281,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 212 */
+/* 216 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -31901,7 +32354,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 213 */
+/* 217 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32022,7 +32475,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 214 */
+/* 218 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32122,7 +32575,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 215 */
+/* 219 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32227,7 +32680,7 @@ exports.JavaKeyTool = JavaKeyTool;
         ordinal : '%d.',
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -32237,7 +32690,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 216 */
+/* 220 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32304,7 +32757,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 217 */
+/* 221 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32387,7 +32840,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -32397,7 +32850,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 218 */
+/* 222 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32481,7 +32934,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 219 */
+/* 223 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32588,7 +33041,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 220 */
+/* 224 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32741,7 +33194,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 0, // Sunday is the first day of the week.
-            doy : 6  // The week that contains Jan 1st is the first week of the year.
+            doy : 6  // The week that contains Jan 6th is the first week of the year.
         }
     });
 
@@ -32751,7 +33204,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 221 */
+/* 225 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32826,7 +33279,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -32836,7 +33289,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 222 */
+/* 226 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32911,7 +33364,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -32921,7 +33374,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 223 */
+/* 227 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -32984,7 +33437,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 224 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33070,7 +33523,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week: {
             dow: 1, // Monday is the first day of the week.
-            doy: 4 // The week that contains Jan 1st is the first week of the year.
+            doy: 4 // The week that contains Jan 4th is the first week of the year.
         }
     });
 
@@ -33080,7 +33533,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 225 */
+/* 229 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33145,7 +33598,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 226 */
+/* 230 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33261,7 +33714,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 0, // Sunday is the first day of the week.
-            doy : 6  // The week that contains Jan 1st is the first week of the year.
+            doy : 6  // The week that contains Jan 6th is the first week of the year.
         }
     });
 
@@ -33271,7 +33724,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 227 */
+/* 231 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33286,7 +33739,7 @@ exports.JavaKeyTool = JavaKeyTool;
         monthsShortWithoutDots = 'jan_feb_mrt_apr_mei_jun_jul_aug_sep_okt_nov_dec'.split('_');
 
     var monthsParse = [/^jan/i, /^feb/i, /^maart|mrt.?$/i, /^apr/i, /^mei$/i, /^jun[i.]?$/i, /^jul[i.]?$/i, /^aug/i, /^sep/i, /^okt/i, /^nov/i, /^dec/i];
-    var monthsRegex = /^(januari|februari|maart|april|mei|april|ju[nl]i|augustus|september|oktober|november|december|jan\.?|feb\.?|mrt\.?|apr\.?|ju[nl]\.?|aug\.?|sep\.?|okt\.?|nov\.?|dec\.?)/i;
+    var monthsRegex = /^(januari|februari|maart|april|mei|ju[nl]i|augustus|september|oktober|november|december|jan\.?|feb\.?|mrt\.?|apr\.?|ju[nl]\.?|aug\.?|sep\.?|okt\.?|nov\.?|dec\.?)/i;
 
     var nl = moment.defineLocale('nl', {
         months : 'januari_februari_maart_april_mei_juni_juli_augustus_september_oktober_november_december'.split('_'),
@@ -33302,7 +33755,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
         monthsRegex: monthsRegex,
         monthsShortRegex: monthsRegex,
-        monthsStrictRegex: /^(januari|februari|maart|mei|ju[nl]i|april|augustus|september|oktober|november|december)/i,
+        monthsStrictRegex: /^(januari|februari|maart|april|mei|ju[nl]i|augustus|september|oktober|november|december)/i,
         monthsShortStrictRegex: /^(jan\.?|feb\.?|mrt\.?|apr\.?|mei|ju[nl]\.?|aug\.?|sep\.?|okt\.?|nov\.?|dec\.?)/i,
 
         monthsParse : monthsParse,
@@ -33361,7 +33814,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 228 */
+/* 232 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33376,7 +33829,7 @@ exports.JavaKeyTool = JavaKeyTool;
         monthsShortWithoutDots = 'jan_feb_mrt_apr_mei_jun_jul_aug_sep_okt_nov_dec'.split('_');
 
     var monthsParse = [/^jan/i, /^feb/i, /^maart|mrt.?$/i, /^apr/i, /^mei$/i, /^jun[i.]?$/i, /^jul[i.]?$/i, /^aug/i, /^sep/i, /^okt/i, /^nov/i, /^dec/i];
-    var monthsRegex = /^(januari|februari|maart|april|mei|april|ju[nl]i|augustus|september|oktober|november|december|jan\.?|feb\.?|mrt\.?|apr\.?|ju[nl]\.?|aug\.?|sep\.?|okt\.?|nov\.?|dec\.?)/i;
+    var monthsRegex = /^(januari|februari|maart|april|mei|ju[nl]i|augustus|september|oktober|november|december|jan\.?|feb\.?|mrt\.?|apr\.?|ju[nl]\.?|aug\.?|sep\.?|okt\.?|nov\.?|dec\.?)/i;
 
     var nlBe = moment.defineLocale('nl-be', {
         months : 'januari_februari_maart_april_mei_juni_juli_augustus_september_oktober_november_december'.split('_'),
@@ -33392,7 +33845,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
         monthsRegex: monthsRegex,
         monthsShortRegex: monthsRegex,
-        monthsStrictRegex: /^(januari|februari|maart|mei|ju[nl]i|april|augustus|september|oktober|november|december)/i,
+        monthsStrictRegex: /^(januari|februari|maart|april|mei|ju[nl]i|augustus|september|oktober|november|december)/i,
         monthsShortStrictRegex: /^(jan\.?|feb\.?|mrt\.?|apr\.?|mei|ju[nl]\.?|aug\.?|sep\.?|okt\.?|nov\.?|dec\.?)/i,
 
         monthsParse : monthsParse,
@@ -33451,7 +33904,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 229 */
+/* 233 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33514,7 +33967,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 230 */
+/* 234 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33551,7 +34004,7 @@ exports.JavaKeyTool = JavaKeyTool;
     };
 
     var paIn = moment.defineLocale('pa-in', {
-        // There are months name as per Nanakshahi Calender but they are not used as rigidly in modern Punjabi.
+        // There are months name as per Nanakshahi Calendar but they are not used as rigidly in modern Punjabi.
         months : 'ਜਨਵਰੀ_ਫ਼ਰਵਰੀ_ਮਾਰਚ_ਅਪ੍ਰੈਲ_ਮਈ_ਜੂਨ_ਜੁਲਾਈ_ਅਗਸਤ_ਸਤੰਬਰ_ਅਕਤੂਬਰ_ਨਵੰਬਰ_ਦਸੰਬਰ'.split('_'),
         monthsShort : 'ਜਨਵਰੀ_ਫ਼ਰਵਰੀ_ਮਾਰਚ_ਅਪ੍ਰੈਲ_ਮਈ_ਜੂਨ_ਜੁਲਾਈ_ਅਗਸਤ_ਸਤੰਬਰ_ਅਕਤੂਬਰ_ਨਵੰਬਰ_ਦਸੰਬਰ'.split('_'),
         weekdays : 'ਐਤਵਾਰ_ਸੋਮਵਾਰ_ਮੰਗਲਵਾਰ_ਬੁਧਵਾਰ_ਵੀਰਵਾਰ_ਸ਼ੁੱਕਰਵਾਰ_ਸ਼ਨੀਚਰਵਾਰ'.split('_'),
@@ -33631,7 +34084,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 0, // Sunday is the first day of the week.
-            doy : 6  // The week that contains Jan 1st is the first week of the year.
+            doy : 6  // The week that contains Jan 6th is the first week of the year.
         }
     });
 
@@ -33641,7 +34094,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 231 */
+/* 235 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33770,7 +34223,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 232 */
+/* 236 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33782,8 +34235,8 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
     var pt = moment.defineLocale('pt', {
-        months : 'janeiro_fevereiro_março_abril_maio_junho_julho_agosto_setembro_outubro_novembro_dezembro'.split('_'),
-        monthsShort : 'jan_fev_mar_abr_mai_jun_jul_ago_set_out_nov_dez'.split('_'),
+        months : 'Janeiro_Fevereiro_Março_Abril_Maio_Junho_Julho_Agosto_Setembro_Outubro_Novembro_Dezembro'.split('_'),
+        monthsShort : 'Jan_Fev_Mar_Abr_Mai_Jun_Jul_Ago_Set_Out_Nov_Dez'.split('_'),
         weekdays : 'Domingo_Segunda-feira_Terça-feira_Quarta-feira_Quinta-feira_Sexta-feira_Sábado'.split('_'),
         weekdaysShort : 'Dom_Seg_Ter_Qua_Qui_Sex_Sáb'.split('_'),
         weekdaysMin : 'Do_2ª_3ª_4ª_5ª_6ª_Sá'.split('_'),
@@ -33838,7 +34291,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 233 */
+/* 237 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33850,8 +34303,8 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
     var ptBr = moment.defineLocale('pt-br', {
-        months : 'janeiro_fevereiro_março_abril_maio_junho_julho_agosto_setembro_outubro_novembro_dezembro'.split('_'),
-        monthsShort : 'jan_fev_mar_abr_mai_jun_jul_ago_set_out_nov_dez'.split('_'),
+        months : 'Janeiro_Fevereiro_Março_Abril_Maio_Junho_Julho_Agosto_Setembro_Outubro_Novembro_Dezembro'.split('_'),
+        monthsShort : 'Jan_Fev_Mar_Abr_Mai_Jun_Jul_Ago_Set_Out_Nov_Dez'.split('_'),
         weekdays : 'Domingo_Segunda-feira_Terça-feira_Quarta-feira_Quinta-feira_Sexta-feira_Sábado'.split('_'),
         weekdaysShort : 'Dom_Seg_Ter_Qua_Qui_Sex_Sáb'.split('_'),
         weekdaysMin : 'Do_2ª_3ª_4ª_5ª_6ª_Sá'.split('_'),
@@ -33902,7 +34355,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 234 */
+/* 238 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -33970,7 +34423,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -33980,7 +34433,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 235 */
+/* 239 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -34165,7 +34618,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 236 */
+/* 240 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -34266,7 +34719,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 237 */
+/* 241 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -34329,7 +34782,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 238 */
+/* 242 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -34403,7 +34856,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 239 */
+/* 243 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -34562,7 +35015,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 240 */
+/* 244 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -34586,7 +35039,7 @@ exports.JavaKeyTool = JavaKeyTool;
                 } else if (number < 5) {
                     result += withoutSuffix || isFuture ? 'sekunde' : 'sekundah';
                 } else {
-                    result += withoutSuffix || isFuture ? 'sekund' : 'sekund';
+                    result += 'sekund';
                 }
                 return result;
             case 'm':
@@ -34728,7 +35181,7 @@ exports.JavaKeyTool = JavaKeyTool;
         ordinal : '%d.',
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -34738,7 +35191,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 241 */
+/* 245 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -34809,7 +35262,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 242 */
+/* 246 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -34913,7 +35366,7 @@ exports.JavaKeyTool = JavaKeyTool;
         ordinal : '%d.',
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -34923,7 +35376,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 243 */
+/* 247 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -35027,7 +35480,7 @@ exports.JavaKeyTool = JavaKeyTool;
         ordinal : '%d.',
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -35037,7 +35490,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 244 */
+/* 248 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -35128,7 +35581,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 245 */
+/* 249 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -35200,7 +35653,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 246 */
+/* 250 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -35252,7 +35705,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -35262,7 +35715,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 247 */
+/* 251 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -35384,7 +35837,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 0, // Sunday is the first day of the week.
-            doy : 6  // The week that contains Jan 1st is the first week of the year.
+            doy : 6  // The week that contains Jan 6th is the first week of the year.
         }
     });
 
@@ -35394,7 +35847,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 248 */
+/* 252 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -35406,8 +35859,8 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
     var te = moment.defineLocale('te', {
-        months : 'జనవరి_ఫిబ్రవరి_మార్చి_ఏప్రిల్_మే_జూన్_జూలై_ఆగస్టు_సెప్టెంబర్_అక్టోబర్_నవంబర్_డిసెంబర్'.split('_'),
-        monthsShort : 'జన._ఫిబ్ర._మార్చి_ఏప్రి._మే_జూన్_జూలై_ఆగ._సెప్._అక్టో._నవ._డిసె.'.split('_'),
+        months : 'జనవరి_ఫిబ్రవరి_మార్చి_ఏప్రిల్_మే_జూన్_జులై_ఆగస్టు_సెప్టెంబర్_అక్టోబర్_నవంబర్_డిసెంబర్'.split('_'),
+        monthsShort : 'జన._ఫిబ్ర._మార్చి_ఏప్రి._మే_జూన్_జులై_ఆగ._సెప్._అక్టో._నవ._డిసె.'.split('_'),
         monthsParseExact : true,
         weekdays : 'ఆదివారం_సోమవారం_మంగళవారం_బుధవారం_గురువారం_శుక్రవారం_శనివారం'.split('_'),
         weekdaysShort : 'ఆది_సోమ_మంగళ_బుధ_గురు_శుక్ర_శని'.split('_'),
@@ -35476,7 +35929,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 0, // Sunday is the first day of the week.
-            doy : 6  // The week that contains Jan 1st is the first week of the year.
+            doy : 6  // The week that contains Jan 6th is the first week of the year.
         }
     });
 
@@ -35486,7 +35939,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 249 */
+/* 253 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -35556,7 +36009,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 250 */
+/* 254 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -35675,7 +36128,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 251 */
+/* 255 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -35745,7 +36198,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 252 */
+/* 256 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -35810,7 +36263,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 253 */
+/* 257 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -35935,7 +36388,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 254 */
+/* 258 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -36022,7 +36475,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -36032,7 +36485,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 255 */
+/* 259 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -36126,7 +36579,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 256 */
+/* 260 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -36177,7 +36630,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 6, // Saturday is the first day of the week.
-            doy : 12  // The week that contains Jan 1st is the first week of the year.
+            doy : 12  // The week that contains Jan 12th is the first week of the year.
         }
     });
 
@@ -36187,7 +36640,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 257 */
+/* 261 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -36238,7 +36691,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 6, // Saturday is the first day of the week.
-            doy : 12  // The week that contains Jan 1st is the first week of the year.
+            doy : 12  // The week that contains Jan 12th is the first week of the year.
         }
     });
 
@@ -36248,7 +36701,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 258 */
+/* 262 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js language configuration
@@ -36370,7 +36823,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 259 */
+/* 263 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -36411,6 +36864,9 @@ exports.JavaKeyTool = JavaKeyTool;
             'genitive': 'неділі_понеділка_вівторка_середи_четверга_п’ятниці_суботи'.split('_')
         };
 
+        if (m === true) {
+            return weekdays['nominative'].slice(1, 7).concat(weekdays['nominative'].slice(0, 1));
+        }
         if (!m) {
             return weekdays['nominative'];
         }
@@ -36514,7 +36970,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -36524,7 +36980,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 260 */
+/* 264 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -36625,7 +37081,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 261 */
+/* 265 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -36686,7 +37142,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 262 */
+/* 266 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -36737,7 +37193,7 @@ exports.JavaKeyTool = JavaKeyTool;
         },
         week : {
             dow : 1, // Monday is the first day of the week.
-            doy : 7  // The week that contains Jan 1st is the first week of the year.
+            doy : 7  // The week that contains Jan 7th is the first week of the year.
         }
     });
 
@@ -36747,7 +37203,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 263 */
+/* 267 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -36829,7 +37285,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 264 */
+/* 268 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -36900,7 +37356,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 265 */
+/* 269 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -36963,7 +37419,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 266 */
+/* 270 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -37076,7 +37532,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 267 */
+/* 271 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -37182,7 +37638,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 268 */
+/* 272 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -37288,7 +37744,7 @@ exports.JavaKeyTool = JavaKeyTool;
 
 
 /***/ }),
-/* 269 */
+/* 273 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global) {/*!
@@ -37296,7 +37752,7 @@ exports.JavaKeyTool = JavaKeyTool;
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
  * @license   Licensed under MIT license
  *            See https://raw.githubusercontent.com/stefanpenner/es6-promise/master/LICENSE
- * @version   v4.2.5+7f2b526d
+ * @version   v4.2.6+9869a4bc
  */
 
 (function (global, factory) {
@@ -38474,25 +38930,20 @@ return Promise$1;
 
 //# sourceMappingURL=es6-promise.map
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(54), __webpack_require__(81)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(55), __webpack_require__(81)))
 
 /***/ }),
-/* 270 */
+/* 274 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(271);
 __webpack_require__(275);
-__webpack_require__(276);
-__webpack_require__(278);
-__webpack_require__(279);
 __webpack_require__(280);
 __webpack_require__(281);
-__webpack_require__(282);
+__webpack_require__(283);
+__webpack_require__(284);
 __webpack_require__(285);
 __webpack_require__(286);
 __webpack_require__(287);
-__webpack_require__(288);
-__webpack_require__(289);
 __webpack_require__(290);
 __webpack_require__(291);
 __webpack_require__(292);
@@ -38501,17 +38952,22 @@ __webpack_require__(294);
 __webpack_require__(295);
 __webpack_require__(296);
 __webpack_require__(297);
+__webpack_require__(298);
+__webpack_require__(299);
+__webpack_require__(300);
+__webpack_require__(301);
+__webpack_require__(302);
 __webpack_require__(94);
-module.exports = __webpack_require__(19).Array;
+module.exports = __webpack_require__(20).Array;
 
 
 /***/ }),
-/* 271 */
+/* 275 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var $at = __webpack_require__(272)(true);
+var $at = __webpack_require__(276)(true);
 
 // 21.1.3.27 String.prototype[@@iterator]()
 __webpack_require__(82)(String, 'String', function (iterated) {
@@ -38530,11 +38986,11 @@ __webpack_require__(82)(String, 'String', function (iterated) {
 
 
 /***/ }),
-/* 272 */
+/* 276 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var toInteger = __webpack_require__(25);
-var defined = __webpack_require__(55);
+var defined = __webpack_require__(56);
 // true  -> String#at
 // false -> String#codePointAt
 module.exports = function (TO_STRING) {
@@ -38553,18 +39009,25 @@ module.exports = function (TO_STRING) {
 
 
 /***/ }),
-/* 273 */
+/* 277 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(43)('native-function-to-string', Function.toString);
+
+
+/***/ }),
+/* 278 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var create = __webpack_require__(56);
+var create = __webpack_require__(57);
 var descriptor = __webpack_require__(30);
-var setToStringTag = __webpack_require__(47);
+var setToStringTag = __webpack_require__(48);
 var IteratorPrototype = {};
 
 // 25.1.2.1.1 %IteratorPrototype%[@@iterator]()
-__webpack_require__(15)(IteratorPrototype, __webpack_require__(5)('iterator'), function () { return this; });
+__webpack_require__(15)(IteratorPrototype, __webpack_require__(6)('iterator'), function () { return this; });
 
 module.exports = function (Constructor, NAME, next) {
   Constructor.prototype = create(IteratorPrototype, { next: descriptor(1, next) });
@@ -38573,12 +39036,12 @@ module.exports = function (Constructor, NAME, next) {
 
 
 /***/ }),
-/* 274 */
+/* 279 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var dP = __webpack_require__(14);
 var anObject = __webpack_require__(26);
-var getKeys = __webpack_require__(57);
+var getKeys = __webpack_require__(58);
 
 module.exports = __webpack_require__(16) ? Object.defineProperties : function defineProperties(O, Properties) {
   anObject(O);
@@ -38592,7 +39055,7 @@ module.exports = __webpack_require__(16) ? Object.defineProperties : function de
 
 
 /***/ }),
-/* 275 */
+/* 280 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 22.1.2.2 / 15.4.3.2 Array.isArray(arg)
@@ -38602,15 +39065,15 @@ $export($export.S, 'Array', { isArray: __webpack_require__(62) });
 
 
 /***/ }),
-/* 276 */
+/* 281 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var ctx = __webpack_require__(43);
+var ctx = __webpack_require__(44);
 var $export = __webpack_require__(3);
-var toObject = __webpack_require__(23);
-var call = __webpack_require__(277);
+var toObject = __webpack_require__(17);
+var call = __webpack_require__(282);
 var isArrayIter = __webpack_require__(88);
 var toLength = __webpack_require__(8);
 var createProperty = __webpack_require__(89);
@@ -38646,7 +39109,7 @@ $export($export.S + $export.F * !__webpack_require__(91)(function (iter) { Array
 
 
 /***/ }),
-/* 277 */
+/* 282 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // call something on iterator step with safe closing on error
@@ -38664,7 +39127,7 @@ module.exports = function (iterator, fn, value, entries) {
 
 
 /***/ }),
-/* 278 */
+/* 283 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38690,18 +39153,18 @@ $export($export.S + $export.F * __webpack_require__(12)(function () {
 
 
 /***/ }),
-/* 279 */
+/* 284 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 // 22.1.3.13 Array.prototype.join(separator)
 var $export = __webpack_require__(3);
-var toIObject = __webpack_require__(22);
+var toIObject = __webpack_require__(23);
 var arrayJoin = [].join;
 
 // fallback for not array-like strings
-$export($export.P + $export.F * (__webpack_require__(45) != Object || !__webpack_require__(13)(arrayJoin)), 'Array', {
+$export($export.P + $export.F * (__webpack_require__(46) != Object || !__webpack_require__(13)(arrayJoin)), 'Array', {
   join: function join(separator) {
     return arrayJoin.call(toIObject(this), separator === undefined ? ',' : separator);
   }
@@ -38709,14 +39172,14 @@ $export($export.P + $export.F * (__webpack_require__(45) != Object || !__webpack
 
 
 /***/ }),
-/* 280 */
+/* 285 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var $export = __webpack_require__(3);
 var html = __webpack_require__(86);
-var cof = __webpack_require__(46);
+var cof = __webpack_require__(47);
 var toAbsoluteIndex = __webpack_require__(31);
 var toLength = __webpack_require__(8);
 var arraySlice = [].slice;
@@ -38744,14 +39207,14 @@ $export($export.P + $export.F * __webpack_require__(12)(function () {
 
 
 /***/ }),
-/* 281 */
+/* 286 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var $export = __webpack_require__(3);
-var aFunction = __webpack_require__(44);
-var toObject = __webpack_require__(23);
+var aFunction = __webpack_require__(45);
+var toObject = __webpack_require__(17);
 var fails = __webpack_require__(12);
 var $sort = [].sort;
 var test = [1, 2, 3];
@@ -38774,7 +39237,7 @@ $export($export.P + $export.F * (fails(function () {
 
 
 /***/ }),
-/* 282 */
+/* 287 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38792,11 +39255,11 @@ $export($export.P + $export.F * !STRICT, 'Array', {
 
 
 /***/ }),
-/* 283 */
+/* 288 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 9.4.2.3 ArraySpeciesCreate(originalArray, length)
-var speciesConstructor = __webpack_require__(284);
+var speciesConstructor = __webpack_require__(289);
 
 module.exports = function (original, length) {
   return new (speciesConstructor(original))(length);
@@ -38804,12 +39267,12 @@ module.exports = function (original, length) {
 
 
 /***/ }),
-/* 284 */
+/* 289 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isObject = __webpack_require__(20);
+var isObject = __webpack_require__(21);
 var isArray = __webpack_require__(62);
-var SPECIES = __webpack_require__(5)('species');
+var SPECIES = __webpack_require__(6)('species');
 
 module.exports = function (original) {
   var C;
@@ -38826,7 +39289,7 @@ module.exports = function (original) {
 
 
 /***/ }),
-/* 285 */
+/* 290 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38843,7 +39306,7 @@ $export($export.P + $export.F * !__webpack_require__(13)([].map, true), 'Array',
 
 
 /***/ }),
-/* 286 */
+/* 291 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38860,7 +39323,7 @@ $export($export.P + $export.F * !__webpack_require__(13)([].filter, true), 'Arra
 
 
 /***/ }),
-/* 287 */
+/* 292 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38877,7 +39340,7 @@ $export($export.P + $export.F * !__webpack_require__(13)([].some, true), 'Array'
 
 
 /***/ }),
-/* 288 */
+/* 293 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38894,7 +39357,7 @@ $export($export.P + $export.F * !__webpack_require__(13)([].every, true), 'Array
 
 
 /***/ }),
-/* 289 */
+/* 294 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38911,7 +39374,7 @@ $export($export.P + $export.F * !__webpack_require__(13)([].reduce, true), 'Arra
 
 
 /***/ }),
-/* 290 */
+/* 295 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -38928,13 +39391,13 @@ $export($export.P + $export.F * !__webpack_require__(13)([].reduceRight, true), 
 
 
 /***/ }),
-/* 291 */
+/* 296 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var $export = __webpack_require__(3);
-var $indexOf = __webpack_require__(58)(false);
+var $indexOf = __webpack_require__(59)(false);
 var $native = [].indexOf;
 var NEGATIVE_ZERO = !!$native && 1 / [1].indexOf(1, -0) < 0;
 
@@ -38950,13 +39413,13 @@ $export($export.P + $export.F * (NEGATIVE_ZERO || !__webpack_require__(13)($nati
 
 
 /***/ }),
-/* 292 */
+/* 297 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var $export = __webpack_require__(3);
-var toIObject = __webpack_require__(22);
+var toIObject = __webpack_require__(23);
 var toInteger = __webpack_require__(25);
 var toLength = __webpack_require__(8);
 var $native = [].lastIndexOf;
@@ -38979,7 +39442,7 @@ $export($export.P + $export.F * (NEGATIVE_ZERO || !__webpack_require__(13)($nati
 
 
 /***/ }),
-/* 293 */
+/* 298 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 22.1.3.3 Array.prototype.copyWithin(target, start, end = this.length)
@@ -38991,7 +39454,7 @@ __webpack_require__(37)('copyWithin');
 
 
 /***/ }),
-/* 294 */
+/* 299 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // 22.1.3.6 Array.prototype.fill(value, start = 0, end = this.length)
@@ -39003,7 +39466,7 @@ __webpack_require__(37)('fill');
 
 
 /***/ }),
-/* 295 */
+/* 300 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39024,7 +39487,7 @@ __webpack_require__(37)(KEY);
 
 
 /***/ }),
-/* 296 */
+/* 301 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39045,14 +39508,14 @@ __webpack_require__(37)(KEY);
 
 
 /***/ }),
-/* 297 */
+/* 302 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(65)('Array');
 
 
 /***/ }),
-/* 298 */
+/* 303 */
 /***/ (function(module, exports) {
 
 module.exports = function (done, value) {
@@ -39061,37 +39524,37 @@ module.exports = function (done, value) {
 
 
 /***/ }),
-/* 299 */
+/* 304 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(300);
-__webpack_require__(301);
-__webpack_require__(302);
-__webpack_require__(303);
-__webpack_require__(304);
 __webpack_require__(305);
 __webpack_require__(306);
 __webpack_require__(307);
 __webpack_require__(308);
 __webpack_require__(309);
 __webpack_require__(310);
+__webpack_require__(311);
+__webpack_require__(312);
+__webpack_require__(313);
+__webpack_require__(314);
+__webpack_require__(315);
 __webpack_require__(100);
-module.exports = __webpack_require__(19);
+module.exports = __webpack_require__(20);
 
 
 /***/ }),
-/* 300 */
+/* 305 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var $export = __webpack_require__(3);
-var $typed = __webpack_require__(48);
+var $typed = __webpack_require__(49);
 var buffer = __webpack_require__(66);
 var anObject = __webpack_require__(26);
 var toAbsoluteIndex = __webpack_require__(31);
 var toLength = __webpack_require__(8);
-var isObject = __webpack_require__(20);
+var isObject = __webpack_require__(21);
 var ArrayBuffer = __webpack_require__(7).ArrayBuffer;
 var speciesConstructor = __webpack_require__(98);
 var $ArrayBuffer = buffer.ArrayBuffer;
@@ -39133,67 +39596,12 @@ __webpack_require__(65)(ARRAY_BUFFER);
 
 
 /***/ }),
-/* 301 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var $export = __webpack_require__(3);
-$export($export.G + $export.W + $export.F * !__webpack_require__(48).ABV, {
-  DataView: __webpack_require__(66).DataView
-});
-
-
-/***/ }),
-/* 302 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(17)('Int8', 1, function (init) {
-  return function Int8Array(data, byteOffset, length) {
-    return init(this, data, byteOffset, length);
-  };
-});
-
-
-/***/ }),
-/* 303 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(17)('Uint8', 1, function (init) {
-  return function Uint8Array(data, byteOffset, length) {
-    return init(this, data, byteOffset, length);
-  };
-});
-
-
-/***/ }),
-/* 304 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(17)('Uint8', 1, function (init) {
-  return function Uint8ClampedArray(data, byteOffset, length) {
-    return init(this, data, byteOffset, length);
-  };
-}, true);
-
-
-/***/ }),
-/* 305 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(17)('Int16', 2, function (init) {
-  return function Int16Array(data, byteOffset, length) {
-    return init(this, data, byteOffset, length);
-  };
-});
-
-
-/***/ }),
 /* 306 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(17)('Uint16', 2, function (init) {
-  return function Uint16Array(data, byteOffset, length) {
-    return init(this, data, byteOffset, length);
-  };
+var $export = __webpack_require__(3);
+$export($export.G + $export.W + $export.F * !__webpack_require__(49).ABV, {
+  DataView: __webpack_require__(66).DataView
 });
 
 
@@ -39201,8 +39609,8 @@ __webpack_require__(17)('Uint16', 2, function (init) {
 /* 307 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(17)('Int32', 4, function (init) {
-  return function Int32Array(data, byteOffset, length) {
+__webpack_require__(18)('Int8', 1, function (init) {
+  return function Int8Array(data, byteOffset, length) {
     return init(this, data, byteOffset, length);
   };
 });
@@ -39212,8 +39620,8 @@ __webpack_require__(17)('Int32', 4, function (init) {
 /* 308 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(17)('Uint32', 4, function (init) {
-  return function Uint32Array(data, byteOffset, length) {
+__webpack_require__(18)('Uint8', 1, function (init) {
+  return function Uint8Array(data, byteOffset, length) {
     return init(this, data, byteOffset, length);
   };
 });
@@ -39223,19 +39631,19 @@ __webpack_require__(17)('Uint32', 4, function (init) {
 /* 309 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(17)('Float32', 4, function (init) {
-  return function Float32Array(data, byteOffset, length) {
+__webpack_require__(18)('Uint8', 1, function (init) {
+  return function Uint8ClampedArray(data, byteOffset, length) {
     return init(this, data, byteOffset, length);
   };
-});
+}, true);
 
 
 /***/ }),
 /* 310 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(17)('Float64', 8, function (init) {
-  return function Float64Array(data, byteOffset, length) {
+__webpack_require__(18)('Int16', 2, function (init) {
+  return function Int16Array(data, byteOffset, length) {
     return init(this, data, byteOffset, length);
   };
 });
@@ -39245,43 +39653,100 @@ __webpack_require__(17)('Float64', 8, function (init) {
 /* 311 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(312);
-__webpack_require__(100);
-module.exports = __webpack_require__(19).Symbol;
+__webpack_require__(18)('Uint16', 2, function (init) {
+  return function Uint16Array(data, byteOffset, length) {
+    return init(this, data, byteOffset, length);
+  };
+});
 
 
 /***/ }),
 /* 312 */
 /***/ (function(module, exports, __webpack_require__) {
 
+__webpack_require__(18)('Int32', 4, function (init) {
+  return function Int32Array(data, byteOffset, length) {
+    return init(this, data, byteOffset, length);
+  };
+});
+
+
+/***/ }),
+/* 313 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(18)('Uint32', 4, function (init) {
+  return function Uint32Array(data, byteOffset, length) {
+    return init(this, data, byteOffset, length);
+  };
+});
+
+
+/***/ }),
+/* 314 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(18)('Float32', 4, function (init) {
+  return function Float32Array(data, byteOffset, length) {
+    return init(this, data, byteOffset, length);
+  };
+});
+
+
+/***/ }),
+/* 315 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(18)('Float64', 8, function (init) {
+  return function Float64Array(data, byteOffset, length) {
+    return init(this, data, byteOffset, length);
+  };
+});
+
+
+/***/ }),
+/* 316 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(317);
+__webpack_require__(100);
+module.exports = __webpack_require__(20).Symbol;
+
+
+/***/ }),
+/* 317 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 // ECMAScript 6 symbols shim
 var global = __webpack_require__(7);
-var has = __webpack_require__(21);
+var has = __webpack_require__(22);
 var DESCRIPTORS = __webpack_require__(16);
 var $export = __webpack_require__(3);
 var redefine = __webpack_require__(35);
-var META = __webpack_require__(313).KEY;
+var META = __webpack_require__(318).KEY;
 var $fails = __webpack_require__(12);
-var shared = __webpack_require__(60);
-var setToStringTag = __webpack_require__(47);
+var shared = __webpack_require__(43);
+var setToStringTag = __webpack_require__(48);
 var uid = __webpack_require__(27);
-var wks = __webpack_require__(5);
+var wks = __webpack_require__(6);
 var wksExt = __webpack_require__(101);
-var wksDefine = __webpack_require__(314);
-var enumKeys = __webpack_require__(315);
+var wksDefine = __webpack_require__(319);
+var enumKeys = __webpack_require__(320);
 var isArray = __webpack_require__(62);
 var anObject = __webpack_require__(26);
-var isObject = __webpack_require__(20);
-var toIObject = __webpack_require__(22);
+var isObject = __webpack_require__(21);
+var toObject = __webpack_require__(17);
+var toIObject = __webpack_require__(23);
 var toPrimitive = __webpack_require__(42);
 var createDesc = __webpack_require__(30);
-var _create = __webpack_require__(56);
-var gOPNExt = __webpack_require__(316);
+var _create = __webpack_require__(57);
+var gOPNExt = __webpack_require__(321);
 var $GOPD = __webpack_require__(99);
+var $GOPS = __webpack_require__(102);
 var $DP = __webpack_require__(14);
-var $keys = __webpack_require__(57);
+var $keys = __webpack_require__(58);
 var gOPD = $GOPD.f;
 var dP = $DP.f;
 var gOPN = gOPNExt.f;
@@ -39296,7 +39761,7 @@ var SymbolRegistry = shared('symbol-registry');
 var AllSymbols = shared('symbols');
 var OPSymbols = shared('op-symbols');
 var ObjectProto = Object[PROTOTYPE];
-var USE_NATIVE = typeof $Symbol == 'function';
+var USE_NATIVE = typeof $Symbol == 'function' && !!$GOPS.f;
 var QObject = global.QObject;
 // Don't use setters in Qt Script, https://github.com/zloirock/core-js/issues/173
 var setter = !QObject || !QObject[PROTOTYPE] || !QObject[PROTOTYPE].findChild;
@@ -39404,9 +39869,9 @@ if (!USE_NATIVE) {
 
   $GOPD.f = $getOwnPropertyDescriptor;
   $DP.f = $defineProperty;
-  __webpack_require__(49).f = gOPNExt.f = $getOwnPropertyNames;
+  __webpack_require__(50).f = gOPNExt.f = $getOwnPropertyNames;
   __webpack_require__(67).f = $propertyIsEnumerable;
-  __webpack_require__(102).f = $getOwnPropertySymbols;
+  $GOPS.f = $getOwnPropertySymbols;
 
   if (DESCRIPTORS && !__webpack_require__(29)) {
     redefine(ObjectProto, 'propertyIsEnumerable', $propertyIsEnumerable, true);
@@ -39457,6 +39922,16 @@ $export($export.S + $export.F * !USE_NATIVE, 'Object', {
   getOwnPropertySymbols: $getOwnPropertySymbols
 });
 
+// Chrome 38 and 39 `Object.getOwnPropertySymbols` fails on primitives
+// https://bugs.chromium.org/p/v8/issues/detail?id=3443
+var FAILS_ON_PRIMITIVES = $fails(function () { $GOPS.f(1); });
+
+$export($export.S + $export.F * FAILS_ON_PRIMITIVES, 'Object', {
+  getOwnPropertySymbols: function getOwnPropertySymbols(it) {
+    return $GOPS.f(toObject(it));
+  }
+});
+
 // 24.3.2 JSON.stringify(value [, replacer [, space]])
 $JSON && $export($export.S + $export.F * (!USE_NATIVE || $fails(function () {
   var S = $Symbol();
@@ -39492,12 +39967,12 @@ setToStringTag(global.JSON, 'JSON', true);
 
 
 /***/ }),
-/* 313 */
+/* 318 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var META = __webpack_require__(27)('meta');
-var isObject = __webpack_require__(20);
-var has = __webpack_require__(21);
+var isObject = __webpack_require__(21);
+var has = __webpack_require__(22);
 var setDesc = __webpack_require__(14).f;
 var id = 0;
 var isExtensible = Object.isExtensible || function () {
@@ -39551,11 +40026,11 @@ var meta = module.exports = {
 
 
 /***/ }),
-/* 314 */
+/* 319 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(7);
-var core = __webpack_require__(19);
+var core = __webpack_require__(20);
 var LIBRARY = __webpack_require__(29);
 var wksExt = __webpack_require__(101);
 var defineProperty = __webpack_require__(14).f;
@@ -39566,11 +40041,11 @@ module.exports = function (name) {
 
 
 /***/ }),
-/* 315 */
+/* 320 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // all enumerable object keys, includes symbols
-var getKeys = __webpack_require__(57);
+var getKeys = __webpack_require__(58);
 var gOPS = __webpack_require__(102);
 var pIE = __webpack_require__(67);
 module.exports = function (it) {
@@ -39587,12 +40062,12 @@ module.exports = function (it) {
 
 
 /***/ }),
-/* 316 */
+/* 321 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
-var toIObject = __webpack_require__(22);
-var gOPN = __webpack_require__(49).f;
+var toIObject = __webpack_require__(23);
+var gOPN = __webpack_require__(50).f;
 var toString = {}.toString;
 
 var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
@@ -39612,7 +40087,7 @@ module.exports.f = function getOwnPropertyNames(it) {
 
 
 /***/ }),
-/* 317 */
+/* 322 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -39665,39 +40140,41 @@ module.exports = {
 
 
 /***/ }),
-/* 318 */
+/* 323 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function(process) {exports = module.exports = SemVer;
+/* WEBPACK VAR INJECTION */(function(process) {exports = module.exports = SemVer
 
-// The debug function is excluded entirely from the minified version.
-/* nomin */ var debug;
-/* nomin */ if (typeof process === 'object' &&
-    /* nomin */ process.env &&
-    /* nomin */ process.env.NODE_DEBUG &&
-    /* nomin */ /\bsemver\b/i.test(process.env.NODE_DEBUG))
-  /* nomin */ debug = function() {
-    /* nomin */ var args = Array.prototype.slice.call(arguments, 0);
-    /* nomin */ args.unshift('SEMVER');
-    /* nomin */ console.log.apply(console, args);
-    /* nomin */ };
-/* nomin */ else
-  /* nomin */ debug = function() {};
+var debug
+/* istanbul ignore next */
+if (typeof process === 'object' &&
+    process.env &&
+    process.env.NODE_DEBUG &&
+    /\bsemver\b/i.test(process.env.NODE_DEBUG)) {
+  debug = function () {
+    var args = Array.prototype.slice.call(arguments, 0)
+    args.unshift('SEMVER')
+    console.log.apply(console, args)
+  }
+} else {
+  debug = function () {}
+}
 
 // Note: this is the semver.org version of the spec that it implements
 // Not necessarily the package version of this code.
-exports.SEMVER_SPEC_VERSION = '2.0.0';
+exports.SEMVER_SPEC_VERSION = '2.0.0'
 
-var MAX_LENGTH = 256;
-var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || 9007199254740991;
+var MAX_LENGTH = 256
+var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER ||
+  /* istanbul ignore next */ 9007199254740991
 
 // Max safe segment length for coercion.
-var MAX_SAFE_COMPONENT_LENGTH = 16;
+var MAX_SAFE_COMPONENT_LENGTH = 16
 
 // The actual regexps go on exports.re
-var re = exports.re = [];
-var src = exports.src = [];
-var R = 0;
+var re = exports.re = []
+var src = exports.src = []
+var R = 0
 
 // The following Regular Expressions can be used for tokenizing,
 // validating, and parsing SemVer version strings.
@@ -39705,71 +40182,67 @@ var R = 0;
 // ## Numeric Identifier
 // A single `0`, or a non-zero digit followed by zero or more digits.
 
-var NUMERICIDENTIFIER = R++;
-src[NUMERICIDENTIFIER] = '0|[1-9]\\d*';
-var NUMERICIDENTIFIERLOOSE = R++;
-src[NUMERICIDENTIFIERLOOSE] = '[0-9]+';
-
+var NUMERICIDENTIFIER = R++
+src[NUMERICIDENTIFIER] = '0|[1-9]\\d*'
+var NUMERICIDENTIFIERLOOSE = R++
+src[NUMERICIDENTIFIERLOOSE] = '[0-9]+'
 
 // ## Non-numeric Identifier
 // Zero or more digits, followed by a letter or hyphen, and then zero or
 // more letters, digits, or hyphens.
 
-var NONNUMERICIDENTIFIER = R++;
-src[NONNUMERICIDENTIFIER] = '\\d*[a-zA-Z-][a-zA-Z0-9-]*';
-
+var NONNUMERICIDENTIFIER = R++
+src[NONNUMERICIDENTIFIER] = '\\d*[a-zA-Z-][a-zA-Z0-9-]*'
 
 // ## Main Version
 // Three dot-separated numeric identifiers.
 
-var MAINVERSION = R++;
+var MAINVERSION = R++
 src[MAINVERSION] = '(' + src[NUMERICIDENTIFIER] + ')\\.' +
                    '(' + src[NUMERICIDENTIFIER] + ')\\.' +
-                   '(' + src[NUMERICIDENTIFIER] + ')';
+                   '(' + src[NUMERICIDENTIFIER] + ')'
 
-var MAINVERSIONLOOSE = R++;
+var MAINVERSIONLOOSE = R++
 src[MAINVERSIONLOOSE] = '(' + src[NUMERICIDENTIFIERLOOSE] + ')\\.' +
                         '(' + src[NUMERICIDENTIFIERLOOSE] + ')\\.' +
-                        '(' + src[NUMERICIDENTIFIERLOOSE] + ')';
+                        '(' + src[NUMERICIDENTIFIERLOOSE] + ')'
 
 // ## Pre-release Version Identifier
 // A numeric identifier, or a non-numeric identifier.
 
-var PRERELEASEIDENTIFIER = R++;
+var PRERELEASEIDENTIFIER = R++
 src[PRERELEASEIDENTIFIER] = '(?:' + src[NUMERICIDENTIFIER] +
-                            '|' + src[NONNUMERICIDENTIFIER] + ')';
+                            '|' + src[NONNUMERICIDENTIFIER] + ')'
 
-var PRERELEASEIDENTIFIERLOOSE = R++;
+var PRERELEASEIDENTIFIERLOOSE = R++
 src[PRERELEASEIDENTIFIERLOOSE] = '(?:' + src[NUMERICIDENTIFIERLOOSE] +
-                                 '|' + src[NONNUMERICIDENTIFIER] + ')';
-
+                                 '|' + src[NONNUMERICIDENTIFIER] + ')'
 
 // ## Pre-release Version
 // Hyphen, followed by one or more dot-separated pre-release version
 // identifiers.
 
-var PRERELEASE = R++;
+var PRERELEASE = R++
 src[PRERELEASE] = '(?:-(' + src[PRERELEASEIDENTIFIER] +
-                  '(?:\\.' + src[PRERELEASEIDENTIFIER] + ')*))';
+                  '(?:\\.' + src[PRERELEASEIDENTIFIER] + ')*))'
 
-var PRERELEASELOOSE = R++;
+var PRERELEASELOOSE = R++
 src[PRERELEASELOOSE] = '(?:-?(' + src[PRERELEASEIDENTIFIERLOOSE] +
-                       '(?:\\.' + src[PRERELEASEIDENTIFIERLOOSE] + ')*))';
+                       '(?:\\.' + src[PRERELEASEIDENTIFIERLOOSE] + ')*))'
 
 // ## Build Metadata Identifier
 // Any combination of digits, letters, or hyphens.
 
-var BUILDIDENTIFIER = R++;
-src[BUILDIDENTIFIER] = '[0-9A-Za-z-]+';
+var BUILDIDENTIFIER = R++
+src[BUILDIDENTIFIER] = '[0-9A-Za-z-]+'
 
 // ## Build Metadata
 // Plus sign, followed by one or more period-separated build metadata
 // identifiers.
 
-var BUILD = R++;
+var BUILD = R++
 src[BUILD] = '(?:\\+(' + src[BUILDIDENTIFIER] +
-             '(?:\\.' + src[BUILDIDENTIFIER] + ')*))';
-
+             '(?:\\.' + src[BUILDIDENTIFIER] + ')*))'
 
 // ## Full Version String
 // A main version, followed optionally by a pre-release version and
@@ -39780,802 +40253,870 @@ src[BUILD] = '(?:\\+(' + src[BUILDIDENTIFIER] +
 // capturing group, because it should not ever be used in version
 // comparison.
 
-var FULL = R++;
+var FULL = R++
 var FULLPLAIN = 'v?' + src[MAINVERSION] +
                 src[PRERELEASE] + '?' +
-                src[BUILD] + '?';
+                src[BUILD] + '?'
 
-src[FULL] = '^' + FULLPLAIN + '$';
+src[FULL] = '^' + FULLPLAIN + '$'
 
 // like full, but allows v1.2.3 and =1.2.3, which people do sometimes.
 // also, 1.0.0alpha1 (prerelease without the hyphen) which is pretty
 // common in the npm registry.
 var LOOSEPLAIN = '[v=\\s]*' + src[MAINVERSIONLOOSE] +
                  src[PRERELEASELOOSE] + '?' +
-                 src[BUILD] + '?';
+                 src[BUILD] + '?'
 
-var LOOSE = R++;
-src[LOOSE] = '^' + LOOSEPLAIN + '$';
+var LOOSE = R++
+src[LOOSE] = '^' + LOOSEPLAIN + '$'
 
-var GTLT = R++;
-src[GTLT] = '((?:<|>)?=?)';
+var GTLT = R++
+src[GTLT] = '((?:<|>)?=?)'
 
 // Something like "2.*" or "1.2.x".
 // Note that "x.x" is a valid xRange identifer, meaning "any version"
 // Only the first item is strictly required.
-var XRANGEIDENTIFIERLOOSE = R++;
-src[XRANGEIDENTIFIERLOOSE] = src[NUMERICIDENTIFIERLOOSE] + '|x|X|\\*';
-var XRANGEIDENTIFIER = R++;
-src[XRANGEIDENTIFIER] = src[NUMERICIDENTIFIER] + '|x|X|\\*';
+var XRANGEIDENTIFIERLOOSE = R++
+src[XRANGEIDENTIFIERLOOSE] = src[NUMERICIDENTIFIERLOOSE] + '|x|X|\\*'
+var XRANGEIDENTIFIER = R++
+src[XRANGEIDENTIFIER] = src[NUMERICIDENTIFIER] + '|x|X|\\*'
 
-var XRANGEPLAIN = R++;
+var XRANGEPLAIN = R++
 src[XRANGEPLAIN] = '[v=\\s]*(' + src[XRANGEIDENTIFIER] + ')' +
                    '(?:\\.(' + src[XRANGEIDENTIFIER] + ')' +
                    '(?:\\.(' + src[XRANGEIDENTIFIER] + ')' +
                    '(?:' + src[PRERELEASE] + ')?' +
                    src[BUILD] + '?' +
-                   ')?)?';
+                   ')?)?'
 
-var XRANGEPLAINLOOSE = R++;
+var XRANGEPLAINLOOSE = R++
 src[XRANGEPLAINLOOSE] = '[v=\\s]*(' + src[XRANGEIDENTIFIERLOOSE] + ')' +
                         '(?:\\.(' + src[XRANGEIDENTIFIERLOOSE] + ')' +
                         '(?:\\.(' + src[XRANGEIDENTIFIERLOOSE] + ')' +
                         '(?:' + src[PRERELEASELOOSE] + ')?' +
                         src[BUILD] + '?' +
-                        ')?)?';
+                        ')?)?'
 
-var XRANGE = R++;
-src[XRANGE] = '^' + src[GTLT] + '\\s*' + src[XRANGEPLAIN] + '$';
-var XRANGELOOSE = R++;
-src[XRANGELOOSE] = '^' + src[GTLT] + '\\s*' + src[XRANGEPLAINLOOSE] + '$';
+var XRANGE = R++
+src[XRANGE] = '^' + src[GTLT] + '\\s*' + src[XRANGEPLAIN] + '$'
+var XRANGELOOSE = R++
+src[XRANGELOOSE] = '^' + src[GTLT] + '\\s*' + src[XRANGEPLAINLOOSE] + '$'
 
 // Coercion.
 // Extract anything that could conceivably be a part of a valid semver
-var COERCE = R++;
+var COERCE = R++
 src[COERCE] = '(?:^|[^\\d])' +
               '(\\d{1,' + MAX_SAFE_COMPONENT_LENGTH + '})' +
               '(?:\\.(\\d{1,' + MAX_SAFE_COMPONENT_LENGTH + '}))?' +
               '(?:\\.(\\d{1,' + MAX_SAFE_COMPONENT_LENGTH + '}))?' +
-              '(?:$|[^\\d])';
+              '(?:$|[^\\d])'
 
 // Tilde ranges.
 // Meaning is "reasonably at or greater than"
-var LONETILDE = R++;
-src[LONETILDE] = '(?:~>?)';
+var LONETILDE = R++
+src[LONETILDE] = '(?:~>?)'
 
-var TILDETRIM = R++;
-src[TILDETRIM] = '(\\s*)' + src[LONETILDE] + '\\s+';
-re[TILDETRIM] = new RegExp(src[TILDETRIM], 'g');
-var tildeTrimReplace = '$1~';
+var TILDETRIM = R++
+src[TILDETRIM] = '(\\s*)' + src[LONETILDE] + '\\s+'
+re[TILDETRIM] = new RegExp(src[TILDETRIM], 'g')
+var tildeTrimReplace = '$1~'
 
-var TILDE = R++;
-src[TILDE] = '^' + src[LONETILDE] + src[XRANGEPLAIN] + '$';
-var TILDELOOSE = R++;
-src[TILDELOOSE] = '^' + src[LONETILDE] + src[XRANGEPLAINLOOSE] + '$';
+var TILDE = R++
+src[TILDE] = '^' + src[LONETILDE] + src[XRANGEPLAIN] + '$'
+var TILDELOOSE = R++
+src[TILDELOOSE] = '^' + src[LONETILDE] + src[XRANGEPLAINLOOSE] + '$'
 
 // Caret ranges.
 // Meaning is "at least and backwards compatible with"
-var LONECARET = R++;
-src[LONECARET] = '(?:\\^)';
+var LONECARET = R++
+src[LONECARET] = '(?:\\^)'
 
-var CARETTRIM = R++;
-src[CARETTRIM] = '(\\s*)' + src[LONECARET] + '\\s+';
-re[CARETTRIM] = new RegExp(src[CARETTRIM], 'g');
-var caretTrimReplace = '$1^';
+var CARETTRIM = R++
+src[CARETTRIM] = '(\\s*)' + src[LONECARET] + '\\s+'
+re[CARETTRIM] = new RegExp(src[CARETTRIM], 'g')
+var caretTrimReplace = '$1^'
 
-var CARET = R++;
-src[CARET] = '^' + src[LONECARET] + src[XRANGEPLAIN] + '$';
-var CARETLOOSE = R++;
-src[CARETLOOSE] = '^' + src[LONECARET] + src[XRANGEPLAINLOOSE] + '$';
+var CARET = R++
+src[CARET] = '^' + src[LONECARET] + src[XRANGEPLAIN] + '$'
+var CARETLOOSE = R++
+src[CARETLOOSE] = '^' + src[LONECARET] + src[XRANGEPLAINLOOSE] + '$'
 
 // A simple gt/lt/eq thing, or just "" to indicate "any version"
-var COMPARATORLOOSE = R++;
-src[COMPARATORLOOSE] = '^' + src[GTLT] + '\\s*(' + LOOSEPLAIN + ')$|^$';
-var COMPARATOR = R++;
-src[COMPARATOR] = '^' + src[GTLT] + '\\s*(' + FULLPLAIN + ')$|^$';
-
+var COMPARATORLOOSE = R++
+src[COMPARATORLOOSE] = '^' + src[GTLT] + '\\s*(' + LOOSEPLAIN + ')$|^$'
+var COMPARATOR = R++
+src[COMPARATOR] = '^' + src[GTLT] + '\\s*(' + FULLPLAIN + ')$|^$'
 
 // An expression to strip any whitespace between the gtlt and the thing
 // it modifies, so that `> 1.2.3` ==> `>1.2.3`
-var COMPARATORTRIM = R++;
+var COMPARATORTRIM = R++
 src[COMPARATORTRIM] = '(\\s*)' + src[GTLT] +
-                      '\\s*(' + LOOSEPLAIN + '|' + src[XRANGEPLAIN] + ')';
+                      '\\s*(' + LOOSEPLAIN + '|' + src[XRANGEPLAIN] + ')'
 
 // this one has to use the /g flag
-re[COMPARATORTRIM] = new RegExp(src[COMPARATORTRIM], 'g');
-var comparatorTrimReplace = '$1$2$3';
-
+re[COMPARATORTRIM] = new RegExp(src[COMPARATORTRIM], 'g')
+var comparatorTrimReplace = '$1$2$3'
 
 // Something like `1.2.3 - 1.2.4`
 // Note that these all use the loose form, because they'll be
 // checked against either the strict or loose comparator form
 // later.
-var HYPHENRANGE = R++;
+var HYPHENRANGE = R++
 src[HYPHENRANGE] = '^\\s*(' + src[XRANGEPLAIN] + ')' +
                    '\\s+-\\s+' +
                    '(' + src[XRANGEPLAIN] + ')' +
-                   '\\s*$';
+                   '\\s*$'
 
-var HYPHENRANGELOOSE = R++;
+var HYPHENRANGELOOSE = R++
 src[HYPHENRANGELOOSE] = '^\\s*(' + src[XRANGEPLAINLOOSE] + ')' +
                         '\\s+-\\s+' +
                         '(' + src[XRANGEPLAINLOOSE] + ')' +
-                        '\\s*$';
+                        '\\s*$'
 
 // Star ranges basically just allow anything at all.
-var STAR = R++;
-src[STAR] = '(<|>)?=?\\s*\\*';
+var STAR = R++
+src[STAR] = '(<|>)?=?\\s*\\*'
 
 // Compile to actual regexp objects.
 // All are flag-free, unless they were created above with a flag.
 for (var i = 0; i < R; i++) {
-  debug(i, src[i]);
-  if (!re[i])
-    re[i] = new RegExp(src[i]);
+  debug(i, src[i])
+  if (!re[i]) {
+    re[i] = new RegExp(src[i])
+  }
 }
 
-exports.parse = parse;
-function parse(version, options) {
-  if (!options || typeof options !== 'object')
-    options = { loose: !!options, includePrerelease: false }
+exports.parse = parse
+function parse (version, options) {
+  if (!options || typeof options !== 'object') {
+    options = {
+      loose: !!options,
+      includePrerelease: false
+    }
+  }
 
-  if (version instanceof SemVer)
-    return version;
+  if (version instanceof SemVer) {
+    return version
+  }
 
-  if (typeof version !== 'string')
-    return null;
+  if (typeof version !== 'string') {
+    return null
+  }
 
-  if (version.length > MAX_LENGTH)
-    return null;
+  if (version.length > MAX_LENGTH) {
+    return null
+  }
 
-  var r = options.loose ? re[LOOSE] : re[FULL];
-  if (!r.test(version))
-    return null;
+  var r = options.loose ? re[LOOSE] : re[FULL]
+  if (!r.test(version)) {
+    return null
+  }
 
   try {
-    return new SemVer(version, options);
+    return new SemVer(version, options)
   } catch (er) {
-    return null;
+    return null
   }
 }
 
-exports.valid = valid;
-function valid(version, options) {
-  var v = parse(version, options);
-  return v ? v.version : null;
+exports.valid = valid
+function valid (version, options) {
+  var v = parse(version, options)
+  return v ? v.version : null
 }
 
-
-exports.clean = clean;
-function clean(version, options) {
-  var s = parse(version.trim().replace(/^[=v]+/, ''), options);
-  return s ? s.version : null;
+exports.clean = clean
+function clean (version, options) {
+  var s = parse(version.trim().replace(/^[=v]+/, ''), options)
+  return s ? s.version : null
 }
 
-exports.SemVer = SemVer;
+exports.SemVer = SemVer
 
-function SemVer(version, options) {
-  if (!options || typeof options !== 'object')
-    options = { loose: !!options, includePrerelease: false }
+function SemVer (version, options) {
+  if (!options || typeof options !== 'object') {
+    options = {
+      loose: !!options,
+      includePrerelease: false
+    }
+  }
   if (version instanceof SemVer) {
-    if (version.loose === options.loose)
-      return version;
-    else
-      version = version.version;
+    if (version.loose === options.loose) {
+      return version
+    } else {
+      version = version.version
+    }
   } else if (typeof version !== 'string') {
-    throw new TypeError('Invalid Version: ' + version);
+    throw new TypeError('Invalid Version: ' + version)
   }
 
-  if (version.length > MAX_LENGTH)
+  if (version.length > MAX_LENGTH) {
     throw new TypeError('version is longer than ' + MAX_LENGTH + ' characters')
+  }
 
-  if (!(this instanceof SemVer))
-    return new SemVer(version, options);
+  if (!(this instanceof SemVer)) {
+    return new SemVer(version, options)
+  }
 
-  debug('SemVer', version, options);
-  this.options = options;
-  this.loose = !!options.loose;
+  debug('SemVer', version, options)
+  this.options = options
+  this.loose = !!options.loose
 
-  var m = version.trim().match(options.loose ? re[LOOSE] : re[FULL]);
+  var m = version.trim().match(options.loose ? re[LOOSE] : re[FULL])
 
-  if (!m)
-    throw new TypeError('Invalid Version: ' + version);
+  if (!m) {
+    throw new TypeError('Invalid Version: ' + version)
+  }
 
-  this.raw = version;
+  this.raw = version
 
   // these are actually numbers
-  this.major = +m[1];
-  this.minor = +m[2];
-  this.patch = +m[3];
+  this.major = +m[1]
+  this.minor = +m[2]
+  this.patch = +m[3]
 
-  if (this.major > MAX_SAFE_INTEGER || this.major < 0)
+  if (this.major > MAX_SAFE_INTEGER || this.major < 0) {
     throw new TypeError('Invalid major version')
+  }
 
-  if (this.minor > MAX_SAFE_INTEGER || this.minor < 0)
+  if (this.minor > MAX_SAFE_INTEGER || this.minor < 0) {
     throw new TypeError('Invalid minor version')
+  }
 
-  if (this.patch > MAX_SAFE_INTEGER || this.patch < 0)
+  if (this.patch > MAX_SAFE_INTEGER || this.patch < 0) {
     throw new TypeError('Invalid patch version')
+  }
 
   // numberify any prerelease numeric ids
-  if (!m[4])
-    this.prerelease = [];
-  else
-    this.prerelease = m[4].split('.').map(function(id) {
+  if (!m[4]) {
+    this.prerelease = []
+  } else {
+    this.prerelease = m[4].split('.').map(function (id) {
       if (/^[0-9]+$/.test(id)) {
-        var num = +id;
-        if (num >= 0 && num < MAX_SAFE_INTEGER)
-          return num;
+        var num = +id
+        if (num >= 0 && num < MAX_SAFE_INTEGER) {
+          return num
+        }
       }
-      return id;
-    });
+      return id
+    })
+  }
 
-  this.build = m[5] ? m[5].split('.') : [];
-  this.format();
+  this.build = m[5] ? m[5].split('.') : []
+  this.format()
 }
 
-SemVer.prototype.format = function() {
-  this.version = this.major + '.' + this.minor + '.' + this.patch;
-  if (this.prerelease.length)
-    this.version += '-' + this.prerelease.join('.');
-  return this.version;
-};
+SemVer.prototype.format = function () {
+  this.version = this.major + '.' + this.minor + '.' + this.patch
+  if (this.prerelease.length) {
+    this.version += '-' + this.prerelease.join('.')
+  }
+  return this.version
+}
 
-SemVer.prototype.toString = function() {
-  return this.version;
-};
+SemVer.prototype.toString = function () {
+  return this.version
+}
 
-SemVer.prototype.compare = function(other) {
-  debug('SemVer.compare', this.version, this.options, other);
-  if (!(other instanceof SemVer))
-    other = new SemVer(other, this.options);
+SemVer.prototype.compare = function (other) {
+  debug('SemVer.compare', this.version, this.options, other)
+  if (!(other instanceof SemVer)) {
+    other = new SemVer(other, this.options)
+  }
 
-  return this.compareMain(other) || this.comparePre(other);
-};
+  return this.compareMain(other) || this.comparePre(other)
+}
 
-SemVer.prototype.compareMain = function(other) {
-  if (!(other instanceof SemVer))
-    other = new SemVer(other, this.options);
+SemVer.prototype.compareMain = function (other) {
+  if (!(other instanceof SemVer)) {
+    other = new SemVer(other, this.options)
+  }
 
   return compareIdentifiers(this.major, other.major) ||
          compareIdentifiers(this.minor, other.minor) ||
-         compareIdentifiers(this.patch, other.patch);
-};
+         compareIdentifiers(this.patch, other.patch)
+}
 
-SemVer.prototype.comparePre = function(other) {
-  if (!(other instanceof SemVer))
-    other = new SemVer(other, this.options);
+SemVer.prototype.comparePre = function (other) {
+  if (!(other instanceof SemVer)) {
+    other = new SemVer(other, this.options)
+  }
 
   // NOT having a prerelease is > having one
-  if (this.prerelease.length && !other.prerelease.length)
-    return -1;
-  else if (!this.prerelease.length && other.prerelease.length)
-    return 1;
-  else if (!this.prerelease.length && !other.prerelease.length)
-    return 0;
+  if (this.prerelease.length && !other.prerelease.length) {
+    return -1
+  } else if (!this.prerelease.length && other.prerelease.length) {
+    return 1
+  } else if (!this.prerelease.length && !other.prerelease.length) {
+    return 0
+  }
 
-  var i = 0;
+  var i = 0
   do {
-    var a = this.prerelease[i];
-    var b = other.prerelease[i];
-    debug('prerelease compare', i, a, b);
-    if (a === undefined && b === undefined)
-      return 0;
-    else if (b === undefined)
-      return 1;
-    else if (a === undefined)
-      return -1;
-    else if (a === b)
-      continue;
-    else
-      return compareIdentifiers(a, b);
-  } while (++i);
-};
+    var a = this.prerelease[i]
+    var b = other.prerelease[i]
+    debug('prerelease compare', i, a, b)
+    if (a === undefined && b === undefined) {
+      return 0
+    } else if (b === undefined) {
+      return 1
+    } else if (a === undefined) {
+      return -1
+    } else if (a === b) {
+      continue
+    } else {
+      return compareIdentifiers(a, b)
+    }
+  } while (++i)
+}
 
 // preminor will bump the version up to the next minor release, and immediately
 // down to pre-release. premajor and prepatch work the same way.
-SemVer.prototype.inc = function(release, identifier) {
+SemVer.prototype.inc = function (release, identifier) {
   switch (release) {
     case 'premajor':
-      this.prerelease.length = 0;
-      this.patch = 0;
-      this.minor = 0;
-      this.major++;
-      this.inc('pre', identifier);
-      break;
+      this.prerelease.length = 0
+      this.patch = 0
+      this.minor = 0
+      this.major++
+      this.inc('pre', identifier)
+      break
     case 'preminor':
-      this.prerelease.length = 0;
-      this.patch = 0;
-      this.minor++;
-      this.inc('pre', identifier);
-      break;
+      this.prerelease.length = 0
+      this.patch = 0
+      this.minor++
+      this.inc('pre', identifier)
+      break
     case 'prepatch':
       // If this is already a prerelease, it will bump to the next version
       // drop any prereleases that might already exist, since they are not
       // relevant at this point.
-      this.prerelease.length = 0;
-      this.inc('patch', identifier);
-      this.inc('pre', identifier);
-      break;
+      this.prerelease.length = 0
+      this.inc('patch', identifier)
+      this.inc('pre', identifier)
+      break
     // If the input is a non-prerelease version, this acts the same as
     // prepatch.
     case 'prerelease':
-      if (this.prerelease.length === 0)
-        this.inc('patch', identifier);
-      this.inc('pre', identifier);
-      break;
+      if (this.prerelease.length === 0) {
+        this.inc('patch', identifier)
+      }
+      this.inc('pre', identifier)
+      break
 
     case 'major':
       // If this is a pre-major version, bump up to the same major version.
       // Otherwise increment major.
       // 1.0.0-5 bumps to 1.0.0
       // 1.1.0 bumps to 2.0.0
-      if (this.minor !== 0 || this.patch !== 0 || this.prerelease.length === 0)
-        this.major++;
-      this.minor = 0;
-      this.patch = 0;
-      this.prerelease = [];
-      break;
+      if (this.minor !== 0 ||
+          this.patch !== 0 ||
+          this.prerelease.length === 0) {
+        this.major++
+      }
+      this.minor = 0
+      this.patch = 0
+      this.prerelease = []
+      break
     case 'minor':
       // If this is a pre-minor version, bump up to the same minor version.
       // Otherwise increment minor.
       // 1.2.0-5 bumps to 1.2.0
       // 1.2.1 bumps to 1.3.0
-      if (this.patch !== 0 || this.prerelease.length === 0)
-        this.minor++;
-      this.patch = 0;
-      this.prerelease = [];
-      break;
+      if (this.patch !== 0 || this.prerelease.length === 0) {
+        this.minor++
+      }
+      this.patch = 0
+      this.prerelease = []
+      break
     case 'patch':
       // If this is not a pre-release version, it will increment the patch.
       // If it is a pre-release it will bump up to the same patch version.
       // 1.2.0-5 patches to 1.2.0
       // 1.2.0 patches to 1.2.1
-      if (this.prerelease.length === 0)
-        this.patch++;
-      this.prerelease = [];
-      break;
+      if (this.prerelease.length === 0) {
+        this.patch++
+      }
+      this.prerelease = []
+      break
     // This probably shouldn't be used publicly.
     // 1.0.0 "pre" would become 1.0.0-0 which is the wrong direction.
     case 'pre':
-      if (this.prerelease.length === 0)
-        this.prerelease = [0];
-      else {
-        var i = this.prerelease.length;
+      if (this.prerelease.length === 0) {
+        this.prerelease = [0]
+      } else {
+        var i = this.prerelease.length
         while (--i >= 0) {
           if (typeof this.prerelease[i] === 'number') {
-            this.prerelease[i]++;
-            i = -2;
+            this.prerelease[i]++
+            i = -2
           }
         }
-        if (i === -1) // didn't increment anything
-          this.prerelease.push(0);
+        if (i === -1) {
+          // didn't increment anything
+          this.prerelease.push(0)
+        }
       }
       if (identifier) {
         // 1.2.0-beta.1 bumps to 1.2.0-beta.2,
         // 1.2.0-beta.fooblz or 1.2.0-beta bumps to 1.2.0-beta.0
         if (this.prerelease[0] === identifier) {
-          if (isNaN(this.prerelease[1]))
-            this.prerelease = [identifier, 0];
-        } else
-          this.prerelease = [identifier, 0];
+          if (isNaN(this.prerelease[1])) {
+            this.prerelease = [identifier, 0]
+          }
+        } else {
+          this.prerelease = [identifier, 0]
+        }
       }
-      break;
+      break
 
     default:
-      throw new Error('invalid increment argument: ' + release);
+      throw new Error('invalid increment argument: ' + release)
   }
-  this.format();
-  this.raw = this.version;
-  return this;
-};
+  this.format()
+  this.raw = this.version
+  return this
+}
 
-exports.inc = inc;
-function inc(version, release, loose, identifier) {
-  if (typeof(loose) === 'string') {
-    identifier = loose;
-    loose = undefined;
+exports.inc = inc
+function inc (version, release, loose, identifier) {
+  if (typeof (loose) === 'string') {
+    identifier = loose
+    loose = undefined
   }
 
   try {
-    return new SemVer(version, loose).inc(release, identifier).version;
+    return new SemVer(version, loose).inc(release, identifier).version
   } catch (er) {
-    return null;
+    return null
   }
 }
 
-exports.diff = diff;
-function diff(version1, version2) {
+exports.diff = diff
+function diff (version1, version2) {
   if (eq(version1, version2)) {
-    return null;
+    return null
   } else {
-    var v1 = parse(version1);
-    var v2 = parse(version2);
+    var v1 = parse(version1)
+    var v2 = parse(version2)
+    var prefix = ''
     if (v1.prerelease.length || v2.prerelease.length) {
-      for (var key in v1) {
-        if (key === 'major' || key === 'minor' || key === 'patch') {
-          if (v1[key] !== v2[key]) {
-            return 'pre'+key;
-          }
-        }
-      }
-      return 'prerelease';
+      prefix = 'pre'
+      var defaultResult = 'prerelease'
     }
     for (var key in v1) {
       if (key === 'major' || key === 'minor' || key === 'patch') {
         if (v1[key] !== v2[key]) {
-          return key;
+          return prefix + key
         }
       }
     }
+    return defaultResult // may be undefined
   }
 }
 
-exports.compareIdentifiers = compareIdentifiers;
+exports.compareIdentifiers = compareIdentifiers
 
-var numeric = /^[0-9]+$/;
-function compareIdentifiers(a, b) {
-  var anum = numeric.test(a);
-  var bnum = numeric.test(b);
+var numeric = /^[0-9]+$/
+function compareIdentifiers (a, b) {
+  var anum = numeric.test(a)
+  var bnum = numeric.test(b)
 
   if (anum && bnum) {
-    a = +a;
-    b = +b;
+    a = +a
+    b = +b
   }
 
-  return (anum && !bnum) ? -1 :
-         (bnum && !anum) ? 1 :
-         a < b ? -1 :
-         a > b ? 1 :
-         0;
+  return a === b ? 0
+    : (anum && !bnum) ? -1
+    : (bnum && !anum) ? 1
+    : a < b ? -1
+    : 1
 }
 
-exports.rcompareIdentifiers = rcompareIdentifiers;
-function rcompareIdentifiers(a, b) {
-  return compareIdentifiers(b, a);
+exports.rcompareIdentifiers = rcompareIdentifiers
+function rcompareIdentifiers (a, b) {
+  return compareIdentifiers(b, a)
 }
 
-exports.major = major;
-function major(a, loose) {
-  return new SemVer(a, loose).major;
+exports.major = major
+function major (a, loose) {
+  return new SemVer(a, loose).major
 }
 
-exports.minor = minor;
-function minor(a, loose) {
-  return new SemVer(a, loose).minor;
+exports.minor = minor
+function minor (a, loose) {
+  return new SemVer(a, loose).minor
 }
 
-exports.patch = patch;
-function patch(a, loose) {
-  return new SemVer(a, loose).patch;
+exports.patch = patch
+function patch (a, loose) {
+  return new SemVer(a, loose).patch
 }
 
-exports.compare = compare;
-function compare(a, b, loose) {
-  return new SemVer(a, loose).compare(new SemVer(b, loose));
+exports.compare = compare
+function compare (a, b, loose) {
+  return new SemVer(a, loose).compare(new SemVer(b, loose))
 }
 
-exports.compareLoose = compareLoose;
-function compareLoose(a, b) {
-  return compare(a, b, true);
+exports.compareLoose = compareLoose
+function compareLoose (a, b) {
+  return compare(a, b, true)
 }
 
-exports.rcompare = rcompare;
-function rcompare(a, b, loose) {
-  return compare(b, a, loose);
+exports.rcompare = rcompare
+function rcompare (a, b, loose) {
+  return compare(b, a, loose)
 }
 
-exports.sort = sort;
-function sort(list, loose) {
-  return list.sort(function(a, b) {
-    return exports.compare(a, b, loose);
-  });
+exports.sort = sort
+function sort (list, loose) {
+  return list.sort(function (a, b) {
+    return exports.compare(a, b, loose)
+  })
 }
 
-exports.rsort = rsort;
-function rsort(list, loose) {
-  return list.sort(function(a, b) {
-    return exports.rcompare(a, b, loose);
-  });
+exports.rsort = rsort
+function rsort (list, loose) {
+  return list.sort(function (a, b) {
+    return exports.rcompare(a, b, loose)
+  })
 }
 
-exports.gt = gt;
-function gt(a, b, loose) {
-  return compare(a, b, loose) > 0;
+exports.gt = gt
+function gt (a, b, loose) {
+  return compare(a, b, loose) > 0
 }
 
-exports.lt = lt;
-function lt(a, b, loose) {
-  return compare(a, b, loose) < 0;
+exports.lt = lt
+function lt (a, b, loose) {
+  return compare(a, b, loose) < 0
 }
 
-exports.eq = eq;
-function eq(a, b, loose) {
-  return compare(a, b, loose) === 0;
+exports.eq = eq
+function eq (a, b, loose) {
+  return compare(a, b, loose) === 0
 }
 
-exports.neq = neq;
-function neq(a, b, loose) {
-  return compare(a, b, loose) !== 0;
+exports.neq = neq
+function neq (a, b, loose) {
+  return compare(a, b, loose) !== 0
 }
 
-exports.gte = gte;
-function gte(a, b, loose) {
-  return compare(a, b, loose) >= 0;
+exports.gte = gte
+function gte (a, b, loose) {
+  return compare(a, b, loose) >= 0
 }
 
-exports.lte = lte;
-function lte(a, b, loose) {
-  return compare(a, b, loose) <= 0;
+exports.lte = lte
+function lte (a, b, loose) {
+  return compare(a, b, loose) <= 0
 }
 
-exports.cmp = cmp;
-function cmp(a, op, b, loose) {
-  var ret;
+exports.cmp = cmp
+function cmp (a, op, b, loose) {
   switch (op) {
     case '===':
-      if (typeof a === 'object') a = a.version;
-      if (typeof b === 'object') b = b.version;
-      ret = a === b;
-      break;
+      if (typeof a === 'object')
+        a = a.version
+      if (typeof b === 'object')
+        b = b.version
+      return a === b
+
     case '!==':
-      if (typeof a === 'object') a = a.version;
-      if (typeof b === 'object') b = b.version;
-      ret = a !== b;
-      break;
-    case '': case '=': case '==': ret = eq(a, b, loose); break;
-    case '!=': ret = neq(a, b, loose); break;
-    case '>': ret = gt(a, b, loose); break;
-    case '>=': ret = gte(a, b, loose); break;
-    case '<': ret = lt(a, b, loose); break;
-    case '<=': ret = lte(a, b, loose); break;
-    default: throw new TypeError('Invalid operator: ' + op);
+      if (typeof a === 'object')
+        a = a.version
+      if (typeof b === 'object')
+        b = b.version
+      return a !== b
+
+    case '':
+    case '=':
+    case '==':
+      return eq(a, b, loose)
+
+    case '!=':
+      return neq(a, b, loose)
+
+    case '>':
+      return gt(a, b, loose)
+
+    case '>=':
+      return gte(a, b, loose)
+
+    case '<':
+      return lt(a, b, loose)
+
+    case '<=':
+      return lte(a, b, loose)
+
+    default:
+      throw new TypeError('Invalid operator: ' + op)
   }
-  return ret;
 }
 
-exports.Comparator = Comparator;
-function Comparator(comp, options) {
-  if (!options || typeof options !== 'object')
-    options = { loose: !!options, includePrerelease: false }
+exports.Comparator = Comparator
+function Comparator (comp, options) {
+  if (!options || typeof options !== 'object') {
+    options = {
+      loose: !!options,
+      includePrerelease: false
+    }
+  }
 
   if (comp instanceof Comparator) {
-    if (comp.loose === !!options.loose)
-      return comp;
-    else
-      comp = comp.value;
+    if (comp.loose === !!options.loose) {
+      return comp
+    } else {
+      comp = comp.value
+    }
   }
 
-  if (!(this instanceof Comparator))
-    return new Comparator(comp, options);
+  if (!(this instanceof Comparator)) {
+    return new Comparator(comp, options)
+  }
 
-  debug('comparator', comp, options);
-  this.options = options;
-  this.loose = !!options.loose;
-  this.parse(comp);
+  debug('comparator', comp, options)
+  this.options = options
+  this.loose = !!options.loose
+  this.parse(comp)
 
-  if (this.semver === ANY)
-    this.value = '';
-  else
-    this.value = this.operator + this.semver.version;
+  if (this.semver === ANY) {
+    this.value = ''
+  } else {
+    this.value = this.operator + this.semver.version
+  }
 
-  debug('comp', this);
+  debug('comp', this)
 }
 
-var ANY = {};
-Comparator.prototype.parse = function(comp) {
-  var r = this.options.loose ? re[COMPARATORLOOSE] : re[COMPARATOR];
-  var m = comp.match(r);
+var ANY = {}
+Comparator.prototype.parse = function (comp) {
+  var r = this.options.loose ? re[COMPARATORLOOSE] : re[COMPARATOR]
+  var m = comp.match(r)
 
-  if (!m)
-    throw new TypeError('Invalid comparator: ' + comp);
-
-  this.operator = m[1];
-  if (this.operator === '=')
-    this.operator = '';
-
-  // if it literally is just '>' or '' then allow anything.
-  if (!m[2])
-    this.semver = ANY;
-  else
-    this.semver = new SemVer(m[2], this.options.loose);
-};
-
-Comparator.prototype.toString = function() {
-  return this.value;
-};
-
-Comparator.prototype.test = function(version) {
-  debug('Comparator.test', version, this.options.loose);
-
-  if (this.semver === ANY)
-    return true;
-
-  if (typeof version === 'string')
-    version = new SemVer(version, this.options);
-
-  return cmp(version, this.operator, this.semver, this.options);
-};
-
-Comparator.prototype.intersects = function(comp, options) {
-  if (!(comp instanceof Comparator)) {
-    throw new TypeError('a Comparator is required');
+  if (!m) {
+    throw new TypeError('Invalid comparator: ' + comp)
   }
 
-  if (!options || typeof options !== 'object')
-    options = { loose: !!options, includePrerelease: false }
+  this.operator = m[1]
+  if (this.operator === '=') {
+    this.operator = ''
+  }
 
-  var rangeTmp;
+  // if it literally is just '>' or '' then allow anything.
+  if (!m[2]) {
+    this.semver = ANY
+  } else {
+    this.semver = new SemVer(m[2], this.options.loose)
+  }
+}
+
+Comparator.prototype.toString = function () {
+  return this.value
+}
+
+Comparator.prototype.test = function (version) {
+  debug('Comparator.test', version, this.options.loose)
+
+  if (this.semver === ANY) {
+    return true
+  }
+
+  if (typeof version === 'string') {
+    version = new SemVer(version, this.options)
+  }
+
+  return cmp(version, this.operator, this.semver, this.options)
+}
+
+Comparator.prototype.intersects = function (comp, options) {
+  if (!(comp instanceof Comparator)) {
+    throw new TypeError('a Comparator is required')
+  }
+
+  if (!options || typeof options !== 'object') {
+    options = {
+      loose: !!options,
+      includePrerelease: false
+    }
+  }
+
+  var rangeTmp
 
   if (this.operator === '') {
-    rangeTmp = new Range(comp.value, options);
-    return satisfies(this.value, rangeTmp, options);
+    rangeTmp = new Range(comp.value, options)
+    return satisfies(this.value, rangeTmp, options)
   } else if (comp.operator === '') {
-    rangeTmp = new Range(this.value, options);
-    return satisfies(comp.semver, rangeTmp, options);
+    rangeTmp = new Range(this.value, options)
+    return satisfies(comp.semver, rangeTmp, options)
   }
 
   var sameDirectionIncreasing =
     (this.operator === '>=' || this.operator === '>') &&
-    (comp.operator === '>=' || comp.operator === '>');
+    (comp.operator === '>=' || comp.operator === '>')
   var sameDirectionDecreasing =
     (this.operator === '<=' || this.operator === '<') &&
-    (comp.operator === '<=' || comp.operator === '<');
-  var sameSemVer = this.semver.version === comp.semver.version;
+    (comp.operator === '<=' || comp.operator === '<')
+  var sameSemVer = this.semver.version === comp.semver.version
   var differentDirectionsInclusive =
     (this.operator === '>=' || this.operator === '<=') &&
-    (comp.operator === '>=' || comp.operator === '<=');
+    (comp.operator === '>=' || comp.operator === '<=')
   var oppositeDirectionsLessThan =
     cmp(this.semver, '<', comp.semver, options) &&
     ((this.operator === '>=' || this.operator === '>') &&
-    (comp.operator === '<=' || comp.operator === '<'));
+    (comp.operator === '<=' || comp.operator === '<'))
   var oppositeDirectionsGreaterThan =
     cmp(this.semver, '>', comp.semver, options) &&
     ((this.operator === '<=' || this.operator === '<') &&
-    (comp.operator === '>=' || comp.operator === '>'));
+    (comp.operator === '>=' || comp.operator === '>'))
 
   return sameDirectionIncreasing || sameDirectionDecreasing ||
     (sameSemVer && differentDirectionsInclusive) ||
-    oppositeDirectionsLessThan || oppositeDirectionsGreaterThan;
-};
+    oppositeDirectionsLessThan || oppositeDirectionsGreaterThan
+}
 
-
-exports.Range = Range;
-function Range(range, options) {
-  if (!options || typeof options !== 'object')
-    options = { loose: !!options, includePrerelease: false }
+exports.Range = Range
+function Range (range, options) {
+  if (!options || typeof options !== 'object') {
+    options = {
+      loose: !!options,
+      includePrerelease: false
+    }
+  }
 
   if (range instanceof Range) {
     if (range.loose === !!options.loose &&
         range.includePrerelease === !!options.includePrerelease) {
-      return range;
+      return range
     } else {
-      return new Range(range.raw, options);
+      return new Range(range.raw, options)
     }
   }
 
   if (range instanceof Comparator) {
-    return new Range(range.value, options);
+    return new Range(range.value, options)
   }
 
-  if (!(this instanceof Range))
-    return new Range(range, options);
+  if (!(this instanceof Range)) {
+    return new Range(range, options)
+  }
 
-  this.options = options;
-  this.loose = !!options.loose;
+  this.options = options
+  this.loose = !!options.loose
   this.includePrerelease = !!options.includePrerelease
 
   // First, split based on boolean or ||
-  this.raw = range;
-  this.set = range.split(/\s*\|\|\s*/).map(function(range) {
-    return this.parseRange(range.trim());
-  }, this).filter(function(c) {
+  this.raw = range
+  this.set = range.split(/\s*\|\|\s*/).map(function (range) {
+    return this.parseRange(range.trim())
+  }, this).filter(function (c) {
     // throw out any that are not relevant for whatever reason
-    return c.length;
-  });
+    return c.length
+  })
 
   if (!this.set.length) {
-    throw new TypeError('Invalid SemVer Range: ' + range);
+    throw new TypeError('Invalid SemVer Range: ' + range)
   }
 
-  this.format();
+  this.format()
 }
 
-Range.prototype.format = function() {
-  this.range = this.set.map(function(comps) {
-    return comps.join(' ').trim();
-  }).join('||').trim();
-  return this.range;
-};
+Range.prototype.format = function () {
+  this.range = this.set.map(function (comps) {
+    return comps.join(' ').trim()
+  }).join('||').trim()
+  return this.range
+}
 
-Range.prototype.toString = function() {
-  return this.range;
-};
+Range.prototype.toString = function () {
+  return this.range
+}
 
-Range.prototype.parseRange = function(range) {
-  var loose = this.options.loose;
-  range = range.trim();
+Range.prototype.parseRange = function (range) {
+  var loose = this.options.loose
+  range = range.trim()
   // `1.2.3 - 1.2.4` => `>=1.2.3 <=1.2.4`
-  var hr = loose ? re[HYPHENRANGELOOSE] : re[HYPHENRANGE];
-  range = range.replace(hr, hyphenReplace);
-  debug('hyphen replace', range);
+  var hr = loose ? re[HYPHENRANGELOOSE] : re[HYPHENRANGE]
+  range = range.replace(hr, hyphenReplace)
+  debug('hyphen replace', range)
   // `> 1.2.3 < 1.2.5` => `>1.2.3 <1.2.5`
-  range = range.replace(re[COMPARATORTRIM], comparatorTrimReplace);
-  debug('comparator trim', range, re[COMPARATORTRIM]);
+  range = range.replace(re[COMPARATORTRIM], comparatorTrimReplace)
+  debug('comparator trim', range, re[COMPARATORTRIM])
 
   // `~ 1.2.3` => `~1.2.3`
-  range = range.replace(re[TILDETRIM], tildeTrimReplace);
+  range = range.replace(re[TILDETRIM], tildeTrimReplace)
 
   // `^ 1.2.3` => `^1.2.3`
-  range = range.replace(re[CARETTRIM], caretTrimReplace);
+  range = range.replace(re[CARETTRIM], caretTrimReplace)
 
   // normalize spaces
-  range = range.split(/\s+/).join(' ');
+  range = range.split(/\s+/).join(' ')
 
   // At this point, the range is completely trimmed and
   // ready to be split into comparators.
 
-  var compRe = loose ? re[COMPARATORLOOSE] : re[COMPARATOR];
-  var set = range.split(' ').map(function(comp) {
-    return parseComparator(comp, this.options);
-  }, this).join(' ').split(/\s+/);
+  var compRe = loose ? re[COMPARATORLOOSE] : re[COMPARATOR]
+  var set = range.split(' ').map(function (comp) {
+    return parseComparator(comp, this.options)
+  }, this).join(' ').split(/\s+/)
   if (this.options.loose) {
     // in loose mode, throw out any that are not valid comparators
-    set = set.filter(function(comp) {
-      return !!comp.match(compRe);
-    });
+    set = set.filter(function (comp) {
+      return !!comp.match(compRe)
+    })
   }
-  set = set.map(function(comp) {
-    return new Comparator(comp, this.options);
-  }, this);
+  set = set.map(function (comp) {
+    return new Comparator(comp, this.options)
+  }, this)
 
-  return set;
-};
+  return set
+}
 
-Range.prototype.intersects = function(range, options) {
+Range.prototype.intersects = function (range, options) {
   if (!(range instanceof Range)) {
-    throw new TypeError('a Range is required');
+    throw new TypeError('a Range is required')
   }
 
-  return this.set.some(function(thisComparators) {
-    return thisComparators.every(function(thisComparator) {
-      return range.set.some(function(rangeComparators) {
-        return rangeComparators.every(function(rangeComparator) {
-          return thisComparator.intersects(rangeComparator, options);
-        });
-      });
-    });
-  });
-};
+  return this.set.some(function (thisComparators) {
+    return thisComparators.every(function (thisComparator) {
+      return range.set.some(function (rangeComparators) {
+        return rangeComparators.every(function (rangeComparator) {
+          return thisComparator.intersects(rangeComparator, options)
+        })
+      })
+    })
+  })
+}
 
 // Mostly just for testing and legacy API reasons
-exports.toComparators = toComparators;
-function toComparators(range, options) {
-  return new Range(range, options).set.map(function(comp) {
-    return comp.map(function(c) {
-      return c.value;
-    }).join(' ').trim().split(' ');
-  });
+exports.toComparators = toComparators
+function toComparators (range, options) {
+  return new Range(range, options).set.map(function (comp) {
+    return comp.map(function (c) {
+      return c.value
+    }).join(' ').trim().split(' ')
+  })
 }
 
 // comprised of xranges, tildes, stars, and gtlt's at this point.
 // already replaced the hyphen ranges
 // turn into a set of JUST comparators.
-function parseComparator(comp, options) {
-  debug('comp', comp, options);
-  comp = replaceCarets(comp, options);
-  debug('caret', comp);
-  comp = replaceTildes(comp, options);
-  debug('tildes', comp);
-  comp = replaceXRanges(comp, options);
-  debug('xrange', comp);
-  comp = replaceStars(comp, options);
-  debug('stars', comp);
-  return comp;
+function parseComparator (comp, options) {
+  debug('comp', comp, options)
+  comp = replaceCarets(comp, options)
+  debug('caret', comp)
+  comp = replaceTildes(comp, options)
+  debug('tildes', comp)
+  comp = replaceXRanges(comp, options)
+  debug('xrange', comp)
+  comp = replaceStars(comp, options)
+  debug('stars', comp)
+  return comp
 }
 
-function isX(id) {
-  return !id || id.toLowerCase() === 'x' || id === '*';
+function isX (id) {
+  return !id || id.toLowerCase() === 'x' || id === '*'
 }
 
 // ~, ~> --> * (any, kinda silly)
@@ -40584,41 +41125,38 @@ function isX(id) {
 // ~1.2, ~1.2.x, ~>1.2, ~>1.2.x --> >=1.2.0 <1.3.0
 // ~1.2.3, ~>1.2.3 --> >=1.2.3 <1.3.0
 // ~1.2.0, ~>1.2.0 --> >=1.2.0 <1.3.0
-function replaceTildes(comp, options) {
-  return comp.trim().split(/\s+/).map(function(comp) {
-    return replaceTilde(comp, options);
-  }).join(' ');
+function replaceTildes (comp, options) {
+  return comp.trim().split(/\s+/).map(function (comp) {
+    return replaceTilde(comp, options)
+  }).join(' ')
 }
 
-function replaceTilde(comp, options) {
-  if (!options || typeof options !== 'object')
-    options = { loose: !!options, includePrerelease: false }
-  var r = options.loose ? re[TILDELOOSE] : re[TILDE];
-  return comp.replace(r, function(_, M, m, p, pr) {
-    debug('tilde', comp, _, M, m, p, pr);
-    var ret;
+function replaceTilde (comp, options) {
+  var r = options.loose ? re[TILDELOOSE] : re[TILDE]
+  return comp.replace(r, function (_, M, m, p, pr) {
+    debug('tilde', comp, _, M, m, p, pr)
+    var ret
 
-    if (isX(M))
-      ret = '';
-    else if (isX(m))
-      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0';
-    else if (isX(p))
+    if (isX(M)) {
+      ret = ''
+    } else if (isX(m)) {
+      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0'
+    } else if (isX(p)) {
       // ~1.2 == >=1.2.0 <1.3.0
-      ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0';
-    else if (pr) {
-      debug('replaceTilde pr', pr);
-      if (pr.charAt(0) !== '-')
-        pr = '-' + pr;
-      ret = '>=' + M + '.' + m + '.' + p + pr +
-            ' <' + M + '.' + (+m + 1) + '.0';
-    } else
+      ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0'
+    } else if (pr) {
+      debug('replaceTilde pr', pr)
+      ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
+            ' <' + M + '.' + (+m + 1) + '.0'
+    } else {
       // ~1.2.3 == >=1.2.3 <1.3.0
       ret = '>=' + M + '.' + m + '.' + p +
-            ' <' + M + '.' + (+m + 1) + '.0';
+            ' <' + M + '.' + (+m + 1) + '.0'
+    }
 
-    debug('tilde return', ret);
-    return ret;
-  });
+    debug('tilde return', ret)
+    return ret
+  })
 }
 
 // ^ --> * (any, kinda silly)
@@ -40627,142 +41165,144 @@ function replaceTilde(comp, options) {
 // ^1.2, ^1.2.x --> >=1.2.0 <2.0.0
 // ^1.2.3 --> >=1.2.3 <2.0.0
 // ^1.2.0 --> >=1.2.0 <2.0.0
-function replaceCarets(comp, options) {
-  return comp.trim().split(/\s+/).map(function(comp) {
-    return replaceCaret(comp, options);
-  }).join(' ');
+function replaceCarets (comp, options) {
+  return comp.trim().split(/\s+/).map(function (comp) {
+    return replaceCaret(comp, options)
+  }).join(' ')
 }
 
-function replaceCaret(comp, options) {
-  debug('caret', comp, options);
-  if (!options || typeof options !== 'object')
-    options = { loose: !!options, includePrerelease: false }
-  var r = options.loose ? re[CARETLOOSE] : re[CARET];
-  return comp.replace(r, function(_, M, m, p, pr) {
-    debug('caret', comp, _, M, m, p, pr);
-    var ret;
+function replaceCaret (comp, options) {
+  debug('caret', comp, options)
+  var r = options.loose ? re[CARETLOOSE] : re[CARET]
+  return comp.replace(r, function (_, M, m, p, pr) {
+    debug('caret', comp, _, M, m, p, pr)
+    var ret
 
-    if (isX(M))
-      ret = '';
-    else if (isX(m))
-      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0';
-    else if (isX(p)) {
-      if (M === '0')
-        ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0';
-      else
-        ret = '>=' + M + '.' + m + '.0 <' + (+M + 1) + '.0.0';
+    if (isX(M)) {
+      ret = ''
+    } else if (isX(m)) {
+      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0'
+    } else if (isX(p)) {
+      if (M === '0') {
+        ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0'
+      } else {
+        ret = '>=' + M + '.' + m + '.0 <' + (+M + 1) + '.0.0'
+      }
     } else if (pr) {
-      debug('replaceCaret pr', pr);
-      if (pr.charAt(0) !== '-')
-        pr = '-' + pr;
+      debug('replaceCaret pr', pr)
       if (M === '0') {
-        if (m === '0')
-          ret = '>=' + M + '.' + m + '.' + p + pr +
-                ' <' + M + '.' + m + '.' + (+p + 1);
-        else
-          ret = '>=' + M + '.' + m + '.' + p + pr +
-                ' <' + M + '.' + (+m + 1) + '.0';
-      } else
-        ret = '>=' + M + '.' + m + '.' + p + pr +
-              ' <' + (+M + 1) + '.0.0';
+        if (m === '0') {
+          ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
+                ' <' + M + '.' + m + '.' + (+p + 1)
+        } else {
+          ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
+                ' <' + M + '.' + (+m + 1) + '.0'
+        }
+      } else {
+        ret = '>=' + M + '.' + m + '.' + p + '-' + pr +
+              ' <' + (+M + 1) + '.0.0'
+      }
     } else {
-      debug('no pr');
+      debug('no pr')
       if (M === '0') {
-        if (m === '0')
+        if (m === '0') {
           ret = '>=' + M + '.' + m + '.' + p +
-                ' <' + M + '.' + m + '.' + (+p + 1);
-        else
+                ' <' + M + '.' + m + '.' + (+p + 1)
+        } else {
           ret = '>=' + M + '.' + m + '.' + p +
-                ' <' + M + '.' + (+m + 1) + '.0';
-      } else
+                ' <' + M + '.' + (+m + 1) + '.0'
+        }
+      } else {
         ret = '>=' + M + '.' + m + '.' + p +
-              ' <' + (+M + 1) + '.0.0';
+              ' <' + (+M + 1) + '.0.0'
+      }
     }
 
-    debug('caret return', ret);
-    return ret;
-  });
+    debug('caret return', ret)
+    return ret
+  })
 }
 
-function replaceXRanges(comp, options) {
-  debug('replaceXRanges', comp, options);
-  return comp.split(/\s+/).map(function(comp) {
-    return replaceXRange(comp, options);
-  }).join(' ');
+function replaceXRanges (comp, options) {
+  debug('replaceXRanges', comp, options)
+  return comp.split(/\s+/).map(function (comp) {
+    return replaceXRange(comp, options)
+  }).join(' ')
 }
 
-function replaceXRange(comp, options) {
-  comp = comp.trim();
-  if (!options || typeof options !== 'object')
-    options = { loose: !!options, includePrerelease: false }
-  var r = options.loose ? re[XRANGELOOSE] : re[XRANGE];
-  return comp.replace(r, function(ret, gtlt, M, m, p, pr) {
-    debug('xRange', comp, ret, gtlt, M, m, p, pr);
-    var xM = isX(M);
-    var xm = xM || isX(m);
-    var xp = xm || isX(p);
-    var anyX = xp;
+function replaceXRange (comp, options) {
+  comp = comp.trim()
+  var r = options.loose ? re[XRANGELOOSE] : re[XRANGE]
+  return comp.replace(r, function (ret, gtlt, M, m, p, pr) {
+    debug('xRange', comp, ret, gtlt, M, m, p, pr)
+    var xM = isX(M)
+    var xm = xM || isX(m)
+    var xp = xm || isX(p)
+    var anyX = xp
 
-    if (gtlt === '=' && anyX)
-      gtlt = '';
+    if (gtlt === '=' && anyX) {
+      gtlt = ''
+    }
 
     if (xM) {
       if (gtlt === '>' || gtlt === '<') {
         // nothing is allowed
-        ret = '<0.0.0';
+        ret = '<0.0.0'
       } else {
         // nothing is forbidden
-        ret = '*';
+        ret = '*'
       }
     } else if (gtlt && anyX) {
+      // we know patch is an x, because we have any x at all.
       // replace X with 0
-      if (xm)
-        m = 0;
-      if (xp)
-        p = 0;
+      if (xm) {
+        m = 0
+      }
+      p = 0
 
       if (gtlt === '>') {
         // >1 => >=2.0.0
         // >1.2 => >=1.3.0
         // >1.2.3 => >= 1.2.4
-        gtlt = '>=';
+        gtlt = '>='
         if (xm) {
-          M = +M + 1;
-          m = 0;
-          p = 0;
-        } else if (xp) {
-          m = +m + 1;
-          p = 0;
+          M = +M + 1
+          m = 0
+          p = 0
+        } else {
+          m = +m + 1
+          p = 0
         }
       } else if (gtlt === '<=') {
         // <=0.7.x is actually <0.8.0, since any 0.7.x should
         // pass.  Similarly, <=7.x is actually <8.0.0, etc.
-        gtlt = '<';
-        if (xm)
-          M = +M + 1;
-        else
-          m = +m + 1;
+        gtlt = '<'
+        if (xm) {
+          M = +M + 1
+        } else {
+          m = +m + 1
+        }
       }
 
-      ret = gtlt + M + '.' + m + '.' + p;
+      ret = gtlt + M + '.' + m + '.' + p
     } else if (xm) {
-      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0';
+      ret = '>=' + M + '.0.0 <' + (+M + 1) + '.0.0'
     } else if (xp) {
-      ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0';
+      ret = '>=' + M + '.' + m + '.0 <' + M + '.' + (+m + 1) + '.0'
     }
 
-    debug('xRange return', ret);
+    debug('xRange return', ret)
 
-    return ret;
-  });
+    return ret
+  })
 }
 
 // Because * is AND-ed with everything else in the comparator,
 // and '' means "any version", just remove the *s entirely.
-function replaceStars(comp, options) {
-  debug('replaceStars', comp, options);
+function replaceStars (comp, options) {
+  debug('replaceStars', comp, options)
   // Looseness is ignored here.  star is always as loose as it gets!
-  return comp.trim().replace(re[STAR], '');
+  return comp.trim().replace(re[STAR], '')
 }
 
 // This function is passed to string.replace(re[HYPHENRANGE])
@@ -40770,57 +41310,58 @@ function replaceStars(comp, options) {
 // 1.2 - 3.4.5 => >=1.2.0 <=3.4.5
 // 1.2.3 - 3.4 => >=1.2.0 <3.5.0 Any 3.4.x will do
 // 1.2 - 3.4 => >=1.2.0 <3.5.0
-function hyphenReplace($0,
-                       from, fM, fm, fp, fpr, fb,
-                       to, tM, tm, tp, tpr, tb) {
+function hyphenReplace ($0,
+  from, fM, fm, fp, fpr, fb,
+  to, tM, tm, tp, tpr, tb) {
+  if (isX(fM)) {
+    from = ''
+  } else if (isX(fm)) {
+    from = '>=' + fM + '.0.0'
+  } else if (isX(fp)) {
+    from = '>=' + fM + '.' + fm + '.0'
+  } else {
+    from = '>=' + from
+  }
 
-  if (isX(fM))
-    from = '';
-  else if (isX(fm))
-    from = '>=' + fM + '.0.0';
-  else if (isX(fp))
-    from = '>=' + fM + '.' + fm + '.0';
-  else
-    from = '>=' + from;
+  if (isX(tM)) {
+    to = ''
+  } else if (isX(tm)) {
+    to = '<' + (+tM + 1) + '.0.0'
+  } else if (isX(tp)) {
+    to = '<' + tM + '.' + (+tm + 1) + '.0'
+  } else if (tpr) {
+    to = '<=' + tM + '.' + tm + '.' + tp + '-' + tpr
+  } else {
+    to = '<=' + to
+  }
 
-  if (isX(tM))
-    to = '';
-  else if (isX(tm))
-    to = '<' + (+tM + 1) + '.0.0';
-  else if (isX(tp))
-    to = '<' + tM + '.' + (+tm + 1) + '.0';
-  else if (tpr)
-    to = '<=' + tM + '.' + tm + '.' + tp + '-' + tpr;
-  else
-    to = '<=' + to;
-
-  return (from + ' ' + to).trim();
+  return (from + ' ' + to).trim()
 }
 
-
 // if ANY of the sets match ALL of its comparators, then pass
-Range.prototype.test = function(version) {
-  if (!version)
-    return false;
+Range.prototype.test = function (version) {
+  if (!version) {
+    return false
+  }
 
-  if (typeof version === 'string')
-    version = new SemVer(version, this.options);
+  if (typeof version === 'string') {
+    version = new SemVer(version, this.options)
+  }
 
   for (var i = 0; i < this.set.length; i++) {
-    if (testSet(this.set[i], version, this.options))
-      return true;
+    if (testSet(this.set[i], version, this.options)) {
+      return true
+    }
   }
-  return false;
-};
+  return false
+}
 
-function testSet(set, version, options) {
+function testSet (set, version, options) {
   for (var i = 0; i < set.length; i++) {
-    if (!set[i].test(version))
-      return false;
+    if (!set[i].test(version)) {
+      return false
+    }
   }
-
-  if (!options)
-    options = {}
 
   if (version.prerelease.length && !options.includePrerelease) {
     // Find the set of versions that are allowed to have prereleases
@@ -40828,203 +41369,268 @@ function testSet(set, version, options) {
     // That should allow `1.2.3-pr.2` to pass.
     // However, `1.2.4-alpha.notready` should NOT be allowed,
     // even though it's within the range set by the comparators.
-    for (var i = 0; i < set.length; i++) {
-      debug(set[i].semver);
-      if (set[i].semver === ANY)
-        continue;
+    for (i = 0; i < set.length; i++) {
+      debug(set[i].semver)
+      if (set[i].semver === ANY) {
+        continue
+      }
 
       if (set[i].semver.prerelease.length > 0) {
-        var allowed = set[i].semver;
+        var allowed = set[i].semver
         if (allowed.major === version.major &&
             allowed.minor === version.minor &&
-            allowed.patch === version.patch)
-          return true;
+            allowed.patch === version.patch) {
+          return true
+        }
       }
     }
 
     // Version has a -pre, but it's not one of the ones we like.
-    return false;
+    return false
   }
 
-  return true;
+  return true
 }
 
-exports.satisfies = satisfies;
-function satisfies(version, range, options) {
+exports.satisfies = satisfies
+function satisfies (version, range, options) {
   try {
-    range = new Range(range, options);
+    range = new Range(range, options)
   } catch (er) {
-    return false;
+    return false
   }
-  return range.test(version);
+  return range.test(version)
 }
 
-exports.maxSatisfying = maxSatisfying;
-function maxSatisfying(versions, range, options) {
-  var max = null;
-  var maxSV = null;
+exports.maxSatisfying = maxSatisfying
+function maxSatisfying (versions, range, options) {
+  var max = null
+  var maxSV = null
   try {
-    var rangeObj = new Range(range, options);
+    var rangeObj = new Range(range, options)
   } catch (er) {
-    return null;
+    return null
   }
   versions.forEach(function (v) {
-    if (rangeObj.test(v)) { // satisfies(v, range, options)
-      if (!max || maxSV.compare(v) === -1) { // compare(max, v, true)
-        max = v;
-        maxSV = new SemVer(max, options);
+    if (rangeObj.test(v)) {
+      // satisfies(v, range, options)
+      if (!max || maxSV.compare(v) === -1) {
+        // compare(max, v, true)
+        max = v
+        maxSV = new SemVer(max, options)
       }
     }
   })
-  return max;
+  return max
 }
 
-exports.minSatisfying = minSatisfying;
-function minSatisfying(versions, range, options) {
-  var min = null;
-  var minSV = null;
+exports.minSatisfying = minSatisfying
+function minSatisfying (versions, range, options) {
+  var min = null
+  var minSV = null
   try {
-    var rangeObj = new Range(range, options);
+    var rangeObj = new Range(range, options)
   } catch (er) {
-    return null;
+    return null
   }
   versions.forEach(function (v) {
-    if (rangeObj.test(v)) { // satisfies(v, range, options)
-      if (!min || minSV.compare(v) === 1) { // compare(min, v, true)
-        min = v;
-        minSV = new SemVer(min, options);
+    if (rangeObj.test(v)) {
+      // satisfies(v, range, options)
+      if (!min || minSV.compare(v) === 1) {
+        // compare(min, v, true)
+        min = v
+        minSV = new SemVer(min, options)
       }
     }
   })
-  return min;
+  return min
 }
 
-exports.validRange = validRange;
-function validRange(range, options) {
+exports.minVersion = minVersion
+function minVersion (range, loose) {
+  range = new Range(range, loose)
+
+  var minver = new SemVer('0.0.0')
+  if (range.test(minver)) {
+    return minver
+  }
+
+  minver = new SemVer('0.0.0-0')
+  if (range.test(minver)) {
+    return minver
+  }
+
+  minver = null
+  for (var i = 0; i < range.set.length; ++i) {
+    var comparators = range.set[i]
+
+    comparators.forEach(function (comparator) {
+      // Clone to avoid manipulating the comparator's semver object.
+      var compver = new SemVer(comparator.semver.version)
+      switch (comparator.operator) {
+        case '>':
+          if (compver.prerelease.length === 0) {
+            compver.patch++
+          } else {
+            compver.prerelease.push(0)
+          }
+          compver.raw = compver.format()
+          /* fallthrough */
+        case '':
+        case '>=':
+          if (!minver || gt(minver, compver)) {
+            minver = compver
+          }
+          break
+        case '<':
+        case '<=':
+          /* Ignore maximum versions */
+          break
+        /* istanbul ignore next */
+        default:
+          throw new Error('Unexpected operation: ' + comparator.operator)
+      }
+    })
+  }
+
+  if (minver && range.test(minver)) {
+    return minver
+  }
+
+  return null
+}
+
+exports.validRange = validRange
+function validRange (range, options) {
   try {
     // Return '*' instead of '' so that truthiness works.
     // This will throw if it's invalid anyway
-    return new Range(range, options).range || '*';
+    return new Range(range, options).range || '*'
   } catch (er) {
-    return null;
+    return null
   }
 }
 
 // Determine if version is less than all the versions possible in the range
-exports.ltr = ltr;
-function ltr(version, range, options) {
-  return outside(version, range, '<', options);
+exports.ltr = ltr
+function ltr (version, range, options) {
+  return outside(version, range, '<', options)
 }
 
 // Determine if version is greater than all the versions possible in the range.
-exports.gtr = gtr;
-function gtr(version, range, options) {
-  return outside(version, range, '>', options);
+exports.gtr = gtr
+function gtr (version, range, options) {
+  return outside(version, range, '>', options)
 }
 
-exports.outside = outside;
-function outside(version, range, hilo, options) {
-  version = new SemVer(version, options);
-  range = new Range(range, options);
+exports.outside = outside
+function outside (version, range, hilo, options) {
+  version = new SemVer(version, options)
+  range = new Range(range, options)
 
-  var gtfn, ltefn, ltfn, comp, ecomp;
+  var gtfn, ltefn, ltfn, comp, ecomp
   switch (hilo) {
     case '>':
-      gtfn = gt;
-      ltefn = lte;
-      ltfn = lt;
-      comp = '>';
-      ecomp = '>=';
-      break;
+      gtfn = gt
+      ltefn = lte
+      ltfn = lt
+      comp = '>'
+      ecomp = '>='
+      break
     case '<':
-      gtfn = lt;
-      ltefn = gte;
-      ltfn = gt;
-      comp = '<';
-      ecomp = '<=';
-      break;
+      gtfn = lt
+      ltefn = gte
+      ltfn = gt
+      comp = '<'
+      ecomp = '<='
+      break
     default:
-      throw new TypeError('Must provide a hilo val of "<" or ">"');
+      throw new TypeError('Must provide a hilo val of "<" or ">"')
   }
 
   // If it satisifes the range it is not outside
   if (satisfies(version, range, options)) {
-    return false;
+    return false
   }
 
   // From now on, variable terms are as if we're in "gtr" mode.
   // but note that everything is flipped for the "ltr" function.
 
   for (var i = 0; i < range.set.length; ++i) {
-    var comparators = range.set[i];
+    var comparators = range.set[i]
 
-    var high = null;
-    var low = null;
+    var high = null
+    var low = null
 
-    comparators.forEach(function(comparator) {
+    comparators.forEach(function (comparator) {
       if (comparator.semver === ANY) {
         comparator = new Comparator('>=0.0.0')
       }
-      high = high || comparator;
-      low = low || comparator;
+      high = high || comparator
+      low = low || comparator
       if (gtfn(comparator.semver, high.semver, options)) {
-        high = comparator;
+        high = comparator
       } else if (ltfn(comparator.semver, low.semver, options)) {
-        low = comparator;
+        low = comparator
       }
-    });
+    })
 
     // If the edge version comparator has a operator then our version
     // isn't outside it
     if (high.operator === comp || high.operator === ecomp) {
-      return false;
+      return false
     }
 
     // If the lowest version comparator has an operator and our version
     // is less than it then it isn't higher than the range
     if ((!low.operator || low.operator === comp) &&
         ltefn(version, low.semver)) {
-      return false;
+      return false
     } else if (low.operator === ecomp && ltfn(version, low.semver)) {
-      return false;
+      return false
     }
   }
-  return true;
+  return true
 }
 
-exports.prerelease = prerelease;
-function prerelease(version, options) {
-  var parsed = parse(version, options);
-  return (parsed && parsed.prerelease.length) ? parsed.prerelease : null;
+exports.prerelease = prerelease
+function prerelease (version, options) {
+  var parsed = parse(version, options)
+  return (parsed && parsed.prerelease.length) ? parsed.prerelease : null
 }
 
-exports.intersects = intersects;
-function intersects(r1, r2, options) {
+exports.intersects = intersects
+function intersects (r1, r2, options) {
   r1 = new Range(r1, options)
   r2 = new Range(r2, options)
   return r1.intersects(r2)
 }
 
-exports.coerce = coerce;
-function coerce(version) {
-  if (version instanceof SemVer)
-    return version;
+exports.coerce = coerce
+function coerce (version) {
+  if (version instanceof SemVer) {
+    return version
+  }
 
-  if (typeof version !== 'string')
-    return null;
+  if (typeof version !== 'string') {
+    return null
+  }
 
-  var match = version.match(re[COERCE]);
+  var match = version.match(re[COERCE])
 
-  if (match == null)
-    return null;
+  if (match == null) {
+    return null
+  }
 
-  return parse((match[1] || '0') + '.' + (match[2] || '0') + '.' + (match[3] || '0')); 
+  return parse(match[1] +
+    '.' + (match[2] || '0') +
+    '.' + (match[3] || '0'))
 }
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(54)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(55)))
 
 /***/ }),
-/* 319 */
+/* 324 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41032,7 +41638,7 @@ function coerce(version) {
 
 var utils = __webpack_require__(10);
 var bind = __webpack_require__(107);
-var Axios = __webpack_require__(321);
+var Axios = __webpack_require__(326);
 var defaults = __webpack_require__(73);
 
 /**
@@ -41067,14 +41673,14 @@ axios.create = function create(instanceConfig) {
 
 // Expose Cancel & CancelToken
 axios.Cancel = __webpack_require__(111);
-axios.CancelToken = __webpack_require__(335);
+axios.CancelToken = __webpack_require__(340);
 axios.isCancel = __webpack_require__(110);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(336);
+axios.spread = __webpack_require__(341);
 
 module.exports = axios;
 
@@ -41083,7 +41689,7 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 320 */
+/* 325 */
 /***/ (function(module, exports) {
 
 /*!
@@ -41110,7 +41716,7 @@ function isSlowBuffer (obj) {
 
 
 /***/ }),
-/* 321 */
+/* 326 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41118,8 +41724,8 @@ function isSlowBuffer (obj) {
 
 var defaults = __webpack_require__(73);
 var utils = __webpack_require__(10);
-var InterceptorManager = __webpack_require__(330);
-var dispatchRequest = __webpack_require__(331);
+var InterceptorManager = __webpack_require__(335);
+var dispatchRequest = __webpack_require__(336);
 
 /**
  * Create a new instance of Axios
@@ -41196,7 +41802,7 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 322 */
+/* 327 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41215,7 +41821,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 323 */
+/* 328 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41248,7 +41854,7 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 324 */
+/* 329 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41276,7 +41882,7 @@ module.exports = function enhanceError(error, config, code, request, response) {
 
 
 /***/ }),
-/* 325 */
+/* 330 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41349,7 +41955,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 326 */
+/* 331 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41409,7 +42015,7 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 327 */
+/* 332 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41484,7 +42090,7 @@ module.exports = (
 
 
 /***/ }),
-/* 328 */
+/* 333 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41527,7 +42133,7 @@ module.exports = btoa;
 
 
 /***/ }),
-/* 329 */
+/* 334 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41587,7 +42193,7 @@ module.exports = (
 
 
 /***/ }),
-/* 330 */
+/* 335 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41646,18 +42252,18 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 331 */
+/* 336 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(10);
-var transformData = __webpack_require__(332);
+var transformData = __webpack_require__(337);
 var isCancel = __webpack_require__(110);
 var defaults = __webpack_require__(73);
-var isAbsoluteURL = __webpack_require__(333);
-var combineURLs = __webpack_require__(334);
+var isAbsoluteURL = __webpack_require__(338);
+var combineURLs = __webpack_require__(339);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -41739,7 +42345,7 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 332 */
+/* 337 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41766,7 +42372,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 333 */
+/* 338 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41787,7 +42393,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 334 */
+/* 339 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41808,7 +42414,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 335 */
+/* 340 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41872,7 +42478,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 336 */
+/* 341 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41906,7 +42512,7 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 337 */
+/* 342 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41924,7 +42530,7 @@ exports.Agent = Agent;
 
 
 /***/ }),
-/* 338 */
+/* 343 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -41940,11 +42546,11 @@ exports.JWTResponse = JWTResponse;
 
 
 /***/ }),
-/* 339 */
+/* 344 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var rng = __webpack_require__(340);
-var bytesToUuid = __webpack_require__(341);
+var rng = __webpack_require__(345);
+var bytesToUuid = __webpack_require__(346);
 
 function v4(options, buf, offset) {
   var i = buf && offset || 0;
@@ -41975,7 +42581,7 @@ module.exports = v4;
 
 
 /***/ }),
-/* 340 */
+/* 345 */
 /***/ (function(module, exports) {
 
 // Unique ID creation requires a high quality random # generator.  In the
@@ -42015,7 +42621,7 @@ if (getRandomValues) {
 
 
 /***/ }),
-/* 341 */
+/* 346 */
 /***/ (function(module, exports) {
 
 /**
@@ -42045,7 +42651,7 @@ module.exports = bytesToUuid;
 
 
 /***/ }),
-/* 342 */
+/* 347 */
 /***/ (function(module, exports, __webpack_require__) {
 
 !function(globals) {
@@ -42053,9 +42659,9 @@ module.exports = bytesToUuid;
 
 var _imports = {}
 
-if (typeof module !== 'undefined' && module.exports) { //CommonJS
-  _imports.bytesToHex = __webpack_require__(343).bytesToHex
-  _imports.convertString = __webpack_require__(344)
+if ( true && module.exports) { //CommonJS
+  _imports.bytesToHex = __webpack_require__(348).bytesToHex
+  _imports.convertString = __webpack_require__(349)
   module.exports = sha256
 } else {
   _imports.bytesToHex = globals.convertHex.bytesToHex
@@ -42204,8 +42810,8 @@ sha256.x2 = function(message, options) {
 
 
 /***/ }),
-/* 343 */
-/***/ (function(module, exports) {
+/* 348 */
+/***/ (function(module, exports, __webpack_require__) {
 
 !function(globals) {
 'use strict'
@@ -42247,7 +42853,7 @@ function padLeft(orig, len) {
 }
 
 
-if (typeof module !== 'undefined' && module.exports) { //CommonJS
+if ( true && module.exports) { //CommonJS
   module.exports = convertHex
 } else {
   globals.convertHex = convertHex
@@ -42256,8 +42862,8 @@ if (typeof module !== 'undefined' && module.exports) { //CommonJS
 }(this);
 
 /***/ }),
-/* 344 */
-/***/ (function(module, exports) {
+/* 349 */
+/***/ (function(module, exports, __webpack_require__) {
 
 !function(globals) {
 'use strict'
@@ -42281,7 +42887,7 @@ convertString.UTF8 = {
   }
 }
 
-if (typeof module !== 'undefined' && module.exports) { //CommonJS
+if ( true && module.exports) { //CommonJS
   module.exports = convertString
 } else {
   globals.convertString = convertString
@@ -42290,7 +42896,7 @@ if (typeof module !== 'undefined' && module.exports) { //CommonJS
 }(this);
 
 /***/ }),
-/* 345 */
+/* 350 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function (global, factory) {
@@ -47665,7 +48271,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 
 /***/ }),
-/* 346 */
+/* 351 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -47697,11 +48303,11 @@ var _AlgorithmIdentifier = __webpack_require__(41);
 
 var _AlgorithmIdentifier2 = _interopRequireDefault(_AlgorithmIdentifier);
 
-var _RelativeDistinguishedNames = __webpack_require__(52);
+var _RelativeDistinguishedNames = __webpack_require__(53);
 
 var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 
-var _Time = __webpack_require__(354);
+var _Time = __webpack_require__(359);
 
 var _Time2 = _interopRequireDefault(_Time);
 
@@ -47713,7 +48319,7 @@ var _Extension = __webpack_require__(123);
 
 var _Extension2 = _interopRequireDefault(_Extension);
 
-var _Extensions = __webpack_require__(375);
+var _Extensions = __webpack_require__(380);
 
 var _Extensions2 = _interopRequireDefault(_Extensions);
 
@@ -48565,7 +49171,7 @@ exports.default = Certificate;
 //# sourceMappingURL=Certificate.js.map
 
 /***/ }),
-/* 347 */
+/* 352 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -48595,7 +49201,7 @@ var _PublicKeyInfo = __webpack_require__(120);
 
 var _PublicKeyInfo2 = _interopRequireDefault(_PublicKeyInfo);
 
-var _PrivateKeyInfo = __webpack_require__(349);
+var _PrivateKeyInfo = __webpack_require__(354);
 
 var _PrivateKeyInfo2 = _interopRequireDefault(_PrivateKeyInfo);
 
@@ -49428,7 +50034,7 @@ exports.default = CryptoEngine;
 //# sourceMappingURL=CryptoEngine.js.map
 
 /***/ }),
-/* 348 */
+/* 353 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -49637,7 +50243,7 @@ exports.default = RSAPublicKey;
 //# sourceMappingURL=RSAPublicKey.js.map
 
 /***/ }),
-/* 349 */
+/* 354 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -49671,11 +50277,11 @@ var _Attribute = __webpack_require__(122);
 
 var _Attribute2 = _interopRequireDefault(_Attribute);
 
-var _ECPrivateKey = __webpack_require__(350);
+var _ECPrivateKey = __webpack_require__(355);
 
 var _ECPrivateKey2 = _interopRequireDefault(_ECPrivateKey);
 
-var _RSAPrivateKey = __webpack_require__(351);
+var _RSAPrivateKey = __webpack_require__(356);
 
 var _RSAPrivateKey2 = _interopRequireDefault(_RSAPrivateKey);
 
@@ -50037,7 +50643,7 @@ exports.default = PrivateKeyInfo;
 //# sourceMappingURL=PrivateKeyInfo.js.map
 
 /***/ }),
-/* 350 */
+/* 355 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -50392,7 +50998,7 @@ exports.default = ECPrivateKey;
 //# sourceMappingURL=ECPrivateKey.js.map
 
 /***/ }),
-/* 351 */
+/* 356 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -50418,7 +51024,7 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _OtherPrimeInfo = __webpack_require__(352);
+var _OtherPrimeInfo = __webpack_require__(357);
 
 var _OtherPrimeInfo2 = _interopRequireDefault(_OtherPrimeInfo);
 
@@ -50764,7 +51370,7 @@ exports.default = RSAPrivateKey;
 //# sourceMappingURL=RSAPrivateKey.js.map
 
 /***/ }),
-/* 352 */
+/* 357 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -50985,7 +51591,7 @@ exports.default = OtherPrimeInfo;
 //# sourceMappingURL=OtherPrimeInfo.js.map
 
 /***/ }),
-/* 353 */
+/* 358 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -51218,7 +51824,7 @@ exports.default = AttributeTypeAndValue;
 //# sourceMappingURL=AttributeTypeAndValue.js.map
 
 /***/ }),
-/* 354 */
+/* 359 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -51418,7 +52024,7 @@ exports.default = Time;
 //# sourceMappingURL=Time.js.map
 
 /***/ }),
-/* 355 */
+/* 360 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -51616,7 +52222,7 @@ exports.default = SubjectDirectoryAttributes;
 //# sourceMappingURL=SubjectDirectoryAttributes.js.map
 
 /***/ }),
-/* 356 */
+/* 361 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -51863,7 +52469,7 @@ exports.default = PrivateKeyUsagePeriod;
 //# sourceMappingURL=PrivateKeyUsagePeriod.js.map
 
 /***/ }),
-/* 357 */
+/* 362 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -52061,7 +52667,7 @@ exports.default = AltName;
 //# sourceMappingURL=AltName.js.map
 
 /***/ }),
-/* 358 */
+/* 363 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -52280,7 +52886,7 @@ exports.default = BasicConstraints;
 //# sourceMappingURL=BasicConstraints.js.map
 
 /***/ }),
-/* 359 */
+/* 364 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -52310,7 +52916,7 @@ var _GeneralName = __webpack_require__(28);
 
 var _GeneralName2 = _interopRequireDefault(_GeneralName);
 
-var _RelativeDistinguishedNames = __webpack_require__(52);
+var _RelativeDistinguishedNames = __webpack_require__(53);
 
 var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 
@@ -52752,7 +53358,7 @@ exports.default = IssuingDistributionPoint;
 //# sourceMappingURL=IssuingDistributionPoint.js.map
 
 /***/ }),
-/* 360 */
+/* 365 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -52940,7 +53546,7 @@ exports.default = GeneralNames;
 //# sourceMappingURL=GeneralNames.js.map
 
 /***/ }),
-/* 361 */
+/* 366 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -52966,7 +53572,7 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _GeneralSubtree = __webpack_require__(362);
+var _GeneralSubtree = __webpack_require__(367);
 
 var _GeneralSubtree2 = _interopRequireDefault(_GeneralSubtree);
 
@@ -53210,7 +53816,7 @@ exports.default = NameConstraints;
 //# sourceMappingURL=NameConstraints.js.map
 
 /***/ }),
-/* 362 */
+/* 367 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -53494,7 +54100,7 @@ exports.default = GeneralSubtree;
 //# sourceMappingURL=GeneralSubtree.js.map
 
 /***/ }),
-/* 363 */
+/* 368 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -53520,7 +54126,7 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _DistributionPoint = __webpack_require__(364);
+var _DistributionPoint = __webpack_require__(369);
 
 var _DistributionPoint2 = _interopRequireDefault(_DistributionPoint);
 
@@ -53691,7 +54297,7 @@ exports.default = CRLDistributionPoints;
 //# sourceMappingURL=CRLDistributionPoints.js.map
 
 /***/ }),
-/* 364 */
+/* 369 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -53721,7 +54327,7 @@ var _GeneralName = __webpack_require__(28);
 
 var _GeneralName2 = _interopRequireDefault(_GeneralName);
 
-var _RelativeDistinguishedNames = __webpack_require__(52);
+var _RelativeDistinguishedNames = __webpack_require__(53);
 
 var _RelativeDistinguishedNames2 = _interopRequireDefault(_RelativeDistinguishedNames);
 
@@ -54066,7 +54672,7 @@ exports.default = DistributionPoint;
 //# sourceMappingURL=DistributionPoint.js.map
 
 /***/ }),
-/* 365 */
+/* 370 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -54092,7 +54698,7 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _PolicyInformation = __webpack_require__(366);
+var _PolicyInformation = __webpack_require__(371);
 
 var _PolicyInformation2 = _interopRequireDefault(_PolicyInformation);
 
@@ -54263,7 +54869,7 @@ exports.default = CertificatePolicies;
 //# sourceMappingURL=CertificatePolicies.js.map
 
 /***/ }),
-/* 366 */
+/* 371 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -54289,7 +54895,7 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _PolicyQualifierInfo = __webpack_require__(367);
+var _PolicyQualifierInfo = __webpack_require__(372);
 
 var _PolicyQualifierInfo2 = _interopRequireDefault(_PolicyQualifierInfo);
 
@@ -54495,7 +55101,7 @@ exports.default = PolicyInformation;
 //# sourceMappingURL=PolicyInformation.js.map
 
 /***/ }),
-/* 367 */
+/* 372 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -54692,7 +55298,7 @@ exports.default = PolicyQualifierInfo;
 //# sourceMappingURL=PolicyQualifierInfo.js.map
 
 /***/ }),
-/* 368 */
+/* 373 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -54718,7 +55324,7 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _PolicyMapping = __webpack_require__(369);
+var _PolicyMapping = __webpack_require__(374);
 
 var _PolicyMapping2 = _interopRequireDefault(_PolicyMapping);
 
@@ -54890,7 +55496,7 @@ exports.default = PolicyMappings;
 //# sourceMappingURL=PolicyMappings.js.map
 
 /***/ }),
-/* 369 */
+/* 374 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -55081,7 +55687,7 @@ exports.default = PolicyMapping;
 //# sourceMappingURL=PolicyMapping.js.map
 
 /***/ }),
-/* 370 */
+/* 375 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -55382,7 +55988,7 @@ exports.default = AuthorityKeyIdentifier;
 //# sourceMappingURL=AuthorityKeyIdentifier.js.map
 
 /***/ }),
-/* 371 */
+/* 376 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -55642,7 +56248,7 @@ exports.default = PolicyConstraints;
 //# sourceMappingURL=PolicyConstraints.js.map
 
 /***/ }),
-/* 372 */
+/* 377 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -55831,7 +56437,7 @@ exports.default = ExtKeyUsage;
 //# sourceMappingURL=ExtKeyUsage.js.map
 
 /***/ }),
-/* 373 */
+/* 378 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -55857,7 +56463,7 @@ var asn1js = _interopRequireWildcard(_asn1js);
 
 var _pvutils = __webpack_require__(2);
 
-var _AccessDescription = __webpack_require__(374);
+var _AccessDescription = __webpack_require__(379);
 
 var _AccessDescription2 = _interopRequireDefault(_AccessDescription);
 
@@ -56030,7 +56636,7 @@ exports.default = InfoAccess;
 //# sourceMappingURL=InfoAccess.js.map
 
 /***/ }),
-/* 374 */
+/* 379 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -56233,7 +56839,7 @@ exports.default = AccessDescription;
 //# sourceMappingURL=AccessDescription.js.map
 
 /***/ }),
-/* 375 */
+/* 380 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -56432,7 +57038,7 @@ exports.default = Extensions;
 //# sourceMappingURL=Extensions.js.map
 
 /***/ }),
-/* 376 */
+/* 381 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -56533,7 +57139,7 @@ exports.OCVInfoResponse = OCVInfoResponse;
 
 
 /***/ }),
-/* 377 */
+/* 382 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -56669,7 +57275,7 @@ exports.RemoveKeyResponse = RemoveKeyResponse;
 
 
 /***/ }),
-/* 378 */
+/* 383 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -56833,7 +57439,7 @@ exports.ModalType = ModalType;
 
 
 /***/ }),
-/* 379 */
+/* 384 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -56988,7 +57594,7 @@ exports.BeidRnDataResponse = BeidRnDataResponse;
 
 
 /***/ }),
-/* 380 */
+/* 385 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -57071,7 +57677,7 @@ exports.DNIeInfo = DNIeInfo;
 
 
 /***/ }),
-/* 381 */
+/* 386 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -57166,7 +57772,7 @@ exports.EmvCertificateResponse = EmvCertificateResponse;
 
 
 /***/ }),
-/* 382 */
+/* 387 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -57272,7 +57878,7 @@ exports.MobibContractsResponse = MobibContractsResponse;
 
 
 /***/ }),
-/* 383 */
+/* 388 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -57288,7 +57894,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var Card_1 = __webpack_require__(6);
+var Card_1 = __webpack_require__(5);
 var CoreModel_1 = __webpack_require__(4);
 var OcraAllDataResponse = (function (_super) {
     __extends(OcraAllDataResponse, _super);
@@ -57331,7 +57937,7 @@ exports.OcraReadCounterResponse = OcraReadCounterResponse;
 
 
 /***/ }),
-/* 384 */
+/* 389 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -57433,7 +58039,7 @@ exports.PivAllData = PivAllData;
 
 
 /***/ }),
-/* 385 */
+/* 390 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -57450,7 +58056,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var CoreModel_1 = __webpack_require__(4);
-var Card_1 = __webpack_require__(6);
+var Card_1 = __webpack_require__(5);
 var Pkcs11InfoResponse = (function (_super) {
     __extends(Pkcs11InfoResponse, _super);
     function Pkcs11InfoResponse(data, success) {
@@ -57596,7 +58202,7 @@ exports.Pkcs11ModuleConfig = Pkcs11ModuleConfig;
 
 
 /***/ }),
-/* 386 */
+/* 391 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -57671,7 +58277,7 @@ exports.AventraAppletInfo = AventraAppletInfo;
 
 
 /***/ }),
-/* 387 */
+/* 392 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -57722,7 +58328,7 @@ exports.LuxtrustAllDataResponse = LuxtrustAllDataResponse;
 
 
 /***/ }),
-/* 388 */
+/* 393 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -57775,7 +58381,7 @@ exports.OberthurAllDataResponse = OberthurAllDataResponse;
 
 
 /***/ }),
-/* 389 */
+/* 394 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -57817,7 +58423,64 @@ exports.Wacom = Wacom;
 
 
 /***/ }),
-/* 390 */
+/* 395 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var Card_1 = __webpack_require__(5);
+var BELAWYER_CERTIFICATE_ROOT = '/certificates/root';
+var BELAWYER_CERTIFICATE_SIGN = '/certificates/signing';
+var BELAWYER_CERTIFICATE_ISSUER = '/certificates/issuer';
+var BELAWYER_CERTIFICATE_AUTHENTICATION = '/certificates/authentication';
+var BELAWYER_CERTIFICATE_ALL = '/certificates';
+var BELAWYER_PHOTO = '/photo';
+var BELAWYER_PERSONAL_INFO = '/personal-info';
+var BeLawyer = (function (_super) {
+    __extends(BeLawyer, _super);
+    function BeLawyer(baseUrl, containerUrl, connection, reader_id) {
+        return _super.call(this, baseUrl, containerUrl, connection, reader_id, BeLawyer.CONTAINER_PREFIX) || this;
+    }
+    BeLawyer.prototype.signingCertificate = function (callback) {
+        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_SIGN), undefined, undefined, callback);
+    };
+    BeLawyer.prototype.issuerCertificate = function (callback) {
+        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_ISSUER), undefined, undefined, callback);
+    };
+    BeLawyer.prototype.allCerts = function (filters, callback) {
+        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_ALL), undefined, undefined, callback);
+    };
+    BeLawyer.prototype.rootCertificate = function (callback) {
+        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_ROOT), undefined, undefined, callback);
+    };
+    BeLawyer.prototype.authenticationCertificate = function (callback) {
+        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_AUTHENTICATION), undefined, undefined, callback);
+    };
+    BeLawyer.prototype.personalInfo = function (callback) {
+        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_PERSONAL_INFO), undefined, undefined, callback);
+    };
+    BeLawyer.prototype.photo = function (callback) {
+        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_PHOTO), undefined, undefined, callback);
+    };
+    BeLawyer.CONTAINER_PREFIX = 'diplad';
+    return BeLawyer;
+}(Card_1.GenericCertCard));
+exports.BeLawyer = BeLawyer;
+
+
+/***/ }),
+/* 396 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -58126,14 +58789,14 @@ exports.GenerateKeyPairResponse = GenerateKeyPairResponse;
 
 
 /***/ }),
-/* 391 */
+/* 397 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = __webpack_require__(72);
-var jwtDecode = __webpack_require__(392);
+var jwtDecode = __webpack_require__(398);
 var moment = __webpack_require__(0);
 var CoreExceptions_1 = __webpack_require__(32);
 var defaults = {
@@ -58657,13 +59320,13 @@ exports.GCLConfig = GCLConfig;
 
 
 /***/ }),
-/* 392 */
+/* 398 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var base64_url_decode = __webpack_require__(393);
+var base64_url_decode = __webpack_require__(399);
 
 function InvalidTokenError(message) {
   this.message = message;
@@ -58690,10 +59353,10 @@ module.exports.InvalidTokenError = InvalidTokenError;
 
 
 /***/ }),
-/* 393 */
+/* 399 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var atob = __webpack_require__(394);
+var atob = __webpack_require__(400);
 
 function b64DecodeUnicode(str) {
   return decodeURIComponent(atob(str).replace(/(.)/g, function (m, p) {
@@ -58729,7 +59392,7 @@ module.exports = function(str) {
 
 
 /***/ }),
-/* 394 */
+/* 400 */
 /***/ (function(module, exports) {
 
 /**
@@ -58773,7 +59436,7 @@ module.exports = typeof window !== 'undefined' && window.atob && window.atob.bin
 
 
 /***/ }),
-/* 395 */
+/* 401 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
@@ -58829,200 +59492,208 @@ var map = {
 	"./dv.js": 170,
 	"./el": 171,
 	"./el.js": 171,
-	"./en-au": 172,
-	"./en-au.js": 172,
-	"./en-ca": 173,
-	"./en-ca.js": 173,
-	"./en-gb": 174,
-	"./en-gb.js": 174,
-	"./en-ie": 175,
-	"./en-ie.js": 175,
-	"./en-il": 176,
-	"./en-il.js": 176,
-	"./en-nz": 177,
-	"./en-nz.js": 177,
-	"./eo": 178,
-	"./eo.js": 178,
-	"./es": 179,
-	"./es-do": 180,
-	"./es-do.js": 180,
-	"./es-us": 181,
-	"./es-us.js": 181,
-	"./es.js": 179,
-	"./et": 182,
-	"./et.js": 182,
-	"./eu": 183,
-	"./eu.js": 183,
-	"./fa": 184,
-	"./fa.js": 184,
-	"./fi": 185,
-	"./fi.js": 185,
-	"./fo": 186,
-	"./fo.js": 186,
-	"./fr": 187,
-	"./fr-ca": 188,
-	"./fr-ca.js": 188,
-	"./fr-ch": 189,
-	"./fr-ch.js": 189,
-	"./fr.js": 187,
-	"./fy": 190,
-	"./fy.js": 190,
-	"./gd": 191,
-	"./gd.js": 191,
-	"./gl": 192,
-	"./gl.js": 192,
-	"./gom-latn": 193,
-	"./gom-latn.js": 193,
-	"./gu": 194,
-	"./gu.js": 194,
-	"./he": 195,
-	"./he.js": 195,
-	"./hi": 196,
-	"./hi.js": 196,
-	"./hr": 197,
-	"./hr.js": 197,
-	"./hu": 198,
-	"./hu.js": 198,
-	"./hy-am": 199,
-	"./hy-am.js": 199,
-	"./id": 200,
-	"./id.js": 200,
-	"./is": 201,
-	"./is.js": 201,
-	"./it": 202,
-	"./it.js": 202,
-	"./ja": 203,
-	"./ja.js": 203,
-	"./jv": 204,
-	"./jv.js": 204,
-	"./ka": 205,
-	"./ka.js": 205,
-	"./kk": 206,
-	"./kk.js": 206,
-	"./km": 207,
-	"./km.js": 207,
-	"./kn": 208,
-	"./kn.js": 208,
-	"./ko": 209,
-	"./ko.js": 209,
-	"./ky": 210,
-	"./ky.js": 210,
-	"./lb": 211,
-	"./lb.js": 211,
-	"./lo": 212,
-	"./lo.js": 212,
-	"./lt": 213,
-	"./lt.js": 213,
-	"./lv": 214,
-	"./lv.js": 214,
-	"./me": 215,
-	"./me.js": 215,
-	"./mi": 216,
-	"./mi.js": 216,
-	"./mk": 217,
-	"./mk.js": 217,
-	"./ml": 218,
-	"./ml.js": 218,
-	"./mn": 219,
-	"./mn.js": 219,
-	"./mr": 220,
-	"./mr.js": 220,
-	"./ms": 221,
-	"./ms-my": 222,
-	"./ms-my.js": 222,
-	"./ms.js": 221,
-	"./mt": 223,
-	"./mt.js": 223,
-	"./my": 224,
-	"./my.js": 224,
-	"./nb": 225,
-	"./nb.js": 225,
-	"./ne": 226,
-	"./ne.js": 226,
-	"./nl": 227,
-	"./nl-be": 228,
-	"./nl-be.js": 228,
-	"./nl.js": 227,
-	"./nn": 229,
-	"./nn.js": 229,
-	"./pa-in": 230,
-	"./pa-in.js": 230,
-	"./pl": 231,
-	"./pl.js": 231,
-	"./pt": 232,
-	"./pt-br": 233,
-	"./pt-br.js": 233,
-	"./pt.js": 232,
-	"./ro": 234,
-	"./ro.js": 234,
-	"./ru": 235,
-	"./ru.js": 235,
-	"./sd": 236,
-	"./sd.js": 236,
-	"./se": 237,
-	"./se.js": 237,
-	"./si": 238,
-	"./si.js": 238,
-	"./sk": 239,
-	"./sk.js": 239,
-	"./sl": 240,
-	"./sl.js": 240,
-	"./sq": 241,
-	"./sq.js": 241,
-	"./sr": 242,
-	"./sr-cyrl": 243,
-	"./sr-cyrl.js": 243,
-	"./sr.js": 242,
-	"./ss": 244,
-	"./ss.js": 244,
-	"./sv": 245,
-	"./sv.js": 245,
-	"./sw": 246,
-	"./sw.js": 246,
-	"./ta": 247,
-	"./ta.js": 247,
-	"./te": 248,
-	"./te.js": 248,
-	"./tet": 249,
-	"./tet.js": 249,
-	"./tg": 250,
-	"./tg.js": 250,
-	"./th": 251,
-	"./th.js": 251,
-	"./tl-ph": 252,
-	"./tl-ph.js": 252,
-	"./tlh": 253,
-	"./tlh.js": 253,
-	"./tr": 254,
-	"./tr.js": 254,
-	"./tzl": 255,
-	"./tzl.js": 255,
-	"./tzm": 256,
-	"./tzm-latn": 257,
-	"./tzm-latn.js": 257,
-	"./tzm.js": 256,
-	"./ug-cn": 258,
-	"./ug-cn.js": 258,
-	"./uk": 259,
-	"./uk.js": 259,
-	"./ur": 260,
-	"./ur.js": 260,
-	"./uz": 261,
-	"./uz-latn": 262,
-	"./uz-latn.js": 262,
-	"./uz.js": 261,
-	"./vi": 263,
-	"./vi.js": 263,
-	"./x-pseudo": 264,
-	"./x-pseudo.js": 264,
-	"./yo": 265,
-	"./yo.js": 265,
-	"./zh-cn": 266,
-	"./zh-cn.js": 266,
-	"./zh-hk": 267,
-	"./zh-hk.js": 267,
-	"./zh-tw": 268,
-	"./zh-tw.js": 268
+	"./en-SG": 172,
+	"./en-SG.js": 172,
+	"./en-au": 173,
+	"./en-au.js": 173,
+	"./en-ca": 174,
+	"./en-ca.js": 174,
+	"./en-gb": 175,
+	"./en-gb.js": 175,
+	"./en-ie": 176,
+	"./en-ie.js": 176,
+	"./en-il": 177,
+	"./en-il.js": 177,
+	"./en-nz": 178,
+	"./en-nz.js": 178,
+	"./eo": 179,
+	"./eo.js": 179,
+	"./es": 180,
+	"./es-do": 181,
+	"./es-do.js": 181,
+	"./es-us": 182,
+	"./es-us.js": 182,
+	"./es.js": 180,
+	"./et": 183,
+	"./et.js": 183,
+	"./eu": 184,
+	"./eu.js": 184,
+	"./fa": 185,
+	"./fa.js": 185,
+	"./fi": 186,
+	"./fi.js": 186,
+	"./fo": 187,
+	"./fo.js": 187,
+	"./fr": 188,
+	"./fr-ca": 189,
+	"./fr-ca.js": 189,
+	"./fr-ch": 190,
+	"./fr-ch.js": 190,
+	"./fr.js": 188,
+	"./fy": 191,
+	"./fy.js": 191,
+	"./ga": 192,
+	"./ga.js": 192,
+	"./gd": 193,
+	"./gd.js": 193,
+	"./gl": 194,
+	"./gl.js": 194,
+	"./gom-latn": 195,
+	"./gom-latn.js": 195,
+	"./gu": 196,
+	"./gu.js": 196,
+	"./he": 197,
+	"./he.js": 197,
+	"./hi": 198,
+	"./hi.js": 198,
+	"./hr": 199,
+	"./hr.js": 199,
+	"./hu": 200,
+	"./hu.js": 200,
+	"./hy-am": 201,
+	"./hy-am.js": 201,
+	"./id": 202,
+	"./id.js": 202,
+	"./is": 203,
+	"./is.js": 203,
+	"./it": 204,
+	"./it-ch": 205,
+	"./it-ch.js": 205,
+	"./it.js": 204,
+	"./ja": 206,
+	"./ja.js": 206,
+	"./jv": 207,
+	"./jv.js": 207,
+	"./ka": 208,
+	"./ka.js": 208,
+	"./kk": 209,
+	"./kk.js": 209,
+	"./km": 210,
+	"./km.js": 210,
+	"./kn": 211,
+	"./kn.js": 211,
+	"./ko": 212,
+	"./ko.js": 212,
+	"./ku": 213,
+	"./ku.js": 213,
+	"./ky": 214,
+	"./ky.js": 214,
+	"./lb": 215,
+	"./lb.js": 215,
+	"./lo": 216,
+	"./lo.js": 216,
+	"./lt": 217,
+	"./lt.js": 217,
+	"./lv": 218,
+	"./lv.js": 218,
+	"./me": 219,
+	"./me.js": 219,
+	"./mi": 220,
+	"./mi.js": 220,
+	"./mk": 221,
+	"./mk.js": 221,
+	"./ml": 222,
+	"./ml.js": 222,
+	"./mn": 223,
+	"./mn.js": 223,
+	"./mr": 224,
+	"./mr.js": 224,
+	"./ms": 225,
+	"./ms-my": 226,
+	"./ms-my.js": 226,
+	"./ms.js": 225,
+	"./mt": 227,
+	"./mt.js": 227,
+	"./my": 228,
+	"./my.js": 228,
+	"./nb": 229,
+	"./nb.js": 229,
+	"./ne": 230,
+	"./ne.js": 230,
+	"./nl": 231,
+	"./nl-be": 232,
+	"./nl-be.js": 232,
+	"./nl.js": 231,
+	"./nn": 233,
+	"./nn.js": 233,
+	"./pa-in": 234,
+	"./pa-in.js": 234,
+	"./pl": 235,
+	"./pl.js": 235,
+	"./pt": 236,
+	"./pt-br": 237,
+	"./pt-br.js": 237,
+	"./pt.js": 236,
+	"./ro": 238,
+	"./ro.js": 238,
+	"./ru": 239,
+	"./ru.js": 239,
+	"./sd": 240,
+	"./sd.js": 240,
+	"./se": 241,
+	"./se.js": 241,
+	"./si": 242,
+	"./si.js": 242,
+	"./sk": 243,
+	"./sk.js": 243,
+	"./sl": 244,
+	"./sl.js": 244,
+	"./sq": 245,
+	"./sq.js": 245,
+	"./sr": 246,
+	"./sr-cyrl": 247,
+	"./sr-cyrl.js": 247,
+	"./sr.js": 246,
+	"./ss": 248,
+	"./ss.js": 248,
+	"./sv": 249,
+	"./sv.js": 249,
+	"./sw": 250,
+	"./sw.js": 250,
+	"./ta": 251,
+	"./ta.js": 251,
+	"./te": 252,
+	"./te.js": 252,
+	"./tet": 253,
+	"./tet.js": 253,
+	"./tg": 254,
+	"./tg.js": 254,
+	"./th": 255,
+	"./th.js": 255,
+	"./tl-ph": 256,
+	"./tl-ph.js": 256,
+	"./tlh": 257,
+	"./tlh.js": 257,
+	"./tr": 258,
+	"./tr.js": 258,
+	"./tzl": 259,
+	"./tzl.js": 259,
+	"./tzm": 260,
+	"./tzm-latn": 261,
+	"./tzm-latn.js": 261,
+	"./tzm.js": 260,
+	"./ug-cn": 262,
+	"./ug-cn.js": 262,
+	"./uk": 263,
+	"./uk.js": 263,
+	"./ur": 264,
+	"./ur.js": 264,
+	"./uz": 265,
+	"./uz-latn": 266,
+	"./uz-latn.js": 266,
+	"./uz.js": 265,
+	"./vi": 267,
+	"./vi.js": 267,
+	"./x-pseudo": 268,
+	"./x-pseudo.js": 268,
+	"./yo": 269,
+	"./yo.js": 269,
+	"./zh-cn": 270,
+	"./zh-cn.js": 270,
+	"./zh-hk": 271,
+	"./zh-hk.js": 271,
+	"./zh-tw": 272,
+	"./zh-tw.js": 272
 };
 
 
@@ -59031,29 +59702,28 @@ function webpackContext(req) {
 	return __webpack_require__(id);
 }
 function webpackContextResolve(req) {
-	var id = map[req];
-	if(!(id + 1)) { // check for number or string
+	if(!__webpack_require__.o(map, req)) {
 		var e = new Error("Cannot find module '" + req + "'");
 		e.code = 'MODULE_NOT_FOUND';
 		throw e;
 	}
-	return id;
+	return map[req];
 }
 webpackContext.keys = function webpackContextKeys() {
 	return Object.keys(map);
 };
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
-webpackContext.id = 395;
+webpackContext.id = 401;
 
 /***/ }),
-/* 396 */
+/* 402 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var CoreService_1 = __webpack_require__(397);
+var CoreService_1 = __webpack_require__(403);
 var Connection_1 = __webpack_require__(75);
 var DSClientModel_1 = __webpack_require__(38);
 var DSClient_1 = __webpack_require__(117);
@@ -59064,11 +59734,11 @@ var ResponseHandler_1 = __webpack_require__(9);
 var agent_1 = __webpack_require__(74);
 var admin_1 = __webpack_require__(103);
 var InitUtil_1 = __webpack_require__(69);
-var ClientService_1 = __webpack_require__(50);
+var ClientService_1 = __webpack_require__(51);
 var Auth_1 = __webpack_require__(112);
 var moment = __webpack_require__(0);
-var Polyfills_1 = __webpack_require__(53);
-var DSException_1 = __webpack_require__(398);
+var Polyfills_1 = __webpack_require__(54);
+var DSException_1 = __webpack_require__(404);
 var __1 = __webpack_require__(34);
 var defaults = {
     gclUrl: 'https://localhost:10443/v2',
@@ -59124,6 +59794,9 @@ var GCLClient = (function () {
         };
         this.beid = function (reader_id) {
             return _this.pluginFactory.createEidBE(reader_id);
+        };
+        this.beLawyer = function (reader_id) {
+            return _this.pluginFactory.createBeLawyer(reader_id);
         };
         this.dnie = function (reader_id) {
             return _this.pluginFactory.createDNIe(reader_id);
@@ -59319,7 +59992,7 @@ exports.GCLClient = GCLClient;
 
 
 /***/ }),
-/* 397 */
+/* 403 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -59574,7 +60247,7 @@ var CoreService = (function () {
         return this.url;
     };
     CoreService.prototype.version = function () {
-        return Promise.resolve("2.2.21");
+        return Promise.resolve("2.2.22");
     };
     return CoreService;
 }());
@@ -59582,7 +60255,7 @@ exports.CoreService = CoreService;
 
 
 /***/ }),
-/* 398 */
+/* 404 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
