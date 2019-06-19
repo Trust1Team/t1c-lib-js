@@ -48,6 +48,7 @@ import {GCLConfig} from './GCLConfig';
 import {DSException} from './exceptions/DSException';
 import {AbstractJavaKeyTool, AbstractSsh, PinEnforcer} from '../..';
 import {AbstractWacom} from '../plugins/wacom/WacomModel';
+import {AbstractBeLawyer} from '../plugins/smartcards/pki/BeLawyer/BeLawyerModel';
 
 // check if any polyfills are needed
 const defaults = {
@@ -221,6 +222,10 @@ export class GCLClient {
     // get instance for belgian eID card
     public beid = (reader_id?: string): AbstractEidBE => {
         return this.pluginFactory.createEidBE(reader_id);
+    };
+    // get instance for belgian eID card
+    public beLawyer = (reader_id?: string): AbstractBeLawyer => {
+        return this.pluginFactory.createBeLawyer(reader_id);
     };
     // get instance for spanish DNIe card
     public dnie = (reader_id?: string): AbstractDNIe => {
