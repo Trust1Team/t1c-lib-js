@@ -7,7 +7,7 @@ const BELAWYER_CERTIFICATE_SIGN = '/certificates/signing';
 const BELAWYER_CERTIFICATE_ISSUER = '/certificates/issuer';
 const BELAWYER_CERTIFICATE_AUTHENTICATION = '/certificates/authentication';
 const BELAWYER_CERTIFICATE_ALL = '/certificates';
-const BELAWYER_ALL_DATA = '';
+// const BELAWYER_ALL_DATA = '';
 const BELAWYER_SIGN = '/sign';
 const BELAWYER_AUTHENTICATE = '/authenticate';
 const BELAWYER_VERIFY_PIN = '/verify-pin';
@@ -41,9 +41,9 @@ export class BeLawyer extends GenericCertCard implements AbstractBeLawyer {
         return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_AUTHENTICATION), undefined, undefined, callback);
     }
 
-    public allData(filters: string[] | Options, callback?: (error: T1CLibException, data: BeLawyerAllDataResponse) => void): Promise<BeLawyerAllDataResponse> {
-        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_ALL_DATA), undefined, undefined, callback);
-    }
+    // public allData(filters: string[] | Options, callback?: (error: T1CLibException, data: BeLawyerAllDataResponse) => void): Promise<BeLawyerAllDataResponse> {
+    //     return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_ALL_DATA), undefined, undefined, callback);
+    // }
 
     public personalInfo(callback?: (error: T1CLibException, data: BeLawyerPersonalInfoResponse) => void): Promise<BeLawyerPersonalInfoResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_PERSONAL_INFO), undefined, undefined, callback);
