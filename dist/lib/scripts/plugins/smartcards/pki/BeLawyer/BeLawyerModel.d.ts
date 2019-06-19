@@ -1,5 +1,7 @@
 import { AuthenticateOrSignData, CertCard } from '../../Card';
-import { Options, T1CLibException, DataObjectResponse, DataResponse } from '../../../../../../lib';
+import { T1CLibException } from '../../../../core/exceptions/CoreExceptions';
+import { DataObjectResponse, DataResponse } from '../../../../core/service/CoreModel';
+import { Options } from '../../../../util/RequestHandler';
 export interface AbstractBeLawyer extends CertCard {
     signingCertificate(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     issuerCertificate(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
