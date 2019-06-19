@@ -1,6 +1,7 @@
 import {} from '../../../../..';
-import {AbstractBeLawyer, BeLawyerAllCertificatesResponse, BeLawyerAllDataResponse, BeLawyerPersonalInfoResponse} from './BeLawyerModel';
+import {AbstractBeLawyer, AuthenticateDataResponse, BeLawyerAllCertificatesResponse, BeLawyerAllDataResponse, BeLawyerPersonalInfoResponse, VerifyPinRequest} from './BeLawyerModel';
 import {GenericCertCard, Options, T1CLibException, DataObjectResponse, DataResponse} from '../../../../../../lib';
+import {AuthenticateOrSignData} from '../../../../..';
 
 const BELAWYER_CERTIFICATE_ROOT = '/certificates/root';
 const BELAWYER_CERTIFICATE_SIGN = '/certificates/signing';
@@ -51,5 +52,21 @@ export class BeLawyer extends GenericCertCard implements AbstractBeLawyer {
 
     public photo(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_PHOTO), undefined, undefined, callback);
+    }
+
+    public signData(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.connection.post(this.baseUrl, this.containerSuffix(BELAWYER_SIGN), body, undefined, undefined, callback);
+    }
+
+    public authenticateMethods(callback?: (error: T1CLibException, data: AuthenticateDataResponse) => void): Promise<AuthenticateDataResponse> {
+        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_AUTHENTICATE), undefined, undefined, callback);
+    }
+
+    public authenticate(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.connection.post(this.baseUrl, this.containerSuffix(BELAWYER_AUTHENTICATE), body, undefined, undefined, callback);
+    }
+
+    public verifyPin(body: VerifyPinRequest, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.connection.post(this.baseUrl, this.containerSuffix(BELAWYER_VERIFY_PIN), body, undefined, undefined, callback);
     }
 }

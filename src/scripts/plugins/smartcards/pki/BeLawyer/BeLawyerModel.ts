@@ -13,9 +13,15 @@ export interface AbstractBeLawyer extends CertCard {
     allData(filters: string[]| Options, callback?: (error: T1CLibException, data: BeLawyerAllDataResponse) => void): Promise<BeLawyerAllDataResponse>;
     personalInfo(callback?: (error: T1CLibException, data: BeLawyerPersonalInfoResponse) => void): Promise<BeLawyerPersonalInfoResponse>;
     photo(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
-    // signData(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
-    // authenticate(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
-    // verifyPin(body: VerifyPinRequest, callback?: (error: T1CLibException, data: T1CResponse) => void): Promise<VerifyPinResponse>;
+    signData(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    authenticateMethods(callback?: (error: T1CLibException, data: AuthenticateDataResponse) => void): Promise<AuthenticateDataResponse>;
+    authenticate(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    verifyPin(body: VerifyPinRequest, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+}
+
+export class VerifyPinRequest {
+    constructor(public os_dialog: boolean, public pinpad: boolean, public pin?: string) {
+    }
 }
 
 export class BeLawyerPersonalInfo {
@@ -48,6 +54,12 @@ export class BeLawyerAllCertificatesData {
 
 export class BeLawyerAllCertificatesResponse extends DataObjectResponse {
     constructor(public data: BeLawyerAllCertificatesData, public success: boolean) {
+        super(data, success);
+    }
+}
+
+export class AuthenticateDataResponse extends DataObjectResponse {
+    constructor(public data: Array<string>, public success: boolean) {
         super(data, success);
     }
 }
