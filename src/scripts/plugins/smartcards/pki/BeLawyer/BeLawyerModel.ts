@@ -3,7 +3,11 @@
  * @since 2017
  */
 import {AuthenticateOrSignData, Card, CertCard, VerifyPinData} from '../../Card';
-import {Options, T1CLibException, DataObjectResponse, DataResponse, DataArrayResponse} from '../../../../../../lib';
+import {T1CLibException} from '../../../../core/exceptions/CoreExceptions';
+import {CertificateResponse, DataObjectResponse, DataResponse, T1CResponse} from '../../../../core/service/CoreModel';
+import {PinEnforcer} from '../../../../util/PinEnforcer';
+import {Options, RequestHandler} from '../../../../util/RequestHandler';
+import {LocalConnection} from '../../../../core/client/Connection';
 
 export interface AbstractBeLawyer extends CertCard {
     signingCertificate(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;

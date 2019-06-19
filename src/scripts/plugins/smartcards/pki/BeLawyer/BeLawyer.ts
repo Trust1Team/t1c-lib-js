@@ -1,7 +1,10 @@
-import {} from '../../../../..';
 import {AbstractBeLawyer, AuthenticateDataResponse, BeLawyerAllCertificatesResponse, BeLawyerAllDataResponse, BeLawyerPersonalInfoResponse, VerifyPinRequest} from './BeLawyerModel';
-import {GenericCertCard, Options, T1CLibException, DataObjectResponse, DataResponse} from '../../../../../../lib';
-import {AuthenticateOrSignData} from '../../../../..';
+import {T1CLibException} from '../../../../core/exceptions/CoreExceptions';
+import {CertificateResponse, DataResponse, T1CResponse} from '../../../../core/service/CoreModel';
+import {AuthenticateOrSignData, GenericCertCard, OptionalPin, VerifyPinData} from '../../Card';
+import {PinEnforcer} from '../../../../util/PinEnforcer';
+import {Options, RequestHandler} from '../../../../util/RequestHandler';
+import {LocalConnection} from '../../../../core/client/Connection';
 
 const BELAWYER_CERTIFICATE_ROOT = '/certificates/root';
 const BELAWYER_CERTIFICATE_SIGN = '/certificates/signing';
@@ -55,7 +58,12 @@ export class BeLawyer extends GenericCertCard implements AbstractBeLawyer {
     }
 
     public signData(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(BELAWYER_SIGN), body, undefined, undefined, callback);
+        if (body.algorithm_reference) {
+            body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
+        }
+        return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
+            return this.connection.post(this.baseUrl, this.containerSuffix(BELAWYER_SIGN), body, undefined, undefined, callback);
+        });
     }
 
     public authenticateMethods(callback?: (error: T1CLibException, data: AuthenticateDataResponse) => void): Promise<AuthenticateDataResponse> {
@@ -63,10 +71,16 @@ export class BeLawyer extends GenericCertCard implements AbstractBeLawyer {
     }
 
     public authenticate(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(BELAWYER_AUTHENTICATE), body, undefined, undefined, callback);
+        return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
+            return this.connection.post(this.baseUrl, this.containerSuffix(BELAWYER_AUTHENTICATE),
+                body, undefined, undefined, callback);
+        });
     }
 
     public verifyPin(body: VerifyPinRequest, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(BELAWYER_VERIFY_PIN), body, undefined, undefined, callback);
+        return PinEnforcer.check(this.connection, this.reader_id, body).then(() => {
+            return this.connection.post(this.baseUrl, this.containerSuffix(BELAWYER_VERIFY_PIN),
+                body, undefined, undefined, callback);
+        });
     }
 }

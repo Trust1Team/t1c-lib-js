@@ -1,6 +1,8 @@
 import { AbstractBeLawyer, AuthenticateDataResponse, BeLawyerAllCertificatesResponse, BeLawyerPersonalInfoResponse, VerifyPinRequest } from './BeLawyerModel';
-import { GenericCertCard, Options, T1CLibException, DataResponse } from '../../../../../../lib';
-import { AuthenticateOrSignData } from '../../../../..';
+import { T1CLibException } from '../../../../core/exceptions/CoreExceptions';
+import { DataResponse } from '../../../../core/service/CoreModel';
+import { AuthenticateOrSignData, GenericCertCard } from '../../Card';
+import { Options } from '../../../../util/RequestHandler';
 export declare class BeLawyer extends GenericCertCard implements AbstractBeLawyer {
     static CONTAINER_PREFIX: string;
     constructor(baseUrl: string, containerUrl: string, connection: any, reader_id: string);
