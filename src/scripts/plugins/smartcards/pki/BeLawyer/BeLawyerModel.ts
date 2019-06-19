@@ -2,8 +2,11 @@
  * @author Maarten Somers
  * @since 2017
  */
-import {AuthenticateOrSignData, Card, CertCard, VerifyPinData} from '../../Card';
-import {Options, T1CLibException, DataObjectResponse, DataResponse, DataArrayResponse} from '../../../../../../lib';
+import { CertCard } from '../../Card';
+import { DataResponse, DataObjectResponse } from '../../../../core/service/CoreModel';
+import { Options } from '../../../../util/RequestHandler';
+import { T1CLibException } from '../../../../core/exceptions/CoreExceptions';
+
 
 export interface AbstractBeLawyer extends CertCard {
     signingCertificate(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
@@ -13,15 +16,9 @@ export interface AbstractBeLawyer extends CertCard {
     allData(filters: string[]| Options, callback?: (error: T1CLibException, data: BeLawyerAllDataResponse) => void): Promise<BeLawyerAllDataResponse>;
     personalInfo(callback?: (error: T1CLibException, data: BeLawyerPersonalInfoResponse) => void): Promise<BeLawyerPersonalInfoResponse>;
     photo(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
-    signData(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
-    authenticateMethods(callback?: (error: T1CLibException, data: AuthenticateDataResponse) => void): Promise<AuthenticateDataResponse>;
-    authenticate(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
-    verifyPin(body: VerifyPinRequest, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
-}
-
-export class VerifyPinRequest {
-    constructor(public os_dialog: boolean, public pinpad: boolean, public pin?: string) {
-    }
+    // signData(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    // authenticate(body: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    // verifyPin(body: VerifyPinRequest, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
 }
 
 export class BeLawyerPersonalInfo {
@@ -63,80 +60,3 @@ export class AuthenticateDataResponse extends DataObjectResponse {
         super(data, success);
     }
 }
-//
-// export class BeLawyerStatusResponse extends DataObjectResponse {
-//     constructor(public data: { active: boolean }, public success: boolean) {
-//         super(data, success);
-//     }
-// }
-
-// export class BeLawyerCardIssuing {
-//     constructor(public card_expiration_date?: string,
-//                 public card_holder_birth_date?: string,
-//                 public card_holder_end_date?: string,
-//                 public card_holder_id?: string,
-//                 public card_holder_name?: string,
-//                 public card_holder_start_date?:  string,
-//                 public card_revalidation_date?: string,
-//                 public card_type?: number,
-//                 public company_id?: number,
-//                 public gender?: number,
-//                 public language?: number,
-//                 public version?: number) {}
-// }
-//
-// export class VerifyPinRequest {
-//     constructor(public os_dialog: boolean, public pinpad: boolean, public pin?: string) {
-//     }
-// }
-//
-// export class VerifyPinResponse {
-//     constructor(public data: boolean, public success: boolean) {
-//     }
-// }
-//
-// export class BeLawyerCardIssuingResponse extends DataObjectResponse {
-//     constructor(public data: BeLawyerCardIssuing, public success: boolean) {
-//         super(data, success);
-//     }
-// }
-//
-// export class BeLawyerContract {
-//     constructor(public authenticator_kvc?: number,
-//                 public authenticator_value?: number,
-//                 public journey_interchanges_allowed?: boolean,
-//                 public passengers_max?: number,
-//                 public period_journeys?: {
-//                     max_number_of_trips?: number
-//                     period?: number
-//                 },
-//                 public price_amount?: number,
-//                 public provider?: number,
-//                 public restrict_code?: number,
-//                 public restrict_time?: number,
-//                 public sale_date?: string,
-//                 public sale_sam_count?: number,
-//                 public sale_sam_id?: number,
-//                 public spatials?: { type: number }[],
-//                 public tariff?: {
-//                     counter: {
-//                         time?: string
-//                         type?: number
-//                     },
-//                     multimodal?: boolean
-//                     nameref?: number
-//                 },
-//                 public validity_duration?: {
-//                     unit?: number
-//                     value?: number
-//                 },
-//                 public validity_start_date?: string,
-//                 public vehicle_class_allowed?: number,
-//                 public version?: number) {}
-// }
-//
-// export class BeLawyerContractsResponse extends DataArrayResponse {
-//     constructor(public data: BeLawyerContract[], public success: boolean) {
-//         super(data, success);
-//     }
-// }
