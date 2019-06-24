@@ -22,15 +22,19 @@ export * from './scripts/core/ocv/OCVClient';
 export * from './scripts/core/ocv/OCVModel';
 
 export * from './scripts/core/service/CoreModel';
+export * from './scripts/core/service/CoreService';
+
+export * from './scripts/core/GCLConfig';
+export * from './scripts/core/GCLLib';
 
 export * from './scripts/plugins/data-container/DataContainer';
 export * from './scripts/plugins/data-container/DataContainerModel';
 
-export * from './scripts/plugins/ssh/Ssh';
-export * from './scripts/plugins/ssh/SshModel';
-
 export * from './scripts/plugins/file/FileExchange';
 export * from './scripts/plugins/file/FileExchangeModel';
+
+export * from './scripts/plugins/java-key-tool/JavaKeyTool';
+export * from './scripts/plugins/java-key-tool/JavaKeyToolModel';
 
 export * from './scripts/plugins/remote-loading/belfius/Belfius';
 export * from './scripts/plugins/remote-loading/belfius/BelfiusModel';
@@ -47,9 +51,6 @@ export * from './scripts/plugins/smartcards/eid/est/EidEst';
 
 export * from './scripts/plugins/smartcards/eid/lux/EidLux';
 export * from './scripts/plugins/smartcards/eid/lux/EidLuxModel';
-
-export * from './scripts/plugins/smartcards/eid/pt/EidPt';
-export * from './scripts/plugins/smartcards/eid/pt/EidPtModel';
 
 export * from './scripts/plugins/smartcards/eid/pt/EidPt';
 export * from './scripts/plugins/smartcards/eid/pt/EidPtModel';
@@ -72,6 +73,9 @@ export * from './scripts/plugins/smartcards/pkcs11/pkcs11Model';
 export * from './scripts/plugins/smartcards/pki/aventra/Aventra';
 export * from './scripts/plugins/smartcards/pki/aventra/AventraModel';
 
+export * from './scripts/plugins/smartcards/pki/BeLawyer/BeLawyer';
+export * from './scripts/plugins/smartcards/pki/BeLawyer/BeLawyerModel';
+
 export * from './scripts/plugins/smartcards/pki/luxtrust/LuxTrust';
 export * from './scripts/plugins/smartcards/pki/luxtrust/LuxTrustModel';
 
@@ -80,11 +84,16 @@ export * from './scripts/plugins/smartcards/pki/oberthur/OberthurModel';
 
 export * from './scripts/plugins/smartcards/Card';
 
+export * from './scripts/plugins/ssh/Ssh';
+export * from './scripts/plugins/ssh/SshModel';
+
+export * from './scripts/plugins/wacom/Wacom';
+export * from './scripts/plugins/wacom/WacomModel';
+
+export * from './scripts/plugins/GenericContainer';
 export * from './scripts/plugins/PluginFactory';
 
-export * from './scripts/plugins/java-key-tool/JavaKeyTool';
-export * from './scripts/plugins/java-key-tool/JavaKeyToolModel';
-
+export * from './scripts/util/ActivatedContainerUtil';
 export * from './scripts/util/ActivationUtil';
 export * from './scripts/util/BrowserFingerprint';
 export * from './scripts/util/CardUtil';
@@ -100,9 +109,7 @@ export * from './scripts/util/RequestHandler';
 export * from './scripts/util/ResponseHandler';
 export * from './scripts/util/SyncUtil';
 export * from './scripts/util/UrlUtil';
-
-export * from './scripts/core/GCLConfig';
-export * from './scripts/core/GCLLib';
+export * from './scripts/util/Utils';
 
 Polyfills.check();
 
