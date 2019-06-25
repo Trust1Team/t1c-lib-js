@@ -132,6 +132,7 @@ var SyncUtil = (function () {
                     return !!(cfg.name === sts.name && cfg.version === sts.version && Util.includes(SyncUtil.ONGOING_STATES, sts.status));
                 });
             });
+            return false;
         }
     };
     SyncUtil.DOWNLOAD_ERROR = 'DOWNLOAD_ERROR';

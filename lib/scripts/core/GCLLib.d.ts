@@ -26,6 +26,8 @@ import { AuthClient } from './auth/Auth';
 import { AbstractOCVClient } from './ocv/OCVModel';
 import { GCLConfig } from './GCLConfig';
 import { AbstractJavaKeyTool, AbstractSsh } from '../..';
+import { AbstractWacom } from '../plugins/wacom/WacomModel';
+import { AbstractBeLawyer } from '../plugins/smartcards/pki/BeLawyer/BeLawyerModel';
 export declare class GCLClient {
     private _gclInstalled;
     private localConfig;
@@ -57,6 +59,7 @@ export declare class GCLClient {
     ocv: () => AbstractOCVClient;
     pf: () => PluginFactory;
     beid: (reader_id?: string) => AbstractEidBE;
+    beLawyer: (reader_id?: string) => AbstractBeLawyer;
     dnie: (reader_id?: string) => AbstractDNIe;
     luxeid: (reader_id?: string, pin?: string, pinType?: PinType, isEncrypted?: boolean) => AbstractEidLUX;
     luxtrust: (reader_id?: string, pin?: string) => AbstractLuxTrust;
@@ -73,6 +76,7 @@ export declare class GCLClient {
     filex: () => AbstractFileExchange;
     javakeytool: () => AbstractJavaKeyTool;
     ssh: () => AbstractSsh;
+    wacom: () => AbstractWacom;
     gclInstalled: boolean;
     containerFor(readerId: string, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     download(callback?: (error: T1CLibException, data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse>;
