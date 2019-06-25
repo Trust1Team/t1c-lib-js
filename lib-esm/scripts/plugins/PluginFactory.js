@@ -16,11 +16,15 @@ import { PKCS11 } from './smartcards/pkcs11/pkcs11';
 import { DataContainer } from './data-container/DataContainer';
 import { JavaKeyTool } from './java-key-tool/JavaKeyTool';
 import { Ssh } from './ssh/Ssh';
+import { Wacom } from './wacom/Wacom';
+import { BeLawyer } from './smartcards/pki/BeLawyer/BeLawyer';
 var CONTAINER_NEW_CONTEXT_PATH = '/containers/';
 var CONTAINER_BEID = CONTAINER_NEW_CONTEXT_PATH + 'beid';
+var CONTAINER_BELAWYER = CONTAINER_NEW_CONTEXT_PATH + 'diplad';
 var CONTAINER_LUXEID = CONTAINER_NEW_CONTEXT_PATH + 'luxeid';
 var CONTAINER_DNIE = CONTAINER_NEW_CONTEXT_PATH + 'dnie';
 var CONTAINER_EMV = CONTAINER_NEW_CONTEXT_PATH + 'emv';
+var CONTAINER_WACOM = CONTAINER_NEW_CONTEXT_PATH + 'wacom-stu';
 var CONTAINER_ISABEL = CONTAINER_NEW_CONTEXT_PATH + 'isabel';
 var CONTAINER_FILE_EXCHANGE = CONTAINER_NEW_CONTEXT_PATH + 'file-exchange';
 var CONTAINER_LUXTRUST = CONTAINER_NEW_CONTEXT_PATH + 'luxtrust';
@@ -41,12 +45,14 @@ var PluginFactory = (function () {
     }
     PluginFactory.prototype.createDNIe = function (reader_id) { return new DNIe(this.url, CONTAINER_DNIE, this.connection, reader_id); };
     PluginFactory.prototype.createEidBE = function (reader_id) { return new EidBe(this.url, CONTAINER_BEID, this.connection, reader_id); };
+    PluginFactory.prototype.createBeLawyer = function (reader_id) { return new BeLawyer(this.url, CONTAINER_BELAWYER, this.connection, reader_id); };
     PluginFactory.prototype.createEidLUX = function (reader_id, pin, pinType, isEncrypted) {
         if (isEncrypted === void 0) { isEncrypted = false; }
         return new EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin, pinType, isEncrypted);
     };
     PluginFactory.prototype.createEidPT = function (reader_id) { return new EidPt(this.url, CONTAINER_PTEID, this.connection, reader_id); };
     PluginFactory.prototype.createEmv = function (reader_id) { return new EMV(this.url, CONTAINER_EMV, this.connection, reader_id); };
+    PluginFactory.prototype.createWacom = function () { return new Wacom(this.url, CONTAINER_WACOM, this.connection, 'wacom-stu'); };
     PluginFactory.prototype.createLuxTrust = function (reader_id) { return new LuxTrust(this.url, CONTAINER_LUXTRUST, this.connection, reader_id); };
     PluginFactory.prototype.createMobib = function (reader_id) { return new Mobib(this.url, CONTAINER_MOBIB, this.connection, reader_id); };
     PluginFactory.prototype.createOcra = function (reader_id) { return new Ocra(this.url, CONTAINER_OCRA, this.connection, reader_id); };

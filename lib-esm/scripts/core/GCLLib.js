@@ -70,6 +70,9 @@ var GCLClient = (function () {
         this.beid = function (reader_id) {
             return _this.pluginFactory.createEidBE(reader_id);
         };
+        this.beLawyer = function (reader_id) {
+            return _this.pluginFactory.createBeLawyer(reader_id);
+        };
         this.dnie = function (reader_id) {
             return _this.pluginFactory.createDNIe(reader_id);
         };
@@ -118,6 +121,9 @@ var GCLClient = (function () {
         };
         this.ssh = function () {
             return _this.pluginFactory.createSsh();
+        };
+        this.wacom = function () {
+            return _this.pluginFactory.createWacom();
         };
         this.localConfig = cfg;
         this.connection = new LocalConnection(this.localConfig);
