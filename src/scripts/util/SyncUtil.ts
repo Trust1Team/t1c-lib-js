@@ -198,12 +198,13 @@ export class SyncUtil {
             });
         }
 
-        function downloadOngoing(config: { name: string, version: string }[], status: { name: string, version: string, status: string }[]) {
+        function downloadOngoing(config: { name: string, version: string }[], status: { name: string, version: string, status: string }[]): boolean {
             config.forEach(cfg => {
                 status.forEach(sts => {
                     return !!(cfg.name === sts.name && cfg.version === sts.version && Util.includes(SyncUtil.ONGOING_STATES, sts.status));
                 });
             });
+            return false;
         }
     }
 }

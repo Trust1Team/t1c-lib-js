@@ -27,7 +27,7 @@ export declare class GenericService {
     static signWithEncryptedPin(client: GCLClient, readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
     static verifyPin(client: GCLClient, readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
     static verifyPinWithEncryptedPin(client: GCLClient, readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;
-    static checkPKCS11(client: GCLClient): Promise<{}>;
+    static checkPKCS11(client: GCLClient): Promise<unknown>;
     private static checkCanAuthenticate;
     private static checkCanSign;
     private static checkCanVerifyPin;
