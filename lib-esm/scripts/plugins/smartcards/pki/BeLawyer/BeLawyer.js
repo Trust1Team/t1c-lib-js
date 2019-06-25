@@ -24,20 +24,20 @@ var BeLawyer = (function (_super) {
     function BeLawyer(baseUrl, containerUrl, connection, reader_id) {
         return _super.call(this, baseUrl, containerUrl, connection, reader_id, BeLawyer.CONTAINER_PREFIX) || this;
     }
+    BeLawyer.prototype.authenticationCertificate = function (callback) {
+        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_AUTHENTICATION), undefined, undefined, callback);
+    };
     BeLawyer.prototype.signingCertificate = function (callback) {
         return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_SIGN), undefined, undefined, callback);
     };
     BeLawyer.prototype.issuerCertificate = function (callback) {
         return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_ISSUER), undefined, undefined, callback);
     };
-    BeLawyer.prototype.allCerts = function (filters, callback) {
-        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_ALL), undefined, undefined, callback);
-    };
     BeLawyer.prototype.rootCertificate = function (callback) {
         return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_ROOT), undefined, undefined, callback);
     };
-    BeLawyer.prototype.authenticationCertificate = function (callback) {
-        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_AUTHENTICATION), undefined, undefined, callback);
+    BeLawyer.prototype.allCerts = function (filters, callback) {
+        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_ALL), undefined, undefined, callback);
     };
     BeLawyer.prototype.personalInfo = function (callback) {
         return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_PERSONAL_INFO), undefined, undefined, callback);
