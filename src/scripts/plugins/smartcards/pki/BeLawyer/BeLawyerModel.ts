@@ -13,8 +13,8 @@ export interface AbstractBeLawyer extends CertCard {
     authenticationCertificate(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     signingCertificate(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     issuerCertificate(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
-    allCerts(filters: string[] | Options, callback?: (error: T1CLibException, data: BeLawyerAllCertificatesResponse) => void): Promise<BeLawyerAllCertificatesResponse>;
     rootCertificate(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
+    allCerts(filters: string[] | Options, callback?: (error: T1CLibException, data: BeLawyerAllCertificatesResponse) => void): Promise<BeLawyerAllCertificatesResponse>;
     allData(filters: string[]| Options, callback?: (error: T1CLibException, data: BeLawyerAllDataResponse) => void): Promise<BeLawyerAllDataResponse>;
     personalInfo(callback?: (error: T1CLibException, data: BeLawyerPersonalInfoResponse) => void): Promise<BeLawyerPersonalInfoResponse>;
     photo(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;

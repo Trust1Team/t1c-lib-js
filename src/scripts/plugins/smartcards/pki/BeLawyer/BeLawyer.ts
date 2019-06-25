@@ -19,6 +19,10 @@ export class BeLawyer extends GenericCertCard implements AbstractBeLawyer {
         super(baseUrl, containerUrl, connection, reader_id, BeLawyer.CONTAINER_PREFIX);
     }
 
+    public authenticationCertificate(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_AUTHENTICATION), undefined, undefined, callback);
+    }
+
     public signingCertificate(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_SIGN), undefined, undefined, callback);
     }
@@ -27,16 +31,12 @@ export class BeLawyer extends GenericCertCard implements AbstractBeLawyer {
         return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_ISSUER), undefined, undefined, callback);
     }
 
-    public allCerts(filters: string[] | Options, callback?: (error: T1CLibException, data: BeLawyerAllCertificatesResponse) => void): Promise<BeLawyerAllCertificatesResponse> {
-        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_ALL), undefined, undefined, callback);
-    }
-
     public rootCertificate(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
         return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_ROOT), undefined, undefined, callback);
     }
 
-    public authenticationCertificate(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
-        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_AUTHENTICATION), undefined, undefined, callback);
+    public allCerts(filters: string[] | Options, callback?: (error: T1CLibException, data: BeLawyerAllCertificatesResponse) => void): Promise<BeLawyerAllCertificatesResponse> {
+        return this.connection.get(this.baseUrl, this.containerSuffix(BELAWYER_CERTIFICATE_ALL), undefined, undefined, callback);
     }
 
     public personalInfo(callback?: (error: T1CLibException, data: BeLawyerPersonalInfoResponse) => void): Promise<BeLawyerPersonalInfoResponse> {
