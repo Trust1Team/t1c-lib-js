@@ -58,10 +58,31 @@ Use npm run the test suite of the project
 $ npm run test
 ```
 
+## Release
+### Prerequisite
+- Have gren installed and add the token to your profile (https://github.com/github-tools/github-release-notes)
+```
+npm install github-release-notes
+```
+- Have the .npmrc file
+
+### Preparation
+1. Create milestone on github with the name "Release x.y.z"
+1. Create issues with the changes assigned to the milestone and close them
+1. Create a release branch with the name "vx.y.z" with x.y.z being the version, starting from your feature branch
+1. Merge the develop branch into the release branch
+1. Increase version in package.json to x.y.z
+1. Build TypeScript and JavaScript library
+1. Finish the release branch and back-merge into develop and master
+1. Push the branches
+1. execute command "gren r -o" this will generate the changelog
+1. publish to npm
+
 ### Build and package
-To build the Javascript library, compressed:
+To build the TypeScript and JavaScript library, compressed:
 ```bash
-$ npm run build
+$ yarn build-ts
+$ yarn build-prod
 ```
 
 ### Publish to NPM
