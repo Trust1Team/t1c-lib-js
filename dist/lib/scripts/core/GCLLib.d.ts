@@ -28,6 +28,7 @@ import { GCLConfig } from './GCLConfig';
 import { AbstractJavaKeyTool, AbstractSsh } from '../..';
 import { AbstractWacom } from '../plugins/wacom/WacomModel';
 import { AbstractBeLawyer } from '../plugins/smartcards/pki/BeLawyer/BeLawyerModel';
+import { AbstractRawPrint } from '../plugins/raw-print/RawPrintModel';
 export declare class GCLClient {
     private _gclInstalled;
     private localConfig;
@@ -77,6 +78,7 @@ export declare class GCLClient {
     javakeytool: () => AbstractJavaKeyTool;
     ssh: () => AbstractSsh;
     wacom: () => AbstractWacom;
+    rawprint: () => AbstractRawPrint;
     gclInstalled: boolean;
     containerFor(readerId: string, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     download(callback?: (error: T1CLibException, data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse>;

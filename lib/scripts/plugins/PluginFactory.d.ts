@@ -19,6 +19,7 @@ import { AbstractJavaKeyTool } from './java-key-tool/JavaKeyToolModel';
 import { AbstractSsh } from './ssh/SshModel';
 import { AbstractWacom } from './wacom/WacomModel';
 import { AbstractBeLawyer } from './smartcards/pki/BeLawyer/BeLawyerModel';
+import { AbstractRawPrint } from './raw-print/RawPrintModel';
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
     createBeLawyer(reader_id?: string): AbstractBeLawyer;
@@ -34,6 +35,7 @@ export interface AbstractFactory {
     createPKCS11(): AbstractPkcs11;
     createJavaKeyTool(): AbstractJavaKeyTool;
     createSsh(): AbstractSsh;
+    createRawPrint(runInUserSpace: boolean): AbstractRawPrint;
 }
 export declare class PluginFactory implements AbstractFactory {
     private url;
@@ -59,4 +61,5 @@ export declare class PluginFactory implements AbstractFactory {
     createDataContainer(containerPath: string): () => AbstractDataContainer;
     createJavaKeyTool(): AbstractJavaKeyTool;
     createSsh(): AbstractSsh;
+    createRawPrint(runInUserSpace: boolean): AbstractRawPrint;
 }

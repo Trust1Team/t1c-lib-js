@@ -125,6 +125,9 @@ var GCLClient = (function () {
         this.wacom = function () {
             return _this.pluginFactory.createWacom();
         };
+        this.rawprint = function () {
+            return _this.pluginFactory.createRawPrint(!_this.config().citrix);
+        };
         this.localConfig = cfg;
         this.connection = new LocalConnection(this.localConfig);
         this.authConnection = new LocalAuthConnection(this.localConfig);
