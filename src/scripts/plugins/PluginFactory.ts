@@ -45,6 +45,8 @@ import {Wacom} from './wacom/Wacom';
 import {AbstractWacom} from './wacom/WacomModel';
 import {AbstractBeLawyer} from './smartcards/pki/BeLawyer/BeLawyerModel';
 import {BeLawyer} from './smartcards/pki/BeLawyer/BeLawyer';
+import {AbstractRawPrint} from './raw-print/RawPrintModel';
+import {RawPrint} from './raw-print/RawPrint';
 // import {Isabel} from './smartcards/isabel/Isabel';
 
 export interface AbstractFactory {
@@ -63,6 +65,7 @@ export interface AbstractFactory {
     createPKCS11(): AbstractPkcs11;
     createJavaKeyTool(): AbstractJavaKeyTool
     createSsh(): AbstractSsh
+    createRawPrint(runInUserSpace: boolean): AbstractRawPrint
 }
 
 const CONTAINER_NEW_CONTEXT_PATH = '/containers/';
@@ -85,39 +88,66 @@ const CONTAINER_PKCS11 = CONTAINER_NEW_CONTEXT_PATH + 'pkcs11';
 const CONTAINER_REMOTE_LOADING = CONTAINER_NEW_CONTEXT_PATH + 'readerapi';
 const CONTAINER_JAVA_KEY_TOOL = CONTAINER_NEW_CONTEXT_PATH + 'java-keytool';
 const CONTAINER_SSH = CONTAINER_NEW_CONTEXT_PATH + 'ssh';
+const CONTAINER_RAW_PRINT = CONTAINER_NEW_CONTEXT_PATH + 'rawprint';
 
 
 export class PluginFactory implements AbstractFactory {
-    constructor(private url: string, private connection: LocalConnection) {}
+    constructor(private url: string, private connection: LocalConnection) {
+    }
 
-    public createDNIe(reader_id?: string): AbstractDNIe { return new DNIe(this.url, CONTAINER_DNIE, this.connection, reader_id); }
+    public createDNIe(reader_id?: string): AbstractDNIe {
+        return new DNIe(this.url, CONTAINER_DNIE, this.connection, reader_id);
+    }
 
-    public createEidBE(reader_id?: string): AbstractEidBE { return new EidBe(this.url, CONTAINER_BEID, this.connection, reader_id); }
+    public createEidBE(reader_id?: string): AbstractEidBE {
+        return new EidBe(this.url, CONTAINER_BEID, this.connection, reader_id);
+    }
 
-    public createBeLawyer(reader_id?: string): AbstractBeLawyer { return new BeLawyer(this.url, CONTAINER_BELAWYER, this.connection, reader_id); }
+    public createBeLawyer(reader_id?: string): AbstractBeLawyer {
+        return new BeLawyer(this.url, CONTAINER_BELAWYER, this.connection, reader_id);
+    }
 
     public createEidLUX(reader_id?: string, pin?: string, pinType?: PinType, isEncrypted: boolean = false): AbstractEidLUX {
         return new EidLux(this.url, CONTAINER_LUXEID, this.connection, reader_id, pin, pinType, isEncrypted);
     }
-    public createEidPT(reader_id?: string): AbstractEidPT { return new EidPt(this.url, CONTAINER_PTEID, this.connection, reader_id); }
 
-    public createEmv(reader_id?: string): AbstractEMV { return new EMV(this.url, CONTAINER_EMV, this.connection, reader_id); }
+    public createEidPT(reader_id?: string): AbstractEidPT {
+        return new EidPt(this.url, CONTAINER_PTEID, this.connection, reader_id);
+    }
 
-    public createWacom(): AbstractWacom { return new Wacom(this.url, CONTAINER_WACOM, this.connection, 'wacom-stu'); }
+    public createEmv(reader_id?: string): AbstractEMV {
+        return new EMV(this.url, CONTAINER_EMV, this.connection, reader_id);
+    }
+
+    public createWacom(): AbstractWacom {
+        return new Wacom(this.url, CONTAINER_WACOM, this.connection, 'wacom-stu');
+    }
 
     // public createIsabel(reader_id?: string): AbstractIsabel { return new Isabel(this.url, CONTAINER_EMV, this.connection, reader_id); }
 
-    public createLuxTrust(reader_id?: string): AbstractLuxTrust { return new LuxTrust(this.url, CONTAINER_LUXTRUST, this.connection, reader_id); }
+    public createLuxTrust(reader_id?: string): AbstractLuxTrust {
+        return new LuxTrust(this.url, CONTAINER_LUXTRUST, this.connection, reader_id);
+    }
 
-    public createMobib(reader_id?: string): AbstractMobib { return new Mobib(this.url, CONTAINER_MOBIB, this.connection, reader_id); }
+    public createMobib(reader_id?: string): AbstractMobib {
+        return new Mobib(this.url, CONTAINER_MOBIB, this.connection, reader_id);
+    }
 
-    public createOcra(reader_id?: string): AbstractOcra { return new Ocra(this.url, CONTAINER_OCRA, this.connection, reader_id); }
+    public createOcra(reader_id?: string): AbstractOcra {
+        return new Ocra(this.url, CONTAINER_OCRA, this.connection, reader_id);
+    }
 
-    public createAventraNO(reader_id?: string): AbstractAventra { return new Aventra(this.url, CONTAINER_AVENTRA, this.connection, reader_id); }
+    public createAventraNO(reader_id?: string): AbstractAventra {
+        return new Aventra(this.url, CONTAINER_AVENTRA, this.connection, reader_id);
+    }
 
-    public createOberthurNO(reader_id?: string): AbstractOberthur {return new Oberthur(this.url, CONTAINER_OBERTHUR, this.connection, reader_id); }
+    public createOberthurNO(reader_id?: string): AbstractOberthur {
+        return new Oberthur(this.url, CONTAINER_OBERTHUR, this.connection, reader_id);
+    }
 
-    public createPIV(reader_id?: string): AbstractPiv { return new PIV(this.url, CONTAINER_PIV, this.connection, reader_id); }
+    public createPIV(reader_id?: string): AbstractPiv {
+        return new PIV(this.url, CONTAINER_PIV, this.connection, reader_id);
+    }
 
     public createPKCS11(): AbstractPkcs11 {
         return new PKCS11(this.url, CONTAINER_PKCS11, this.connection);
@@ -141,11 +171,15 @@ export class PluginFactory implements AbstractFactory {
         };
     }
 
-    createJavaKeyTool(): AbstractJavaKeyTool {
+    public createJavaKeyTool(): AbstractJavaKeyTool {
         return new JavaKeyTool(this.url, CONTAINER_JAVA_KEY_TOOL, this.connection);
     }
 
-    createSsh(): AbstractSsh {
+    public createSsh(): AbstractSsh {
         return new Ssh(this.url, '', this.connection, 'ssh');
+    }
+
+    public createRawPrint(runInUserSpace: boolean): AbstractRawPrint {
+        return new RawPrint(this.url, CONTAINER_RAW_PRINT, this.connection, runInUserSpace);
     }
 }

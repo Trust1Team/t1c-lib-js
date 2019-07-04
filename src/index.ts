@@ -36,6 +36,9 @@ export * from './scripts/plugins/file/FileExchangeModel';
 export * from './scripts/plugins/java-key-tool/JavaKeyTool';
 export * from './scripts/plugins/java-key-tool/JavaKeyToolModel';
 
+export * from './scripts/plugins/raw-print/RawPrint';
+export * from './scripts/plugins/raw-print/RawPrintModel';
+
 export * from './scripts/plugins/remote-loading/belfius/Belfius';
 export * from './scripts/plugins/remote-loading/belfius/BelfiusModel';
 export * from './scripts/plugins/remote-loading/RemoteLoading';

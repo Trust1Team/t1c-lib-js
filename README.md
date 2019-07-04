@@ -25,6 +25,13 @@ $ npm i trust1connector@1.8.3
 We're present on Gitter in the following room:
 [Trust1Connector-gitter]
 
+## Development
+To build the library locally
+```bash
+yarn build-dev
+```
+This will create a GCLLib.js in the dist folder
+
 ## Installation - OSX Only
 Make sure you have NodeJS installed on your machine. Use of Yarn is recommended but not required.
 
@@ -51,10 +58,31 @@ Use npm run the test suite of the project
 $ npm run test
 ```
 
+## Release
+### Prerequisite
+- Have gren installed and add the token to your profile (https://github.com/github-tools/github-release-notes)
+```
+npm install github-release-notes
+```
+- Have the .npmrc file
+
+### Preparation
+1. Create milestone on github with the name "Release x.y.z"
+1. Create issues with the changes assigned to the milestone and close them
+1. Create a release branch with the name "vx.y.z" with x.y.z being the version, starting from your feature branch
+1. Merge the develop branch into the release branch
+1. Increase version in package.json to x.y.z
+1. Build TypeScript and JavaScript library
+1. Finish the release branch and back-merge into develop and master
+1. Push the branches
+1. execute command "gren r -o" this will generate the changelog
+1. publish to npm
+
 ### Build and package
-To build the Javascript library, compressed:
+To build the TypeScript and JavaScript library, compressed:
 ```bash
-$ npm run build
+$ yarn build-ts
+$ yarn build-prod
 ```
 
 ### Publish to NPM
@@ -63,11 +91,6 @@ To publish to NPM (public!), run the following NPM command:
 $ npm publish
 ```
 *Note*: This requires the correct .npmrc to be set. See documentation [here](https://trust1t.atlassian.net/wiki/spaces/NPAPI/pages/631242830/Publishing+to+public+NPM+registry).
-
-
-## Distribution ##
-Registered bower:
-`bower register trust1connector git://github.com/Trust1Team/t1c-lib-js.git
 
 ## License
 

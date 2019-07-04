@@ -49,6 +49,7 @@ import {DSException} from './exceptions/DSException';
 import {AbstractJavaKeyTool, AbstractSsh, PinEnforcer} from '../..';
 import {AbstractWacom} from '../plugins/wacom/WacomModel';
 import {AbstractBeLawyer} from '../plugins/smartcards/pki/BeLawyer/BeLawyerModel';
+import {AbstractRawPrint} from '../plugins/raw-print/RawPrintModel';
 
 // check if any polyfills are needed
 const defaults = {
@@ -296,6 +297,9 @@ export class GCLClient {
     public wacom = (): AbstractWacom => {
         return this.pluginFactory.createWacom();
     };
+    public rawprint = (): AbstractRawPrint => {
+        return this.pluginFactory.createRawPrint(!this.config().citrix);
+    }
 
     get gclInstalled(): boolean {
         return this._gclInstalled;
