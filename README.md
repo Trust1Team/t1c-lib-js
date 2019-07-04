@@ -25,6 +25,13 @@ $ npm i trust1connector@1.8.3
 We're present on Gitter in the following room:
 [Trust1Connector-gitter]
 
+## Development
+To build the library locally
+```bash
+yarn build-dev
+```
+This will create a GCLLib.js in the dist folder
+
 ## Installation - OSX Only
 Make sure you have NodeJS installed on your machine. Use of Yarn is recommended but not required.
 
@@ -84,11 +91,6 @@ To publish to NPM (public!), run the following NPM command:
 $ npm publish
 ```
 *Note*: This requires the correct .npmrc to be set. See documentation [here](https://trust1t.atlassian.net/wiki/spaces/NPAPI/pages/631242830/Publishing+to+public+NPM+registry).
-
-
-## Distribution ##
-Registered bower:
-`bower register trust1connector git://github.com/Trust1Team/t1c-lib-js.git
 
 ## License
 
