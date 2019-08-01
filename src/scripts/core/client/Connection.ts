@@ -305,15 +305,15 @@ export abstract class GenericConnection implements Connection {
                         } else {
                             if (error.response) {
                                 if (error.response.data) {
-                                    callback(error.response.data, null);
-                                    return reject(error.response.data);
+                                    callback(new T1CLibException(500, '998', error.response.data), null);
+                                    return reject(new T1CLibException(500, '998', error.response.data));
                                 } else {
-                                    callback(error.response, null);
-                                    return reject(error.response);
+                                    callback(new T1CLibException(500, '998', JSON.stringify(error.response)), null);
+                                    return reject(new T1CLibException(500, '998', JSON.stringify(error.response)));
                                 }
                             } else {
-                                callback(error, null);
-                                return reject(error);
+                                callback(new T1CLibException(500, '998', JSON.stringify(error)), null);
+                                return reject(new T1CLibException(500, '998', JSON.stringify(error)));
                             }
                         }
                     });
@@ -555,12 +555,13 @@ export class LocalConnection extends GenericConnection implements Connection {
      * @returns {Promise<any>}
      */
     public requestFile(basePath: string, suffix: string, body: {
-        entity: string,
-        type: string,
-        filename: string,
-        rel_path: string[],
-        notify_on_completion: boolean
-    }, callback?: RequestCallback): Promise<any> {
+                           entity: string,
+                           type: string,
+                           filename: string,
+                           rel_path: string[],
+                           notify_on_completion: boolean
+                       },
+                       callback?: RequestCallback): Promise<any> {
         // init callback if necessary
         if (!callback || typeof callback !== 'function') {
             callback = function () { /* no-op */
