@@ -5,10 +5,10 @@
  * @since 2016
  */
 
-import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import * as jwtDecode from 'jwt-decode';
 import * as moment from 'moment';
-import { T1CLibException } from './exceptions/CoreExceptions';
+import {T1CLibException} from './exceptions/CoreExceptions';
 import {Pkcs11ModuleConfig} from '../plugins/smartcards/pkcs11/pkcs11Model';
 import {T1CContainerid} from './service/CoreModel';
 
@@ -51,7 +51,8 @@ export class GCLConfigOptions {
                 public containerDownloadTimeout?: number,
                 public localTestMode?: boolean,
                 public lang?: string,
-                public providedContainers?: T1CContainerid[]) {}
+                public providedContainers?: T1CContainerid[]) {
+    }
 }
 
 /**
@@ -88,22 +89,86 @@ export class GCLConfig {
     // constructor for DTO
     public constructor(options: GCLConfigOptions) {
         if (options) {
-            if (options.gclUrl) { this._gclUrl = options.gclUrl; } else { this._gclUrl = defaults.gclUrl; }
-            if (options.gwOrProxyUrl) { this._gwUrl = options.gwOrProxyUrl; } else { this._gwUrl = undefined; }
-            if (options.apiKey) { this._apiKey = options.apiKey; } else { this._apiKey = undefined; } // no default
-            if (options.gwJwt) { this._gwJwt = options.gwJwt; } else { this._gwJwt = undefined; } // no default
-            if (options.tokenExchangeContextPath) { this._tokenExchangeContextPath = options.tokenExchangeContextPath; } else { this._tokenExchangeContextPath = defaults.tokenExchangeContextPath; }
-            if (options.agentPort) { this._agentPort = options.agentPort; } else { this._agentPort = -1; }
-            if (options.localTestMode) { this._localTestMode = options.localTestMode; } else { this._localTestMode = defaults.localTestMode; } // TODO: review
-            if (options.forceHardwarePinpad) { this._forceHardwarePinpad = options.forceHardwarePinpad; } else { this._forceHardwarePinpad = defaults.forceHardwarePinpad; }
-            if (options.sessionTimeout) { this._defaultSessionTimeout = options.sessionTimeout; } else { this._defaultSessionTimeout = defaults.sessionTimeout; }
-            if (options.consentDuration) { this._defaultConsentDuration = options.consentDuration; } else { this._defaultConsentDuration = defaults.consentDuration; }
-            if (options.consentTimeout) { this._defaultConsentTimeout = options.consentTimeout; } else { this._defaultConsentTimeout = defaults.consentTimeout; }
-            if (options.pkcs11Config) { this._pkcs11Config = options.pkcs11Config; } else { this._pkcs11Config = undefined; } // no default
-            if (options.osPinDialog) { this._osPinDialog = options.osPinDialog; } else { this._osPinDialog = defaults.osPinDialog; }
-            if (options.containerDownloadTimeout) { this._containerDownloadTimeout = options.containerDownloadTimeout; } else { this._containerDownloadTimeout = defaults.containerDownloadTimeout; }
-            if (options.lang) { this._lang = options.lang; } else { this._lang = defaults.lang; }
-            if (options.providedContainers) { this._providedContainers = options.providedContainers; } else { this._providedContainers = undefined; }
+            if (options.gclUrl) {
+                this._gclUrl = options.gclUrl;
+            } else {
+                this._gclUrl = defaults.gclUrl;
+            }
+            if (options.gwOrProxyUrl) {
+                this._gwUrl = options.gwOrProxyUrl;
+            } else {
+                this._gwUrl = undefined;
+            }
+            if (options.apiKey) {
+                this._apiKey = options.apiKey;
+            } else {
+                this._apiKey = undefined;
+            } // no default
+            if (options.gwJwt) {
+                this._gwJwt = options.gwJwt;
+            } else {
+                this._gwJwt = undefined;
+            } // no default
+            if (options.tokenExchangeContextPath) {
+                this._tokenExchangeContextPath = options.tokenExchangeContextPath;
+            } else {
+                this._tokenExchangeContextPath = defaults.tokenExchangeContextPath;
+            }
+            if (options.agentPort) {
+                this._agentPort = options.agentPort;
+            } else {
+                this._agentPort = -1;
+            }
+            if (options.localTestMode) {
+                this._localTestMode = options.localTestMode;
+            } else {
+                this._localTestMode = defaults.localTestMode;
+            } // TODO: review
+            if (options.forceHardwarePinpad) {
+                this._forceHardwarePinpad = options.forceHardwarePinpad;
+            } else {
+                this._forceHardwarePinpad = defaults.forceHardwarePinpad;
+            }
+            if (options.sessionTimeout) {
+                this._defaultSessionTimeout = options.sessionTimeout;
+            } else {
+                this._defaultSessionTimeout = defaults.sessionTimeout;
+            }
+            if (options.consentDuration) {
+                this._defaultConsentDuration = options.consentDuration;
+            } else {
+                this._defaultConsentDuration = defaults.consentDuration;
+            }
+            if (options.consentTimeout) {
+                this._defaultConsentTimeout = options.consentTimeout;
+            } else {
+                this._defaultConsentTimeout = defaults.consentTimeout;
+            }
+            if (options.pkcs11Config) {
+                this._pkcs11Config = options.pkcs11Config;
+            } else {
+                this._pkcs11Config = undefined;
+            } // no default
+            if (options.osPinDialog) {
+                this._osPinDialog = options.osPinDialog;
+            } else {
+                this._osPinDialog = defaults.osPinDialog;
+            }
+            if (options.containerDownloadTimeout) {
+                this._containerDownloadTimeout = options.containerDownloadTimeout;
+            } else {
+                this._containerDownloadTimeout = defaults.containerDownloadTimeout;
+            }
+            if (options.lang) {
+                this._lang = options.lang;
+            } else {
+                this._lang = defaults.lang;
+            }
+            if (options.providedContainers) {
+                this._providedContainers = options.providedContainers;
+            } else {
+                this._providedContainers = undefined;
+            }
             this._citrix = false; // will be set to true during initialisation if Shared environment is detected
             // resolve DS file context path
             if (this.gwUrl) {
@@ -175,7 +240,7 @@ export class GCLConfig {
     }
 
     get dsUrl(): string {
-        if (! this.gwUrl) {
+        if (!this.gwUrl) {
             return undefined;
         } else {
             return this.gwUrl + this.dsContextPath;
@@ -330,13 +395,21 @@ export class GCLConfig {
         return new Promise<string>((resolve, reject) => {
             if (!self._gwJwt || !self._gwJwt.length) {
                 // no jwt available, get one from the GW if we have an API key
-                resolve(self.getGwJwt());
+                self.getGwJwt().then(result => {
+                    resolve(result);
+                }, err => {
+                    reject(err);
+                });
             } else {
                 let decoded = jwtDecode(self._gwJwt);
                 // check JWT expired
                 if (decoded < moment(new Date()).format('X')) {
                     // refresh if we have an API key
-                    resolve(self.getGwJwt());
+                    self.getGwJwt().then(result => {
+                        resolve(result);
+                    }, err => {
+                        reject(err);
+                    });
                 } else {
                     // jwt ok to use
                     resolve(self._gwJwt);
@@ -400,15 +473,27 @@ export class GCLConfig {
             let config: AxiosRequestConfig = {
                 url: this.authUrl + '/login/application/token',
                 method: 'GET',
-                headers: { apikey: this.apiKey },
-                responseType:  'json'
+                headers: {apikey: this.apiKey},
+                responseType: 'json'
             };
             return new Promise((resolve, reject) => {
                 axios.request(config).then((response: AxiosResponse) => {
                     this._gwJwt = response.data.token;
                     resolve(response.data.token);
                 }, err => {
-                    reject(err);
+                    if (err.response) {
+                        if (err.response.data) {
+                            if (err.response.data.message) {
+                                reject(new T1CLibException(500, err.code || '998', err.response.data.message));
+                            } else {
+                                reject(new T1CLibException(500, err.code || '998', err.response.data));
+                            }
+                        } else {
+                            reject(new T1CLibException(500, err.code || '998', JSON.stringify(err.response)));
+                        }
+                    } else {
+                        reject(new T1CLibException(500, '998', JSON.stringify(err)));
+                    }
                 });
             });
         } else {
