@@ -485,14 +485,14 @@ export class GCLConfig {
                     if (err.response) {
                         if (err.response.data) {
                             if (err.response.data.message) {
-                                reject(new T1CLibException(500, err.code || '998', err.response.data.message));
+                                reject(new T1CLibException(500, '' + (err.response.data.code || err.code || '998'), err.response.data.message));
                             } else if (err.response.data.description) {
-                                reject(new T1CLibException(500, err.code || '998', err.response.data.description));
+                                reject(new T1CLibException(500, '' + (err.response.data.code || err.code || '998'), err.response.data.description));
                             } else {
-                                reject(new T1CLibException(500, err.code || '998', err.response.data));
+                                reject(new T1CLibException(500, '' + (err.response.data.code || err.code || '998'), err.response.data));
                             }
                         } else {
-                            reject(new T1CLibException(500, err.code || '998', JSON.stringify(err.response)));
+                            reject(new T1CLibException(500, '' + err.code || '998', JSON.stringify(err.response)));
                         }
                     } else {
                         reject(new T1CLibException(500, '998', JSON.stringify(err)));

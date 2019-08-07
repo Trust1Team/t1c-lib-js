@@ -306,22 +306,22 @@ export abstract class GenericConnection implements Connection {
                             if (error.response) {
                                 if (error.response.data) {
                                     if (error.response.data.message) {
-                                        callback(new T1CLibException(500, error.response.data.code || error.code || '998', error.response.data.message), null);
-                                        return reject(new T1CLibException(500, error.response.data.code || error.code || '998', error.response.data.message));
+                                        callback(new T1CLibException(500, '' + (error.response.data.code || error.code || '998'), error.response.data.message), null);
+                                        return reject(new T1CLibException(500, '' + (error.response.data.code || error.code || '998'), error.response.data.message));
                                     } else if (error.response.data.description) {
-                                        callback(new T1CLibException(500, error.response.data.code || error.code || '998', error.response.data.description), null);
-                                        return reject(new T1CLibException(500, error.response.data.code || error.code || '998', error.response.data.description));
+                                        callback(new T1CLibException(500, '' + (error.response.data.code || error.code || '998'), error.response.data.description), null);
+                                        return reject(new T1CLibException(500, '' + (error.response.data.code || error.code || '998'), error.response.data.description));
                                     } else {
-                                        callback(new T1CLibException(500, error.response.data.code || error.code || '998', error.response.data), null);
-                                        return reject(new T1CLibException(500, error.response.data.code || error.code || '998', error.response.data));
+                                        callback(new T1CLibException(500, '' + (error.response.data.code || error.code || '998'), error.response.data), null);
+                                        return reject(new T1CLibException(500, '' + (error.response.data.code || error.code || '998'), error.response.data));
                                     }
                                 } else {
-                                    callback(new T1CLibException(500, error.code || '998', JSON.stringify(error.response)), null);
-                                    return reject(new T1CLibException(500, error.code || '998', JSON.stringify(error.response)));
+                                    callback(new T1CLibException(500, '' + error.code || '998', JSON.stringify(error.response)), null);
+                                    return reject(new T1CLibException(500, '' + error.code || '998', JSON.stringify(error.response)));
                                 }
                             } else {
-                                callback(new T1CLibException(500, error.code || '998', JSON.stringify(error)), null);
-                                return reject(new T1CLibException(500, error.code || '998', JSON.stringify(error)));
+                                callback(new T1CLibException(500, '' + error.code || '998', JSON.stringify(error)), null);
+                                return reject(new T1CLibException(500, '' + error.code || '998', JSON.stringify(error)));
                             }
                         }
                     });
