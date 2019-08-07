@@ -16570,7 +16570,7 @@ var SyncUtil = (function () {
     };
     SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
         return client.ds().then(function (ds) {
-            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.27-2"), info.namespace, containers));
+            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.27-3"), info.namespace, containers));
         });
     };
     SyncUtil.doSyncFlow = function (client, mergedInfo, uuid, containers, isRetry, config) {
@@ -16985,26 +16985,26 @@ var GenericConnection = (function () {
                             if (error.response) {
                                 if (error.response.data) {
                                     if (error.response.data.message) {
-                                        callback(new CoreExceptions_1.T1CLibException(500, error.response.data.code || error.code || '998', error.response.data.message), null);
-                                        return reject(new CoreExceptions_1.T1CLibException(500, error.response.data.code || error.code || '998', error.response.data.message));
+                                        callback(new CoreExceptions_1.T1CLibException(500, '' + (error.response.data.code || error.code || '998'), error.response.data.message), null);
+                                        return reject(new CoreExceptions_1.T1CLibException(500, '' + (error.response.data.code || error.code || '998'), error.response.data.message));
                                     }
                                     else if (error.response.data.description) {
-                                        callback(new CoreExceptions_1.T1CLibException(500, error.response.data.code || error.code || '998', error.response.data.description), null);
-                                        return reject(new CoreExceptions_1.T1CLibException(500, error.response.data.code || error.code || '998', error.response.data.description));
+                                        callback(new CoreExceptions_1.T1CLibException(500, '' + (error.response.data.code || error.code || '998'), error.response.data.description), null);
+                                        return reject(new CoreExceptions_1.T1CLibException(500, '' + (error.response.data.code || error.code || '998'), error.response.data.description));
                                     }
                                     else {
-                                        callback(new CoreExceptions_1.T1CLibException(500, error.response.data.code || error.code || '998', error.response.data), null);
-                                        return reject(new CoreExceptions_1.T1CLibException(500, error.response.data.code || error.code || '998', error.response.data));
+                                        callback(new CoreExceptions_1.T1CLibException(500, '' + (error.response.data.code || error.code || '998'), error.response.data), null);
+                                        return reject(new CoreExceptions_1.T1CLibException(500, '' + (error.response.data.code || error.code || '998'), error.response.data));
                                     }
                                 }
                                 else {
-                                    callback(new CoreExceptions_1.T1CLibException(500, error.code || '998', JSON.stringify(error.response)), null);
-                                    return reject(new CoreExceptions_1.T1CLibException(500, error.code || '998', JSON.stringify(error.response)));
+                                    callback(new CoreExceptions_1.T1CLibException(500, '' + error.code || '998', JSON.stringify(error.response)), null);
+                                    return reject(new CoreExceptions_1.T1CLibException(500, '' + error.code || '998', JSON.stringify(error.response)));
                                 }
                             }
                             else {
-                                callback(new CoreExceptions_1.T1CLibException(500, error.code || '998', JSON.stringify(error)), null);
-                                return reject(new CoreExceptions_1.T1CLibException(500, error.code || '998', JSON.stringify(error)));
+                                callback(new CoreExceptions_1.T1CLibException(500, '' + error.code || '998', JSON.stringify(error)), null);
+                                return reject(new CoreExceptions_1.T1CLibException(500, '' + error.code || '998', JSON.stringify(error)));
                             }
                         }
                     });
@@ -19567,7 +19567,7 @@ var ActivationUtil = (function () {
     ActivationUtil.registerDevice = function (client, mergedInfo, uuid) {
         return client.admin().getPubKey().then(function (pubKey) {
             return client.ds().then(function (ds) {
-                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.27-2"), mergedInfo.namespace));
+                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.2.27-3"), mergedInfo.namespace));
             });
         });
     };
@@ -22844,7 +22844,7 @@ var CoreService = (function () {
         return this.url;
     };
     CoreService.prototype.version = function () {
-        return Promise.resolve("2.2.27-2");
+        return Promise.resolve("2.2.27-3");
     };
     return CoreService;
 }());
@@ -57445,17 +57445,17 @@ var GCLConfig = (function () {
                     if (err.response) {
                         if (err.response.data) {
                             if (err.response.data.message) {
-                                reject(new CoreExceptions_1.T1CLibException(500, err.code || '998', err.response.data.message));
+                                reject(new CoreExceptions_1.T1CLibException(500, '' + (err.response.data.code || err.code || '998'), err.response.data.message));
                             }
                             else if (err.response.data.description) {
-                                reject(new CoreExceptions_1.T1CLibException(500, err.code || '998', err.response.data.description));
+                                reject(new CoreExceptions_1.T1CLibException(500, '' + (err.response.data.code || err.code || '998'), err.response.data.description));
                             }
                             else {
-                                reject(new CoreExceptions_1.T1CLibException(500, err.code || '998', err.response.data));
+                                reject(new CoreExceptions_1.T1CLibException(500, '' + (err.response.data.code || err.code || '998'), err.response.data));
                             }
                         }
                         else {
-                            reject(new CoreExceptions_1.T1CLibException(500, err.code || '998', JSON.stringify(err.response)));
+                            reject(new CoreExceptions_1.T1CLibException(500, '' + err.code || '998', JSON.stringify(err.response)));
                         }
                     }
                     else {
