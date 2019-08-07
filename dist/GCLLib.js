@@ -16984,17 +16984,27 @@ var GenericConnection = (function () {
                         else {
                             if (error.response) {
                                 if (error.response.data) {
-                                    callback(new CoreExceptions_1.T1CLibException(500, '998', error.response.data), null);
-                                    return reject(new CoreExceptions_1.T1CLibException(500, '998', error.response.data));
+                                    if (error.response.data.message) {
+                                        callback(new CoreExceptions_1.T1CLibException(500, error.response.data.code || error.code || '998', error.response.data.message), null);
+                                        return reject(new CoreExceptions_1.T1CLibException(500, error.response.data.code || error.code || '998', error.response.data.message));
+                                    }
+                                    else if (error.response.data.description) {
+                                        callback(new CoreExceptions_1.T1CLibException(500, error.response.data.code || error.code || '998', error.response.data.description), null);
+                                        return reject(new CoreExceptions_1.T1CLibException(500, error.response.data.code || error.code || '998', error.response.data.description));
+                                    }
+                                    else {
+                                        callback(new CoreExceptions_1.T1CLibException(500, error.response.data.code || error.code || '998', error.response.data), null);
+                                        return reject(new CoreExceptions_1.T1CLibException(500, error.response.data.code || error.code || '998', error.response.data));
+                                    }
                                 }
                                 else {
-                                    callback(new CoreExceptions_1.T1CLibException(500, '998', JSON.stringify(error.response)), null);
-                                    return reject(new CoreExceptions_1.T1CLibException(500, '998', JSON.stringify(error.response)));
+                                    callback(new CoreExceptions_1.T1CLibException(500, error.code || '998', JSON.stringify(error.response)), null);
+                                    return reject(new CoreExceptions_1.T1CLibException(500, error.code || '998', JSON.stringify(error.response)));
                                 }
                             }
                             else {
-                                callback(new CoreExceptions_1.T1CLibException(500, '998', JSON.stringify(error)), null);
-                                return reject(new CoreExceptions_1.T1CLibException(500, '998', JSON.stringify(error)));
+                                callback(new CoreExceptions_1.T1CLibException(500, error.code || '998', JSON.stringify(error)), null);
+                                return reject(new CoreExceptions_1.T1CLibException(500, error.code || '998', JSON.stringify(error)));
                             }
                         }
                     });
@@ -57431,10 +57441,14 @@ var GCLConfig = (function () {
                     _this._gwJwt = response.data.token;
                     resolve(response.data.token);
                 }, function (err) {
+                    console.warn(err);
                     if (err.response) {
                         if (err.response.data) {
                             if (err.response.data.message) {
                                 reject(new CoreExceptions_1.T1CLibException(500, err.code || '998', err.response.data.message));
+                            }
+                            else if (err.response.data.description) {
+                                reject(new CoreExceptions_1.T1CLibException(500, err.code || '998', err.response.data.description));
                             }
                             else {
                                 reject(new CoreExceptions_1.T1CLibException(500, err.code || '998', err.response.data));
