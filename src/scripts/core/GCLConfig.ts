@@ -481,10 +481,13 @@ export class GCLConfig {
                     this._gwJwt = response.data.token;
                     resolve(response.data.token);
                 }, err => {
+                    console.warn(err);
                     if (err.response) {
                         if (err.response.data) {
                             if (err.response.data.message) {
                                 reject(new T1CLibException(500, err.code || '998', err.response.data.message));
+                            } else if (err.response.data.description) {
+                                reject(new T1CLibException(500, err.code || '998', err.response.data.description));
                             } else {
                                 reject(new T1CLibException(500, err.code || '998', err.response.data));
                             }
