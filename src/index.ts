@@ -61,6 +61,9 @@ export * from './scripts/plugins/smartcards/eid/pt/EidPtModel';
 export * from './scripts/plugins/smartcards/emv/EMV';
 export * from './scripts/plugins/smartcards/emv/EMVModel';
 
+export * from './scripts/plugins/smartcards/isabel/Isabel';
+export * from './scripts/plugins/smartcards/isabel/IsabelModel';
+
 export * from './scripts/plugins/smartcards/mobib/mobib';
 export * from './scripts/plugins/smartcards/mobib/mobibModel';
 

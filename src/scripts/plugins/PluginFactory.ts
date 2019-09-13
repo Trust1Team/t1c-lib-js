@@ -15,7 +15,7 @@ import { Oberthur } from './smartcards/pki/oberthur/Oberthur';
 import { PIV } from './smartcards/piv/piv';
 import { AbstractEidBE } from './smartcards/eid/be/EidBeModel';
 import { AbstractEMV } from './smartcards/emv/EMVModel';
-// import { AbstractIsabel } from './smartcards/isabel/IsabelModel';
+import { AbstractIsabel } from './smartcards/isabel/IsabelModel';
 import { AbstractOcra } from './smartcards/ocra/ocraModel';
 import { AbstractAventra } from './smartcards/pki/aventra/AventraModel';
 import { AbstractLuxTrust } from './smartcards/pki/luxtrust/LuxTrustModel';
@@ -47,7 +47,7 @@ import {AbstractBeLawyer} from './smartcards/pki/BeLawyer/BeLawyerModel';
 import {BeLawyer} from './smartcards/pki/BeLawyer/BeLawyer';
 import {AbstractRawPrint} from './raw-print/RawPrintModel';
 import {RawPrint} from './raw-print/RawPrint';
-// import {Isabel} from './smartcards/isabel/Isabel';
+import {Isabel} from './smartcards/isabel/Isabel';
 
 export interface AbstractFactory {
     createEidBE(reader_id?: string): AbstractEidBE;
@@ -55,7 +55,7 @@ export interface AbstractFactory {
     createEidLUX(reader_id?: string): AbstractEidLUX;
     createEmv(reader_id?: string): AbstractEMV;
     createWacom(): AbstractWacom;
-    // createIsabel(reader_id?: string): AbstractIsabel;
+    createIsabel(reader_id?: string, runInUserSpace?: boolean): AbstractIsabel;
     createLuxTrust(reader_id?: string): AbstractLuxTrust;
     createMobib(reader_id?: string): AbstractMobib;
     createOcra(reader_id?: string): AbstractOcra;
@@ -123,7 +123,9 @@ export class PluginFactory implements AbstractFactory {
         return new Wacom(this.url, CONTAINER_WACOM, this.connection, 'wacom-stu');
     }
 
-    // public createIsabel(reader_id?: string): AbstractIsabel { return new Isabel(this.url, CONTAINER_EMV, this.connection, reader_id); }
+    public createIsabel(reader_id?: string, runInUserSpace?: boolean): AbstractIsabel {
+        return new Isabel(this.url, CONTAINER_ISABEL, this.connection, reader_id, runInUserSpace);
+    }
 
     public createLuxTrust(reader_id?: string): AbstractLuxTrust {
         return new LuxTrust(this.url, CONTAINER_LUXTRUST, this.connection, reader_id);
