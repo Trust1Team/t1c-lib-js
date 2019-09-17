@@ -1,5 +1,5 @@
 import {T1CLibException} from '../../../core/exceptions/CoreExceptions';
-import {DataResponse, DataObjectResponse, DataArrayResponse, CertificateResponse} from '../../../core/service/CoreModel';
+import {DataResponse, DataArrayResponse, CertificateResponse} from '../../../core/service/CoreModel';
 import {AbstractIsabel, IsabelAllDataResponse, IsabelSignRequest} from './IsabelModel';
 import {GenericReaderContainer} from '../Card';
 import {Options, RequestHandler} from '../../../..';
