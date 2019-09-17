@@ -1,8 +1,10 @@
 import {T1CLibException} from '../../../core/exceptions/CoreExceptions';
-import {DataObjectResponse, DataArrayResponse } from '../../../core/service/CoreModel';
-import {AbstractIsabel, IsabelRequest, IsabelSignRequest} from './IsabelModel';
+import {DataResponse, DataObjectResponse, DataArrayResponse, CertificateResponse} from '../../../core/service/CoreModel';
+import {AbstractIsabel, IsabelAllDataResponse, IsabelSignRequest} from './IsabelModel';
 import {GenericReaderContainer} from '../Card';
+import {Options, RequestHandler} from '../../../..';
 
+const ISABEL_CARD_ID = '/card-id';
 const ISABEL_CERT_ROOT = '/certificates/root';
 const ISABEL_CERT_NON_REPUDIATION = '/certificates/signing';
 const ISABEL_AUTHENTICATE = '/authenticate';
@@ -15,17 +17,30 @@ export class Isabel extends GenericReaderContainer implements AbstractIsabel {
         super(baseUrl, containerUrl, connection, reader_id, Isabel.CONTAINER_PREFIX, runInUserSpace);
     }
 
-    public rootCertificate(body: IsabelRequest, callback?: (error: T1CLibException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
+    public allDataFilters() {
+        return ['card-id'];
+    }
+
+    public allData(options: string[] | Options, callback?: (error: T1CLibException, data: IsabelAllDataResponse) => void): Promise<IsabelAllDataResponse> {
+        const requestOptions = RequestHandler.determineOptionsWithFilter(options);
+        return this.connection.get(this.baseUrl, this.containerSuffix(), requestOptions.params);
+    }
+
+    public cardId(callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
+        return this.connection.get(this.baseUrl, this.containerSuffix(ISABEL_CARD_ID), undefined, undefined, callback);
+    }
+
+    public rootCertificate(callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse> {
         // tslint:disable-next-line:comment-format
         // Fetching the root should always be done in the admin space as the user has no rights to the admin root cert (stored in the OS root cert store)
         let suffix = this.containerSuffix(ISABEL_CERT_ROOT);
         suffix = suffix.replace('/agent/0', '');
 
-        return this.connection.post(this.baseUrl, suffix, body, undefined, undefined, callback);
+        return this.connection.get(this.baseUrl, suffix, undefined, undefined, callback);
     }
 
-    public nonRepudiationCertificate(body: IsabelRequest, callback?: (error: T1CLibException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
-        return this.connection.post(this.baseUrl, this.containerSuffix(ISABEL_CERT_NON_REPUDIATION), body, undefined, undefined, callback);
+    public nonRepudiationCertificate(callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse> {
+        return this.connection.get(this.baseUrl, this.containerSuffix(ISABEL_CERT_NON_REPUDIATION), undefined, undefined, callback);
     }
 
     public allAlgoRefsForAuthentication(callback?: (error: T1CLibException, data: DataArrayResponse) => void): Promise<DataArrayResponse> {
@@ -36,14 +51,14 @@ export class Isabel extends GenericReaderContainer implements AbstractIsabel {
         return this.connection.get(this.baseUrl, this.containerSuffix(ISABEL_SIGN_DATA), undefined, undefined, callback);
     }
 
-    public signData(body: IsabelSignRequest, callback?: (error: T1CLibException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
+    public signData(body: IsabelSignRequest, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
         if (body.algorithm_reference) {
             body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
         }
         return this.connection.post(this.baseUrl, this.containerSuffix(ISABEL_SIGN_DATA), body, undefined, undefined, callback);
     }
 
-    public authenticate(body: IsabelSignRequest, callback?: (error: T1CLibException, data: DataObjectResponse) => void): Promise<DataObjectResponse> {
+    public authenticate(body: IsabelSignRequest, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse> {
         if (body.algorithm_reference) {
             body.algorithm_reference = body.algorithm_reference.toLocaleLowerCase();
         }
