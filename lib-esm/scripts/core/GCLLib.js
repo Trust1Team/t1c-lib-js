@@ -128,6 +128,9 @@ var GCLClient = (function () {
         this.rawprint = function () {
             return _this.pluginFactory.createRawPrint(!_this.config().citrix);
         };
+        this.isabel = function(reader_id) {
+            return _this.pluginFactory.createIsabel(!_this.config().citrix, reader_id);
+        }
         this.localConfig = cfg;
         this.connection = new LocalConnection(this.localConfig);
         this.authConnection = new LocalAuthConnection(this.localConfig);

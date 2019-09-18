@@ -73,12 +73,15 @@ export class PinTryCounterData {
 
 export abstract class GenericReaderContainer extends GenericContainer {
 
+    CONTAINER_NEW_CONTEXT_PATH_IN_USERSPACE = '/agent/0';
+
     constructor(protected baseUrl: string,
                 protected containerUrl: string,
                 protected connection: LocalConnection,
                 protected reader_id: string,
-                protected containerPrefix: string) {
-        super(baseUrl, containerUrl, connection, containerPrefix);
+                protected containerPrefix: string,
+                protected runInUserSpace?: boolean) {
+        super(baseUrl, containerUrl, connection, containerPrefix, runInUserSpace);
     }
 
     // resolves the reader_id in the base URL
@@ -91,6 +94,11 @@ export abstract class GenericReaderContainer extends GenericContainer {
         if (path && path.length) {
             suffix += path.startsWith('/') ? path : '/' + path;
         }
+
+        if (this.runInUserSpace) {
+            suffix = this.CONTAINER_NEW_CONTEXT_PATH_IN_USERSPACE + suffix;
+        }
+
         return suffix;
     }
 }
