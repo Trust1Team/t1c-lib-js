@@ -50,6 +50,7 @@ import {AbstractJavaKeyTool, AbstractSsh, PinEnforcer} from '../..';
 import {AbstractWacom} from '../plugins/wacom/WacomModel';
 import {AbstractBeLawyer} from '../plugins/smartcards/pki/BeLawyer/BeLawyerModel';
 import {AbstractRawPrint} from '../plugins/raw-print/RawPrintModel';
+import {AbstractIsabel} from '../plugins/smartcards/isabel/IsabelModel';
 
 // check if any polyfills are needed
 const defaults = {
@@ -299,7 +300,10 @@ export class GCLClient {
     };
     public rawprint = (): AbstractRawPrint => {
         return this.pluginFactory.createRawPrint(!this.config().citrix);
-    }
+    };
+    public isabel = (reader_id: string): AbstractIsabel => {
+        return this.pluginFactory.createIsabel(reader_id, !this.config().citrix);
+    };
 
     get gclInstalled(): boolean {
         return this._gclInstalled;
