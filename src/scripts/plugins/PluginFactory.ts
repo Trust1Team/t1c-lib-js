@@ -63,9 +63,11 @@ export interface AbstractFactory {
     createOberthurNO(reader_id?: string): AbstractOberthur;
     createPIV(reader_id?: string): AbstractPiv;
     createPKCS11(): AbstractPkcs11;
-    createJavaKeyTool(): AbstractJavaKeyTool
-    createSsh(): AbstractSsh
-    createRawPrint(runInUserSpace: boolean): AbstractRawPrint
+    createRemoteLoading(reader_id?: string): AbstractRemoteLoading;
+    createFileExchange(runInUserSpace: boolean): AbstractFileExchange;
+    createJavaKeyTool(): AbstractJavaKeyTool;
+    createSsh(): AbstractSsh;
+    createRawPrint(runInUserSpace: boolean): AbstractRawPrint;
 }
 
 const CONTAINER_NEW_CONTEXT_PATH = '/containers/';
@@ -163,8 +165,8 @@ export class PluginFactory implements AbstractFactory {
         return new Belfius(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id);
     }
 
-    public createFileExchange(): AbstractFileExchange {
-        return new FileExchange(this.url, CONTAINER_FILE_EXCHANGE, this.connection);
+    public createFileExchange(runInUserSpace: boolean): AbstractFileExchange {
+        return new FileExchange(this.url, CONTAINER_FILE_EXCHANGE, this.connection, runInUserSpace);
     }
 
     public createDataContainer(containerPath: string): () => AbstractDataContainer {

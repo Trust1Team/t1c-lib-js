@@ -284,7 +284,7 @@ export class GCLClient {
     };
     // get instance for File Exchange
     public filex = (): AbstractFileExchange => {
-        return this.pluginFactory.createFileExchange();
+        return this.pluginFactory.createFileExchange(!this.config().citrix);
     };
     // get instance for Java key tool
     public javakeytool = (): AbstractJavaKeyTool => {
