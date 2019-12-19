@@ -83,7 +83,7 @@ export declare class GCLClient {
     isabel: (reader_id: string) => AbstractIsabel;
     gclInstalled: boolean;
     containerFor(readerId: string, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
-    download(callback?: (error: T1CLibException, data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse>;
+    download(version?: string, callback?: (error: T1CLibException, data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse>;
     dumpData(readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     readersCanAuthenticate(callback?: (error: T1CLibException, data: CardReadersResponse) => void): Promise<any>;
     authenticate(readerId: string, data: AuthenticateOrSignData, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<any>;

@@ -1,7 +1,4 @@
-/**
- * @author Michallis Pashidis
- * @author Maarten Somers
- */
+
 import {Connection} from '../client/Connection';
 import {GCLConfig} from '../GCLConfig';
 import {
@@ -14,7 +11,8 @@ import {T1CLibException} from '../exceptions/CoreExceptions';
 const SEPARATOR = '/';
 const SECURITY = '/security';
 const SYS_INFO = '/system/status';
-const DOWNLOAD = '/download/gcl';
+const DOWNLOAD = '/download/';
+const DOWNLOAD_DEFAULT = 'gcl';
 const PUB_KEY = SECURITY + '/keys/public';
 const DEVICE = '/devices';
 
@@ -67,16 +65,17 @@ export class DSClient implements AbstractDSClient {
                                     data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse> {
         let self = this;
         if (callback) {
-            doGetDownloadLink();
+            doGetDownloadLink(downloadData.gclVersion);
         } else {
             // promise
             return new Promise<DSDownloadLinkResponse>((resolve, reject) => {
-                doGetDownloadLink(resolve, reject);
+                doGetDownloadLink(downloadData.gclVersion, resolve, reject);
             });
         }
 
-        function doGetDownloadLink(resolve?: (data: any) => void, reject?: (data: any) => void) {
-            self.connection.post(self.url, DOWNLOAD, downloadData, undefined, undefined, function (err, data) {
+        function doGetDownloadLink(version?: string, resolve?: (data: any) => void, reject?: (data: any) => void) {
+            let suffix = DOWNLOAD + (version ? version : DOWNLOAD_DEFAULT);
+            self.connection.post(self.url, suffix, downloadData, undefined, undefined, function (err, data) {
                 if (err) {
                     if (callback) {
                         return callback(err, null);

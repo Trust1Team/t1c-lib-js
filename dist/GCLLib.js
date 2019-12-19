@@ -14499,12 +14499,13 @@ var DSClientInfo = (function () {
 }());
 exports.DSClientInfo = DSClientInfo;
 var DSDownloadRequest = (function () {
-    function DSDownloadRequest(browser, manufacturer, os, ua, proxyDomain) {
+    function DSDownloadRequest(browser, manufacturer, os, ua, proxyDomain, gclVersion) {
         this.browser = browser;
         this.manufacturer = manufacturer;
         this.os = os;
         this.ua = ua;
         this.proxyDomain = proxyDomain;
+        this.gclVersion = gclVersion;
     }
     return DSDownloadRequest;
 }());
@@ -16577,7 +16578,7 @@ var SyncUtil = (function () {
     };
     SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
         return client.ds().then(function (ds) {
-            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.3.0"), info.namespace, containers));
+            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.4.0"), info.namespace, containers));
         });
     };
     SyncUtil.doSyncFlow = function (client, mergedInfo, uuid, containers, isRetry, config) {
@@ -19574,7 +19575,7 @@ var ActivationUtil = (function () {
     ActivationUtil.registerDevice = function (client, mergedInfo, uuid) {
         return client.admin().getPubKey().then(function (pubKey) {
             return client.ds().then(function (ds) {
-                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.3.0"), mergedInfo.namespace));
+                return ds.register(new DSClientModel_1.DSRegistrationOrSyncRequest(mergedInfo.activated, uuid, mergedInfo.core_version, pubKey.data.device, mergedInfo.manufacturer, mergedInfo.browser, mergedInfo.os, mergedInfo.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "2.4.0"), mergedInfo.namespace));
             });
         });
     };
@@ -20310,7 +20311,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var SEPARATOR = '/';
 var SECURITY = '/security';
 var SYS_INFO = '/system/status';
-var DOWNLOAD = '/download/gcl';
+var DOWNLOAD = '/download/';
+var DOWNLOAD_DEFAULT = 'gcl';
 var PUB_KEY = SECURITY + '/keys/public';
 var DEVICE = '/devices';
 var DSClient = (function () {
@@ -20351,15 +20353,16 @@ var DSClient = (function () {
     DSClient.prototype.downloadLink = function (downloadData, callback) {
         var self = this;
         if (callback) {
-            doGetDownloadLink();
+            doGetDownloadLink(downloadData.gclVersion);
         }
         else {
             return new Promise(function (resolve, reject) {
-                doGetDownloadLink(resolve, reject);
+                doGetDownloadLink(downloadData.gclVersion, resolve, reject);
             });
         }
-        function doGetDownloadLink(resolve, reject) {
-            self.connection.post(self.url, DOWNLOAD, downloadData, undefined, undefined, function (err, data) {
+        function doGetDownloadLink(version, resolve, reject) {
+            var suffix = DOWNLOAD + (version ? version : DOWNLOAD_DEFAULT);
+            self.connection.post(self.url, suffix, downloadData, undefined, undefined, function (err, data) {
                 if (err) {
                     if (callback) {
                         return callback(err, null);
@@ -22851,7 +22854,7 @@ var CoreService = (function () {
         return this.url;
     };
     CoreService.prototype.version = function () {
-        return Promise.resolve("2.3.0");
+        return Promise.resolve("2.4.0");
     };
     return CoreService;
 }());
@@ -58178,10 +58181,10 @@ var GCLClient = (function () {
     GCLClient.prototype.containerFor = function (readerId, callback) {
         return GenericService_1.GenericService.containerForReader(this, readerId, callback);
     };
-    GCLClient.prototype.download = function (callback) {
+    GCLClient.prototype.download = function (version, callback) {
         var _this = this;
         return this.core().infoBrowser().then(function (info) {
-            var downloadData = new DSClientModel_1.DSDownloadRequest(info.data.browser, info.data.manufacturer, info.data.os, info.data.ua, _this.config().gwUrl);
+            var downloadData = new DSClientModel_1.DSDownloadRequest(info.data.browser, info.data.manufacturer, info.data.os, info.data.ua, _this.config().gwUrl, version);
             return _this.ds().then(function (ds) {
                 return ds.downloadLink(downloadData, callback);
             }, function (err) {

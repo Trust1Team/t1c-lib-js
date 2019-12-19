@@ -318,10 +318,10 @@ export class GCLClient {
         return GenericService.containerForReader(this, readerId, callback);
     }
 
-    public download(callback?: (error: T1CLibException, data: DSDownloadLinkResponse) => void) {
+    public download(version?: string, callback?: (error: T1CLibException, data: DSDownloadLinkResponse) => void) {
         return this.core().infoBrowser().then(info => {
             let downloadData = new DSDownloadRequest(info.data.browser, info.data.manufacturer,
-                info.data.os, info.data.ua, this.config().gwUrl);
+                info.data.os, info.data.ua, this.config().gwUrl, version);
             return this.ds().then(ds => {
                 return ds.downloadLink(downloadData, callback);
             }, err => {

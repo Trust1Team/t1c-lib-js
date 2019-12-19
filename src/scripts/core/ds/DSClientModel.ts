@@ -47,7 +47,8 @@ export class DSDownloadRequest {
                 public manufacturer: string,
                 public os: DSOperatingSystem,
                 public ua: string,
-                public proxyDomain: string) {
+                public proxyDomain: string,
+                public gclVersion?: string) {
     }
 }
 
