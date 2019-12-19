@@ -31,7 +31,8 @@ export declare class DSDownloadRequest {
     os: DSOperatingSystem;
     ua: string;
     proxyDomain: string;
-    constructor(browser: DSBrowser, manufacturer: string, os: DSOperatingSystem, ua: string, proxyDomain: string);
+    gclVersion?: string;
+    constructor(browser: DSBrowser, manufacturer: string, os: DSOperatingSystem, ua: string, proxyDomain: string, gclVersion?: string);
 }
 export declare class DSRegistrationOrSyncRequest {
     activated: boolean;

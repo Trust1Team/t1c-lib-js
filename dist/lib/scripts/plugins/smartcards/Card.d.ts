@@ -58,7 +58,9 @@ export declare abstract class GenericReaderContainer extends GenericContainer {
     protected connection: LocalConnection;
     protected reader_id: string;
     protected containerPrefix: string;
-    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string, containerPrefix: string);
+    protected runInUserSpace?: boolean;
+    CONTAINER_NEW_CONTEXT_PATH_IN_USERSPACE: string;
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string, containerPrefix: string, runInUserSpace?: boolean);
     protected containerSuffix(path?: string): string;
 }
 export declare abstract class GenericSmartCard extends GenericReaderContainer implements Card {

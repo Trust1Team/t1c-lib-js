@@ -1,6 +1,7 @@
 import { LocalConnection } from '../core/client/Connection';
 import { AbstractEidBE } from './smartcards/eid/be/EidBeModel';
 import { AbstractEMV } from './smartcards/emv/EMVModel';
+import { AbstractIsabel } from './smartcards/isabel/IsabelModel';
 import { AbstractOcra } from './smartcards/ocra/ocraModel';
 import { AbstractAventra } from './smartcards/pki/aventra/AventraModel';
 import { AbstractLuxTrust } from './smartcards/pki/luxtrust/LuxTrustModel';
@@ -26,6 +27,7 @@ export interface AbstractFactory {
     createEidLUX(reader_id?: string): AbstractEidLUX;
     createEmv(reader_id?: string): AbstractEMV;
     createWacom(): AbstractWacom;
+    createIsabel(reader_id?: string, runInUserSpace?: boolean): AbstractIsabel;
     createLuxTrust(reader_id?: string): AbstractLuxTrust;
     createMobib(reader_id?: string): AbstractMobib;
     createOcra(reader_id?: string): AbstractOcra;
@@ -48,6 +50,7 @@ export declare class PluginFactory implements AbstractFactory {
     createEidPT(reader_id?: string): AbstractEidPT;
     createEmv(reader_id?: string): AbstractEMV;
     createWacom(): AbstractWacom;
+    createIsabel(reader_id?: string, runInUserSpace?: boolean): AbstractIsabel;
     createLuxTrust(reader_id?: string): AbstractLuxTrust;
     createMobib(reader_id?: string): AbstractMobib;
     createOcra(reader_id?: string): AbstractOcra;
