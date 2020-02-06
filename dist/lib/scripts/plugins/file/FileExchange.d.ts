@@ -24,7 +24,7 @@ export declare class FileExchange extends GenericContainer implements AbstractFi
     static CONTAINERS_ENABLED: string;
     static DIR_CREATE: string;
     static FILE_INFO: string;
-    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection);
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, runInUserSpace: boolean);
     copyFile(entity: string, from_type: string, to_type: string, filename: string, new_filename: string, from_rel_path?: [string], to_rel_path?: [string], callback?: (error: T1CLibException, data: FileResponse) => void): Promise<FileResponse>;
     createDir(entity: string, type: string, rel_path: [string], recursive?: boolean, callback?: (error: T1CLibException, data: FileResponse) => void): Promise<FileResponse>;
     createType(entity: string, type: string, initabspath?: [string], showModal?: boolean, timeoutInSeconds?: number, callback?: (error: T1CLibException, data: TypeResponse) => void): Promise<TypeResponse>;

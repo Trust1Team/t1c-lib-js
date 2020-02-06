@@ -32,8 +32,8 @@ export class FileExchange extends GenericContainer implements AbstractFileExchan
     static FILE_INFO = '/file-info';
 
 
-    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection) {
-        super(baseUrl, containerUrl, connection, FileExchange.CONTAINER_PREFIX);
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, runInUserSpace: boolean) {
+        super(baseUrl, containerUrl, connection, FileExchange.CONTAINER_PREFIX, runInUserSpace);
     }
 
     copyFile(entity: string, from_type: string, to_type: string, filename: string, new_filename: string, from_rel_path?: [string], to_rel_path?: [string], callback?: (error: T1CLibException, data: FileResponse) => void): Promise<FileResponse> {

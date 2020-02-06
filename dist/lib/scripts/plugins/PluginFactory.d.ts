@@ -60,7 +60,7 @@ export declare class PluginFactory implements AbstractFactory {
     createPKCS11(): AbstractPkcs11;
     createRemoteLoading(reader_id?: string): AbstractRemoteLoading;
     createBelfius(reader_id?: string): AbstractBelfius;
-    createFileExchange(): AbstractFileExchange;
+    createFileExchange(runInUserSpace: boolean): AbstractFileExchange;
     createDataContainer(containerPath: string): () => AbstractDataContainer;
     createJavaKeyTool(): AbstractJavaKeyTool;
     createSsh(): AbstractSsh;

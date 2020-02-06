@@ -176,7 +176,7 @@ export class GCLClient {
      */
     private static initLibrary(): Promise<GCLClient> {
         return InitUtil.initializeLibrary(ClientService.getClient());
-    };
+    }
 
     public encryptPin(pin: string): string {
         return PinEnforcer.encryptPin(pin);
@@ -284,7 +284,7 @@ export class GCLClient {
     };
     // get instance for File Exchange
     public filex = (): AbstractFileExchange => {
-        return this.pluginFactory.createFileExchange();
+        return this.pluginFactory.createFileExchange(!this.config().citrix);
     };
     // get instance for Java key tool
     public javakeytool = (): AbstractJavaKeyTool => {

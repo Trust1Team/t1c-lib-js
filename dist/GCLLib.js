@@ -16849,7 +16849,7 @@ var AgentClient = (function () {
         return AgentClient.AGENT_PATH + '/' + port;
     };
     AgentClient.prototype.get = function (username, callback) {
-        var body = { 'username': username };
+        var body = { username: username };
         return this.connection.postSkipCitrix(this.url, AgentClient.AGENT_PATH, undefined, body, undefined, callback);
     };
     AgentClient.AGENT_PATH = '/agent';
@@ -35934,8 +35934,8 @@ var PluginFactory = (function () {
     PluginFactory.prototype.createBelfius = function (reader_id) {
         return new Belfius_1.Belfius(this.url, CONTAINER_REMOTE_LOADING, this.connection, reader_id);
     };
-    PluginFactory.prototype.createFileExchange = function () {
-        return new FileExchange_1.FileExchange(this.url, CONTAINER_FILE_EXCHANGE, this.connection);
+    PluginFactory.prototype.createFileExchange = function (runInUserSpace) {
+        return new FileExchange_1.FileExchange(this.url, CONTAINER_FILE_EXCHANGE, this.connection, runInUserSpace);
     };
     PluginFactory.prototype.createDataContainer = function (containerPath) {
         var _this = this;
@@ -37116,8 +37116,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var GenericContainer_1 = __webpack_require__(25);
 var FileExchange = (function (_super) {
     __extends(FileExchange, _super);
-    function FileExchange(baseUrl, containerUrl, connection) {
-        return _super.call(this, baseUrl, containerUrl, connection, FileExchange.CONTAINER_PREFIX) || this;
+    function FileExchange(baseUrl, containerUrl, connection, runInUserSpace) {
+        return _super.call(this, baseUrl, containerUrl, connection, FileExchange.CONTAINER_PREFIX, runInUserSpace) || this;
     }
     FileExchange.prototype.copyFile = function (entity, from_type, to_type, filename, new_filename, from_rel_path, to_rel_path, callback) {
         return this.connection.post(this.baseUrl, this.containerSuffix(FileExchange.FILE_COPY), { entity: entity, from_type: from_type, to_type: to_type, filename: filename, new_filename: new_filename, from_rel_path: from_rel_path, to_rel_path: to_rel_path }, undefined, undefined, callback);
@@ -58079,7 +58079,7 @@ var GCLClient = (function () {
             return _this.pluginFactory.createBelfius(reader_id);
         };
         this.filex = function () {
-            return _this.pluginFactory.createFileExchange();
+            return _this.pluginFactory.createFileExchange(!_this.config().citrix);
         };
         this.javakeytool = function () {
             return _this.pluginFactory.createJavaKeyTool();
@@ -58164,7 +58164,6 @@ var GCLClient = (function () {
     GCLClient.initLibrary = function () {
         return InitUtil_1.InitUtil.initializeLibrary(ClientService_1.ClientService.getClient());
     };
-    ;
     GCLClient.prototype.encryptPin = function (pin) {
         return __1.PinEnforcer.encryptPin(pin);
     };
