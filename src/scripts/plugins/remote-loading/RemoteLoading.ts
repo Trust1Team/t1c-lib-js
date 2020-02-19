@@ -1,7 +1,4 @@
-/**
- * @author Maarten Somers
- * @since 2017
- */
+
 import { AbstractRemoteLoading, APDU, CommandResponse, CommandsResponse } from './RemoteLoadingModel';
 import { T1CLibException } from '../../core/exceptions/CoreExceptions';
 

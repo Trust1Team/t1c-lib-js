@@ -1,8 +1,3 @@
-/**
- * @author Maarten Somers
- * @since 2017
- */
-
 import {T1CLibException} from '../exceptions/CoreExceptions';
 import Certificate from 'pkijs/build/Certificate';
 

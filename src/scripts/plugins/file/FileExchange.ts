@@ -1,7 +1,4 @@
-/**
- * @author Michallis Pashidis
- * @since 2017
- */
+
 import {AbstractFileExchange, FileListResponse, FileResponse, FileSort, ModalType, Page, TypeListResponse, TypeResponse} from './FileExchangeModel';
 import {T1CLibException} from '../../core/exceptions/CoreExceptions';
 import {BoolDataResponse, DataArrayResponse, DataResponse} from '../../core/service/CoreModel';
@@ -32,8 +29,8 @@ export class FileExchange extends GenericContainer implements AbstractFileExchan
     static FILE_INFO = '/file-info';
 
 
-    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, runInUserSpace: boolean) {
-        super(baseUrl, containerUrl, connection, FileExchange.CONTAINER_PREFIX, runInUserSpace);
+    constructor(baseUrl: string, containerUrl: string, connection: LocalConnection) {
+        super(baseUrl, containerUrl, connection, FileExchange.CONTAINER_PREFIX);
     }
 
     copyFile(entity: string, from_type: string, to_type: string, filename: string, new_filename: string, from_rel_path?: [string], to_rel_path?: [string], callback?: (error: T1CLibException, data: FileResponse) => void): Promise<FileResponse> {

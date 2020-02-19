@@ -1,8 +1,3 @@
-/**
- * @author Michallis Pashidis
- * @since 2017
- */
-
 import {GCLConfig} from '../GCLConfig';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {T1CLibException} from '../exceptions/CoreExceptions';

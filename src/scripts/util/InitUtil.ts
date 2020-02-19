@@ -5,12 +5,9 @@
 import {GCLClient} from '../core/GCLLib';
 import * as semver from 'semver';
 import {SyncUtil} from './SyncUtil';
-import {ActivationUtil} from './ActivationUtil';
 import {DSPlatformInfo} from '../core/ds/DSClientModel';
 import {PubKeyService} from './PubKeyService';
 import {T1CLibException} from '../core/exceptions/CoreExceptions';
-import {AxiosResponse} from 'axios';
-import axios from 'axios';
 import {ActivatedContainerUtil} from './ActivatedContainerUtil';
 import {BrowserInfo, InfoResponse} from '../core/service/CoreModel';
 import {GCLConfig} from '../..';
@@ -29,6 +26,7 @@ export class InitUtil {
         return new Promise((finalResolve, finalReject) => {
             let initPromise = new Promise((resolve, reject) => {
                 let cfg = client.config();
+
                 client.core().info().then(infoResponse => {
                     // update config values
                     cfg.citrix = infoResponse.data.citrix;
@@ -57,17 +55,6 @@ export class InitUtil {
                     console.error('initializeLibrary - getInfoError', err);
                     // failure probably because GCL is not installed
                     client.gclInstalled = false;
-                    // check if older GCL version is available at v1 endpoint
-                    axios.get('https://localhost:10443/v1').then((response: AxiosResponse) => {
-                        // response received, inform user that he needs to update
-                        reject(new T1CLibException(400, '301',
-                            'Installed GCL version is not v2 compatible. Please update to a compatible version.', client));
-                    }).catch(() => {
-                        // no response, no older GCL version installed
-                        // return the client in the error so a new version can be downloaded!
-                        reject(new T1CLibException(400, '302',
-                            'No installed GCL component found. Please download and install the GCL.', client));
-                    });
                 });
             });
             initPromise.then(() => {
@@ -89,7 +76,6 @@ export class InitUtil {
         // console.log(config.activeContainers);
     }
 
-
     private static activateAndSync(infoResponse: InfoResponse, mergedInfo: DSPlatformInfo, client: GCLClient, config: GCLConfig, initResolve: any, initReject: any) {
         const activated = infoResponse.data.activated;
         const uuid = infoResponse.data.uid;
@@ -97,12 +83,7 @@ export class InitUtil {
             if (activated) {
                 resolve();
             } else {
-                if (config.dsUrl) {
-                    resolve(ActivationUtil.unManagedInitialization(client, mergedInfo, uuid));
-                }
-                else {
-                    initReject(new T1CLibException(400, '400', 'Installed GCL is not activated and has no DS to activate', client));
-                }
+                initReject(new T1CLibException(400, '400', 'Installed GCL is not activated and has no DS to activate', client));
             }
         });
         activationPromise.then(() => {

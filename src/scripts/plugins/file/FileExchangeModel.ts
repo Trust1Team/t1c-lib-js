@@ -1,8 +1,3 @@
-/**
- * @author Michallis Pashidis
- * @since 2018
- */
-
 import { T1CLibException } from '../../core/exceptions/CoreExceptions';
 import {BoolDataResponse, DataArrayResponse, DataResponse, T1CResponse} from '../../core/service/CoreModel';
 export interface AbstractFileExchange {

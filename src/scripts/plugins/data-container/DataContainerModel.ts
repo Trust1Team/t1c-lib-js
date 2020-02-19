@@ -1,8 +1,3 @@
-/**
- * @author Maarten Somers
- * @since 2018
- */
-
 import { T1CLibException } from '../../core/exceptions/CoreExceptions';
 
 

@@ -1,12 +1,6 @@
 import {DataResponse, T1CResponse} from '../../core/service/CoreModel';
 import {T1CLibException} from '../../core/exceptions/CoreExceptions';
 
-/**
- *
- * @author Gilles Platteeuw
- * @since  2018
- */
-
 export interface AbstractJavaKeyTool {
     generateKeyPair(body: GenerateKeyPairData, callback?: (error: T1CLibException, data: GenerateKeyPairResponse) => void): Promise<DataResponse>;
     GenerateCertificateRequest(body: CSRData, callback?: (error: T1CLibException, data: CSRResponse) => void): Promise<DataResponse>;

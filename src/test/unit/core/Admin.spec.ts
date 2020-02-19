@@ -20,20 +20,6 @@ describe('AdminService', () => {
         mock.restore();
     });
 
-    test('activate', done => {
-        const mockresponse = {
-            data: 'Activation Data',
-            success: true
-        };
-        mock.onPost('/admin/activate').reply(200, mockresponse);
-
-        return admin.activate().then(res => {
-            expect(res).toHaveProperty('success', true);
-            expect(res).toHaveProperty('data', 'Activation Data');
-            done();
-        });
-    });
-
 
     test('makes the correct call to get pub key', () => {
         const mockresponse = {
@@ -44,7 +30,7 @@ describe('AdminService', () => {
                 },
             success: true
         };
-        mock.onGet('/admin/certificate').reply(200, mockresponse);
+        mock.onGet('/admin/certificate/device').reply(200, mockresponse);
 
         return admin.getPubKey().then(res => {
             expect(res).toHaveProperty('success', true);
@@ -58,16 +44,17 @@ describe('AdminService', () => {
     });
 
 
-    test('makes the correct call to set pub key', done => {
-        const mockresponse = {data: 'Set Pub Key Data', success: true};
-        mock.onPut('/admin/certificate', {encryptedPublicKey: 'pubkey', encryptedAesKey: 'aeskey', ns: ''}).reply(200, mockresponse);
-
-        return admin.setPubKey({encryptedAesKey: 'aeskey', encryptedPublicKey: 'pubkey', ns: ''}).then(res => {
-            expect(res).toHaveProperty('success', true);
-            expect(res).toHaveProperty('data', 'Set Pub Key Data');
-            done();
-        });
-    });
+    // TODO not needed in unmanaged
+    // test('makes the correct call to set pub key', done => {
+    //     const mockresponse = {data: 'Set Pub Key Data', success: true};
+    //     mock.onPut('/admin/certificate', {encryptedPublicKey: 'pubkey', encryptedAesKey: 'aeskey', ns: ''}).reply(200, mockresponse);
+    //
+    //     return admin.setPubKey({encryptedAesKey: 'aeskey', encryptedPublicKey: 'pubkey', ns: ''}).then(res => {
+    //         expect(res).toHaveProperty('success', true);
+    //         expect(res).toHaveProperty('data', 'Set Pub Key Data');
+    //         done();
+    //     });
+    // });
 
     // TODO fix body
     // test('updateContainerConfig', done => {

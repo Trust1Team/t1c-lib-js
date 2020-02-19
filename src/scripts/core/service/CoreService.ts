@@ -1,7 +1,3 @@
-/**
- * @author Michallis Pashidis
- * @author Maarten Somers
- */
 import {LocalAuthConnection} from '../client/Connection';
 import * as platform from 'platform';
 import {ResponseHandler} from '../../util/ResponseHandler';

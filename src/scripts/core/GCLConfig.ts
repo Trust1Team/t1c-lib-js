@@ -1,10 +1,3 @@
-/**
- * @author Maarten Casteels
- * @author Michallis Pashidis
- * @author Maarten Somers
- * @since 2016
- */
-
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import * as jwtDecode from 'jwt-decode';
 import * as moment from 'moment';
@@ -13,12 +6,9 @@ import {Pkcs11ModuleConfig} from '../plugins/smartcards/pkcs11/pkcs11Model';
 import {T1CContainerid} from './service/CoreModel';
 
 const defaults = {
-    gclUrl: 'https://localhost:10443/v2',
-    dsContextPath: '/trust1team/gclds/v2',
-    ocvContextPath: '/trust1team/ocv-api/v1',
-    dsContextPathTestMode: '/gcl-ds-web/v2',
-    dsFileContextPath: '/trust1team/gclds-file/v1',
-    tokenExchangeContextPath: '/apiengineauth/v1',
+    gclUrl: 'https://localhost:34752/v3',
+    dsContextPath: '/trust1team/gclds/v3',
+    dsContextPathTestMode: '/gcl-ds-web/v3',
     lang: 'en',
     implicitDownload: false,
     localTestMode: false,
@@ -35,10 +25,7 @@ export class GCLConfigOptions {
                 public gwOrProxyUrl?: string,
                 public apiKey?: string,
                 public gwJwt?: string,
-                public tokenExchangeContextPath?: string,
-                public ocvContextPath?: string,
                 public dsContextPath?: string,
-                public dsFileContextPath?: string,
                 public pkcs11Config?: Pkcs11ModuleConfig,
                 public agentPort?: number,
                 public implicitDownload?: boolean,
@@ -63,11 +50,8 @@ export class GCLConfig {
     private _gwUrl: string;
     private _gclUrl: string;
     private _dsContextPath: string;
-    private _dsFileContextPath: string;
-    private _ocvContextPath: string;
     private _apiKey: string;
     private _gwJwt: string;
-    private _tokenExchangeContextPath: string;
     private _gclJwt: string;
     private _citrix: boolean;
     private _agentPort: number;
@@ -109,11 +93,7 @@ export class GCLConfig {
             } else {
                 this._gwJwt = undefined;
             } // no default
-            if (options.tokenExchangeContextPath) {
-                this._tokenExchangeContextPath = options.tokenExchangeContextPath;
-            } else {
-                this._tokenExchangeContextPath = defaults.tokenExchangeContextPath;
-            }
+
             if (options.agentPort) {
                 this._agentPort = options.agentPort;
             } else {
@@ -170,16 +150,7 @@ export class GCLConfig {
                 this._providedContainers = undefined;
             }
             this._citrix = false; // will be set to true during initialisation if Shared environment is detected
-            // resolve DS file context path
-            if (this.gwUrl) {
-                if (options.dsFileContextPath) {
-                    this._dsFileContextPath = options.dsFileContextPath;
-                } else {
-                    this._dsFileContextPath = defaults.dsFileContextPath;
-                }
-            } else {
-                this._dsFileContextPath = undefined;
-            }
+
             // resolve DS context path
             if (this.gwUrl) {
                 if (options.dsContextPath) {
@@ -190,45 +161,16 @@ export class GCLConfig {
             } else {
                 this._dsContextPath = undefined;
             }
-            // resolve OCV context path
-            if (this.gwUrl) {
-                if (options.ocvContextPath) {
-                    this._ocvContextPath = options.ocvContextPath;
-                } else {
-                    this._ocvContextPath = defaults.ocvContextPath;
-                }
-            } else {
-                this._ocvContextPath = undefined;
-            }
         }
-    }
-
-    get tokenExchangeContextPath(): string {
-        return this._tokenExchangeContextPath;
-    }
-
-    set tokenExchangeContextPath(value: string) {
-        this._tokenExchangeContextPath = value;
     }
 
     get authUrl(): string {
-        return this.gwUrl + this.tokenExchangeContextPath;
+        // TODO: remove
+        return undefined;
     }
 
     get ocvUrl(): string {
-        if (!this.gwUrl) {
-            return undefined;
-        } else {
-            return this.gwUrl + this.ocvContextPath;
-        }
-    }
-
-    get ocvContextPath(): string {
-        return this._ocvContextPath;
-    }
-
-    set ocvContextPath(value: string) {
-        this._ocvContextPath = value;
+        return undefined;
     }
 
     get gclUrl(): string {
@@ -253,14 +195,6 @@ export class GCLConfig {
 
     set dsContextPath(value: string) {
         this._dsContextPath = value;
-    }
-
-    get dsFileContextPath(): string {
-        return this._dsFileContextPath;
-    }
-
-    set dsFileContextPath(value: string) {
-        this._dsFileContextPath = value;
     }
 
     get apiKey(): string {
@@ -288,11 +222,7 @@ export class GCLConfig {
     }
 
     get dsFileDownloadUrl(): string {
-        if (!this.gwUrl) {
-            return undefined;
-        } else {
-            return this.gwUrl + this.dsFileContextPath;
-        }
+        return undefined;
     }
 
     get gwUrl() {
