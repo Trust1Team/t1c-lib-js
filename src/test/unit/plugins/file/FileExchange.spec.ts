@@ -13,7 +13,7 @@ let activecontainers = new Map<string, string[]>();
 activecontainers.set('file-exchange', ['file-exchange-v1-1-0']);
 gclconfig.activeContainers = activecontainers;
 connection = new LocalConnection(gclconfig);
-filex = new PluginFactory('', connection).createFileExchange();
+filex = new PluginFactory('', connection).createFileExchange(true);
 
 describe('File Exchange', () => {
     beforeEach(() => {
