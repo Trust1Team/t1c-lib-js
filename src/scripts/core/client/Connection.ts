@@ -208,7 +208,7 @@ export abstract class GenericConnection implements Connection {
     getRequestHeaders(headers: RequestHeaders): RequestHeaders {
         let reqHeaders = headers || {};
         reqHeaders['Accept-Language'] = 'en-US';
-        /*reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;*/
+        reqHeaders['T1C-CSRF-Token'] = 'client';
         return reqHeaders;
     }
 
