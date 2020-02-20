@@ -1,11 +1,3 @@
-/**
- * @author Maarten Casteels
- * @author Michallis Pashidis
- * @author Maarten Somers
- * @since 2016
- */
-
-
 import {CoreService} from './service/CoreService';
 import {
     LocalConnection, RemoteJwtConnection, LocalAuthConnection, LocalTestConnection,
@@ -14,7 +6,7 @@ import {
 import {DSDownloadLinkResponse, DSDownloadRequest} from './ds/DSClientModel';
 import {DSClient} from './ds/DSClient';
 import {OCVClient} from './ocv/OCVClient';
-import {CardReadersResponse, DataResponse, T1CContainer, T1CContainerid} from './service/CoreModel';
+import {CardReadersResponse, CheckGclVersionResponse, DataResponse, T1CContainer, T1CContainerid} from './service/CoreModel';
 import {AbstractEidBE} from '../plugins/smartcards/eid/be/EidBeModel';
 import {AbstractEMV} from '../plugins/smartcards/emv/EMVModel';
 import {AbstractOcra} from '../plugins/smartcards/ocra/ocraModel';
@@ -54,13 +46,10 @@ import {AbstractIsabel} from '../plugins/smartcards/isabel/IsabelModel';
 
 // check if any polyfills are needed
 const defaults = {
-    gclUrl: 'https://localhost:10443/v2',
+    gclUrl: 'https://localhost:34752/v3',
     gwUrl: 'https://accapim.t1t.be:443',
-    dsContextPath: '/trust1team/gclds/v2',
-    ocvContextPath: '/trust1team/ocv-api/v1',
-    dsContextPathTestMode: '/gcl-ds-web/v2',
-    dsFileContextPath: '/trust1team/gclds-file/v1',
-    tokenExchangeContextPath: '/apiengineauth/v1',
+    dsContextPath: '/trust1team/gclds/v3',
+    dsContextPathTestMode: '/gcl-ds-web/v3',
     implicitDownload: false,
     localTestMode: false,
     forceHardwarePinpad: false,
@@ -90,10 +79,12 @@ export class GCLClient {
     private dsClient: DSClient;
     private ocvClient: OCVClient;
     private authClient: AuthClient;
+    private gclVersion: string;
 
     public constructor(cfg: GCLConfig, automatic: boolean) {
         // resolve config to singleton
         this.localConfig = cfg;
+        this.gclVersion = cfg.gclVersion;
         // init communication
         this.connection = new LocalConnection(this.localConfig);
         this.authConnection = new LocalAuthConnection(this.localConfig);
@@ -176,7 +167,7 @@ export class GCLClient {
      */
     private static initLibrary(): Promise<GCLClient> {
         return InitUtil.initializeLibrary(ClientService.getClient());
-    };
+    }
 
     public encryptPin(pin: string): string {
         return PinEnforcer.encryptPin(pin);
@@ -185,23 +176,23 @@ export class GCLClient {
     // get admin services
     public admin = (): AdminService => {
         return this.adminService;
-    };
+    }
     // get auth service
     public auth = (): AuthClient => {
         return this.authClient;
-    };
+    }
     // get core services
     public core = (): CoreService => {
         return this.coreService;
-    };
+    }
     // get core config
     public config = (): GCLConfig => {
         return this.localConfig;
-    };
+    }
     // get agent client services
     public agent = (): AbstractAgent => {
         return this.agentClient;
-    };
+    }
     // get ds client services
     public ds = (): Promise<DSClient> => {
         // als ds niet geconfigureerd is moet je hier een exception geven
@@ -212,98 +203,98 @@ export class GCLClient {
                 reject(new DSException('Distribution server is not configured'));
             }
         });
-    };
+    }
     // get ocv client services
     public ocv = (): AbstractOCVClient => {
         return this.ocvClient;
-    };
+    }
     // get plugin factory
     public pf = (): PluginFactory => {
         return this.pluginFactory;
-    };
+    }
     // get instance for belgian eID card
     public beid = (reader_id?: string): AbstractEidBE => {
         return this.pluginFactory.createEidBE(reader_id);
-    };
+    }
     // get instance for belgian eID card
     public beLawyer = (reader_id?: string): AbstractBeLawyer => {
         return this.pluginFactory.createBeLawyer(reader_id);
-    };
+    }
     // get instance for spanish DNIe card
     public dnie = (reader_id?: string): AbstractDNIe => {
         return this.pluginFactory.createDNIe(reader_id);
-    };
+    }
     // get instance for luxemburg eID card
     public luxeid = (reader_id?: string, pin?: string, pinType?: PinType, isEncrypted = false): AbstractEidLUX => {
         return this.pluginFactory.createEidLUX(reader_id, pin, pinType, isEncrypted);
-    };
+    }
     // get instance for luxtrust card
     public luxtrust = (reader_id?: string, pin?: string): AbstractLuxTrust => {
         return this.pluginFactory.createLuxTrust(reader_id);
-    };
+    }
     // get instance for EMV
     public emv = (reader_id?: string): AbstractEMV => {
         return this.pluginFactory.createEmv(reader_id);
-    };
+    }
     // get instance for MOBIB
     public mobib = (reader_id?: string): AbstractMobib => {
         return this.pluginFactory.createMobib(reader_id);
-    };
+    }
     // get instance for OCRA
     public ocra = (reader_id?: string): AbstractOcra => {
         return this.pluginFactory.createOcra(reader_id);
-    };
+    }
     // get instance for Aventra
     public aventra = (reader_id?: string): AbstractAventra => {
         return this.pluginFactory.createAventraNO(reader_id);
-    };
+    }
     // get instance for Oberthur
     public oberthur = (reader_id?: string): AbstractOberthur => {
         return this.pluginFactory.createOberthurNO(reader_id);
-    };
+    }
     // get instance for PIV
     public piv = (reader_id?: string): AbstractPiv => {
         return this.pluginFactory.createPIV(reader_id);
-    };
+    }
     // get instance for PT Eid
     public pteid = (reader_id?: string): AbstractEidPT => {
         return this.pluginFactory.createEidPT(reader_id);
-    };
+    }
     // get instance for PKCS11
     public pkcs11 = (): AbstractPkcs11 => {
         return this.pluginFactory.createPKCS11();
-    };
+    }
     // get instance for Remote Loading
     public readerapi = (reader_id: string): AbstractRemoteLoading => {
         return this.pluginFactory.createRemoteLoading(reader_id);
-    };
+    }
     // TODO change name
     // get instance for Belfius
     public belfius = (reader_id: string): AbstractBelfius => {
         return this.pluginFactory.createBelfius(reader_id);
-    };
+    }
     // get instance for File Exchange
     public filex = (): AbstractFileExchange => {
         return this.pluginFactory.createFileExchange();
-    };
+    }
     // get instance for Java key tool
     public javakeytool = (): AbstractJavaKeyTool => {
         return this.pluginFactory.createJavaKeyTool();
-    };
+    }
     // get instance for SSH
     public ssh = (): AbstractSsh => {
         return this.pluginFactory.createSsh();
-    };
+    }
     // get instance for Wacom
     public wacom = (): AbstractWacom => {
         return this.pluginFactory.createWacom();
-    };
+    }
     public rawprint = (): AbstractRawPrint => {
         return this.pluginFactory.createRawPrint(!this.config().citrix);
-    };
+    }
     public isabel = (reader_id: string): AbstractIsabel => {
         return this.pluginFactory.createIsabel(reader_id, !this.config().citrix);
-    };
+    }
 
     get gclInstalled(): boolean {
         return this._gclInstalled;

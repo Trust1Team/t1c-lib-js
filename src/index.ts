@@ -1,7 +1,7 @@
 import {Polyfills} from './scripts/util/Polyfills';
 
-export * from './scripts/core/admin/adminModel';
 export * from './scripts/core/admin/admin';
+export * from './scripts/core/admin/adminModel';
 
 export * from './scripts/core/agent/agent';
 export * from './scripts/core/agent/agentModel';
@@ -100,7 +100,6 @@ export * from './scripts/plugins/GenericContainer';
 export * from './scripts/plugins/PluginFactory';
 
 export * from './scripts/util/ActivatedContainerUtil';
-export * from './scripts/util/ActivationUtil';
 export * from './scripts/util/BrowserFingerprint';
 export * from './scripts/util/CardUtil';
 export * from './scripts/util/CertParser';

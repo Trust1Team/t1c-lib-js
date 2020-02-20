@@ -1,6 +1,4 @@
-/**
- * @author Maarten Somers
- */
+
 import {GenericConnection, LocalAuthConnection} from '../core/client/Connection';
 import {JSEncrypt} from 'jsencrypt';
 import {PubKeyService} from './PubKeyService';

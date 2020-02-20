@@ -1,8 +1,3 @@
-/**
- * @author Maarten Somers
- * @since 2018
- */
-
 
 declare function require(name: string);
 export class Polyfills {

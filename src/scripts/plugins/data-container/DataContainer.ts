@@ -1,8 +1,3 @@
-/**
- * @author Maarten Somers
- * @since 2018
- */
-
 import { AbstractDataContainer } from './DataContainerModel';
 import { T1CLibException } from '../../core/exceptions/CoreExceptions';
 import {GenericContainer} from '../GenericContainer';

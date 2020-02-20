@@ -1,6 +1,4 @@
-/**
- * @author Maarten Somers
- */
+
 import { Options } from './RequestHandler';
 import {SmartCard} from '../core/service/CoreModel';
 import {Util} from './Utils';

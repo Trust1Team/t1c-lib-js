@@ -1,6 +1,4 @@
-/**
- * @author Maarten Somers
- */
+
 import { GCLClient } from '../core/GCLLib';
 
 export class ClientService {

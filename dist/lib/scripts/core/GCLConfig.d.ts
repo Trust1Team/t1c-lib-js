@@ -5,10 +5,7 @@ export declare class GCLConfigOptions {
     gwOrProxyUrl?: string;
     apiKey?: string;
     gwJwt?: string;
-    tokenExchangeContextPath?: string;
-    ocvContextPath?: string;
     dsContextPath?: string;
-    dsFileContextPath?: string;
     pkcs11Config?: Pkcs11ModuleConfig;
     agentPort?: number;
     implicitDownload?: boolean;
@@ -21,18 +18,17 @@ export declare class GCLConfigOptions {
     containerDownloadTimeout?: number;
     localTestMode?: boolean;
     lang?: string;
+    gclDownloadLink?: string;
+    gclVersion?: string;
     providedContainers?: T1CContainerid[];
-    constructor(gclUrl?: string, gwOrProxyUrl?: string, apiKey?: string, gwJwt?: string, tokenExchangeContextPath?: string, ocvContextPath?: string, dsContextPath?: string, dsFileContextPath?: string, pkcs11Config?: Pkcs11ModuleConfig, agentPort?: number, implicitDownload?: boolean, forceHardwarePinpad?: boolean, sessionTimeout?: number, consentDuration?: number, consentTimeout?: number, syncManaged?: boolean, osPinDialog?: boolean, containerDownloadTimeout?: number, localTestMode?: boolean, lang?: string, providedContainers?: T1CContainerid[]);
+    constructor(gclUrl?: string, gwOrProxyUrl?: string, apiKey?: string, gwJwt?: string, dsContextPath?: string, pkcs11Config?: Pkcs11ModuleConfig, agentPort?: number, implicitDownload?: boolean, forceHardwarePinpad?: boolean, sessionTimeout?: number, consentDuration?: number, consentTimeout?: number, syncManaged?: boolean, osPinDialog?: boolean, containerDownloadTimeout?: number, localTestMode?: boolean, lang?: string, gclDownloadLink?: string, gclVersion?: string, providedContainers?: T1CContainerid[]);
 }
 export declare class GCLConfig {
     private _gwUrl;
     private _gclUrl;
     private _dsContextPath;
-    private _dsFileContextPath;
-    private _ocvContextPath;
     private _apiKey;
     private _gwJwt;
-    private _tokenExchangeContextPath;
     private _gclJwt;
     private _citrix;
     private _agentPort;
@@ -48,17 +44,16 @@ export declare class GCLConfig {
     private _containerDownloadTimeout;
     private _contextToken;
     private _lang;
+    private _gclDownloadLink;
     private _providedContainers;
     private _activeContainers;
+    private _gclVersion;
     constructor(options: GCLConfigOptions);
-    tokenExchangeContextPath: string;
     readonly authUrl: string;
     readonly ocvUrl: string;
-    ocvContextPath: string;
     gclUrl: string;
     readonly dsUrl: string;
     dsContextPath: string;
-    dsFileContextPath: string;
     apiKey: string;
     citrix: boolean;
     agentPort: number;
@@ -80,5 +75,7 @@ export declare class GCLConfig {
     lang: string;
     overrideContainers: T1CContainerid[];
     activeContainers: Map<string, string[]>;
+    gclDownloadLink: string;
+    gclVersion: string;
     getGwJwt(): Promise<string>;
 }
