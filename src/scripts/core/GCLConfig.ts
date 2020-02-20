@@ -69,6 +69,7 @@ export class GCLConfig {
     private _lang: string;
     private _providedContainers: T1CContainerid[]; // force to use specific containerversion
     private _activeContainers: Map<string, string[]>; // hashmap with active application containers
+    private _gclVersion: string;
 
     // constructor for DTO
     public constructor(options: GCLConfigOptions) {
@@ -386,6 +387,15 @@ export class GCLConfig {
 
     set activeContainers(value: Map<string, string[]>) {
         this._activeContainers = value;
+    }
+
+
+    get gclVersion(): string {
+        return this._gclVersion;
+    }
+
+    set gclVersion(value: string) {
+        this._gclVersion = value;
     }
 
     /**

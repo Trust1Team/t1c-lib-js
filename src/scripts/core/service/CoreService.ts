@@ -1,15 +1,17 @@
 import {LocalAuthConnection} from '../client/Connection';
 import * as platform from 'platform';
 import {ResponseHandler} from '../../util/ResponseHandler';
-import {AbstractCore, BoolDataResponse, BrowserInfoResponse, CardReader, CardReadersResponse, DataResponse, InfoResponse, SingleReaderResponse} from './CoreModel';
+import {AbstractCore, BoolDataResponse, BrowserInfoResponse, CardReader, CardReadersResponse, CheckGclVersion, CheckGclVersionResponse, DataResponse, InfoResponse, SingleReaderResponse} from './CoreModel';
 import {T1CLibException} from '../exceptions/CoreExceptions';
 import {Util} from '../../util/Utils';
+import {GCLClient} from '../../..';
 
 const CORE_CONSENT = '/consent';
 const CORE_INFO = '/';
 const CORE_READERS = '/card-readers';
 const CORE_CONSENT_IMPLICIT = '/consent/implicit';
 const CORE_RETUREVE_ENCRYPTED_PIN = '/dialog/pin';
+import * as semver from 'semver';
 
 
 declare var VERSION: string;
@@ -314,8 +316,33 @@ export class CoreService implements AbstractCore {
         return this.url;
     }
 
+    public checkGclVersion(client: GCLClient, gclVersion?: string): Promise<CheckGclVersionResponse> {
+        return new Promise<CheckGclVersionResponse>((resolve, reject) => {
+            client.core().info().then(infoResponse => {
+                const installedGclVersion = semver.coerce(infoResponse.data.version);
+
+                if (gclVersion) {
+                    resolve(new CheckGclVersionResponse(new CheckGclVersion(semver.ltr(installedGclVersion, gclVersion)), true));
+                } else {
+                    if (client.config().gclVersion) {
+                        resolve(new CheckGclVersionResponse(new CheckGclVersion(semver.ltr(installedGclVersion, client.config().gclVersion)), true));
+                    } else {
+                        reject(new T1CLibException(412, '701', 'No version to check against was provided', client));
+                    }
+                }
+            }, (err) => {
+                console.error('Could not receive info', err);
+                // TODO check if errorcode is good
+                // failure probably because GCL is not installed
+                reject(new T1CLibException(500, '700', 'Could not retrieve GCL information', client));
+
+            });
+        });
+    }
+
     // get Lib version
     public version(): Promise<string> {
         return Promise.resolve(VERSION);
     }
+
 }

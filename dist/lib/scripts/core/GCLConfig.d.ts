@@ -44,6 +44,7 @@ export declare class GCLConfig {
     private _lang;
     private _providedContainers;
     private _activeContainers;
+    private _gclVersion;
     constructor(options: GCLConfigOptions);
     readonly authUrl: string;
     readonly ocvUrl: string;
@@ -71,5 +72,6 @@ export declare class GCLConfig {
     lang: string;
     overrideContainers: T1CContainerid[];
     activeContainers: Map<string, string[]>;
+    gclVersion: string;
     getGwJwt(): Promise<string>;
 }

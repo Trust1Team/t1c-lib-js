@@ -1,5 +1,6 @@
 import {T1CLibException} from '../exceptions/CoreExceptions';
 import Certificate from 'pkijs/build/Certificate';
+import {GCLClient} from '../GCLLib';
 
 export interface AbstractCore {
     // async
@@ -39,6 +40,8 @@ export interface AbstractCore {
     // sync
     getUrl(): string;
     infoBrowserSync(): BrowserInfoResponse;
+
+    checkGclVersion(client: GCLClient, gclVersion?: string): Promise<CheckGclVersionResponse>;
 
     // t1c-lib-info
     version(): Promise<string>;
@@ -143,6 +146,16 @@ export class T1CCertificate {
 
 export class SingleReaderResponse extends T1CResponse {
     constructor(public data: CardReader, public success: boolean) {
+        super(success, data);
+    }
+}
+
+export class CheckGclVersion {
+    constructor(public outDated: boolean, downloadLink?: string) {}
+}
+
+export class CheckGclVersionResponse extends T1CResponse {
+    constructor(public data: CheckGclVersion, public success: boolean) {
         super(success, data);
     }
 }
