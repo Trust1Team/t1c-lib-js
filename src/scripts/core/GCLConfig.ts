@@ -39,6 +39,7 @@ export class GCLConfigOptions {
                 public localTestMode?: boolean,
                 public lang?: string,
                 public gclDownloadLink?: string,
+                public gclVersion?: string,
                 public providedContainers?: T1CContainerid[]) {
     }
 }
@@ -76,6 +77,9 @@ export class GCLConfig {
     // constructor for DTO
     public constructor(options: GCLConfigOptions) {
         if (options) {
+            if (options.gclVersion) {
+                this.gclVersion = options.gclVersion;
+            }
             if (options.gclUrl) {
                 this._gclUrl = options.gclUrl;
             } else {
