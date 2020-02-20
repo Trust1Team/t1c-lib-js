@@ -1,10 +1,6 @@
-/**
- * @author Maarten Somers
- */
 import {T1CLibException} from '../exceptions/CoreExceptions';
 import {AbstractAgent, AgentResponse} from './agentModel';
 import {LocalAuthConnection, RequestBody} from '../client/Connection';
-
 
 /**
  * Provides access to the /agent endpoint and a URL prefixing utility method
@@ -21,7 +17,7 @@ export class AgentClient implements AbstractAgent {
     }
 
     public get(username: string, callback?: (error: T1CLibException, data: AgentResponse) => void): Promise<any> {
-        let body: RequestBody = {username};
+        let body: RequestBody = { 'username' :  username};
         return this.connection.postSkipCitrix(this.url, AgentClient.AGENT_PATH, undefined, body, undefined, callback);
     }
 

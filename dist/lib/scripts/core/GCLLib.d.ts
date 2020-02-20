@@ -47,6 +47,7 @@ export declare class GCLClient {
     private dsClient;
     private ocvClient;
     private authClient;
+    private gclVersion;
     constructor(cfg: GCLConfig, automatic: boolean);
     static checkPolyfills(): void;
     static initialize(cfg: GCLConfig, callback?: (error: T1CLibException, client: GCLClient) => void): Promise<GCLClient>;

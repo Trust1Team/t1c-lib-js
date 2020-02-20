@@ -1,7 +1,4 @@
-/**
- * @author Maarten Somers
- * @since 2018
- */
+
 import {
     DeviceResponse, DSClientInfo, DSContainer, DSPlatformInfo, DSRegistrationOrSyncRequest
 } from '../core/ds/DSClientModel';
@@ -9,8 +6,6 @@ import { DataContainerUtil } from './DataContainerUtil';
 import { GCLClient } from '../core/GCLLib';
 import { T1CLibException } from '../core/exceptions/CoreExceptions';
 import { T1CContainer } from '../core/service/CoreModel';
-import {ContainerSyncRequest, SetPubKeyRequest} from '../core/admin/adminModel';
-import {ActivatedContainerUtil} from './ActivatedContainerUtil';
 import {Util} from './Utils';
 import {GCLConfig} from '../..';
 
@@ -35,18 +30,16 @@ export class SyncUtil {
                                            config: GCLConfig) {
         // do core v2 sync flow
         // unmanaged sync is blocking, so reject if an error occurs
-        return new Promise((resolve, reject) => {
-            if (client.ds()) {
-                SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, false, config).then(() => {
-                    resolve();
-                }).catch(err => {
-                    reject(err);
-                });
-            }
+        /*return new Promise((resolve, reject) => {
+            if (client.ds()) SyncUtil.doSyncFlow(client, mergedInfo, uuid, containers, false, config).then(() => {
+                resolve();
+            }).catch(err => {
+                reject(err);
+            });
             else {
                 resolve();
             }
-        });
+        });*/
     }
 
     public static syncDevice(client: GCLClient,
@@ -82,7 +75,7 @@ export class SyncUtil {
         // final sync with updated container list
 
         // get GCL pubkey
-        return client.admin().getPubKey().then(pubKey => {
+        /*return client.admin().getPubKey().then(pubKey => {
             return SyncUtil.syncDevice(client, pubKey.data.device, mergedInfo, uuid, containers).then(device => {
                 client.ds().then(dsclient => {
 
@@ -132,7 +125,7 @@ export class SyncUtil {
                     return Promise.reject(err);
                 });
             });
-        });
+        });*/
     }
 
     private static pollDownloadCompletion(client: GCLClient, containerConfig: DSContainer[], isRetry: boolean): Promise<T1CContainer[]> {

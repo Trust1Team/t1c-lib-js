@@ -5,7 +5,7 @@ import {GCLConfig, GCLConfigOptions} from '../../scripts/core/GCLConfig';
 
 
 describe('GCLClient', () => {
-    let gclUnderTest = 'https://localhost:10443/v1';
+    let gclUnderTest = 'https://localhost:34752/v3';
     let localAuthConnection: LocalAuthConnection;
     let core: CoreService;
     let config = new GCLConfig(new GCLConfigOptions());

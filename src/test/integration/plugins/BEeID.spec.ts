@@ -4,7 +4,7 @@ import { CoreService } from '../../../scripts/core/service/CoreService';
 import { PluginFactory } from '../../../scripts/plugins/PluginFactory';
 
 describe('Plugin-Belgian eID', () => {
-    let gclUnderTest = 'https://localhost:10443/v2';
+    let gclUnderTest = 'https://localhost:34752/v3';
     let localAuthConnection: LocalAuthConnection;
     let coreService;
     let cardFactory;

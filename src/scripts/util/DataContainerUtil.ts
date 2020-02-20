@@ -1,7 +1,3 @@
-/**
- * @author Maarten Somers
- * @since 2018
- */
 
 import { ClientService } from './ClientService';
 

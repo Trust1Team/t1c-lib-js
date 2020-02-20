@@ -10,11 +10,11 @@ describe('Config', () => {
 
     test('should return the default connector url', () => {
         let url: string = config.gclUrl;
-        expect(url).toEqual('https://localhost:10443/v2');
+        expect(url).toEqual('https://localhost:34752/v3');
     });
 
     test('should return the custom connector url', () => {
-        let test = 'http://localhost:10080/v2';
+        let test = 'http://localhost:10080/v3';
         let myConfig: GCLConfig = new GCLConfig({gclUrl: test});
         let url: string = myConfig.gclUrl;
         expect(url).toEqual(test);
@@ -39,7 +39,7 @@ describe('Config', () => {
         let gwUrl = 'https://dist.t1t.be';
         let apikey = 'someapikey';
         let myConfig = new GCLConfig({gwOrProxyUrl: gwUrl, apiKey: apikey});
-        expect(myConfig.dsUrl).toEqual(gwUrl + '/trust1team/gclds/v2');
+        expect(myConfig.dsUrl).toEqual(gwUrl + '/trust1team/gclds/v3');
         expect(myConfig.apiKey).toEqual(apikey);
     });
 });

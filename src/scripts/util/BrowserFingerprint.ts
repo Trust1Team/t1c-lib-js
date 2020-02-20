@@ -1,7 +1,4 @@
-/**
- * @author Michallis Pashidis
- * @since 2018
- */
+
 import * as store from 'store2';
 import * as Base64 from 'Base64';
 import * as uuid from 'uuid/v4';

@@ -1,7 +1,3 @@
-/**
- * @author Maarten Somers
- * @since 2017
- */
 
 import { RemoteLoading } from '../RemoteLoading';
 import { AbstractBelfius } from './BelfiusModel';

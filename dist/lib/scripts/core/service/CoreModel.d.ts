@@ -1,5 +1,6 @@
 import { T1CLibException } from '../exceptions/CoreExceptions';
 import Certificate from 'pkijs/build/Certificate';
+import { GCLClient } from '../GCLLib';
 export interface AbstractCore {
     getConsent(title: string, codeWord: string, durationInDays?: number, alertLevel?: string, alertPosition?: string, type?: string, timeoutInSeconds?: number, callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
     getImplicitConsent(codeWord: string, durationInDays?: number, type?: string, callback?: (error: T1CLibException, data: BoolDataResponse) => void): Promise<BoolDataResponse>;
@@ -14,6 +15,7 @@ export interface AbstractCore {
     readersCardsUnavailable(callback?: (error: T1CLibException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
     getUrl(): string;
     infoBrowserSync(): BrowserInfoResponse;
+    checkGclVersion(client: GCLClient, gclVersion?: string): Promise<CheckGclVersionResponse>;
     version(): Promise<string>;
 }
 export declare class T1CResponse {
@@ -134,4 +136,14 @@ export declare class SingleReaderResponse extends T1CResponse {
     data: CardReader;
     success: boolean;
     constructor(data: CardReader, success: boolean);
+}
+export declare class CheckGclVersion {
+    outDated: boolean;
+    downloadLink?: string;
+    constructor(outDated: boolean, downloadLink?: string);
+}
+export declare class CheckGclVersionResponse extends T1CResponse {
+    data: CheckGclVersion;
+    success: boolean;
+    constructor(data: CheckGclVersion, success: boolean);
 }

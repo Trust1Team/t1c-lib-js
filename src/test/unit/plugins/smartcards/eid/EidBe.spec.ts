@@ -19,7 +19,7 @@ let mock: MockAdapter;
 describe('Belgian eID Container', () => {
     beforeEach(() => {
         mock = new MockAdapter(axios);
-        mock.onGet('https://localhost:10443/v2/card-readers/123').reply(200, {data: {pinpad: false}, success: true});
+        mock.onGet('https://localhost:34752/v3/card-readers/123').reply(200, {data: {pinpad: false}, success: true});
     });
     PubKeyService.setPubKey('MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvb2PY42OifgdjoWrIPYezOiN0p859PK+k4ts0JY9S1I0WqWJROsoaB4o9JjubZPlP7A6chp30g++XE1KjQOzSm6Epr+t6rdlPxD+MfpB1y+4ACfB0xmoh6SWAtiSUKK4N76mPOyeIGvQ4/zmqKL1JyVxEFKyvUOH1zVQT4YPbmyxLpanXI2coP8q00BKcravSTxgmdOMlaCiD+bINwiv1x3rHq+lGT8rc2jUbTAHsS61Nj6Kten2QCtCpKYipe5H0jDTAnOlfaJHnEQ3qg7ULUN+KiwElIyvr2lf3SR9tLhyV9x8ezO8IOQPLZSMXT1w4UdGwIblXKpVgA9w2fs+SwIDAQAB');
 

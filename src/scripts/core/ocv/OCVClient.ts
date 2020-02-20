@@ -1,7 +1,3 @@
-/**
- * @author Michallis Pashidis
- * @author Maarten Somers
- */
 import { RemoteJwtConnection } from '../client/Connection';
 import { T1CLibException } from '../exceptions/CoreExceptions';
 import {

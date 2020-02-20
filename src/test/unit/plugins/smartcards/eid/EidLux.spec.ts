@@ -28,7 +28,7 @@ describe('Luxembourg eID Container', () => {
 
     beforeEach(() => {
         mock = new MockAdapter(axios);
-        mock.onGet('https://localhost:10443/v2/card-readers/123').reply(() => {
+        mock.onGet('https://localhost:34752/v3/card-readers/123').reply(() => {
             return [ 200, { data: { pinpad: false }, success: true }];
         });
     });

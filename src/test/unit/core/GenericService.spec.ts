@@ -6,8 +6,8 @@ import {CoreService} from '../../../scripts/core/service/CoreService';
 
 
 
-const gclConfig = new GCLConfig({gclUrl: 'https://localhost:10443/v1'});
-const gclUnderTest = 'https://localhost:10443/v1';
+const gclConfig = new GCLConfig({gclUrl: 'https://localhost:34752/v3'});
+const gclUnderTest = 'https://localhost:34752/v3';
 const localAuthConnection: LocalAuthConnection = new LocalAuthConnection(gclConfig);
 const core: CoreService = new CoreService(gclUnderTest, localAuthConnection);
 
@@ -15,7 +15,7 @@ let mock: MockAdapter;
 
 beforeEach(() => {
     mock = new MockAdapter(axios);
-    mock.onGet('/v1/card-readers').reply(200, {
+    mock.onGet('/v3/card-readers').reply(200, {
         success: true,
         data: [
             {id: '12', card: {atr: '111', description: ['Mocked Unknown Card']}, name: 'Mocked Reader', pinpad: false},
