@@ -24430,20 +24430,23 @@ var CoreService = (function () {
         return new Promise(function (resolve, reject) {
             client.core().info().then(function (infoResponse) {
                 var installedGclVersion = semver.coerce(infoResponse.data.version);
-                var outdated = semver.ltr(installedGclVersion, gclVersion);
-                if (!gclVersion && client.config().gclVersion) {
-                    outdated = semver.ltr(installedGclVersion, client.config().gclVersion);
-                }
-                if (outdated !== undefined && outdated !== null) {
-                    if (outdated === true) {
-                        resolve(new CoreModel_1.CheckGclVersionResponse(new CoreModel_1.CheckGclVersion(outdated, client.config().gclDownloadLink), true));
-                    }
-                    else {
-                        resolve(new CoreModel_1.CheckGclVersionResponse(new CoreModel_1.CheckGclVersion(outdated), true));
-                    }
+                var outdated = false;
+                if (gclVersion) {
+                    outdated = semver.ltr(installedGclVersion, gclVersion);
                 }
                 else {
-                    reject(new CoreExceptions_1.T1CLibException(412, '701', 'No version to check against was provided', client));
+                    if (client.config().gclVersion) {
+                        outdated = semver.ltr(installedGclVersion, client.config().gclVersion);
+                    }
+                    else {
+                        reject(new CoreExceptions_1.T1CLibException(412, '701', 'No version to check against was provided', client));
+                    }
+                }
+                if (outdated === true) {
+                    resolve(new CoreModel_1.CheckGclVersionResponse(new CoreModel_1.CheckGclVersion(outdated, client.config().gclDownloadLink), true));
+                }
+                else {
+                    resolve(new CoreModel_1.CheckGclVersionResponse(new CoreModel_1.CheckGclVersion(outdated), true));
                 }
             }, function (err) {
                 console.error('Could not receive info', err);
