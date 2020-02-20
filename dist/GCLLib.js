@@ -12319,6 +12319,7 @@ exports.SingleReaderResponse = SingleReaderResponse;
 var CheckGclVersion = (function () {
     function CheckGclVersion(outDated, downloadLink) {
         this.outDated = outDated;
+        this.downloadLink = downloadLink;
     }
     return CheckGclVersion;
 }());

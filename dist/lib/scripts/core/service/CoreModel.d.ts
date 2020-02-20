@@ -139,6 +139,7 @@ export declare class SingleReaderResponse extends T1CResponse {
 }
 export declare class CheckGclVersion {
     outDated: boolean;
+    downloadLink?: string;
     constructor(outDated: boolean, downloadLink?: string);
 }
 export declare class CheckGclVersionResponse extends T1CResponse {
