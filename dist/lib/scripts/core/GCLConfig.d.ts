@@ -18,8 +18,9 @@ export declare class GCLConfigOptions {
     containerDownloadTimeout?: number;
     localTestMode?: boolean;
     lang?: string;
+    gclDownloadLink?: string;
     providedContainers?: T1CContainerid[];
-    constructor(gclUrl?: string, gwOrProxyUrl?: string, apiKey?: string, gwJwt?: string, dsContextPath?: string, pkcs11Config?: Pkcs11ModuleConfig, agentPort?: number, implicitDownload?: boolean, forceHardwarePinpad?: boolean, sessionTimeout?: number, consentDuration?: number, consentTimeout?: number, syncManaged?: boolean, osPinDialog?: boolean, containerDownloadTimeout?: number, localTestMode?: boolean, lang?: string, providedContainers?: T1CContainerid[]);
+    constructor(gclUrl?: string, gwOrProxyUrl?: string, apiKey?: string, gwJwt?: string, dsContextPath?: string, pkcs11Config?: Pkcs11ModuleConfig, agentPort?: number, implicitDownload?: boolean, forceHardwarePinpad?: boolean, sessionTimeout?: number, consentDuration?: number, consentTimeout?: number, syncManaged?: boolean, osPinDialog?: boolean, containerDownloadTimeout?: number, localTestMode?: boolean, lang?: string, gclDownloadLink?: string, providedContainers?: T1CContainerid[]);
 }
 export declare class GCLConfig {
     private _gwUrl;
@@ -42,6 +43,7 @@ export declare class GCLConfig {
     private _containerDownloadTimeout;
     private _contextToken;
     private _lang;
+    private _gclDownloadLink;
     private _providedContainers;
     private _activeContainers;
     private _gclVersion;
@@ -72,6 +74,7 @@ export declare class GCLConfig {
     lang: string;
     overrideContainers: T1CContainerid[];
     activeContainers: Map<string, string[]>;
+    gclDownloadLink: string;
     gclVersion: string;
     getGwJwt(): Promise<string>;
 }

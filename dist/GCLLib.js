@@ -24430,16 +24430,20 @@ var CoreService = (function () {
         return new Promise(function (resolve, reject) {
             client.core().info().then(function (infoResponse) {
                 var installedGclVersion = semver.coerce(infoResponse.data.version);
-                if (gclVersion) {
-                    resolve(new CoreModel_1.CheckGclVersionResponse(new CoreModel_1.CheckGclVersion(semver.ltr(installedGclVersion, gclVersion)), true));
+                var outdated = semver.ltr(installedGclVersion, gclVersion);
+                if (!gclVersion && client.config().gclVersion) {
+                    outdated = semver.ltr(installedGclVersion, client.config().gclVersion);
                 }
-                else {
-                    if (client.config().gclVersion) {
-                        resolve(new CoreModel_1.CheckGclVersionResponse(new CoreModel_1.CheckGclVersion(semver.ltr(installedGclVersion, client.config().gclVersion)), true));
+                if (outdated !== undefined && outdated !== null) {
+                    if (outdated === true) {
+                        resolve(new CoreModel_1.CheckGclVersionResponse(new CoreModel_1.CheckGclVersion(outdated, client.config().gclDownloadLink), true));
                     }
                     else {
-                        reject(new CoreExceptions_1.T1CLibException(412, '701', 'No version to check against was provided', client));
+                        resolve(new CoreModel_1.CheckGclVersionResponse(new CoreModel_1.CheckGclVersion(outdated), true));
                     }
+                }
+                else {
+                    reject(new CoreExceptions_1.T1CLibException(412, '701', 'No version to check against was provided', client));
                 }
             }, function (err) {
                 console.error('Could not receive info', err);
@@ -63540,7 +63544,7 @@ var defaults = {
     containerDownloadTimeout: 30
 };
 var GCLConfigOptions = (function () {
-    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, gwJwt, dsContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode, lang, providedContainers) {
+    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, gwJwt, dsContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode, lang, gclDownloadLink, providedContainers) {
         this.gclUrl = gclUrl;
         this.gwOrProxyUrl = gwOrProxyUrl;
         this.apiKey = apiKey;
@@ -63558,6 +63562,7 @@ var GCLConfigOptions = (function () {
         this.containerDownloadTimeout = containerDownloadTimeout;
         this.localTestMode = localTestMode;
         this.lang = lang;
+        this.gclDownloadLink = gclDownloadLink;
         this.providedContainers = providedContainers;
     }
     return GCLConfigOptions;
@@ -63571,6 +63576,9 @@ var GCLConfig = (function () {
             }
             else {
                 this._gclUrl = defaults.gclUrl;
+            }
+            if (options.gclDownloadLink) {
+                this._gclDownloadLink = options.gclDownloadLink;
             }
             if (options.gwOrProxyUrl) {
                 this._gwUrl = options.gwOrProxyUrl;
@@ -63943,6 +63951,16 @@ var GCLConfig = (function () {
         },
         set: function (value) {
             this._activeContainers = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(GCLConfig.prototype, "gclDownloadLink", {
+        get: function () {
+            return this._gclDownloadLink;
+        },
+        set: function (value) {
+            this._gclDownloadLink = value;
         },
         enumerable: true,
         configurable: true

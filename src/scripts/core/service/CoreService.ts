@@ -320,15 +320,18 @@ export class CoreService implements AbstractCore {
         return new Promise<CheckGclVersionResponse>((resolve, reject) => {
             client.core().info().then(infoResponse => {
                 const installedGclVersion = semver.coerce(infoResponse.data.version);
-
-                if (gclVersion) {
-                    resolve(new CheckGclVersionResponse(new CheckGclVersion(semver.ltr(installedGclVersion, gclVersion)), true));
-                } else {
-                    if (client.config().gclVersion) {
-                        resolve(new CheckGclVersionResponse(new CheckGclVersion(semver.ltr(installedGclVersion, client.config().gclVersion)), true));
+                let outdated: boolean = semver.ltr(installedGclVersion, gclVersion);
+                if (!gclVersion && client.config().gclVersion) {
+                    outdated = semver.ltr(installedGclVersion, client.config().gclVersion);
+                }
+                if (outdated !== undefined && outdated !== null) {
+                    if (outdated === true) {
+                        resolve(new CheckGclVersionResponse(new CheckGclVersion(outdated, client.config().gclDownloadLink), true));
                     } else {
-                        reject(new T1CLibException(412, '701', 'No version to check against was provided', client));
+                        resolve(new CheckGclVersionResponse(new CheckGclVersion(outdated), true));
                     }
+                } else {
+                    reject(new T1CLibException(412, '701', 'No version to check against was provided', client));
                 }
             }, (err) => {
                 console.error('Could not receive info', err);

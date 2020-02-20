@@ -38,6 +38,7 @@ export class GCLConfigOptions {
                 public containerDownloadTimeout?: number,
                 public localTestMode?: boolean,
                 public lang?: string,
+                public gclDownloadLink?: string,
                 public providedContainers?: T1CContainerid[]) {
     }
 }
@@ -67,6 +68,7 @@ export class GCLConfig {
     private _containerDownloadTimeout: number;
     private _contextToken: string;
     private _lang: string;
+    private _gclDownloadLink: string;
     private _providedContainers: T1CContainerid[]; // force to use specific containerversion
     private _activeContainers: Map<string, string[]>; // hashmap with active application containers
     private _gclVersion: string;
@@ -78,6 +80,9 @@ export class GCLConfig {
                 this._gclUrl = options.gclUrl;
             } else {
                 this._gclUrl = defaults.gclUrl;
+            }
+            if (options.gclDownloadLink) {
+                this._gclDownloadLink = options.gclDownloadLink;
             }
             if (options.gwOrProxyUrl) {
                 this._gwUrl = options.gwOrProxyUrl;
@@ -389,6 +394,14 @@ export class GCLConfig {
         this._activeContainers = value;
     }
 
+
+    get gclDownloadLink(): string {
+        return this._gclDownloadLink;
+    }
+
+    set gclDownloadLink(value: string) {
+        this._gclDownloadLink = value;
+    }
 
     get gclVersion(): string {
         return this._gclVersion;
