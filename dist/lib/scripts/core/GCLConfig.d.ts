@@ -19,8 +19,9 @@ export declare class GCLConfigOptions {
     localTestMode?: boolean;
     lang?: string;
     gclDownloadLink?: string;
+    gclVersion?: string;
     providedContainers?: T1CContainerid[];
-    constructor(gclUrl?: string, gwOrProxyUrl?: string, apiKey?: string, gwJwt?: string, dsContextPath?: string, pkcs11Config?: Pkcs11ModuleConfig, agentPort?: number, implicitDownload?: boolean, forceHardwarePinpad?: boolean, sessionTimeout?: number, consentDuration?: number, consentTimeout?: number, syncManaged?: boolean, osPinDialog?: boolean, containerDownloadTimeout?: number, localTestMode?: boolean, lang?: string, gclDownloadLink?: string, providedContainers?: T1CContainerid[]);
+    constructor(gclUrl?: string, gwOrProxyUrl?: string, apiKey?: string, gwJwt?: string, dsContextPath?: string, pkcs11Config?: Pkcs11ModuleConfig, agentPort?: number, implicitDownload?: boolean, forceHardwarePinpad?: boolean, sessionTimeout?: number, consentDuration?: number, consentTimeout?: number, syncManaged?: boolean, osPinDialog?: boolean, containerDownloadTimeout?: number, localTestMode?: boolean, lang?: string, gclDownloadLink?: string, gclVersion?: string, providedContainers?: T1CContainerid[]);
 }
 export declare class GCLConfig {
     private _gwUrl;

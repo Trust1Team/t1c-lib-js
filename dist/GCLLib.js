@@ -63547,7 +63547,7 @@ var defaults = {
     containerDownloadTimeout: 30
 };
 var GCLConfigOptions = (function () {
-    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, gwJwt, dsContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode, lang, gclDownloadLink, providedContainers) {
+    function GCLConfigOptions(gclUrl, gwOrProxyUrl, apiKey, gwJwt, dsContextPath, pkcs11Config, agentPort, implicitDownload, forceHardwarePinpad, sessionTimeout, consentDuration, consentTimeout, syncManaged, osPinDialog, containerDownloadTimeout, localTestMode, lang, gclDownloadLink, gclVersion, providedContainers) {
         this.gclUrl = gclUrl;
         this.gwOrProxyUrl = gwOrProxyUrl;
         this.apiKey = apiKey;
@@ -63566,6 +63566,7 @@ var GCLConfigOptions = (function () {
         this.localTestMode = localTestMode;
         this.lang = lang;
         this.gclDownloadLink = gclDownloadLink;
+        this.gclVersion = gclVersion;
         this.providedContainers = providedContainers;
     }
     return GCLConfigOptions;
@@ -63574,6 +63575,9 @@ exports.GCLConfigOptions = GCLConfigOptions;
 var GCLConfig = (function () {
     function GCLConfig(options) {
         if (options) {
+            if (options.gclVersion) {
+                this.gclVersion = options.gclVersion;
+            }
             if (options.gclUrl) {
                 this._gclUrl = options.gclUrl;
             }
