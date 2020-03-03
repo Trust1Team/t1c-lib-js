@@ -21,14 +21,14 @@ export class Polyfills {
         if (!Array.from) {
             // not found, load array.from polyfill (core-js)
             console.log('T1C-JS Lib: applying polyfill for ES6 Array');
-            require('core-js/es6/array');
-            require('core-js/es6/typed');
+            require('core-js/es/array');
+            require('core-js/es/typed-array');
         }
 
         // check Symbol
         if (!windowToCheck.Symbol) {
             console.log('T1C-JS Lib: applying polyfill for ES6 Symbol');
-            require('core-js/es6/symbol');
+            require('core-js/es/symbol');
         }
 
         if (typeof Object.assign !== 'function') {

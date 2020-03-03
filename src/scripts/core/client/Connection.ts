@@ -4,7 +4,7 @@
  */
 
 import {GCLConfig} from '../GCLConfig';
-import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
+import axios, {AxiosError, AxiosRequestConfig, AxiosResponse, Method} from 'axios';
 import {T1CLibException} from '../exceptions/CoreExceptions';
 import {UrlUtil} from '../../util/UrlUtil';
 import * as store from 'store2';
@@ -253,7 +253,7 @@ export abstract class GenericConnection implements Connection {
             let config: AxiosRequestConfig = {
                 // use UrlUtil to create correct URL based on config
                 url: UrlUtil.create(basePath, suffix, gclConfig, securityConfig.skipCitrixCheck),
-                method,
+                method: method.toLowerCase() as Method,
                 headers: this.getRequestHeaders(headers),
                 responseType: 'json'
             };
@@ -773,7 +773,7 @@ export class LocalTestConnection extends GenericConnection implements Connection
         } else {
             let config: AxiosRequestConfig = {
                 url: UrlUtil.create(basePath, suffix, gclConfig, true),
-                method,
+                method: method.toLowerCase() as Method,
                 headers: this.getRequestHeaders(headers),
                 responseType: 'json'
             };

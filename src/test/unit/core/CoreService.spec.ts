@@ -35,7 +35,7 @@ describe('Core Services', () => {
                 expect(result.success).toBe(true);
 
                 expect(result).toHaveProperty('data');
-                expect(result.data).toBeObject();
+                expect(result.data).toBeInstanceOf(Object);
 
                 expect(result.data).toHaveProperty('title');
                 expect(result.data.title).toBe('test');
@@ -66,7 +66,7 @@ describe('Core Services', () => {
                 expect(result.success).toBe(true);
 
                 expect(result).toHaveProperty('data');
-                expect(result.data).toBeObject();
+                expect(result.data).toBeInstanceOf(Object);
 
                 expect(result.data).toHaveProperty('title');
                 expect(result.data.title).toBe('test2');
@@ -85,7 +85,7 @@ describe('Core Services', () => {
                 expect(result.success).toBe(true);
 
                 expect(result).toHaveProperty('data');
-                expect(result.data).toBeObject();
+                expect(result.data).toBeInstanceOf(Object);
 
                 expect(result.data).toHaveProperty('title');
                 expect(result.data.title).toBe('test2');
