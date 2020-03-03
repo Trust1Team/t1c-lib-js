@@ -1,3 +1,7 @@
+/**
+ * @author Maarten Somers
+ * @since 2017
+ */
 
 import {T1CLibException} from '../../../core/exceptions/CoreExceptions';
 import {BoolDataResponse, DataResponse, T1CResponse} from '../../../core/service/CoreModel';

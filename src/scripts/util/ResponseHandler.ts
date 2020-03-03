@@ -1,4 +1,6 @@
-
+/**
+ * @author Maarten Somers
+ */
 import { T1CLibException } from '../core/exceptions/CoreExceptions';
 
 export class ResponseHandler {

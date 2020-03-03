@@ -1,3 +1,6 @@
+/**
+ * @author Maarten Somers
+ */
 
 export class Options {
     constructor(public parseCerts: boolean, public filters?: string[]) {}

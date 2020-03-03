@@ -81,7 +81,8 @@ export declare class GCLClient {
     wacom: () => AbstractWacom;
     rawprint: () => AbstractRawPrint;
     isabel: (reader_id: string) => AbstractIsabel;
-    gclInstalled: boolean;
+    get gclInstalled(): boolean;
+    set gclInstalled(value: boolean);
     containerFor(readerId: string, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     download(version?: string, callback?: (error: T1CLibException, data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse>;
     dumpData(readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;

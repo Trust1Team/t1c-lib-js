@@ -1,4 +1,7 @@
-
+/**
+ * @author Michallis Pashidis
+ * @since 2017
+ */
 import {AbstractFileExchange, FileListResponse, FileResponse, FileSort, ModalType, Page, TypeListResponse, TypeResponse} from './FileExchangeModel';
 import {T1CLibException} from '../../core/exceptions/CoreExceptions';
 import {BoolDataResponse, DataArrayResponse, DataResponse} from '../../core/service/CoreModel';

@@ -1,3 +1,9 @@
+/**
+ *
+ * @author Gilles Platteeuw
+ * @since  2018
+ */
+import {type} from 'os';
 
 export class Util {
 

@@ -1,7 +1,6 @@
 import { LocalAuthConnection } from '../client/Connection';
-import { AbstractCore, BoolDataResponse, BrowserInfoResponse, CardReader, CardReadersResponse, CheckGclVersionResponse, DataResponse, InfoResponse, SingleReaderResponse } from './CoreModel';
+import { AbstractCore, BoolDataResponse, BrowserInfoResponse, CardReader, CardReadersResponse, DataResponse, InfoResponse, SingleReaderResponse } from './CoreModel';
 import { T1CLibException } from '../exceptions/CoreExceptions';
-import { GCLClient } from '../../..';
 export declare class CoreService implements AbstractCore {
     private url;
     private connection;
@@ -22,6 +21,5 @@ export declare class CoreService implements AbstractCore {
     readersCardsUnavailable(callback?: (error: T1CLibException, data: CardReadersResponse) => void): Promise<CardReadersResponse>;
     infoBrowserSync(): BrowserInfoResponse;
     getUrl(): string;
-    checkGclVersion(client: GCLClient, gclVersion?: string): Promise<CheckGclVersionResponse>;
     version(): Promise<string>;
 }

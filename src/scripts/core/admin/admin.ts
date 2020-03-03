@@ -1,5 +1,10 @@
+/**
+ * @author Michallis Pashidis
+ * @since 2018
+ */
 import {LocalAdminConnection, LocalAuthAdminConnection} from '../client/Connection';
-import { AbstractAdmin, PubKeyResponse} from './adminModel';
+import { AbstractAdmin, PubKeyResponse, SetPubKeyRequest } from './adminModel';
+import { T1CResponse } from '../service/CoreModel';
 import { ResponseHandler } from '../../util/ResponseHandler';
 import { InitUtil } from '../../util/InitUtil';
 import { T1CLibException } from '../exceptions/CoreExceptions';
@@ -42,6 +47,12 @@ export class AdminService implements AbstractAdmin {
         return this.getPubKeys(this.url, CORE_PUB_KEY, callback);
     }
 
+    public setPubKey(keys: SetPubKeyRequest,
+                     callback?: (error: T1CLibException, data: PubKeyResponse)
+                         => void): Promise<PubKeyResponse> {
+        return this.put(this.url, CORE_PUB_KEY, keys, callback);
+    }
+
     // private methods
     // ===============
 
@@ -54,6 +65,46 @@ export class AdminService implements AbstractAdmin {
                 AdminService.errorHandler(err).then(() => {
                     // retry initial request
                     self.connection.get(url, suffix, undefined).then(retryResult => {
+                        resolve(ResponseHandler.response(retryResult, callback));
+                    }, retryError => {
+                        resolve(ResponseHandler.error(retryError, callback));
+                    });
+                }, retryError => {
+                    resolve(ResponseHandler.error(retryError, callback));
+                });
+            });
+        });
+    }
+
+    private post(url: string, suffix: string, body: any, callback?: any): Promise<T1CResponse> {
+        let self = this;
+        return new Promise((resolve, reject) => {
+            self.connection.post(url, suffix, body, undefined).then(result => {
+                resolve(ResponseHandler.response(result, callback));
+            }, err => {
+                AdminService.errorHandler(err).then(() => {
+                    // retry initial request
+                    self.connection.post(url, suffix, body, undefined).then(retryResult => {
+                        resolve(ResponseHandler.response(retryResult, callback));
+                    }, retryError => {
+                        resolve(ResponseHandler.error(retryError, callback));
+                    });
+                }, retryError => {
+                    resolve(ResponseHandler.error(retryError, callback));
+                });
+            });
+        });
+    }
+
+    private put(url: string, suffix: string, body: any, callback?: any): Promise<T1CResponse> {
+        let self = this;
+        return new Promise((resolve, reject) => {
+            self.connection.put(url, suffix, body, undefined).then(result => {
+                resolve(ResponseHandler.response(result, callback));
+            }, err => {
+                AdminService.errorHandler(err).then(() => {
+                    // retry initial request
+                    self.connection.put(url, suffix, body, undefined).then(retryResult => {
                         resolve(ResponseHandler.response(retryResult, callback));
                     }, retryError => {
                         resolve(ResponseHandler.error(retryError, callback));

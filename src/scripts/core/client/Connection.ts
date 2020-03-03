@@ -1,3 +1,8 @@
+/**
+ * @author Michallis Pashidis
+ * @since 2017
+ */
+
 import {GCLConfig} from '../GCLConfig';
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import {T1CLibException} from '../exceptions/CoreExceptions';
@@ -203,7 +208,7 @@ export abstract class GenericConnection implements Connection {
     getRequestHeaders(headers: RequestHeaders): RequestHeaders {
         let reqHeaders = headers || {};
         reqHeaders['Accept-Language'] = 'en-US';
-        reqHeaders['T1C-CSRF-Token'] = 'client';
+        /*reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;*/
         return reqHeaders;
     }
 
@@ -514,6 +519,7 @@ export class LocalConnection extends GenericConnection implements Connection {
 
     getRequestHeaders(headers: RequestHeaders): RequestHeaders {
         let reqHeaders = super.getRequestHeaders(headers);
+        reqHeaders['T1T-CRSF-Token'] = 'CSRF_Token';
         reqHeaders[GenericConnection.HEADER_GCL_LANG] = this.cfg.lang;
         // contextToken = application id (ex. 26)
         let contextToken = this.cfg.contextToken;

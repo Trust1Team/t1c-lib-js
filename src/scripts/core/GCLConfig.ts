@@ -1,3 +1,10 @@
+/**
+ * @author Maarten Casteels
+ * @author Michallis Pashidis
+ * @author Maarten Somers
+ * @since 2016
+ */
+
 import axios, {AxiosError, AxiosRequestConfig, AxiosResponse} from 'axios';
 import * as jwtDecode from 'jwt-decode';
 import * as moment from 'moment';
@@ -38,8 +45,6 @@ export class GCLConfigOptions {
                 public containerDownloadTimeout?: number,
                 public localTestMode?: boolean,
                 public lang?: string,
-                public gclDownloadLink?: string,
-                public gclVersion?: string,
                 public providedContainers?: T1CContainerid[]) {
     }
 }
@@ -69,24 +74,16 @@ export class GCLConfig {
     private _containerDownloadTimeout: number;
     private _contextToken: string;
     private _lang: string;
-    private _gclDownloadLink: string;
     private _providedContainers: T1CContainerid[]; // force to use specific containerversion
     private _activeContainers: Map<string, string[]>; // hashmap with active application containers
-    private _gclVersion: string;
 
     // constructor for DTO
     public constructor(options: GCLConfigOptions) {
         if (options) {
-            if (options.gclVersion) {
-                this.gclVersion = options.gclVersion;
-            }
             if (options.gclUrl) {
                 this._gclUrl = options.gclUrl;
             } else {
                 this._gclUrl = defaults.gclUrl;
-            }
-            if (options.gclDownloadLink) {
-                this._gclDownloadLink = options.gclDownloadLink;
             }
             if (options.gwOrProxyUrl) {
                 this._gwUrl = options.gwOrProxyUrl;
@@ -396,23 +393,6 @@ export class GCLConfig {
 
     set activeContainers(value: Map<string, string[]>) {
         this._activeContainers = value;
-    }
-
-
-    get gclDownloadLink(): string {
-        return this._gclDownloadLink;
-    }
-
-    set gclDownloadLink(value: string) {
-        this._gclDownloadLink = value;
-    }
-
-    get gclVersion(): string {
-        return this._gclVersion;
-    }
-
-    set gclVersion(value: string) {
-        this._gclVersion = value;
     }
 
     /**

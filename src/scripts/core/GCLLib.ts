@@ -1,3 +1,11 @@
+/**
+ * @author Maarten Casteels
+ * @author Michallis Pashidis
+ * @author Maarten Somers
+ * @since 2016
+ */
+
+
 import {CoreService} from './service/CoreService';
 import {
     LocalConnection, RemoteJwtConnection, LocalAuthConnection, LocalTestConnection,
@@ -6,7 +14,7 @@ import {
 import {DSDownloadLinkResponse, DSDownloadRequest} from './ds/DSClientModel';
 import {DSClient} from './ds/DSClient';
 import {OCVClient} from './ocv/OCVClient';
-import {CardReadersResponse, CheckGclVersionResponse, DataResponse, T1CContainer, T1CContainerid} from './service/CoreModel';
+import {CardReadersResponse, DataResponse, T1CContainer, T1CContainerid} from './service/CoreModel';
 import {AbstractEidBE} from '../plugins/smartcards/eid/be/EidBeModel';
 import {AbstractEMV} from '../plugins/smartcards/emv/EMVModel';
 import {AbstractOcra} from '../plugins/smartcards/ocra/ocraModel';
@@ -79,12 +87,10 @@ export class GCLClient {
     private dsClient: DSClient;
     private ocvClient: OCVClient;
     private authClient: AuthClient;
-    private gclVersion: string;
 
     public constructor(cfg: GCLConfig, automatic: boolean) {
         // resolve config to singleton
         this.localConfig = cfg;
-        this.gclVersion = cfg.gclVersion;
         // init communication
         this.connection = new LocalConnection(this.localConfig);
         this.authConnection = new LocalAuthConnection(this.localConfig);

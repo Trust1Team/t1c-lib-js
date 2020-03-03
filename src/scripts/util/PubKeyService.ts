@@ -1,4 +1,6 @@
-
+/**
+ * @author Maarten Somers
+ */
 export class PubKeyService {
     private static pubKey: string;
 

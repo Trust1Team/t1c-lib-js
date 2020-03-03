@@ -1,3 +1,7 @@
+/**
+ * @author Maarten Somers
+ * @since 2018
+ */
 import {RemoteApiKeyConnection} from '../client/Connection';
 import {GCLConfig} from '../GCLConfig';
 import {AbstractAuth} from './AuthModel';

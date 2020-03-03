@@ -1,4 +1,7 @@
-
+/**
+ * @author Maarten Somers
+ * @since 2018
+ */
 import {
     DeviceResponse, DSClientInfo, DSContainer, DSPlatformInfo, DSRegistrationOrSyncRequest
 } from '../core/ds/DSClientModel';
@@ -6,6 +9,8 @@ import { DataContainerUtil } from './DataContainerUtil';
 import { GCLClient } from '../core/GCLLib';
 import { T1CLibException } from '../core/exceptions/CoreExceptions';
 import { T1CContainer } from '../core/service/CoreModel';
+// import {ContainerSyncRequest, SetPubKeyRequest} from '../core/admin/adminModel';
+import {ActivatedContainerUtil} from './ActivatedContainerUtil';
 import {Util} from './Utils';
 import {GCLConfig} from '../..';
 

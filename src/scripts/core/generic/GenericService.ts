@@ -1,3 +1,7 @@
+/**
+ * @author Maarten Somers
+ */
+
 import {GCLClient} from '../GCLLib';
 import {AuthenticateOrSignData, OptionalPin, VerifyPinData} from '../../plugins/smartcards/Card';
 import {EidBe} from '../../plugins/smartcards/eid/be/EidBe';

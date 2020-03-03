@@ -1,10 +1,13 @@
+/**
+ * @author Maarten Somers
+ */
 
 import * as asn1js from 'asn1js';
 import * as Base64 from 'Base64';
+import Certificate from 'pkijs/build/Certificate';
 import { T1CLibException } from '../core/exceptions/CoreExceptions';
 import { T1CCertificate, T1CResponse } from '../core/service/CoreModel';
 import { ResponseHandler } from './ResponseHandler';
-import Certificate from 'pkijs/build/Certificate';
 
 export class CertParser {
 
@@ -13,7 +16,6 @@ export class CertParser {
                           callback?: (error: T1CLibException, data: T1CResponse) => void):  Promise<any> {
         // check if data has properties
         if (response && response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
-            // tslint:disable-next-line:forin
             for (let key in response.data) {
                 let value = response.data[key];
                 if (key.indexOf('certificate') > -1) {

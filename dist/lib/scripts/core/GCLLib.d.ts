@@ -47,7 +47,6 @@ export declare class GCLClient {
     private dsClient;
     private ocvClient;
     private authClient;
-    private gclVersion;
     constructor(cfg: GCLConfig, automatic: boolean);
     static checkPolyfills(): void;
     static initialize(cfg: GCLConfig, callback?: (error: T1CLibException, client: GCLClient) => void): Promise<GCLClient>;
@@ -82,7 +81,8 @@ export declare class GCLClient {
     wacom: () => AbstractWacom;
     rawprint: () => AbstractRawPrint;
     isabel: (reader_id: string) => AbstractIsabel;
-    gclInstalled: boolean;
+    get gclInstalled(): boolean;
+    set gclInstalled(value: boolean);
     containerFor(readerId: string, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;
     download(version?: string, callback?: (error: T1CLibException, data: DSDownloadLinkResponse) => void): Promise<DSDownloadLinkResponse>;
     dumpData(readerId: string, data: OptionalPin, callback?: (error: T1CLibException, data: DataResponse) => void): Promise<DataResponse>;

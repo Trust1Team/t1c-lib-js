@@ -41,7 +41,6 @@ export class InitUtil {
                         if (cfg.gwUrl && !cfg.citrix) {
                             console.log('using gateway: ', cfg.gwUrl);
                             console.log('citrix: ', cfg.citrix);
-                            console.log('', infoResponse.data.version);
                             this.activateAndSync(infoResponse, mergedInfo, client, cfg, resolve, reject);
                         } else {
                             resolve();

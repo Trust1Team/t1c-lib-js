@@ -1,6 +1,10 @@
+/**
+ * @author Maarten Somers
+ */
 import {T1CLibException} from '../exceptions/CoreExceptions';
 import {AbstractAgent, AgentResponse} from './agentModel';
 import {LocalAuthConnection, RequestBody} from '../client/Connection';
+
 
 /**
  * Provides access to the /agent endpoint and a URL prefixing utility method
