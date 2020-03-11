@@ -36,14 +36,14 @@ describe('Connection', () => {
 
         test('sends the correct headers for regular connections', () => {
             return connection.get('', '/hello', undefined).then(res => {
-                expect(res.headers).toBeObject();
+                expect(res.headers).toBeInstanceOf(Object);
                 expect(res.headers).not.toHaveProperty(GenericConnection.AUTH_TOKEN_HEADER);
             });
         });
 
         test('sends the X-Authentication-Token header for compatible connections', () => {
             return tokenConnection.get('', '/hello', undefined).then(res => {
-                expect(res.headers).toBeObject();
+                expect(res.headers).toBeInstanceOf(Object);
                 expect(res.headers).toHaveProperty(GenericConnection.AUTH_TOKEN_HEADER, 'ZGRlMjk3YjktNzVkNi00MjhlLWExZDMtM2I0ZDUyMDExMGU5LTAwNWRkYTVk');
             });
         });
@@ -65,14 +65,14 @@ describe('Connection', () => {
 
         test('sends the correct headers for regular connections', () => {
             return connection.post('', '/hello', { payload: 'some string' }, undefined).then(res => {
-                expect(res.headers).toBeObject();
+                expect(res.headers).toBeInstanceOf(Object);
                 expect(res.headers).not.toHaveProperty(GenericConnection.AUTH_TOKEN_HEADER);
             });
         });
 
         test('sends the X-Authentication-Token header for compatible connections', () => {
             return tokenConnection.post('', '/hello', { payload: 'some string' }, undefined).then(res => {
-                expect(res.headers).toBeObject();
+                expect(res.headers).toBeInstanceOf(Object);
                 expect(res.headers).toHaveProperty(GenericConnection.AUTH_TOKEN_HEADER, 'ZGRlMjk3YjktNzVkNi00MjhlLWExZDMtM2I0ZDUyMDExMGU5LTAwNWRkYTVk');
             });
         });
@@ -94,14 +94,14 @@ describe('Connection', () => {
 
         test('sends the correct headers for regular connections', () => {
             return connection.put('', '/hello', { payload: 'some string' }, undefined).then(res => {
-                expect(res.headers).toBeObject();
+                expect(res.headers).toBeInstanceOf(Object);
                 expect(res.headers).not.toHaveProperty(GenericConnection.AUTH_TOKEN_HEADER);
             });
         });
 
         test('sends the X-Authentication-Token header for compatible connections', () => {
             return tokenConnection.put('', '/hello', { payload: 'some string' }, undefined).then(res => {
-                expect(res.headers).toBeObject();
+                expect(res.headers).toBeInstanceOf(Object);
                 expect(res.headers).toHaveProperty(GenericConnection.AUTH_TOKEN_HEADER, 'ZGRlMjk3YjktNzVkNi00MjhlLWExZDMtM2I0ZDUyMDExMGU5LTAwNWRkYTVk');
             });
         });
