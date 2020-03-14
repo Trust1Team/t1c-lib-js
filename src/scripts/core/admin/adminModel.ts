@@ -8,7 +8,7 @@ export interface AbstractAdmin {
 }
 
 export class PubKeyResponse implements T1CResponse {
-    constructor(public data: PubKeys, public success: boolean) {}
+    constructor(public data: string, public success: boolean) {}
 }
 
 // TODO typings for ds
