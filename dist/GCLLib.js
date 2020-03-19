@@ -16869,7 +16869,7 @@ var SyncUtil = (function () {
     };
     SyncUtil.syncDevice = function (client, pubKey, info, deviceId, containers) {
         return client.ds().then(function (ds) {
-            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "3.0.0-beta3"), info.namespace, containers));
+            return ds.sync(new DSClientModel_1.DSRegistrationOrSyncRequest(info.activated, deviceId, info.core_version, pubKey, info.manufacturer, info.browser, info.os, info.ua, client.config().gwUrl, new DSClientModel_1.DSClientInfo('JAVASCRIPT', "3.0.0"), info.namespace, containers));
         });
     };
     SyncUtil.doSyncFlow = function (client, mergedInfo, uuid, containers, isRetry, config) {
@@ -24456,7 +24456,7 @@ var CoreService = (function () {
         });
     };
     CoreService.prototype.version = function () {
-        return Promise.resolve("3.0.0-beta3");
+        return Promise.resolve("3.0.0");
     };
     return CoreService;
 }());
