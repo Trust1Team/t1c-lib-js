@@ -4,9 +4,9 @@ export interface AbstractAdmin {
     getPubKey(callback?: (error: T1CLibException, data: PubKeyResponse) => void): Promise<PubKeyResponse>;
 }
 export declare class PubKeyResponse implements T1CResponse {
-    data: PubKeys;
+    data: string;
     success: boolean;
-    constructor(data: PubKeys, success: boolean);
+    constructor(data: string, success: boolean);
 }
 export declare class PubKeys {
     device: string;

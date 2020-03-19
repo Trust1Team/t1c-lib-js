@@ -61,7 +61,7 @@ export class InitUtil {
             initPromise.then(() => {
                 // store device PubKey
                 client.admin().getPubKey().then(pubKey => {
-                    PubKeyService.setPubKey(pubKey.data.device);
+                    PubKeyService.setPubKey(pubKey.data);
                     finalResolve();
                 });
             }, err => {
