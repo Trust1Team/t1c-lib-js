@@ -16,7 +16,7 @@ var CardUtil = /** @class */ (function () {
             case 'dnie':
             case 'luxeid':
             case 'luxtrust':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'piv':
             case 'pteid':
                 return true;
@@ -35,7 +35,7 @@ var CardUtil = /** @class */ (function () {
             case 'dnie':
             case 'luxeid':
             case 'luxtrust':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'piv':
             case 'pteid':
             case 'pkcs11':
@@ -55,7 +55,7 @@ var CardUtil = /** @class */ (function () {
             case 'dnie':
             case 'luxeid':
             case 'luxtrust':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'ocra':
             case 'piv':
             case 'pteid':
@@ -86,8 +86,8 @@ var CardUtil = /** @class */ (function () {
             else if (findDescription(card.description, 'MOBIB')) {
                 return 'mobib';
             }
-            else if (findDescription(card.description, 'Oberthur')) {
-                return 'oberthur';
+            else if (findDescription(card.description, 'Idemia_Ias_Ecc')) {
+                return 'idemia_ias_ecc';
             }
             else if (findDescription(card.description, 'Aventra')) {
                 return 'aventra';
@@ -128,7 +128,7 @@ var CardUtil = /** @class */ (function () {
             case 'aventra':
             case 'beid':
             case 'dnie':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'piv':
             case 'luxeid':
             case 'luxtrust':
@@ -148,7 +148,7 @@ var CardUtil = /** @class */ (function () {
             case 'luxeid':
             case 'luxtrust':
             case 'mobib':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'ocra':
             case 'piv':
             case 'pteid':
@@ -167,7 +167,7 @@ var CardUtil = /** @class */ (function () {
             case 'luxeid':
             case 'luxtrust':
             case 'mobib':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'ocra':
             case 'piv':
             case 'pteid':

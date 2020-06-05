@@ -122,9 +122,9 @@ var GCLClient = /** @class */ (function () {
         this.aventra = function (reader_id) {
             return _this.pluginFactory.createAventraNO(reader_id);
         };
-        // get instance for Oberthur
-        this.oberthur = function (reader_id) {
-            return _this.pluginFactory.createOberthurNO(reader_id);
+        // get instance for Idemia_Ias_Ecc
+        this.idemia_ias_ecc = function (reader_id) {
+            return _this.pluginFactory.createIdemia_Ias_EccNO(reader_id);
         };
         // get instance for PIV
         this.piv = function (reader_id) {

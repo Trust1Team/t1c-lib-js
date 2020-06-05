@@ -23965,7 +23965,7 @@ var CardUtil = (function () {
             case 'dnie':
             case 'luxeid':
             case 'luxtrust':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'piv':
             case 'pteid':
                 return true;
@@ -23984,7 +23984,7 @@ var CardUtil = (function () {
             case 'dnie':
             case 'luxeid':
             case 'luxtrust':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'piv':
             case 'pteid':
             case 'pkcs11':
@@ -24004,7 +24004,7 @@ var CardUtil = (function () {
             case 'dnie':
             case 'luxeid':
             case 'luxtrust':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'ocra':
             case 'piv':
             case 'pteid':
@@ -24035,8 +24035,8 @@ var CardUtil = (function () {
             else if (findDescription(card.description, 'MOBIB')) {
                 return 'mobib';
             }
-            else if (findDescription(card.description, 'Oberthur')) {
-                return 'oberthur';
+            else if (findDescription(card.description, 'Idemia_Ias_Ecc')) {
+                return 'idemia_ias_ecc';
             }
             else if (findDescription(card.description, 'Aventra')) {
                 return 'aventra';
@@ -24075,7 +24075,7 @@ var CardUtil = (function () {
             case 'aventra':
             case 'beid':
             case 'dnie':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'piv':
             case 'luxeid':
             case 'luxtrust':
@@ -24095,7 +24095,7 @@ var CardUtil = (function () {
             case 'luxeid':
             case 'luxtrust':
             case 'mobib':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'ocra':
             case 'piv':
             case 'pteid':
@@ -24114,7 +24114,7 @@ var CardUtil = (function () {
             case 'luxeid':
             case 'luxtrust':
             case 'mobib':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'ocra':
             case 'piv':
             case 'pteid':
@@ -37443,7 +37443,7 @@ var mobib_1 = __webpack_require__(253);
 var LuxTrust_1 = __webpack_require__(254);
 var ocra_1 = __webpack_require__(255);
 var Aventra_1 = __webpack_require__(76);
-var Oberthur_1 = __webpack_require__(256);
+var Idemia_Ias_Ecc_1 = __webpack_require__(256);
 var piv_1 = __webpack_require__(257);
 var dnie_1 = __webpack_require__(258);
 var EidPt_1 = __webpack_require__(259);
@@ -37471,7 +37471,7 @@ var CONTAINER_LUXTRUST = CONTAINER_NEW_CONTEXT_PATH + 'luxtrust';
 var CONTAINER_MOBIB = CONTAINER_NEW_CONTEXT_PATH + 'mobib';
 var CONTAINER_OCRA = CONTAINER_NEW_CONTEXT_PATH + 'ocra';
 var CONTAINER_AVENTRA = CONTAINER_NEW_CONTEXT_PATH + 'aventra';
-var CONTAINER_OBERTHUR = CONTAINER_NEW_CONTEXT_PATH + 'oberthur';
+var CONTAINER_IDEMIA_IAS_ECC = CONTAINER_NEW_CONTEXT_PATH + 'idemia_ias_ecc';
 var CONTAINER_PIV = CONTAINER_NEW_CONTEXT_PATH + 'piv';
 var CONTAINER_PTEID = CONTAINER_NEW_CONTEXT_PATH + 'pteid';
 var CONTAINER_PKCS11 = CONTAINER_NEW_CONTEXT_PATH + 'pkcs11';
@@ -37521,8 +37521,8 @@ var PluginFactory = (function () {
     PluginFactory.prototype.createAventraNO = function (reader_id) {
         return new Aventra_1.Aventra(this.url, CONTAINER_AVENTRA, this.connection, reader_id);
     };
-    PluginFactory.prototype.createOberthurNO = function (reader_id) {
-        return new Oberthur_1.Oberthur(this.url, CONTAINER_OBERTHUR, this.connection, reader_id);
+    PluginFactory.prototype.createIdemia_Ias_EccNO = function (reader_id) {
+        return new Idemia_Ias_Ecc_1.Idemia_Ias_Ecc(this.url, CONTAINER_IDEMIA_IAS_ECC, this.connection, reader_id);
     };
     PluginFactory.prototype.createPIV = function (reader_id) {
         return new piv_1.PIV(this.url, CONTAINER_PIV, this.connection, reader_id);
@@ -38199,52 +38199,52 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var Card_1 = __webpack_require__(5);
 var PinEnforcer_1 = __webpack_require__(18);
 var RequestHandler_1 = __webpack_require__(11);
-var Oberthur = (function (_super) {
-    __extends(Oberthur, _super);
-    function Oberthur(baseUrl, containerUrl, connection, reader_id) {
-        return _super.call(this, baseUrl, containerUrl, connection, reader_id, Oberthur.CONTAINER_PREFIX) || this;
+var Idemia_Ias_Ecc = (function (_super) {
+    __extends(Idemia_Ias_Ecc, _super);
+    function Idemia_Ias_Ecc(baseUrl, containerUrl, connection, reader_id) {
+        return _super.call(this, baseUrl, containerUrl, connection, reader_id, Idemia_Ias_Ecc.CONTAINER_PREFIX) || this;
     }
-    Oberthur.prototype.allDataFilters = function () {
+    Idemia_Ias_Ecc.prototype.allDataFilters = function () {
         return ['root_certificate', 'authentication-certificate',
             'encryption_certificate', 'issuer_certificate', 'signing_certificate'];
     };
-    Oberthur.prototype.allCertFilters = function () {
+    Idemia_Ias_Ecc.prototype.allCertFilters = function () {
         return ['root_certificate', 'authentication-certificate', 'encryption_certificate', 'issuer_certificate', 'signing_certificate'];
     };
-    Oberthur.prototype.allKeyRefs = function () {
+    Idemia_Ias_Ecc.prototype.allKeyRefs = function () {
         return ['authenticate', 'sign', 'encrypt'];
     };
-    Oberthur.prototype.rootCertificate = function (options, callback) {
-        return this.getCertificate(Oberthur.CERT_ROOT, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+    Idemia_Ias_Ecc.prototype.rootCertificate = function (options, callback) {
+        return this.getCertificate(Idemia_Ias_Ecc.CERT_ROOT, RequestHandler_1.RequestHandler.determineOptions(options, callback));
     };
-    Oberthur.prototype.issuerCertificate = function (options, callback) {
-        return this.getCertificate(Oberthur.CERT_ISSUER, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+    Idemia_Ias_Ecc.prototype.issuerCertificate = function (options, callback) {
+        return this.getCertificate(Idemia_Ias_Ecc.CERT_ISSUER, RequestHandler_1.RequestHandler.determineOptions(options, callback));
     };
-    Oberthur.prototype.authenticationCertificate = function (options, callback) {
-        return this.getCertificate(Oberthur.CERT_AUTHENTICATION, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+    Idemia_Ias_Ecc.prototype.authenticationCertificate = function (options, callback) {
+        return this.getCertificate(Idemia_Ias_Ecc.CERT_AUTHENTICATION, RequestHandler_1.RequestHandler.determineOptions(options, callback));
     };
-    Oberthur.prototype.signingCertificate = function (options, callback) {
-        return this.getCertificate(Oberthur.CERT_SIGNING, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+    Idemia_Ias_Ecc.prototype.signingCertificate = function (options, callback) {
+        return this.getCertificate(Idemia_Ias_Ecc.CERT_SIGNING, RequestHandler_1.RequestHandler.determineOptions(options, callback));
     };
-    Oberthur.prototype.encryptionCertificate = function (options, callback) {
-        return this.getCertificate(Oberthur.CERT_ENCRYPTION, RequestHandler_1.RequestHandler.determineOptions(options, callback));
+    Idemia_Ias_Ecc.prototype.encryptionCertificate = function (options, callback) {
+        return this.getCertificate(Idemia_Ias_Ecc.CERT_ENCRYPTION, RequestHandler_1.RequestHandler.determineOptions(options, callback));
     };
-    Oberthur.prototype.verifyPin = function (body, callback) {
+    Idemia_Ias_Ecc.prototype.verifyPin = function (body, callback) {
         var _this = this;
         return PinEnforcer_1.PinEnforcer.check(this.connection, this.reader_id, body).then(function () {
-            return _this.connection.post(_this.baseUrl, _this.containerSuffix(Oberthur.VERIFY_PIN), body, undefined, undefined, callback);
+            return _this.connection.post(_this.baseUrl, _this.containerSuffix(Idemia_Ias_Ecc.VERIFY_PIN), body, undefined, undefined, callback);
         });
     };
-    Oberthur.prototype.verifyPinWithEncryptedPin = function (body, callback) {
+    Idemia_Ias_Ecc.prototype.verifyPinWithEncryptedPin = function (body, callback) {
         var _this = this;
         return PinEnforcer_1.PinEnforcer.checkAlreadyEncryptedPin(this.connection, this.reader_id, body).then(function () {
-            return _this.connection.post(_this.baseUrl, _this.containerSuffix(Oberthur.VERIFY_PIN), body, undefined, undefined, callback);
+            return _this.connection.post(_this.baseUrl, _this.containerSuffix(Idemia_Ias_Ecc.VERIFY_PIN), body, undefined, undefined, callback);
         });
     };
-    Oberthur.CONTAINER_PREFIX = 'oberthur';
-    return Oberthur;
+    Idemia_Ias_Ecc.CONTAINER_PREFIX = 'idemia_ias_ecc';
+    return Idemia_Ias_Ecc;
 }(Card_1.GenericCertCard));
-exports.Oberthur = Oberthur;
+exports.Idemia_Ias_Ecc = Idemia_Ias_Ecc;
 
 
 /***/ }),
@@ -64525,8 +64525,8 @@ var GCLClient = (function () {
         this.aventra = function (reader_id) {
             return _this.pluginFactory.createAventraNO(reader_id);
         };
-        this.oberthur = function (reader_id) {
-            return _this.pluginFactory.createOberthurNO(reader_id);
+        this.idemia_ias_ecc = function (reader_id) {
+            return _this.pluginFactory.createIdemia_Ias_EccNO(reader_id);
         };
         this.piv = function (reader_id) {
             return _this.pluginFactory.createPIV(reader_id);
@@ -66443,39 +66443,39 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var CoreModel_1 = __webpack_require__(4);
-var OberthurAllCertsResponse = (function (_super) {
-    __extends(OberthurAllCertsResponse, _super);
-    function OberthurAllCertsResponse(data, success) {
+var Idemia_Ias_EccAllCertsResponse = (function (_super) {
+    __extends(Idemia_Ias_EccAllCertsResponse, _super);
+    function Idemia_Ias_EccAllCertsResponse(data, success) {
         var _this = _super.call(this, data, success) || this;
         _this.data = data;
         _this.success = success;
         return _this;
     }
-    return OberthurAllCertsResponse;
+    return Idemia_Ias_EccAllCertsResponse;
 }(CoreModel_1.DataObjectResponse));
-exports.OberthurAllCertsResponse = OberthurAllCertsResponse;
-var OberthurAllCerts = (function () {
-    function OberthurAllCerts(root_certificate, issuer_certificate, authentication_certificate, signing_certificate, encryption_certificate) {
+exports.Idemia_Ias_EccAllCertsResponse = Idemia_Ias_EccAllCertsResponse;
+var Idemia_Ias_EccAllCerts = (function () {
+    function Idemia_Ias_EccAllCerts(root_certificate, issuer_certificate, authentication_certificate, signing_certificate, encryption_certificate) {
         this.root_certificate = root_certificate;
         this.issuer_certificate = issuer_certificate;
         this.authentication_certificate = authentication_certificate;
         this.signing_certificate = signing_certificate;
         this.encryption_certificate = encryption_certificate;
     }
-    return OberthurAllCerts;
+    return Idemia_Ias_EccAllCerts;
 }());
-exports.OberthurAllCerts = OberthurAllCerts;
-var OberthurAllDataResponse = (function (_super) {
-    __extends(OberthurAllDataResponse, _super);
-    function OberthurAllDataResponse(data, success) {
+exports.Idemia_Ias_EccAllCerts = Idemia_Ias_EccAllCerts;
+var Idemia_Ias_EccAllDataResponse = (function (_super) {
+    __extends(Idemia_Ias_EccAllDataResponse, _super);
+    function Idemia_Ias_EccAllDataResponse(data, success) {
         var _this = _super.call(this, data, success) || this;
         _this.data = data;
         _this.success = success;
         return _this;
     }
-    return OberthurAllDataResponse;
-}(OberthurAllCertsResponse));
-exports.OberthurAllDataResponse = OberthurAllDataResponse;
+    return Idemia_Ias_EccAllDataResponse;
+}(Idemia_Ias_EccAllCertsResponse));
+exports.Idemia_Ias_EccAllDataResponse = Idemia_Ias_EccAllDataResponse;
 
 
 /***/ }),
