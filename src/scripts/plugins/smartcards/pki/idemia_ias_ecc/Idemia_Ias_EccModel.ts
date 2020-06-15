@@ -11,7 +11,7 @@ import {CertCard, VerifyPinData} from '../../Card';
 import {Options} from '../../../../util/RequestHandler';
 
 
-export interface AbstractOberthur extends CertCard {
+export interface AbstractIdemia_Ias_Ecc extends CertCard {
     allDataFilters(): string[];
 
     allCertFilters(): string[];
@@ -22,9 +22,9 @@ export interface AbstractOberthur extends CertCard {
 
     allAlgoRefsForSigning(callback?: (error: T1CLibException, data: DataArrayResponse) => void): Promise<DataArrayResponse>;
 
-    allData(filters: string[], callback?: (error: T1CLibException, data: OberthurAllDataResponse) => void): Promise<OberthurAllDataResponse>;
+    allData(filters: string[], callback?: (error: T1CLibException, data: Idemia_Ias_EccAllDataResponse) => void): Promise<Idemia_Ias_EccAllDataResponse>;
 
-    allCerts(filters: string[], callback?: (error: T1CLibException, data: OberthurAllCertsResponse) => void): Promise<OberthurAllCertsResponse>;
+    allCerts(filters: string[], callback?: (error: T1CLibException, data: Idemia_Ias_EccAllCertsResponse) => void): Promise<Idemia_Ias_EccAllCertsResponse>;
 
     rootCertificate(options?: Options,
                     callback?: (error: T1CLibException, data: CertificateResponse) => void): Promise<CertificateResponse>;
@@ -43,13 +43,13 @@ export interface AbstractOberthur extends CertCard {
 }
 
 
-export class OberthurAllCertsResponse extends DataObjectResponse {
-    constructor(public data: OberthurAllCerts, public success: boolean) {
+export class Idemia_Ias_EccAllCertsResponse extends DataObjectResponse {
+    constructor(public data: Idemia_Ias_EccAllCerts, public success: boolean) {
         super(data, success);
     }
 }
 
-export class OberthurAllCerts {
+export class Idemia_Ias_EccAllCerts {
     constructor(public root_certificate?: T1CCertificate,
                 public issuer_certificate?: T1CCertificate,
                 public authentication_certificate?: T1CCertificate,
@@ -58,8 +58,8 @@ export class OberthurAllCerts {
     }
 }
 
-export class OberthurAllDataResponse extends OberthurAllCertsResponse {
-    constructor(public data: OberthurAllCerts, public success: boolean) {
+export class Idemia_Ias_EccAllDataResponse extends Idemia_Ias_EccAllCertsResponse {
+    constructor(public data: Idemia_Ias_EccAllCerts, public success: boolean) {
         super(data, success);
     }
 }

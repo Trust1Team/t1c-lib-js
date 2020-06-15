@@ -5,7 +5,7 @@ import { AbstractIsabel } from './smartcards/isabel/IsabelModel';
 import { AbstractOcra } from './smartcards/ocra/ocraModel';
 import { AbstractAventra } from './smartcards/pki/aventra/AventraModel';
 import { AbstractLuxTrust } from './smartcards/pki/luxtrust/LuxTrustModel';
-import { AbstractOberthur } from './smartcards/pki/oberthur/OberthurModel';
+import { AbstractIdemia_Ias_Ecc } from './smartcards/pki/idemia_ias_ecc/Idemia_Ias_EccModel';
 import { AbstractPiv } from './smartcards/piv/pivModel';
 import { AbstractMobib } from './smartcards/mobib/mobibModel';
 import { AbstractEidLUX, PinType } from './smartcards/eid/lux/EidLuxModel';
@@ -32,7 +32,7 @@ export interface AbstractFactory {
     createMobib(reader_id?: string): AbstractMobib;
     createOcra(reader_id?: string): AbstractOcra;
     createAventraNO(reader_id?: string): AbstractAventra;
-    createOberthurNO(reader_id?: string): AbstractOberthur;
+    createIdemia_Ias_EccNO(reader_id?: string): AbstractIdemia_Ias_Ecc;
     createPIV(reader_id?: string): AbstractPiv;
     createPKCS11(): AbstractPkcs11;
     createJavaKeyTool(): AbstractJavaKeyTool;
@@ -55,7 +55,7 @@ export declare class PluginFactory implements AbstractFactory {
     createMobib(reader_id?: string): AbstractMobib;
     createOcra(reader_id?: string): AbstractOcra;
     createAventraNO(reader_id?: string): AbstractAventra;
-    createOberthurNO(reader_id?: string): AbstractOberthur;
+    createIdemia_Ias_EccNO(reader_id?: string): AbstractIdemia_Ias_Ecc;
     createPIV(reader_id?: string): AbstractPiv;
     createPKCS11(): AbstractPkcs11;
     createRemoteLoading(reader_id?: string): AbstractRemoteLoading;

@@ -12,37 +12,37 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 import { DataObjectResponse } from '../../../../core/service/CoreModel';
-var OberthurAllCertsResponse = (function (_super) {
-    __extends(OberthurAllCertsResponse, _super);
-    function OberthurAllCertsResponse(data, success) {
+var Idemia_Ias_EccAllCertsResponse = (function (_super) {
+    __extends(Idemia_Ias_EccAllCertsResponse, _super);
+    function Idemia_Ias_EccAllCertsResponse(data, success) {
         var _this = _super.call(this, data, success) || this;
         _this.data = data;
         _this.success = success;
         return _this;
     }
-    return OberthurAllCertsResponse;
+    return Idemia_Ias_EccAllCertsResponse;
 }(DataObjectResponse));
-export { OberthurAllCertsResponse };
-var OberthurAllCerts = (function () {
-    function OberthurAllCerts(root_certificate, issuer_certificate, authentication_certificate, signing_certificate, encryption_certificate) {
+export { Idemia_Ias_EccAllCertsResponse };
+var Idemia_Ias_EccAllCerts = (function () {
+    function Idemia_Ias_EccAllCerts(root_certificate, issuer_certificate, authentication_certificate, signing_certificate, encryption_certificate) {
         this.root_certificate = root_certificate;
         this.issuer_certificate = issuer_certificate;
         this.authentication_certificate = authentication_certificate;
         this.signing_certificate = signing_certificate;
         this.encryption_certificate = encryption_certificate;
     }
-    return OberthurAllCerts;
+    return Idemia_Ias_EccAllCerts;
 }());
-export { OberthurAllCerts };
-var OberthurAllDataResponse = (function (_super) {
-    __extends(OberthurAllDataResponse, _super);
-    function OberthurAllDataResponse(data, success) {
+export { Idemia_Ias_EccAllCerts };
+var Idemia_Ias_EccAllDataResponse = (function (_super) {
+    __extends(Idemia_Ias_EccAllDataResponse, _super);
+    function Idemia_Ias_EccAllDataResponse(data, success) {
         var _this = _super.call(this, data, success) || this;
         _this.data = data;
         _this.success = success;
         return _this;
     }
-    return OberthurAllDataResponse;
-}(OberthurAllCertsResponse));
-export { OberthurAllDataResponse };
-//# sourceMappingURL=OberthurModel.js.map
+    return Idemia_Ias_EccAllDataResponse;
+}(Idemia_Ias_EccAllCertsResponse));
+export { Idemia_Ias_EccAllDataResponse };
+//# sourceMappingURL=Idemia_Ias_EccModel.js.map

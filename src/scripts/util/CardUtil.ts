@@ -14,7 +14,7 @@ export class CardUtil {
             case 'dnie':
             case 'luxeid':
             case 'luxtrust':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'piv':
             case 'pteid':
                 return true;
@@ -35,7 +35,7 @@ export class CardUtil {
             case 'dnie':
             case 'luxeid':
             case 'luxtrust':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'piv':
             case 'pteid':
             case 'pkcs11':
@@ -57,7 +57,7 @@ export class CardUtil {
             case 'dnie':
             case 'luxeid':
             case 'luxtrust':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'ocra':
             case 'piv':
             case 'pteid':
@@ -78,7 +78,7 @@ export class CardUtil {
             else if (findDescription(card.description, 'LuxTrust card')) { return 'luxtrust'; }
             else if (findDescription(card.description, 'Juridic Person\'s Token (PKI)')) { return 'ocra'; }
             else if (findDescription(card.description, 'MOBIB')) { return 'mobib'; }
-            else if (findDescription(card.description, 'Oberthur')) { return 'oberthur'; }
+            else if (findDescription(card.description, 'Idemia_Ias_Ecc')) { return 'idemia_ias_ecc'; }
             else if (findDescription(card.description, 'Aventra')) { return 'aventra'; }
             else if (findDescription(card.description, 'PIV')) { return 'piv'; }
             else if (findDescription(card.description, 'CIV')) { return 'piv'; }
@@ -107,7 +107,7 @@ export class CardUtil {
             case 'aventra':
             case 'beid':
             case 'dnie':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'piv':
             case 'luxeid':
             case 'luxtrust':
@@ -128,7 +128,7 @@ export class CardUtil {
             case 'luxeid':
             case 'luxtrust':
             case 'mobib':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'ocra':
             case 'piv':
             case 'pteid':
@@ -148,7 +148,7 @@ export class CardUtil {
             case 'luxeid':
             case 'luxtrust':
             case 'mobib':
-            case 'oberthur':
+            case 'idemia_ias_ecc':
             case 'ocra':
             case 'piv':
             case 'pteid':

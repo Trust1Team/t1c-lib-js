@@ -7,7 +7,7 @@ import { AbstractEMV } from '../plugins/smartcards/emv/EMVModel';
 import { AbstractOcra } from '../plugins/smartcards/ocra/ocraModel';
 import { AbstractAventra } from '../plugins/smartcards/pki/aventra/AventraModel';
 import { AbstractLuxTrust } from '../plugins/smartcards/pki/luxtrust/LuxTrustModel';
-import { AbstractOberthur } from '../plugins/smartcards/pki/oberthur/OberthurModel';
+import { AbstractIdemia_Ias_Ecc } from '../plugins/smartcards/pki/idemia_ias_ecc/Idemia_Ias_EccModel';
 import { AbstractPiv } from '../plugins/smartcards/piv/pivModel';
 import { AbstractMobib } from '../plugins/smartcards/mobib/mobibModel';
 import { AbstractEidLUX, PinType } from '../plugins/smartcards/eid/lux/EidLuxModel';
@@ -69,7 +69,7 @@ export declare class GCLClient {
     mobib: (reader_id?: string) => AbstractMobib;
     ocra: (reader_id?: string) => AbstractOcra;
     aventra: (reader_id?: string) => AbstractAventra;
-    oberthur: (reader_id?: string) => AbstractOberthur;
+    idemia_ias_ecc: (reader_id?: string) => AbstractIdemia_Ias_Ecc;
     piv: (reader_id?: string) => AbstractPiv;
     pteid: (reader_id?: string) => AbstractEidPT;
     pkcs11: () => AbstractPkcs11;
