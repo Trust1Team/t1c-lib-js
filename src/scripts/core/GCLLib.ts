@@ -12,7 +12,7 @@ import {AbstractEMV} from '../plugins/smartcards/emv/EMVModel';
 import {AbstractOcra} from '../plugins/smartcards/ocra/ocraModel';
 import {AbstractAventra} from '../plugins/smartcards/pki/aventra/AventraModel';
 import {AbstractLuxTrust} from '../plugins/smartcards/pki/luxtrust/LuxTrustModel';
-import {AbstractOberthur} from '../plugins/smartcards/pki/oberthur/OberthurModel';
+import {AbstractIdemia_Ias_Ecc} from '../plugins/smartcards/pki/idemia_ias_ecc/Idemia_Ias_EccModel';
 import {AbstractPiv} from '../plugins/smartcards/piv/pivModel';
 import {AbstractMobib} from '../plugins/smartcards/mobib/mobibModel';
 import {AbstractEidLUX, PinType} from '../plugins/smartcards/eid/lux/EidLuxModel';
@@ -248,9 +248,9 @@ export class GCLClient {
     public aventra = (reader_id?: string): AbstractAventra => {
         return this.pluginFactory.createAventraNO(reader_id);
     }
-    // get instance for Oberthur
-    public oberthur = (reader_id?: string): AbstractOberthur => {
-        return this.pluginFactory.createOberthurNO(reader_id);
+    // get instance for Idemia_Ias_Ecc
+    public idemia_ias_ecc = (reader_id?: string): AbstractIdemia_Ias_Ecc => {
+        return this.pluginFactory.createIdemia_Ias_EccNO(reader_id);
     }
     // get instance for PIV
     public piv = (reader_id?: string): AbstractPiv => {

@@ -1,10 +1,10 @@
 import { T1CLibException } from '../../../../core/exceptions/CoreExceptions';
 import { CertificateResponse, T1CResponse } from '../../../../core/service/CoreModel';
 import { GenericCertCard, VerifyPinData } from '../../Card';
-import { AbstractOberthur } from './OberthurModel';
+import { AbstractIdemia_Ias_Ecc } from './Idemia_Ias_EccModel';
 import { Options } from '../../../../util/RequestHandler';
 import { LocalConnection } from '../../../../core/client/Connection';
-export declare class Oberthur extends GenericCertCard implements AbstractOberthur {
+export declare class Idemia_Ias_Ecc extends GenericCertCard implements AbstractIdemia_Ias_Ecc {
     static CONTAINER_PREFIX: string;
     constructor(baseUrl: string, containerUrl: string, connection: LocalConnection, reader_id: string);
     allDataFilters(): string[];
