@@ -5,7 +5,7 @@ import { Mobib } from './smartcards/mobib/mobib';
 import { LuxTrust } from './smartcards/pki/luxtrust/LuxTrust';
 import { Ocra } from './smartcards/ocra/ocra';
 import { Aventra } from './smartcards/pki/aventra/Aventra';
-import { Oberthur } from './smartcards/pki/oberthur/Oberthur';
+import { Idemia_Ias_Ecc } from './smartcards/pki/idemia_ias_ecc/Idemia_Ias_Ecc';
 import { PIV } from './smartcards/piv/piv';
 import { DNIe } from './smartcards/eid/esp/dnie';
 import { EidPt } from './smartcards/eid/pt/EidPt';
@@ -33,7 +33,7 @@ var CONTAINER_LUXTRUST = CONTAINER_NEW_CONTEXT_PATH + 'luxtrust';
 var CONTAINER_MOBIB = CONTAINER_NEW_CONTEXT_PATH + 'mobib';
 var CONTAINER_OCRA = CONTAINER_NEW_CONTEXT_PATH + 'ocra';
 var CONTAINER_AVENTRA = CONTAINER_NEW_CONTEXT_PATH + 'aventra';
-var CONTAINER_OBERTHUR = CONTAINER_NEW_CONTEXT_PATH + 'oberthur';
+var CONTAINER_IDEMIA_IAS_ECC = CONTAINER_NEW_CONTEXT_PATH + 'idemia_ias_ecc';
 var CONTAINER_PIV = CONTAINER_NEW_CONTEXT_PATH + 'piv';
 var CONTAINER_PTEID = CONTAINER_NEW_CONTEXT_PATH + 'pteid';
 var CONTAINER_PKCS11 = CONTAINER_NEW_CONTEXT_PATH + 'pkcs11';
@@ -83,8 +83,8 @@ var PluginFactory = (function () {
     PluginFactory.prototype.createAventraNO = function (reader_id) {
         return new Aventra(this.url, CONTAINER_AVENTRA, this.connection, reader_id);
     };
-    PluginFactory.prototype.createOberthurNO = function (reader_id) {
-        return new Oberthur(this.url, CONTAINER_OBERTHUR, this.connection, reader_id);
+    PluginFactory.prototype.createIdemia_Ias_EccNO = function (reader_id) {
+        return new Idemia_Ias_Ecc(this.url, CONTAINER_IDEMIA_IAS_ECC, this.connection, reader_id);
     };
     PluginFactory.prototype.createPIV = function (reader_id) {
         return new PIV(this.url, CONTAINER_PIV, this.connection, reader_id);

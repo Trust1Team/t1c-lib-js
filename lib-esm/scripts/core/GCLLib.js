@@ -92,8 +92,8 @@ var GCLClient = (function () {
         this.aventra = function (reader_id) {
             return _this.pluginFactory.createAventraNO(reader_id);
         };
-        this.oberthur = function (reader_id) {
-            return _this.pluginFactory.createOberthurNO(reader_id);
+        this.idemia_ias_ecc = function (reader_id) {
+            return _this.pluginFactory.createIdemia_Ias_EccNO(reader_id);
         };
         this.piv = function (reader_id) {
             return _this.pluginFactory.createPIV(reader_id);

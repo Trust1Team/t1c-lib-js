@@ -11,7 +11,7 @@ import { Mobib } from './smartcards/mobib/mobib';
 import { LuxTrust } from './smartcards/pki/luxtrust/LuxTrust';
 import { Ocra } from './smartcards/ocra/ocra';
 import { Aventra } from './smartcards/pki/aventra/Aventra';
-import { Oberthur } from './smartcards/pki/oberthur/Oberthur';
+import { Idemia_Ias_Ecc } from './smartcards/pki/idemia_ias_ecc/Idemia_Ias_Ecc';
 import { PIV } from './smartcards/piv/piv';
 import { AbstractEidBE } from './smartcards/eid/be/EidBeModel';
 import { AbstractEMV } from './smartcards/emv/EMVModel';
@@ -19,7 +19,7 @@ import { AbstractIsabel } from './smartcards/isabel/IsabelModel';
 import { AbstractOcra } from './smartcards/ocra/ocraModel';
 import { AbstractAventra } from './smartcards/pki/aventra/AventraModel';
 import { AbstractLuxTrust } from './smartcards/pki/luxtrust/LuxTrustModel';
-import { AbstractOberthur } from './smartcards/pki/oberthur/OberthurModel';
+import { AbstractIdemia_Ias_Ecc } from './smartcards/pki/idemia_ias_ecc/Idemia_Ias_EccModel';
 import { AbstractPiv } from './smartcards/piv/pivModel';
 import { AbstractMobib } from './smartcards/mobib/mobibModel';
 import {AbstractEidLUX, PinType} from './smartcards/eid/lux/EidLuxModel';
@@ -60,7 +60,7 @@ export interface AbstractFactory {
     createMobib(reader_id?: string): AbstractMobib;
     createOcra(reader_id?: string): AbstractOcra;
     createAventraNO(reader_id?: string): AbstractAventra;
-    createOberthurNO(reader_id?: string): AbstractOberthur;
+    createIdemia_Ias_EccNO(reader_id?: string): AbstractIdemia_Ias_Ecc;
     createPIV(reader_id?: string): AbstractPiv;
     createPKCS11(): AbstractPkcs11;
     createJavaKeyTool(): AbstractJavaKeyTool
@@ -81,7 +81,7 @@ const CONTAINER_LUXTRUST = CONTAINER_NEW_CONTEXT_PATH + 'luxtrust';
 const CONTAINER_MOBIB = CONTAINER_NEW_CONTEXT_PATH + 'mobib';
 const CONTAINER_OCRA = CONTAINER_NEW_CONTEXT_PATH + 'ocra';
 const CONTAINER_AVENTRA = CONTAINER_NEW_CONTEXT_PATH + 'aventra';
-const CONTAINER_OBERTHUR = CONTAINER_NEW_CONTEXT_PATH + 'oberthur';
+const CONTAINER_IDEMIA_IAS_ECC = CONTAINER_NEW_CONTEXT_PATH + 'idemia_ias_ecc';
 const CONTAINER_PIV = CONTAINER_NEW_CONTEXT_PATH + 'piv';
 const CONTAINER_PTEID = CONTAINER_NEW_CONTEXT_PATH + 'pteid';
 const CONTAINER_PKCS11 = CONTAINER_NEW_CONTEXT_PATH + 'pkcs11';
@@ -143,8 +143,8 @@ export class PluginFactory implements AbstractFactory {
         return new Aventra(this.url, CONTAINER_AVENTRA, this.connection, reader_id);
     }
 
-    public createOberthurNO(reader_id?: string): AbstractOberthur {
-        return new Oberthur(this.url, CONTAINER_OBERTHUR, this.connection, reader_id);
+    public createIdemia_Ias_EccNO(reader_id?: string): AbstractIdemia_Ias_Ecc {
+        return new Idemia_Ias_Ecc(this.url, CONTAINER_IDEMIA_IAS_ECC, this.connection, reader_id);
     }
 
     public createPIV(reader_id?: string): AbstractPiv {

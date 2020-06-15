@@ -14,13 +14,13 @@ import { PubKeyService } from '../../../../../scripts/util/PubKeyService';
  */
 
 
-describe('Oberthur Container', () => {
+describe('Idemia_Ias_Ecc Container', () => {
     let gclconfig = new GCLConfig({});
     let activecontainers = new Map<string, string[]>();
-    activecontainers.set('oberthur', ['oberthur-v2-1-1']);
+    activecontainers.set('idemia_ias_ecc', ['idemia_ias_ecc-v2-1-1']);
     gclconfig.activeContainers = activecontainers;
     const connection: LocalConnection = new LocalConnection(gclconfig);
-    const oberthur = new PluginFactory('', connection).createOberthurNO('123');
+    const idemia_ias_ecc = new PluginFactory('', connection).createIdemia_Ias_EccNO('123');
     let mock: MockAdapter;
 
     beforeEach(() => {
@@ -40,7 +40,7 @@ describe('Oberthur Container', () => {
 
     describe('verifyPin', function () {
         beforeEach(function () {
-            mock.onPost('containers/oberthur-v2-1-1/123/verify-pin').reply((config) => {
+            mock.onPost('containers/idemia_ias_ecc-v2-1-1/123/verify-pin').reply((config) => {
                 let data = JSON.parse(config.data);
                 if (data && data.private_key_reference === 'key' && data.pin && data.pin.length) {
                     return [ 200, { data: 'Verify Pin Data', success: true }];
@@ -49,7 +49,7 @@ describe('Oberthur Container', () => {
         });
 
         it('makes the correct call for activated data', () => {
-            return oberthur.verifyPin({ private_key_reference: 'key', pin: '1234' }).then(res => {
+            return idemia_ias_ecc.verifyPin({ private_key_reference: 'key', pin: '1234' }).then(res => {
                 expect(res).toHaveProperty('success');
                 expect(res.success).toEqual(true);
 
