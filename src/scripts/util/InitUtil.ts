@@ -56,6 +56,7 @@ export class InitUtil {
                     console.error('initializeLibrary - getInfoError', err);
                     // failure probably because GCL is not installed
                     client.gclInstalled = false;
+                    reject(err);
                 });
             });
             initPromise.then(() => {
