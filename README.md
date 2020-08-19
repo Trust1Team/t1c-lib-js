@@ -2,35 +2,29 @@
 # Trust1Connector JavaScript Library
 [![][t1c-logo]][Trust1Connector-url]
 
+
+## 🎊 🎊 🎊 🎉 🎉 🎉  Trust1Connector *v3* 🎉 🎉 🎉 🎊 🎊 🎊
+You can find the repository for the Trust1Connector v3 Javascript SDK via the following link:
+[Trust1Connector v3]
+
+## Trust1Connector *v2*
+
 The Trust1Connector library (T1C-Lib), is a javascript library to communicate with the Trust1Connector. The library simplifies the execution to the connector and works asynchronously.
 
 This is version 2 of the library, and is intended to be used with Trust1Connector v2+.
 
 When the Trust1Connector isn’t installed the library will return an uninitialised client which can be used to download a client installer.
 
-## Backward compatibility
-The library will detect the installed version of Trust1Connector and will only function with version 2.0.0 and higher.
-
-If you have version 1.x.x installed you have two options:
-
-  * Upgrade to version 2+ (recommended)
-  * Use an older version of the library by running:
-
 ```bash
-$ npm i trust1connector@1.8.3
+$ npm i trust1connector@2.4.3
 ```
-(currently v1.8.3 is the latest version compatible with T1C v1)
+(currently v2.4.3 is the latest version compatible with T1C v2)
+
 
 ## Community
 We're present on Gitter in the following room:
 [Trust1Connector-gitter]
 
-## Development
-To build the library locally
-```bash
-yarn build-dev
-```
-This will create a GCLLib.js in the dist folder
 
 ## Installation - OSX Only
 Make sure you have NodeJS installed on your machine. Use of Yarn is recommended but not required.
@@ -52,45 +46,15 @@ Use npm install
 $ npm install
 ```
 
-#### Run tests
-Use npm run the test suite of the project
-```bash
-$ npm run test
-```
 
 ## Release
 ### Prerequisite
-- Have gren installed and add the token to your profile (https://github.com/github-tools/github-release-notes)
-```
-npm install github-release-notes
-```
-- Have the .npmrc file
-
-### Preparation
-1. Create milestone on github with the name "Release x.y.z"
-1. Create issues with the changes assigned to the milestone and close them
-1. Create a release branch with the name "vx.y.z" with x.y.z being the version, starting from your feature branch
-1. Merge the develop branch into the release branch
-1. Increase version in package.json to x.y.z
-1. Build TypeScript and JavaScript library
-1. Finish the release branch and back-merge into develop and master
-1. Push the branches
-1. execute command "gren r -o" this will generate the changelog
-1. publish to npm
-
 ### Build and package
 To build the TypeScript and JavaScript library, compressed:
 ```bash
 $ yarn build-ts
 $ yarn build-prod
 ```
-
-### Publish to NPM
-To publish to NPM (public!), run the following NPM command:
-```
-$ npm publish
-```
-*Note*: This requires the correct .npmrc to be set. See documentation [here](https://trust1t.atlassian.net/wiki/spaces/NPAPI/pages/631242830/Publishing+to+public+NPM+registry).
 
 ## License
 
@@ -137,3 +101,4 @@ Irrespective of your choice of license, the T1T logo as depicted below may not b
 [t1t-logo]: http://imgur.com/lukAaxx.png
 [t1c-logo]: http://i.imgur.com/We0DIvj.png
 [jwt-up-doc]: https://trust1t.atlassian.net/wiki/pages/viewpage.action?pageId=74547210
+[Trust1Connector v3]: https://github.com/Trust1Team/t1c-sdk-js
